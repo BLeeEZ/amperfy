@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="SongActionSheetView" customModule="Amperfy" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pBf-ZZ-ShI">
+                    <rect key="frame" x="84" y="46" width="275" height="22"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="22" id="ecy-rE-GIC"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RaK-2T-fwR">
+                    <rect key="frame" x="84" y="70" width="275" height="16"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="16" id="MLU-MR-V3y"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="koO-Vo-Wj8" userLabel="Artwork">
+                    <rect key="frame" x="16" y="36" width="60" height="60"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="koO-Vo-Wj8" secondAttribute="height" multiplier="1:1" id="UW3-IR-tqo"/>
+                        <constraint firstAttribute="width" constant="60" id="uTn-pl-k6S"/>
+                    </constraints>
+                </imageView>
+            </subviews>
+            <constraints>
+                <constraint firstItem="koO-Vo-Wj8" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="7E2-Cp-dOL"/>
+                <constraint firstItem="RaK-2T-fwR" firstAttribute="top" secondItem="pBf-ZZ-ShI" secondAttribute="bottom" constant="2" id="CdP-pX-S16"/>
+                <constraint firstItem="pBf-ZZ-ShI" firstAttribute="leading" secondItem="koO-Vo-Wj8" secondAttribute="trailing" constant="8" id="Uye-qI-5PI"/>
+                <constraint firstItem="koO-Vo-Wj8" firstAttribute="width" secondItem="koO-Vo-Wj8" secondAttribute="height" multiplier="1:1" id="cp0-vx-noP"/>
+                <constraint firstItem="koO-Vo-Wj8" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="dyN-vY-jEV"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="pBf-ZZ-ShI" secondAttribute="trailing" constant="16" id="gWQ-xe-MHb"/>
+                <constraint firstItem="RaK-2T-fwR" firstAttribute="trailing" secondItem="pBf-ZZ-ShI" secondAttribute="trailing" id="rT2-Pk-naf"/>
+                <constraint firstItem="pBf-ZZ-ShI" firstAttribute="top" secondItem="koO-Vo-Wj8" secondAttribute="top" constant="10" id="v8i-Gx-fXV"/>
+                <constraint firstItem="RaK-2T-fwR" firstAttribute="leading" secondItem="pBf-ZZ-ShI" secondAttribute="leading" id="vvL-MA-iyh"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <connections>
+                <outlet property="artistLabel" destination="RaK-2T-fwR" id="kf6-fM-Mgn"/>
+                <outlet property="artworkImage" destination="koO-Vo-Wj8" id="dmD-Tr-cBp"/>
+                <outlet property="titleLabel" destination="pBf-ZZ-ShI" id="CBU-eU-he7"/>
+            </connections>
+            <point key="canvasLocation" x="138.40000000000001" y="126.38680659670166"/>
+        </view>
+    </objects>
+</document>

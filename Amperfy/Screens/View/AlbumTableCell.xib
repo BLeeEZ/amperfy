@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="56" id="16c-hv-7gn" customClass="AlbumTableCell" customModule="Amperfy" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="421" height="56"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="16c-hv-7gn" id="OYQ-xE-eM6">
+                <rect key="frame" x="0.0" y="0.0" width="421" height="55.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hM0-yx-hsO">
+                        <rect key="frame" x="64" y="32" width="349" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="16" id="dnN-rs-XET"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Album" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHk-4e-H8f">
+                        <rect key="frame" x="64" y="8" width="349" height="22"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="22" id="vsJ-7z-xj1"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Bfg-4d-rHy" userLabel="Artwork" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                        <rect key="frame" x="8" y="4" width="48" height="48"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="48" id="1Qy-aS-wnU"/>
+                            <constraint firstAttribute="width" secondItem="Bfg-4d-rHy" secondAttribute="height" multiplier="1:1" id="Z2i-DU-4sa"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="Bfg-4d-rHy" firstAttribute="leading" secondItem="OYQ-xE-eM6" secondAttribute="leading" constant="8" id="6lo-ue-pEa"/>
+                    <constraint firstItem="Bfg-4d-rHy" firstAttribute="top" secondItem="OYQ-xE-eM6" secondAttribute="top" constant="4" id="HOb-jD-APT"/>
+                    <constraint firstAttribute="trailing" secondItem="WHk-4e-H8f" secondAttribute="trailing" constant="8" id="RkP-Jd-aR6"/>
+                    <constraint firstItem="hM0-yx-hsO" firstAttribute="top" secondItem="WHk-4e-H8f" secondAttribute="bottom" constant="2" id="Va4-qM-Jim"/>
+                    <constraint firstItem="hM0-yx-hsO" firstAttribute="leading" secondItem="WHk-4e-H8f" secondAttribute="leading" id="YGw-dA-n5A"/>
+                    <constraint firstItem="WHk-4e-H8f" firstAttribute="leading" secondItem="Bfg-4d-rHy" secondAttribute="trailing" constant="8" id="aEU-gE-pw6"/>
+                    <constraint firstItem="hM0-yx-hsO" firstAttribute="trailing" secondItem="WHk-4e-H8f" secondAttribute="trailing" id="iXf-6M-Qpj"/>
+                    <constraint firstItem="WHk-4e-H8f" firstAttribute="top" secondItem="OYQ-xE-eM6" secondAttribute="top" constant="8" id="qLJ-MI-qeU"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="albumLabel" destination="WHk-4e-H8f" id="ohx-DI-VsD"/>
+                <outlet property="artistLabel" destination="hM0-yx-hsO" id="37o-uX-paA"/>
+                <outlet property="artworkImage" destination="Bfg-4d-rHy" id="glS-T7-ZbK"/>
+            </connections>
+            <point key="canvasLocation" x="-348" y="-367.01649175412297"/>
+        </tableViewCell>
+    </objects>
+</document>

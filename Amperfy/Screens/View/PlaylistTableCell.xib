@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="88" id="KGk-i7-Jjw" customClass="PlaylistTableCell" customModule="Amperfy" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="406" height="88"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="406" height="87.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ELd-mq-eKZ" userLabel="art1" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                        <rect key="frame" x="4" y="4" width="40" height="40"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="ELd-mq-eKZ" secondAttribute="height" multiplier="1:1" id="5oa-nm-y2p"/>
+                            <constraint firstAttribute="width" constant="40" id="aoa-NM-Y3N"/>
+                        </constraints>
+                    </imageView>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="CoM-cP-AFY" userLabel="art2" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                        <rect key="frame" x="44" y="4" width="40" height="40"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="CoM-cP-AFY" secondAttribute="height" multiplier="1:1" id="L6h-13-zPV"/>
+                        </constraints>
+                    </imageView>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="6p5-nV-8sB" userLabel="art3" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                        <rect key="frame" x="4" y="44" width="40" height="40"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="6p5-nV-8sB" secondAttribute="height" multiplier="1:1" id="7Ol-0z-gpN"/>
+                        </constraints>
+                    </imageView>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZzK-67-ki6" userLabel="art4" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                        <rect key="frame" x="44" y="44" width="40" height="40"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="ZzK-67-ki6" secondAttribute="height" multiplier="1:1" id="3eh-gR-qpG"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Playlist name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MMM-Yr-IkZ">
+                        <rect key="frame" x="92" y="34" width="306" height="20.5"/>
+                        <constraints>
+                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="20" id="MBe-4a-Yhx"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="ZzK-67-ki6" firstAttribute="centerY" secondItem="6p5-nV-8sB" secondAttribute="centerY" id="3aD-vZ-czi"/>
+                    <constraint firstAttribute="trailing" secondItem="MMM-Yr-IkZ" secondAttribute="trailing" constant="8" id="BCU-yV-uoh"/>
+                    <constraint firstItem="ELd-mq-eKZ" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="4" id="HTA-F6-yEf"/>
+                    <constraint firstItem="6p5-nV-8sB" firstAttribute="centerX" secondItem="ELd-mq-eKZ" secondAttribute="centerX" id="KuZ-l5-GnN"/>
+                    <constraint firstItem="6p5-nV-8sB" firstAttribute="width" secondItem="ELd-mq-eKZ" secondAttribute="width" id="LgQ-bI-CBq"/>
+                    <constraint firstItem="MMM-Yr-IkZ" firstAttribute="leading" secondItem="CoM-cP-AFY" secondAttribute="trailing" constant="8" id="O26-dg-Eda"/>
+                    <constraint firstItem="6p5-nV-8sB" firstAttribute="top" secondItem="ELd-mq-eKZ" secondAttribute="bottom" id="TYo-T8-do2"/>
+                    <constraint firstItem="CoM-cP-AFY" firstAttribute="centerY" secondItem="ELd-mq-eKZ" secondAttribute="centerY" id="Vcj-Hf-D6k"/>
+                    <constraint firstItem="CoM-cP-AFY" firstAttribute="leading" secondItem="ELd-mq-eKZ" secondAttribute="trailing" id="ggD-P4-QG4"/>
+                    <constraint firstItem="MMM-Yr-IkZ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="34" id="qAm-0j-PKg"/>
+                    <constraint firstItem="ELd-mq-eKZ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="4" id="qHf-C1-rnP"/>
+                    <constraint firstItem="ZzK-67-ki6" firstAttribute="width" secondItem="ELd-mq-eKZ" secondAttribute="width" id="tn1-uD-Ayt"/>
+                    <constraint firstItem="CoM-cP-AFY" firstAttribute="width" secondItem="ELd-mq-eKZ" secondAttribute="width" id="wA4-yT-rxI"/>
+                    <constraint firstItem="ZzK-67-ki6" firstAttribute="centerX" secondItem="CoM-cP-AFY" secondAttribute="centerX" id="zdK-wW-rE1"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="art1Image" destination="ELd-mq-eKZ" id="PNP-l5-ZEQ"/>
+                <outlet property="art2Image" destination="CoM-cP-AFY" id="scL-L8-2bL"/>
+                <outlet property="art3Image" destination="6p5-nV-8sB" id="4c5-nX-CuM"/>
+                <outlet property="art4Image" destination="ZzK-67-ki6" id="L6C-WJ-2yn"/>
+                <outlet property="nameLabel" destination="MMM-Yr-IkZ" id="isL-UW-3LQ"/>
+            </connections>
+            <point key="canvasLocation" x="-88" y="81.859070464767626"/>
+        </tableViewCell>
+    </objects>
+</document>
