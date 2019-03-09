@@ -1,8 +1,8 @@
-# ![Logo](https://github.com/BLeeEZ/amperfy/blob/master/Amperfy/Assets.xcassets/AppIcon.appiconset/Icon-120.png) Amperfy
+# ![Logo](https://github.com/BLeeEZ/amperfy/blob/master/Amperfy/Assets.xcassets/AppIcon.appiconset/Icon-40.png) Amperfy
 
 ## Basics
 
-Amperfy is a iOs app written in Swift to interact with an [ampache](http://ampache.github.io) instance.
+Amperfy is an iOs app written in Swift to interact with an [ampache](http://ampache.github.io) instance.
 
 ## Features
 
