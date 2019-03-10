@@ -34,7 +34,7 @@
                     <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="koO-Vo-Wj8" userLabel="Artwork">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="koO-Vo-Wj8" userLabel="Artwork" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="16" y="36" width="60" height="60"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="koO-Vo-Wj8" secondAttribute="height" multiplier="1:1" id="UW3-IR-tqo"/>
