@@ -4,6 +4,9 @@
 
 Amperfy is an iOs app written in Swift to interact with an [ampache](http://ampache.github.io) instance.
 
+<img src=".github/Screenshots/Artists.png" width="250" alt="Screenshot of the Amperfy artists" /> &nbsp;
+<img src=".github/Screenshots/Player.png" width="250" alt="Screenshot of the Amperfy player" />
+
 ## Features
 
 - Offline support
