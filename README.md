@@ -38,6 +38,7 @@ Amperfy is an iOs app written in Swift to interact with an [ampache](http://ampa
 Acknowledgements
 ----------------
 [LNPopupController](https://github.com/LeoNatan/LNPopupController) by LeoNatan
+
 [Font Awesome](https://fontawesome.com/)
 
 **License:** [GPLv3](https://github.com/BLeeEZ/Amperfy/blob/master/LICENSE)
