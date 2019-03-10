@@ -16,7 +16,7 @@ class NextSongsVC: UITableViewController {
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
 
-        optionsButton = UIBarButtonItem(title: "...", style: .plain, target: self, action: #selector(optionsPressed))
+        optionsButton = OptionsBarButtonItem(target: self, action: #selector(optionsPressed))
         navigationItem.rightBarButtonItem = optionsButton
     }
     
