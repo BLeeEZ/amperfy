@@ -16,7 +16,7 @@ Amperfy is an iOs app written in Swift to interact with an [ampache](http://ampa
 
 ## Requirements
 
-* XCode 10, swift 4.
+* XCode 10, swift 4.2
 
 ## Getting Started
 
@@ -31,8 +31,7 @@ Amperfy is an iOs app written in Swift to interact with an [ampache](http://ampa
   git submodule update --init --recursive
   ```
 
-3. Open the `Amperfy.xcworkspace` file.
-> If you open the `.xcodeproj` instead, the project will not be able to find its dependencies.
+3. Open the `Amperfy.xcodeproj` file.
 
 4. Build and run the "Amperfy" scheme
 
