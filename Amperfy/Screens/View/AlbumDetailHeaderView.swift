@@ -1,11 +1,3 @@
-//
-//  LibraryElementDetailTableHeaderView.swift
-//  Amperfy
-//
-//  Created by Maximilian Bauer on 15.01.19.
-//  Copyright © 2019 Maximilian Bauer. All rights reserved.
-//
-
 import UIKit
 
 class LibraryElementDetailTableHeaderView: UIView {
