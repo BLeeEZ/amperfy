@@ -3,7 +3,7 @@ import UIKit
 import CoreData
 import os.log
 
-class AlbumParserDelegate: AmpacheLibParser {
+class AlbumParserDelegate: GenericXmlLibParser {
     
     var albumBuffer: Album?
     

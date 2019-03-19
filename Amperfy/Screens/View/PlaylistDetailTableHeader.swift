@@ -81,7 +81,6 @@ class PlaylistDetailTableHeader: UIView {
     }
 
     func createAlert(forPlaylist playlist: Playlist, statusNotifyier: PlaylistSyncCallbacks) -> UIAlertController {
-        let ampacheApi = appDelegate.ampacheApi
         let storage = appDelegate.storage
         let alert = UIAlertController(title: playlist.name, message: nil, preferredStyle: .actionSheet)
         
@@ -89,7 +88,7 @@ class PlaylistDetailTableHeader: UIView {
             alert.addAction(UIAlertAction(title: "Download from server", style: .default, handler: { _ in
                 storage.persistentContainer.performBackgroundTask() { (context) in
                     let backgroundStorage = LibraryStorage(context: context)
-                    let syncer = LibrarySyncer(ampacheApi: ampacheApi)
+                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
                     guard let playlistAsync = backgroundStorage.getPlaylist(id: playlist.id) else { return }
                     syncer.syncDown(playlist: playlistAsync, libraryStorage: backgroundStorage, statusNotifyier: statusNotifyier)
                 }
@@ -98,7 +97,7 @@ class PlaylistDetailTableHeader: UIView {
         alert.addAction(UIAlertAction(title: "Upload to server", style: .default, handler: { _ in
             storage.persistentContainer.performBackgroundTask() { (context) in
                 let backgroundStorage = LibraryStorage(context: context)
-                let syncer = LibrarySyncer(ampacheApi: ampacheApi)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
                 guard let playlistAsync = backgroundStorage.getPlaylist(id: playlist.id) else { return }
                 syncer.syncUpload(playlist: playlistAsync, libraryStorage: backgroundStorage, statusNotifyier: statusNotifyier)
             }

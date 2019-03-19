@@ -63,7 +63,7 @@ class PlaylistsVC: UITableViewController {
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let syncer = LibrarySyncer(ampacheApi: self.appDelegate.ampacheApi)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
             let storage = LibraryStorage(context: context)
             syncer.syncDownPlaylistsWithoutSongs(libraryStorage: storage)
             

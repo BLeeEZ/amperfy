@@ -5,7 +5,7 @@ class BackgroundSyncer {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "backgroundSyncer")
     private let storage : PersistentStorage
-    private let ampacheApi: AmpacheApi
+    private let backendApi: BackendApi
     private let artworkSyncer: ArtworkSyncer
     private let libSyncer: LibrarySyncer
     private let semaphore = DispatchSemaphore(value: 1)
@@ -14,11 +14,11 @@ class BackgroundSyncer {
         return artworkSyncer.isActive || libSyncer.isActive
     }
 
-    init(storage: PersistentStorage, ampacheApi: AmpacheApi) {
+    init(storage: PersistentStorage, backendApi: BackendApi) {
         self.storage = storage
-        self.ampacheApi = ampacheApi
-        self.artworkSyncer = ArtworkSyncer(ampacheApi: self.ampacheApi)
-        self.libSyncer = LibrarySyncer(ampacheApi: self.ampacheApi)
+        self.backendApi = backendApi
+        self.artworkSyncer = ArtworkSyncer(backendApi: backendApi)
+        self.libSyncer = backendApi.createLibrarySyncer()
     }
     
     func start() {

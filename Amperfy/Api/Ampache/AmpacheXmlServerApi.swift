@@ -6,16 +6,33 @@ protocol AmpacheUrlCreationable {
     func getArtUrlString(forArtistId: Int32) -> String
 }
 
-class AmpacheApi {
+class AmpacheXmlServerApi {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "ampache")
     private var credentials: LoginCredentials?
     private var authHandshake: AuthentificationHandshake?
     static let maxItemCountToPollAtOnce: Int = 500
     
-    var objectsToParseCount: Int? {
+    var artistCount: Int {
         reauthenticateIfNeccessary()
-        return authHandshake?.objectsToParseCount
+        return authHandshake?.artistCount ?? 0
+    }
+    var albumCount: Int {
+        reauthenticateIfNeccessary()
+        return authHandshake?.albumCount ?? 0
+    }
+    var songCount: Int {
+        reauthenticateIfNeccessary()
+        return authHandshake?.songCount ?? 0
+    }
+
+    var defaultArtworkUrl: String {
+        var url = ""
+        reauthenticateIfNeccessary()
+        if let hostname = credentials?.serverUrl, let auth = authHandshake {
+            url = "\(hostname)/image.php?object_id=0&object_type=album&auth=\(auth.token)"
+        }
+        return url
     }
 
     func isAuthenticated() -> Bool {
@@ -29,23 +46,11 @@ class AmpacheApi {
         return true
     }
     
-    func sha256(dataString : String) -> String {
-        let data = dataString.data(using: String.Encoding.ascii)! as NSData
-        var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
-        CC_SHA256(data.bytes, CC_LONG(data.length), &hash)
-        
-        let resstr = NSMutableString()
-        for byte in hash {
-            resstr.appendFormat("%02hhx", byte)
-        }
-        return resstr as String
-    }
-    
-    func generatePassphrase(passwordHash: String, timestamp: Int) -> String {
+    private func generatePassphrase(passwordHash: String, timestamp: Int) -> String {
         // Ampache passphrase: sha256(unixtime + sha256(password)) where '+' denotes concatenation
         // Concatenate timestamp and password hash
         let dataStr = "\(timestamp)\(passwordHash)"
-        let passphrase = sha256(dataString: dataStr)
+        let passphrase = Hasher.sha256(dataString: dataStr)
         return passphrase
     }
     
@@ -77,7 +82,7 @@ class AmpacheApi {
         }
     }
     
-    func reauthenticateIfNeccessary() {
+    private func reauthenticateIfNeccessary() {
         if !isAuthenticated() {
             if let cred = credentials {
                 authenticate(credentials: cred)
@@ -88,9 +93,9 @@ class AmpacheApi {
     func requestArtists(parserDelegate: XMLParserDelegate) {
         reauthenticateIfNeccessary()
         if let auth = authHandshake {
-            let pollCount = (auth.artistCount / AmpacheApi.maxItemCountToPollAtOnce)
+            let pollCount = (auth.artistCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
             for i in 0...pollCount {
-                requestArtists(parserDelegate: parserDelegate, startIndex: i*AmpacheApi.maxItemCountToPollAtOnce, pollCount: AmpacheApi.maxItemCountToPollAtOnce)
+                requestArtists(parserDelegate: parserDelegate, startIndex: i*AmpacheXmlServerApi.maxItemCountToPollAtOnce, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
             }
         }
     }
@@ -114,9 +119,9 @@ class AmpacheApi {
     func requestAlbums(parserDelegate: XMLParserDelegate) {
         reauthenticateIfNeccessary()
         if let auth = authHandshake {
-            let pollCount = (auth.albumCount / AmpacheApi.maxItemCountToPollAtOnce)
+            let pollCount = (auth.albumCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
             for i in 0...pollCount {
-                requestAlbums(parserDelegate: parserDelegate, startIndex: i*AmpacheApi.maxItemCountToPollAtOnce, pollCount: AmpacheApi.maxItemCountToPollAtOnce)
+                requestAlbums(parserDelegate: parserDelegate, startIndex: i*AmpacheXmlServerApi.maxItemCountToPollAtOnce, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
             }
         }
     }
@@ -140,9 +145,9 @@ class AmpacheApi {
     func requestSongs(parserDelegate: XMLParserDelegate) {
         reauthenticateIfNeccessary()
         if let auth = authHandshake {
-            let pollCount = (auth.songCount / AmpacheApi.maxItemCountToPollAtOnce)
+            let pollCount = (auth.songCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
             for i in 0...pollCount {
-                requestSongs(parserDelegate: parserDelegate, startIndex: i*AmpacheApi.maxItemCountToPollAtOnce, pollCount: AmpacheApi.maxItemCountToPollAtOnce)
+                requestSongs(parserDelegate: parserDelegate, startIndex: i*AmpacheXmlServerApi.maxItemCountToPollAtOnce, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
             }
         }
     }
@@ -244,15 +249,6 @@ class AmpacheApi {
         return authHandshake
     }
     
-    var defaultArtworkUrl: String {
-        var url = ""
-        reauthenticateIfNeccessary()
-        if let hostname = credentials?.serverUrl, let auth = authHandshake {
-            url = "\(hostname)/image.php?object_id=0&object_type=album&auth=\(auth.token)"
-        }
-        return url
-    }
-    
     func updateUrlToken(url: inout String) {
         reauthenticateIfNeccessary()
         if let auth = authHandshake {
@@ -273,7 +269,7 @@ class AmpacheApi {
     }
 }
 
-extension AmpacheApi: AmpacheUrlCreationable {
+extension AmpacheXmlServerApi: AmpacheUrlCreationable {
     func getArtUrlString(forArtistId id: Int32) -> String {
         guard let hostname = credentials?.serverUrl else { return "" }
         let token = authHandshake?.token ?? "aaaa"

@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 import CoreData
 
-class ArtistParserDelegate: AmpacheLibParser {
+class ArtistParserDelegate: GenericXmlLibParser {
 
     var artistBuffer: Artist?
     var ampacheUrlCreator: AmpacheUrlCreationable

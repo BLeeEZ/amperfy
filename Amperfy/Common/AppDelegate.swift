@@ -4,7 +4,7 @@ import MediaPlayer
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    static let name = "familie-zimba.Amperfy"
+    static let name = "Amperfy"
     var window: UIWindow?
 
     lazy var storage = {
@@ -13,8 +13,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var persistentLibraryStorage = {
         return LibraryStorage(context: storage.context)
     }()
-    lazy var ampacheApi = {
-        return AmpacheApi()
+    lazy var backendApi: BackendApi = {
+        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi())
     }()
     lazy var library = {
         return Library(storage: persistentLibraryStorage)
@@ -24,14 +24,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }()
     lazy var downloadManager: DownloadManager = {
         let requestManager = RequestManager()
-        let dlDelegate = DownloadDelegate(ampacheApi: ampacheApi)
+        let dlDelegate = DownloadDelegate(backendApi: backendApi)
         let urlDownloader = UrlDownloader(requestManager: requestManager)
         let dlManager = DownloadManager(storage: storage, requestManager: requestManager, urlDownloader: urlDownloader, downloadDelegate: dlDelegate)
         urlDownloader.urlDownloadNotifier = dlManager
         return dlManager
     }()
     lazy var backgroundSyncer = {
-        return BackgroundSyncer(storage: storage, ampacheApi: ampacheApi)
+        return BackgroundSyncer(storage: storage, backendApi: backendApi)
     }()
 
     func reinit() {
@@ -60,7 +60,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.window?.makeKeyAndVisible()
             return true
         }
-        ampacheApi.provideCredentials(credentials: credentials)
+        backendApi.provideCredentials(credentials: credentials)
         
         guard storage.isAmpacheSynced() else {
             let initialViewController = SyncVC.instantiateFromAppStoryboard()
@@ -84,6 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        guard storage.getLoginCredentials() != nil, storage.isAmpacheSynced() else { return }
         backgroundSyncer.stop()
     }
 

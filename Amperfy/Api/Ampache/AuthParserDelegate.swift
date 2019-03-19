@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 import CoreData
 
-class AuthParserDelegate: AmpacheParser {
+class AuthParserDelegate: GenericXmlParser {
     
     var authHandshake: AuthentificationHandshake?
     private var authBuffer = AuthentificationHandshake()

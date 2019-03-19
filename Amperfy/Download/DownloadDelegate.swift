@@ -3,10 +3,10 @@ import CoreData
 
 class DownloadDelegate: DownloadManagerDelegate {
 
-    private let ampacheApi: AmpacheApi
+    private let backendApi: BackendApi
 
-    init(ampacheApi: AmpacheApi) {
-        self.ampacheApi = ampacheApi
+    init(backendApi: BackendApi) {
+        self.backendApi = backendApi
     }
 
     func prepareDownload(forRequest request: DownloadRequest<Song>, context: NSManagedObjectContext) throws -> URL {
@@ -26,7 +26,7 @@ class DownloadDelegate: DownloadManagerDelegate {
             throw DownloadError.noConnectivity
         }
         
-        ampacheApi.updateUrlToken(url: &urlString)
+        backendApi.updateUrlToken(url: &urlString)
         guard let url = URL(string: urlString) else {
             throw DownloadError.urlInvalid
         }

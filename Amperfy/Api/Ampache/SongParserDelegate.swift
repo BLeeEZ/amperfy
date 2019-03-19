@@ -3,7 +3,7 @@ import UIKit
 import CoreData
 import os.log
 
-class SongParserDelegate: AmpacheLibParser {
+class SongParserDelegate: GenericXmlLibParser {
 
     var songBuffer: Song?
     

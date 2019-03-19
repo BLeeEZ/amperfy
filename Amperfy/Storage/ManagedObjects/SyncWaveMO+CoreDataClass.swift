@@ -45,10 +45,10 @@ public class SyncWaveMO: NSManagedObject {
         return temp
     }
 
-    func setMetaData(fromAuth: AuthentificationHandshake) {
-        dateOfLastUpdate = fromAuth.libraryChangeDates.dateOfLastUpdate as NSDate
-        dateOfLastAdd = fromAuth.libraryChangeDates.dateOfLastAdd as NSDate
-        dateOfLastClean = fromAuth.libraryChangeDates.dateOfLastClean as NSDate
+    func setMetaData(fromLibraryChangeDates: LibraryChangeDates) {
+        dateOfLastUpdate = fromLibraryChangeDates.dateOfLastUpdate as NSDate
+        dateOfLastAdd = fromLibraryChangeDates.dateOfLastAdd as NSDate
+        dateOfLastClean = fromLibraryChangeDates.dateOfLastClean as NSDate
     }
     
     var songs: [Song] {

@@ -7,7 +7,7 @@ struct AmpacheXmlError {
     var message: String = ""
 }
 
-class ErrorParserDelegate: AmpacheParser {
+class ErrorParserDelegate: GenericXmlParser {
     
     var error: AmpacheXmlError? = nil
     

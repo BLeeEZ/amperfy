@@ -3,7 +3,7 @@ import UIKit
 import CoreData
 import os.log
 
-class PlaylistParserDelegate: AmpacheParser {
+class PlaylistParserDelegate: GenericXmlParser {
     
     var playlist: Playlist?
     var libraryStorage: LibraryStorage

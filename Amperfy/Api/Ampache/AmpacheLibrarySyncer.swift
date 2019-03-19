@@ -2,64 +2,51 @@ import Foundation
 import CoreData
 import os.log
 
-protocol ParsedObjectNotifiable {
-    func notifyParsedObject()
-}
-
-protocol SyncCallbacks: ParsedObjectNotifiable {
-    func notifyArtistSyncStarted()
-    func notifyAlbumsSyncStarted()
-    func notifySongsSyncStarted()
-    func notifyPlaylistSyncStarted()
-    func notifyPlaylistCount(playlistCount: Int)
-    func notifySyncFinished()
-}
-
-protocol PlaylistSyncCallbacks {
-    func notifyPlaylistWillCleared()
-    func notifyPlaylistSyncFinished(playlist: Playlist)
-    func notifyPlaylistUploadFinished(success: Bool)
-}
-
-class LibrarySyncer {
+class AmpacheLibrarySyncer: GenericLibrarySyncer, LibrarySyncer {
     
-    private let log = OSLog(subsystem: AppDelegate.name, category: "librarySyncer")
-    var ampacheApi: AmpacheApi
-    private let semaphoreGroup = DispatchGroup()
-    private var isRunning = false
-    public private(set) var isActive = false
+    private let ampacheXmlServerApi: AmpacheXmlServerApi
     
-    init(ampacheApi: AmpacheApi) {
-        self.ampacheApi = ampacheApi
+    var artistCount: Int {
+        return ampacheXmlServerApi.artistCount
+    }
+    var albumCount: Int {
+        return ampacheXmlServerApi.albumCount
+    }
+    var songCount: Int {
+        return ampacheXmlServerApi.songCount
+    }
+    
+    init(ampacheXmlServerApi: AmpacheXmlServerApi) {
+        self.ampacheXmlServerApi = ampacheXmlServerApi
     }
     
     func sync(libraryStorage: LibraryStorage, statusNotifyier: SyncCallbacks? = nil) {
-        if let libMetaData = ampacheApi.requesetLibraryMetaData() {
+        if let libMetaData = ampacheXmlServerApi.requesetLibraryMetaData() {
             let syncWave = libraryStorage.createSyncWave()
-            syncWave.setMetaData(fromAuth: libMetaData)
+            syncWave.setMetaData(fromLibraryChangeDates: libMetaData.libraryChangeDates)
 
             statusNotifyier?.notifyArtistSyncStarted()
-            let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, ampacheUrlCreator: ampacheApi, parseNotifier: statusNotifyier)
-            ampacheApi.requestArtists(parserDelegate: artistParser)
+            let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, ampacheUrlCreator: ampacheXmlServerApi, parseNotifier: statusNotifyier)
+            ampacheXmlServerApi.requestArtists(parserDelegate: artistParser)
             addInstForUnknownArtitst(libraryStorage: libraryStorage)
             
             statusNotifyier?.notifyAlbumsSyncStarted()
             let albumDelegate = AlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: statusNotifyier)
-            ampacheApi.requestAlbums(parserDelegate: albumDelegate)
+            ampacheXmlServerApi.requestAlbums(parserDelegate: albumDelegate)
             
             statusNotifyier?.notifySongsSyncStarted()
             let songParser = SongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: statusNotifyier)
-            ampacheApi.requestSongs(parserDelegate: songParser)
+            ampacheXmlServerApi.requestSongs(parserDelegate: songParser)
             
             statusNotifyier?.notifyPlaylistSyncStarted()
             let playlistParser = PlaylistParserDelegate(libraryStorage: libraryStorage)
-            ampacheApi.requestPlaylists(parserDelegate: playlistParser)
+            ampacheXmlServerApi.requestPlaylists(parserDelegate: playlistParser)
             statusNotifyier?.notifyPlaylistCount(playlistCount: libraryStorage.getPlaylists().count)
             // Request the songs in all playlists
             for playlist in libraryStorage.getPlaylists() {
                 playlist.removeAllSongs()
                 let parser = PlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
-                ampacheApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
+                ampacheXmlServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
                 statusNotifyier?.notifyParsedObject()
             }
         
@@ -77,7 +64,7 @@ class LibrarySyncer {
     
     func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage) {
         let playlistParser = PlaylistParserDelegate(libraryStorage: libraryStorage)
-        ampacheApi.requestPlaylists(parserDelegate: playlistParser)
+        ampacheXmlServerApi.requestPlaylists(parserDelegate: playlistParser)
         libraryStorage.saveContext()
     }
     
@@ -91,7 +78,7 @@ class LibrarySyncer {
         statusNotifyier?.notifyPlaylistWillCleared()
         playlist.removeAllSongs()
         let parser = PlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
-        ampacheApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
+        ampacheXmlServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
         libraryStorage.saveContext()
         statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist)
     }
@@ -103,22 +90,22 @@ class LibrarySyncer {
             os_log("Create playlist on server", log: log, type: .info)
             let playlistParser = PlaylistParserDelegate(libraryStorage: libraryStorage)
             playlistParser.playlist = playlist
-            ampacheApi.requestPlaylistCreate(parserDelegate: playlistParser, playlist: playlist)
+            ampacheXmlServerApi.requestPlaylistCreate(parserDelegate: playlistParser, playlist: playlist)
         }
         
         os_log("Request playlist songs from remote for following clear request", log: log, type: .info)
         let playlistForRemoteClear = libraryStorage.createPlaylist()
         let parser = PlaylistSongsParserDelegate(playlist: playlistForRemoteClear, libraryStorage: libraryStorage)
-        ampacheApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
+        ampacheXmlServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
         os_log("Clear remote playlist songs", log: log, type: .info)
         for entry in playlistForRemoteClear.entries {
-            ampacheApi.requestPlaylist(removeSongIndex: entry.order, fromPlaylistId: playlist.id)
+            ampacheXmlServerApi.requestPlaylist(removeSongIndex: entry.order, fromPlaylistId: playlist.id)
         }
         libraryStorage.deletePlaylist(playlistForRemoteClear)
         
         os_log("Uploading playlist songs", log: log, type: .info)
         for song in playlist.songs {
-            ampacheApi.requestPlaylist(addSongId: song.id, toPlaylistId: playlist.id)
+            ampacheXmlServerApi.requestPlaylist(addSongId: song.id, toPlaylistId: playlist.id)
         }
         statusNotifyier?.notifyPlaylistUploadFinished(success: true)
     }
@@ -126,7 +113,7 @@ class LibrarySyncer {
     private func validatePlaylistId(playlist: Playlist, libraryStorage: LibraryStorage) {
         let playlistParser = PlaylistParserDelegate(libraryStorage: libraryStorage)
         playlistParser.playlist = playlist
-        ampacheApi.requestPlaylist(parserDelegate: playlistParser, id: playlist.id)
+        ampacheXmlServerApi.requestPlaylist(parserDelegate: playlistParser, id: playlist.id)
     }
     
     func syncInBackground(libraryStorage: LibraryStorage) {
@@ -137,11 +124,11 @@ class LibrarySyncer {
             os_log("Lib resync: Continue last resync", log: log, type: .info)
             resync(libraryStorage: libraryStorage, syncWave: latestSyncWave, previousAddDate: latestSyncWave.libraryChangeDates.dateOfLastAdd)
         } else if let latestSyncWave = libraryStorage.getLatestSyncWave(),
-        let ampacheMetaData = ampacheApi.requesetLibraryMetaData(),
+        let ampacheMetaData = ampacheXmlServerApi.requesetLibraryMetaData(),
         latestSyncWave.libraryChangeDates.dateOfLastAdd != ampacheMetaData.libraryChangeDates.dateOfLastAdd {
             os_log("Lib resync: New changes on server", log: log, type: .info)
             let syncWave = libraryStorage.createSyncWave()
-            syncWave.setMetaData(fromAuth: ampacheMetaData)
+            syncWave.setMetaData(fromLibraryChangeDates: ampacheMetaData.libraryChangeDates)
             libraryStorage.saveContext()
             resync(libraryStorage: libraryStorage, syncWave: syncWave, previousAddDate: latestSyncWave.libraryChangeDates.dateOfLastAdd)
         } else {
@@ -158,8 +145,8 @@ class LibrarySyncer {
         if syncWave.syncState == .Artists, isRunning {
             var allParsed = false
             repeat {
-                let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, ampacheUrlCreator: ampacheApi)
-                ampacheApi.requestArtists(parserDelegate: artistParser, addDate: addDate, startIndex: syncWave.syncIndexToContinue, pollCount: AmpacheApi.maxItemCountToPollAtOnce)
+                let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, ampacheUrlCreator: ampacheXmlServerApi)
+                ampacheXmlServerApi.requestArtists(parserDelegate: artistParser, addDate: addDate, startIndex: syncWave.syncIndexToContinue, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                 syncWave.syncIndexToContinue += artistParser.parsedCount
                 allParsed = artistParser.parsedCount == 0
             } while(!allParsed && isRunning)
@@ -174,7 +161,7 @@ class LibrarySyncer {
             var allParsed = false
             repeat {
                 let albumParser = AlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave)
-                ampacheApi.requestAlbums(parserDelegate: albumParser, addDate: addDate, startIndex: syncWave.syncIndexToContinue, pollCount: AmpacheApi.maxItemCountToPollAtOnce)
+                ampacheXmlServerApi.requestAlbums(parserDelegate: albumParser, addDate: addDate, startIndex: syncWave.syncIndexToContinue, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                 syncWave.syncIndexToContinue += albumParser.parsedCount
                 allParsed = albumParser.parsedCount == 0
             } while(!allParsed && isRunning)
@@ -189,7 +176,7 @@ class LibrarySyncer {
             var allParsed = false
             repeat {
                 let songParser = SongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave)
-                ampacheApi.requestSongs(parserDelegate: songParser, addDate: addDate, startIndex: syncWave.syncIndexToContinue, pollCount: AmpacheApi.maxItemCountToPollAtOnce)
+                ampacheXmlServerApi.requestSongs(parserDelegate: songParser, addDate: addDate, startIndex: syncWave.syncIndexToContinue, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                 syncWave.syncIndexToContinue += songParser.parsedCount
                 allParsed = songParser.parsedCount == 0
             } while(!allParsed && isRunning)
@@ -200,15 +187,6 @@ class LibrarySyncer {
             }
             libraryStorage.saveContext()
         }
-    }
-    
-    func stop() {
-        isRunning = false
-    }
-
-    func stopAndWait() {
-        stop()
-        semaphoreGroup.wait()
     }
 
 }

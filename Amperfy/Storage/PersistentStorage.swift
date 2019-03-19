@@ -16,7 +16,7 @@ class PersistentStorage {
     func saveLoginCredentials(credentials: LoginCredentials) {
         UserDefaults.standard.set(credentials.serverUrl, forKey: UserDefaultsKey.ServerUrl.rawValue)
         UserDefaults.standard.set(credentials.username, forKey: UserDefaultsKey.Username.rawValue)
-        UserDefaults.standard.set(credentials.passwordHash, forKey: UserDefaultsKey.PasswordHash.rawValue)
+        UserDefaults.standard.set(credentials.password, forKey: UserDefaultsKey.PasswordHash.rawValue)
     }
     
     func deleteLoginCredentials() {
@@ -26,14 +26,10 @@ class PersistentStorage {
     }
 
     func getLoginCredentials() -> LoginCredentials? {
-        let credentials = LoginCredentials()
         if  let serverUrl = UserDefaults.standard.object(forKey: UserDefaultsKey.ServerUrl.rawValue) as? String,
             let username = UserDefaults.standard.object(forKey: UserDefaultsKey.Username.rawValue) as? String,
             let passwordHash = UserDefaults.standard.object(forKey: UserDefaultsKey.PasswordHash.rawValue) as? String {
-                credentials.serverUrl = serverUrl
-                credentials.username = username
-                credentials.passwordHash = passwordHash
-                return credentials
+                return LoginCredentials(serverUrl: serverUrl, username: username, password: passwordHash)
         } 
         return nil
     }

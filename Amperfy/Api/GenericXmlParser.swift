@@ -1,7 +1,7 @@
 import Foundation
 import os.log
 
-class AmpacheParser: NSObject, XMLParserDelegate {
+class GenericXmlParser: NSObject, XMLParserDelegate {
     
     let log = OSLog(subsystem: AppDelegate.name, category: "parser")
     var buffer = ""
@@ -16,7 +16,7 @@ class AmpacheParser: NSObject, XMLParserDelegate {
     
 }
 
-class AmpacheLibParser: AmpacheParser {
+class GenericXmlLibParser: GenericXmlParser {
     
     var parsedCount = 0
     var libraryStorage: LibraryStorage

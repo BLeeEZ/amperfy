@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 import CoreData
 
-class PlaylistSongsParserDelegate: AmpacheParser {
+class PlaylistSongsParserDelegate: GenericXmlParser {
 
     let playlist: Playlist
     let libraryStorage: LibraryStorage

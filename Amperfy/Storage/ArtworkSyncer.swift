@@ -5,14 +5,14 @@ import os.log
 class ArtworkSyncer {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "artworkSyncer")
-    private let ampacheApi: AmpacheApi
+    private let backendApi: BackendApi
     private let semaphoreGroup = DispatchGroup()
     private var imageDefaultData: Data?
     private var isRunning = false
     public private(set) var isActive = false
     
-    init(ampacheApi: AmpacheApi) {
-        self.ampacheApi = ampacheApi
+    init(backendApi: BackendApi) {
+        self.backendApi = backendApi
     }
     
     func stop() {
@@ -28,7 +28,7 @@ class ArtworkSyncer {
         isRunning = true
         semaphoreGroup.enter()
         isActive = true
-        imageDefaultData = fetchImageData(urlString: ampacheApi.defaultArtworkUrl)
+        imageDefaultData = fetchImageData(urlString: backendApi.defaultArtworkUrl)
         guard imageDefaultData != nil else {
             os_log("Failed to fetch default image", log: log, type: .error)
             isActive = false
@@ -54,7 +54,7 @@ class ArtworkSyncer {
     
     private func fetchImageData(urlString: String) -> Data? {
         var updatedUrl = urlString
-        ampacheApi.updateUrlToken(url: &updatedUrl)
+        backendApi.updateUrlToken(url: &updatedUrl)
         return Data.fetch(fromUrlString: updatedUrl)
     }
     

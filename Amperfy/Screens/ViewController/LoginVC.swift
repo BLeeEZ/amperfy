@@ -3,7 +3,7 @@ import UIKit
 class LoginVC: UIViewController {
 
     var appDelegate: AppDelegate!
-    var ampacheApi: AmpacheApi!
+    var backendApi: BackendApi!
     
     @IBOutlet weak var serverUrlTF: UITextField!
     @IBOutlet weak var usernameTF: UITextField!
@@ -23,10 +23,9 @@ class LoginVC: UIViewController {
             return
         }
 
-        let passwordHash = ampacheApi.sha256(dataString: password)
-        let credentials = LoginCredentials(serverUrl: serverUrl, username: username, passwordHash: passwordHash)
-        ampacheApi.authenticate(credentials: credentials)
-        if ampacheApi.isAuthenticated() {
+        let credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
+        backendApi.authenticate(credentials: credentials)
+        if backendApi.isAuthenticated() {
             appDelegate.storage.saveLoginCredentials(credentials: credentials)
             performSegue(withIdentifier: "toSync", sender: self)
         } else {
@@ -43,7 +42,7 @@ class LoginVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        ampacheApi = appDelegate.ampacheApi
+        backendApi = appDelegate.backendApi
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -52,4 +51,5 @@ class LoginVC: UIViewController {
             usernameTF.text = credentials.username
         }
     }
+
 }

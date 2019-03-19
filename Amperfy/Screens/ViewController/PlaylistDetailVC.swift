@@ -97,7 +97,7 @@ class PlaylistDetailVC: UITableViewController {
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
             let backgroundStorage = LibraryStorage(context: context)
-            let syncer = LibrarySyncer(ampacheApi: self.appDelegate.ampacheApi)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
             guard let playlistMain = self.playlist, let playlistAsync = backgroundStorage.getPlaylist(id: playlistMain.id) else { return }
             syncer.syncDown(playlist: playlistAsync, libraryStorage: backgroundStorage, statusNotifyier: self)
         }
