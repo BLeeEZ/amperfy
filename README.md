@@ -31,7 +31,7 @@ Amperfy is an iOs app written in Swift to interact with an [ampache](http://ampa
 
 2. In the Amperfy directory, check out the project's dependencies:
   ```
-  cd Amperfy
+  cd amperfy
   git submodule update --init --recursive
   ```
 
