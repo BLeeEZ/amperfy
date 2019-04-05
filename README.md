@@ -2,7 +2,7 @@
 
 ## Basics
 
-Amperfy is an iOs app written in Swift to interact with an [ampache](http://ampache.github.io) instance.
+Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampache.github.io) or [Subsonic](http://www.subsonic.org) server.
 
 <img src=".github/Screenshots/Artist.png" width="250" alt="Screenshot of the Amperfy artist" /> &nbsp;
 <img src=".github/Screenshots/Search.png" width="250" alt="Screenshot of the Amperfy search" /> &nbsp;
