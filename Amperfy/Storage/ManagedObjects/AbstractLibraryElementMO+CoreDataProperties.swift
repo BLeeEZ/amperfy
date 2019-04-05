@@ -8,6 +8,7 @@ extension AbstractLibraryElementMO {
         return NSFetchRequest<AbstractLibraryElementMO>(entityName: "AbstractLibraryElementMO")
     }
 
+    @NSManaged public var id: Int32
     @NSManaged public var artwork: Artwork?
 
 }

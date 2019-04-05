@@ -1,9 +1,9 @@
 import Foundation
 import os.log
 
-class GenericLibrarySyncer {
+class GenericLibraryBackgroundSyncer {
     
-    internal let log = OSLog(subsystem: AppDelegate.name, category: "librarySyncer")
+    internal let log = OSLog(subsystem: AppDelegate.name, category: "LibrarySyncer")
     internal let semaphoreGroup = DispatchGroup()
     internal var isRunning = false
     public internal(set) var isActive = false

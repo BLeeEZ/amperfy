@@ -18,6 +18,7 @@
 		5007CE4721EF6A8E00BC5CBA /* PlaylistDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5007CE4621EF6A8E00BC5CBA /* PlaylistDetailVC.swift */; };
 		5009863C2208CB650057A1A6 /* OptionsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009863B2208CB650057A1A6 /* OptionsButton.swift */; };
 		5009863E2208CC1E0057A1A6 /* BasicButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009863D2208CC1E0057A1A6 /* BasicButton.swift */; };
+		500B2B312249607B00D14EF4 /* BackendProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B2B302249607B00D14EF4 /* BackendProxy.swift */; };
 		500B7D3F21EC87FD0083ED6F /* SongActionSheetView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500B7D3E21EC87FD0083ED6F /* SongActionSheetView.xib */; };
 		500B7D4121EC893B0083ED6F /* SongActionSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4021EC893B0083ED6F /* SongActionSheetView.swift */; };
 		500B7D4321ECFCDD0083ED6F /* LibraryElementEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4221ECFCDD0083ED6F /* LibraryElementEnum.swift */; };
@@ -38,6 +39,9 @@
 		502040342203865400ED48A3 /* PlaylistSongsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502040332203865400ED48A3 /* PlaylistSongsParserDelegate.swift */; };
 		5029E0392235A8EC0027F96F /* CommonString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E0382235A8EC0027F96F /* CommonString.swift */; };
 		5029E03B2235ABB80027F96F /* OptionsBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */; };
+		502C0041224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502C0040224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift */; };
+		502C0043224C091800DA0D1E /* SubsonicLibraryBackgroundSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502C0042224C091800DA0D1E /* SubsonicLibraryBackgroundSyncer.swift */; };
+		502C0045224C0B1400DA0D1E /* SubsonicArtworkBackgroundSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502C0044224C0B1400DA0D1E /* SubsonicArtworkBackgroundSyncer.swift */; };
 		5041B8002212051A00603F02 /* ArtistDetailTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5041B7FF2212051A00603F02 /* ArtistDetailTableHeader.xib */; };
 		5041B8022212053300603F02 /* ArtistDetailTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5041B8012212053300603F02 /* ArtistDetailTableHeader.swift */; };
 		5058708E21DEB07F0043896F /* SongAlphabetSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708D21DEB07F0043896F /* SongAlphabetSection.swift */; };
@@ -62,10 +66,16 @@
 		5083861A21C827E600C4BB32 /* AuthParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5083861921C827E600C4BB32 /* AuthParserDelegate.swift */; };
 		5083861C21C828E200C4BB32 /* AmpacheXmlServerApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5083861B21C828E200C4BB32 /* AmpacheXmlServerApi.swift */; };
 		5083862121C97A1C00C4BB32 /* SongParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5083862021C97A1C00C4BB32 /* SongParserDelegate.swift */; };
+		5086F876223852F200546F5A /* SubsonicApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F875223852F200546F5A /* SubsonicApi.swift */; };
 		5086F87922397B2900546F5A /* Hasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87822397B2900546F5A /* Hasher.swift */; };
 		5086F87B22397B8400546F5A /* BackendApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87A22397B8400546F5A /* BackendApi.swift */; };
 		5086F87D22397B9A00546F5A /* AmpacheApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87C22397B9A00546F5A /* AmpacheApi.swift */; };
-		5086F8832239A2B700546F5A /* GenericLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F8822239A2B700546F5A /* GenericLibrarySyncer.swift */; };
+		5086F87F22399D1900546F5A /* SubsonicServerApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87E22399D1900546F5A /* SubsonicServerApi.swift */; };
+		5086F88122399F3700546F5A /* SubsonicLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F88022399F3700546F5A /* SubsonicLibrarySyncer.swift */; };
+		5086F8832239A2B700546F5A /* GenericLibraryBackgroundSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F8822239A2B700546F5A /* GenericLibraryBackgroundSyncer.swift */; };
+		5086F885223A1E4600546F5A /* PingParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F884223A1E4600546F5A /* PingParserDelegate.swift */; };
+		5086F887223BD68C00546F5A /* SsArtistParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F886223BD68B00546F5A /* SsArtistParserDelegate.swift */; };
+		5086F88B223E867500546F5A /* SsAlbumParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F88A223E867500546F5A /* SsAlbumParserDelegate.swift */; };
 		508FDE3621F1E130005A0724 /* NewPlaylistTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE3521F1E130005A0724 /* NewPlaylistTableHeader.swift */; };
 		508FDE3821F1E14F005A0724 /* NewPlaylistTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 508FDE3721F1E14F005A0724 /* NewPlaylistTableHeader.xib */; };
 		508FDE3C21F2FA3A005A0724 /* PlaylistDetailTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE3B21F2FA3A005A0724 /* PlaylistDetailTableHeader.swift */; };
@@ -75,6 +85,9 @@
 		508FDE4A21F44E91005A0724 /* AmpachePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4921F44E91005A0724 /* AmpachePlayer.swift */; };
 		508FDE4C21F58AFC005A0724 /* AppStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4B21F58AFC005A0724 /* AppStoryboard.swift */; };
 		508FDE5021F64ED6005A0724 /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4F21F64ED6005A0724 /* TabBarVC.swift */; };
+		50A738812244B03700D3F2D4 /* SsSongParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A738802244B03700D3F2D4 /* SsSongParserDelegate.swift */; };
+		50A7388322451ED200D3F2D4 /* SsPlaylistParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A7388222451ED200D3F2D4 /* SsPlaylistParserDelegate.swift */; };
+		50A7388522452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A7388422452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift */; };
 		50BA92EF21CBF45D00E5901D /* AlbumParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92EC21CBF45D00E5901D /* AlbumParserDelegate.swift */; };
 		50BA92F021CBF45E00E5901D /* ArtistParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92ED21CBF45D00E5901D /* ArtistParserDelegate.swift */; };
 		50BA92F121CBF45E00E5901D /* LoginCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92EE21CBF45D00E5901D /* LoginCredentials.swift */; };
@@ -117,8 +130,8 @@
 		50C16C2E21E8F93F00F086F0 /* Artwork+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C2A21E8F93F00F086F0 /* Artwork+CoreDataProperties.swift */; };
 		50C16C2F21E8F93F00F086F0 /* AbstractLibraryElementMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C2B21E8F93F00F086F0 /* AbstractLibraryElementMO+CoreDataClass.swift */; };
 		50C16C3021E8F93F00F086F0 /* AbstractLibraryElementMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C2C21E8F93F00F086F0 /* AbstractLibraryElementMO+CoreDataProperties.swift */; };
-		50C16C3221EA77C700F086F0 /* ArtworkSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C3121EA77C700F086F0 /* ArtworkSyncer.swift */; };
-		50C16C3421EB454100F086F0 /* BackgroundSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C3321EB454100F086F0 /* BackgroundSyncer.swift */; };
+		50C16C3221EA77C700F086F0 /* AmpacheArtworkSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C3121EA77C700F086F0 /* AmpacheArtworkSyncer.swift */; };
+		50C16C3421EB454100F086F0 /* BackgroundSyncerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C3321EB454100F086F0 /* BackgroundSyncerManager.swift */; };
 		50F8CA2D21FAD5400084F8D8 /* Reachabilty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */; };
 		50F8CA3421FF9A170084F8D8 /* SyncWaveMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F8CA3221FF9A170084F8D8 /* SyncWaveMO+CoreDataClass.swift */; };
 		50F8CA3521FF9A170084F8D8 /* SyncWaveMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F8CA3321FF9A170084F8D8 /* SyncWaveMO+CoreDataProperties.swift */; };
@@ -181,6 +194,7 @@
 		5007CE4621EF6A8E00BC5CBA /* PlaylistDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDetailVC.swift; sourceTree = "<group>"; };
 		5009863B2208CB650057A1A6 /* OptionsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsButton.swift; sourceTree = "<group>"; };
 		5009863D2208CC1E0057A1A6 /* BasicButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicButton.swift; sourceTree = "<group>"; };
+		500B2B302249607B00D14EF4 /* BackendProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendProxy.swift; sourceTree = "<group>"; };
 		500B7D3E21EC87FD0083ED6F /* SongActionSheetView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SongActionSheetView.xib; sourceTree = "<group>"; };
 		500B7D4021EC893B0083ED6F /* SongActionSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongActionSheetView.swift; sourceTree = "<group>"; };
 		500B7D4221ECFCDD0083ED6F /* LibraryElementEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryElementEnum.swift; sourceTree = "<group>"; };
@@ -201,6 +215,9 @@
 		502040332203865400ED48A3 /* PlaylistSongsParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistSongsParserDelegate.swift; sourceTree = "<group>"; };
 		5029E0382235A8EC0027F96F /* CommonString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonString.swift; sourceTree = "<group>"; };
 		5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsBarButtonItem.swift; sourceTree = "<group>"; };
+		502C0040224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmpacheLibraryBackgroundSyncer.swift; sourceTree = "<group>"; };
+		502C0042224C091800DA0D1E /* SubsonicLibraryBackgroundSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubsonicLibraryBackgroundSyncer.swift; sourceTree = "<group>"; };
+		502C0044224C0B1400DA0D1E /* SubsonicArtworkBackgroundSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubsonicArtworkBackgroundSyncer.swift; sourceTree = "<group>"; };
 		5041B7FF2212051A00603F02 /* ArtistDetailTableHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ArtistDetailTableHeader.xib; sourceTree = "<group>"; };
 		5041B8012212053300603F02 /* ArtistDetailTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistDetailTableHeader.swift; sourceTree = "<group>"; };
 		5058708D21DEB07F0043896F /* SongAlphabetSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongAlphabetSection.swift; sourceTree = "<group>"; };
@@ -231,10 +248,16 @@
 		5083861B21C828E200C4BB32 /* AmpacheXmlServerApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheXmlServerApi.swift; sourceTree = "<group>"; };
 		5083861D21C82E8200C4BB32 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		5083862021C97A1C00C4BB32 /* SongParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongParserDelegate.swift; sourceTree = "<group>"; };
+		5086F875223852F200546F5A /* SubsonicApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicApi.swift; sourceTree = "<group>"; };
 		5086F87822397B2900546F5A /* Hasher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hasher.swift; sourceTree = "<group>"; };
 		5086F87A22397B8400546F5A /* BackendApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendApi.swift; sourceTree = "<group>"; };
 		5086F87C22397B9A00546F5A /* AmpacheApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmpacheApi.swift; sourceTree = "<group>"; };
-		5086F8822239A2B700546F5A /* GenericLibrarySyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericLibrarySyncer.swift; sourceTree = "<group>"; };
+		5086F87E22399D1900546F5A /* SubsonicServerApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicServerApi.swift; sourceTree = "<group>"; };
+		5086F88022399F3700546F5A /* SubsonicLibrarySyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicLibrarySyncer.swift; sourceTree = "<group>"; };
+		5086F8822239A2B700546F5A /* GenericLibraryBackgroundSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericLibraryBackgroundSyncer.swift; sourceTree = "<group>"; };
+		5086F884223A1E4600546F5A /* PingParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingParserDelegate.swift; sourceTree = "<group>"; };
+		5086F886223BD68B00546F5A /* SsArtistParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SsArtistParserDelegate.swift; sourceTree = "<group>"; };
+		5086F88A223E867500546F5A /* SsAlbumParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserDelegate.swift; sourceTree = "<group>"; };
 		508FDE3521F1E130005A0724 /* NewPlaylistTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPlaylistTableHeader.swift; sourceTree = "<group>"; };
 		508FDE3721F1E14F005A0724 /* NewPlaylistTableHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewPlaylistTableHeader.xib; sourceTree = "<group>"; };
 		508FDE3B21F2FA3A005A0724 /* PlaylistDetailTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDetailTableHeader.swift; sourceTree = "<group>"; };
@@ -244,6 +267,9 @@
 		508FDE4921F44E91005A0724 /* AmpachePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpachePlayer.swift; sourceTree = "<group>"; };
 		508FDE4B21F58AFC005A0724 /* AppStoryboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoryboard.swift; sourceTree = "<group>"; };
 		508FDE4F21F64ED6005A0724 /* TabBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarVC.swift; sourceTree = "<group>"; };
+		50A738802244B03700D3F2D4 /* SsSongParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSongParserDelegate.swift; sourceTree = "<group>"; };
+		50A7388222451ED200D3F2D4 /* SsPlaylistParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPlaylistParserDelegate.swift; sourceTree = "<group>"; };
+		50A7388422452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPlaylistSongsParserDelegate.swift; sourceTree = "<group>"; };
 		50BA92EC21CBF45D00E5901D /* AlbumParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumParserDelegate.swift; sourceTree = "<group>"; };
 		50BA92ED21CBF45D00E5901D /* ArtistParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistParserDelegate.swift; sourceTree = "<group>"; };
 		50BA92EE21CBF45D00E5901D /* LoginCredentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginCredentials.swift; sourceTree = "<group>"; };
@@ -286,8 +312,8 @@
 		50C16C2A21E8F93F00F086F0 /* Artwork+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Artwork+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50C16C2B21E8F93F00F086F0 /* AbstractLibraryElementMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AbstractLibraryElementMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50C16C2C21E8F93F00F086F0 /* AbstractLibraryElementMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AbstractLibraryElementMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		50C16C3121EA77C700F086F0 /* ArtworkSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkSyncer.swift; sourceTree = "<group>"; };
-		50C16C3321EB454100F086F0 /* BackgroundSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSyncer.swift; sourceTree = "<group>"; };
+		50C16C3121EA77C700F086F0 /* AmpacheArtworkSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheArtworkSyncer.swift; sourceTree = "<group>"; };
+		50C16C3321EB454100F086F0 /* BackgroundSyncerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSyncerManager.swift; sourceTree = "<group>"; };
 		50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachabilty.swift; sourceTree = "<group>"; };
 		50F8CA3221FF9A170084F8D8 /* SyncWaveMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncWaveMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50F8CA3321FF9A170084F8D8 /* SyncWaveMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncWaveMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -403,7 +429,6 @@
 				5083860621C5965E00C4BB32 /* AmperfyUITests */,
 				508385E521C5965B00C4BB32 /* Products */,
 				5077F9452225C8B90099CA91 /* LNPopupController.xcodeproj */,
-				509109F022417AB300CC0FB1 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -455,21 +480,40 @@
 			isa = PBXGroup;
 			children = (
 				5086F87A22397B8400546F5A /* BackendApi.swift */,
-				5086F8822239A2B700546F5A /* GenericLibrarySyncer.swift */,
+				500B2B302249607B00D14EF4 /* BackendProxy.swift */,
+				5086F8822239A2B700546F5A /* GenericLibraryBackgroundSyncer.swift */,
 				5077F954222C58A10099CA91 /* GenericXmlParser.swift */,
+				5086F87422384B5500546F5A /* Subsonic */,
 				50BA92F321CC29D600E5901D /* Ampache */,
 			);
 			path = Api;
+			sourceTree = "<group>";
+		};
+		5086F87422384B5500546F5A /* Subsonic */ = {
+			isa = PBXGroup;
+			children = (
+				5086F875223852F200546F5A /* SubsonicApi.swift */,
+				5086F87E22399D1900546F5A /* SubsonicServerApi.swift */,
+				5086F88022399F3700546F5A /* SubsonicLibrarySyncer.swift */,
+				502C0042224C091800DA0D1E /* SubsonicLibraryBackgroundSyncer.swift */,
+				502C0044224C0B1400DA0D1E /* SubsonicArtworkBackgroundSyncer.swift */,
+				5086F884223A1E4600546F5A /* PingParserDelegate.swift */,
+				5086F886223BD68B00546F5A /* SsArtistParserDelegate.swift */,
+				5086F88A223E867500546F5A /* SsAlbumParserDelegate.swift */,
+				50A738802244B03700D3F2D4 /* SsSongParserDelegate.swift */,
+				50A7388222451ED200D3F2D4 /* SsPlaylistParserDelegate.swift */,
+				50A7388422452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift */,
+			);
+			path = Subsonic;
 			sourceTree = "<group>";
 		};
 		50BA92F221CC26BE00E5901D /* Storage */ = {
 			isa = PBXGroup;
 			children = (
 				5020402E2202271000ED48A3 /* ManagedObjects */,
-				50C16C3321EB454100F086F0 /* BackgroundSyncer.swift */,
+				50C16C3321EB454100F086F0 /* BackgroundSyncerManager.swift */,
 				500BB45521CAA73700D367CF /* PersistentStorage.swift */,
 				50BA930521D5715D00E5901D /* LibraryStorage.swift */,
-				50C16C3121EA77C700F086F0 /* ArtworkSyncer.swift */,
 				50C16C2121E7A38A00F086F0 /* Identifyable.swift */,
 				50C16BF721E10E7500F086F0 /* Playlist.swift */,
 				50C16BEF21E0A3B500F086F0 /* PlayerData.swift */,
@@ -482,8 +526,10 @@
 			isa = PBXGroup;
 			children = (
 				5086F87C22397B9A00546F5A /* AmpacheApi.swift */,
-				50BA930121D1019B00E5901D /* AmpacheLibrarySyncer.swift */,
 				5083861B21C828E200C4BB32 /* AmpacheXmlServerApi.swift */,
+				50BA930121D1019B00E5901D /* AmpacheLibrarySyncer.swift */,
+				502C0040224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift */,
+				50C16C3121EA77C700F086F0 /* AmpacheArtworkSyncer.swift */,
 				50BA92EE21CBF45D00E5901D /* LoginCredentials.swift */,
 				50BA930721D75C5600E5901D /* AuthentificationHandshake.swift */,
 				5083861921C827E600C4BB32 /* AuthParserDelegate.swift */,
@@ -747,14 +793,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				50C16C2221E7A38A00F086F0 /* Identifyable.swift in Sources */,
+				502C0043224C091800DA0D1E /* SubsonicLibraryBackgroundSyncer.swift in Sources */,
 				50BA92F121CBF45E00E5901D /* LoginCredentials.swift in Sources */,
 				5077F936221E6D0E0099CA91 /* ListenLaterVC.swift in Sources */,
 				50BA92FE21CED4AF00E5901D /* Utilities.swift in Sources */,
 				500BB49721CAAA2700D367CF /* Amperfy.xcdatamodeld in Sources */,
-				50C16C3421EB454100F086F0 /* BackgroundSyncer.swift in Sources */,
+				50C16C3421EB454100F086F0 /* BackgroundSyncerManager.swift in Sources */,
 				508FDE4721F3C89E005A0724 /* SongDataMO+CoreDataClass.swift in Sources */,
 				50C16C1E21E7A35C00F086F0 /* AlbumTableCell.swift in Sources */,
 				50C16C1421E687AB00F086F0 /* ArtistTableCell.swift in Sources */,
+				5086F88B223E867500546F5A /* SsAlbumParserDelegate.swift in Sources */,
 				5086F87B22397B8400546F5A /* BackendApi.swift in Sources */,
 				502040302202341500ED48A3 /* PlaylistParserDelegate.swift in Sources */,
 				5007CE4121EF5F4300BC5CBA /* PlaylistsVC.swift in Sources */,
@@ -772,6 +820,7 @@
 				508FDE4C21F58AFC005A0724 /* AppStoryboard.swift in Sources */,
 				50C16BF821E10E7500F086F0 /* Playlist.swift in Sources */,
 				5083861C21C828E200C4BB32 /* AmpacheXmlServerApi.swift in Sources */,
+				500B2B312249607B00D14EF4 /* BackendProxy.swift in Sources */,
 				50073BE322319868000130D8 /* DownloadDelegate.swift in Sources */,
 				50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */,
 				5009863C2208CB650057A1A6 /* OptionsButton.swift in Sources */,
@@ -791,9 +840,11 @@
 				50C16C0421E11A5300F086F0 /* PlayerManaged+CoreDataProperties.swift in Sources */,
 				50C16C2021E7A37000F086F0 /* Segues.swift in Sources */,
 				5058709021DEBBCA0043896F /* NextSongsVC.swift in Sources */,
-				5086F8832239A2B700546F5A /* GenericLibrarySyncer.swift in Sources */,
+				5086F8832239A2B700546F5A /* GenericLibraryBackgroundSyncer.swift in Sources */,
+				5086F876223852F200546F5A /* SubsonicApi.swift in Sources */,
 				500BB45721CAA73700D367CF /* PersistentStorage.swift in Sources */,
 				50BA930821D75C5600E5901D /* AuthentificationHandshake.swift in Sources */,
+				502C0045224C0B1400DA0D1E /* SubsonicArtworkBackgroundSyncer.swift in Sources */,
 				50BA930021CFDEBD00E5901D /* LibraryVC.swift in Sources */,
 				50BA92FA21CC37F800E5901D /* SongVC.swift in Sources */,
 				500B7D4921EDD6250083ED6F /* ViewBuilder.swift in Sources */,
@@ -805,18 +856,22 @@
 				500B7D4321ECFCDD0083ED6F /* LibraryElementEnum.swift in Sources */,
 				508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */,
 				508FDE3621F1E130005A0724 /* NewPlaylistTableHeader.swift in Sources */,
+				50A7388322451ED200D3F2D4 /* SsPlaylistParserDelegate.swift in Sources */,
 				5077F955222C58A10099CA91 /* GenericXmlParser.swift in Sources */,
+				5086F885223A1E4600546F5A /* PingParserDelegate.swift in Sources */,
 				50C16C2D21E8F93F00F086F0 /* Artwork+CoreDataClass.swift in Sources */,
 				5086F87922397B2900546F5A /* Hasher.swift in Sources */,
 				50BA930C21D80B3900E5901D /* PlayerVC.swift in Sources */,
 				500BB4BA21CAD63700D367CF /* Artist+CoreDataClass.swift in Sources */,
 				5077F95122279DF40099CA91 /* PlaytimeSlider.swift in Sources */,
+				5086F87F22399D1900546F5A /* SubsonicServerApi.swift in Sources */,
+				5086F887223BD68C00546F5A /* SsArtistParserDelegate.swift in Sources */,
 				502040322202469100ED48A3 /* ErrorParserDelegate.swift in Sources */,
 				500BB45621CAA73700D367CF /* Library.swift in Sources */,
 				50BA930421D10F0000E5901D /* SyncVC.swift in Sources */,
 				5077F95322283FED0099CA91 /* RoundedImage.swift in Sources */,
 				50073BDF22301D9A000130D8 /* RequestManager.swift in Sources */,
-				50C16C3221EA77C700F086F0 /* ArtworkSyncer.swift in Sources */,
+				50C16C3221EA77C700F086F0 /* AmpacheArtworkSyncer.swift in Sources */,
 				50C16C1021E5463E00F086F0 /* ArtistsVC.swift in Sources */,
 				50C16C0821E296FF00F086F0 /* ReorderTableViewCell.swift in Sources */,
 				50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */,
@@ -825,9 +880,11 @@
 				50BA92F821CC318D00E5901D /* SongTableCell.swift in Sources */,
 				5007CE4721EF6A8E00BC5CBA /* PlaylistDetailVC.swift in Sources */,
 				50BA92EF21CBF45D00E5901D /* AlbumParserDelegate.swift in Sources */,
+				50A738812244B03700D3F2D4 /* SsSongParserDelegate.swift in Sources */,
 				50F8CA2D21FAD5400084F8D8 /* Reachabilty.swift in Sources */,
 				50F8CA3421FF9A170084F8D8 /* SyncWaveMO+CoreDataClass.swift in Sources */,
 				50C16BFC21E1132600F086F0 /* PlaylistElement+CoreDataProperties.swift in Sources */,
+				5086F88122399F3700546F5A /* SubsonicLibrarySyncer.swift in Sources */,
 				50C16C2F21E8F93F00F086F0 /* AbstractLibraryElementMO+CoreDataClass.swift in Sources */,
 				50BA932321DA6AFA00E5901D /* FontAwesomeIcon.swift in Sources */,
 				508FDE4A21F44E91005A0724 /* AmpachePlayer.swift in Sources */,
@@ -838,9 +895,11 @@
 				50F8CA3521FF9A170084F8D8 /* SyncWaveMO+CoreDataProperties.swift in Sources */,
 				5083862121C97A1C00C4BB32 /* SongParserDelegate.swift in Sources */,
 				50BA930621D5715D00E5901D /* LibraryStorage.swift in Sources */,
+				50A7388522452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift in Sources */,
 				508FDE4821F3C89E005A0724 /* SongDataMO+CoreDataProperties.swift in Sources */,
 				50C16C3021E8F93F00F086F0 /* AbstractLibraryElementMO+CoreDataProperties.swift in Sources */,
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
+				502C0041224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift in Sources */,
 				5058708E21DEB07F0043896F /* SongAlphabetSection.swift in Sources */,
 				50C16C1C21E7051700F086F0 /* AlbumDetailVC.swift in Sources */,
 				50BA92F021CBF45E00E5901D /* ArtistParserDelegate.swift in Sources */,

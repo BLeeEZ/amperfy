@@ -1,13 +1,13 @@
 import Foundation
 import os.log
 
-class BackgroundSyncer {
+class BackgroundSyncerManager {
     
-    private let log = OSLog(subsystem: AppDelegate.name, category: "backgroundSyncer")
+    private let log = OSLog(subsystem: AppDelegate.name, category: "BackgroundSyncer")
     private let storage : PersistentStorage
     private let backendApi: BackendApi
-    private let artworkSyncer: ArtworkSyncer
-    private let libSyncer: LibrarySyncer
+    private let artworkSyncer: BackgroundLibrarySyncer
+    private let libSyncer: BackgroundLibrarySyncer
     private let semaphore = DispatchSemaphore(value: 1)
     private var isRunning = false
     var isActive: Bool {
@@ -17,8 +17,8 @@ class BackgroundSyncer {
     init(storage: PersistentStorage, backendApi: BackendApi) {
         self.storage = storage
         self.backendApi = backendApi
-        self.artworkSyncer = ArtworkSyncer(backendApi: backendApi)
-        self.libSyncer = backendApi.createLibrarySyncer()
+        self.artworkSyncer = backendApi.createArtworkBackgroundSyncer()
+        self.libSyncer = backendApi.createLibraryBackgroundSyncer()
     }
     
     func start() {
@@ -40,10 +40,11 @@ class BackgroundSyncer {
         isRunning = false
         artworkSyncer.stopAndWait()
         libSyncer.stopAndWait()
+        os_log("SyncInBackground stopped", log: log, type: .info)
     }
     
     private func syncInBackground() {
-        os_log("BackgroundSyncer start syncInBackground", log: log, type: .info)
+        os_log("SyncInBackground start", log: log, type: .info)
         storage.persistentContainer.performBackgroundTask() { (context) in
             let backgroundLibrary = LibraryStorage(context: context)
             self.artworkSyncer.syncInBackground(libraryStorage: backgroundLibrary)

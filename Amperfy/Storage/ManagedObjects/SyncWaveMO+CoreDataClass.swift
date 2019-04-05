@@ -27,7 +27,7 @@ public class SyncWaveMO: NSManagedObject {
             return Int(syncIndexToContinueMO)
         }
         set {
-            syncIndexToContinueMO = Int16(newValue)
+            syncIndexToContinueMO = Int32(newValue)
         }
     }
     var isInitialWave: Bool {

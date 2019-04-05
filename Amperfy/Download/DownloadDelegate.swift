@@ -18,16 +18,10 @@ class DownloadDelegate: DownloadManagerDelegate {
     }
 
     private func updateDownloadUrl(forSong song: Song) throws -> URL {
-        guard var urlString = song.url else {
-            throw DownloadError.urlInvalid
-        }
-        
         guard Reachability.isConnectedToNetwork() else {
             throw DownloadError.noConnectivity
         }
-        
-        backendApi.updateUrlToken(url: &urlString)
-        guard let url = URL(string: urlString) else {
+        guard let url = backendApi.generateUrl(forSong: song) else {
             throw DownloadError.urlInvalid
         }
         return url

@@ -3,8 +3,9 @@ import os.log
 
 class GenericXmlParser: NSObject, XMLParserDelegate {
     
-    let log = OSLog(subsystem: AppDelegate.name, category: "parser")
+    let log = OSLog(subsystem: AppDelegate.name, category: "Parser")
     var buffer = ""
+    var parsedCount = 0
     
     func parser(_ parser: XMLParser, foundCharacters string: String) {
         buffer.append(string)
@@ -18,7 +19,6 @@ class GenericXmlParser: NSObject, XMLParserDelegate {
 
 class GenericXmlLibParser: GenericXmlParser {
     
-    var parsedCount = 0
     var libraryStorage: LibraryStorage
     var syncWave: SyncWaveMO
     var parseNotifier: ParsedObjectNotifiable?

@@ -8,7 +8,6 @@ extension Artist {
         return NSFetchRequest<Artist>(entityName: "Artist")
     }
 
-    @NSManaged public var id: Int32
     @NSManaged public var name: String?
     @NSManaged public var albums: NSOrderedSet?
     @NSManaged public var songsMO: NSOrderedSet?

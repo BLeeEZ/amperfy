@@ -98,7 +98,7 @@ class PlaylistDetailTableHeader: UIView {
             storage.persistentContainer.performBackgroundTask() { (context) in
                 let backgroundStorage = LibraryStorage(context: context)
                 let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                guard let playlistAsync = backgroundStorage.getPlaylist(id: playlist.id) else { return }
+                guard let playlistAsync = backgroundStorage.getPlaylist(viaPlaylistFromOtherContext: playlist) else { return }
                 syncer.syncUpload(playlist: playlistAsync, libraryStorage: backgroundStorage, statusNotifyier: statusNotifyier)
             }
         }))

@@ -21,8 +21,8 @@ class SyncVC: UIViewController, SyncCallbacks {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        self.appDelegate.backgroundSyncer.stopAndWait()
-        self.appDelegate.storage.deleteAmpacheIsSynced()
+        self.appDelegate.backgroundSyncerManager.stopAndWait()
+        self.appDelegate.storage.deleteLibraryIsSyncedFlag()
         self.appDelegate.persistentLibraryStorage.cleanStorage()
         self.appDelegate.reinit()
         
@@ -30,8 +30,8 @@ class SyncVC: UIViewController, SyncCallbacks {
             let backgroundLibrary = LibraryStorage(context: context)
             self.syncer = self.appDelegate.backendApi.createLibrarySyncer()
             self.syncer?.sync(libraryStorage: backgroundLibrary, statusNotifyier: self)
-            self.appDelegate.storage.saveAmpacheIsSynced()
-            self.appDelegate.backgroundSyncer.start()
+            self.appDelegate.storage.saveLibraryIsSyncedFlag()
+            self.appDelegate.backgroundSyncerManager.start()
         }
     }
     
@@ -83,16 +83,8 @@ class SyncVC: UIViewController, SyncCallbacks {
     func notifyPlaylistSyncStarted() {
         DispatchQueue.main.async { [weak self] in
             self?.progressInfo.text = "Syncing playlists ..."
+            self?.libObjectsToParseCount = self?.syncer?.playlistCount ?? 1
             self?.parsedObjectCount = 0
-            self?.updateSyncInfo()
-        }
-    }
-    
-    func notifyPlaylistCount(playlistCount: Int)  {
-        DispatchQueue.main.async { [weak self] in
-            self?.progressInfo.text = "Syncing playlists ..."
-            self?.parsedObjectCount = 0
-            self?.libObjectsToParseCount = playlistCount
             self?.updateSyncInfo()
         }
     }

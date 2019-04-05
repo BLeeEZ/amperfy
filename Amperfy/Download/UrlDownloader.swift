@@ -7,7 +7,7 @@ protocol UrlDownloadNotifiable {
 
 class UrlDownloader: NSObject, URLSessionDownloadDelegate {
     
-    private let log = OSLog(subsystem: AppDelegate.name, category: "urlDownloader")
+    private let log = OSLog(subsystem: AppDelegate.name, category: "UrlDownloader")
     let requestManager: RequestManager
     var urlDownloadNotifier: UrlDownloadNotifiable?
     lazy var downloadsSession: URLSession = {

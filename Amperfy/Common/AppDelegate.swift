@@ -13,8 +13,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var persistentLibraryStorage = {
         return LibraryStorage(context: storage.context)
     }()
+    lazy var backendProxy: BackendProxy = {
+        return BackendProxy()
+    }()
     lazy var backendApi: BackendApi = {
-        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi())
+        return backendProxy
     }()
     lazy var library = {
         return Library(storage: persistentLibraryStorage)
@@ -30,8 +33,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         urlDownloader.urlDownloadNotifier = dlManager
         return dlManager
     }()
-    lazy var backgroundSyncer = {
-        return BackgroundSyncer(storage: storage, backendApi: backendApi)
+    lazy var backgroundSyncerManager = {
+        return BackgroundSyncerManager(storage: storage, backendApi: backendApi)
     }()
 
     func reinit() {
@@ -60,15 +63,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.window?.makeKeyAndVisible()
             return true
         }
+        backendProxy.selectedApi = credentials.backendApi
         backendApi.provideCredentials(credentials: credentials)
         
-        guard storage.isAmpacheSynced() else {
+        guard storage.isLibrarySynced() else {
             let initialViewController = SyncVC.instantiateFromAppStoryboard()
             self.window?.rootViewController = initialViewController
             self.window?.makeKeyAndVisible()
             return true
         }
-        backgroundSyncer.start()
+        backgroundSyncerManager.start()
     
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()
         self.window?.rootViewController = initialViewController
@@ -84,8 +88,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-        guard storage.getLoginCredentials() != nil, storage.isAmpacheSynced() else { return }
-        backgroundSyncer.stop()
+        guard storage.getLoginCredentials() != nil, storage.isLibrarySynced() else { return }
+        backgroundSyncerManager.stop()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -94,8 +98,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        if storage.isAmpacheSynced() {
-            backgroundSyncer.start()
+        if storage.isLibrarySynced() {
+            backgroundSyncerManager.start()
         }
     }
 

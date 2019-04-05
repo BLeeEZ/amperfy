@@ -27,7 +27,7 @@ class SettingsVC: UITableViewController {
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in
             self.appDelegate.player.stop()
             self.appDelegate.downloadManager.stopAndWait()
-            self.appDelegate.backgroundSyncer.stopAndWait()
+            self.appDelegate.backgroundSyncerManager.stopAndWait()
             self.appDelegate.storage.deleteLoginCredentials()
             self.appDelegate.persistentLibraryStorage.cleanStorage()
             self.appDelegate.reinit()

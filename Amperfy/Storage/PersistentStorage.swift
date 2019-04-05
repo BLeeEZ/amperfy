@@ -1,14 +1,15 @@
 import Foundation
 import CoreData
 
-enum UserDefaultsKey: String {
-    case ServerUrl = "serverUrl"
-    case Username = "username"
-    case PasswordHash = "passwordHash"
-    case AmpacheIsSynced = "ampacheIsSynced"
-}
-
 class PersistentStorage {
+
+    private enum UserDefaultsKey: String {
+        case ServerUrl = "serverUrl"
+        case Username = "username"
+        case Password = "password"
+        case BackendApi = "backendApi"
+        case LibraryIsSynced = "libraryIsSynced"
+    }
 
     init() {
     }
@@ -16,37 +17,41 @@ class PersistentStorage {
     func saveLoginCredentials(credentials: LoginCredentials) {
         UserDefaults.standard.set(credentials.serverUrl, forKey: UserDefaultsKey.ServerUrl.rawValue)
         UserDefaults.standard.set(credentials.username, forKey: UserDefaultsKey.Username.rawValue)
-        UserDefaults.standard.set(credentials.password, forKey: UserDefaultsKey.PasswordHash.rawValue)
+        UserDefaults.standard.set(credentials.password, forKey: UserDefaultsKey.Password.rawValue)
+        UserDefaults.standard.set(credentials.backendApi.rawValue, forKey: UserDefaultsKey.BackendApi.rawValue)
     }
     
     func deleteLoginCredentials() {
         UserDefaults.standard.removeObject(forKey: UserDefaultsKey.ServerUrl.rawValue)
         UserDefaults.standard.removeObject(forKey: UserDefaultsKey.Username.rawValue)
-        UserDefaults.standard.removeObject(forKey: UserDefaultsKey.PasswordHash.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultsKey.Password.rawValue)
+        UserDefaults.standard.removeObject(forKey: UserDefaultsKey.BackendApi.rawValue)
     }
 
     func getLoginCredentials() -> LoginCredentials? {
         if  let serverUrl = UserDefaults.standard.object(forKey: UserDefaultsKey.ServerUrl.rawValue) as? String,
             let username = UserDefaults.standard.object(forKey: UserDefaultsKey.Username.rawValue) as? String,
-            let passwordHash = UserDefaults.standard.object(forKey: UserDefaultsKey.PasswordHash.rawValue) as? String {
-                return LoginCredentials(serverUrl: serverUrl, username: username, password: passwordHash)
+            let passwordHash = UserDefaults.standard.object(forKey: UserDefaultsKey.Password.rawValue) as? String,
+            let backendApiRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.BackendApi.rawValue) as? Int,
+            let backendApi = BackenApiType(rawValue: backendApiRaw) {
+                return LoginCredentials(serverUrl: serverUrl, username: username, password: passwordHash, backendApi: backendApi)
         } 
         return nil
     }
     
-    func saveAmpacheIsSynced() {
-        UserDefaults.standard.set(true, forKey: UserDefaultsKey.AmpacheIsSynced.rawValue)
+    func saveLibraryIsSyncedFlag() {
+        UserDefaults.standard.set(true, forKey: UserDefaultsKey.LibraryIsSynced.rawValue)
     }
     
-    func deleteAmpacheIsSynced() {
-        UserDefaults.standard.removeObject(forKey: UserDefaultsKey.AmpacheIsSynced.rawValue)
+    func deleteLibraryIsSyncedFlag() {
+        UserDefaults.standard.removeObject(forKey: UserDefaultsKey.LibraryIsSynced.rawValue)
     }
     
-    func isAmpacheSynced() -> Bool {
-        guard let isAmpacheSynced = UserDefaults.standard.object(forKey: UserDefaultsKey.AmpacheIsSynced.rawValue) as? Bool else {
+    func isLibrarySynced() -> Bool {
+        guard let isLibrarySynced = UserDefaults.standard.object(forKey: UserDefaultsKey.LibraryIsSynced.rawValue) as? Bool else {
             return false
         }
-        return isAmpacheSynced
+        return isLibrarySynced
     }
 
     

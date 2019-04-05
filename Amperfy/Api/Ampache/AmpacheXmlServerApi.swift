@@ -8,7 +8,7 @@ protocol AmpacheUrlCreationable {
 
 class AmpacheXmlServerApi {
     
-    private let log = OSLog(subsystem: AppDelegate.name, category: "ampache")
+    private let log = OSLog(subsystem: AppDelegate.name, category: "Ampache")
     private var credentials: LoginCredentials?
     private var authHandshake: AuthentificationHandshake?
     static let maxItemCountToPollAtOnce: Int = 500
@@ -249,7 +249,21 @@ class AmpacheXmlServerApi {
         return authHandshake
     }
     
-    func updateUrlToken(url: inout String) {
+    func generateUrl(forSong song: Song) -> URL? {
+        guard var urlString = song.url else {
+            return nil
+        }
+        updateUrlToken(url: &urlString)
+        return URL(string: urlString)
+    }
+    
+    func generateUrl(forArtwork artwork: Artwork) -> URL? {
+        var updatedUrl = artwork.url
+        updateUrlToken(url: &updatedUrl)
+        return URL(string: updatedUrl)
+    }
+    
+    private func updateUrlToken(url: inout String) {
         reauthenticateIfNeccessary()
         if let auth = authHandshake {
             if let query = URL(string: url)?.query {
@@ -267,6 +281,7 @@ class AmpacheXmlServerApi {
             }
         }
     }
+    
 }
 
 extension AmpacheXmlServerApi: AmpacheUrlCreationable {

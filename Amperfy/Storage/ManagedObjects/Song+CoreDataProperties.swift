@@ -8,7 +8,6 @@ extension Song {
         return NSFetchRequest<Song>(entityName: "Song")
     }
 
-    @NSManaged public var id: Int32
     @NSManaged public var title: String?
     @NSManaged public var track: Int16
     @NSManaged public var url: String?

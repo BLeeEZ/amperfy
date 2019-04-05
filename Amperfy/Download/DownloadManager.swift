@@ -24,7 +24,7 @@ protocol DownloadManagerDelegate {
 
 class DownloadManager {
     
-    private let log = OSLog(subsystem: AppDelegate.name, category: "downloadManager")
+    private let log = OSLog(subsystem: AppDelegate.name, category: "DownloadManager")
     private let storage: PersistentStorage
     private let requestManager: RequestManager
     private let urlDownloader: UrlDownloader

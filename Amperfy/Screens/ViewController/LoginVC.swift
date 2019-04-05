@@ -24,11 +24,12 @@ class LoginVC: UIViewController {
         }
 
         let credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
-        backendApi.authenticate(credentials: credentials)
-        if backendApi.isAuthenticated() {
+        do {
+            let authenticatedApi = try appDelegate.backendProxy.login(credentials: credentials)
+            credentials.backendApi = authenticatedApi
             appDelegate.storage.saveLoginCredentials(credentials: credentials)
             performSegue(withIdentifier: "toSync", sender: self)
-        } else {
+        } catch {
             showErrorMsg(message: "Not able to login, please check credentials!")
         }
     }

@@ -47,27 +47,6 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7aA-CY-fi1">
-                                <rect key="frame" x="162.5" y="342" width="50" height="30"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="fP5-0V-kT7"/>
-                                    <constraint firstAttribute="width" constant="50" id="z63-ey-Arv"/>
-                                </constraints>
-                                <color key="tintColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <state key="normal">
-                                    <attributedString key="attributedTitle">
-                                        <fragment content="Login">
-                                            <attributes>
-                                                <font key="NSFont" metaFont="system" size="15"/>
-                                            </attributes>
-                                        </fragment>
-                                    </attributedString>
-                                </state>
-                                <connections>
-                                    <action selector="loginPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="WBP-bb-5qG"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Server url" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fDZ-Za-sK8">
                                 <rect key="frame" x="30" y="206" width="79" height="30"/>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
@@ -89,6 +68,27 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="URL" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no" textContentType="url"/>
                             </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7aA-CY-fi1">
+                                <rect key="frame" x="162.5" y="422" width="50" height="30"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="fP5-0V-kT7"/>
+                                    <constraint firstAttribute="width" constant="50" id="z63-ey-Arv"/>
+                                </constraints>
+                                <color key="tintColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <state key="normal">
+                                    <attributedString key="attributedTitle">
+                                        <fragment content="Login">
+                                            <attributes>
+                                                <font key="NSFont" metaFont="system" size="15"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
+                                </state>
+                                <connections>
+                                    <action selector="loginPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="WBP-bb-5qG"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -107,7 +107,6 @@
                             <constraint firstItem="vfm-n3-YO9" firstAttribute="width" secondItem="cJB-xi-h6o" secondAttribute="width" id="OLv-WK-43r"/>
                             <constraint firstItem="Hkb-KJ-f3A" firstAttribute="top" secondItem="cJB-xi-h6o" secondAttribute="bottom" constant="8" id="PQY-0l-1Os"/>
                             <constraint firstItem="0Dr-h8-7rI" firstAttribute="top" secondItem="aKf-Oy-Mn4" secondAttribute="bottom" constant="8" id="Qbj-KN-y8t"/>
-                            <constraint firstItem="7aA-CY-fi1" firstAttribute="top" secondItem="vfm-n3-YO9" secondAttribute="bottom" constant="30" id="WEl-LZ-Sur"/>
                             <constraint firstItem="Hkb-KJ-f3A" firstAttribute="trailing" secondItem="cJB-xi-h6o" secondAttribute="trailing" id="WMY-fG-XMg"/>
                             <constraint firstItem="vfm-n3-YO9" firstAttribute="centerY" secondItem="0Dr-h8-7rI" secondAttribute="centerY" id="YHu-Y4-7w5"/>
                             <constraint firstItem="0Dr-h8-7rI" firstAttribute="width" secondItem="fDZ-Za-sK8" secondAttribute="width" id="YeK-Pf-Fvc"/>
@@ -124,6 +123,7 @@
                             <constraint firstItem="vfm-n3-YO9" firstAttribute="top" secondItem="Hkb-KJ-f3A" secondAttribute="bottom" constant="8" id="rT8-XR-RMg"/>
                             <constraint firstItem="cJB-xi-h6o" firstAttribute="top" secondItem="23L-Mn-QSO" secondAttribute="bottom" constant="56" id="ste-gC-7NE"/>
                             <constraint firstItem="0Dr-h8-7rI" firstAttribute="leading" secondItem="fDZ-Za-sK8" secondAttribute="leading" id="y1E-kI-fvv"/>
+                            <constraint firstItem="7aA-CY-fi1" firstAttribute="top" secondItem="vfm-n3-YO9" secondAttribute="bottom" constant="110" id="y35-V9-Ri9"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
@@ -136,7 +136,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-546" y="155"/>
+            <point key="canvasLocation" x="-546.39999999999998" y="154.27286356821591"/>
         </scene>
         <!--Library-->
         <scene sceneID="XCi-yT-Pqw">

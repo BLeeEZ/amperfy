@@ -6,12 +6,14 @@ class LoginCredentials {
     var username: String
     var password: String
     var passwordHash: String
+    var backendApi: BackenApiType 
 
     init() {
         self.serverUrl = ""
         self.username = ""
         self.password = ""
         self.passwordHash = ""
+        self.backendApi = .notDetected
     }
 
     init(serverUrl: String, username: String, password: String) {
@@ -19,6 +21,12 @@ class LoginCredentials {
         self.username = username
         self.password = password
         self.passwordHash = Hasher.sha256(dataString: password)
+        self.backendApi = .notDetected
+    }
+
+    convenience init(serverUrl: String, username: String, password: String, backendApi: BackenApiType) {
+        self.init(serverUrl: serverUrl, username: username, password: password)
+        self.backendApi = backendApi
     }
 }
 

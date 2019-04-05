@@ -4,7 +4,7 @@ import os.log
 
 class LibraryStorage {
     
-    private let log = OSLog(subsystem: AppDelegate.name, category: "libraryStorage")
+    private let log = OSLog(subsystem: AppDelegate.name, category: "LibraryStorage")
     private var context: NSManagedObjectContext
     
     init(context: NSManagedObjectContext) {
@@ -239,6 +239,11 @@ class LibraryStorage {
             os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
         }
         return foundPlaylist
+    }
+    
+    func getPlaylist(viaPlaylistFromOtherContext: Playlist) -> Playlist? {
+        guard let foundManagedPlaylist = context.object(with: viaPlaylistFromOtherContext.managedPlaylist.objectID) as? PlaylistManaged else { return nil }
+        return Playlist(storage: self, managedPlaylist: foundManagedPlaylist)
     }
     
     func getArtworksThatAreNotChecked(fetchCount: Int = 10) -> [Artwork] {

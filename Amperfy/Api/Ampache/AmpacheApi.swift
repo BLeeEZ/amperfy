@@ -8,10 +8,6 @@ class AmpacheApi: BackendApi {
         self.ampacheXmlServerApi = ampacheXmlServerApi
     }
 
-    var defaultArtworkUrl: String {
-        return ampacheXmlServerApi.defaultArtworkUrl
-    }
-
     func provideCredentials(credentials: LoginCredentials) {
         ampacheXmlServerApi.provideCredentials(credentials: credentials)
     }
@@ -24,12 +20,24 @@ class AmpacheApi: BackendApi {
         return ampacheXmlServerApi.isAuthenticated()
     }
 
-    func updateUrlToken(url: inout String) {
-        ampacheXmlServerApi.updateUrlToken(url: &url)
+    func generateUrl(forSong song: Song) -> URL? {
+        return ampacheXmlServerApi.generateUrl(forSong: song)
+    }
+    
+    func generateUrl(forArtwork artwork: Artwork) -> URL? {
+        return ampacheXmlServerApi.generateUrl(forArtwork: artwork)
     }
 
     func createLibrarySyncer() -> LibrarySyncer {
         return AmpacheLibrarySyncer(ampacheXmlServerApi: ampacheXmlServerApi)
+    }    
+    
+    func createLibraryBackgroundSyncer() -> BackgroundLibrarySyncer {
+        return AmpacheLibraryBackgroundSyncer(ampacheXmlServerApi: ampacheXmlServerApi)
+    }
+
+    func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer {
+        return AmpacheArtworkSyncer(ampacheXmlServerApi: ampacheXmlServerApi)
     }
 
 }
