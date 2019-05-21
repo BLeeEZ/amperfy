@@ -9,7 +9,26 @@ class LoginVC: UIViewController {
     @IBOutlet weak var usernameTF: UITextField!
     @IBOutlet weak var passwordTF: UITextField!
     
-    @IBAction func loginPressed(_ sender: Any) {
+    @IBAction func serverUrlActionPressed() {
+        serverUrlTF.resignFirstResponder()
+        login()
+    }
+    @IBAction func usernameActionPressed() {
+        usernameTF.resignFirstResponder()
+        login()
+    }
+    @IBAction func passwordActionPressed() {
+        passwordTF.resignFirstResponder()
+        login()
+    }
+    @IBAction func loginPressed() {
+        serverUrlTF.resignFirstResponder()
+        usernameTF.resignFirstResponder()
+        passwordTF.resignFirstResponder()
+        login()
+    }
+    
+    func login() {
         guard let serverUrl = serverUrlTF.text, !serverUrl.isEmpty else {
             showErrorMsg(message: "No server address given!")
             return
