@@ -20,7 +20,7 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 
 ## Requirements
 
-* XCode 10, swift 4.2
+* XCode 10, swift 5.0
 
 ## Getting Started
 
