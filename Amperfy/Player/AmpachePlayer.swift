@@ -107,8 +107,8 @@ class AmpachePlayer: SongDownloadNotifiable {
     }
     
     private func insertCachedSong(playlistEntry: PlaylistElement) {
-        guard let song = playlistEntry.song, let songData = song.data, let artistName = song.artist?.name, let title = song.title else { return }
-        os_log(.default, "Play song: %s - %s", artistName, title)
+        guard let song = playlistEntry.song, let songData = song.data else { return }
+        os_log(.default, "Play song: %s", song.displayString)
         let url = createLocalUrl(songData: songData)
         player.pause()
         player.replaceCurrentItem(with: nil)

@@ -20,7 +20,7 @@ public class Song: AbstractLibraryElementMO {
     }
     
     var displayString: String {
-        return "\(artist?.name ?? "") - \(title ?? "")"
+        return "\(artist?.name ?? "Unknown artist") - \(title ?? "Unknown title")"
     }
     
     var data: NSData? {
