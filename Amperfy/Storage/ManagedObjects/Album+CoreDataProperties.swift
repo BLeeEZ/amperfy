@@ -11,42 +11,42 @@ extension Album {
     @NSManaged public var name: String?
     @NSManaged public var year: Int16
     @NSManaged public var artist: Artist?
-    @NSManaged public var songs: NSOrderedSet?
+    @NSManaged public var songsMO: NSOrderedSet?
     @NSManaged public var syncInfo: SyncWaveMO?
 
 }
 
-// MARK: Generated accessors for songs
+// MARK: Generated accessors for songsMO
 extension Album {
 
-    @objc(insertObject:inSongsAtIndex:)
-    @NSManaged public func insertIntoSongs(_ value: Song, at idx: Int)
+    @objc(insertObject:inSongsMOAtIndex:)
+    @NSManaged public func insertIntoSongsMO(_ value: Song, at idx: Int)
 
-    @objc(removeObjectFromSongsAtIndex:)
-    @NSManaged public func removeFromSongs(at idx: Int)
+    @objc(removeObjectFromSongsMOAtIndex:)
+    @NSManaged public func removeFromSongsMO(at idx: Int)
 
-    @objc(insertSongs:atIndexes:)
-    @NSManaged public func insertIntoSongs(_ values: [Song], at indexes: NSIndexSet)
+    @objc(insertSongsMO:atIndexes:)
+    @NSManaged public func insertIntoSongsMO(_ values: [Song], at indexes: NSIndexSet)
 
-    @objc(removeSongsAtIndexes:)
-    @NSManaged public func removeFromSongs(at indexes: NSIndexSet)
+    @objc(removeSongsMOAtIndexes:)
+    @NSManaged public func removeFromSongsMO(at indexes: NSIndexSet)
 
-    @objc(replaceObjectInSongsAtIndex:withObject:)
-    @NSManaged public func replaceSongs(at idx: Int, with value: Song)
+    @objc(replaceObjectInSongsMOAtIndex:withObject:)
+    @NSManaged public func replaceSongsMO(at idx: Int, with value: Song)
 
-    @objc(replaceSongsAtIndexes:withSongs:)
-    @NSManaged public func replaceSongs(at indexes: NSIndexSet, with values: [Song])
+    @objc(replaceSongsMOAtIndexes:withSongsMO:)
+    @NSManaged public func replaceSongsMO(at indexes: NSIndexSet, with values: [Song])
 
-    @objc(addSongsObject:)
-    @NSManaged public func addToSongs(_ value: Song)
+    @objc(addSongsMOObject:)
+    @NSManaged public func addToSongsMO(_ value: Song)
 
-    @objc(removeSongsObject:)
-    @NSManaged public func removeFromSongs(_ value: Song)
+    @objc(removeSongsMOObject:)
+    @NSManaged public func removeFromSongsMO(_ value: Song)
 
-    @objc(addSongs:)
-    @NSManaged public func addToSongs(_ values: NSOrderedSet)
+    @objc(addSongsMO:)
+    @NSManaged public func addToSongsMO(_ values: NSOrderedSet)
 
-    @objc(removeSongs:)
-    @NSManaged public func removeFromSongs(_ values: NSOrderedSet)
+    @objc(removeSongsMO:)
+    @NSManaged public func removeFromSongsMO(_ values: NSOrderedSet)
 
 }

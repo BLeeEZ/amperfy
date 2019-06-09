@@ -33,12 +33,12 @@ class AlbumDetailVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return album?.songs?.count ?? 0
+        return album?.songs.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
-        if let song = album?.songs?[indexPath.row] as? Song {
+        if let song = album?.songs[indexPath.row] {
             cell.display(song: song, rootView: self)
         }
         return cell

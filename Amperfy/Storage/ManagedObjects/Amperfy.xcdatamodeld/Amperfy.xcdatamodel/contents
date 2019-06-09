@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.98" systemVersion="18E226" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.99" systemVersion="18F132" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="AbstractLibraryElementMO" representedClassName="AbstractLibraryElementMO" isAbstract="YES" syncable="YES">
         <attribute name="id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="artwork" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Artwork" inverseName="owners" inverseEntity="Artwork" syncable="YES"/>
@@ -8,7 +8,7 @@
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="year" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="albums" inverseEntity="Artist" syncable="YES"/>
-        <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="album" inverseEntity="Song" syncable="YES"/>
+        <relationship name="songsMO" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="album" inverseEntity="Song" syncable="YES"/>
         <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWaveMO" inverseName="albums" inverseEntity="SyncWaveMO" syncable="YES"/>
     </entity>
     <entity name="Artist" representedClassName="Artist" parentEntity="AbstractLibraryElementMO" syncable="YES">
@@ -44,7 +44,7 @@
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="track" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songs" inverseEntity="Album" syncable="YES"/>
+        <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songsMO" inverseEntity="Album" syncable="YES"/>
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="songsMO" inverseEntity="Artist" syncable="YES"/>
         <relationship name="dataMO" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SongDataMO" inverseName="info" inverseEntity="SongDataMO" syncable="YES"/>
         <relationship name="playlistElements" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistElement" inverseName="song" inverseEntity="PlaylistElement" syncable="YES"/>

@@ -50,7 +50,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     private func playAllSongsInAlbum(album: Album) {
-        guard let player = player, let _ = album.songs?.array as? [Song] else {
+        guard let player = player else {
             return
         }
         player.cleanPlaylist()
@@ -59,10 +59,10 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     private func addAlbumSongsToPlaylist(album: Album) {
-        guard let player = player, let songs = album.songs?.array as? [Song] else {
+        guard let player = player else {
             return
         }
-        for song in songs {
+        for song in album.songs {
             player.addToPlaylist(song: song)
         }
     }

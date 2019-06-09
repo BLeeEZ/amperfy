@@ -64,7 +64,7 @@ class LibraryStorage {
     }
     
     func deleteCache(ofAlbum album: Album) {
-        for song in album.songsOfAlbum {
+        for song in album.songs {
             if let songData = song.dataMO {
                 deleteSongData(songData: songData)
                 song.dataMO = nil
