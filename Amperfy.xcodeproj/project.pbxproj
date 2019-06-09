@@ -46,6 +46,8 @@
 		5041B8022212053300603F02 /* ArtistDetailTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5041B8012212053300603F02 /* ArtistDetailTableHeader.swift */; };
 		5058708E21DEB07F0043896F /* SongAlphabetSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708D21DEB07F0043896F /* SongAlphabetSection.swift */; };
 		5058709021DEBBCA0043896F /* NextSongsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708F21DEBBCA0043896F /* NextSongsVC.swift */; };
+		50763F1922AD942A00D062A0 /* AlbumDetailTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50763F1722AD942A00D062A0 /* AlbumDetailTableHeader.xib */; };
+		50763F1A22AD942A00D062A0 /* AlbumDetailTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50763F1822AD942A00D062A0 /* AlbumDetailTableHeader.swift */; };
 		5077F934221DAB5C0099CA91 /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F933221DAB5C0099CA91 /* DownloadManager.swift */; };
 		5077F936221E6D0E0099CA91 /* ListenLaterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F935221E6D0E0099CA91 /* ListenLaterVC.swift */; };
 		5077F938221F24C10099CA91 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F937221F24C10099CA91 /* Download.swift */; };
@@ -222,6 +224,8 @@
 		5041B8012212053300603F02 /* ArtistDetailTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistDetailTableHeader.swift; sourceTree = "<group>"; };
 		5058708D21DEB07F0043896F /* SongAlphabetSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongAlphabetSection.swift; sourceTree = "<group>"; };
 		5058708F21DEBBCA0043896F /* NextSongsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextSongsVC.swift; sourceTree = "<group>"; };
+		50763F1722AD942A00D062A0 /* AlbumDetailTableHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AlbumDetailTableHeader.xib; sourceTree = "<group>"; };
+		50763F1822AD942A00D062A0 /* AlbumDetailTableHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumDetailTableHeader.swift; sourceTree = "<group>"; };
 		5077F933221DAB5C0099CA91 /* DownloadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadManager.swift; sourceTree = "<group>"; };
 		5077F935221E6D0E0099CA91 /* ListenLaterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListenLaterVC.swift; sourceTree = "<group>"; };
 		5077F937221F24C10099CA91 /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
@@ -605,6 +609,8 @@
 				500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */,
 				500B7D3E21EC87FD0083ED6F /* SongActionSheetView.xib */,
 				500B7D4021EC893B0083ED6F /* SongActionSheetView.swift */,
+				50763F1722AD942A00D062A0 /* AlbumDetailTableHeader.xib */,
+				50763F1822AD942A00D062A0 /* AlbumDetailTableHeader.swift */,
 				50C16C2521E7CBA500F086F0 /* AlbumTableCell.xib */,
 				50C16C1D21E7A35C00F086F0 /* AlbumTableCell.swift */,
 				5041B7FF2212051A00603F02 /* ArtistDetailTableHeader.xib */,
@@ -760,6 +766,7 @@
 				500B7D3F21EC87FD0083ED6F /* SongActionSheetView.xib in Resources */,
 				50C16C0C21E52BBB00F086F0 /* SongTableCell.xib in Resources */,
 				508FDE3E21F2FA44005A0724 /* PlaylistDetailTableHeader.xib in Resources */,
+				50763F1922AD942A00D062A0 /* AlbumDetailTableHeader.xib in Resources */,
 				500B7D4521EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib in Resources */,
 				50C16C1621E687CF00F086F0 /* ArtistTableCell.xib in Resources */,
 				50C16C2621E7CBA500F086F0 /* AlbumTableCell.xib in Resources */,
@@ -850,6 +857,7 @@
 				50BA92FA21CC37F800E5901D /* SongVC.swift in Sources */,
 				500B7D4921EDD6250083ED6F /* ViewBuilder.swift in Sources */,
 				5086F87D22397B9A00546F5A /* AmpacheApi.swift in Sources */,
+				50763F1A22AD942A00D062A0 /* AlbumDetailTableHeader.swift in Sources */,
 				5077F93C2222CFCA0099CA91 /* LatestSongsVC.swift in Sources */,
 				5083861A21C827E600C4BB32 /* AuthParserDelegate.swift in Sources */,
 				50C16BFF21E118CB00F086F0 /* PlaylistManaged+CoreDataClass.swift in Sources */,

@@ -62,6 +62,15 @@ class LibraryStorage {
             }
         }
     }
+    
+    func deleteCache(ofAlbum album: Album) {
+        for song in album.songsOfAlbum {
+            if let songData = song.dataMO {
+                deleteSongData(songData: songData)
+                song.dataMO = nil
+            }
+        }
+    }
 
     func deleteCompleteSongCache() {
         clearStorage(ofType: SongDataMO.typeName)

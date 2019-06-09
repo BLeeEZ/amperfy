@@ -18,5 +18,19 @@ public class Album: AbstractLibraryElementMO {
         }
         return Artwork.defaultImage
     }
+    
+    var songsOfAlbum: [Song] {
+        guard let songsSet = songs else { return [Song]() }
+        return songsSet.array as! [Song]
+    }
+    
+    var hasCachedSongs: Bool {
+        for song in songsOfAlbum {
+            if song.data != nil {
+                return true
+            }
+        }
+        return false
+    }
 
 }

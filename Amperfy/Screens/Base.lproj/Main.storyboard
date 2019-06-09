@@ -396,6 +396,7 @@
                             <outlet property="delegate" destination="CiG-al-lkI" id="hr0-ZU-8lQ"/>
                         </connections>
                     </tableView>
+                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="i4d-Ey-cJ4"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DkM-7I-Ffg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
