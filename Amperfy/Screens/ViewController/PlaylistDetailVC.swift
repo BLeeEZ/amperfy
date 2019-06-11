@@ -119,7 +119,7 @@ extension PlaylistDetailVC: PlaylistSyncCallbacks {
     func notifyPlaylistSyncFinished(playlist: Playlist) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.playlist = playlist
+            self.playlist = self.appDelegate.persistentLibraryStorage.getPlaylist(id: playlist.id)
             self.tableView.reloadData()
             self.playlistOperationsView?.refresh()
             self.refreshControl?.endRefreshing()
