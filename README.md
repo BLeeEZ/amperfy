@@ -42,9 +42,8 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 Attributions
 ----------------
 [LNPopupController](https://github.com/LeoNatan/LNPopupController) by [LeoNatan](https://github.com/LeoNatan) is licensed under [MIT License](https://github.com/LeoNatan/LNPopupController/blob/master/LICENSE)
-
 [Font Awesome Icons](https://fontawesome.com/) by [Font Awesome](https://fontawesome.com/) is licensed under [CC BY 4.0 License](https://creativecommons.org/licenses/by/4.0/)
-
 [Font Awesome Fonts](https://fontawesome.com/) by [Font Awesome](https://fontawesome.com/) is licensed under [SIL OFL 1.1 License](https://scripts.sil.org/OFL)
+[iOS 11 Glyphs](https://icons8.com/ios) by [Icons8](https://icons8.com) is licensed under [Good Boy License](https://icons8.com/good-boy-license/)
 
 **License:** [GPLv3](https://github.com/BLeeEZ/Amperfy/blob/master/LICENSE)

@@ -548,6 +548,21 @@
                                     <action selector="currentSongTimeSliderChanged:" destination="cNo-Gw-08t" eventType="valueChanged" id="osz-uX-6MM"/>
                                 </connections>
                             </slider>
+                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p7l-Fc-xc4" userLabel="Airplay Button">
+                                <rect key="frame" x="312.5" y="609.5" width="40" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="40" id="eLY-qS-VcR"/>
+                                    <constraint firstAttribute="width" secondItem="p7l-Fc-xc4" secondAttribute="height" multiplier="1:1" id="oHa-Ii-emV"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="28"/>
+                                <state key="normal" image="airplay">
+                                    <color key="titleColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="titleShadowColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
+                                </state>
+                                <connections>
+                                    <action selector="airplayButtonPushed:" destination="cNo-Gw-08t" eventType="touchUpInside" id="XUE-fj-C3U"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -570,6 +585,8 @@
                             <constraint firstItem="QP1-rV-89n" firstAttribute="centerY" secondItem="zFW-m3-QjH" secondAttribute="centerY" id="PD2-RQ-Rve"/>
                             <constraint firstItem="QP1-rV-89n" firstAttribute="centerX" secondItem="Xnh-I5-qVt" secondAttribute="centerX" id="RM1-d9-0Of"/>
                             <constraint firstItem="TGj-Mw-Bpv" firstAttribute="top" secondItem="LPu-j3-Kng" secondAttribute="bottom" constant="8" id="aXF-Ro-uUa"/>
+                            <constraint firstItem="p7l-Fc-xc4" firstAttribute="leading" secondItem="KUY-Ba-KyK" secondAttribute="trailing" constant="50" id="cwi-Yl-4xL"/>
+                            <constraint firstItem="p7l-Fc-xc4" firstAttribute="centerY" secondItem="KUY-Ba-KyK" secondAttribute="centerY" id="dPu-kH-IFW"/>
                             <constraint firstItem="l2S-Z0-dxR" firstAttribute="leading" secondItem="MHX-G3-ckA" secondAttribute="trailing" constant="-175" id="eCv-hr-Gli"/>
                             <constraint firstItem="l2S-Z0-dxR" firstAttribute="bottom" secondItem="zUl-18-nko" secondAttribute="bottom" constant="20" id="eZO-14-36z"/>
                             <constraint firstItem="MHX-G3-ckA" firstAttribute="top" secondItem="LPu-j3-Kng" secondAttribute="bottom" constant="8" id="fOd-DY-XVV"/>
@@ -596,7 +613,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Fni-nx-M1Q" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1199" y="1002"/>
+            <point key="canvasLocation" x="1197.5999999999999" y="1001.649175412294"/>
         </scene>
         <!--Playlist-->
         <scene sceneID="lSZ-Ln-AXX">
@@ -681,7 +698,7 @@
         <scene sceneID="04c-tK-1Hj">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hgg-wk-1fD" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Library" image="musical_notes" selectedImage="musical_notes" id="wHf-aA-izU"/>
+                    <tabBarItem key="tabBarItem" title="Library" image="music_library" selectedImage="music_library" id="wHf-aA-izU"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="VnR-3z-lih">
                         <rect key="frame" x="0.0" y="20" width="375" height="96"/>
@@ -770,7 +787,7 @@
         <scene sceneID="zJV-6j-uMQ">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="JNI-Av-z8L" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Playlist" image="menu" selectedImage="menu" id="ci9-V8-L3U"/>
+                    <tabBarItem key="tabBarItem" title="Playlist" image="playlist" selectedImage="playlist" id="ci9-V8-L3U"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="3gT-R5-CQU">
                         <rect key="frame" x="0.0" y="20" width="375" height="96"/>
@@ -883,7 +900,7 @@
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7ec-Lo-v0P">
                                                     <rect key="frame" x="16" y="11" width="343" height="228"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <mutableString key="text">All attributions can also be found here:
+                                                    <string key="text">All attributions can also be found here:
 https://github.com/BLeeEZ/amperfy
 
 Amperfy is licensed under GPLv3 License:
@@ -900,7 +917,12 @@ https://creativecommons.org/licenses/by/4.0
 
 Font Awesome Fonts by Font Awesome is licensed under SIL OFL 1.1 License:
 https://fontawesome.com
-https://scripts.sil.org/OFL</mutableString>
+https://scripts.sil.org/OFL
+
+iOS 11 Glyphs by Icons8 is licensed under Good Boy License
+https://icons8.com/ios
+https://icons8.com
+https://icons8.com/good-boy-license</string>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                 </textView>
@@ -951,10 +973,11 @@ https://scripts.sil.org/OFL</mutableString>
         </scene>
     </scenes>
     <resources>
-        <image name="menu" width="33.333332061767578" height="33.333332061767578"/>
-        <image name="musical_notes" width="33.333332061767578" height="33.333332061767578"/>
-        <image name="search" width="33.333332061767578" height="33.333332061767578"/>
-        <image name="settings" width="33.333332061767578" height="33.333332061767578"/>
+        <image name="airplay" width="30" height="30"/>
+        <image name="music_library" width="30" height="30"/>
+        <image name="playlist" width="30" height="30"/>
+        <image name="search" width="30" height="30"/>
+        <image name="settings" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="GrB-fu-hYZ"/>

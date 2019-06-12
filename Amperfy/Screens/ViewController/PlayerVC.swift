@@ -1,4 +1,5 @@
 import UIKit
+import MediaPlayer
 
 class PlayerVC: UIViewController {
     
@@ -44,6 +45,20 @@ class PlayerVC: UIViewController {
         }
     }
 
+    @IBAction func airplayButtonPushed(_ sender: Any) {
+        let rect = CGRect(x: -100, y: 0, width: 0, height: 0)
+        let airplayVolume = MPVolumeView(frame: rect)
+        airplayVolume.showsVolumeSlider = false
+        self.view.addSubview(airplayVolume)
+        for view: UIView in airplayVolume.subviews {
+            if let button = view as? UIButton {
+                button.sendActions(for: .touchUpInside)
+                break
+            }
+        }
+        airplayVolume.removeFromSuperview()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
