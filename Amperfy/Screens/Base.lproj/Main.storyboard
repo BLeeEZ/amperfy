@@ -628,7 +628,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bWG-CV-eC7" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2974" y="1767"/>
+            <point key="canvasLocation" x="2974" y="1765"/>
         </scene>
         <!--Search-->
         <scene sceneID="2oE-zy-AcU">
@@ -668,7 +668,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3tw-4G-Oye" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3918" y="1766"/>
+            <point key="canvasLocation" x="3918" y="1764"/>
         </scene>
         <!--Tab BarVC-->
         <scene sceneID="nnu-C8-zem">
@@ -683,7 +683,7 @@
                         <segue destination="hgg-wk-1fD" kind="relationship" relationship="viewControllers" id="efZ-e2-QYR"/>
                         <segue destination="JNI-Av-z8L" kind="relationship" relationship="viewControllers" id="sw2-oI-emN"/>
                         <segue destination="Xme-l1-fiY" kind="relationship" relationship="viewControllers" id="lHO-db-1UC"/>
-                        <segue destination="Qhm-KH-aq7" kind="relationship" relationship="viewControllers" id="rE7-yI-kVY"/>
+                        <segue destination="I0E-6C-Xz3" kind="relationship" relationship="viewControllers" id="rE7-yI-kVY"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jPK-lo-A9E" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -884,50 +884,30 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Attribution" id="2lU-Sp-sof">
+                            <tableViewSection id="2lU-Sp-sof">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="250" id="jEv-Dh-Yf5">
-                                        <rect key="frame" x="0.0" y="255.5" width="375" height="250"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="44" id="tKf-HH-isM">
+                                        <rect key="frame" x="0.0" y="235.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jEv-Dh-Yf5" id="AFy-oj-21e">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="249.5"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tKf-HH-isM" id="ptJ-kC-ghZ">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7ec-Lo-v0P">
-                                                    <rect key="frame" x="16" y="11" width="343" height="228"/>
-                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <string key="text">All attributions can also be found here:
-https://github.com/BLeeEZ/amperfy
-
-Amperfy is licensed under GPLv3 License:
-https://github.com/BLeeEZ/Amperfy/blob/master/LICENSE
-
-LNPopupController by LeoNatan is licensed under MIT License:
-https://github.com/LeoNatan/LNPopupController
-https://github.com/LeoNatan
-https://github.com/LeoNatan/LNPopupController/blob/master/LICENSE
-
-Font Awesome Icons by Font Awesome is licensed under CC BY 4.0 License:
-https://fontawesome.com
-https://creativecommons.org/licenses/by/4.0
-
-Font Awesome Fonts by Font Awesome is licensed under SIL OFL 1.1 License:
-https://fontawesome.com
-https://scripts.sil.org/OFL
-
-iOS 11 Glyphs by Icons8 is licensed under Good Boy License
-https://icons8.com/ios
-https://icons8.com
-https://icons8.com/good-boy-license</string>
-                                                    <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
-                                                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                                </textView>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yLz-qt-tsU">
+                                                    <rect key="frame" x="16" y="7" width="359" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="rjH-Pp-vd6"/>
+                                                    </constraints>
+                                                    <state key="normal" title="About"/>
+                                                    <connections>
+                                                        <segue destination="6s0-DO-Zi4" kind="show" id="lcs-uX-3pl"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="trailingMargin" secondItem="7ec-Lo-v0P" secondAttribute="trailing" id="BTt-Pv-VHp"/>
-                                                <constraint firstItem="7ec-Lo-v0P" firstAttribute="bottom" secondItem="AFy-oj-21e" secondAttribute="bottom" constant="-10.5" id="BwR-9c-dHH"/>
-                                                <constraint firstItem="7ec-Lo-v0P" firstAttribute="leading" secondItem="AFy-oj-21e" secondAttribute="leading" constant="16" id="Q2M-fX-Bci"/>
-                                                <constraint firstItem="7ec-Lo-v0P" firstAttribute="top" secondItem="AFy-oj-21e" secondAttribute="top" constant="11" id="RCy-0N-PLb"/>
+                                                <constraint firstItem="yLz-qt-tsU" firstAttribute="leading" secondItem="ptJ-kC-ghZ" secondAttribute="leading" constant="16" id="Lbi-gT-TPv"/>
+                                                <constraint firstAttribute="trailing" secondItem="yLz-qt-tsU" secondAttribute="trailing" id="Qsq-pF-wGX"/>
+                                                <constraint firstItem="yLz-qt-tsU" firstAttribute="centerY" secondItem="ptJ-kC-ghZ" secondAttribute="centerY" id="VaX-EF-2QU"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -939,14 +919,52 @@ https://icons8.com/good-boy-license</string>
                             <outlet property="delegate" destination="Qhm-KH-aq7" id="SC1-bM-DQL"/>
                         </connections>
                     </tableView>
-                    <tabBarItem key="tabBarItem" title="Settings" image="settings" selectedImage="settings" id="eYw-qp-kII"/>
+                    <navigationItem key="navigationItem" title="Settings" largeTitleDisplayMode="never" id="Tpb-zW-gf4"/>
                     <connections>
                         <segue destination="BYZ-38-t0r" kind="showDetail" identifier="toLogin" id="GrB-fu-hYZ"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="l2K-Vp-kqS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2122" y="1002"/>
+            <point key="canvasLocation" x="2122" y="1766"/>
+        </scene>
+        <!--About-->
+        <scene sceneID="I3u-G9-7pr">
+            <objects>
+                <viewController title="About" id="6s0-DO-Zi4" customClass="AboutVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="5kl-Ya-3fC">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vZx-T1-TgZ" userLabel="About Text View">
+                                <rect key="frame" x="0.0" y="64" width="375" height="554"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <attributedString key="attributedText">
+                                    <fragment content="About text will be set in view controller">
+                                        <attributes>
+                                            <font key="NSFont" metaFont="system" size="14"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="vZx-T1-TgZ" firstAttribute="leading" secondItem="AUl-SB-v6c" secondAttribute="leading" id="Mhs-Q3-nj0"/>
+                            <constraint firstItem="vZx-T1-TgZ" firstAttribute="top" secondItem="AUl-SB-v6c" secondAttribute="top" id="jCm-Y1-Pg1"/>
+                            <constraint firstItem="AUl-SB-v6c" firstAttribute="bottom" secondItem="vZx-T1-TgZ" secondAttribute="bottom" id="o44-Jj-gyS"/>
+                            <constraint firstItem="AUl-SB-v6c" firstAttribute="trailing" secondItem="vZx-T1-TgZ" secondAttribute="trailing" id="rij-eQ-ZsW"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="AUl-SB-v6c"/>
+                    </view>
+                    <connections>
+                        <outlet property="aboutTextView" destination="vZx-T1-TgZ" id="TUL-pP-N1H"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7Gt-xY-bek" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2122" y="2508"/>
         </scene>
         <!--Latest Songs-->
         <scene sceneID="hyu-9c-dpK">
@@ -966,6 +984,25 @@ https://icons8.com/good-boy-license</string>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wa6-VT-4pR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2974" y="-1332"/>
+        </scene>
+        <!--Settings-->
+        <scene sceneID="sI0-OS-aAK">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="I0E-6C-Xz3" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Settings" image="settings" selectedImage="settings" id="eYw-qp-kII"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="jGM-TB-a88">
+                        <rect key="frame" x="0.0" y="20" width="375" height="96"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Qhm-KH-aq7" kind="relationship" relationship="rootViewController" id="wcb-ws-MR9"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="y2x-MA-OEj" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2120.8000000000002" y="1001.649175412294"/>
         </scene>
     </scenes>
     <resources>
