@@ -548,17 +548,13 @@
                                     <action selector="currentSongTimeSliderChanged:" destination="cNo-Gw-08t" eventType="valueChanged" id="osz-uX-6MM"/>
                                 </connections>
                             </slider>
-                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p7l-Fc-xc4" userLabel="Airplay Button">
+                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p7l-Fc-xc4" userLabel="Airplay Button">
                                 <rect key="frame" x="312.5" y="609.5" width="40" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="40" id="eLY-qS-VcR"/>
                                     <constraint firstAttribute="width" secondItem="p7l-Fc-xc4" secondAttribute="height" multiplier="1:1" id="oHa-Ii-emV"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="28"/>
-                                <state key="normal" image="airplay">
-                                    <color key="titleColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="titleShadowColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
-                                </state>
+                                <state key="normal" image="airplay"/>
                                 <connections>
                                     <action selector="airplayButtonPushed:" destination="cNo-Gw-08t" eventType="touchUpInside" id="XUE-fj-C3U"/>
                                 </connections>
