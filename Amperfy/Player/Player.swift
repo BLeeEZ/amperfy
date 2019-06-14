@@ -136,6 +136,9 @@ class Player: NSObject, AmpacheRespondable {
             play(songInPlaylistAt: coreData.currentSongIndex)
         } else {
             ampachePlayer.continuePlay()
+            if let curPlaylistElement = ampachePlayer.currentlyPlaying {
+                notifySongStartedPlaying(playlistElement: curPlaylistElement)
+            }
         }
     }
     
@@ -309,11 +312,8 @@ class Player: NSObject, AmpacheRespondable {
                 let interruptionOption = AVAudioSession.InterruptionOptions(rawValue: interruptionOptionRaw.uintValue)
                 if interruptionOption == AVAudioSession.InterruptionOptions.shouldResume {
                     // Here you should continue playback
-                    if let curPlaying = currentlyPlaying {
-                        os_log(.info, "Audio interruption ended -> Resume playing")
-                        play()
-                        notifySongStartedPlaying(playlistElement: curPlaying)
-                    }
+                    os_log(.info, "Audio interruption ended -> Resume playing")
+                    play()
                 }
             }
         default: break
