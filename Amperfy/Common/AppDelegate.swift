@@ -41,7 +41,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         player.reinit(coreData: persistentLibraryStorage.getPlayerData())
     }
 
-    func configureRemoteControl() {
+    func configureAudioSessionInterruptionAndRemoteControl() {
+        self.player.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
         self.player.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
         UIApplication.shared.beginReceivingRemoteControlEvents()
         self.player.nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
@@ -53,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        configureRemoteControl()
+        configureAudioSessionInterruptionAndRemoteControl()
         configureDefaultNavigationBarStyle()
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
