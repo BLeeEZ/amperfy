@@ -102,7 +102,7 @@ class AmpacheXmlServerApi {
 
     func requestArtists(parserDelegate: XMLParserDelegate, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
         reauthenticateIfNeccessary()
-        if let hostname = credentials?.serverUrl, let auth = authHandshake, pollCount < auth.artistCount {
+        if let hostname = credentials?.serverUrl, let auth = authHandshake, startIndex < auth.artistCount {
             let urlPath = "\(hostname)/server/xml.server.php?auth=\(auth.token)&action=artists&offset=\(startIndex)&limit=\(pollCount)"
             request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
         }
