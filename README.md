@@ -17,10 +17,11 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 - Remote controlable
 - Artwork sync from database
 - Playlist download and upload
+- Dark mode support
 
 ## Requirements
 
-* XCode 10, swift 5.0
+* Xcode 11, swift 5
 
 ## Getting Started
 

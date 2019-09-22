@@ -49,7 +49,6 @@ class SearchVC: UITableViewController {
         }
         
         searchController.delegate = self
-        searchController.dimsBackgroundDuringPresentation = false // The default is true.
         searchController.searchBar.delegate = self // Monitor when the search button is tapped.
         
         /** Search presents a view controller by applying normal view controller presentation semantics.
