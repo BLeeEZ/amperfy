@@ -10,8 +10,10 @@ public class Song: AbstractLibraryElementMO {
     }
 
     override var image: UIImage {
-        if super.image != Artwork.defaultImage {
-            return super.image
+        if let curAlbum = album, !curAlbum.isOrphaned {
+            if super.image != Artwork.defaultImage {
+                return super.image
+            }
         }
         if let artistArt = artist?.artwork?.image {
             return artistArt

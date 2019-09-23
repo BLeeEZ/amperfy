@@ -32,5 +32,9 @@ public class Album: AbstractLibraryElementMO {
         }
         return false
     }
+    
+    var isOrphaned: Bool {
+        return identifier == "Unknown (Orphaned)"
+    }
 
 }
