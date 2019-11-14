@@ -73,7 +73,7 @@ class SongTableCell: ReorderTableViewCell {
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-        if isUserTouchInteractionAllowed, isForceClicked(touches), let song = song, let rootView = rootView, rootView.presentedViewController == nil {
+        if isUserTouchInteractionAllowed, isForceClicked(touches), let song = song, let rootView = rootView, rootView.presentingViewController == nil {
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.impactOccurred()
             isAlertPresented = true

@@ -15,6 +15,7 @@ class NextSongsVC: UITableViewController {
         appDelegate.downloadManager.addNotifier(self)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
+        tableView.isEditing = true
 
         optionsButton = OptionsBarButtonItem(target: self, action: #selector(optionsPressed))
         navigationItem.rightBarButtonItem = optionsButton
