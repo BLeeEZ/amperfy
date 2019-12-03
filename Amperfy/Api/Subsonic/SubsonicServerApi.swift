@@ -10,16 +10,13 @@ class SubsonicServerApi {
     private let log = OSLog(subsystem: AppDelegate.name, category: "Subsonic")
     private var credentials: LoginCredentials?
     private var isValidCredentials = false
-    private var basicRequestUrlString: String {
+
+    private func urlString(forAction: String) -> String {
         guard let credentials = self.credentials else { return "" }
-        let defaultSalt = "a9lkens5nfklken3293nknl2nk3nflk"
         let version = "1.11.0"
-        return "\(credentials.serverUrl)/rest/index.php?u=\(credentials.username)&p=\(credentials.password)&s=\(defaultSalt)&v=\(version)&c=\(AppDelegate.name)"
+        return "\(credentials.serverUrl)/rest/\(forAction).view?u=\(credentials.username)&p=\(credentials.password)&v=\(version)&c=\(AppDelegate.name)"
     }
     
-    private func urlString(forAction: String) -> String {
-        return basicRequestUrlString + "&action=" + forAction
-    }
     private func urlString(forAction: String, id: Int32) -> String {
         return urlString(forAction: forAction) + "&id=\(id)"
     }
