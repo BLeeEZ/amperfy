@@ -62,11 +62,17 @@ class AmpacheXmlServerApi {
         self.credentials = credentials
         let timestamp = Int(NSDate().timeIntervalSince1970)
         let passphrase = generatePassphrase(passwordHash: credentials.passwordHash, timestamp: timestamp)
-        let urlPath = "\(credentials.serverUrl)/server/xml.server.php?action=handshake&auth=\(passphrase)&timestamp=\(timestamp)&version=350001&user=\(credentials.username)"
+        
+        guard let userUrl = credentials.username.addingPercentEncoding(withAllowedCharacters: .alphanumerics) else {
+            os_log("Username could not be url escaped: %s", log: log, type: .error, credentials.username)
+            return
+        }
+        
+        let urlPath = "\(credentials.serverUrl)/server/xml.server.php?action=handshake&auth=\(passphrase)&timestamp=\(timestamp)&version=350001&user=\(userUrl)"
         os_log("%s", log: log, type: .default, urlPath)
         
         guard let url = URL(string: urlPath) else {
-            os_log("Ampache server url invalid: %s", log: log, type: .error, urlPath)
+            os_log("Ampache server url is invalid: %s", log: log, type: .error, urlPath)
             return
         }
         
@@ -195,7 +201,7 @@ class AmpacheXmlServerApi {
     func requestPlaylistCreate(parserDelegate: XMLParserDelegate, playlist: Playlist) {
         reauthenticateIfNeccessary()
         if let hostname = credentials?.serverUrl, let auth = authHandshake {
-            let playlistNameUrl = playlist.name.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "InvalidPlaylistName"
+            let playlistNameUrl = playlist.name.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "InvalidPlaylistName"
             let urlPath = "\(hostname)/server/xml.server.php?auth=\(auth.token)&action=playlist_create&name=\(playlistNameUrl)"
             request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
         }

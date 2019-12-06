@@ -14,7 +14,12 @@ class SubsonicServerApi {
     private func urlString(forAction: String) -> String {
         guard let credentials = self.credentials else { return "" }
         let version = "1.11.0"
-        return "\(credentials.serverUrl)/rest/\(forAction).view?u=\(credentials.username)&p=\(credentials.password)&v=\(version)&c=\(AppDelegate.name)"
+
+        guard let userUrl = credentials.username.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+            let passwordUrl = credentials.password.addingPercentEncoding(withAllowedCharacters: .alphanumerics) else {
+            return ""
+        }
+        return "\(credentials.serverUrl)/rest/\(forAction).view?u=\(userUrl)&p=\(passwordUrl)&v=\(version)&c=\(AppDelegate.name)"
     }
     
     private func urlString(forAction: String, id: Int32) -> String {
@@ -94,7 +99,7 @@ class SubsonicServerApi {
 
     func requestPlaylistCreate(parserDelegate: XMLParserDelegate, playlist: Playlist) {
         var urlPath = urlString(forAction: "createPlaylist")
-        let playlistNameUrl = playlist.name.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "InvalidPlaylistName"
+        let playlistNameUrl = playlist.name.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? "InvalidPlaylistName"
         urlPath += "&name=" + playlistNameUrl
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
@@ -102,7 +107,7 @@ class SubsonicServerApi {
     func requestPlaylistUpdate(parserDelegate: XMLParserDelegate, playlist: Playlist, songIndicesToRemove: [Int32], songIdsToAdd: [Int32]) {
         var urlPath = urlString(forAction: "updatePlaylist")
         urlPath += "&playlistId=\(playlist.id)"
-        let playlistNameUrl = playlist.name.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "InvalidPlaylistName"
+        let playlistNameUrl = playlist.name.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? "InvalidPlaylistName"
         urlPath += "&name=" + playlistNameUrl
         for songIndex in songIndicesToRemove {
             urlPath += "&songIndexToRemove=\(songIndex)"

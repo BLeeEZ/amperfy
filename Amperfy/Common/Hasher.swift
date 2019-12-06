@@ -3,7 +3,7 @@ import Foundation
 class Hasher {
 
     static func sha256(dataString : String) -> String {
-        let data = dataString.data(using: String.Encoding.ascii)! as NSData
+        let data = dataString.data(using: String.Encoding.utf8)! as NSData
         var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
         CC_SHA256(data.bytes, CC_LONG(data.length), &hash)
         
