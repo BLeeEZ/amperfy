@@ -164,3 +164,32 @@ extension UIImageView {
         downloaded(from: url, contentMode: mode)
     }
 }
+
+extension UIAlertController {
+    /*
+     Workaround to avoid false 'LayoutConstraints' warning:
+     
+     "2019-04-12 15:33:29.584076+0200 Appname[4688:39368] [LayoutConstraints] Unable to simultaneously satisfy constraints.
+         Probably at least one of the constraints in the following list is one you don't want.
+         Try this:
+             (1) look at each constraint and try to figure out which you don't expect;
+             (2) find the code that added the unwanted constraint or constraints and fix it.
+     (
+         "<NSLayoutConstraint:0x6000025a1e50 UIView:0x7f88fcf6ce60.width == - 16   (active)>"
+     )
+
+     Will attempt to recover by breaking constraint
+     <NSLayoutConstraint:0x6000025a1e50 UIView:0x7f88fcf6ce60.width == - 16   (active)>"
+     
+     Found fix for this here:
+     https://stackoverflow.com/questions/55653187/swift-default-alertviewcontroller-breaking-constraints
+     --> Remove invalid constrain from UIAlertController
+     */
+    func pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings() {
+        for subview in self.view.subviews {
+            for constraint in subview.constraints where constraint.debugDescription.contains("width == - 16") {
+                subview.removeConstraint(constraint)
+            }
+        }
+    }
+}

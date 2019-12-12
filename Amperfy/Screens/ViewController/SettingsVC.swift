@@ -19,6 +19,7 @@ class SettingsVC: UITableViewController {
             self.appDelegate.persistentLibraryStorage.saveContext()
         }))
         alert.addAction(UIAlertAction(title: "No", style: .default , handler: nil))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         self.present(alert, animated: true)
     }
     
@@ -34,6 +35,7 @@ class SettingsVC: UITableViewController {
             self.performSegue(withIdentifier: Segues.toLogin.rawValue, sender: nil)
         }))
         alert.addAction(UIAlertAction(title: "No", style: .default , handler: nil))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         self.present(alert, animated: true)
     }
     

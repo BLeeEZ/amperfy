@@ -67,6 +67,7 @@ class LatestSongsVC: UITableViewController {
             self.present(selectPlaylistNav, animated: true, completion: nil)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         present(alert, animated: true, completion: nil)
     }
     

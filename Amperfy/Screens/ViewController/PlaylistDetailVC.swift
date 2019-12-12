@@ -132,10 +132,12 @@ extension PlaylistDetailVC: PlaylistSyncCallbacks {
             if success {
                 let alert = UIAlertController(title: "Upload successful", message: nil, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
+                alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
                 self.present(alert, animated: true, completion: nil)
             } else {
                 let alert = UIAlertController(title: "Upload failed", message: nil, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
+                alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
                 self.present(alert, animated: true, completion: nil)
             }
         }

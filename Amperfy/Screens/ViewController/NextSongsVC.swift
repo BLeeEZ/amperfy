@@ -83,6 +83,7 @@ class NextSongsVC: UITableViewController {
             self.present(selectPlaylistNav, animated: true, completion: nil)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         
         self.present(alert, animated: true, completion: nil)
     }

@@ -50,6 +50,7 @@ class AlbumDetailTableHeader: UIView {
             }))
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         return alert
     }
     
