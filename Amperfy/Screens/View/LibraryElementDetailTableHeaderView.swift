@@ -22,7 +22,7 @@ class LibraryElementDetailTableHeaderView: UIView {
         }
     }
     
-    @IBAction func addAllToPlaylistButtonPressed(_ sender: Any) {
+    @IBAction func addAllToPlayNextButtonPressed(_ sender: Any) {
         if let artist = artist {
             addArtistSongsToPlaylist(artist: artist)
         } else if let album = album {
