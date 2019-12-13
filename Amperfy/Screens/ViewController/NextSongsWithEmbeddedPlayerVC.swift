@@ -3,7 +3,7 @@ import UIKit
 class NextSongsWithEmbeddedPlayerVC: UITableViewController {
 
     var appDelegate: AppDelegate!
-    var player: Player!
+    var player: AmperfyPlayer!
     var playerView: PlayerView!
     
     override func viewDidLoad() {

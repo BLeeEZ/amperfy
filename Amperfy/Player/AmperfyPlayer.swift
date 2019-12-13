@@ -27,25 +27,25 @@ enum RepeatMode: Int16 {
     }
 }
 
-class Player: NSObject, AmpacheRespondable {
+class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     var playlist: Playlist { 
         return coreData.playlist
     }
     var isPlaying: Bool {
-        return ampachePlayer.isPlaying
+        return backendAudioPlayer.isPlaying
     }
     var currentlyPlaying: PlaylistElement? {
-        if let playingSong = ampachePlayer.currentlyPlaying {
+        if let playingSong = backendAudioPlayer.currentlyPlaying {
             return playingSong
         }
         return coreData.currentPlaylistElement
     }
     var elapsedTime: Double {
-        return ampachePlayer.elapsedTime
+        return backendAudioPlayer.elapsedTime
     }
     var duration: Double {
-        return ampachePlayer.duration
+        return backendAudioPlayer.duration
     }
     var nowPlayingInfoCenter: MPNowPlayingInfoCenter?
     var isShuffel: Bool {
@@ -58,15 +58,15 @@ class Player: NSObject, AmpacheRespondable {
     }
 
     private var coreData: PlayerData
-    private let ampachePlayer: AmpachePlayer
+    private let backendAudioPlayer: BackendAudioPlayer
     private var notifierList = [MusicPlayable]()
     private let currentSongReplayInsteadPlayPreviousTimeInSec = 5.0
     
-    init(coreData: PlayerData, ampachePlayer: AmpachePlayer) {
+    init(coreData: PlayerData, backendAudioPlayer: BackendAudioPlayer) {
         self.coreData = coreData
-        self.ampachePlayer = ampachePlayer
+        self.backendAudioPlayer = backendAudioPlayer
         super.init()
-        self.ampachePlayer.responder = self
+        self.backendAudioPlayer.responder = self
     }
 
     func reinit(coreData: PlayerData) {
@@ -74,10 +74,10 @@ class Player: NSObject, AmpacheRespondable {
     }
 
     private func shouldCurrentSongReplayInsteadPlayPrevious() -> Bool {
-        if !ampachePlayer.canBeContinued {
+        if !backendAudioPlayer.canBeContinued {
             return false
         }
-        return ampachePlayer.elapsedTime >= currentSongReplayInsteadPlayPreviousTimeInSec
+        return backendAudioPlayer.elapsedTime >= currentSongReplayInsteadPlayPreviousTimeInSec
     }
 
     private func replayCurrenSong() {
@@ -86,8 +86,8 @@ class Player: NSObject, AmpacheRespondable {
     }
 
     func seek(toSecond: Double) {
-        ampachePlayer.seek(toSecond: toSecond)
-        ampachePlayer.continuePlay()
+        backendAudioPlayer.seek(toSecond: toSecond)
+        backendAudioPlayer.continuePlay()
     }
     
     func addToPlaylist(song: Song) {
@@ -110,12 +110,12 @@ class Player: NSObject, AmpacheRespondable {
     private func prepareSongAndInsertToPlayer(playlistIndex: Int, reactionToError: FetchErrorReaction) {
         guard playlistIndex < playlist.songs.count else { return }
         let playlistEntry = playlist.entries[playlistIndex]
-        ampachePlayer.requestToPlay(playlistEntry: playlistEntry, reactionToError: reactionToError)
+        backendAudioPlayer.requestToPlay(playlistEntry: playlistEntry, reactionToError: reactionToError)
         coreData.currentSongIndex = playlistIndex
     }
     
     func notifySongPreparationFinished() {
-        if let curPlaylistElement = ampachePlayer.currentlyPlaying {
+        if let curPlaylistElement = backendAudioPlayer.currentlyPlaying {
             notifySongStartedPlaying(playlistElement: curPlaylistElement)
             if let song = curPlaylistElement.song {
                 updateNowPlayingInfo(song: song)
@@ -132,11 +132,11 @@ class Player: NSObject, AmpacheRespondable {
     }
     
     func play() {
-        if !ampachePlayer.canBeContinued {
+        if !backendAudioPlayer.canBeContinued {
             play(songInPlaylistAt: coreData.currentSongIndex)
         } else {
-            ampachePlayer.continuePlay()
-            if let curPlaylistElement = ampachePlayer.currentlyPlaying {
+            backendAudioPlayer.continuePlay()
+            if let curPlaylistElement = backendAudioPlayer.currentlyPlaying {
                 notifySongStartedPlaying(playlistElement: curPlaylistElement)
             }
         }
@@ -211,7 +211,7 @@ class Player: NSObject, AmpacheRespondable {
     }
     
     func pause() {
-        ampachePlayer.pause()
+        backendAudioPlayer.pause()
         notifySongPaused()
         if let song = coreData.currentSong {
             updateNowPlayingInfo(song: song)
@@ -220,7 +220,7 @@ class Player: NSObject, AmpacheRespondable {
     
     func stop() {
         notifyPlayerStopped(playlistElement: currentlyPlaying)
-        ampachePlayer.stop()
+        backendAudioPlayer.stop()
         coreData.currentSongIndex = 0
     }
     
@@ -278,8 +278,8 @@ class Player: NSObject, AmpacheRespondable {
             MPMediaItemPropertyTitle: song.title ?? "",
             MPMediaItemPropertyAlbumTitle: song.album?.name ?? "",
             MPMediaItemPropertyArtist: song.artist?.name ?? "",
-            MPMediaItemPropertyPlaybackDuration: ampachePlayer.duration,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: ampachePlayer.elapsedTime,
+            MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
             MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: song.image.size, requestHandler: { (size) -> UIImage in
                 return song.image
             })

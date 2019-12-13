@@ -10,7 +10,7 @@ enum FetchErrorReaction {
     case stop
 }
 
-protocol AmpacheRespondable {
+protocol BackendAudioPlayerNotifiable {
     func didElapsedTimeChanged()
     func stop()
     func playPrevious()
@@ -26,7 +26,7 @@ struct PlayRequest {
     let reactionToError: FetchErrorReaction
 }
 
-class AmpachePlayer: SongDownloadNotifiable {
+class BackendAudioPlayer: SongDownloadNotifiable {
 
     private let downloadManager: DownloadManager
     private let player = AVPlayer()
@@ -37,7 +37,7 @@ class AmpachePlayer: SongDownloadNotifiable {
     public private(set) var isPlaying: Bool = false
     public private(set) var currentlyPlaying: PlaylistElement?
     
-    var responder: AmpacheRespondable?
+    var responder: BackendAudioPlayerNotifiable?
     var elapsedTime: Double {
         if !player.currentTime().seconds.isFinite {
             return 0.0

@@ -5,7 +5,7 @@ class PlayerView: UIView {
   
     static let frameHeight: CGFloat = 320.0
     private var appDelegate: AppDelegate!
-    private var player: Player!
+    private var player: AmperfyPlayer!
     private var rootView: NextSongsWithEmbeddedPlayerVC?
     
     @IBOutlet weak var songTitleLabel: UILabel!
