@@ -34,7 +34,7 @@ class AlbumDetailTableHeader: UIView {
     
     func createAlert(forAlbum album: Album) -> UIAlertController {
         let alert = UIAlertController(title: album.name, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "Listen later", style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
             for song in album.songs {
                 if !song.isCached {
                     self.appDelegate.downloadManager.download(song: song)

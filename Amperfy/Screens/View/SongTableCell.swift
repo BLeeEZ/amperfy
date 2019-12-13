@@ -128,7 +128,7 @@ class SongTableCell: ReorderTableViewCell {
                 self.refresh()
             }))
         } else {
-            alert.addAction(UIAlertAction(title: "Listen later", style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
                 self.appDelegate.downloadManager.download(song: song)
                 self.refresh()
             }))

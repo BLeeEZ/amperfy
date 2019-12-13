@@ -5,7 +5,7 @@ private enum Section: Int {
     case queuedRequests = 0
 }
 
-class ListenLaterVC: UITableViewController, SongDownloadViewUpdatable {
+class DownloadsVC: UITableViewController, SongDownloadViewUpdatable {
     
     var appDelegate: AppDelegate!
     var downloadManager: DownloadManager!

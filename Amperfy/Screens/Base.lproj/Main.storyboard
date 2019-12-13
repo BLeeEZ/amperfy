@@ -7,11 +7,6 @@
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="Font Awesome 5 Free-Solid-900.otf">
-            <string>FontAwesome5FreeSolid</string>
-        </array>
-    </customFonts>
     <scenes>
         <!--LoginVC-->
         <scene sceneID="tne-QT-ifu">
@@ -185,10 +180,10 @@
                                     <segue destination="1iw-qc-oYh" kind="show" id="N9s-E8-jHU"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FCZ-ku-lFp" userLabel="ListenLater">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FCZ-ku-lFp" userLabel="Downloads">
                                 <rect key="frame" x="30" y="336" width="345" height="36"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                <state key="normal" title="Listen Later"/>
+                                <state key="normal" title="Downloads"/>
                                 <connections>
                                     <segue destination="0yB-ih-px5" kind="show" id="FrA-mH-sYU"/>
                                 </connections>
@@ -560,10 +555,10 @@
             </objects>
             <point key="canvasLocation" x="351" y="154"/>
         </scene>
-        <!--Listen Later-->
+        <!--Downloads-->
         <scene sceneID="6gv-xD-OeS">
             <objects>
-                <tableViewController title="Listen Later" id="0yB-ih-px5" customClass="ListenLaterVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Downloads" id="0yB-ih-px5" userLabel="Downloads" customClass="DownloadsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="BWe-SW-JDn">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

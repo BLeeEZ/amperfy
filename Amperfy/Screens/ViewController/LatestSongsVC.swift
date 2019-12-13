@@ -45,7 +45,7 @@ class LatestSongsVC: UITableViewController {
         guard let syncWave = latestSyncWave else { return }
         let alert = UIAlertController(title: "Latest songs", message: nil, preferredStyle: .actionSheet)
         
-        alert.addAction(UIAlertAction(title: "Listen later", style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
             for song in syncWave.songs {
                 if !song.isCached {
                     self.appDelegate.downloadManager.download(song: song)
