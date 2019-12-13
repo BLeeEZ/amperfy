@@ -1,11 +1,13 @@
 import UIKit
 import MediaPlayer
 
-class PlayerVC: UIViewController {
+class PlayerView: UIView {
+  
+    static let frameHeight: CGFloat = 320.0
+    private var appDelegate: AppDelegate!
+    private var player: Player!
+    private var rootView: NextSongsWithEmbeddedPlayerVC?
     
-    var appDelegate: AppDelegate!
-    var player: Player!
- 
     @IBOutlet weak var songTitleLabel: UILabel!
     @IBOutlet weak var artistNameLabel: UILabel!
     @IBOutlet weak var playButton: UIButton!
@@ -15,6 +17,18 @@ class PlayerVC: UIViewController {
     @IBOutlet weak var elapsedTimeLabel: UILabel!
     @IBOutlet weak var remainingTimeLabel: UILabel!
     @IBOutlet weak var artworkImage: UIImageView!
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        player = appDelegate.player
+        player.addNotifier(notifier: self)
+    }
+    
+    func prepare(toWorkOnRootView: NextSongsWithEmbeddedPlayerVC? ) {
+        self.rootView = toWorkOnRootView
+        refreshPlayer()
+    }
     
     @IBAction func playButtonPushed(_ sender: Any) {
         player.togglePlay()
@@ -49,7 +63,7 @@ class PlayerVC: UIViewController {
         let rect = CGRect(x: -100, y: 0, width: 0, height: 0)
         let airplayVolume = MPVolumeView(frame: rect)
         airplayVolume.showsVolumeSlider = false
-        self.view.addSubview(airplayVolume)
+        self.addSubview(airplayVolume)
         for view: UIView in airplayVolume.subviews {
             if let button = view as? UIButton {
                 button.sendActions(for: .touchUpInside)
@@ -59,14 +73,11 @@ class PlayerVC: UIViewController {
         airplayVolume.removeFromSuperview()
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        player = appDelegate.player
-        player.addNotifier(notifier: self)
+    @IBAction private func playlistOptionsPressed() {
+        self.rootView?.optionsPressed()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    func viewWillAppear(_ animated: Bool) {
         refreshPlayer()
     }
     
@@ -82,8 +93,8 @@ class PlayerVC: UIViewController {
         }
         
         playButton.setTitle(title, for: UIControl.State.normal)
-        let barButtonItem = UIBarButtonItem(image: buttonImg, style: .plain, target: self, action: #selector(PlayerVC.playButtonPushed))
-        popupItem.rightBarButtonItems = [ barButtonItem ]
+        let barButtonItem = UIBarButtonItem(image: buttonImg, style: .plain, target: self, action: #selector(PlayerView.playButtonPushed))
+        rootView?.popupItem.rightBarButtonItems = [ barButtonItem ]
     }
     
     func refreshSongInfo(song: Song? = nil) {
@@ -91,29 +102,38 @@ class PlayerVC: UIViewController {
             songTitleLabel.text = songInfo.title
             artistNameLabel.text = songInfo.artist?.name
             artworkImage.image = songInfo.image
-            popupItem.title = songInfo.title
-            popupItem.subtitle = songInfo.artist?.name
-            popupItem.image = songInfo.image
+            rootView?.popupItem.title = songInfo.title
+            rootView?.popupItem.subtitle = songInfo.artist?.name
+            rootView?.popupItem.image = songInfo.image
         } else {
-            songTitleLabel.text = ""
+            songTitleLabel.text = "No song playing"
             artistNameLabel.text = ""
             artworkImage.image = Artwork.defaultImage
-            popupItem.title = "No song playing"
-            popupItem.subtitle = ""
-            popupItem.image = Artwork.defaultImage
+            rootView?.popupItem.title = "No song playing"
+            rootView?.popupItem.subtitle = ""
+            rootView?.popupItem.image = Artwork.defaultImage
         }
     }
 
     func refreshSongTime() {
-        let elapsedTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
-        elapsedTimeLabel.text = elapsedTime.asShortString()
-        let playerDuration = player.duration.isFinite ? player.duration : 0.0
-        let remainingTime = ClockTime(timeInSeconds: Int(player.elapsedTime - ceil(playerDuration)))
-        remainingTimeLabel.text = remainingTime.asShortString()
-        currentSongTimeSlider.minimumValue = 0.0
-        currentSongTimeSlider.maximumValue = Float(player.duration)
-        currentSongTimeSlider.value = Float(player.elapsedTime)
-        popupItem.progress = Float(player.elapsedTime / player.duration)
+        if player.currentlyPlaying != nil {
+            let elapsedTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
+            elapsedTimeLabel.text = elapsedTime.asShortString()
+            let playerDuration = player.duration.isFinite ? player.duration : 0.0
+            let remainingTime = ClockTime(timeInSeconds: Int(player.elapsedTime - ceil(playerDuration)))
+            remainingTimeLabel.text = remainingTime.asShortString()
+            currentSongTimeSlider.minimumValue = 0.0
+            currentSongTimeSlider.maximumValue = Float(player.duration)
+            currentSongTimeSlider.value = Float(player.elapsedTime)
+            rootView?.popupItem.progress = Float(player.elapsedTime / player.duration)
+        } else {
+            elapsedTimeLabel.text = "--:--"
+            remainingTimeLabel.text = "--:--"
+            currentSongTimeSlider.minimumValue = 0.0
+            currentSongTimeSlider.maximumValue = 1.0
+            currentSongTimeSlider.value = 0.0
+            rootView?.popupItem.progress = 0.0
+        }
     }
     
     func refreshPlayer() {
@@ -148,7 +168,7 @@ class PlayerVC: UIViewController {
     
 }
 
-extension PlayerVC: MusicPlayable {
+extension PlayerView: MusicPlayable {
 
     func didStartedPlaying(playlistElement: PlaylistElement) {
         refreshPlayer()

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -413,218 +413,6 @@
             </objects>
             <point key="canvasLocation" x="3918" y="154"/>
         </scene>
-        <!--PlayerVC-->
-        <scene sceneID="pI0-bq-0LL">
-            <objects>
-                <viewController storyboardIdentifier="PlayerVC" id="cNo-Gw-08t" customClass="PlayerVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="Xnh-I5-qVt">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zFW-m3-QjH" userLabel="Previous Button">
-                                <rect key="frame" x="62" y="532" width="70" height="70"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="70" id="EO8-Hr-THn"/>
-                                    <constraint firstAttribute="height" constant="70" id="QXN-6j-3I9"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
-                                <state key="normal" title=""/>
-                                <connections>
-                                    <action selector="previousButtonPushed:" destination="cNo-Gw-08t" eventType="touchUpInside" id="bmV-Ie-3AG"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sAD-QL-G7Q" userLabel="Next Button">
-                                <rect key="frame" x="243" y="532" width="70" height="70"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="70" id="2jv-jZ-biB"/>
-                                    <constraint firstAttribute="width" constant="70" id="X2A-jD-FGf"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
-                                <state key="normal" title=""/>
-                                <connections>
-                                    <action selector="nextButtonPushed:" destination="cNo-Gw-08t" eventType="touchUpInside" id="iJB-A4-GDa"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QP1-rV-89n">
-                                <rect key="frame" x="142.5" y="522" width="90" height="90"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="90" id="1jk-Vl-bLZ"/>
-                                    <constraint firstAttribute="width" constant="90" id="hKo-Gu-zZd"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
-                                <state key="normal" title=""/>
-                                <connections>
-                                    <action selector="playButtonPushed:" destination="cNo-Gw-08t" eventType="touchUpInside" id="rLS-pG-zbo"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zUl-18-nko" userLabel="Repeat Button">
-                                <rect key="frame" x="107.5" y="612" width="60" height="35"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="60" id="0D5-pa-Uw4"/>
-                                    <constraint firstAttribute="height" constant="35" id="UTv-sF-YR3"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="23"/>
-                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <state key="normal" title="">
-                                    <color key="titleColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                                <state key="selected" title=" all">
-                                    <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="repeatButtonPushed:" destination="cNo-Gw-08t" eventType="touchUpInside" id="xaq-f5-LE5"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KUY-Ba-KyK" userLabel="Shuffel Button">
-                                <rect key="frame" x="212.5" y="612" width="50" height="35"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="50" id="T2g-Hi-ZcU"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="23"/>
-                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <state key="normal" title="">
-                                    <color key="titleColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                                <state key="selected">
-                                    <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="shuffelButtonPushed:" destination="cNo-Gw-08t" eventType="touchUpInside" id="JME-Vk-6zI"/>
-                                </connections>
-                            </button>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LPu-j3-Kng">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="375"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="LPu-j3-Kng" secondAttribute="height" multiplier="1:1" id="PaB-6D-xXY"/>
-                                </constraints>
-                            </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-5:30" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TGj-Mw-Bpv">
-                                <rect key="frame" x="275" y="383" width="92" height="20"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="lwA-l4-f3d"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0:15" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MHX-G3-ckA">
-                                <rect key="frame" x="8" y="383" width="167" height="20"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="VQ6-Ma-alb"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YHQ-xq-ElC">
-                                <rect key="frame" x="0.0" y="447.5" width="375" height="23"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="23" id="3X0-Fw-Quj"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="19"/>
-                                <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="z1x-TS-eE2">
-                                <rect key="frame" x="0.0" y="410" width="375" height="25.5"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="25.5" id="5up-5T-Ypj"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="21"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="UjB-eE-0xE" userLabel="Progress" customClass="PlaytimeSlider" customModule="Amperfy" customModuleProvider="target">
-                                <rect key="frame" x="-2" y="373" width="379" height="31"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="VAV-GE-Znd"/>
-                                </constraints>
-                                <connections>
-                                    <action selector="currentSongTimeSliderChanged:" destination="cNo-Gw-08t" eventType="valueChanged" id="osz-uX-6MM"/>
-                                </connections>
-                            </slider>
-                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p7l-Fc-xc4" userLabel="Airplay Button">
-                                <rect key="frame" x="312.5" y="609.5" width="40" height="40"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="40" id="eLY-qS-VcR"/>
-                                    <constraint firstAttribute="width" secondItem="p7l-Fc-xc4" secondAttribute="height" multiplier="1:1" id="oHa-Ii-emV"/>
-                                </constraints>
-                                <state key="normal" image="airplay"/>
-                                <connections>
-                                    <action selector="airplayButtonPushed:" destination="cNo-Gw-08t" eventType="touchUpInside" id="XUE-fj-C3U"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                        <constraints>
-                            <constraint firstItem="LPu-j3-Kng" firstAttribute="leading" secondItem="l2S-Z0-dxR" secondAttribute="leading" id="20k-o8-4rM"/>
-                            <constraint firstItem="LPu-j3-Kng" firstAttribute="top" secondItem="l2S-Z0-dxR" secondAttribute="top" id="3Wm-NS-Bsl"/>
-                            <constraint firstItem="l2S-Z0-dxR" firstAttribute="trailing" secondItem="z1x-TS-eE2" secondAttribute="trailing" id="3wv-41-sxk"/>
-                            <constraint firstAttribute="trailing" secondItem="YHQ-xq-ElC" secondAttribute="trailing" id="4sM-xZ-nFH"/>
-                            <constraint firstItem="UjB-eE-0xE" firstAttribute="top" secondItem="LPu-j3-Kng" secondAttribute="bottom" constant="-2" id="8wL-ky-qrZ"/>
-                            <constraint firstItem="KUY-Ba-KyK" firstAttribute="centerY" secondItem="zUl-18-nko" secondAttribute="centerY" id="9U8-wQ-6XZ"/>
-                            <constraint firstItem="QP1-rV-89n" firstAttribute="leading" secondItem="zFW-m3-QjH" secondAttribute="trailing" constant="10.5" id="DTB-xl-ia5"/>
-                            <constraint firstItem="l2S-Z0-dxR" firstAttribute="trailing" secondItem="UjB-eE-0xE" secondAttribute="trailing" id="GNh-eX-sjd"/>
-                            <constraint firstItem="TGj-Mw-Bpv" firstAttribute="leading" secondItem="l2S-Z0-dxR" secondAttribute="trailing" constant="-100" id="JFK-VY-em3"/>
-                            <constraint firstItem="KUY-Ba-KyK" firstAttribute="centerX" secondItem="Xnh-I5-qVt" secondAttribute="centerX" constant="50" id="JbE-mP-CSs"/>
-                            <constraint firstItem="zUl-18-nko" firstAttribute="top" secondItem="QP1-rV-89n" secondAttribute="bottom" id="K9j-H3-3mN"/>
-                            <constraint firstItem="zUl-18-nko" firstAttribute="centerX" secondItem="Xnh-I5-qVt" secondAttribute="centerX" constant="-50" id="Kos-ng-isL"/>
-                            <constraint firstItem="z1x-TS-eE2" firstAttribute="leading" secondItem="l2S-Z0-dxR" secondAttribute="leading" id="M7n-kz-jTo"/>
-                            <constraint firstItem="z1x-TS-eE2" firstAttribute="top" secondItem="LPu-j3-Kng" secondAttribute="bottom" constant="35" id="Msf-7L-jhA"/>
-                            <constraint firstItem="UjB-eE-0xE" firstAttribute="leading" secondItem="l2S-Z0-dxR" secondAttribute="leading" id="O89-o5-sqK"/>
-                            <constraint firstItem="l2S-Z0-dxR" firstAttribute="trailing" secondItem="LPu-j3-Kng" secondAttribute="trailing" id="P4W-EQ-NMj"/>
-                            <constraint firstItem="QP1-rV-89n" firstAttribute="centerY" secondItem="zFW-m3-QjH" secondAttribute="centerY" id="PD2-RQ-Rve"/>
-                            <constraint firstItem="QP1-rV-89n" firstAttribute="centerX" secondItem="Xnh-I5-qVt" secondAttribute="centerX" id="RM1-d9-0Of"/>
-                            <constraint firstItem="TGj-Mw-Bpv" firstAttribute="top" secondItem="LPu-j3-Kng" secondAttribute="bottom" constant="8" id="aXF-Ro-uUa"/>
-                            <constraint firstItem="p7l-Fc-xc4" firstAttribute="leading" secondItem="KUY-Ba-KyK" secondAttribute="trailing" constant="50" id="cwi-Yl-4xL"/>
-                            <constraint firstItem="p7l-Fc-xc4" firstAttribute="centerY" secondItem="KUY-Ba-KyK" secondAttribute="centerY" id="dPu-kH-IFW"/>
-                            <constraint firstItem="l2S-Z0-dxR" firstAttribute="leading" secondItem="MHX-G3-ckA" secondAttribute="trailing" constant="-175" id="eCv-hr-Gli"/>
-                            <constraint firstItem="l2S-Z0-dxR" firstAttribute="bottom" secondItem="zUl-18-nko" secondAttribute="bottom" constant="20" id="eZO-14-36z"/>
-                            <constraint firstItem="MHX-G3-ckA" firstAttribute="top" secondItem="LPu-j3-Kng" secondAttribute="bottom" constant="8" id="fOd-DY-XVV"/>
-                            <constraint firstItem="MHX-G3-ckA" firstAttribute="leading" secondItem="l2S-Z0-dxR" secondAttribute="leading" constant="8" id="faZ-o9-utg"/>
-                            <constraint firstAttribute="trailing" secondItem="TGj-Mw-Bpv" secondAttribute="trailing" constant="8" id="o1W-ca-gAS"/>
-                            <constraint firstItem="YHQ-xq-ElC" firstAttribute="top" secondItem="z1x-TS-eE2" secondAttribute="bottom" constant="12" id="oOD-4H-PEn"/>
-                            <constraint firstItem="YHQ-xq-ElC" firstAttribute="leading" secondItem="l2S-Z0-dxR" secondAttribute="leading" id="ptk-fZ-Ss5"/>
-                            <constraint firstItem="sAD-QL-G7Q" firstAttribute="centerY" secondItem="zFW-m3-QjH" secondAttribute="centerY" id="sjo-hA-dcV"/>
-                            <constraint firstItem="sAD-QL-G7Q" firstAttribute="leading" secondItem="QP1-rV-89n" secondAttribute="trailing" constant="10.5" id="zBG-aV-smP"/>
-                        </constraints>
-                        <viewLayoutGuide key="safeArea" id="l2S-Z0-dxR"/>
-                    </view>
-                    <connections>
-                        <outlet property="artistNameLabel" destination="YHQ-xq-ElC" id="d4L-YL-dIV"/>
-                        <outlet property="artworkImage" destination="LPu-j3-Kng" id="e2X-Jg-tXP"/>
-                        <outlet property="currentSongTimeSlider" destination="UjB-eE-0xE" id="FeY-jR-AiH"/>
-                        <outlet property="elapsedTimeLabel" destination="MHX-G3-ckA" id="Iqf-qa-Oaj"/>
-                        <outlet property="playButton" destination="QP1-rV-89n" id="x6q-lJ-dYo"/>
-                        <outlet property="remainingTimeLabel" destination="TGj-Mw-Bpv" id="29y-e0-iaE"/>
-                        <outlet property="repeatButton" destination="zUl-18-nko" id="R4B-8M-pZG"/>
-                        <outlet property="shuffelButton" destination="KUY-Ba-KyK" id="0gn-UM-u0z"/>
-                        <outlet property="songTitleLabel" destination="z1x-TS-eE2" id="QnR-wi-Y6O"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Fni-nx-M1Q" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1197.5999999999999" y="1001.649175412294"/>
-        </scene>
-        <!--Playlist-->
-        <scene sceneID="lSZ-Ln-AXX">
-            <objects>
-                <tableViewController title="Playlist" id="1jr-NR-xhR" customClass="NextSongsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="CvB-ci-ZYh">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="1jr-NR-xhR" id="eOH-e0-Ung"/>
-                            <outlet property="delegate" destination="1jr-NR-xhR" id="CCu-9D-RHd"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Next songs" id="9l2-C5-oXz"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="bWG-CV-eC7" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2974" y="1765"/>
-        </scene>
         <!--Search-->
         <scene sceneID="2oE-zy-AcU">
             <objects>
@@ -676,7 +464,6 @@
                     </tabBar>
                     <connections>
                         <segue destination="hgg-wk-1fD" kind="relationship" relationship="viewControllers" id="efZ-e2-QYR"/>
-                        <segue destination="JNI-Av-z8L" kind="relationship" relationship="viewControllers" id="sw2-oI-emN"/>
                         <segue destination="Xme-l1-fiY" kind="relationship" relationship="viewControllers" id="lHO-db-1UC"/>
                         <segue destination="I0E-6C-Xz3" kind="relationship" relationship="viewControllers" id="rE7-yI-kVY"/>
                     </connections>
@@ -772,25 +559,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="M3f-FL-42B" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="351" y="154"/>
-        </scene>
-        <!--Playlist-->
-        <scene sceneID="zJV-6j-uMQ">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="JNI-Av-z8L" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Playlist" image="playlist" selectedImage="playlist" id="ci9-V8-L3U"/>
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="3gT-R5-CQU">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="96"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="1jr-NR-xhR" kind="relationship" relationship="rootViewController" id="9F7-aS-rW6"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Nmj-Ga-af0" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2974" y="1002"/>
         </scene>
         <!--Listen Later-->
         <scene sceneID="6gv-xD-OeS">
@@ -931,12 +699,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vZx-T1-TgZ" userLabel="About Text View">
-                                <rect key="frame" x="0.0" y="44" width="375" height="623"/>
+                                <rect key="frame" x="0.0" y="44" width="375" height="574"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <attributedString key="attributedText">
                                     <fragment content="About text will be set in view controller">
                                         <attributes>
-                                            <font key="NSFont" metaFont="system" size="14"/>
+                                            <font key="NSFont" metaFont="menu" size="14"/>
                                         </attributes>
                                     </fragment>
                                 </attributedString>
@@ -1001,12 +769,11 @@
     <resources>
         <image name="airplay" width="30" height="30"/>
         <image name="music_library" width="30" height="30"/>
-        <image name="playlist" width="30" height="30"/>
         <image name="search" width="30" height="30"/>
         <image name="settings" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="wcb-ws-MR9"/>
+        <segue reference="rE7-yI-kVY"/>
         <segue reference="axa-3B-EfE"/>
         <segue reference="tfW-38-Y3k"/>
     </inferredMetricsTieBreakers>

@@ -1,11 +1,10 @@
 import UIKit
 
-class NextSongsVC: UITableViewController {
+class NextSongsWithEmbeddedPlayerVC: UITableViewController {
 
     var appDelegate: AppDelegate!
     var player: Player!
-
-    var optionsButton: UIBarButtonItem!
+    var playerView: PlayerView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,13 +15,18 @@ class NextSongsVC: UITableViewController {
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
         tableView.isEditing = true
-
-        optionsButton = OptionsBarButtonItem(target: self, action: #selector(optionsPressed))
-        navigationItem.rightBarButtonItem = optionsButton
+        
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: PlayerView.frameHeight))
+        if let (fixedView, headerView) = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: PlayerView.frameHeight)) {
+            playerView = headerView
+            playerView.prepare(toWorkOnRootView: self)
+            tableView.tableHeaderView?.addSubview(fixedView)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         self.tableView.reloadData()
+        self.playerView.viewWillAppear(animated)
     }
 
     // MARK: - Table view data source
@@ -69,7 +73,7 @@ class NextSongsVC: UITableViewController {
     return true
     }
     
-    @objc private func optionsPressed() {
+    func optionsPressed() {
         let alert = UIAlertController(title: "Next songs", message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Clear", style: .default, handler: { _ in
@@ -90,7 +94,7 @@ class NextSongsVC: UITableViewController {
 
 }
 
-extension NextSongsVC: MusicPlayable {
+extension NextSongsWithEmbeddedPlayerVC: MusicPlayable {
 
     func didStartedPlaying(playlistElement: PlaylistElement) {
         tableView.reloadData()
@@ -110,7 +114,7 @@ extension NextSongsVC: MusicPlayable {
 
 }
 
-extension NextSongsVC: SongDownloadViewUpdatable {
+extension NextSongsWithEmbeddedPlayerVC: SongDownloadViewUpdatable {
     
     func downloadManager(_ downloadManager: DownloadManager, updatedRequest: DownloadRequest<Song>, updateReason: SongDownloadRequestEvent) {
         switch(updateReason) {
