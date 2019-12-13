@@ -18,7 +18,7 @@
             <objects>
                 <viewController storyboardIdentifier="LoginVC" id="BYZ-38-t0r" customClass="LoginVC" customModule="Amperfy" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Username" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aKf-Oy-Mn4">
@@ -138,7 +138,7 @@
                         <outlet property="passwordTF" destination="vfm-n3-YO9" id="bfH-Hk-RYo"/>
                         <outlet property="serverUrlTF" destination="cJB-xi-h6o" id="vTq-48-JYD"/>
                         <outlet property="usernameTF" destination="Hkb-KJ-f3A" id="TMh-2q-bUV"/>
-                        <segue destination="n1j-bZ-g7e" kind="showDetail" identifier="toSync" id="TBt-Gf-8Wu"/>
+                        <segue destination="n1j-bZ-g7e" kind="presentation" identifier="toSync" modalPresentationStyle="fullScreen" id="TBt-Gf-8Wu"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -499,7 +499,7 @@
             <objects>
                 <viewController storyboardIdentifier="SyncVC" id="n1j-bZ-g7e" customClass="SyncVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="eKy-0T-u87">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Syncing" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Hu-Ks-SWY">
@@ -553,7 +553,7 @@
                         <outlet property="progressBar" destination="npf-bB-pkf" id="C83-ms-bZn"/>
                         <outlet property="progressInfo" destination="qe5-xR-nU8" id="9mn-5u-yc5"/>
                         <outlet property="progressLabel" destination="KKh-tQ-byV" id="Wib-rh-Gpj"/>
-                        <segue destination="Odu-0e-SfH" kind="showDetail" identifier="toLibrary" id="n3S-Ug-p4Z"/>
+                        <segue destination="Odu-0e-SfH" kind="presentation" identifier="toLibrary" modalPresentationStyle="fullScreen" id="n3S-Ug-p4Z"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="M3f-FL-42B" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -662,7 +662,7 @@
                                                     </constraints>
                                                     <state key="normal" title="About"/>
                                                     <connections>
-                                                        <segue destination="6s0-DO-Zi4" kind="show" id="lcs-uX-3pl"/>
+                                                        <segue destination="6s0-DO-Zi4" kind="showDetail" id="lcs-uX-3pl"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -683,7 +683,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Settings" largeTitleDisplayMode="never" id="Tpb-zW-gf4"/>
                     <connections>
-                        <segue destination="BYZ-38-t0r" kind="showDetail" identifier="toLogin" id="GrB-fu-hYZ"/>
+                        <segue destination="BYZ-38-t0r" kind="presentation" identifier="toLogin" modalPresentationStyle="fullScreen" id="GrB-fu-hYZ"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="l2K-Vp-kqS" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -695,11 +695,11 @@
             <objects>
                 <viewController title="About" id="6s0-DO-Zi4" customClass="AboutVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="5kl-Ya-3fC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vZx-T1-TgZ" userLabel="About Text View">
-                                <rect key="frame" x="0.0" y="44" width="375" height="574"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <attributedString key="attributedText">
                                     <fragment content="About text will be set in view controller">
@@ -719,6 +719,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="AUl-SB-v6c"/>
                     </view>
+                    <navigationItem key="navigationItem" id="8q4-Lg-5uh"/>
                     <connections>
                         <outlet property="aboutTextView" destination="vZx-T1-TgZ" id="TUL-pP-N1H"/>
                     </connections>
@@ -767,14 +768,13 @@
         </scene>
     </scenes>
     <resources>
-        <image name="airplay" width="30" height="30"/>
         <image name="music_library" width="30" height="30"/>
         <image name="search" width="30" height="30"/>
         <image name="settings" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="rE7-yI-kVY"/>
-        <segue reference="axa-3B-EfE"/>
-        <segue reference="tfW-38-Y3k"/>
+        <segue reference="n3S-Ug-p4Z"/>
+        <segue reference="sdx-Gn-m0J"/>
+        <segue reference="PtL-O3-n85"/>
     </inferredMetricsTieBreakers>
 </document>
