@@ -57,8 +57,6 @@
 		5077F93A221F40130099CA91 /* SynchronizedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F939221F40130099CA91 /* SynchronizedArray.swift */; };
 		5077F93C2222CFCA0099CA91 /* LatestSongsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F93B2222CFCA0099CA91 /* LatestSongsVC.swift */; };
 		5077F93E222489510099CA91 /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F93D222489510099CA91 /* SettingsVC.swift */; };
-		5077F94B2225C8C40099CA91 /* LNPopupController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5077F94A2225C8B90099CA91 /* LNPopupController.framework */; };
-		5077F94C2225C8C40099CA91 /* LNPopupController.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5077F94A2225C8B90099CA91 /* LNPopupController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5077F95122279DF40099CA91 /* PlaytimeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F95022279DF40099CA91 /* PlaytimeSlider.swift */; };
 		5077F95322283FED0099CA91 /* RoundedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F95222283FED0099CA91 /* RoundedImage.swift */; };
 		5077F955222C58A10099CA91 /* GenericXmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F954222C58A10099CA91 /* GenericXmlParser.swift */; };
@@ -90,6 +88,7 @@
 		508FDE4A21F44E91005A0724 /* BackendAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */; };
 		508FDE4C21F58AFC005A0724 /* AppStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4B21F58AFC005A0724 /* AppStoryboard.swift */; };
 		508FDE5021F64ED6005A0724 /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4F21F64ED6005A0724 /* TabBarVC.swift */; };
+		5091858023A753C800A8891E /* LNPopupController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5091857F23A753C800A8891E /* LNPopupController.framework */; };
 		50A738812244B03700D3F2D4 /* SsSongParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A738802244B03700D3F2D4 /* SsSongParserDelegate.swift */; };
 		50A7388322451ED200D3F2D4 /* SsPlaylistParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A7388222451ED200D3F2D4 /* SsPlaylistParserDelegate.swift */; };
 		50A7388522452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A7388422452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift */; };
@@ -142,20 +141,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		5077F9492225C8B90099CA91 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 5077F9452225C8B90099CA91 /* LNPopupController.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 39DB52E51B5823330061C589;
-			remoteInfo = LNPopupController;
-		};
-		5077F94D2225C8C40099CA91 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 5077F9452225C8B90099CA91 /* LNPopupController.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 39DB52E41B5823330061C589;
-			remoteInfo = LNPopupController;
-		};
 		508385F921C5965E00C4BB32 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 508385DC21C5965B00C4BB32 /* Project object */;
@@ -179,7 +164,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5077F94C2225C8C40099CA91 /* LNPopupController.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -237,7 +221,6 @@
 		5077F939221F40130099CA91 /* SynchronizedArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedArray.swift; sourceTree = "<group>"; };
 		5077F93B2222CFCA0099CA91 /* LatestSongsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatestSongsVC.swift; sourceTree = "<group>"; };
 		5077F93D222489510099CA91 /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
-		5077F9452225C8B90099CA91 /* LNPopupController.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LNPopupController.xcodeproj; path = import/LNPopupController/LNPopupController/LNPopupController.xcodeproj; sourceTree = "<group>"; };
 		5077F95022279DF40099CA91 /* PlaytimeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaytimeSlider.swift; sourceTree = "<group>"; };
 		5077F95222283FED0099CA91 /* RoundedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedImage.swift; sourceTree = "<group>"; };
 		5077F954222C58A10099CA91 /* GenericXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericXmlParser.swift; sourceTree = "<group>"; };
@@ -276,6 +259,7 @@
 		508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendAudioPlayer.swift; sourceTree = "<group>"; };
 		508FDE4B21F58AFC005A0724 /* AppStoryboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoryboard.swift; sourceTree = "<group>"; };
 		508FDE4F21F64ED6005A0724 /* TabBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarVC.swift; sourceTree = "<group>"; };
+		5091857F23A753C800A8891E /* LNPopupController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LNPopupController.framework; path = Carthage/Build/iOS/LNPopupController.framework; sourceTree = "<group>"; };
 		50A738802244B03700D3F2D4 /* SsSongParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSongParserDelegate.swift; sourceTree = "<group>"; };
 		50A7388222451ED200D3F2D4 /* SsPlaylistParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPlaylistParserDelegate.swift; sourceTree = "<group>"; };
 		50A7388422452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPlaylistSongsParserDelegate.swift; sourceTree = "<group>"; };
@@ -332,7 +316,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5077F94B2225C8C40099CA91 /* LNPopupController.framework in Frameworks */,
+				5091858023A753C800A8891E /* LNPopupController.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,14 +405,6 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
-		5077F9462225C8B90099CA91 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				5077F94A2225C8B90099CA91 /* LNPopupController.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		508385DB21C5965B00C4BB32 = {
 			isa = PBXGroup;
 			children = (
@@ -436,7 +412,7 @@
 				508385FB21C5965E00C4BB32 /* AmperfyTests */,
 				5083860621C5965E00C4BB32 /* AmperfyUITests */,
 				508385E521C5965B00C4BB32 /* Products */,
-				5077F9452225C8B90099CA91 /* LNPopupController.xcodeproj */,
+				5091857E23A753C800A8891E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -513,6 +489,14 @@
 				50A7388422452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift */,
 			);
 			path = Subsonic;
+			sourceTree = "<group>";
+		};
+		5091857E23A753C800A8891E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5091857F23A753C800A8891E /* LNPopupController.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		50BA92F221CC26BE00E5901D /* Storage */ = {
@@ -652,11 +636,11 @@
 				508385E121C5965B00C4BB32 /* Frameworks */,
 				508385E221C5965B00C4BB32 /* Resources */,
 				5077F94F2225C8C40099CA91 /* Embed Frameworks */,
+				5091858223A7570700A8891E /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				5077F94E2225C8C40099CA91 /* PBXTargetDependency */,
 			);
 			name = Amperfy;
 			productName = Amperfy;
@@ -739,12 +723,6 @@
 			mainGroup = 508385DB21C5965B00C4BB32;
 			productRefGroup = 508385E521C5965B00C4BB32 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 5077F9462225C8B90099CA91 /* Products */;
-					ProjectRef = 5077F9452225C8B90099CA91 /* LNPopupController.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				508385E321C5965B00C4BB32 /* Amperfy */,
@@ -753,16 +731,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		5077F94A2225C8B90099CA91 /* LNPopupController.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = LNPopupController.framework;
-			remoteRef = 5077F9492225C8B90099CA91 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		508385E221C5965B00C4BB32 /* Resources */ = {
@@ -801,6 +769,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5091858223A7570700A8891E /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/LNPopupController.framework",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/LNPopupController.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		508385E021C5965B00C4BB32 /* Sources */ = {
@@ -943,11 +933,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		5077F94E2225C8C40099CA91 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = LNPopupController;
-			targetProxy = 5077F94D2225C8C40099CA91 /* PBXContainerItemProxy */;
-		};
 		508385FA21C5965E00C4BB32 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 508385E321C5965B00C4BB32 /* Amperfy */;
@@ -1094,6 +1079,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = U3R6D65S8W;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = Amperfy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1114,6 +1103,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = U3R6D65S8W;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = Amperfy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
