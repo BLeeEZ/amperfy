@@ -45,6 +45,8 @@ Attributions
 ----------------
 [LNPopupController](https://github.com/LeoNatan/LNPopupController) by [LeoNatan](https://github.com/LeoNatan) is licensed under [MIT License](https://github.com/LeoNatan/LNPopupController/blob/master/LICENSE)
 
+[MarqueeLabel](https://github.com/cbpowell/MarqueeLabel) by [Charles Powell](https://github.com/cbpowell) is licensed under [MIT License](https://github.com/cbpowell/MarqueeLabel/blob/master/LICENSE)
+
 [Font Awesome Icons](https://fontawesome.com/) by [Font Awesome](https://fontawesome.com/) is licensed under [CC BY 4.0 License](https://creativecommons.org/licenses/by/4.0/)
 
 [Font Awesome Fonts](https://fontawesome.com/) by [Font Awesome](https://fontawesome.com/) is licensed under [SIL OFL 1.1 License](https://scripts.sil.org/OFL)

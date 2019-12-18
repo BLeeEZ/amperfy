@@ -1,5 +1,6 @@
 import UIKit
 import MediaPlayer
+import MarqueeLabel
 
 class PlayerView: UIView {
   
@@ -8,8 +9,8 @@ class PlayerView: UIView {
     private var player: AmperfyPlayer!
     private var rootView: NextSongsWithEmbeddedPlayerVC?
     
-    @IBOutlet weak var songTitleLabel: UILabel!
-    @IBOutlet weak var artistNameLabel: UILabel!
+    @IBOutlet weak var songTitleLabel: MarqueeLabel!
+    @IBOutlet weak var artistNameLabel: MarqueeLabel!
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var repeatButton: UIButton!
     @IBOutlet weak var shuffelButton: UIButton!
@@ -79,6 +80,20 @@ class PlayerView: UIView {
     
     func viewWillAppear(_ animated: Bool) {
         refreshPlayer()
+        
+        songTitleLabel.leadingBuffer = 0.0
+        songTitleLabel.trailingBuffer = 30.0
+        songTitleLabel.animationDelay = 2.0
+        songTitleLabel.type = .continuous
+        songTitleLabel.speed = .rate(20.0)
+        songTitleLabel.fadeLength = 10.0
+        
+        artistNameLabel.leadingBuffer = 0.0
+        artistNameLabel.trailingBuffer = 30.0
+        artistNameLabel.animationDelay = 2.0
+        artistNameLabel.type = .continuous
+        artistNameLabel.speed = .rate(20.0)
+        artistNameLabel.fadeLength = 10.0
     }
     
     func refreshPlayButtonTitle() {

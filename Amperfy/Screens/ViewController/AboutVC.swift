@@ -23,6 +23,11 @@ class AboutVC: UIViewController {
         https://github.com/LeoNatan
         https://github.com/LeoNatan/LNPopupController/blob/master/LICENSE
         
+        MarqueeLabel by Charles Powell is licensed under MIT License:
+        https://github.com/cbpowell/MarqueeLabel
+        https://github.com/cbpowell
+        https://github.com/cbpowell/MarqueeLabel/blob/master/LICENSE
+        
         Font Awesome Icons by Font Awesome is licensed under CC BY 4.0 License:
         https://fontawesome.com
         https://creativecommons.org/licenses/by/4.0

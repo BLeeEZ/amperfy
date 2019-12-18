@@ -92,6 +92,7 @@
 		50A738812244B03700D3F2D4 /* SsSongParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A738802244B03700D3F2D4 /* SsSongParserDelegate.swift */; };
 		50A7388322451ED200D3F2D4 /* SsPlaylistParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A7388222451ED200D3F2D4 /* SsPlaylistParserDelegate.swift */; };
 		50A7388522452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A7388422452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift */; };
+		50B8A16F23AA618A00BAD8AF /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B8A16E23AA618A00BAD8AF /* MarqueeLabel.swift */; };
 		50BA92EF21CBF45D00E5901D /* AlbumParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92EC21CBF45D00E5901D /* AlbumParserDelegate.swift */; };
 		50BA92F021CBF45E00E5901D /* ArtistParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92ED21CBF45D00E5901D /* ArtistParserDelegate.swift */; };
 		50BA92F121CBF45E00E5901D /* LoginCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92EE21CBF45D00E5901D /* LoginCredentials.swift */; };
@@ -263,6 +264,7 @@
 		50A738802244B03700D3F2D4 /* SsSongParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSongParserDelegate.swift; sourceTree = "<group>"; };
 		50A7388222451ED200D3F2D4 /* SsPlaylistParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPlaylistParserDelegate.swift; sourceTree = "<group>"; };
 		50A7388422452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPlaylistSongsParserDelegate.swift; sourceTree = "<group>"; };
+		50B8A16E23AA618A00BAD8AF /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MarqueeLabel.swift; path = Carthage/Checkouts/MarqueeLabel/Sources/MarqueeLabel.swift; sourceTree = SOURCE_ROOT; };
 		50BA92EC21CBF45D00E5901D /* AlbumParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumParserDelegate.swift; sourceTree = "<group>"; };
 		50BA92ED21CBF45D00E5901D /* ArtistParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistParserDelegate.swift; sourceTree = "<group>"; };
 		50BA92EE21CBF45D00E5901D /* LoginCredentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginCredentials.swift; sourceTree = "<group>"; };
@@ -353,6 +355,7 @@
 		5009863A2208CB170057A1A6 /* Basics */ = {
 			isa = PBXGroup;
 			children = (
+				50B8A16E23AA618A00BAD8AF /* MarqueeLabel.swift */,
 				5009863B2208CB650057A1A6 /* OptionsButton.swift */,
 				5009863D2208CC1E0057A1A6 /* BasicButton.swift */,
 				5077F95022279DF40099CA91 /* PlaytimeSlider.swift */,
@@ -834,6 +837,7 @@
 				500BB4B721CAD63700D367CF /* Album+CoreDataProperties.swift in Sources */,
 				5041B8022212053300603F02 /* ArtistDetailTableHeader.swift in Sources */,
 				5077F93A221F40130099CA91 /* SynchronizedArray.swift in Sources */,
+				50B8A16F23AA618A00BAD8AF /* MarqueeLabel.swift in Sources */,
 				5009863E2208CC1E0057A1A6 /* BasicButton.swift in Sources */,
 				500BB4B621CAD63700D367CF /* Album+CoreDataClass.swift in Sources */,
 				50C16BFB21E1132600F086F0 /* PlaylistElement+CoreDataClass.swift in Sources */,
