@@ -1,2 +1,2 @@
-github "LeoNatan/LNPopupController"
-github "BLeeEZ/MarqueeLabel"
+github "LeoNatan/LNPopupController" ~> 2.8.5
+github "cbpowell/MarqueeLabel" ~> 4.0.1
