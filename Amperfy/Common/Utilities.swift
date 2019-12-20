@@ -193,3 +193,32 @@ extension UIAlertController {
         }
     }
 }
+
+extension UISlider {
+    func setUnicolorThumbImage(thumbSize: CGFloat, color: UIColor, for state: UIControl.State){
+        let thumbImage = createThumbImage(size: thumbSize, color: color)
+        self.setThumbImage(thumbImage, for: state)
+    }
+
+    private func createThumbImage(size: CGFloat, color: UIColor) -> UIImage {
+        let layerFrame = CGRect(x: 0, y: 0, width: size, height: size)
+
+        let shapeLayer = CAShapeLayer()
+        shapeLayer.path = CGPath(ellipseIn: layerFrame.insetBy(dx: 1, dy: 1), transform: nil)
+        shapeLayer.fillColor = color.cgColor
+        shapeLayer.strokeColor = color.withAlphaComponent(0.65).cgColor
+
+        let layer = CALayer.init()
+        layer.frame = layerFrame
+        layer.addSublayer(shapeLayer)
+        return self.imageFromLayer(layer: layer)
+    }
+
+    private func imageFromLayer(layer: CALayer) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(layer.frame.size, false, UIScreen.main.scale)
+        layer.render(in: UIGraphicsGetCurrentContext()!)
+        let outputImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        return outputImage
+    }
+}

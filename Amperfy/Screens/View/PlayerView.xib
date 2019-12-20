@@ -37,8 +37,9 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="42q-l9-IXM" userLabel="Progress" customClass="PlaytimeSlider" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="6" y="160" width="363" height="31"/>
+                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" continuous="NO" translatesAutoresizingMaskIntoConstraints="NO" id="42q-l9-IXM" userLabel="Progress" customClass="PlaytimeSlider" customModule="Amperfy" customModuleProvider="target">
+                    <rect key="frame" x="6" y="158" width="363" height="31"/>
+                    <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="30" id="KQ1-7I-Fbo"/>
                     </constraints>
@@ -187,7 +188,7 @@
                 <constraint firstItem="zaZ-s9-erE" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="-50" id="bAY-Bv-due"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="leading" secondItem="pOR-k2-6Vf" secondAttribute="leading" id="c3V-lE-hW9"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="top" secondItem="pOR-k2-6Vf" secondAttribute="bottom" constant="12" id="ghg-6R-wWp"/>
-                <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="zQR-aF-4SD" secondAttribute="bottom" constant="20" id="guh-i3-Npn"/>
+                <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="zQR-aF-4SD" secondAttribute="bottom" constant="18" id="guh-i3-Npn"/>
                 <constraint firstItem="pOR-k2-6Vf" firstAttribute="top" secondItem="zQR-aF-4SD" secondAttribute="top" constant="18" id="i5C-U2-zOK"/>
                 <constraint firstItem="E3q-DK-jgm" firstAttribute="centerY" secondItem="Byk-rx-3Lv" secondAttribute="centerY" id="lhe-qV-eMq"/>
                 <constraint firstItem="ZVN-JG-VAA" firstAttribute="centerY" secondItem="zaZ-s9-erE" secondAttribute="centerY" constant="-2" id="meJ-qg-Z4y"/>

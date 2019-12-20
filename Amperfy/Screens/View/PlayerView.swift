@@ -94,6 +94,9 @@ class PlayerView: UIView {
         artistNameLabel.type = .continuous
         artistNameLabel.speed = .rate(20.0)
         artistNameLabel.fadeLength = 10.0
+        
+        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .lightGray, for: UIControl.State.normal)
+        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .lightGray, for: UIControl.State.highlighted)
     }
     
     func refreshPlayButtonTitle() {
@@ -139,7 +142,9 @@ class PlayerView: UIView {
             remainingTimeLabel.text = remainingTime.asShortString()
             currentSongTimeSlider.minimumValue = 0.0
             currentSongTimeSlider.maximumValue = Float(player.duration)
-            currentSongTimeSlider.value = Float(player.elapsedTime)
+            if !currentSongTimeSlider.isTouchInside {
+                currentSongTimeSlider.value = Float(player.elapsedTime)
+            }
             rootView?.popupItem.progress = Float(player.elapsedTime / player.duration)
         } else {
             elapsedTimeLabel.text = "--:--"
