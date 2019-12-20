@@ -87,7 +87,6 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
 
     func seek(toSecond: Double) {
         backendAudioPlayer.seek(toSecond: toSecond)
-        backendAudioPlayer.continuePlay()
     }
     
     func addToPlaylist(song: Song) {
