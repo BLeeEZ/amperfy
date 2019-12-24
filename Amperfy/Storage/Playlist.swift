@@ -70,6 +70,24 @@ public class Playlist {
         return false
     }
     
+    var info: String {
+        var infoText = "Name: " + name + "\n"
+        infoText += "Count: " + String(sortedPlaylistElements.count) + "\n"
+        infoText += "Songs:\n"
+        for playlistElement in sortedPlaylistElements {
+            infoText += String(playlistElement.order) + ": "
+            if let song = playlistElement.song {
+                infoText += song.artist?.name ?? "NO ARTIST"
+                infoText += " - "
+                infoText += song.title ?? "NO TILE"
+            } else {
+                infoText += "NOT AVAILABLE"
+            }
+            infoText += "\n"
+        }
+        return infoText
+    }
+    
     init(storage: LibraryStorage, managedPlaylist: PlaylistManaged) {
         self.storage = storage
         self.managedPlaylist = managedPlaylist
@@ -133,13 +151,20 @@ public class Playlist {
     }
     
     func movePlaylistSong(fromIndex: Int, to: Int) {
-        if fromIndex < songs.count, to < songs.count {
-            let fromEntity = sortedPlaylistElements[fromIndex]
-            let toEntity = sortedPlaylistElements[to]
+        if fromIndex < songs.count, to < songs.count, fromIndex != to {
+            let localSortedPlaylistElements = sortedPlaylistElements
+
+            if fromIndex < to {
+                for i in fromIndex+1...to {
+                    localSortedPlaylistElements[i].order = localSortedPlaylistElements[i].order - 1
+                }
+            } else {
+                for i in to...fromIndex-1 {
+                    localSortedPlaylistElements[i].order = localSortedPlaylistElements[i].order + 1
+                }
+            }
+            localSortedPlaylistElements[fromIndex].order = Int32(to)
             
-            let fromEntityOrder = fromEntity.order
-            fromEntity.order = toEntity.order
-            toEntity.order = fromEntityOrder
             storage.saveContext()
             ensureConsistentEntityOrder()
         }

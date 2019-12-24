@@ -104,12 +104,14 @@ public class PlayerData {
     }
     
     func movePlaylistSong(fromIndex: Int, to: Int) {
-        if fromIndex < playlist.songs.count, to < playlist.songs.count {
+        if fromIndex < playlist.songs.count, to < playlist.songs.count, fromIndex != to {
             playlist.movePlaylistSong(fromIndex: fromIndex, to: to)
             if currentSongIndex == fromIndex {
                 currentSongIndex = to
-            } else if currentSongIndex == to {
-                currentSongIndex = fromIndex
+            } else if fromIndex < currentSongIndex, currentSongIndex <= to {
+                currentSongIndex = currentSongIndex - 1
+            } else if to <= currentSongIndex, currentSongIndex < fromIndex {
+                currentSongIndex = currentSongIndex + 1
             }
         }
     }
