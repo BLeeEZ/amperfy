@@ -142,7 +142,7 @@ class LibraryStorage {
     func getPlaylists() -> Array<Playlist> {
         var foundPlaylists = Array<Playlist>()
         let fr: NSFetchRequest<PlaylistManaged> = PlaylistManaged.fetchRequest()
-        fr.predicate = NSPredicate(format: "currentlyPlaying == nil")
+        fr.predicate = NSPredicate(format: "playersNormalPlaylist == nil && playersShuffledPlaylist == nil")
         do {
             let result = try context.fetch(fr) as NSArray?
             if let playlists = result as? Array<PlaylistManaged> {
@@ -171,13 +171,25 @@ class LibraryStorage {
                 saveContext()
             }
             
-            if playerManaged.playlist == nil {
-                playerManaged.playlist = PlaylistManaged(context: context)
+            if playerManaged.normalPlaylist == nil {
+                playerManaged.normalPlaylist = PlaylistManaged(context: context)
+                saveContext()
+            }
+            if playerManaged.shuffledPlaylist == nil {
+                playerManaged.shuffledPlaylist = PlaylistManaged(context: context)
                 saveContext()
             }
             
-            let playlist = Playlist(storage: self, managedPlaylist: playerManaged.playlist!)
-            playerData = PlayerData(storage: self, managedPlayer: playerManaged, playlist: playlist)
+            let normalPlaylist = Playlist(storage: self, managedPlaylist: playerManaged.normalPlaylist!)
+            let shuffledPlaylist = Playlist(storage: self, managedPlaylist: playerManaged.shuffledPlaylist!)
+            
+            if shuffledPlaylist.entries.count != normalPlaylist.entries.count {
+                shuffledPlaylist.removeAllSongs()
+                shuffledPlaylist.append(songs: normalPlaylist.songs)
+                shuffledPlaylist.shuffle()
+            }
+            
+            playerData = PlayerData(storage: self, managedPlayer: playerManaged, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
             
         } catch {
             fatalError("Not able to get/create" + PlayerManaged.typeName)

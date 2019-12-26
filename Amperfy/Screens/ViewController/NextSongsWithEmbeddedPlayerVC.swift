@@ -111,6 +111,10 @@ extension NextSongsWithEmbeddedPlayerVC: MusicPlayable {
 
     func didElapsedTimeChanged() {
     }
+    
+    func didUpdatePlaylist() {
+        tableView.reloadData()
+    }
 
 }
 

@@ -5,14 +5,39 @@ public class PlayerData {
     
     private let storage: LibraryStorage
     private let managed: PlayerManaged
-    let playlist: Playlist
+    private let normalPlaylist: Playlist
+    private let shuffledPlaylist: Playlist
     
-    init(storage: LibraryStorage, managedPlayer: PlayerManaged, playlist: Playlist) {
+    init(storage: LibraryStorage, managedPlayer: PlayerManaged, normalPlaylist: Playlist, shuffledPlaylist: Playlist) {
         self.storage = storage
         self.managed = managedPlayer
-        self.playlist = playlist
+        self.normalPlaylist = normalPlaylist
+        self.shuffledPlaylist = shuffledPlaylist
     }
     
+    private var activePlaylist: Playlist {
+        get {
+            if !isShuffel {
+                return normalPlaylist
+            } else {
+                return shuffledPlaylist
+            }
+        }
+    }
+    
+    private var inactivePlaylist: Playlist {
+        get {
+            if !isShuffel {
+                return shuffledPlaylist
+            } else {
+                return normalPlaylist
+            }
+        }
+    }
+    
+    public var playlist: Playlist {
+        get { return activePlaylist }
+    }
     public var currentSong: Song? {
         get {
             guard currentSongIndex < playlist.songs.count else {
@@ -36,6 +61,17 @@ public class PlayerData {
             return managed.shuffelSetting == 1
         }
         set {
+            if newValue {
+                shuffledPlaylist.shuffle()
+                if let curSong = currentSong, let indexOfCurrentSongInShuffledPlaylist = shuffledPlaylist.getFirstIndex(song: curSong) {
+                    shuffledPlaylist.movePlaylistSong(fromIndex: indexOfCurrentSongInShuffledPlaylist, to: 0)
+                    currentSongIndex = 0
+                }
+            } else {
+                if let curSong = currentSong, let indexOfCurrentSongInNormalPlaylist = normalPlaylist.getFirstIndex(song: curSong) {
+                    currentSongIndex = indexOfCurrentSongInNormalPlaylist
+                }
+            }
             managed.shuffelSetting = newValue ? 1 : 0
             storage.saveContext()
         }
@@ -89,14 +125,22 @@ public class PlayerData {
         }
     }
     
+    func addToPlaylist(song: Song) {
+        normalPlaylist.append(song: song)
+        shuffledPlaylist.append(song: song)
+    }
+    
     func removeAllSongs() {
         currentSongIndex = 0
-        playlist.removeAllSongs()
+        normalPlaylist.removeAllSongs()
+        shuffledPlaylist.removeAllSongs()
     }
     
     func removeSongFromPlaylist(at index: Int) {
         if index < playlist.songs.count {
-            playlist.remove(at: index)
+            let songToRemove = playlist.songs[index]
+            activePlaylist.remove(at: index)
+            inactivePlaylist.remove(firstOccurrenceOfSong: songToRemove)
             if index < currentSongIndex {
                 currentSongIndex = currentSongIndex - 1
             }

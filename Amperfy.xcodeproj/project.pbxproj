@@ -214,6 +214,7 @@
 		5041B8012212053300603F02 /* ArtistDetailTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistDetailTableHeader.swift; sourceTree = "<group>"; };
 		5058708D21DEB07F0043896F /* SongAlphabetSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongAlphabetSection.swift; sourceTree = "<group>"; };
 		5058708F21DEBBCA0043896F /* NextSongsWithEmbeddedPlayerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextSongsWithEmbeddedPlayerVC.swift; sourceTree = "<group>"; };
+		506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v2.xcdatamodel"; sourceTree = "<group>"; };
 		50763F1722AD942A00D062A0 /* AlbumDetailTableHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AlbumDetailTableHeader.xib; sourceTree = "<group>"; };
 		50763F1822AD942A00D062A0 /* AlbumDetailTableHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumDetailTableHeader.swift; sourceTree = "<group>"; };
 		5077F933221DAB5C0099CA91 /* DownloadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadManager.swift; sourceTree = "<group>"; };
@@ -1252,9 +1253,10 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */;
+			currentVersion = 506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

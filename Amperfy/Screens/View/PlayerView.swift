@@ -200,10 +200,15 @@ extension PlayerView: MusicPlayable {
     
     func didStopped(playlistElement: PlaylistElement?) {
         refreshPlayer()
+        refreshSongInfo(song: nil)
     }
 
     func didElapsedTimeChanged() {
         refreshSongTime()
+    }
+    
+    func didUpdatePlaylist() {
+        refreshPlayer()
     }
 
 }

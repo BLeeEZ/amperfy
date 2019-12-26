@@ -11,6 +11,7 @@ extension PlayerManaged {
     @NSManaged public var currentSongIndex: Int32
     @NSManaged public var shuffelSetting: Int16
     @NSManaged public var repeatSetting: Int16
-    @NSManaged public var playlist: PlaylistManaged?
+    @NSManaged public var normalPlaylist: PlaylistManaged?
+    @NSManaged public var shuffledPlaylist: PlaylistManaged?
 
 }

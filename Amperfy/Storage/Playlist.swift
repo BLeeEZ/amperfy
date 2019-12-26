@@ -50,12 +50,6 @@ public class Playlist {
             storage.saveContext()
         }
     }
-    var randomSongIndex: Int {
-        return Int.random(in: 0..<songs.count)
-    }
-    var randomCachedSongIndex: Int? {
-        return nextCachedSongIndex(beginningAt: Int.random(in: 0..<sortedCachedPlaylistElements.count))
-    }
     var lastSongIndex: Int {
         guard songs.count > 0 else { return 0 }
         return songs.count-1
@@ -184,11 +178,37 @@ public class Playlist {
         }
     }
     
+    func remove(firstOccurrenceOfSong song: Song) {
+        for entry in entries {
+            if entry.song?.id == song.id {
+                remove(at: Int(entry.order))
+                break
+            }
+        }
+    }
+    
+    func getFirstIndex(song: Song) -> Int? {
+        for entry in entries {
+            if entry.song?.id == song.id {
+                return Int(entry.order)
+            }
+        }
+        return nil
+    }
+    
     func removeAllSongs() {
         for entry in managedPlaylist.entries!.allObjects as! [PlaylistElement] {
             storage.deletePlaylistElement(element: entry)
         }
         storage.saveContext()
+    }
+    
+    func shuffle() {
+        if songs.count > 0 {
+            for i in 0..<songs.count {
+                movePlaylistSong(fromIndex: i, to: Int.random(in: 0..<songs.count))
+            }
+        }
     }
 
     private func ensureConsistentEntityOrder() {

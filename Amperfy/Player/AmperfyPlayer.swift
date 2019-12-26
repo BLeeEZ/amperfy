@@ -8,6 +8,7 @@ protocol MusicPlayable {
     func didStartedPausing()
     func didStopped(playlistElement: PlaylistElement?)
     func didElapsedTimeChanged()
+    func didUpdatePlaylist()
 }
 
 enum RepeatMode: Int16 {
@@ -50,7 +51,13 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     var nowPlayingInfoCenter: MPNowPlayingInfoCenter?
     var isShuffel: Bool {
         get { return coreData.isShuffel }
-        set { coreData.isShuffel = newValue }
+        set {
+            coreData.isShuffel = newValue
+            if let curPlaylistElement = coreData.currentPlaylistElement {
+                backendAudioPlayer.updateCurrentlyPlayingReference(playlistEntry: curPlaylistElement)
+            }
+            notifyPlaylistUpdated()
+        }
     }
     var repeatMode: RepeatMode {
         get { return coreData.repeatMode }
@@ -90,7 +97,7 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
     
     func addToPlaylist(song: Song) {
-        playlist.append(song: song)
+        coreData.addToPlaylist(song: song)
     }
     
     func movePlaylistSong(fromIndex: Int, to: Int) {
@@ -100,7 +107,9 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     func removeFromPlaylist(at index: Int) {
         guard index < playlist.songs.count else { return }
         let toBeRemovedSong = playlist.songs[index]
-        if toBeRemovedSong == coreData.currentSong {
+        if playlist.songs.count <= 1 {
+            stop()
+        } else if toBeRemovedSong == coreData.currentSong {
             playNext()
         }
         coreData.removeSongFromPlaylist(at: index)
@@ -186,9 +195,7 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
     
     func playNext() {
-        if isShuffel {
-            play(songInPlaylistAt: playlist.randomSongIndex)
-        } else if let nextSongIndex = coreData.nextSongIndex {
+        if let nextSongIndex = coreData.nextSongIndex {
             play(songInPlaylistAt: nextSongIndex)
         } else if repeatMode == .all, !playlist.songs.isEmpty {
             play(songInPlaylistAt: 0)
@@ -198,9 +205,7 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
     
     func playNextCached() {
-        if isShuffel, let nextSongIndex = playlist.randomCachedSongIndex {
-            play(songInPlaylistAt: nextSongIndex)
-        } else if let nextSongIndex = playlist.nextCachedSongIndex(upwardsFrom: coreData.currentSongIndex) {
+        if let nextSongIndex = playlist.nextCachedSongIndex(upwardsFrom: coreData.currentSongIndex) {
             play(songInPlaylistAt: nextSongIndex)
         } else if repeatMode == .all, let nextSongIndex = playlist.nextCachedSongIndex(beginningAt: 0) {
             play(songInPlaylistAt: nextSongIndex)
@@ -269,6 +274,12 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     func notifyElapsedTimeChanged() {
         for notifier in notifierList {
             notifier.didElapsedTimeChanged()
+        }
+    }
+    
+    func notifyPlaylistUpdated() {
+        for notifier in notifierList {
+            notifier.didUpdatePlaylist()
         }
     }
 

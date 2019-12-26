@@ -92,6 +92,12 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         player.seek(to: CMTime(seconds: toSecond, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
     }
     
+    func updateCurrentlyPlayingReference(playlistEntry: PlaylistElement) {
+        if currentlyPlaying?.song?.id == playlistEntry.song?.id {
+            currentlyPlaying = playlistEntry
+        }
+    }
+    
     func requestToPlay(playlistEntry: PlaylistElement, reactionToError: FetchErrorReaction) {
         semaphore.wait()
         latestPlayRequest = PlayRequest(playlistEntry: playlistEntry, reactionToError: reactionToError)
