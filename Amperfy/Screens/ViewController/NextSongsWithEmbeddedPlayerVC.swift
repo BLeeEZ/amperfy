@@ -96,23 +96,23 @@ class NextSongsWithEmbeddedPlayerVC: UITableViewController {
 
 extension NextSongsWithEmbeddedPlayerVC: MusicPlayable {
 
-    func didStartedPlaying(playlistElement: PlaylistElement) {
+    func didStartPlaying(playlistElement: PlaylistElement) {
         tableView.reloadData()
     }
     
-    func didStartedPausing() {
+    func didPause() {
     }
     
-    func didStopped(playlistElement: PlaylistElement?) {
+    func didStopPlaying(playlistElement: PlaylistElement?) {
         if let stoppedPlaylistElement = playlistElement, let index = stoppedPlaylistElement.index, let cell = self.tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? SongTableCell {
             cell.refresh()
         }
     }
 
-    func didElapsedTimeChanged() {
+    func didElapsedTimeChange() {
     }
     
-    func didUpdatePlaylist() {
+    func didPlaylistChange() {
         tableView.reloadData()
     }
 

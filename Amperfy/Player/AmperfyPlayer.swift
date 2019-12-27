@@ -4,11 +4,11 @@ import MediaPlayer
 import os.log
 
 protocol MusicPlayable {
-    func didStartedPlaying(playlistElement: PlaylistElement)
-    func didStartedPausing()
-    func didStopped(playlistElement: PlaylistElement?)
-    func didElapsedTimeChanged()
-    func didUpdatePlaylist()
+    func didStartPlaying(playlistElement: PlaylistElement)
+    func didPause()
+    func didStopPlaying(playlistElement: PlaylistElement?)
+    func didElapsedTimeChange()
+    func didPlaylistChange()
 }
 
 enum RepeatMode: Int16 {
@@ -49,10 +49,10 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
         return backendAudioPlayer.duration
     }
     var nowPlayingInfoCenter: MPNowPlayingInfoCenter?
-    var isShuffel: Bool {
-        get { return coreData.isShuffel }
+    var isShuffle: Bool {
+        get { return coreData.isShuffle }
         set {
-            coreData.isShuffel = newValue
+            coreData.isShuffle = newValue
             if let curPlaylistElement = coreData.currentPlaylistElement {
                 backendAudioPlayer.updateCurrentlyPlayingReference(playlistEntry: curPlaylistElement)
             }
@@ -251,35 +251,35 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     func notifySongStartedPlaying(playlistElement: PlaylistElement) {
         for notifier in notifierList {
-            notifier.didStartedPlaying(playlistElement: playlistElement)
+            notifier.didStartPlaying(playlistElement: playlistElement)
         }
     }
     
     func notifySongPaused() {
         for notifier in notifierList {
-            notifier.didStartedPausing()
+            notifier.didPause()
         }
     }
     
     func notifyPlayerStopped(playlistElement: PlaylistElement?) {
         for notifier in notifierList {
-            notifier.didStopped(playlistElement: playlistElement)
+            notifier.didStopPlaying(playlistElement: playlistElement)
         }
     }
     
-    func didElapsedTimeChanged() {
+    func didElapsedTimeChange() {
         notifyElapsedTimeChanged()
     }
     
     func notifyElapsedTimeChanged() {
         for notifier in notifierList {
-            notifier.didElapsedTimeChanged()
+            notifier.didElapsedTimeChange()
         }
     }
     
     func notifyPlaylistUpdated() {
         for notifier in notifierList {
-            notifier.didUpdatePlaylist()
+            notifier.didPlaylistChange()
         }
     }
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -95,7 +95,7 @@
                         <action selector="repeatButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="t47-X3-Ber"/>
                     </connections>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhL-mu-zks" userLabel="Shuffel Button">
+                <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhL-mu-zks" userLabel="Shuffle Button">
                     <rect key="frame" x="212.5" y="259.5" width="50" height="32"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="50" id="4pq-Gs-5H2"/>
@@ -109,7 +109,7 @@
                         <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </state>
                     <connections>
-                        <action selector="shuffelButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Ucb-jo-3Q5"/>
+                        <action selector="shuffleButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="s11-0d-7rF"/>
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Previous Button">
@@ -209,7 +209,7 @@
                 <outlet property="playButton" destination="Byk-rx-3Lv" id="03r-73-6Na"/>
                 <outlet property="remainingTimeLabel" destination="t1c-hF-UMw" id="hPl-lK-efe"/>
                 <outlet property="repeatButton" destination="zaZ-s9-erE" id="GdF-O9-5q9"/>
-                <outlet property="shuffelButton" destination="mhL-mu-zks" id="dt9-IK-dq9"/>
+                <outlet property="shuffleButton" destination="mhL-mu-zks" id="GGU-BH-0MG"/>
                 <outlet property="songTitleLabel" destination="pOR-k2-6Vf" id="cbC-Pn-Q2g"/>
             </connections>
             <point key="canvasLocation" x="138.40000000000001" y="99.400299850074973"/>

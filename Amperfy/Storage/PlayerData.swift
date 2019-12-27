@@ -17,7 +17,7 @@ public class PlayerData {
     
     private var activePlaylist: Playlist {
         get {
-            if !isShuffel {
+            if !isShuffle {
                 return normalPlaylist
             } else {
                 return shuffledPlaylist
@@ -27,7 +27,7 @@ public class PlayerData {
     
     private var inactivePlaylist: Playlist {
         get {
-            if !isShuffel {
+            if !isShuffle {
                 return shuffledPlaylist
             } else {
                 return normalPlaylist
@@ -56,9 +56,9 @@ public class PlayerData {
         }
     }
     
-    var isShuffel: Bool {
+    var isShuffle: Bool {
         get {
-            return managed.shuffelSetting == 1
+            return managed.shuffleSetting == 1
         }
         set {
             if newValue {
@@ -72,7 +72,7 @@ public class PlayerData {
                     currentSongIndex = indexOfCurrentSongInNormalPlaylist
                 }
             }
-            managed.shuffelSetting = newValue ? 1 : 0
+            managed.shuffleSetting = newValue ? 1 : 0
             storage.saveContext()
         }
     }

@@ -11,7 +11,7 @@ enum FetchErrorReaction {
 }
 
 protocol BackendAudioPlayerNotifiable {
-    func didElapsedTimeChanged()
+    func didElapsedTimeChange()
     func stop()
     func playPrevious()
     func playPreviousCached()
@@ -62,7 +62,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         
         player.addPeriodicTimeObserver(forInterval: updateElapsedTimeInterval, queue: DispatchQueue.main) { [weak self] time in
             if let self = self {
-                self.responder?.didElapsedTimeChanged()
+                self.responder?.didElapsedTimeChange()
             }
         }
     }

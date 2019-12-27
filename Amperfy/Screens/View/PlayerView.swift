@@ -13,7 +13,7 @@ class PlayerView: UIView {
     @IBOutlet weak var artistNameLabel: MarqueeLabel!
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var repeatButton: UIButton!
-    @IBOutlet weak var shuffelButton: UIButton!
+    @IBOutlet weak var shuffleButton: UIButton!
     @IBOutlet weak var currentSongTimeSlider: UISlider!
     @IBOutlet weak var elapsedTimeLabel: UILabel!
     @IBOutlet weak var remainingTimeLabel: UILabel!
@@ -49,9 +49,9 @@ class PlayerView: UIView {
         refreshRepeatButton()
     }
     
-    @IBAction func shuffelButtonPushed(_ sender: Any) {
-        player.isShuffel.toggle()
-        refreshShuffelButton()
+    @IBAction func shuffleButtonPushed(_ sender: Any) {
+        player.isShuffle.toggle()
+        refreshShuffleButton()
     }
     
     @IBAction func currentSongTimeSliderChanged(_ sender: Any) {
@@ -161,7 +161,7 @@ class PlayerView: UIView {
         refreshPlayButtonTitle()
         refreshSongTime()
         refreshRepeatButton()
-        refreshShuffelButton()
+        refreshShuffleButton()
     }
     
     func refreshRepeatButton() {
@@ -178,11 +178,11 @@ class PlayerView: UIView {
         }
     }
     
-    func refreshShuffelButton() {
-        if player.isShuffel {
-            shuffelButton.isSelected = true
+    func refreshShuffleButton() {
+        if player.isShuffle {
+            shuffleButton.isSelected = true
         } else {
-            shuffelButton.isSelected = false
+            shuffleButton.isSelected = false
         }
     }
     
@@ -190,24 +190,24 @@ class PlayerView: UIView {
 
 extension PlayerView: MusicPlayable {
 
-    func didStartedPlaying(playlistElement: PlaylistElement) {
+    func didStartPlaying(playlistElement: PlaylistElement) {
         refreshPlayer()
     }
     
-    func didStartedPausing() {
+    func didPause() {
         refreshPlayer()
     }
     
-    func didStopped(playlistElement: PlaylistElement?) {
+    func didStopPlaying(playlistElement: PlaylistElement?) {
         refreshPlayer()
         refreshSongInfo(song: nil)
     }
 
-    func didElapsedTimeChanged() {
+    func didElapsedTimeChange() {
         refreshSongTime()
     }
     
-    func didUpdatePlaylist() {
+    func didPlaylistChange() {
         refreshPlayer()
     }
 
