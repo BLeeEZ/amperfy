@@ -6,7 +6,7 @@ enum BehaviourOnTab {
     case playAndKeepPlaylist
 }
 
-class SongTableCell: ReorderTableViewCell {
+class SongTableCell: UITableViewCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!

@@ -49,7 +49,6 @@ class NextSongsWithEmbeddedPlayerVC: UITableViewController {
         if let currentlyPlaingIndex = player.currentlyPlaying?.index, indexPath.row == currentlyPlaingIndex {
             cell.displayAsPlaying()
         }
-        cell.isEditing = true
         
         return cell
     }
