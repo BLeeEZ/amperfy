@@ -285,7 +285,7 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
 
     func updateNowPlayingInfo(song: Song) {
         nowPlayingInfoCenter?.nowPlayingInfo = [
-            MPMediaItemPropertyTitle: song.title ?? "",
+            MPMediaItemPropertyTitle: song.title,
             MPMediaItemPropertyAlbumTitle: song.album?.name ?? "",
             MPMediaItemPropertyArtist: song.artist?.name ?? "",
             MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,

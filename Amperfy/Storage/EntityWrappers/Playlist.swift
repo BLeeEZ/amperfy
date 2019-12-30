@@ -2,22 +2,36 @@ import Foundation
 import CoreData
 import os.log
 
-public class Playlist {
+public class Playlist: NSObject {
     
-    let managedPlaylist: PlaylistManaged
+    let managedObject: PlaylistMO
     private let storage: LibraryStorage
+    
+    init(storage: LibraryStorage, managedObject: PlaylistMO) {
+        self.storage = storage
+        self.managedObject = managedObject
+    }
+    
     private var sortedPlaylistElements: [PlaylistElement] {
-        return managedPlaylist.sortedByOrder
+        var sortedElements = [PlaylistElement]()
+        let sortedElementsMO = (managedObject.entries!.allObjects as! [PlaylistElementMO]).sorted(by: { $0.order < $1.order })
+        for elementMO in sortedElementsMO {
+            sortedElements.append(PlaylistElement(storage: storage, managedObject: elementMO))
+        }
+        return sortedElements
     }
     private var sortedCachedPlaylistElements: [PlaylistElement] {
-        let cachedSongs = managedPlaylist.entries!.filter{ entry in
-            let element = entry as! PlaylistElement
-            if element.song?.data == nil {
-                return false
-            }
-            return true
+        let cachedElementsMO = managedObject.entries!.filter{ entry in
+            let element = entry as! PlaylistElementMO
+            return element.song?.fileDataContainer != nil
         }
-        return (cachedSongs as! [PlaylistElement]).sorted(by: { $0.order < $1.order })
+        let sortedElementsMO = (cachedElementsMO as! [PlaylistElementMO]).sorted(by: { $0.order < $1.order })
+        
+        var sortedCachedElements = [PlaylistElement]()
+        for elementMO in sortedElementsMO {
+            sortedCachedElements.append(PlaylistElement(storage: storage, managedObject: elementMO))
+        }
+        return sortedCachedElements
     }
     
     var songs: [Song] {
@@ -34,19 +48,19 @@ public class Playlist {
     }
     var id: Int32 {
         get {
-            return managedPlaylist.id
+            return managedObject.id
         }
         set {
-            managedPlaylist.id = newValue
+            managedObject.id = newValue
             storage.saveContext()
         }
     }
     var name: String {
         get {
-            return managedPlaylist.name ?? ""
+            return managedObject.name ?? ""
         }
         set {
-            managedPlaylist.name = newValue
+            managedObject.name = newValue
             storage.saveContext()
         }
     }
@@ -56,12 +70,7 @@ public class Playlist {
     }
     
     var hasCachedSongs: Bool {
-        for song in songs {
-            if song.data != nil {
-                return true
-            }
-        }
-        return false
+        return songs.hasCachedSongs
     }
     
     var info: String {
@@ -73,18 +82,13 @@ public class Playlist {
             if let song = playlistElement.song {
                 infoText += song.artist?.name ?? "NO ARTIST"
                 infoText += " - "
-                infoText += song.title ?? "NO TILE"
+                infoText += song.title
             } else {
                 infoText += "NOT AVAILABLE"
             }
             infoText += "\n"
         }
         return infoText
-    }
-    
-    init(storage: LibraryStorage, managedPlaylist: PlaylistManaged) {
-        self.storage = storage
-        self.managedPlaylist = managedPlaylist
     }
     
     func previousCachedSongIndex(downwardsFrom: Int) -> Int? {
@@ -127,8 +131,8 @@ public class Playlist {
     
     func append(song: Song) {
         let playlistElement = storage.createPlaylistElement()
-        playlistElement.order = Int32(managedPlaylist.entries!.count)
-        playlistElement.playlist = managedPlaylist
+        playlistElement.order = managedObject.entries!.count
+        playlistElement.playlist = self
         playlistElement.song = song
         storage.saveContext()
         ensureConsistentEntityOrder()
@@ -141,13 +145,13 @@ public class Playlist {
     }
 
     func add(entry: PlaylistElement) {
-        entry.playlist = managedPlaylist
+        managedObject.addToEntries(entry.managedObject)
     }
     
     func movePlaylistSong(fromIndex: Int, to: Int) {
         if fromIndex < songs.count, to < songs.count, fromIndex != to {
             let localSortedPlaylistElements = sortedPlaylistElements
-
+            let targetOrder = localSortedPlaylistElements[to].order
             if fromIndex < to {
                 for i in fromIndex+1...to {
                     localSortedPlaylistElements[i].order = localSortedPlaylistElements[i].order - 1
@@ -157,7 +161,7 @@ public class Playlist {
                     localSortedPlaylistElements[i].order = localSortedPlaylistElements[i].order + 1
                 }
             }
-            localSortedPlaylistElements[fromIndex].order = Int32(to)
+            localSortedPlaylistElements[fromIndex].order = targetOrder
             
             storage.saveContext()
             ensureConsistentEntityOrder()
@@ -167,7 +171,7 @@ public class Playlist {
     func remove(at index: Int) {
         if index < sortedPlaylistElements.count {
             let elementToBeRemoved = sortedPlaylistElements[index]
-            for entry in managedPlaylist.entries!.allObjects as! [PlaylistElement] {
+            for entry in sortedPlaylistElements {
                 if entry.order > index {
                     entry.order = entry.order - 1
                 }
@@ -197,7 +201,7 @@ public class Playlist {
     }
     
     func removeAllSongs() {
-        for entry in managedPlaylist.entries!.allObjects as! [PlaylistElement] {
+        for entry in sortedPlaylistElements {
             storage.deletePlaylistElement(element: entry)
         }
         storage.saveContext()
@@ -216,7 +220,7 @@ public class Playlist {
         for (index, element) in sortedPlaylistElements.enumerated() {
             if element.order != index {
                 os_log(.debug, "Playlist inconsistency detected! Order: %d  Index: %d", element.order, index)
-                element.order = Int32(index)
+                element.order = index
                 hasInconsistencyDetected = true
             }
         }

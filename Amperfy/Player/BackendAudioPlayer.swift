@@ -113,7 +113,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     }
     
     private func insertCachedSong(playlistEntry: PlaylistElement) {
-        guard let song = playlistEntry.song, let songData = song.data else { return }
+        guard let song = playlistEntry.song, let songData = song.fileData else { return }
         os_log(.default, "Play song: %s", song.displayString)
         let url = createLocalUrl(songData: songData)
         player.pause()

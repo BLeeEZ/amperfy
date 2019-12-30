@@ -11,6 +11,8 @@ class LibraryStorage {
         self.context = context
     }
     
+    static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongDataMO.typeName, Artwork.typeName, SyncWaveMO.typeName, Playlist.typeName, PlaylistElement.typeName, PlayerManaged.typeName]
+    
     func createArtist() -> Artist {
         let artist = Artist(context: context)
         artist.artwork = createArtwork()
@@ -24,9 +26,9 @@ class LibraryStorage {
     }
     
     func createSong() -> Song {
-        let song = Song(context: context)
-        song.artwork = createArtwork()
-        return song
+        let songMO = SongMO(context: context)
+        songMO.artwork = createArtwork()
+        return Song(managedObject: songMO)
     }
     
     func createSongData() -> SongDataMO {
@@ -39,35 +41,35 @@ class LibraryStorage {
     }
 
     func deleteCache(ofSong song: Song) {
-        if let songData = song.dataMO {
+        if let songData = song.fileDataContainer {
             deleteSongData(songData: songData)
-            song.dataMO = nil
+            song.fileDataContainer = nil
         }
     }
 
     func deleteCache(ofPlaylist playlist: Playlist) {
         for song in playlist.songs {
-            if let songData = song.dataMO {
+            if let songData = song.fileDataContainer {
                 deleteSongData(songData: songData)
-                song.dataMO = nil
+                song.fileDataContainer = nil
             }
         }
     }
     
     func deleteCache(ofArtist artist: Artist) {
         for song in artist.songs {
-            if let songData = song.dataMO {
+            if let songData = song.fileDataContainer {
                 deleteSongData(songData: songData)
-                song.dataMO = nil
+                song.fileDataContainer = nil
             }
         }
     }
     
     func deleteCache(ofAlbum album: Album) {
         for song in album.songs {
-            if let songData = song.dataMO {
+            if let songData = song.fileDataContainer {
                 deleteSongData(songData: songData)
-                song.dataMO = nil
+                song.fileDataContainer = nil
             }
         }
     }
@@ -85,19 +87,20 @@ class LibraryStorage {
     }
  
     func createPlaylist() -> Playlist {
-        return Playlist(storage: self, managedPlaylist: PlaylistManaged(context: context))
+        return Playlist(storage: self, managedObject: PlaylistMO(context: context))
     }
     
     func deletePlaylist(_ playlist: Playlist) {
-        context.delete(playlist.managedPlaylist)
+        context.delete(playlist.managedObject)
     }
     
     func createPlaylistElement() -> PlaylistElement {
-        return PlaylistElement(context: context)
+        let elementMO = PlaylistElementMO(context: context)
+        return PlaylistElement(storage: self, managedObject: elementMO)
     }
     
     func deletePlaylistElement(element: PlaylistElement) {
-        context.delete(element)
+        context.delete(element.managedObject)
     }
 
     func createSyncWave() -> SyncWaveMO {
@@ -130,9 +133,13 @@ class LibraryStorage {
     
     func getSongs() -> Array<Song> {
         var songs = Array<Song>()
-        let fetchRequest: NSFetchRequest<Song> = Song.fetchRequest()
+        var foundSongs = Array<SongMO>()
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         do {
-            songs = try context.fetch(fetchRequest)
+            foundSongs = try context.fetch(fetchRequest)
+            for songMO in foundSongs {
+                songs.append(Song(managedObject: songMO))
+            }
         }
         catch {}
         
@@ -141,13 +148,13 @@ class LibraryStorage {
     
     func getPlaylists() -> Array<Playlist> {
         var foundPlaylists = Array<Playlist>()
-        let fr: NSFetchRequest<PlaylistManaged> = PlaylistManaged.fetchRequest()
+        let fr: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         fr.predicate = NSPredicate(format: "playersNormalPlaylist == nil && playersShuffledPlaylist == nil")
         do {
             let result = try context.fetch(fr) as NSArray?
-            if let playlists = result as? Array<PlaylistManaged> {
+            if let playlists = result as? Array<PlaylistMO> {
                 for playlist in playlists {
-                    let wrappedPlaylist = Playlist(storage: self, managedPlaylist: playlist)
+                    let wrappedPlaylist = Playlist(storage: self, managedObject: playlist)
                     foundPlaylists.append(wrappedPlaylist)
                 }
             }
@@ -172,16 +179,16 @@ class LibraryStorage {
             }
             
             if playerManaged.normalPlaylist == nil {
-                playerManaged.normalPlaylist = PlaylistManaged(context: context)
+                playerManaged.normalPlaylist = PlaylistMO(context: context)
                 saveContext()
             }
             if playerManaged.shuffledPlaylist == nil {
-                playerManaged.shuffledPlaylist = PlaylistManaged(context: context)
+                playerManaged.shuffledPlaylist = PlaylistMO(context: context)
                 saveContext()
             }
             
-            let normalPlaylist = Playlist(storage: self, managedPlaylist: playerManaged.normalPlaylist!)
-            let shuffledPlaylist = Playlist(storage: self, managedPlaylist: playerManaged.shuffledPlaylist!)
+            let normalPlaylist = Playlist(storage: self, managedObject: playerManaged.normalPlaylist!)
+            let shuffledPlaylist = Playlist(storage: self, managedObject: playerManaged.shuffledPlaylist!)
             
             if shuffledPlaylist.entries.count != normalPlaylist.entries.count {
                 shuffledPlaylist.removeAllSongs()
@@ -230,31 +237,35 @@ class LibraryStorage {
         return foundAlbum
     }
     
-    func getSong(id: Int32) -> Song? {
-        var foundSong: Song? = nil
-        let fr: NSFetchRequest<Song> = Song.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: Int(id)))
+    func getSong(id: Int) -> Song? {
+        var foundSongMO: SongMO? = nil
+        let fr: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
-            if let songs = result, songs.count > 0, let song = songs[0] as? Song  {
-                foundSong = song
+            if let songs = result, songs.count > 0, let song = songs[0] as? SongMO  {
+                foundSongMO = song
             }
         } catch {
             os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
         }
-        return foundSong
+        
+        guard let foundSong = foundSongMO else {
+            return nil
+        }
+        return Song(managedObject: foundSong)
     }
     
     func getPlaylist(id: Int32) -> Playlist? {
         var foundPlaylist: Playlist? = nil
-        let fr: NSFetchRequest<PlaylistManaged> = PlaylistManaged.fetchRequest()
+        let fr: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: Int(id)))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
-            if let playlists = result, playlists.count > 0, let playlist = playlists[0] as? PlaylistManaged  {
-                foundPlaylist = Playlist(storage: self, managedPlaylist: playlist)
+            if let playlists = result, playlists.count > 0, let playlist = playlists[0] as? PlaylistMO  {
+                foundPlaylist = Playlist(storage: self, managedObject: playlist)
             }
         } catch {
             os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
@@ -263,8 +274,8 @@ class LibraryStorage {
     }
     
     func getPlaylist(viaPlaylistFromOtherContext: Playlist) -> Playlist? {
-        guard let foundManagedPlaylist = context.object(with: viaPlaylistFromOtherContext.managedPlaylist.objectID) as? PlaylistManaged else { return nil }
-        return Playlist(storage: self, managedPlaylist: foundManagedPlaylist)
+        guard let foundManagedPlaylist = context.object(with: viaPlaylistFromOtherContext.managedObject.objectID) as? PlaylistMO else { return nil }
+        return Playlist(storage: self, managedObject: foundManagedPlaylist)
     }
     
     func getArtworksThatAreNotChecked(fetchCount: Int = 10) -> [Artwork] {
@@ -309,9 +320,7 @@ class LibraryStorage {
     }
     
     func cleanStorage() {
-        let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongDataMO.typeName, Artwork.typeName, SyncWaveMO.typeName, PlaylistManaged.typeName, PlaylistElement.typeName, PlayerManaged.typeName]
-        
-        for entityToDelete in entitiesToDelete {
+        for entityToDelete in LibraryStorage.entitiesToDelete {
             clearStorage(ofType: entityToDelete)
         }
         saveContext()

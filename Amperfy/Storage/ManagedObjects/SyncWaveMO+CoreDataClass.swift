@@ -52,17 +52,16 @@ public class SyncWaveMO: NSManagedObject {
     }
     
     var songs: [Song] {
-        guard let songsSet = songsMO else { return [Song]() }
-        return songsSet.array as! [Song]
+        var returnSongs = [Song]()
+        guard let songsMOSet = songsMO, let songsMOArray = songsMOSet.array as? [SongMO] else { return returnSongs }
+        for song in songsMOArray {
+            returnSongs.append(Song(managedObject: song))
+        }
+        return returnSongs
     }
     
     var hasCachedSongs: Bool {
-        for song in songs {
-            if song.data != nil {
-                return true
-            }
-        }
-        return false
+        return songs.hasCachedSongs
     }
 
 }

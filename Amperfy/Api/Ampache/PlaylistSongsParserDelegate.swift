@@ -19,7 +19,7 @@ class PlaylistSongsParserDelegate: GenericXmlParser {
         
         switch(elementName) {
         case "song":
-            if let songId = Int32(attributeDict["id"] ?? "0"), let fetchedSong = libraryStorage.getSong(id: songId) {
+            if let songId = Int(attributeDict["id"] ?? "0"), let fetchedSong = libraryStorage.getSong(id: songId) {
                 playlistElementBuffer = libraryStorage.createPlaylistElement()
                 playlistElementBuffer?.song = fetchedSong
             }
@@ -31,7 +31,7 @@ class PlaylistSongsParserDelegate: GenericXmlParser {
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "playlisttrack":
-            playlistElementBuffer?.order = Int32(buffer) ?? 0
+            playlistElementBuffer?.order = Int(buffer) ?? 0
         case "song":
             if let entry = playlistElementBuffer {
                 playlist.add(entry: entry)

@@ -25,12 +25,7 @@ public class Album: AbstractLibraryElementMO {
     }
     
     var hasCachedSongs: Bool {
-        for song in songs {
-            if song.data != nil {
-                return true
-            }
-        }
-        return false
+        return songs.hasCachedSongs
     }
     
     var isOrphaned: Bool {

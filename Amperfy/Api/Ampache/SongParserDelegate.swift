@@ -12,12 +12,12 @@ class SongParserDelegate: GenericXmlLibParser {
         
         switch(elementName) {
         case "song":
-            if !syncWave.isInitialWave, let songId = Int32(attributeDict["id"] ?? "0"), let fetchedSong = libraryStorage.getSong(id: songId)  {
+            if !syncWave.isInitialWave, let songId = Int(attributeDict["id"] ?? "0"), let fetchedSong = libraryStorage.getSong(id: songId)  {
                 songBuffer = fetchedSong
             } else {
                 songBuffer = libraryStorage.createSong()
                 songBuffer?.syncInfo = syncWave
-                songBuffer?.id = Int32(attributeDict["id"] ?? "0") ?? 0
+                songBuffer?.id = Int(attributeDict["id"] ?? "0") ?? 0
             }
         case "artist":
             if let song = songBuffer {
@@ -48,7 +48,7 @@ class SongParserDelegate: GenericXmlLibParser {
         case "title":
             songBuffer?.title = buffer
         case "track":
-            songBuffer?.track = Int16(buffer) ?? 0
+            songBuffer?.track = Int(buffer) ?? 0
         case "url":
             songBuffer?.url = buffer
         case "art":

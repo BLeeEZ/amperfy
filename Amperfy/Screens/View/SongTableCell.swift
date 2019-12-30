@@ -43,10 +43,10 @@ class SongTableCell: UITableViewCell {
     
     func refresh() {
         guard let song = song else { return }
-        titleLabel.attributedText = NSMutableAttributedString(string: song.title ?? "", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
+        titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         artistLabel.text = song.artist?.name
         artworkImage.image = song.image
-        if song.data != nil {
+        if song.isCached {
             cloudSyncedLabel.text = FontAwesomeIcon.Cloud.asString
         } else {
             cloudSyncedLabel.text = ""

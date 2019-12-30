@@ -22,6 +22,11 @@ class SubsonicServerApi {
         return "\(credentials.serverUrl)/rest/\(forAction).view?u=\(userUrl)&p=\(passwordUrl)&v=\(version)&c=\(AppDelegate.name)"
     }
     
+    private func urlString(forAction: String, id: Int) -> String {
+        return urlString(forAction: forAction) + "&id=\(id)"
+    }
+    
+    // TODO: needs to be deleted
     private func urlString(forAction: String, id: Int32) -> String {
         return urlString(forAction: forAction) + "&id=\(id)"
     }
@@ -63,7 +68,9 @@ class SubsonicServerApi {
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {
-        guard let owners = artwork.owners!.allObjects as? [AbstractLibraryElementMO],
+        // TODO: CHeck prev: artwork.owner!.allObjects as? [AbstractLibraryElementMO]
+        // -> Use directly owners -> this should return [AbstractLibraryElement]
+        guard let owners = artwork.owners!.allObjects as? [AbstractLibraryElement],
             !owners.isEmpty,
             let firstOwner = owners.first else {
                 return nil
@@ -104,7 +111,7 @@ class SubsonicServerApi {
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
 
-    func requestPlaylistUpdate(parserDelegate: XMLParserDelegate, playlist: Playlist, songIndicesToRemove: [Int32], songIdsToAdd: [Int32]) {
+    func requestPlaylistUpdate(parserDelegate: XMLParserDelegate, playlist: Playlist, songIndicesToRemove: [Int], songIdsToAdd: [Int]) {
         var urlPath = urlString(forAction: "updatePlaylist")
         urlPath += "&playlistId=\(playlist.id)"
         let playlistNameUrl = playlist.name.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? "InvalidPlaylistName"

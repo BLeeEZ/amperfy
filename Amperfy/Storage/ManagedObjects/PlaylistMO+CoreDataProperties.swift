@@ -2,10 +2,10 @@ import Foundation
 import CoreData
 
 
-extension PlaylistManaged {
+extension PlaylistMO {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<PlaylistManaged> {
-        return NSFetchRequest<PlaylistManaged>(entityName: "PlaylistManaged")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<PlaylistMO> {
+        return NSFetchRequest<PlaylistMO>(entityName: "Playlist")
     }
 
     @NSManaged public var id: Int32
@@ -17,13 +17,13 @@ extension PlaylistManaged {
 }
 
 // MARK: Generated accessors for entries
-extension PlaylistManaged {
+extension PlaylistMO {
 
     @objc(addEntriesObject:)
-    @NSManaged public func addToEntries(_ value: PlaylistElement)
+    @NSManaged public func addToEntries(_ value: PlaylistElementMO)
 
     @objc(removeEntriesObject:)
-    @NSManaged public func removeFromEntries(_ value: PlaylistElement)
+    @NSManaged public func removeFromEntries(_ value: PlaylistElementMO)
 
     @objc(addEntries:)
     @NSManaged public func addToEntries(_ values: NSSet)

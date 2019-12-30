@@ -219,7 +219,7 @@ class AmpacheXmlServerApi {
         }
     }
 
-    func requestPlaylist(addSongId: Int32, toPlaylistId: Int32) {
+    func requestPlaylist(addSongId: Int, toPlaylistId: Int32) {
         reauthenticateIfNeccessary()
         if let hostname = credentials?.serverUrl, let auth = authHandshake {
             let errorParser = ErrorParserDelegate()
@@ -231,7 +231,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylist(removeSongIndex: Int32, fromPlaylistId: Int32) {
+    func requestPlaylist(removeSongIndex: Int, fromPlaylistId: Int32) {
         reauthenticateIfNeccessary()
         if let hostname = credentials?.serverUrl, let auth = authHandshake {
             let errorParser = ErrorParserDelegate()

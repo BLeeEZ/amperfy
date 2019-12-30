@@ -10,8 +10,9 @@ class DownloadDelegate: DownloadManagerDelegate {
     }
 
     func prepareDownload(forRequest request: DownloadRequest<Song>, context: NSManagedObjectContext) throws -> URL {
-        let song = try context.existingObject(with: request.element.objectID) as! Song
-        guard song.data == nil else { 
+        let songMO = try context.existingObject(with: request.element.objectID) as! SongMO
+        let song = Song(managedObject: songMO)
+        guard !song.isCached else {
             throw DownloadError.alreadyDownloaded 
         }
         return try updateDownloadUrl(forSong: song)
@@ -30,10 +31,10 @@ class DownloadDelegate: DownloadManagerDelegate {
     func completedDownload(request: DownloadRequest<Song>, context: NSManagedObjectContext) {
         guard let download = request.download, let data = download.resumeData else { return }
 		let libraryStorage = LibraryStorage(context: context)
-        if let song = try? context.existingObject(with: request.element.objectID) as? Song {
-            song.dataMO = libraryStorage.createSongData()
-            song.dataMO?.id = song.id
-            song.dataMO?.data = NSData(data: data)
+        if let songMO = try? context.existingObject(with: request.element.objectID) as? SongMO {
+            songMO.fileDataContainer = libraryStorage.createSongData()
+            songMO.fileDataContainer?.id = songMO.id
+            songMO.fileDataContainer?.data = NSData(data: data)
             libraryStorage.saveContext()
         }
     }

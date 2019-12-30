@@ -1,8 +1,8 @@
 import Foundation
 import CoreData
 
-@objc(PlaylistElement)
-public class PlaylistElement: NSManagedObject {
+@objc(PlaylistElementMO)
+public class PlaylistElementMO: NSManagedObject {
 
     var index: Int? {
         // Check if object has been deleted

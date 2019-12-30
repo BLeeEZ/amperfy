@@ -14,12 +14,7 @@ public class Artist: AbstractLibraryElementMO {
     }
     
     var hasCachedSongs: Bool {
-        for song in songs {
-            if song.data != nil {
-                return true
-            }
-        }
-        return false
+        return songs.hasCachedSongs
     }
 
 }

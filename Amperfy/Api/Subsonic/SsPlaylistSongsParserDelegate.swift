@@ -31,13 +31,13 @@ class SsPlaylistSongsParserDelegate: GenericXmlParser {
         
         if elementName == "entry" {
             guard let attributeId = attributeDict["id"],
-                let songEntryId = Int32(attributeId),
+                let songEntryId = Int(attributeId),
                 let fetchedSong = libraryStorage.getSong(id: songEntryId) else {
                     return
             }
             
             let playlistEntry = libraryStorage.createPlaylistElement()
-            playlistEntry.order = Int32(parsedCount)
+            playlistEntry.order = Int(parsedCount)
             playlistEntry.song = fetchedSong
             playlist.add(entry: playlistEntry)
         }
