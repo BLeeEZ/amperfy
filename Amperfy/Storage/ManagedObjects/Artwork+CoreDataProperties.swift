@@ -19,10 +19,10 @@ extension Artwork {
 extension Artwork {
 
     @objc(addOwnersObject:)
-    @NSManaged public func addToOwners(_ value: AbstractLibraryElementMO)
+    @NSManaged public func addToOwners(_ value: AbstractLibraryEntityMO)
 
     @objc(removeOwnersObject:)
-    @NSManaged public func removeFromOwners(_ value: AbstractLibraryElementMO)
+    @NSManaged public func removeFromOwners(_ value: AbstractLibraryEntityMO)
 
     @objc(addOwners:)
     @NSManaged public func addToOwners(_ values: NSSet)

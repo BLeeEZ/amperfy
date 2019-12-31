@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Song: AbstractLibraryElement {
+public class Song: AbstractLibraryEntity {
     
     let managedObject: SongMO
     

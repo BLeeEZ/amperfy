@@ -2,8 +2,8 @@ import Foundation
 import CoreData
 import UIKit
 
-@objc(AbstractLibraryElementMO)
-public class AbstractLibraryElementMO: NSManagedObject, Identifyable {
+@objc(AbstractLibraryEntityMO)
+public class AbstractLibraryEntityMO: NSManagedObject, Identifyable {
 
     var image: UIImage {
         guard let art = artwork?.image else {

@@ -3,6 +3,6 @@ import CoreData
 import UIKit
 
 @objc(SongMO)
-public class SongMO: AbstractLibraryElementMO {
+public class SongMO: AbstractLibraryEntityMO {
 
 }

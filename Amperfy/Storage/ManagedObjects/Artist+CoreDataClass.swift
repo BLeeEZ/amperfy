@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 
 @objc(Artist)
-public class Artist: AbstractLibraryElementMO {
+public class Artist: AbstractLibraryEntityMO {
 
     override var identifier: String {
         return name ?? ""

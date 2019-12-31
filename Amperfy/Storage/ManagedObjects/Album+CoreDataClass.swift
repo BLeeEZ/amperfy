@@ -3,7 +3,7 @@ import CoreData
 import UIKit
 
 @objc(Album)
-public class Album: AbstractLibraryElementMO {
+public class Album: AbstractLibraryEntityMO {
 
     override var identifier: String {
         return name ?? ""

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19B88" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="AbstractLibraryElementMO" representedClassName="AbstractLibraryElementMO" isAbstract="YES" syncable="YES">
+    <entity name="AbstractLibraryEntity" representedClassName="AbstractLibraryEntityMO" isAbstract="YES" elementID="AbstractLibraryElementMO" syncable="YES">
         <attribute name="id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="artwork" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Artwork" inverseName="owners" inverseEntity="Artwork"/>
     </entity>
-    <entity name="Album" representedClassName="Album" parentEntity="AbstractLibraryElementMO" syncable="YES">
+    <entity name="Album" representedClassName="Album" parentEntity="AbstractLibraryEntity" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="year" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="albums" inverseEntity="Artist"/>
         <relationship name="songsMO" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="album" inverseEntity="Song"/>
         <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWaveMO" inverseName="albums" inverseEntity="SyncWaveMO"/>
     </entity>
-    <entity name="Artist" representedClassName="Artist" parentEntity="AbstractLibraryElementMO" syncable="YES">
+    <entity name="Artist" representedClassName="Artist" parentEntity="AbstractLibraryEntity" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="albums" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Album" inverseName="artist" inverseEntity="Album"/>
         <relationship name="songsMO" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="artist" inverseEntity="Song"/>
@@ -21,7 +21,7 @@
         <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="statusMO" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="urlMO" optional="YES" attributeType="String"/>
-        <relationship name="owners" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AbstractLibraryElementMO" inverseName="artwork" inverseEntity="AbstractLibraryElementMO"/>
+        <relationship name="owners" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AbstractLibraryEntity" inverseName="artwork" inverseEntity="AbstractLibraryEntity"/>
     </entity>
     <entity name="PlayerManaged" representedClassName="PlayerManaged" syncable="YES">
         <attribute name="currentSongIndex" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -42,7 +42,7 @@
         <relationship name="playlist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="items" inverseEntity="Playlist"/>
         <relationship name="song" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Song" inverseName="playlistItems" inverseEntity="Song"/>
     </entity>
-    <entity name="Song" representedClassName="SongMO" parentEntity="AbstractLibraryElementMO" syncable="YES">
+    <entity name="Song" representedClassName="SongMO" parentEntity="AbstractLibraryEntity" syncable="YES">
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="track" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="url" optional="YES" attributeType="String"/>
@@ -69,7 +69,7 @@
         <relationship name="songsMO" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="syncInfo" inverseEntity="Song"/>
     </entity>
     <elements>
-        <element name="AbstractLibraryElementMO" positionX="-30561.8125" positionY="-8377.35546875" width="128" height="75"/>
+        <element name="AbstractLibraryEntity" positionX="-30561.8125" positionY="-8377.35546875" width="128" height="73"/>
         <element name="Album" positionX="-30672.00390625" positionY="-8275.76953125" width="128" height="120"/>
         <element name="Artist" positionX="-30559.515625" positionY="-8017.5703125" width="128" height="105"/>
         <element name="Artwork" positionX="-30271.51171875" positionY="-8396.6953125" width="128" height="105"/>

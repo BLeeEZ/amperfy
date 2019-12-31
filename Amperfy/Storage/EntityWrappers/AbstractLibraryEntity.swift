@@ -1,11 +1,11 @@
 import Foundation
 import UIKit
 
-public class AbstractLibraryElement: NSObject, Identifyable {
+public class AbstractLibraryEntity: NSObject, Identifyable {
 
-    private let managedObject: AbstractLibraryElementMO
+    private let managedObject: AbstractLibraryEntityMO
     
-    init(managedObject: AbstractLibraryElementMO) {
+    init(managedObject: AbstractLibraryEntityMO) {
         self.managedObject = managedObject
     }
     
