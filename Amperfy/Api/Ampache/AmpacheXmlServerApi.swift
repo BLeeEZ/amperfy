@@ -3,6 +3,7 @@ import CoreData
 import os.log
 
 protocol AmpacheUrlCreationable {
+    // TODO: Change to type Int
     func getArtUrlString(forArtistId: Int32) -> String
 }
 

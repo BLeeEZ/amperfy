@@ -20,9 +20,9 @@ class LibraryStorage {
     }
     
     func createAlbum() -> Album {
-        let album = Album(context: context)
-        album.artwork = createArtwork()
-        return album
+        let albumMO = AlbumMO(context: context)
+        albumMO.artwork = createArtwork()
+        return Album(managedObject: albumMO)
     }
     
     func createSong() -> Song {
@@ -122,9 +122,13 @@ class LibraryStorage {
     
     func getAlbums() -> Array<Album> {
         var albums = Array<Album>()
-        let fetchRequest: NSFetchRequest<Album> = Album.fetchRequest()
+        var foundAlbums = Array<AlbumMO>()
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
         do {
-            albums = try context.fetch(fetchRequest)
+            foundAlbums = try context.fetch(fetchRequest)
+            for albumMO in foundAlbums {
+                albums.append(Album(managedObject: albumMO))
+            }
         }
         catch {}
         
@@ -221,15 +225,15 @@ class LibraryStorage {
         return foundArtist
     }
     
-    func getAlbum(id: Int32) -> Album? {
+    func getAlbum(id: Int) -> Album? {
         var foundAlbum: Album? = nil
-        let fr: NSFetchRequest<Album> = Album.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: Int(id)))
+        let fr: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
-            if let albums = result, albums.count > 0, let album = albums[0] as? Album  {
-                foundAlbum = album
+            if let albums = result, albums.count > 0, let album = albums[0] as? AlbumMO  {
+                foundAlbum = Album(managedObject: album)
             }
         } catch {
             os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
@@ -238,23 +242,19 @@ class LibraryStorage {
     }
     
     func getSong(id: Int) -> Song? {
-        var foundSongMO: SongMO? = nil
+        var foundSong: Song? = nil
         let fr: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
             if let songs = result, songs.count > 0, let song = songs[0] as? SongMO  {
-                foundSongMO = song
+                foundSong = Song(managedObject: song)
             }
         } catch {
             os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
         }
-        
-        guard let foundSong = foundSongMO else {
-            return nil
-        }
-        return Song(managedObject: foundSong)
+        return foundSong
     }
     
     func getPlaylist(id: Int32) -> Playlist? {

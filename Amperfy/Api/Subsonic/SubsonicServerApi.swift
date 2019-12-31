@@ -2,6 +2,7 @@ import Foundation
 import os.log
 
 protocol SubsonicUrlCreator {
+    // TODO: Change id to type Int
     func getArtUrlString(forArtistId: Int32) -> String
 }
 
@@ -89,7 +90,7 @@ class SubsonicServerApi {
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
     
-    func requestAlbum(parserDelegate: XMLParserDelegate, id: Int32) {
+    func requestAlbum(parserDelegate: XMLParserDelegate, id: Int) {
         let urlPath = urlString(forAction: "getAlbum", id: id)
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }

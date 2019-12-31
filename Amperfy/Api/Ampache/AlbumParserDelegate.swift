@@ -12,12 +12,12 @@ class AlbumParserDelegate: GenericXmlLibParser {
         
  		switch(elementName) {
 		case "album":
-            if !syncWave.isInitialWave, let albumId = Int32(attributeDict["id"] ?? "0"), let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
+            if !syncWave.isInitialWave, let albumId = Int(attributeDict["id"] ?? "0"), let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
                 albumBuffer = fetchedAlbum
             } else {
                 albumBuffer = libraryStorage.createAlbum()
                 albumBuffer?.syncInfo = syncWave
-                albumBuffer?.id = Int32(attributeDict["id"] ?? "0") ?? 0
+                albumBuffer?.id = Int(attributeDict["id"] ?? "0") ?? 0
             }
 		case "artist":
             if let album = albumBuffer {
@@ -42,7 +42,7 @@ class AlbumParserDelegate: GenericXmlLibParser {
 			parseNotifier?.notifyParsedObject()
             albumBuffer = nil
 		case "year":
-            albumBuffer?.year = Int16(buffer) ?? 0
+            albumBuffer?.year = Int(buffer) ?? 0
         case "art":
             albumBuffer?.artwork?.url = buffer
 		default:

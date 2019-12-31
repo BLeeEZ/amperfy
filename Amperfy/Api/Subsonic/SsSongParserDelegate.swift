@@ -23,7 +23,7 @@ class SsSongParserDelegate: GenericXmlLibParser {
                 let attributeArtistId = attributeDict["artistId"],
                 let artistId = Int32(attributeArtistId),
                 let attributeAlbumId = attributeDict["albumId"],
-                let albumId = Int32(attributeAlbumId) else {
+                let albumId = Int(attributeAlbumId) else {
                     return
             }
             
@@ -36,7 +36,7 @@ class SsSongParserDelegate: GenericXmlLibParser {
             songBuffer?.syncInfo = syncWave
             songBuffer?.id = songId
             songBuffer?.title = attributeSongTitle
-            songBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: albumId)
+            songBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: Int32(albumId))
             
             if let attributeTrack = attributeDict["track"], let track = Int(attributeTrack) {
                 songBuffer?.track = track

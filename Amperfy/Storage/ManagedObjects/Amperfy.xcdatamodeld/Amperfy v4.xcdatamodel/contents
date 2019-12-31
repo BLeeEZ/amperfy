@@ -4,11 +4,11 @@
         <attribute name="id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="artwork" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Artwork" inverseName="owners" inverseEntity="Artwork"/>
     </entity>
-    <entity name="Album" representedClassName="Album" parentEntity="AbstractLibraryEntity" syncable="YES">
+    <entity name="Album" representedClassName="AlbumMO" parentEntity="AbstractLibraryEntity" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="year" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="albums" inverseEntity="Artist"/>
-        <relationship name="songsMO" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="album" inverseEntity="Song"/>
+        <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="album" inverseEntity="Song" elementID="songsMO"/>
         <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWaveMO" inverseName="albums" inverseEntity="SyncWaveMO"/>
     </entity>
     <entity name="Artist" representedClassName="Artist" parentEntity="AbstractLibraryEntity" syncable="YES">
@@ -46,7 +46,7 @@
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="track" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="url" optional="YES" attributeType="String"/>
-        <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songsMO" inverseEntity="Album"/>
+        <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songs" inverseEntity="Album"/>
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="songsMO" inverseEntity="Artist"/>
         <relationship name="fileDataContainer" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SongDataMO" inverseName="info" inverseEntity="SongDataMO" elementID="dataMO"/>
         <relationship name="playlistItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistItem" inverseName="song" inverseEntity="PlaylistItem" elementID="playlistElements"/>
@@ -70,7 +70,7 @@
     </entity>
     <elements>
         <element name="AbstractLibraryEntity" positionX="-30561.8125" positionY="-8377.35546875" width="128" height="73"/>
-        <element name="Album" positionX="-30672.00390625" positionY="-8275.76953125" width="128" height="120"/>
+        <element name="Album" positionX="-30672.00390625" positionY="-8275.76953125" width="128" height="118"/>
         <element name="Artist" positionX="-30559.515625" positionY="-8017.5703125" width="128" height="105"/>
         <element name="Artwork" positionX="-30271.51171875" positionY="-8396.6953125" width="128" height="105"/>
         <element name="PlayerManaged" positionX="-29890.359375" positionY="-8230.625" width="128" height="118"/>

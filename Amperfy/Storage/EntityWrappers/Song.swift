@@ -4,16 +4,16 @@ import UIKit
 
 public class Song: AbstractLibraryEntity {
     
-    let managedObject: SongMO
-    
-    init(managedObject: SongMO) {
-        self.managedObject = managedObject
-        super.init(managedObject: managedObject)
-    }
-    
-    var objectID: NSManagedObjectID {
-        return managedObject.objectID
-    }
+     let managedObject: SongMO
+
+     init(managedObject: SongMO) {
+         self.managedObject = managedObject
+         super.init(managedObject: managedObject)
+     }
+
+     var objectID: NSManagedObjectID {
+         return managedObject.objectID
+     }
      var title: String {
          get { return managedObject.title ?? "Unknown title" }
          set { managedObject.title = newValue }
@@ -27,8 +27,11 @@ public class Song: AbstractLibraryEntity {
          set { managedObject.url = newValue }
      }
      var album: Album? {
-         get { return managedObject.album }
-         set { managedObject.album = newValue }
+         get {
+             guard let albumMO = managedObject.album else { return nil }
+             return Album(managedObject: albumMO)
+         }
+         set { managedObject.album = newValue?.managedObject }
      }
      var artist: Artist? {
          get { return managedObject.artist }
@@ -57,12 +60,12 @@ public class Song: AbstractLibraryEntity {
     }
 
     override var image: UIImage {
-        if let curAlbum = managedObject.album, !curAlbum.isOrphaned {
+        if let curAlbum = album, !curAlbum.isOrphaned {
             if super.image != Artwork.defaultImage {
                 return super.image
             }
         }
-        if let artistArt = managedObject.artist?.artwork?.image {
+        if let artistArt = artist?.artwork?.image {
             return artistArt
         }
         return Artwork.defaultImage

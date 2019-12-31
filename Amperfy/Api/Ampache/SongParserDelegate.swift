@@ -30,7 +30,7 @@ class SongParserDelegate: GenericXmlLibParser {
             }
         case "album":
             if let song = songBuffer {
-                let albumId = Int32(attributeDict["id"] ?? "0") ?? 0
+                let albumId = Int(attributeDict["id"] ?? "0") ?? 0
                 if let album = libraryStorage.getAlbum(id: albumId)  {
                     song.album = album
                 }

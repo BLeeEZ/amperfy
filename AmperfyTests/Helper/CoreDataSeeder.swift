@@ -39,9 +39,9 @@ class CoreDataSeeder {
         
         for albumSeed in albums {
             let album = storage.createAlbum()
-            album.id = Int32(albumSeed.id)
+            album.id = albumSeed.id
             album.name = albumSeed.name
-            album.year = Int16(albumSeed.year)
+            album.year = albumSeed.year
             let artist = storage.getArtist(id: Int32(albumSeed.artistId))
             album.artist = artist
         }
@@ -54,7 +54,7 @@ class CoreDataSeeder {
             song.url = songSeed.url
             let artist = storage.getArtist(id: Int32(songSeed.artistId))
             song.artist = artist
-            let album = storage.getAlbum(id: Int32(songSeed.albumId))
+            let album = storage.getAlbum(id: songSeed.albumId)
             song.album = album
             if songSeed.isCached {
                 song.fileDataContainer = storage.createSongData()

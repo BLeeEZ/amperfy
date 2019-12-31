@@ -19,7 +19,7 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
         
         if(elementName == "album") {
             guard let attributeId = attributeDict["id"],
-                let albumId = Int32(attributeId),
+                let albumId = Int(attributeId),
                 let attributeAlbumtName = attributeDict["name"],
                 let attributeArtistId = attributeDict["artistId"],
                 let artistId = Int32(attributeArtistId),
@@ -37,9 +37,9 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
             albumBuffer?.syncInfo = syncWave
             albumBuffer?.id = albumId
             albumBuffer?.name = attributeAlbumtName
-            albumBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: albumId)
+            albumBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: Int32(albumId))
             
-            if let attributeYear = attributeDict["year"], let year = Int16(attributeYear) {
+            if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
                 albumBuffer?.year = year
             }
             
