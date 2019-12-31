@@ -14,24 +14,24 @@ extension SongMO {
     @NSManaged public var album: Album?
     @NSManaged public var artist: Artist?
     @NSManaged public var fileDataContainer: SongDataMO?
-    @NSManaged public var playlistElements: NSSet?
+    @NSManaged public var playlistItems: NSSet?
     @NSManaged public var syncInfo: SyncWaveMO?
 
 }
 
-// MARK: Generated accessors for playlistElements
+// MARK: Generated accessors for playlistItems
 extension SongMO {
 
-    @objc(addPlaylistElementsObject:)
-    @NSManaged public func addToPlaylistElements(_ value: PlaylistElementMO)
+    @objc(addPlaylistItemsObject:)
+    @NSManaged public func addToPlaylistItems(_ value: PlaylistItemMO)
 
-    @objc(removePlaylistElementsObject:)
-    @NSManaged public func removeFromPlaylistElements(_ value: PlaylistElementMO)
+    @objc(removePlaylistItemsObject:)
+    @NSManaged public func removeFromPlaylistItems(_ value: PlaylistItemMO)
 
-    @objc(addPlaylistElements:)
-    @NSManaged public func addToPlaylistElements(_ values: NSSet)
+    @objc(addPlaylistItems:)
+    @NSManaged public func addToPlaylistItems(_ values: NSSet)
 
-    @objc(removePlaylistElements:)
-    @NSManaged public func removeFromPlaylistElements(_ values: NSSet)
+    @objc(removePlaylistItems:)
+    @NSManaged public func removeFromPlaylistItems(_ values: NSSet)
 
 }

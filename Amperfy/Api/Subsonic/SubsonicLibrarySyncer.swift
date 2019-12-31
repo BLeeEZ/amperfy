@@ -115,14 +115,14 @@ class SubsonicLibrarySyncer: LibrarySyncer {
 
         os_log("Update remote playlist songs", log: log, type: .info)
         var songIndicesToRemove = [Int]()
-        for entry in playlistForRemoteClear.entries {
-            songIndicesToRemove.append(entry.order)
+        for item in playlistForRemoteClear.items {
+            songIndicesToRemove.append(item.order)
         }
 
         var songIdsToAdd = [Int]()
-        for entry in playlist.entries {
-            if let songEntry = entry.song {
-                songIdsToAdd.append(songEntry.id)
+        for item in playlist.items {
+            if let songItem = item.song {
+                songIdsToAdd.append(songItem.id)
             }
         }
 

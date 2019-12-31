@@ -190,7 +190,7 @@ class PlayerView: UIView {
 
 extension PlayerView: MusicPlayable {
 
-    func didStartPlaying(playlistElement: PlaylistElement) {
+    func didStartPlaying(playlistItem: PlaylistItem) {
         refreshPlayer()
     }
     
@@ -198,7 +198,7 @@ extension PlayerView: MusicPlayable {
         refreshPlayer()
     }
     
-    func didStopPlaying(playlistElement: PlaylistElement?) {
+    func didStopPlaying(playlistItem: PlaylistItem?) {
         refreshPlayer()
         refreshSongInfo(song: nil)
     }

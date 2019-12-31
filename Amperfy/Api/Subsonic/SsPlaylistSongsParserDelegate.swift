@@ -36,10 +36,10 @@ class SsPlaylistSongsParserDelegate: GenericXmlParser {
                     return
             }
             
-            let playlistEntry = libraryStorage.createPlaylistElement()
-            playlistEntry.order = Int(parsedCount)
-            playlistEntry.song = fetchedSong
-            playlist.add(entry: playlistEntry)
+            let playlistItem = libraryStorage.createPlaylistItem()
+            playlistItem.order = Int(parsedCount)
+            playlistItem.song = fetchedSong
+            playlist.add(item: playlistItem)
         }
     }
     

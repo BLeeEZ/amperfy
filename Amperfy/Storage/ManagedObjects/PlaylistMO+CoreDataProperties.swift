@@ -12,23 +12,23 @@ extension PlaylistMO {
     @NSManaged public var name: String?
     @NSManaged public var playersNormalPlaylist: PlayerManaged?
     @NSManaged public var playersShuffledPlaylist: PlayerManaged?
-    @NSManaged public var entries: NSSet?
+    @NSManaged public var items: NSSet?
 
 }
 
-// MARK: Generated accessors for entries
+// MARK: Generated accessors for items
 extension PlaylistMO {
 
-    @objc(addEntriesObject:)
-    @NSManaged public func addToEntries(_ value: PlaylistElementMO)
+    @objc(addItemsObject:)
+    @NSManaged public func addToItems(_ value: PlaylistItemMO)
 
-    @objc(removeEntriesObject:)
-    @NSManaged public func removeFromEntries(_ value: PlaylistElementMO)
+    @objc(removeItemsObject:)
+    @NSManaged public func removeFromItems(_ value: PlaylistItemMO)
 
-    @objc(addEntries:)
-    @NSManaged public func addToEntries(_ values: NSSet)
+    @objc(addItems:)
+    @NSManaged public func addToItems(_ values: NSSet)
 
-    @objc(removeEntries:)
-    @NSManaged public func removeFromEntries(_ values: NSSet)
+    @objc(removeItems:)
+    @NSManaged public func removeFromItems(_ values: NSSet)
 
 }

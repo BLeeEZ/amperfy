@@ -6,7 +6,7 @@ class PlaylistSongsParserDelegate: GenericXmlParser {
 
     let playlist: Playlist
     let libraryStorage: LibraryStorage
-    var playlistElementBuffer: PlaylistElement?
+    var playlistItemBuffer: PlaylistItem?
 
     init(playlist: Playlist, libraryStorage: LibraryStorage) {
         self.playlist = playlist
@@ -20,8 +20,8 @@ class PlaylistSongsParserDelegate: GenericXmlParser {
         switch(elementName) {
         case "song":
             if let songId = Int(attributeDict["id"] ?? "0"), let fetchedSong = libraryStorage.getSong(id: songId) {
-                playlistElementBuffer = libraryStorage.createPlaylistElement()
-                playlistElementBuffer?.song = fetchedSong
+                playlistItemBuffer = libraryStorage.createPlaylistItem()
+                playlistItemBuffer?.song = fetchedSong
             }
         default:
             break
@@ -31,12 +31,12 @@ class PlaylistSongsParserDelegate: GenericXmlParser {
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "playlisttrack":
-            playlistElementBuffer?.order = Int(buffer) ?? 0
+            playlistItemBuffer?.order = Int(buffer) ?? 0
         case "song":
-            if let entry = playlistElementBuffer {
-                playlist.add(entry: entry)
+            if let item = playlistItemBuffer {
+                playlist.add(item: item)
             }
-            playlistElementBuffer = nil
+            playlistItemBuffer = nil
         default:
             break
         }

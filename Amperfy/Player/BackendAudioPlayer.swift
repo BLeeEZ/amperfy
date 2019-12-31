@@ -22,7 +22,7 @@ protocol BackendAudioPlayerNotifiable {
 }
 
 struct PlayRequest {
-    let playlistEntry: PlaylistElement
+    let playlistItem: PlaylistItem
     let reactionToError: FetchErrorReaction
 }
 
@@ -35,7 +35,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     private let semaphore = DispatchSemaphore(value: 1)
     
     public private(set) var isPlaying: Bool = false
-    public private(set) var currentlyPlaying: PlaylistElement?
+    public private(set) var currentlyPlaying: PlaylistItem?
     
     var responder: BackendAudioPlayerNotifiable?
     var elapsedTime: Double {
@@ -92,28 +92,28 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         player.seek(to: CMTime(seconds: toSecond, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
     }
     
-    func updateCurrentlyPlayingReference(playlistEntry: PlaylistElement) {
-        if currentlyPlaying?.song?.id == playlistEntry.song?.id {
-            currentlyPlaying = playlistEntry
+    func updateCurrentlyPlayingReference(playlistItem: PlaylistItem) {
+        if currentlyPlaying?.song?.id == playlistItem.song?.id {
+            currentlyPlaying = playlistItem
         }
     }
     
-    func requestToPlay(playlistEntry: PlaylistElement, reactionToError: FetchErrorReaction) {
+    func requestToPlay(playlistItem: PlaylistItem, reactionToError: FetchErrorReaction) {
         semaphore.wait()
-        latestPlayRequest = PlayRequest(playlistEntry: playlistEntry, reactionToError: reactionToError)
-        guard let song = playlistEntry.song else { return }
+        latestPlayRequest = PlayRequest(playlistItem: playlistItem, reactionToError: reactionToError)
+        guard let song = playlistItem.song else { return }
         if song.isCached {
-            insertCachedSong(playlistEntry: playlistEntry)
+            insertCachedSong(playlistItem: playlistItem)
             self.continuePlay()
-            self.reactToInsertationFinish(playlistEntry: playlistEntry)
+            self.reactToInsertationFinish(playlistItem: playlistItem)
         } else {
             downloadManager.download(song: song, notifier: self, priority: .high)
         }
         semaphore.signal()
     }
     
-    private func insertCachedSong(playlistEntry: PlaylistElement) {
-        guard let song = playlistEntry.song, let songData = song.fileData else { return }
+    private func insertCachedSong(playlistItem: PlaylistItem) {
+        guard let song = playlistItem.song, let songData = song.fileData else { return }
         os_log(.default, "Play song: %s", song.displayString)
         let url = createLocalUrl(songData: songData)
         player.pause()
@@ -123,8 +123,8 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         NotificationCenter.default.addObserver(self, selector: #selector(songFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
     }
 
-    private func reactToInsertationFinish(playlistEntry: PlaylistElement) {
-        currentlyPlaying = playlistEntry
+    private func reactToInsertationFinish(playlistItem: PlaylistItem) {
+        currentlyPlaying = playlistItem
         self.responder?.notifySongPreparationFinished()
     }
     
@@ -151,11 +151,11 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     }
     
     func finished(downloading song: Song, error: DownloadError?) {
-        guard let playRequest = self.latestPlayRequest, song == playRequest.playlistEntry.song else { return }
+        guard let playRequest = self.latestPlayRequest, song == playRequest.playlistItem.song else { return }
         
         if let fetchError = error {
             if fetchError == .noConnectivity {
-                self.reactToInsertationFinish(playlistEntry: playRequest.playlistEntry)
+                self.reactToInsertationFinish(playlistItem: playRequest.playlistItem)
                 switch playRequest.reactionToError {
                 case .playPrevious:
                     self.reactToError(reaction: .playPreviousCached)
@@ -166,13 +166,13 @@ class BackendAudioPlayer: SongDownloadNotifiable {
                 }
                 
             } else {
-                self.reactToInsertationFinish(playlistEntry: playRequest.playlistEntry)
+                self.reactToInsertationFinish(playlistItem: playRequest.playlistItem)
                 self.reactToError(reaction: playRequest.reactionToError)
             }
         } else {
-            self.insertCachedSong(playlistEntry: playRequest.playlistEntry)
+            self.insertCachedSong(playlistItem: playRequest.playlistItem)
             self.continuePlay()
-            self.reactToInsertationFinish(playlistEntry: playRequest.playlistEntry)
+            self.reactToInsertationFinish(playlistItem: playRequest.playlistItem)
         }
     }
     

@@ -1,12 +1,12 @@
 import Foundation
 import CoreData
 
-public class PlaylistElement: NSObject {
+public class PlaylistItem: NSObject {
 
-    let managedObject: PlaylistElementMO
+    let managedObject: PlaylistItemMO
     private let storage: LibraryStorage
     
-    init(storage: LibraryStorage, managedObject: PlaylistElementMO) {
+    init(storage: LibraryStorage, managedObject: PlaylistItemMO) {
         self.storage = storage
         self.managedObject = managedObject
     }
@@ -16,11 +16,15 @@ public class PlaylistElement: NSObject {
     }
 
     var index: Int? {
-         return managedObject.index
+        // Check if object has been deleted
+        guard (managedObject.managedObjectContext != nil) else {
+            return nil
+        }
+        return order
     }
     var order: Int {
-         get { return Int(managedObject.order) }
-         set { managedObject.order = Int32(newValue) }
+        get { return Int(managedObject.order) }
+        set { managedObject.order = Int32(newValue) }
      }
     var song: Song? {
         get {

@@ -47,12 +47,12 @@ public class PlayerData {
         }
     }
     
-    public var currentPlaylistElement: PlaylistElement? {
+    public var currentPlaylistItem: PlaylistItem? {
         get {
             guard currentSongIndex < playlist.songs.count else {
                 return nil
             }
-            return playlist.entries[currentSongIndex]
+            return playlist.items[currentSongIndex]
         }
     }
     

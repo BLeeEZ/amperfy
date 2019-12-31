@@ -4,9 +4,9 @@ import MediaPlayer
 import os.log
 
 protocol MusicPlayable {
-    func didStartPlaying(playlistElement: PlaylistElement)
+    func didStartPlaying(playlistItem: PlaylistItem)
     func didPause()
-    func didStopPlaying(playlistElement: PlaylistElement?)
+    func didStopPlaying(playlistItem: PlaylistItem?)
     func didElapsedTimeChange()
     func didPlaylistChange()
 }
@@ -36,11 +36,11 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     var isPlaying: Bool {
         return backendAudioPlayer.isPlaying
     }
-    var currentlyPlaying: PlaylistElement? {
+    var currentlyPlaying: PlaylistItem? {
         if let playingSong = backendAudioPlayer.currentlyPlaying {
             return playingSong
         }
-        return coreData.currentPlaylistElement
+        return coreData.currentPlaylistItem
     }
     var elapsedTime: Double {
         return backendAudioPlayer.elapsedTime
@@ -53,8 +53,8 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
         get { return coreData.isShuffle }
         set {
             coreData.isShuffle = newValue
-            if let curPlaylistElement = coreData.currentPlaylistElement {
-                backendAudioPlayer.updateCurrentlyPlayingReference(playlistEntry: curPlaylistElement)
+            if let curPlaylistItem = coreData.currentPlaylistItem {
+                backendAudioPlayer.updateCurrentlyPlayingReference(playlistItem: curPlaylistItem)
             }
             notifyPlaylistUpdated()
         }
@@ -117,15 +117,15 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     private func prepareSongAndInsertToPlayer(playlistIndex: Int, reactionToError: FetchErrorReaction) {
         guard playlistIndex < playlist.songs.count else { return }
-        let playlistEntry = playlist.entries[playlistIndex]
-        backendAudioPlayer.requestToPlay(playlistEntry: playlistEntry, reactionToError: reactionToError)
+        let playlistItem = playlist.items[playlistIndex]
+        backendAudioPlayer.requestToPlay(playlistItem: playlistItem, reactionToError: reactionToError)
         coreData.currentSongIndex = playlistIndex
     }
     
     func notifySongPreparationFinished() {
-        if let curPlaylistElement = backendAudioPlayer.currentlyPlaying {
-            notifySongStartedPlaying(playlistElement: curPlaylistElement)
-            if let song = curPlaylistElement.song {
+        if let curPlaylistItem = backendAudioPlayer.currentlyPlaying {
+            notifySongStartedPlaying(playlistItem: curPlaylistItem)
+            if let song = curPlaylistItem.song {
                 updateNowPlayingInfo(song: song)
             }
         }
@@ -144,8 +144,8 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
             play(songInPlaylistAt: coreData.currentSongIndex)
         } else {
             backendAudioPlayer.continuePlay()
-            if let curPlaylistElement = backendAudioPlayer.currentlyPlaying {
-                notifySongStartedPlaying(playlistElement: curPlaylistElement)
+            if let curPlaylistItem = backendAudioPlayer.currentlyPlaying {
+                notifySongStartedPlaying(playlistItem: curPlaylistItem)
             }
         }
     }
@@ -223,7 +223,7 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
     
     func stop() {
-        notifyPlayerStopped(playlistElement: currentlyPlaying)
+        notifyPlayerStopped(playlistItem: currentlyPlaying)
         backendAudioPlayer.stop()
         coreData.currentSongIndex = 0
     }
@@ -249,9 +249,9 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
         notifierList.removeAll()
     }
     
-    func notifySongStartedPlaying(playlistElement: PlaylistElement) {
+    func notifySongStartedPlaying(playlistItem: PlaylistItem) {
         for notifier in notifierList {
-            notifier.didStartPlaying(playlistElement: playlistElement)
+            notifier.didStartPlaying(playlistItem: playlistItem)
         }
     }
     
@@ -261,9 +261,9 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
         }
     }
     
-    func notifyPlayerStopped(playlistElement: PlaylistElement?) {
+    func notifyPlayerStopped(playlistItem: PlaylistItem?) {
         for notifier in notifierList {
-            notifier.didStopPlaying(playlistElement: playlistElement)
+            notifier.didStopPlaying(playlistItem: playlistItem)
         }
     }
     

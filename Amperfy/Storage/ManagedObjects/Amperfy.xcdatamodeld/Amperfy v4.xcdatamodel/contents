@@ -33,14 +33,14 @@
     <entity name="Playlist" representedClassName="PlaylistMO" elementID="PlaylistManaged" syncable="YES">
         <attribute name="id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <relationship name="entries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistElement" inverseName="playlist" inverseEntity="PlaylistElement"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistItem" inverseName="playlist" inverseEntity="PlaylistItem" elementID="entries"/>
         <relationship name="playersNormalPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PlayerManaged" inverseName="normalPlaylist" inverseEntity="PlayerManaged" elementID="currentlyPlaying"/>
         <relationship name="playersShuffledPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PlayerManaged" inverseName="shuffledPlaylist" inverseEntity="PlayerManaged"/>
     </entity>
-    <entity name="PlaylistElement" representedClassName="PlaylistElementMO" syncable="YES">
+    <entity name="PlaylistItem" representedClassName="PlaylistItemMO" elementID="PlaylistElement" syncable="YES">
         <attribute name="order" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="playlist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="entries" inverseEntity="Playlist"/>
-        <relationship name="song" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Song" inverseName="playlistElements" inverseEntity="Song"/>
+        <relationship name="playlist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="items" inverseEntity="Playlist"/>
+        <relationship name="song" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Song" inverseName="playlistItems" inverseEntity="Song"/>
     </entity>
     <entity name="Song" representedClassName="SongMO" parentEntity="AbstractLibraryElementMO" syncable="YES">
         <attribute name="title" optional="YES" attributeType="String"/>
@@ -49,7 +49,7 @@
         <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songsMO" inverseEntity="Album"/>
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="songsMO" inverseEntity="Artist"/>
         <relationship name="fileDataContainer" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SongDataMO" inverseName="info" inverseEntity="SongDataMO" elementID="dataMO"/>
-        <relationship name="playlistElements" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistElement" inverseName="song" inverseEntity="PlaylistElement"/>
+        <relationship name="playlistItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistItem" inverseName="song" inverseEntity="PlaylistItem" elementID="playlistElements"/>
         <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWaveMO" inverseName="songsMO" inverseEntity="SyncWaveMO"/>
     </entity>
     <entity name="SongDataMO" representedClassName="SongDataMO" syncable="YES">
@@ -74,8 +74,8 @@
         <element name="Artist" positionX="-30559.515625" positionY="-8017.5703125" width="128" height="105"/>
         <element name="Artwork" positionX="-30271.51171875" positionY="-8396.6953125" width="128" height="105"/>
         <element name="PlayerManaged" positionX="-29890.359375" positionY="-8230.625" width="128" height="118"/>
-        <element name="PlaylistElement" positionX="-30254.0078125" positionY="-8216.28125" width="128" height="88"/>
         <element name="Playlist" positionX="-30080.7734375" positionY="-8216.7734375" width="128" height="118"/>
+        <element name="PlaylistItem" positionX="-30254.0078125" positionY="-8216.28125" width="128" height="88"/>
         <element name="Song" positionX="-30463.86328125" positionY="-8276.4765625" width="128" height="163"/>
         <element name="SongDataMO" positionX="-30352.42578125" positionY="-8090.62109375" width="128" height="88"/>
         <element name="SyncWaveMO" positionX="-30465" positionY="-8244" width="128" height="180"/>

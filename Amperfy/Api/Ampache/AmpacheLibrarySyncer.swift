@@ -100,8 +100,8 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         let parser = PlaylistSongsParserDelegate(playlist: playlistForRemoteClear, libraryStorage: libraryStorage)
         ampacheXmlServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
         os_log("Clear remote playlist songs", log: log, type: .info)
-        for entry in playlistForRemoteClear.entries.reversed() {
-            ampacheXmlServerApi.requestPlaylist(removeSongIndex: entry.order, fromPlaylistId: playlist.id)
+        for item in playlistForRemoteClear.items.reversed() {
+            ampacheXmlServerApi.requestPlaylist(removeSongIndex: item.order, fromPlaylistId: playlist.id)
         }
         libraryStorage.deletePlaylist(playlistForRemoteClear)
         

@@ -11,7 +11,7 @@ class LibraryStorage {
         self.context = context
     }
     
-    static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongDataMO.typeName, Artwork.typeName, SyncWaveMO.typeName, Playlist.typeName, PlaylistElement.typeName, PlayerManaged.typeName]
+    static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongDataMO.typeName, Artwork.typeName, SyncWaveMO.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerManaged.typeName]
     
     func createArtist() -> Artist {
         let artist = Artist(context: context)
@@ -94,13 +94,13 @@ class LibraryStorage {
         context.delete(playlist.managedObject)
     }
     
-    func createPlaylistElement() -> PlaylistElement {
-        let elementMO = PlaylistElementMO(context: context)
-        return PlaylistElement(storage: self, managedObject: elementMO)
+    func createPlaylistItem() -> PlaylistItem {
+        let itemMO = PlaylistItemMO(context: context)
+        return PlaylistItem(storage: self, managedObject: itemMO)
     }
     
-    func deletePlaylistElement(element: PlaylistElement) {
-        context.delete(element.managedObject)
+    func deletePlaylistItem(item: PlaylistItem) {
+        context.delete(item.managedObject)
     }
 
     func createSyncWave() -> SyncWaveMO {
@@ -190,7 +190,7 @@ class LibraryStorage {
             let normalPlaylist = Playlist(storage: self, managedObject: playerManaged.normalPlaylist!)
             let shuffledPlaylist = Playlist(storage: self, managedObject: playerManaged.shuffledPlaylist!)
             
-            if shuffledPlaylist.entries.count != normalPlaylist.entries.count {
+            if shuffledPlaylist.items.count != normalPlaylist.items.count {
                 shuffledPlaylist.removeAllSongs()
                 shuffledPlaylist.append(songs: normalPlaylist.songs)
                 shuffledPlaylist.shuffle()
