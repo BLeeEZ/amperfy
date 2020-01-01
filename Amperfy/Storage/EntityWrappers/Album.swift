@@ -24,8 +24,11 @@ public class Album: AbstractLibraryEntity {
         set { managedObject.year = Int16(newValue) }
     }
     var artist: Artist? {
-        get { return managedObject.artist }
-        set { managedObject.artist = newValue }
+        get {
+            guard let artistMO = managedObject.artist else { return nil }
+            return Artist(managedObject: artistMO)
+        }
+        set { managedObject.artist = newValue?.managedObject }
     }
     // TODO: replace with entitWrapper SyncWave
     var syncInfo: SyncWaveMO? {

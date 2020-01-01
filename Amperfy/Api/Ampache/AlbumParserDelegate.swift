@@ -21,7 +21,7 @@ class AlbumParserDelegate: GenericXmlLibParser {
             }
 		case "artist":
             if let album = albumBuffer {
-                let artistId = Int32(attributeDict["id"] ?? "0") ?? 0
+                let artistId = Int(attributeDict["id"] ?? "0") ?? 0
                 if let artist = libraryStorage.getArtist(id: artistId) {
                     album.artist = artist
                 } else {

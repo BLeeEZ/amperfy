@@ -33,7 +33,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     private func playAllSongsofArtist(artist: Artist) {
-        guard let player = player, let _ = artist.albums?.array as? [Album] else {
+        guard let player = player else {
             return
         }
         player.cleanPlaylist()

@@ -46,7 +46,7 @@ class ArtistDetailVC: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section+1 {
         case LibraryElement.Album.rawValue:
-            return artist?.albums?.count ?? 0
+            return artist?.albums.count ?? 0
         case LibraryElement.Song.rawValue:
             return artist?.songs.count ?? 0
         default:
@@ -58,7 +58,7 @@ class ArtistDetailVC: UITableViewController {
         switch indexPath.section+1 {
         case LibraryElement.Album.rawValue:
             let cell: AlbumTableCell = dequeueCell(for: tableView, at: indexPath)
-            if let album = artist?.albums?[indexPath.row] as? Album {
+            if let album = artist?.albums[indexPath.row] {
                 cell.display(album: album)
             }
             return cell
@@ -76,7 +76,7 @@ class ArtistDetailVC: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         switch section+1 {
         case LibraryElement.Album.rawValue:
-            return artist?.albums?.count != 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
+            return artist?.albums.count != 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
         case LibraryElement.Song.rawValue:
             return artist?.songs.count != 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
         default:
@@ -98,7 +98,7 @@ class ArtistDetailVC: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.section+1 {
         case LibraryElement.Album.rawValue:
-            if let album = artist?.albums?[indexPath.row] as? Album {
+            if let album = artist?.albums[indexPath.row] {
                 performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
             }
         case LibraryElement.Song.rawValue: break

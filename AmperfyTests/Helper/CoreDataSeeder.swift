@@ -11,7 +11,8 @@ class CoreDataSeeder {
     let albums = [
         (id: 12, artistId: 4, name: "High Voltage", year: 2018),
         (id: 34, artistId: 92, name: "Du Hast", year: 1987),
-        (id: 59, artistId: 93, name: "Dreams", year: 2002)
+        (id: 59, artistId: 93, name: "Dreams", year: 2002),
+        (id: 60, artistId: 93, name: "Let it go", year: 2007)
     ]
     let songs = [
         (id: 3,     artistId: 4, albumId: 12, track: 3, isCached: false, title: "go home",       url: "www.blub.de/ahhh"),
@@ -20,7 +21,11 @@ class CoreDataSeeder {
         (id: 19,    artistId: 92, albumId: 34, track: 0, isCached: false, title: "baby", url: "www.blub.de/dddtd"),
         (id: 36,    artistId: 92, albumId: 34, track: 1, isCached: true, title: "son", url: "www.blub.de/dddtdiuz"),
         (id: 38,    artistId: 93, albumId: 59, track: 4, isCached: true, title: "oh no", url: "www.blub.de/dddtd23iuz"),
-        (id: 41,    artistId: 93, albumId: 59, track: 5, isCached: true, title: "please", url: "www.blub.de/dddtd233iuz")
+        (id: 41,    artistId: 93, albumId: 59, track: 5, isCached: true, title: "please", url: "www.blub.de/dddtd233iuz"),
+        (id: 54,    artistId: 93, albumId: 60, track: 1, isCached: true, title: "see", url: "www.blub.de/ddf"),
+        (id: 55,    artistId: 93, albumId: 60, track: 2, isCached: true, title: "feel", url: "www.blub.de/654"),
+        (id: 56,    artistId: 93, albumId: 60, track: 3, isCached: true, title: "house", url: "www.blub.de/trd"),
+        (id: 57,    artistId: 93, albumId: 60, track: 4, isCached: true, title: "car", url: "www.blub.de/jhrf")
     ]
     let playlists = [
         (id: 3,     name: "With One Cached", songIds: [3, 5, 10, 36, 19]),
@@ -33,7 +38,7 @@ class CoreDataSeeder {
         
         for artistSeed in artists {
             let artist = storage.createArtist()
-            artist.id = Int32(artistSeed.id)
+            artist.id = artistSeed.id
             artist.name = artistSeed.name
         }
         
@@ -42,7 +47,7 @@ class CoreDataSeeder {
             album.id = albumSeed.id
             album.name = albumSeed.name
             album.year = albumSeed.year
-            let artist = storage.getArtist(id: Int32(albumSeed.artistId))
+            let artist = storage.getArtist(id: albumSeed.artistId)
             album.artist = artist
         }
         
@@ -52,7 +57,7 @@ class CoreDataSeeder {
             song.title = songSeed.title
             song.track = songSeed.track
             song.url = songSeed.url
-            let artist = storage.getArtist(id: Int32(songSeed.artistId))
+            let artist = storage.getArtist(id: songSeed.artistId)
             song.artist = artist
             let album = storage.getAlbum(id: songSeed.albumId)
             song.album = album

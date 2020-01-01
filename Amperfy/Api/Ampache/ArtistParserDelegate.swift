@@ -16,14 +16,14 @@ class ArtistParserDelegate: GenericXmlLibParser {
         buffer = ""
 
         if(elementName == "artist") {
-            guard let attributeId = attributeDict["id"], let artistId = Int32(attributeId) else { return }
+            guard let attributeId = attributeDict["id"], let artistId = Int(attributeId) else { return }
             if !syncWave.isInitialWave, let fetchedArtist = libraryStorage.getArtist(id: artistId)  {
                 artistBuffer = fetchedArtist
             } else {
                 artistBuffer = libraryStorage.createArtist()
                 artistBuffer?.syncInfo = syncWave
                 artistBuffer?.id = artistId
-                artistBuffer?.artwork?.url = ampacheUrlCreator.getArtUrlString(forArtistId: artistId)
+                artistBuffer?.artwork?.url = ampacheUrlCreator.getArtUrlString(forArtistId: Int32(artistId))
             }
 		}    
     }

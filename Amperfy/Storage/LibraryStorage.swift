@@ -14,9 +14,9 @@ class LibraryStorage {
     static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongDataMO.typeName, Artwork.typeName, SyncWaveMO.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerManaged.typeName]
     
     func createArtist() -> Artist {
-        let artist = Artist(context: context)
-        artist.artwork = createArtwork()
-        return artist
+        let artistMO = ArtistMO(context: context)
+        artistMO.artwork = createArtwork()
+        return Artist(managedObject: artistMO)
     }
     
     func createAlbum() -> Album {
@@ -111,9 +111,13 @@ class LibraryStorage {
     
     func getArtists() -> Array<Artist> {
         var artists = Array<Artist>()
-        let fetchRequest: NSFetchRequest<Artist> = Artist.fetchRequest()
+        var foundArtists = Array<ArtistMO>()
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
         do {
-            artists = try context.fetch(fetchRequest)
+            foundArtists = try context.fetch(fetchRequest)
+            for artistMO in foundArtists {
+                artists.append(Artist(managedObject: artistMO))
+            }
         }
         catch {}
         
@@ -209,15 +213,15 @@ class LibraryStorage {
         return playerData
     }
     
-    func getArtist(id: Int32) -> Artist? {
+    func getArtist(id: Int) -> Artist? {
         var foundArtist: Artist? = nil
-        let fr: NSFetchRequest<Artist> = Artist.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: Int(id)))
+        let fr: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
-            if let artists = result, artists.count > 0, let artist = artists[0] as? Artist {
-                foundArtist = artist
+            if let artists = result, artists.count > 0, let artist = artists[0] as? ArtistMO {
+                foundArtist = Artist(managedObject: artist)
             }
         } catch {
             os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)

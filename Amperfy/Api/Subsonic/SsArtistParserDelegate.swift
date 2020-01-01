@@ -18,7 +18,7 @@ class SsArtistParserDelegate: GenericXmlLibParser {
 
         if(elementName == "artist") {
             guard let attributeId = attributeDict["id"], 
-                let artistId = Int32(attributeId),
+                let artistId = Int(attributeId),
                 let attributeArtistName = attributeDict["name"],
                 let attributeAlbumCount = attributeDict["albumCount"],
                 let albumCount = Int(attributeAlbumCount) else {
@@ -31,7 +31,7 @@ class SsArtistParserDelegate: GenericXmlLibParser {
                 artistBuffer?.syncInfo = syncWave
                 artistBuffer?.id = artistId
                 artistBuffer?.name = attributeArtistName
-                artistBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: artistId)
+                artistBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: Int32(artistId))
             }
             albumCountOfAllArtists += albumCount
 		}    

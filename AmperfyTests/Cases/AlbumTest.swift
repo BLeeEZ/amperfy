@@ -34,7 +34,7 @@ class AlbumTest: XCTestCase {
     }
     
     func testArtist() {
-        guard let artist = storage.getArtist(id: Int32(cdHelper.seeder.artists[0].id)) else { XCTFail(); return }
+        guard let artist = storage.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
         testAlbum.artist = artist
         XCTAssertEqual(testAlbum.artist!.id, artist.id)
         storage.saveContext()

@@ -85,7 +85,7 @@ class SubsonicServerApi {
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
     
-    func requestArtist(parserDelegate: XMLParserDelegate, id: Int32) {
+    func requestArtist(parserDelegate: XMLParserDelegate, id: Int) {
         let urlPath = urlString(forAction: "getArtist", id: id)
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
@@ -99,7 +99,7 @@ class SubsonicServerApi {
         let urlPath = urlString(forAction: "getPlaylists")
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
-    
+    // TODO: id: Int32 to Int
     func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: Int32) {
         let urlPath = urlString(forAction: "getPlaylist", id: id)
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)

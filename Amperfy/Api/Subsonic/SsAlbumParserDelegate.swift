@@ -22,7 +22,7 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
                 let albumId = Int(attributeId),
                 let attributeAlbumtName = attributeDict["name"],
                 let attributeArtistId = attributeDict["artistId"],
-                let artistId = Int32(attributeArtistId),
+                let artistId = Int(attributeArtistId),
                 let attributeSongCount = attributeDict["songCount"],
                 let songCount = Int(attributeSongCount) else {
                     return

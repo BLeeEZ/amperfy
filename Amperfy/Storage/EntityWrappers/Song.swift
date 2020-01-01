@@ -34,8 +34,11 @@ public class Song: AbstractLibraryEntity {
          set { managedObject.album = newValue?.managedObject }
      }
      var artist: Artist? {
-         get { return managedObject.artist }
-         set { managedObject.artist = newValue }
+         get {
+             guard let artistMO = managedObject.artist else { return nil }
+             return Artist(managedObject: artistMO)
+         }
+         set { managedObject.artist = newValue?.managedObject }
      }
      //TODO: use SongData instead of MO
      var fileDataContainer: SongDataMO? {
