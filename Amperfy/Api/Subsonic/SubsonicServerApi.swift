@@ -69,12 +69,8 @@ class SubsonicServerApi {
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {
-        // TODO: CHeck prev: artwork.owner!.allObjects as? [AbstractLibraryElementMO]
-        // -> Use directly owners -> this should return [AbstractLibraryElement]
-        guard let owners = artwork.owners!.allObjects as? [AbstractLibraryEntity],
-            !owners.isEmpty,
-            let firstOwner = owners.first else {
-                return nil
+        guard !artwork.owners.isEmpty, let firstOwner = artwork.owners.first else {
+            return nil
         }
         let coverArtUrlString = urlString(forAction: "getCoverArt", id: firstOwner.id)
         return URL(string: coverArtUrlString)

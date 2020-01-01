@@ -17,10 +17,10 @@
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="artist" inverseEntity="Song" elementID="songsMO"/>
         <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWaveMO" inverseName="artists" inverseEntity="SyncWaveMO"/>
     </entity>
-    <entity name="Artwork" representedClassName="Artwork" syncable="YES">
+    <entity name="Artwork" representedClassName="ArtworkMO" syncable="YES">
         <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
-        <attribute name="statusMO" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="urlMO" optional="YES" attributeType="String"/>
+        <attribute name="status" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" elementID="statusMO"/>
+        <attribute name="url" optional="YES" attributeType="String" elementID="urlMO"/>
         <relationship name="owners" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AbstractLibraryEntity" inverseName="artwork" inverseEntity="AbstractLibraryEntity"/>
     </entity>
     <entity name="PlayerManaged" representedClassName="PlayerManaged" syncable="YES">
@@ -72,7 +72,7 @@
         <element name="AbstractLibraryEntity" positionX="-30561.8125" positionY="-8377.35546875" width="128" height="73"/>
         <element name="Album" positionX="-30672.00390625" positionY="-8275.76953125" width="128" height="118"/>
         <element name="Artist" positionX="-30559.515625" positionY="-8017.5703125" width="128" height="103"/>
-        <element name="Artwork" positionX="-30271.51171875" positionY="-8396.6953125" width="128" height="105"/>
+        <element name="Artwork" positionX="-30271.51171875" positionY="-8396.6953125" width="128" height="103"/>
         <element name="PlayerManaged" positionX="-29890.359375" positionY="-8230.625" width="128" height="118"/>
         <element name="Playlist" positionX="-30080.7734375" positionY="-8216.7734375" width="128" height="118"/>
         <element name="PlaylistItem" positionX="-30254.0078125" positionY="-8216.28125" width="128" height="88"/>

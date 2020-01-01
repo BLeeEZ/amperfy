@@ -15,19 +15,19 @@ class LibraryStorage {
     
     func createArtist() -> Artist {
         let artistMO = ArtistMO(context: context)
-        artistMO.artwork = createArtwork()
+        artistMO.artwork = createArtwork().managedObject
         return Artist(managedObject: artistMO)
     }
     
     func createAlbum() -> Album {
         let albumMO = AlbumMO(context: context)
-        albumMO.artwork = createArtwork()
+        albumMO.artwork = createArtwork().managedObject
         return Album(managedObject: albumMO)
     }
     
     func createSong() -> Song {
         let songMO = SongMO(context: context)
-        songMO.artwork = createArtwork()
+        songMO.artwork = createArtwork().managedObject
         return Song(managedObject: songMO)
     }
     
@@ -79,11 +79,11 @@ class LibraryStorage {
     }
     
     func createArtwork() -> Artwork {
-        return Artwork(context: context)
+        return Artwork(managedObject: ArtworkMO(context: context))
     }
     
     func deleteArtwork(artwork: Artwork) {
-        context.delete(artwork)
+        context.delete(artwork.managedObject)
     }
  
     func createPlaylist() -> Playlist {
@@ -260,7 +260,7 @@ class LibraryStorage {
         }
         return foundSong
     }
-    
+    // TODO: id Int
     func getPlaylist(id: Int32) -> Playlist? {
         var foundPlaylist: Playlist? = nil
         let fr: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
@@ -285,13 +285,15 @@ class LibraryStorage {
     func getArtworksThatAreNotChecked(fetchCount: Int = 10) -> [Artwork] {
         var foundArtworks = [Artwork]()
         
-        let fr: NSFetchRequest<Artwork> = Artwork.fetchRequest()
-        fr.predicate = NSPredicate(format: "statusMO == %@", NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue)))
+        let fr: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "status == %@", NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue)))
         fr.fetchLimit = fetchCount
         do {
             let result = try context.fetch(fr) as NSArray?
-            if let results = result, let artworks = results as? [Artwork] {
-                foundArtworks = artworks
+            if let results = result, let artworksMO = results as? [ArtworkMO] {
+                for artworkMO in artworksMO {
+                    foundArtworks.append(Artwork(managedObject: artworkMO))
+                }
             }
         } catch {
             os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)

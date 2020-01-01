@@ -68,7 +68,7 @@ class AmpacheArtworkSyncer: GenericLibraryBackgroundSyncer, BackgroundLibrarySyn
             artwork.status = .IsDefaultImage
         } else {
             artwork.status = .CustomImage
-            artwork.imageData = NSData(data: imageData)
+            artwork.setImage(fromData: NSData(data: imageData))
         }
     }
 }

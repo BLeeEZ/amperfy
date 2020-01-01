@@ -104,7 +104,7 @@ class SongTest: XCTestCase {
         let testData = Artwork.defaultImage.pngData()! as NSData
         let testImg = Artwork.defaultImage
         testSong.artwork = storage.createArtwork()
-        testSong.artwork?.imageData = testData
+        testSong.artwork?.setImage(fromData: testData)
         XCTAssertEqual(testSong.artwork?.image, testImg)
         XCTAssertEqual(testSong.image, testImg)
         storage.saveContext()

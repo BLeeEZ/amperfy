@@ -2,21 +2,21 @@ import Foundation
 import CoreData
 
 
-extension Artwork {
+extension ArtworkMO {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<Artwork> {
-        return NSFetchRequest<Artwork>(entityName: "Artwork")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<ArtworkMO> {
+        return NSFetchRequest<ArtworkMO>(entityName: "Artwork")
     }
 
     @NSManaged public var imageData: NSData?
-    @NSManaged public var statusMO: Int16
-    @NSManaged public var urlMO: String?
+    @NSManaged public var status: Int16
+    @NSManaged public var url: String?
     @NSManaged public var owners: NSSet?
 
 }
 
 // MARK: Generated accessors for owners
-extension Artwork {
+extension ArtworkMO {
 
     @objc(addOwnersObject:)
     @NSManaged public func addToOwners(_ value: AbstractLibraryEntityMO)
