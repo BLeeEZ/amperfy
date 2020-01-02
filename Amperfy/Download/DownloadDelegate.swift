@@ -32,9 +32,9 @@ class DownloadDelegate: DownloadManagerDelegate {
         guard let download = request.download, let data = download.resumeData else { return }
 		let libraryStorage = LibraryStorage(context: context)
         if let songMO = try? context.existingObject(with: request.element.objectID) as? SongMO {
-            songMO.fileDataContainer = libraryStorage.createSongData()
-            songMO.fileDataContainer?.id = songMO.id
-            songMO.fileDataContainer?.data = NSData(data: data)
+            let songFile = libraryStorage.createSongFile()
+            songFile.info = Song(managedObject: songMO)
+            songFile.data = NSData(data: data)
             libraryStorage.saveContext()
         }
     }

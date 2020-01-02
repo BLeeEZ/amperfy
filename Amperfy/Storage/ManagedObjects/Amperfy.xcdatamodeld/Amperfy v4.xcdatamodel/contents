@@ -48,14 +48,13 @@
         <attribute name="url" optional="YES" attributeType="String"/>
         <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songs" inverseEntity="Album"/>
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="songs" inverseEntity="Artist"/>
-        <relationship name="fileDataContainer" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SongDataMO" inverseName="info" inverseEntity="SongDataMO" elementID="dataMO"/>
+        <relationship name="file" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SongFile" inverseName="info" inverseEntity="SongFile" elementID="dataMO"/>
         <relationship name="playlistItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistItem" inverseName="song" inverseEntity="PlaylistItem" elementID="playlistElements"/>
         <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWaveMO" inverseName="songsMO" inverseEntity="SyncWaveMO"/>
     </entity>
-    <entity name="SongDataMO" representedClassName="SongDataMO" syncable="YES">
+    <entity name="SongFile" representedClassName="SongFileMO" elementID="SongDataMO" syncable="YES">
         <attribute name="data" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
-        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Song" inverseName="fileDataContainer" inverseEntity="Song"/>
+        <relationship name="info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Song" inverseName="file" inverseEntity="Song"/>
     </entity>
     <entity name="SyncWaveMO" representedClassName="SyncWaveMO" syncable="YES">
         <attribute name="dateOfLastAdd" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -77,7 +76,7 @@
         <element name="Playlist" positionX="-30080.7734375" positionY="-8216.7734375" width="128" height="118"/>
         <element name="PlaylistItem" positionX="-30254.0078125" positionY="-8216.28125" width="128" height="88"/>
         <element name="Song" positionX="-30463.86328125" positionY="-8276.4765625" width="128" height="163"/>
-        <element name="SongDataMO" positionX="-30352.42578125" positionY="-8090.62109375" width="128" height="88"/>
+        <element name="SongFile" positionX="-30352.42578125" positionY="-8090.62109375" width="128" height="73"/>
         <element name="SyncWaveMO" positionX="-30465" positionY="-8244" width="128" height="180"/>
     </elements>
 </model>

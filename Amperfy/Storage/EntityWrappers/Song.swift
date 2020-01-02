@@ -40,13 +40,15 @@ public class Song: AbstractLibraryEntity {
          }
          set { managedObject.artist = newValue?.managedObject }
      }
-     //TODO: use SongData instead of MO
-     var fileDataContainer: SongDataMO? {
-         get { return managedObject.fileDataContainer }
-         set { managedObject.fileDataContainer = newValue }
+     var file: SongFile? {
+         get {
+            guard let songFileMO = managedObject.file else { return nil }
+            return SongFile(managedObject: songFileMO)
+        }
+        set { managedObject.file = newValue?.managedObject }
      }
      var fileData: NSData? {
-         return managedObject.fileDataContainer?.data
+         return managedObject.file?.data
      }
      //TODO: use SongData instead of MO
      var syncInfo: SyncWaveMO? {
@@ -75,7 +77,7 @@ public class Song: AbstractLibraryEntity {
     }
 
     var isCached: Bool {
-        if let _ = managedObject.fileDataContainer?.data {
+        if let _ = managedObject.file?.data {
             return true
         }
         return false

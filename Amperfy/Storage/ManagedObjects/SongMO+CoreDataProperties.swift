@@ -13,7 +13,7 @@ extension SongMO {
     @NSManaged public var url: String?
     @NSManaged public var album: AlbumMO?
     @NSManaged public var artist: ArtistMO?
-    @NSManaged public var fileDataContainer: SongDataMO?
+    @NSManaged public var file: SongFileMO?
     @NSManaged public var playlistItems: NSSet?
     @NSManaged public var syncInfo: SyncWaveMO?
 

@@ -11,7 +11,7 @@ class LibraryStorage {
         self.context = context
     }
     
-    static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongDataMO.typeName, Artwork.typeName, SyncWaveMO.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName]
+    static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWaveMO.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName]
     
     func createArtist() -> Artist {
         let artistMO = ArtistMO(context: context)
@@ -31,51 +31,51 @@ class LibraryStorage {
         return Song(managedObject: songMO)
     }
     
-    func createSongData() -> SongDataMO {
-        let songData = SongDataMO(context: context)
-        return songData
+    func createSongFile() -> SongFile {
+        let songFileMO = SongFileMO(context: context)
+        return SongFile(managedObject: songFileMO)
     }
     
-    func deleteSongData(songData: SongDataMO) {
-        context.delete(songData)
+    func deleteSongFile(songFile: SongFile) {
+        context.delete(songFile.managedObject)
     }
 
     func deleteCache(ofSong song: Song) {
-        if let songData = song.fileDataContainer {
-            deleteSongData(songData: songData)
-            song.fileDataContainer = nil
+        if let songFile = song.file {
+            deleteSongFile(songFile: songFile)
+            song.file = nil
         }
     }
 
     func deleteCache(ofPlaylist playlist: Playlist) {
         for song in playlist.songs {
-            if let songData = song.fileDataContainer {
-                deleteSongData(songData: songData)
-                song.fileDataContainer = nil
+            if let songFile = song.file {
+                deleteSongFile(songFile: songFile)
+                song.file = nil
             }
         }
     }
     
     func deleteCache(ofArtist artist: Artist) {
         for song in artist.songs {
-            if let songData = song.fileDataContainer {
-                deleteSongData(songData: songData)
-                song.fileDataContainer = nil
+            if let songFile = song.file {
+                deleteSongFile(songFile: songFile)
+                song.file = nil
             }
         }
     }
     
     func deleteCache(ofAlbum album: Album) {
         for song in album.songs {
-            if let songData = song.fileDataContainer {
-                deleteSongData(songData: songData)
-                song.fileDataContainer = nil
+            if let songFile = song.file {
+                deleteSongFile(songFile: songFile)
+                song.file = nil
             }
         }
     }
 
     func deleteCompleteSongCache() {
-        clearStorage(ofType: SongDataMO.typeName)
+        clearStorage(ofType: SongFile.typeName)
     }
     
     func createArtwork() -> Artwork {

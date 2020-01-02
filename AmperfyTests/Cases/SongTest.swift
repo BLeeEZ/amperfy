@@ -27,7 +27,7 @@ class SongTest: XCTestCase {
         XCTAssertEqual(song.url, nil)
         XCTAssertEqual(song.album, nil)
         XCTAssertEqual(song.artist, nil)
-        XCTAssertEqual(song.fileDataContainer, nil)
+        XCTAssertEqual(song.file, nil)
         XCTAssertEqual(song.fileData, nil)
         XCTAssertEqual(song.syncInfo, nil)
         XCTAssertEqual(song.displayString, "Unknown artist - Unknown title")
@@ -87,17 +87,16 @@ class SongTest: XCTestCase {
     
     func testCachedSong() {
         let testData = NSData(base64Encoded: "Test", options: .ignoreUnknownCharacters)
-        testSong.fileDataContainer = storage.createSongData()
-        testSong.fileDataContainer?.id = Int32(testId)
-        testSong.fileDataContainer?.data = testData
+        testSong.file = storage.createSongFile()
+        testSong.file?.data = testData
         XCTAssertTrue(testSong.isCached)
         XCTAssertEqual(testSong.fileData, testData)
-        XCTAssertEqual(testSong.fileDataContainer?.data, testData)
+        XCTAssertEqual(testSong.file?.data, testData)
         storage.saveContext()
         guard let songFetched = storage.getSong(id: testId) else { XCTFail(); return }
         XCTAssertTrue(songFetched.isCached)
         XCTAssertEqual(songFetched.fileData, testData)
-        XCTAssertEqual(songFetched.fileDataContainer?.data, testData)
+        XCTAssertEqual(songFetched.file?.data, testData)
     }
     
     func testArtworkAndImage() {

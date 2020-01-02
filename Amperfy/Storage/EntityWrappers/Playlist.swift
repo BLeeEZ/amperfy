@@ -23,7 +23,7 @@ public class Playlist: NSObject {
     private var sortedCachedPlaylistItems: [PlaylistItem] {
         let cachedItemsMO = managedObject.items!.filter{ entry in
             let item = entry as! PlaylistItemMO
-            return item.song?.fileDataContainer != nil
+            return item.song?.file != nil
         }
         let sortedItemsMO = (cachedItemsMO as! [PlaylistItemMO]).sorted(by: { $0.order < $1.order })
         

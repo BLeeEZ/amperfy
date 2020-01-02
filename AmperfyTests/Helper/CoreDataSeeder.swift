@@ -62,9 +62,8 @@ class CoreDataSeeder {
             let album = storage.getAlbum(id: songSeed.albumId)
             song.album = album
             if songSeed.isCached {
-                song.fileDataContainer = storage.createSongData()
-                song.fileDataContainer?.id = Int32(songSeed.id)
-                song.fileDataContainer?.data = NSData(base64Encoded: "Test", options: .ignoreUnknownCharacters)
+                song.file = storage.createSongFile()
+                song.file?.data = NSData(base64Encoded: "Test", options: .ignoreUnknownCharacters)
             }
         }
         
