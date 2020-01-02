@@ -8,7 +8,7 @@ class SsArtistParserDelegate: GenericXmlLibParser {
     private var artistBuffer: Artist?
     var albumCountOfAllArtists = 0
 
-    init(libraryStorage: LibraryStorage, syncWave: SyncWaveMO, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.subsonicUrlCreator = subsonicUrlCreator
         super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
     }

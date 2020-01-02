@@ -77,7 +77,7 @@ class AlbumTest: XCTestCase {
     }
 
     func testSyncWave() {
-        let testWaveId: Int16 = 987
+        let testWaveId: Int = 987
         let testWave = storage.createSyncWave()
         testWave.id = testWaveId
         testAlbum.syncInfo = testWave

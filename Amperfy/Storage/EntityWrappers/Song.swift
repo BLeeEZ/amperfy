@@ -50,11 +50,12 @@ public class Song: AbstractLibraryEntity {
      var fileData: NSData? {
          return managedObject.file?.data
      }
-     //TODO: use SongData instead of MO
-     var syncInfo: SyncWaveMO? {
-         get { return managedObject.syncInfo }
-         set { managedObject.syncInfo = newValue }
-    }
+     var syncInfo: SyncWave? {
+         get {
+             guard let syncInfoMO = managedObject.syncInfo else { return nil }
+             return SyncWave(managedObject: syncInfoMO) }
+         set { managedObject.syncInfo = newValue?.managedObject }
+     }
     
     var displayString: String {
         return "\(managedObject.artist?.name ?? "Unknown artist") - \(title)"

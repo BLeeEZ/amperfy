@@ -8,7 +8,7 @@ class SsSongParserDelegate: GenericXmlLibParser {
     private var subsonicUrlCreator: SubsonicUrlCreator
     private var songBuffer: Song?
     
-    init(libraryStorage: LibraryStorage, syncWave: SyncWaveMO, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.subsonicUrlCreator = subsonicUrlCreator
         super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
     }

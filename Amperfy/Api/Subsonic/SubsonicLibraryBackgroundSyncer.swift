@@ -30,7 +30,7 @@ class SubsonicLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Backgroun
         semaphoreGroup.leave()
     }   
     
-    private func resync(libraryStorage: LibraryStorage, syncWave: SyncWaveMO) {
+    private func resync(libraryStorage: LibraryStorage, syncWave: SyncWave) {
         if syncWave.syncState == .Artists, isRunning {
             os_log("Lib resync: Artist parsing start", log: log, type: .info)
             let artistParser = SsArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)

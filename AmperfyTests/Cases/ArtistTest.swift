@@ -77,7 +77,7 @@ class ArtistTest: XCTestCase {
     }
 
     func testSyncWave() {
-        let testWaveId: Int16 = 987
+        let testWaveId: Int = 987
         let testWave = storage.createSyncWave()
         testWave.id = testWaveId
         testArtist.syncInfo = testWave

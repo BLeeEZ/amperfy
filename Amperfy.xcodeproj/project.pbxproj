@@ -153,6 +153,8 @@
 		50F81E9223BD29BB00EAAC3E /* PlayerDataTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E9123BD29BB00EAAC3E /* PlayerDataTest.swift */; };
 		50F81E9423BE1AFD00EAAC3E /* SongFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E9323BE1AFD00EAAC3E /* SongFile.swift */; };
 		50F81E9623BE22AA00EAAC3E /* SongFileTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E9523BE22AA00EAAC3E /* SongFileTest.swift */; };
+		50F81E9823BE4C1800EAAC3E /* SyncWave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E9723BE4C1800EAAC3E /* SyncWave.swift */; };
+		50F81E9B23BE531900EAAC3E /* SyncWaveTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E9A23BE531900EAAC3E /* SyncWaveTest.swift */; };
 		50F8CA2D21FAD5400084F8D8 /* Reachabilty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */; };
 		50F8CA3421FF9A170084F8D8 /* SyncWaveMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F8CA3221FF9A170084F8D8 /* SyncWaveMO+CoreDataClass.swift */; };
 		50F8CA3521FF9A170084F8D8 /* SyncWaveMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F8CA3321FF9A170084F8D8 /* SyncWaveMO+CoreDataProperties.swift */; };
@@ -344,6 +346,8 @@
 		50F81E9123BD29BB00EAAC3E /* PlayerDataTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerDataTest.swift; sourceTree = "<group>"; };
 		50F81E9323BE1AFD00EAAC3E /* SongFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongFile.swift; sourceTree = "<group>"; };
 		50F81E9523BE22AA00EAAC3E /* SongFileTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongFileTest.swift; sourceTree = "<group>"; };
+		50F81E9723BE4C1800EAAC3E /* SyncWave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncWave.swift; sourceTree = "<group>"; };
+		50F81E9A23BE531900EAAC3E /* SyncWaveTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncWaveTest.swift; sourceTree = "<group>"; };
 		50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachabilty.swift; sourceTree = "<group>"; };
 		50F8CA3221FF9A170084F8D8 /* SyncWaveMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncWaveMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50F8CA3321FF9A170084F8D8 /* SyncWaveMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncWaveMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -550,6 +554,7 @@
 				50C16BF721E10E7500F086F0 /* Playlist.swift */,
 				50B798A823B6E5FF00551E62 /* PlaylistItem.swift */,
 				50F81E9323BE1AFD00EAAC3E /* SongFile.swift */,
+				50F81E9723BE4C1800EAAC3E /* SyncWave.swift */,
 			);
 			path = EntityWrappers;
 			sourceTree = "<group>";
@@ -691,6 +696,7 @@
 				50F81E8F23BCDE1600EAAC3E /* ArtworkTest.swift */,
 				50F81E9123BD29BB00EAAC3E /* PlayerDataTest.swift */,
 				50F81E9523BE22AA00EAAC3E /* SongFileTest.swift */,
+				50F81E9A23BE531900EAAC3E /* SyncWaveTest.swift */,
 			);
 			path = Cases;
 			sourceTree = "<group>";
@@ -905,6 +911,7 @@
 				508FDE4C21F58AFC005A0724 /* AppStoryboard.swift in Sources */,
 				50B798A323B6CCE800551E62 /* AbstractLibraryEntity.swift in Sources */,
 				50F81E8623BAF25900EAAC3E /* Album.swift in Sources */,
+				50F81E9823BE4C1800EAAC3E /* SyncWave.swift in Sources */,
 				50C16BF821E10E7500F086F0 /* Playlist.swift in Sources */,
 				5083861C21C828E200C4BB32 /* AmpacheXmlServerApi.swift in Sources */,
 				500B2B312249607B00D14EF4 /* BackendProxy.swift in Sources */,
@@ -1014,6 +1021,7 @@
 				504C718F23BAC8F2001F82C7 /* PlaylistItemTest.swift in Sources */,
 				50B798AF23B7ED6200551E62 /* CoreDataSeeder.swift in Sources */,
 				50B798B423B8664700551E62 /* HelperTest.swift in Sources */,
+				50F81E9B23BE531900EAAC3E /* SyncWaveTest.swift in Sources */,
 				50F81E9023BCDE1600EAAC3E /* ArtworkTest.swift in Sources */,
 				50B798B223B7F51000551E62 /* PlaylistTest.swift in Sources */,
 			);

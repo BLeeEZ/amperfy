@@ -5,18 +5,18 @@ import CoreData
 extension SyncWaveMO {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<SyncWaveMO> {
-        return NSFetchRequest<SyncWaveMO>(entityName: "SyncWaveMO")
+        return NSFetchRequest<SyncWaveMO>(entityName: "SyncWave")
     }
 
     @NSManaged public var dateOfLastAdd: NSDate?
     @NSManaged public var dateOfLastClean: NSDate?
     @NSManaged public var dateOfLastUpdate: NSDate?
     @NSManaged public var id: Int16
-    @NSManaged public var syncIndexToContinueMO: Int32
-    @NSManaged public var syncStateMO: Int16
+    @NSManaged public var syncIndexToContinue: Int32
+    @NSManaged public var syncState: Int16
     @NSManaged public var albums: NSOrderedSet?
     @NSManaged public var artists: NSOrderedSet?
-    @NSManaged public var songsMO: NSOrderedSet?
+    @NSManaged public var songs: NSOrderedSet?
 
 }
 
@@ -90,37 +90,37 @@ extension SyncWaveMO {
 
 }
 
-// MARK: Generated accessors for songsMO
+// MARK: Generated accessors for songs
 extension SyncWaveMO {
 
-    @objc(insertObject:inSongsMOAtIndex:)
-    @NSManaged public func insertIntoSongsMO(_ value: SongMO, at idx: Int)
+    @objc(insertObject:inSongsAtIndex:)
+    @NSManaged public func insertIntoSongs(_ value: SongMO, at idx: Int)
 
-    @objc(removeObjectFromSongsMOAtIndex:)
-    @NSManaged public func removeFromSongsMO(at idx: Int)
+    @objc(removeObjectFromSongsAtIndex:)
+    @NSManaged public func removeFromSongs(at idx: Int)
 
-    @objc(insertSongsMO:atIndexes:)
-    @NSManaged public func insertIntoSongsMO(_ values: [SongMO], at indexes: NSIndexSet)
+    @objc(insertSongs:atIndexes:)
+    @NSManaged public func insertIntoSongs(_ values: [SongMO], at indexes: NSIndexSet)
 
-    @objc(removeSongsMOAtIndexes:)
-    @NSManaged public func removeFromSongsMO(at indexes: NSIndexSet)
+    @objc(removeSongsAtIndexes:)
+    @NSManaged public func removeFromSongs(at indexes: NSIndexSet)
 
-    @objc(replaceObjectInSongsMOAtIndex:withObject:)
-    @NSManaged public func replaceSongsMO(at idx: Int, with value: SongMO)
+    @objc(replaceObjectInSongsAtIndex:withObject:)
+    @NSManaged public func replaceSongs(at idx: Int, with value: SongMO)
 
-    @objc(replaceSongsMOAtIndexes:withSongsMO:)
-    @NSManaged public func replaceSongsMO(at indexes: NSIndexSet, with values: [SongMO])
+    @objc(replaceSongsAtIndexes:withSongs:)
+    @NSManaged public func replaceSongs(at indexes: NSIndexSet, with values: [SongMO])
 
-    @objc(addSongsMOObject:)
-    @NSManaged public func addToSongsMO(_ value: SongMO)
+    @objc(addSongsObject:)
+    @NSManaged public func addToSongs(_ value: SongMO)
 
-    @objc(removeSongsMOObject:)
-    @NSManaged public func removeFromSongsMO(_ value: SongMO)
+    @objc(removeSongsObject:)
+    @NSManaged public func removeFromSongs(_ value: SongMO)
 
-    @objc(addSongsMO:)
-    @NSManaged public func addToSongsMO(_ values: NSOrderedSet)
+    @objc(addSongs:)
+    @NSManaged public func addToSongs(_ values: NSOrderedSet)
 
-    @objc(removeSongsMO:)
-    @NSManaged public func removeFromSongsMO(_ values: NSOrderedSet)
+    @objc(removeSongs:)
+    @NSManaged public func removeFromSongs(_ values: NSOrderedSet)
 
 }

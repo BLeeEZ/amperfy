@@ -39,10 +39,11 @@ public class Artist: AbstractLibraryEntity {
         }
         return returnAlbums
     }
-    // TODO: replace with entitWrapper SyncWave
-    var syncInfo: SyncWaveMO? {
-        get { return managedObject.syncInfo }
-        set { managedObject.syncInfo = newValue }
+    var syncInfo: SyncWave? {
+        get {
+            guard let syncInfoMO = managedObject.syncInfo else { return nil }
+            return SyncWave(managedObject: syncInfoMO) }
+        set { managedObject.syncInfo = newValue?.managedObject }
     }
 
 }

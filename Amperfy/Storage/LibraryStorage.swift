@@ -11,7 +11,7 @@ class LibraryStorage {
         self.context = context
     }
     
-    static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWaveMO.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName]
+    static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName]
     
     func createArtist() -> Artist {
         let artistMO = ArtistMO(context: context)
@@ -103,10 +103,11 @@ class LibraryStorage {
         context.delete(item.managedObject)
     }
 
-    func createSyncWave() -> SyncWaveMO {
-        let syncWave = SyncWaveMO(context: context)
-        syncWave.id = Int16(getSyncWaves().count)
-        return syncWave
+    func createSyncWave() -> SyncWave {
+        let syncWaveCount = Int16(getSyncWaves().count)
+        let syncWaveMO = SyncWaveMO(context: context)
+        syncWaveMO.id = syncWaveCount
+        return SyncWave(managedObject: syncWaveMO)
     }
     
     func getArtists() -> Array<Artist> {
@@ -304,24 +305,30 @@ class LibraryStorage {
         return foundArtworks
     }
 
-    func getSyncWaves() -> Array<SyncWaveMO> {
-        var syncWaves = Array<SyncWaveMO>()
+    func getSyncWaves() -> Array<SyncWave> {
+        var foundSyncWaves = Array<SyncWave>()
         let fetchRequest: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
         do {
-            syncWaves = try context.fetch(fetchRequest)
+            let foundSyncWavesMO = try context.fetch(fetchRequest)
+            for syncWave in foundSyncWavesMO {
+                foundSyncWaves.append(SyncWave(managedObject: syncWave))
+            }
         }
         catch {}
         
-        return syncWaves
+        return foundSyncWaves
     }
 
-    func getLatestSyncWave() -> SyncWaveMO? {
-        var latestSyncWave: SyncWaveMO? = nil
+    func getLatestSyncWave() -> SyncWave? {
+        var latestSyncWave: SyncWave? = nil
         let fr: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
         fr.predicate = NSPredicate(format: "id == max(id)")
         fr.fetchLimit = 1
         do {
-            latestSyncWave = try self.context.fetch(fr).first
+            let result = try self.context.fetch(fr).first
+            if let latestSyncWaveMO = result {
+                latestSyncWave = SyncWave(managedObject: latestSyncWaveMO)
+            }
         } catch {
             os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
         }

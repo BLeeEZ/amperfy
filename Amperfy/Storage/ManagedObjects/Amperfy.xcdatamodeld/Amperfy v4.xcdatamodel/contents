@@ -9,13 +9,13 @@
         <attribute name="year" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="albums" inverseEntity="Artist"/>
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="album" inverseEntity="Song" elementID="songsMO"/>
-        <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWaveMO" inverseName="albums" inverseEntity="SyncWaveMO"/>
+        <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWave" inverseName="albums" inverseEntity="SyncWave"/>
     </entity>
     <entity name="Artist" representedClassName="ArtistMO" parentEntity="AbstractLibraryEntity" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="albums" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Album" inverseName="artist" inverseEntity="Album"/>
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="artist" inverseEntity="Song" elementID="songsMO"/>
-        <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWaveMO" inverseName="artists" inverseEntity="SyncWaveMO"/>
+        <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWave" inverseName="artists" inverseEntity="SyncWave"/>
     </entity>
     <entity name="Artwork" representedClassName="ArtworkMO" syncable="YES">
         <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
@@ -50,22 +50,22 @@
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="songs" inverseEntity="Artist"/>
         <relationship name="file" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SongFile" inverseName="info" inverseEntity="SongFile" elementID="dataMO"/>
         <relationship name="playlistItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistItem" inverseName="song" inverseEntity="PlaylistItem" elementID="playlistElements"/>
-        <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWaveMO" inverseName="songsMO" inverseEntity="SyncWaveMO"/>
+        <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWave" inverseName="songs" inverseEntity="SyncWave"/>
     </entity>
     <entity name="SongFile" representedClassName="SongFileMO" elementID="SongDataMO" syncable="YES">
         <attribute name="data" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
         <relationship name="info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Song" inverseName="file" inverseEntity="Song"/>
     </entity>
-    <entity name="SyncWaveMO" representedClassName="SyncWaveMO" syncable="YES">
+    <entity name="SyncWave" representedClassName="SyncWaveMO" elementID="SyncWaveMO" syncable="YES">
         <attribute name="dateOfLastAdd" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dateOfLastClean" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dateOfLastUpdate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="syncIndexToContinueMO" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="syncStateMO" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="syncIndexToContinue" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" elementID="syncIndexToContinueMO"/>
+        <attribute name="syncState" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" elementID="syncStateMO"/>
         <relationship name="albums" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Album" inverseName="syncInfo" inverseEntity="Album"/>
         <relationship name="artists" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Artist" inverseName="syncInfo" inverseEntity="Artist"/>
-        <relationship name="songsMO" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="syncInfo" inverseEntity="Song"/>
+        <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="syncInfo" inverseEntity="Song" elementID="songsMO"/>
     </entity>
     <elements>
         <element name="AbstractLibraryEntity" positionX="-30561.8125" positionY="-8377.35546875" width="128" height="73"/>
@@ -77,6 +77,6 @@
         <element name="PlaylistItem" positionX="-30254.0078125" positionY="-8216.28125" width="128" height="88"/>
         <element name="Song" positionX="-30463.86328125" positionY="-8276.4765625" width="128" height="163"/>
         <element name="SongFile" positionX="-30352.42578125" positionY="-8090.62109375" width="128" height="73"/>
-        <element name="SyncWaveMO" positionX="-30465" positionY="-8244" width="128" height="180"/>
+        <element name="SyncWave" positionX="-30465" positionY="-8244" width="128" height="178"/>
     </elements>
 </model>

@@ -20,10 +20,10 @@ class GenericXmlParser: NSObject, XMLParserDelegate {
 class GenericXmlLibParser: GenericXmlParser {
     
     var libraryStorage: LibraryStorage
-    var syncWave: SyncWaveMO
+    var syncWave: SyncWave
     var parseNotifier: ParsedObjectNotifiable?
     
-    init(libraryStorage: LibraryStorage, syncWave: SyncWaveMO, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(libraryStorage: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.libraryStorage = libraryStorage
         self.syncWave = syncWave
         self.parseNotifier = parseNotifier

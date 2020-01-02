@@ -4,7 +4,7 @@ class LatestSongsVC: UITableViewController {
     
     var actionButton: UIBarButtonItem!
     var appDelegate: AppDelegate!
-    var latestSyncWave: SyncWaveMO?
+    var latestSyncWave: SyncWave?
     
     override func viewDidLoad() {
         super.viewDidLoad()

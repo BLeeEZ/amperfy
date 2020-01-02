@@ -34,7 +34,7 @@ class AmpacheLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Background
         semaphoreGroup.leave()
     }   
     
-    private func resync(libraryStorage: LibraryStorage, syncWave: SyncWaveMO, previousAddDate: Date) {
+    private func resync(libraryStorage: LibraryStorage, syncWave: SyncWave, previousAddDate: Date) {
         // Add one second to previouseAddDate to avoid resyncing previous sync Wave
         let addDate = Date(timeInterval: 1, since: previousAddDate)
 

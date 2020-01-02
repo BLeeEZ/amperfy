@@ -7,7 +7,7 @@ class ArtistParserDelegate: GenericXmlLibParser {
     var artistBuffer: Artist?
     var ampacheUrlCreator: AmpacheUrlCreationable
 
-    init(libraryStorage: LibraryStorage, syncWave: SyncWaveMO, ampacheUrlCreator: AmpacheUrlCreationable, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(libraryStorage: LibraryStorage, syncWave: SyncWave, ampacheUrlCreator: AmpacheUrlCreationable, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.ampacheUrlCreator = ampacheUrlCreator
         super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
     }
