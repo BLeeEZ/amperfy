@@ -11,7 +11,7 @@ class LibraryStorage {
         self.context = context
     }
     
-    static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongDataMO.typeName, Artwork.typeName, SyncWaveMO.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerManaged.typeName]
+    static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongDataMO.typeName, Artwork.typeName, SyncWaveMO.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName]
     
     func createArtist() -> Artist {
         let artistMO = ArtistMO(context: context)
@@ -174,29 +174,32 @@ class LibraryStorage {
     
     func getPlayerData() -> PlayerData {
         var playerData: PlayerData
-        var playerManaged: PlayerManaged
-        let fetchRequest: NSFetchRequest<PlayerManaged> = PlayerManaged.fetchRequest()
+        var playerMO: PlayerMO
+        let fetchRequest: NSFetchRequest<PlayerMO> = PlayerMO.fetchRequest()
         do {
-            let fetchResults: Array<PlayerManaged> = try context.fetch(fetchRequest)
+            let fetchResults: Array<PlayerMO> = try context.fetch(fetchRequest)
             if fetchResults.count == 1 {
-                playerManaged = fetchResults[0]
+                playerMO = fetchResults[0]
+            } else if (fetchResults.count == 0) {
+                playerMO = PlayerMO(context: context)
+                saveContext()
             } else {
-                clearStorage(ofType: PlayerManaged.typeName)
-                playerManaged = PlayerManaged(context: context)
+                clearStorage(ofType: PlayerData.entityName)
+                playerMO = PlayerMO(context: context)
                 saveContext()
             }
             
-            if playerManaged.normalPlaylist == nil {
-                playerManaged.normalPlaylist = PlaylistMO(context: context)
+            if playerMO.normalPlaylist == nil {
+                playerMO.normalPlaylist = PlaylistMO(context: context)
                 saveContext()
             }
-            if playerManaged.shuffledPlaylist == nil {
-                playerManaged.shuffledPlaylist = PlaylistMO(context: context)
+            if playerMO.shuffledPlaylist == nil {
+                playerMO.shuffledPlaylist = PlaylistMO(context: context)
                 saveContext()
             }
             
-            let normalPlaylist = Playlist(storage: self, managedObject: playerManaged.normalPlaylist!)
-            let shuffledPlaylist = Playlist(storage: self, managedObject: playerManaged.shuffledPlaylist!)
+            let normalPlaylist = Playlist(storage: self, managedObject: playerMO.normalPlaylist!)
+            let shuffledPlaylist = Playlist(storage: self, managedObject: playerMO.shuffledPlaylist!)
             
             if shuffledPlaylist.items.count != normalPlaylist.items.count {
                 shuffledPlaylist.removeAllSongs()
@@ -204,10 +207,10 @@ class LibraryStorage {
                 shuffledPlaylist.shuffle()
             }
             
-            playerData = PlayerData(storage: self, managedPlayer: playerManaged, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
+            playerData = PlayerData(storage: self, managedObject: playerMO, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
             
         } catch {
-            fatalError("Not able to get/create" + PlayerManaged.typeName)
+            fatalError("Not able to get/create" + PlayerData.entityName)
         }
         
         return playerData

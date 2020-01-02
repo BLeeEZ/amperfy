@@ -4,13 +4,15 @@ import CoreData
 public class PlayerData {
     
     private let storage: LibraryStorage
-    private let managed: PlayerManaged
+    private let managedObject: PlayerMO
     private let normalPlaylist: Playlist
     private let shuffledPlaylist: Playlist
     
-    init(storage: LibraryStorage, managedPlayer: PlayerManaged, normalPlaylist: Playlist, shuffledPlaylist: Playlist) {
+    static let entityName: String = { return "Player" }()
+    
+    init(storage: LibraryStorage, managedObject: PlayerMO, normalPlaylist: Playlist, shuffledPlaylist: Playlist) {
         self.storage = storage
-        self.managed = managedPlayer
+        self.managedObject = managedObject
         self.normalPlaylist = normalPlaylist
         self.shuffledPlaylist = shuffledPlaylist
     }
@@ -58,7 +60,7 @@ public class PlayerData {
     
     var isShuffle: Bool {
         get {
-            return managed.shuffleSetting == 1
+            return managedObject.shuffleSetting == 1
         }
         set {
             if newValue {
@@ -72,33 +74,33 @@ public class PlayerData {
                     currentSongIndex = indexOfCurrentSongInNormalPlaylist
                 }
             }
-            managed.shuffleSetting = newValue ? 1 : 0
+            managedObject.shuffleSetting = newValue ? 1 : 0
             storage.saveContext()
         }
     }
     var repeatMode: RepeatMode {
         get {
-            return RepeatMode(rawValue: managed.repeatSetting) ?? .off
+            return RepeatMode(rawValue: managedObject.repeatSetting) ?? .off
         }
         set {
-            managed.repeatSetting = newValue.rawValue
+            managedObject.repeatSetting = newValue.rawValue
             storage.saveContext()
         }
     }
     
     var currentSongIndex: Int {
         get {
-            if managed.currentSongIndex >= playlist.songs.count, managed.currentSongIndex < 0 {
-                managed.currentSongIndex = 0
+            if managedObject.currentSongIndex >= playlist.songs.count, managedObject.currentSongIndex < 0 {
+                managedObject.currentSongIndex = 0
                 storage.saveContext()
             }
-            return Int(managed.currentSongIndex)
+            return Int(managedObject.currentSongIndex)
         }
         set {
             if newValue >= 0, newValue < playlist.songs.count {
-                managed.currentSongIndex = Int32(newValue)
+                managedObject.currentSongIndex = Int32(newValue)
             } else {
-                managed.currentSongIndex = 0
+                managedObject.currentSongIndex = 0
             }
             storage.saveContext()
         }

@@ -2,10 +2,10 @@ import Foundation
 import CoreData
 
 
-extension PlayerManaged {
+extension PlayerMO {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<PlayerManaged> {
-        return NSFetchRequest<PlayerManaged>(entityName: "PlayerManaged")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<PlayerMO> {
+        return NSFetchRequest<PlayerMO>(entityName: "Player")
     }
 
     @NSManaged public var currentSongIndex: Int32

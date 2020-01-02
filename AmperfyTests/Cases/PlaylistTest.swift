@@ -5,6 +5,7 @@ class PlaylistTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
     var storage: LibraryStorage!
+    var testPlaylist: Playlist!
     var defaultPlaylist: Playlist!
     var playlistThreeCached: Playlist!
     var playlistNoCached: Playlist!
@@ -18,9 +19,30 @@ class PlaylistTest: XCTestCase {
         playlistThreeCached = playlistCached
         guard let playlistZeroCached = storage.getPlaylist(id: Int32(cdHelper.seeder.playlists[2].id)) else { XCTFail(); return }
         playlistNoCached = playlistZeroCached
+        testPlaylist = storage.createPlaylist()
+        resetTestPlaylist()
     }
 
     override func tearDown() {
+    }
+    
+    func resetTestPlaylist() {
+        testPlaylist.removeAllSongs()
+        for i in 0...4 {
+            guard let song = storage.getSong(id: cdHelper.seeder.songs[i].id) else { XCTFail(); return }
+            testPlaylist.append(song: song)
+        }
+    }
+    
+    func checkTestPlaylistNoChange() {
+        for i in 0...4 {
+            checkPlaylistIndexEqualSeedIndex(playlistIndex: i, seedIndex: i)
+        }
+    }
+    
+    func checkPlaylistIndexEqualSeedIndex(playlistIndex: Int, seedIndex: Int) {
+        guard let song = storage.getSong(id: cdHelper.seeder.songs[seedIndex].id) else { XCTFail(); return }
+        XCTAssertEqual(testPlaylist.songs[playlistIndex].id, song.id)
     }
     
     func testCreation() {
@@ -233,5 +255,100 @@ class PlaylistTest: XCTestCase {
         XCTAssertEqual(playlistThreeCached.nextCachedSongIndex(upwardsFrom: 8), nil)
         XCTAssertEqual(playlistThreeCached.nextCachedSongIndex(beginningAt: 9), nil)
     }
+    
+    func testMovePlaylistSong_InvalidValues() {
+        resetTestPlaylist()
+        
+        testPlaylist.movePlaylistSong(fromIndex: 0, to: 5)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: 0, to: 20)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: 5, to: 0)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: 20, to: 0)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: -1, to: 2)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: -9, to: 1)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: 1, to: -1)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: 1, to: -20)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: 1, to: 1)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: 4, to: 4)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: -5, to: 30)
+        checkTestPlaylistNoChange()
+        testPlaylist.movePlaylistSong(fromIndex: 30, to: -9)
+        checkTestPlaylistNoChange()
+    }
+
+    func testMovePlaylistSong() {
+        resetTestPlaylist()
+        testPlaylist.movePlaylistSong(fromIndex: 1, to: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 1)
+
+        resetTestPlaylist()
+        testPlaylist.movePlaylistSong(fromIndex: 2, to: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 4)
+
+        resetTestPlaylist()
+        testPlaylist.movePlaylistSong(fromIndex: 2, to: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 2)
+
+        resetTestPlaylist()
+        testPlaylist.movePlaylistSong(fromIndex: 0, to: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 4)
+
+        resetTestPlaylist()
+        testPlaylist.movePlaylistSong(fromIndex: 4, to: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 3)
+
+        resetTestPlaylist()
+        testPlaylist.movePlaylistSong(fromIndex: 4, to: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 3)
+
+        resetTestPlaylist()
+        testPlaylist.movePlaylistSong(fromIndex: 3, to: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 4)
+
+        resetTestPlaylist()
+        testPlaylist.movePlaylistSong(fromIndex: 4, to: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 3)
+     }
 
 }

@@ -149,23 +149,23 @@ public class Playlist: NSObject {
     }
     
     func movePlaylistSong(fromIndex: Int, to: Int) {
-        if fromIndex < songs.count, to < songs.count, fromIndex != to {
-            let localSortedPlaylistItems = sortedPlaylistItems
-            let targetOrder = localSortedPlaylistItems[to].order
-            if fromIndex < to {
-                for i in fromIndex+1...to {
-                    localSortedPlaylistItems[i].order = localSortedPlaylistItems[i].order - 1
-                }
-            } else {
-                for i in to...fromIndex-1 {
-                    localSortedPlaylistItems[i].order = localSortedPlaylistItems[i].order + 1
-                }
+        guard fromIndex >= 0, fromIndex < songs.count, to >= 0, to < songs.count, fromIndex != to else { return }
+        
+        let localSortedPlaylistItems = sortedPlaylistItems
+        let targetOrder = localSortedPlaylistItems[to].order
+        if fromIndex < to {
+            for i in fromIndex+1...to {
+                localSortedPlaylistItems[i].order = localSortedPlaylistItems[i].order - 1
             }
-            localSortedPlaylistItems[fromIndex].order = targetOrder
-            
-            storage.saveContext()
-            ensureConsistentItemOrder()
+        } else {
+            for i in to...fromIndex-1 {
+                localSortedPlaylistItems[i].order = localSortedPlaylistItems[i].order + 1
+            }
         }
+        localSortedPlaylistItems[fromIndex].order = targetOrder
+        
+        storage.saveContext()
+        ensureConsistentItemOrder()
     }
     
     func remove(at index: Int) {
