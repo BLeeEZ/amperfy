@@ -24,7 +24,7 @@ class SongFileTest: XCTestCase {
     
     func testProperties() {
         let songId = cdHelper.seeder.songs[0].id
-        let testData = Artwork.defaultImage.pngData()! as NSData
+        let testData = Artwork.defaultImage.pngData()!
         guard let song = storage.getSong(id: songId) else { XCTFail(); return }
         testSongFile.info = song
         testSongFile.data = testData

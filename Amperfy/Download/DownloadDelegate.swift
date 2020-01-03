@@ -34,7 +34,7 @@ class DownloadDelegate: DownloadManagerDelegate {
         if let songMO = try? context.existingObject(with: request.element.objectID) as? SongMO {
             let songFile = libraryStorage.createSongFile()
             songFile.info = Song(managedObject: songMO)
-            songFile.data = NSData(data: data)
+            songFile.data = data
             libraryStorage.saveContext()
         }
     }

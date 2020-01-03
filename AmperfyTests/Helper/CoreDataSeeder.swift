@@ -63,7 +63,7 @@ class CoreDataSeeder {
             song.album = album
             if songSeed.isCached {
                 song.file = storage.createSongFile()
-                song.file?.data = NSData(base64Encoded: "Test", options: .ignoreUnknownCharacters)
+                song.file?.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
             }
         }
         

@@ -8,9 +8,9 @@ extension SyncWaveMO {
         return NSFetchRequest<SyncWaveMO>(entityName: "SyncWave")
     }
 
-    @NSManaged public var dateOfLastAdd: NSDate?
-    @NSManaged public var dateOfLastClean: NSDate?
-    @NSManaged public var dateOfLastUpdate: NSDate?
+    @NSManaged public var dateOfLastAdd: Date?
+    @NSManaged public var dateOfLastClean: Date?
+    @NSManaged public var dateOfLastUpdate: Date?
     @NSManaged public var id: Int16
     @NSManaged public var syncIndexToContinue: Int32
     @NSManaged public var syncState: Int16
@@ -59,28 +59,28 @@ extension SyncWaveMO {
 extension SyncWaveMO {
 
     @objc(insertObject:inArtistsAtIndex:)
-    @NSManaged public func insertIntoArtists(_ value: Artist, at idx: Int)
+    @NSManaged public func insertIntoArtists(_ value: ArtistMO, at idx: Int)
 
     @objc(removeObjectFromArtistsAtIndex:)
     @NSManaged public func removeFromArtists(at idx: Int)
 
     @objc(insertArtists:atIndexes:)
-    @NSManaged public func insertIntoArtists(_ values: [Artist], at indexes: NSIndexSet)
+    @NSManaged public func insertIntoArtists(_ values: [ArtistMO], at indexes: NSIndexSet)
 
     @objc(removeArtistsAtIndexes:)
     @NSManaged public func removeFromArtists(at indexes: NSIndexSet)
 
     @objc(replaceObjectInArtistsAtIndex:withObject:)
-    @NSManaged public func replaceArtists(at idx: Int, with value: Artist)
+    @NSManaged public func replaceArtists(at idx: Int, with value: ArtistMO)
 
     @objc(replaceArtistsAtIndexes:withArtists:)
-    @NSManaged public func replaceArtists(at indexes: NSIndexSet, with values: [Artist])
+    @NSManaged public func replaceArtists(at indexes: NSIndexSet, with values: [ArtistMO])
 
     @objc(addArtistsObject:)
-    @NSManaged public func addToArtists(_ value: Artist)
+    @NSManaged public func addToArtists(_ value: ArtistMO)
 
     @objc(removeArtistsObject:)
-    @NSManaged public func removeFromArtists(_ value: Artist)
+    @NSManaged public func removeFromArtists(_ value: ArtistMO)
 
     @objc(addArtists:)
     @NSManaged public func addToArtists(_ values: NSOrderedSet)

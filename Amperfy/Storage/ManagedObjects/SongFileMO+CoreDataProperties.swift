@@ -8,7 +8,7 @@ extension SongFileMO {
         return NSFetchRequest<SongFileMO>(entityName: "SongFile")
     }
 
-    @NSManaged public var data: NSData?
+    @NSManaged public var data: Data?
     @NSManaged public var info: SongMO?
 
 }

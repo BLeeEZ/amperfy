@@ -47,7 +47,7 @@ public class Song: AbstractLibraryEntity {
         }
         set { managedObject.file = newValue?.managedObject }
      }
-     var fileData: NSData? {
+     var fileData: Data? {
          return managedObject.file?.data
      }
      var syncInfo: SyncWave? {

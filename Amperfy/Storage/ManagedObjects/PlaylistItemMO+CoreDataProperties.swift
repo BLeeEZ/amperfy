@@ -9,7 +9,7 @@ extension PlaylistItemMO {
     }
 
     @NSManaged public var order: Int32
-    @NSManaged public var song: SongMO?
     @NSManaged public var playlist: PlaylistMO?
+    @NSManaged public var song: SongMO?
 
 }

@@ -52,8 +52,8 @@ class ArtworkTest: XCTestCase {
     
     func testImageWithCorrectStatus() {
         testArtwork.status = ImageStatus.CustomImage
-        let testData = NSData(base64Encoded: "Test", options: .ignoreUnknownCharacters)!
-        let testImg = UIImage(data: testData as Data)
+        let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)!
+        let testImg = UIImage(data: testData)
         testArtwork.setImage(fromData: testData)
         XCTAssertEqual(testArtwork.managedObject.imageData, testData)
         XCTAssertEqual(testArtwork.status, ImageStatus.CustomImage)
@@ -62,7 +62,7 @@ class ArtworkTest: XCTestCase {
     
     func testImageWithWrongStatus() {
         testArtwork.status = ImageStatus.NotChecked
-        let testData = NSData(base64Encoded: "Test", options: .ignoreUnknownCharacters)!
+        let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)!
         testArtwork.setImage(fromData: testData)
         XCTAssertEqual(testArtwork.managedObject.imageData, testData)
         XCTAssertEqual(testArtwork.status, ImageStatus.NotChecked)

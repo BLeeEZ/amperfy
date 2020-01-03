@@ -86,7 +86,7 @@ class SongTest: XCTestCase {
     }
     
     func testCachedSong() {
-        let testData = NSData(base64Encoded: "Test", options: .ignoreUnknownCharacters)
+        let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
         testSong.file = storage.createSongFile()
         testSong.file?.data = testData
         XCTAssertTrue(testSong.isCached)
@@ -100,7 +100,7 @@ class SongTest: XCTestCase {
     }
     
     func testArtworkAndImage() {
-        let testData = Artwork.defaultImage.pngData()! as NSData
+        let testData = Artwork.defaultImage.pngData()!
         let testImg = Artwork.defaultImage
         testSong.artwork = storage.createArtwork()
         testSong.artwork?.setImage(fromData: testData)

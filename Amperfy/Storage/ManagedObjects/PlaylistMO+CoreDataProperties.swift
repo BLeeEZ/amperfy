@@ -10,9 +10,9 @@ extension PlaylistMO {
 
     @NSManaged public var id: Int32
     @NSManaged public var name: String?
+    @NSManaged public var items: NSSet?
     @NSManaged public var playersNormalPlaylist: PlayerMO?
     @NSManaged public var playersShuffledPlaylist: PlayerMO?
-    @NSManaged public var items: NSSet?
 
 }
 

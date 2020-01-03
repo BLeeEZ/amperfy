@@ -143,10 +143,10 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         }
     }
     
-    private func createLocalUrl(songData: NSData) -> URL {
+    private func createLocalUrl(songData: Data) -> URL {
         let tempDirectoryURL = NSURL.fileURL(withPath: NSTemporaryDirectory(), isDirectory: true)
         let url = tempDirectoryURL.appendingPathComponent("curSong.mp3")
-        songData.write(to: url, atomically: true)
+        try! songData.write(to: url, options: Data.WritingOptions.atomic)
         return url
     }
     

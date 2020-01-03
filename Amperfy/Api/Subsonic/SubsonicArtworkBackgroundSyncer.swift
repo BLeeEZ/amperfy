@@ -39,7 +39,7 @@ class SubsonicArtworkBackgroundSyncer: GenericLibraryBackgroundSyncer, Backgroun
             let imageData = try Data(contentsOf: url)
             if imageData.count != 0 {
                 artwork.status = .CustomImage
-                artwork.setImage(fromData: NSData(data: imageData))
+                artwork.setImage(fromData: imageData)
             } else {
                 artwork.status = .IsDefaultImage
             }

@@ -23,7 +23,7 @@ extension AlbumMO {
     @NSManaged public func insertIntoSongs(_ value: SongMO, at idx: Int)
 
     @objc(removeObjectFromSongsAtIndex:)
-    @NSManaged public func removeFromSong(at idx: Int)
+    @NSManaged public func removeFromSongs(at idx: Int)
 
     @objc(insertSongs:atIndexes:)
     @NSManaged public func insertIntoSongs(_ values: [SongMO], at indexes: NSIndexSet)

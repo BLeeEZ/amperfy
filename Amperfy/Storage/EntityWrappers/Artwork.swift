@@ -47,7 +47,7 @@ public class Artwork: NSObject {
         return img
     }
     
-    func setImage(fromData: NSData) {
+    func setImage(fromData: Data) {
         managedObject.imageData = fromData
     }
     

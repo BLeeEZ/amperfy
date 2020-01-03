@@ -46,16 +46,16 @@ public class SyncWave: NSObject {
     
     var libraryChangeDates: LibraryChangeDates {
         let temp = LibraryChangeDates()
-        temp.dateOfLastUpdate = managedObject.dateOfLastUpdate as Date? ?? Date()
-        temp.dateOfLastAdd = managedObject.dateOfLastAdd as Date? ?? Date()
-        temp.dateOfLastClean = managedObject.dateOfLastClean as Date? ?? Date()
+        temp.dateOfLastUpdate = managedObject.dateOfLastUpdate ?? Date()
+        temp.dateOfLastAdd = managedObject.dateOfLastAdd ?? Date()
+        temp.dateOfLastClean = managedObject.dateOfLastClean ?? Date()
         return temp
     }
 
     func setMetaData(fromLibraryChangeDates: LibraryChangeDates) {
-        managedObject.dateOfLastUpdate = fromLibraryChangeDates.dateOfLastUpdate as NSDate
-        managedObject.dateOfLastAdd = fromLibraryChangeDates.dateOfLastAdd as NSDate
-        managedObject.dateOfLastClean = fromLibraryChangeDates.dateOfLastClean as NSDate
+        managedObject.dateOfLastUpdate = fromLibraryChangeDates.dateOfLastUpdate
+        managedObject.dateOfLastAdd = fromLibraryChangeDates.dateOfLastAdd
+        managedObject.dateOfLastClean = fromLibraryChangeDates.dateOfLastClean
     }
     
     var songs: [Song] {

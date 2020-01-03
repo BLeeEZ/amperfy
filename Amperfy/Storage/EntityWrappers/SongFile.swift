@@ -23,7 +23,7 @@ public class SongFile: NSObject {
         }
     }
     
-    var data: NSData? {
+    var data: Data? {
         get {
             return managedObject.data
         }

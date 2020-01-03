@@ -64,7 +64,7 @@ class ArtistTest: XCTestCase {
     }
     
     func testArtworkAndImage() {
-        let testData = Artwork.defaultImage.pngData()! as NSData
+        let testData = Artwork.defaultImage.pngData()!
         let testImg = Artwork.defaultImage
         testArtist.artwork = storage.createArtwork()
         testArtist.artwork?.setImage(fromData: testData)
