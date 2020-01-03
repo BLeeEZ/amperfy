@@ -31,7 +31,7 @@ class SsArtistParserDelegate: GenericXmlLibParser {
                 artistBuffer?.syncInfo = syncWave
                 artistBuffer?.id = artistId
                 artistBuffer?.name = attributeArtistName
-                artistBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: Int32(artistId))
+                artistBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: artistId)
             }
             albumCountOfAllArtists += albumCount
 		}    

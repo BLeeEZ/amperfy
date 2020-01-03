@@ -60,5 +60,10 @@ public class Artwork: NSObject {
         }
         return returnOwners
     }
+    
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Artwork else { return false }
+        return managedObject == object.managedObject
+    }
 
 }

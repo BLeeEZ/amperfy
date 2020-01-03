@@ -24,14 +24,14 @@ class PlaylistItemTest: XCTestCase {
         guard let song1 = storage.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
         item.song = song1
         XCTAssertEqual(item.song!.id, song1.id)
-        guard let playlist = storage.getPlaylist(id: Int32(cdHelper.seeder.playlists[0].id)) else { XCTFail(); return }
+        guard let playlist = storage.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }
         let itemOrder = playlist.songs.count
         item.playlist = playlist
         XCTAssertEqual(item.playlist!.id, playlist.id)
         item.order = itemOrder
         XCTAssertEqual(item.order, itemOrder)
         
-        guard let playlistFetched = storage.getPlaylist(id: Int32(cdHelper.seeder.playlists[0].id)) else { XCTFail(); return }
+        guard let playlistFetched = storage.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }
         XCTAssertEqual(playlistFetched.items[itemOrder].song!.id, song1.id)
         XCTAssertEqual(playlistFetched.items[itemOrder].playlist!.id, playlistFetched.id)
         XCTAssertEqual(playlistFetched.items[itemOrder].order, itemOrder)

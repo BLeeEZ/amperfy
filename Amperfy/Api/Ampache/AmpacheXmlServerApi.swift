@@ -3,8 +3,7 @@ import CoreData
 import os.log
 
 protocol AmpacheUrlCreationable {
-    // TODO: Change to type Int
-    func getArtUrlString(forArtistId: Int32) -> String
+    func getArtUrlString(forArtistId: Int) -> String
 }
 
 class AmpacheXmlServerApi {
@@ -183,7 +182,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylist(parserDelegate: XMLParserDelegate, id: Int32) {
+    func requestPlaylist(parserDelegate: XMLParserDelegate, id: Int) {
         reauthenticateIfNeccessary()
         if let hostname = credentials?.serverUrl, let auth = authHandshake {
             let urlPath = "\(hostname)/server/xml.server.php?auth=\(auth.token)&action=playlist&filter=\(id)"
@@ -191,7 +190,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: Int32) {
+    func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: Int) {
         reauthenticateIfNeccessary()
         if let hostname = credentials?.serverUrl, let auth = authHandshake {
             let urlPath = "\(hostname)/server/xml.server.php?auth=\(auth.token)&action=playlist_songs&filter=\(id)"
@@ -208,7 +207,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylistDelete(id: Int32) {
+    func requestPlaylistDelete(id: Int) {
         reauthenticateIfNeccessary()
         if let hostname = credentials?.serverUrl, let auth = authHandshake {
             let errorParser = ErrorParserDelegate()
@@ -220,7 +219,7 @@ class AmpacheXmlServerApi {
         }
     }
 
-    func requestPlaylist(addSongId: Int, toPlaylistId: Int32) {
+    func requestPlaylist(addSongId: Int, toPlaylistId: Int) {
         reauthenticateIfNeccessary()
         if let hostname = credentials?.serverUrl, let auth = authHandshake {
             let errorParser = ErrorParserDelegate()
@@ -232,7 +231,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylist(removeSongIndex: Int, fromPlaylistId: Int32) {
+    func requestPlaylist(removeSongIndex: Int, fromPlaylistId: Int) {
         reauthenticateIfNeccessary()
         if let hostname = credentials?.serverUrl, let auth = authHandshake {
             let errorParser = ErrorParserDelegate()
@@ -292,7 +291,7 @@ class AmpacheXmlServerApi {
 }
 
 extension AmpacheXmlServerApi: AmpacheUrlCreationable {
-    func getArtUrlString(forArtistId id: Int32) -> String {
+    func getArtUrlString(forArtistId id: Int) -> String {
         guard let hostname = credentials?.serverUrl else { return "" }
         let token = authHandshake?.token ?? "aaaa"
         return "\(hostname)/image.php?auth=\(token)&object_id=\(id)&object_type=artist"

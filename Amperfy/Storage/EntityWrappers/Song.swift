@@ -84,6 +84,11 @@ public class Song: AbstractLibraryEntity {
         return false
     }
     
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Song else { return false }
+        return managedObject == object.managedObject
+    }
+
 }
 
 extension Array where Element: Song {

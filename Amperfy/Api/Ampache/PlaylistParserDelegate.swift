@@ -18,7 +18,7 @@ class PlaylistParserDelegate: GenericXmlParser {
         
         switch(elementName) {
         case "playlist":
-            guard let attributeId = attributeDict["id"], let playlistId = Int32(attributeId) else {
+            guard let attributeId = attributeDict["id"], let playlistId = Int(attributeId) else {
                 os_log("Error: Playlist could not be parsed -> id invalid", log: log, type: .error)
                 if playlist != nil {
                     os_log("Error: Playlist has been removed on server -> local id reset", log: log, type: .error)

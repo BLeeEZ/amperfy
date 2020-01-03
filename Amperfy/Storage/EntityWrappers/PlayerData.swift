@@ -1,7 +1,7 @@
 import Foundation
 import CoreData
 
-public class PlayerData {
+public class PlayerData: NSObject {
     
     private let storage: LibraryStorage
     private let managedObject: PlayerMO
@@ -161,4 +161,10 @@ public class PlayerData {
             }
         }
     }
+    
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? PlayerData else { return false }
+        return managedObject == object.managedObject
+    }
+
 }

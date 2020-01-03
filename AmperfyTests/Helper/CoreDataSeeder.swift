@@ -69,7 +69,7 @@ class CoreDataSeeder {
         
         for playlistSeed in playlists {
             let playlist = storage.createPlaylist()
-            playlist.id = Int32(playlistSeed.id)
+            playlist.id = playlistSeed.id
             playlist.name = playlistSeed.name
             for songId in playlistSeed.songIds {
                 if let song = storage.getSong(id: songId) {

@@ -32,4 +32,9 @@ public class SongFile: NSObject {
         }
     }
     
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? SongFile else { return false }
+        return managedObject == object.managedObject
+    }
+
 }

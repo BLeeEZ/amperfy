@@ -2,8 +2,7 @@ import Foundation
 import os.log
 
 protocol SubsonicUrlCreator {
-    // TODO: Change id to type Int
-    func getArtUrlString(forArtistId: Int32) -> String
+    func getArtUrlString(forArtistId: Int) -> String
 }
 
 class SubsonicServerApi {
@@ -24,11 +23,6 @@ class SubsonicServerApi {
     }
     
     private func urlString(forAction: String, id: Int) -> String {
-        return urlString(forAction: forAction) + "&id=\(id)"
-    }
-    
-    // TODO: needs to be deleted
-    private func urlString(forAction: String, id: Int32) -> String {
         return urlString(forAction: forAction) + "&id=\(id)"
     }
     
@@ -95,8 +89,8 @@ class SubsonicServerApi {
         let urlPath = urlString(forAction: "getPlaylists")
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
-    // TODO: id: Int32 to Int
-    func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: Int32) {
+
+    func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: Int) {
         let urlPath = urlString(forAction: "getPlaylist", id: id)
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
@@ -132,7 +126,7 @@ class SubsonicServerApi {
 }
 
 extension SubsonicServerApi: SubsonicUrlCreator {
-    func getArtUrlString(forArtistId id: Int32) -> String {
+    func getArtUrlString(forArtistId id: Int) -> String {
         return urlString(forAction: "getCoverArt", id: id)
     }
 }

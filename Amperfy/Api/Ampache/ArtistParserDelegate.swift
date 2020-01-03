@@ -23,7 +23,7 @@ class ArtistParserDelegate: GenericXmlLibParser {
                 artistBuffer = libraryStorage.createArtist()
                 artistBuffer?.syncInfo = syncWave
                 artistBuffer?.id = artistId
-                artistBuffer?.artwork?.url = ampacheUrlCreator.getArtUrlString(forArtistId: Int32(artistId))
+                artistBuffer?.artwork?.url = ampacheUrlCreator.getArtUrlString(forArtistId: artistId)
             }
 		}    
     }

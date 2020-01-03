@@ -20,7 +20,7 @@ class SsPlaylistSongsParserDelegate: GenericXmlParser {
 
         if elementName == "playlist" {
             guard let attributeId = attributeDict["id"],
-                let playlistId = Int32(attributeId),
+                let playlistId = Int(attributeId),
                 let attributePlaylistName = attributeDict["name"] else {
                     return
             }

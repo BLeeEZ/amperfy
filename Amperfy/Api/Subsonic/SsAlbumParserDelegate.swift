@@ -37,7 +37,7 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
             albumBuffer?.syncInfo = syncWave
             albumBuffer?.id = albumId
             albumBuffer?.name = attributeAlbumtName
-            albumBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: Int32(albumId))
+            albumBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: albumId)
             
             if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
                 albumBuffer?.year = year

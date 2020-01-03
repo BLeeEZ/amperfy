@@ -13,11 +13,11 @@ class PlaylistTest: XCTestCase {
     override func setUp() {
         cdHelper = CoreDataHelper()
         storage = cdHelper.createSeededStorage()
-        guard let playlist = storage.getPlaylist(id: Int32(cdHelper.seeder.playlists[0].id)) else { XCTFail(); return }
+        guard let playlist = storage.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }
         defaultPlaylist = playlist
-        guard let playlistCached = storage.getPlaylist(id: Int32(cdHelper.seeder.playlists[1].id)) else { XCTFail(); return }
+        guard let playlistCached = storage.getPlaylist(id: cdHelper.seeder.playlists[1].id) else { XCTFail(); return }
         playlistThreeCached = playlistCached
-        guard let playlistZeroCached = storage.getPlaylist(id: Int32(cdHelper.seeder.playlists[2].id)) else { XCTFail(); return }
+        guard let playlistZeroCached = storage.getPlaylist(id: cdHelper.seeder.playlists[2].id) else { XCTFail(); return }
         playlistNoCached = playlistZeroCached
         testPlaylist = storage.createPlaylist()
         resetTestPlaylist()
@@ -56,14 +56,14 @@ class PlaylistTest: XCTestCase {
         playlist.name = name
         XCTAssertEqual(playlist.name, name)
         
-        let id: Int32 = 12345
+        let id = 12345
         playlist.id = id
         XCTAssertEqual(playlist.id, id)
     }
     
     func testFetch() {
         let playlist = storage.createPlaylist()
-        let id: Int32 = 12345
+        let id = 12345
         let name = "Test 234"
         playlist.name = name
         playlist.id = id

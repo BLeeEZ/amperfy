@@ -71,4 +71,9 @@ public class SyncWave: NSObject {
         return songs.hasCachedSongs
     }
     
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? SyncWave else { return false }
+        return managedObject == object.managedObject
+    }
+
 }

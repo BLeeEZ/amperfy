@@ -264,8 +264,8 @@ class LibraryStorage {
         }
         return foundSong
     }
-    // TODO: id Int
-    func getPlaylist(id: Int32) -> Playlist? {
+
+    func getPlaylist(id: Int) -> Playlist? {
         var foundPlaylist: Playlist? = nil
         let fr: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: Int(id)))

@@ -45,5 +45,10 @@ public class Artist: AbstractLibraryEntity {
             return SyncWave(managedObject: syncInfoMO) }
         set { managedObject.syncInfo = newValue?.managedObject }
     }
+    
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Artist else { return false }
+        return managedObject == object.managedObject
+    }
 
 }

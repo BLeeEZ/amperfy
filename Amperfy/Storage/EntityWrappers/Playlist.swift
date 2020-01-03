@@ -46,12 +46,12 @@ public class Playlist: NSObject {
     var items: [PlaylistItem] {
         return sortedPlaylistItems
     }
-    var id: Int32 {
+    var id: Int {
         get {
-            return managedObject.id
+            return Int(managedObject.id)
         }
         set {
-            managedObject.id = newValue
+            managedObject.id = Int32(newValue)
             storage.saveContext()
         }
     }
@@ -228,6 +228,12 @@ public class Playlist: NSObject {
             storage.saveContext()
         }
     }
+    
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Playlist else { return false }
+        return managedObject == object.managedObject
+    }
+
 }
 
 extension Playlist: Identifyable {

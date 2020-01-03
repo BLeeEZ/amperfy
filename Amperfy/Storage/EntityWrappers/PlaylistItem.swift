@@ -48,4 +48,9 @@ public class PlaylistItem: NSObject {
         }
     }
     
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? PlaylistItem else { return false }
+        return managedObject == object.managedObject
+    }
+
 }

@@ -61,4 +61,10 @@ public class Album: AbstractLibraryEntity {
         }
         return Artwork.defaultImage
     }
+    
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Album else { return false }
+        return managedObject == object.managedObject
+    }
+
 }
