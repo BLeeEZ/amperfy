@@ -789,6 +789,7 @@
 					};
 					508385F721C5965E00C4BB32 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1130;
 						TestTargetID = 508385E321C5965B00C4BB32;
 					};
 					5083860221C5965E00C4BB32 = {
@@ -1241,7 +1242,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "familie-zimba.AmperfyTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Amperfy.app/Amperfy";
 			};
@@ -1262,7 +1263,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "familie-zimba.AmperfyTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Amperfy.app/Amperfy";
 			};
