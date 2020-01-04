@@ -1,13 +1,25 @@
 import UIKit
 
-class NextSongsWithEmbeddedPlayerVC: UITableViewController {
+class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var playerPlaceholderView: UIView!
+    
     var appDelegate: AppDelegate!
     var player: AmperfyPlayer!
     var playerView: PlayerView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        if let (fixedView, headerView) = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: playerPlaceholderView.bounds.size.width, height: playerPlaceholderView.bounds.size.height)) {
+            assert(playerPlaceholderView.bounds.size.height >= PlayerView.frameHeight, "Placeholder must provide enough height for player")
+            playerView = headerView
+            playerView.prepare(toWorkOnRootView: self)
+            playerPlaceholderView.addSubview(fixedView)
+        }
+
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         player = appDelegate.player
         player.addNotifier(notifier: self)
@@ -15,13 +27,6 @@ class NextSongsWithEmbeddedPlayerVC: UITableViewController {
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
         tableView.isEditing = true
-        
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: PlayerView.frameHeight))
-        if let (fixedView, headerView) = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: PlayerView.frameHeight)) {
-            playerView = headerView
-            playerView.prepare(toWorkOnRootView: self)
-            tableView.tableHeaderView?.addSubview(fixedView)
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -31,16 +36,16 @@ class NextSongsWithEmbeddedPlayerVC: UITableViewController {
 
     // MARK: - Table view data source
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return player.playlist.songs.count
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: SongTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
         
         let song = player.playlist.songs[indexPath.row]
         
@@ -54,7 +59,7 @@ class NextSongsWithEmbeddedPlayerVC: UITableViewController {
     }
     
     // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             player.removeFromPlaylist(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
@@ -62,12 +67,12 @@ class NextSongsWithEmbeddedPlayerVC: UITableViewController {
     }
 
     // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+    func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         player.movePlaylistSong(fromIndex: fromIndexPath.row, to: to.row)
     }
 
     // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
     // Return false if you do not want the item to be re-orderable.
     return true
     }
@@ -93,7 +98,7 @@ class NextSongsWithEmbeddedPlayerVC: UITableViewController {
 
 }
 
-extension NextSongsWithEmbeddedPlayerVC: MusicPlayable {
+extension PopupPlayerVC: MusicPlayable {
 
     func didStartPlaying(playlistItem: PlaylistItem) {
         tableView.reloadData()
@@ -117,7 +122,7 @@ extension NextSongsWithEmbeddedPlayerVC: MusicPlayable {
 
 }
 
-extension NextSongsWithEmbeddedPlayerVC: SongDownloadViewUpdatable {
+extension PopupPlayerVC: SongDownloadViewUpdatable {
     
     func downloadManager(_ downloadManager: DownloadManager, updatedRequest: DownloadRequest<Song>, updateReason: SongDownloadRequestEvent) {
         switch(updateReason) {

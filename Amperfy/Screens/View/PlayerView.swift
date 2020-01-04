@@ -4,10 +4,10 @@ import MarqueeLabel
 
 class PlayerView: UIView {
   
-    static let frameHeight: CGFloat = 320.0
+    static let frameHeight: CGFloat = 305.0
     private var appDelegate: AppDelegate!
     private var player: AmperfyPlayer!
-    private var rootView: NextSongsWithEmbeddedPlayerVC?
+    private var rootView: PopupPlayerVC?
     
     @IBOutlet weak var songTitleLabel: MarqueeLabel!
     @IBOutlet weak var artistNameLabel: MarqueeLabel!
@@ -26,7 +26,7 @@ class PlayerView: UIView {
         player.addNotifier(notifier: self)
     }
     
-    func prepare(toWorkOnRootView: NextSongsWithEmbeddedPlayerVC? ) {
+    func prepare(toWorkOnRootView: PopupPlayerVC? ) {
         self.rootView = toWorkOnRootView
         refreshPlayer()
     }

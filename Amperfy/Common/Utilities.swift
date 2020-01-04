@@ -128,13 +128,19 @@ extension UIView {
     }
 }
 
-extension UITableViewController {
+extension UITableView {
     func dequeueCell<CellType: UITableViewCell>(for tableView: UITableView, at indexPath: IndexPath) -> CellType {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CellType.typeName, for: indexPath) as? CellType else {
+        guard let cell = self.dequeueReusableCell(withIdentifier: CellType.typeName, for: indexPath) as? CellType else {
             os_log(.error, "The dequeued cell is not an instance of %s", CellType.typeName)
             return CellType()
         }
         return cell
+    }
+}
+
+extension UITableViewController {
+    func dequeueCell<CellType: UITableViewCell>(for tableView: UITableView, at indexPath: IndexPath) -> CellType {
+        return self.tableView.dequeueCell(for: tableView, at: indexPath)
     }
 }
 
