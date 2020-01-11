@@ -9,6 +9,10 @@ enum DownloadError: Error {
     case fetchFailed
 }
 
+protocol SongDownloadable {
+    func download(song: Song, notifier: SongDownloadNotifiable?, priority: Priority)
+}
+
 protocol SongDownloadNotifiable {
     func finished(downloading: Song, error: DownloadError?)
 }
@@ -22,7 +26,7 @@ protocol DownloadManagerDelegate {
     func completedDownload(request: DownloadRequest<Song>, context: NSManagedObjectContext)
 }
 
-class DownloadManager {
+class DownloadManager: SongDownloadable {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "DownloadManager")
     private let storage: PersistentStorage

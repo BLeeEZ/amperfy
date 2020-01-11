@@ -28,7 +28,7 @@ struct PlayRequest {
 
 class BackendAudioPlayer: SongDownloadNotifiable {
 
-    private let downloadManager: DownloadManager
+    private let songDownloader: SongDownloadable
     private let player = AVPlayer()
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     private var latestPlayRequest: PlayRequest?
@@ -57,8 +57,8 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         return player.currentItem != nil
     }
     
-    init(downloadManager: DownloadManager) {
-        self.downloadManager = downloadManager
+    init(songDownloader: SongDownloadable) {
+        self.songDownloader = songDownloader
         
         player.addPeriodicTimeObserver(forInterval: updateElapsedTimeInterval, queue: DispatchQueue.main) { [weak self] time in
             if let self = self {
@@ -107,7 +107,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
             self.continuePlay()
             self.reactToInsertationFinish(playlistItem: playlistItem)
         } else {
-            downloadManager.download(song: song, notifier: self, priority: .high)
+            songDownloader.download(song: song, notifier: self, priority: .high)
         }
         semaphore.signal()
     }
@@ -164,7 +164,6 @@ class BackendAudioPlayer: SongDownloadNotifiable {
                 default:
                     self.reactToError(reaction: .stop)
                 }
-                
             } else {
                 self.reactToInsertationFinish(playlistItem: playRequest.playlistItem)
                 self.reactToError(reaction: playRequest.reactionToError)

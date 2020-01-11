@@ -157,7 +157,7 @@ class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
     
     func play(songInPlaylistAt: Int, reactionToError: FetchErrorReaction = .playNext) {
-        if songInPlaylistAt <= playlist.songs.count {
+        if songInPlaylistAt >= 0, songInPlaylistAt <= playlist.songs.count {
             prepareSongAndInsertToPlayer(playlistIndex: songInPlaylistAt, reactionToError: reactionToError)
         } else {
             stop()
