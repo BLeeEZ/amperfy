@@ -12,6 +12,15 @@ extension String {
     func isFoundBy(searchText: String) -> Bool {
         return self.lowercased().contains(searchText.lowercased())
     }
+    
+    func isContainedIn(_ container: [String]) -> Bool {
+        return container.contains(self)
+    }
+    
+    var asIso8601Date: Date? {
+        let dateFormatter = ISO8601DateFormatter()
+        return dateFormatter.date(from: self)
+    }
 }
 
 extension UIColor {
@@ -73,10 +82,16 @@ extension Date {
     }
 }
 
-extension String {
-    var asIso8601Date: Date? {
-        let dateFormatter = ISO8601DateFormatter()
-        return dateFormatter.date(from: self)
+extension URLComponents {
+    mutating func addQueryItem(name: String, value: Int) {
+        self.addQueryItem(name: name, value: String(value))
+    }
+    
+    mutating func addQueryItem(name: String, value: String) {
+        let queryItem = URLQueryItem(name: name, value: value)
+        var queryItems = self.queryItems ?? [URLQueryItem]()
+        queryItems.append(queryItem)
+        self.queryItems = queryItems
     }
 }
 
