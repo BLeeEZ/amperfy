@@ -18,7 +18,7 @@ public class Artwork: NSObject {
     }
 
     static var defaultImage: UIImage = {
-        return UIImage(named: "song")!
+        return UIImage(named: "song") ?? UIImage()
     }()
 
     var status: ImageStatus {
