@@ -18,6 +18,11 @@ class AboutVC: UIViewController {
         Amperfy is licensed under GPLv3 License:
         https://github.com/BLeeEZ/Amperfy/blob/master/LICENSE
         
+        Ampache by Ampache is licensed under AGPLv3:
+        https://github.com/ampache/ampache
+        https://github.com/ampache
+        https://www.gnu.org/licenses/agpl-3.0.en.html
+        
         LNPopupController by LeoNatan is licensed under MIT License:
         https://github.com/LeoNatan/LNPopupController
         https://github.com/LeoNatan

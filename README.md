@@ -43,6 +43,8 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 
 Attributions
 ----------------
+[Ampache](https://github.com/ampache/ampache) by [Ampache](https://github.com/ampache) is licensed under [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html)
+
 [LNPopupController](https://github.com/LeoNatan/LNPopupController) by [LeoNatan](https://github.com/LeoNatan) is licensed under [MIT License](https://github.com/LeoNatan/LNPopupController/blob/master/LICENSE)
 
 [MarqueeLabel](https://github.com/cbpowell/MarqueeLabel) by [Charles Powell](https://github.com/cbpowell) is licensed under [MIT License](https://github.com/cbpowell/MarqueeLabel/blob/master/LICENSE)
