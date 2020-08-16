@@ -34,6 +34,14 @@ class AlbumDetailTableHeader: UIView {
     
     func createAlert(forAlbum album: Album) -> UIAlertController {
         let alert = UIAlertController(title: album.name, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
+            let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
+            selectPlaylistVC.songsToAdd = album.songs
+            let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+            if let rootView = self.rootView {
+                rootView.present(selectPlaylistNav, animated: true, completion: nil)
+            }
+        }))
         alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
             for song in album.songs {
                 if !song.isCached {
