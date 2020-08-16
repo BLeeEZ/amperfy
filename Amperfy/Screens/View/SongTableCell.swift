@@ -28,6 +28,9 @@ class SongTableCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
+        self.addGestureRecognizer(longPressGesture)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -70,17 +73,6 @@ class SongTableCell: UITableViewCell {
         attributedText.append(NSMutableAttributedString(string: titleLabel.text ?? "", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]))
         titleLabel.attributedText = attributedText
     }
-
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesMoved(touches, with: event)
-        if isUserTouchInteractionAllowed, isForceClicked(touches), let song = song, let rootView = rootView, rootView.presentingViewController == nil {
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
-            isAlertPresented = true
-            let alert = createAlert(forSong: song, rootView: rootView, displayMode: forceTouchDisplayMode)
-            rootView.present(alert, animated: true, completion: nil)
-        }
-    }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let song = song else { return }
@@ -98,6 +90,22 @@ class SongTableCell: UITableViewCell {
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         isAlertPresented = false
+    }
+    
+    @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {
+        if isUserTouchInteractionAllowed, gesture.state == .began {
+            displayMenu()
+        }
+    }
+    
+    func displayMenu() {
+        if let song = song, let rootView = rootView, rootView.presentingViewController == nil {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            isAlertPresented = true
+            let alert = createAlert(forSong: song, rootView: rootView, displayMode: forceTouchDisplayMode)
+            rootView.present(alert, animated: true, completion: nil)
+        }
     }
     
     func createAlert(forSong song: Song, rootView: UIViewController, displayMode: SongOperationDisplayModes) -> UIAlertController {
