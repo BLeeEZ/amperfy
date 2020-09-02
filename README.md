@@ -4,9 +4,9 @@
 
 Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampache.github.io) or [Subsonic](http://www.subsonic.org) server.
 
-<img src=".github/Screenshots/Player.png" width="250" alt="Screenshot of the Amperfy player" />
+<img src=".github/Screenshots/Player.png" width="250" alt="Screenshot of the Amperfy player" /> &nbsp;
 <img src=".github/Screenshots/Search.png" width="250" alt="Screenshot of the Amperfy search" /> &nbsp;
-<img src=".github/Screenshots/Artist.png" width="250" alt="Screenshot of the Amperfy artist" /> &nbsp;
+<img src=".github/Screenshots/Artist.png" width="250" alt="Screenshot of the Amperfy artist" />
 
 ## Features
 
