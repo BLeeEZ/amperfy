@@ -6,7 +6,7 @@ class PlayerView: UIView {
   
     static let frameHeight: CGFloat = 305.0
     private var appDelegate: AppDelegate!
-    private var player: AmperfyPlayer!
+    private var player: MusicPlayer!
     private var rootView: PopupPlayerVC?
     
     @IBOutlet weak var songTitleLabel: MarqueeLabel!

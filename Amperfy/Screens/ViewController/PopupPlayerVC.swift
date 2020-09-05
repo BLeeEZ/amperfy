@@ -6,7 +6,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var playerPlaceholderView: UIView!
     
     var appDelegate: AppDelegate!
-    var player: AmperfyPlayer!
+    var player: MusicPlayer!
     var playerView: PlayerView!
     
     override func viewDidLoad() {

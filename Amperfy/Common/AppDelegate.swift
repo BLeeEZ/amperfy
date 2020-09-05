@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return Library(storage: persistentLibraryStorage)
     }()
     lazy var player = {
-        return AmperfyPlayer(coreData: persistentLibraryStorage.getPlayerData(), backendAudioPlayer: BackendAudioPlayer(songDownloader: downloadManager))
+        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), backendAudioPlayer: BackendAudioPlayer(songDownloader: downloadManager))
     }()
     lazy var downloadManager: DownloadManager = {
         let requestManager = RequestManager()

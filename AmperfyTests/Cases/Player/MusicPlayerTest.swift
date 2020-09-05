@@ -21,14 +21,14 @@ class MOCK_SongDownloader: SongDownloadable {
     
 }
 
-class AmperfyPlayerTest: XCTestCase {
+class MusicPlayerTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
     var storage: LibraryStorage!
     var songDownloader: MOCK_SongDownloader!
     var backendPlayer: BackendAudioPlayer!
     var playerData: PlayerData!
-    var testPlayer: AmperfyPlayer!
+    var testPlayer: MusicPlayer!
     
     var songCached: Song!
     var songToDownload: Song!
@@ -40,7 +40,7 @@ class AmperfyPlayerTest: XCTestCase {
         songDownloader = MOCK_SongDownloader()
         backendPlayer = BackendAudioPlayer(songDownloader: songDownloader)
         playerData = storage.getPlayerData()
-        testPlayer = AmperfyPlayer(coreData: playerData, backendAudioPlayer: backendPlayer)
+        testPlayer = MusicPlayer(coreData: playerData, backendAudioPlayer: backendPlayer)
         
         guard let songCachedFetched = storage.getSong(id: 36) else { XCTFail(); return }
         songCached = songCachedFetched

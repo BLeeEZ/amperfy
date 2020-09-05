@@ -28,7 +28,7 @@ enum RepeatMode: Int16 {
     }
 }
 
-class AmperfyPlayer: NSObject, BackendAudioPlayerNotifiable {
+class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     var playlist: Playlist { 
         return coreData.playlist

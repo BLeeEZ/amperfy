@@ -10,7 +10,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     private var artist: Artist?
     private var album: Album?
     private var playlist: Playlist?
-    private var player: AmperfyPlayer?
+    private var player: MusicPlayer?
     
     @IBAction func playAllButtonPressed(_ sender: Any) {
         if let artist = artist {
@@ -85,17 +85,17 @@ class LibraryElementDetailTableHeaderView: UIView {
         }
     }
     
-    func prepare(toWorkOnArtist artist: Artist?, with player: AmperfyPlayer) {
+    func prepare(toWorkOnArtist artist: Artist?, with player: MusicPlayer) {
         self.artist = artist
         self.player = player
     }
     
-    func prepare(toWorkOnAlbum album: Album?, with player: AmperfyPlayer) {
+    func prepare(toWorkOnAlbum album: Album?, with player: MusicPlayer) {
         self.album = album
         self.player = player
     }
     
-    func prepare(toWorkOnPlaylist playlist: Playlist?, with player: AmperfyPlayer) {
+    func prepare(toWorkOnPlaylist playlist: Playlist?, with player: MusicPlayer) {
         self.playlist = playlist
         self.player = player
     }
