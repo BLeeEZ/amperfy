@@ -220,6 +220,7 @@ class AmpacheXmlServerApi {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_create")
         apiUrlComponent.addQueryItem(name: "name", value: playlist.name)
+        apiUrlComponent.addQueryItem(name: "type", value: "private")
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
