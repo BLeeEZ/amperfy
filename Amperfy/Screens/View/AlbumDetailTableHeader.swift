@@ -28,6 +28,7 @@ class AlbumDetailTableHeader: UIView {
     @IBAction func optionsButtonPressed(_ sender: Any) {
         if let album = self.album, let rootView = self.rootView {
             let alert = createAlert(forAlbum: album)
+            alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
             rootView.present(alert, animated: true, completion: nil)
         }
     }

@@ -104,6 +104,7 @@ class SongTableCell: UITableViewCell {
             generator.impactOccurred()
             isAlertPresented = true
             let alert = createAlert(forSong: song, rootView: rootView, displayMode: forceTouchDisplayMode)
+            alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
             rootView.present(alert, animated: true, completion: nil)
         }
     }

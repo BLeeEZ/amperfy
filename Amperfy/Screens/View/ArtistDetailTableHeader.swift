@@ -28,6 +28,7 @@ class ArtistDetailTableHeader: UIView {
     @IBAction func optionsButtonPressed(_ sender: Any) {
         if let artist = self.artist, let rootView = self.rootView {
             let alert = createAlert(forArtist: artist)
+            alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
             rootView.present(alert, animated: true, completion: nil)
         }
     }

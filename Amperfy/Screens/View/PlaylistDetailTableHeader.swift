@@ -76,6 +76,7 @@ class PlaylistDetailTableHeader: UIView {
     @IBAction func optionsButtonPressed(_ sender: Any) {
         if let playlist = self.playlist, let rootView = self.rootView {
             let alert = createAlert(forPlaylist: playlist, statusNotifyier: rootView)
+            alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
             rootView.present(alert, animated: true, completion: nil)
         }
     }

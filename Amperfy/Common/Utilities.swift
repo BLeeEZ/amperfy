@@ -213,6 +213,14 @@ extension UIAlertController {
             }
         }
     }
+    
+    func setOptionsForIPadToDisplayPopupCentricIn(view: UIView) {
+        if let popoverController = self.popoverPresentationController {
+            popoverController.sourceView = view
+            popoverController.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+    }
 }
 
 extension UISlider {
