@@ -34,7 +34,7 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 2. In the Amperfy directory, fetch and build the projects dependencies via Carthage:
   ```
   cd amperfy
-  carthage update --platform iOS
+  ./update-carthage.sh
   ```
 
 3. Open the `Amperfy.xcodeproj` file.
