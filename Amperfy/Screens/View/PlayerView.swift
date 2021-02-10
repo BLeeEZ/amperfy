@@ -112,7 +112,7 @@ class PlayerView: UIView {
         
         playButton.setTitle(title, for: UIControl.State.normal)
         let barButtonItem = UIBarButtonItem(image: buttonImg, style: .plain, target: self, action: #selector(PlayerView.playButtonPushed))
-        rootView?.popupItem.rightBarButtonItems = [ barButtonItem ]
+        rootView?.popupItem.trailingBarButtonItems = [ barButtonItem ]
     }
     
     func refreshSongInfo(song: Song? = nil) {
