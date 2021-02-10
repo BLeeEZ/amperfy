@@ -6,6 +6,9 @@ class SettingsVC: UITableViewController {
     var appDelegate: AppDelegate!
     
     @IBOutlet weak var versionLabel: UILabel!
+    @IBOutlet weak var serverUrlTF: UITextField!
+    @IBOutlet weak var usernameTF: UITextField!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -14,6 +17,10 @@ class SettingsVC: UITableViewController {
         versionLabel.text = ""
         if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
             versionLabel.text = version
+        }
+        if let loginCredentials = self.appDelegate.storage.getLoginCredentials() {
+            serverUrlTF.text = loginCredentials.serverUrl
+            usernameTF.text = loginCredentials.username
         }
     }
     
