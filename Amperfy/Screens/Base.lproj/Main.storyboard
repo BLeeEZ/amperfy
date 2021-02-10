@@ -630,7 +630,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                         <sections>
-                            <tableViewSection headerTitle="Song Cache" id="voI-g3-iGb">
+                            <tableViewSection headerTitle="Info" id="voI-g3-iGb" userLabel="Info">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="44" id="797-YX-Jow">
                                         <rect key="frame" x="0.0" y="55.5" width="414" height="44"/>
@@ -639,21 +639,61 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6jo-pq-RgQ">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="App Version" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Yx-qL-iZV">
+                                                    <rect key="frame" x="16" y="7" width="134" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="zwB-b9-VUM"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Amperfy Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="q6s-bU-RKi" userLabel="Amperfy Version">
+                                                    <rect key="frame" x="304" y="7" width="94" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="e9t-aF-xDi"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="q6s-bU-RKi" secondAttribute="trailing" constant="16" id="37e-eU-Po2"/>
+                                                <constraint firstItem="5Yx-qL-iZV" firstAttribute="centerY" secondItem="Tee-Vd-ebO" secondAttribute="centerY" id="EXR-Ft-BW4"/>
+                                                <constraint firstItem="q6s-bU-RKi" firstAttribute="leading" secondItem="Tee-Vd-ebO" secondAttribute="trailing" constant="-110" id="NQV-6a-AxJ"/>
+                                                <constraint firstItem="5Yx-qL-iZV" firstAttribute="leading" secondItem="Tee-Vd-ebO" secondAttribute="leading" constant="16" id="Sg1-57-JTe"/>
+                                                <constraint firstAttribute="leading" secondItem="5Yx-qL-iZV" secondAttribute="trailing" constant="-150" id="XpE-qq-lXz"/>
+                                                <constraint firstItem="q6s-bU-RKi" firstAttribute="centerY" secondItem="Tee-Vd-ebO" secondAttribute="centerY" id="iwm-Iw-2rp"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Song Cache" id="5C9-MT-vZ3">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="44" id="ZRa-Lk-2uY">
+                                        <rect key="frame" x="0.0" y="155.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ZRa-Lk-2uY" id="DkM-cL-fDU">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KhG-LL-ekC">
                                                     <rect key="frame" x="16" y="7" width="398" height="30"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="BGy-Fc-YOt"/>
+                                                        <constraint firstAttribute="height" constant="30" id="iEX-g1-DeY"/>
                                                     </constraints>
                                                     <state key="normal" title="Delete cached songs"/>
                                                     <connections>
-                                                        <action selector="deleteSongCachePressed:" destination="Qhm-KH-aq7" eventType="touchUpInside" id="kbw-IH-n1A"/>
+                                                        <action selector="deleteSongCachePressed:" destination="Qhm-KH-aq7" eventType="touchUpInside" id="H9l-uu-6SN"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="trailing" secondItem="6jo-pq-RgQ" secondAttribute="trailing" id="8KY-So-5cd"/>
-                                                <constraint firstItem="6jo-pq-RgQ" firstAttribute="leading" secondItem="Tee-Vd-ebO" secondAttribute="leading" constant="16" id="Jtm-Jh-7wd"/>
-                                                <constraint firstItem="6jo-pq-RgQ" firstAttribute="centerY" secondItem="Tee-Vd-ebO" secondAttribute="centerY" id="aXx-d8-RyR"/>
+                                                <constraint firstItem="KhG-LL-ekC" firstAttribute="leading" secondItem="DkM-cL-fDU" secondAttribute="leading" constant="16" id="HY1-C7-Tpy"/>
+                                                <constraint firstItem="KhG-LL-ekC" firstAttribute="centerY" secondItem="DkM-cL-fDU" secondAttribute="centerY" id="Iun-nV-G07"/>
+                                                <constraint firstAttribute="trailing" secondItem="KhG-LL-ekC" secondAttribute="trailing" id="yaW-DS-WmD"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -662,7 +702,7 @@
                             <tableViewSection headerTitle="Reset" id="nqc-W9-qKK">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="44" id="6Cx-Vn-wFV">
-                                        <rect key="frame" x="0.0" y="155.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="255.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="6Cx-Vn-wFV" id="cqD-So-7R4">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -691,7 +731,7 @@
                             <tableViewSection id="2lU-Sp-sof">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="44" id="tKf-HH-isM">
-                                        <rect key="frame" x="0.0" y="235.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="335.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tKf-HH-isM" id="ptJ-kC-ghZ">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -725,6 +765,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Settings" largeTitleDisplayMode="never" id="Tpb-zW-gf4"/>
                     <connections>
+                        <outlet property="versionLabel" destination="q6s-bU-RKi" id="sF1-Qt-D3l"/>
                         <segue destination="BYZ-38-t0r" kind="presentation" identifier="toLogin" modalPresentationStyle="fullScreen" id="GrB-fu-hYZ"/>
                     </connections>
                 </tableViewController>
@@ -810,7 +851,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="TBt-Gf-8Wu"/>
+        <segue reference="GrB-fu-hYZ"/>
         <segue reference="sdx-Gn-m0J"/>
         <segue reference="PtL-O3-n85"/>
     </inferredMetricsTieBreakers>

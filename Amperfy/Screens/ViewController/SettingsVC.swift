@@ -5,9 +5,16 @@ class SettingsVC: UITableViewController {
     
     var appDelegate: AppDelegate!
     
+    @IBOutlet weak var versionLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        
+        versionLabel.text = ""
+        if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
+            versionLabel.text = version
+        }
     }
     
     @IBAction func deleteSongCachePressed(_ sender: Any) {
