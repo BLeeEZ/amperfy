@@ -3,14 +3,44 @@ import UIKit
 class ArtistsVC: UITableViewController {
 
     var appDelegate: AppDelegate!
+    var artistsUnfiltered: [Artist]!
+    var artistsFiltered: [Artist]!
     var sections = [AlphabeticSection<Artist>]()
+    
+    private let searchController = UISearchController(searchResultsController: nil)
 
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        sections = AlphabeticSection<Artist>.group(appDelegate.library.getArtists())
+        
+        configureSearchController()
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.rowHeight = ArtistTableCell.rowHeight
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        artistsUnfiltered = appDelegate.library.getArtists().sortAlphabeticallyAscending()
+        updateSearchResults(for: searchController)
+    }
+    
+    private func configureSearchController() {
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.autocapitalizationType = .none
+
+        if #available(iOS 11.0, *) {
+            // For iOS 11 and later, place the search bar in the navigation bar.
+            navigationItem.searchController = searchController
+            // Make the search bar always visible.
+            navigationItem.hidesSearchBarWhenScrolling = false
+        } else {
+            // For iOS 10 and earlier, place the search controller's search bar in the table view's header.
+            tableView.tableHeaderView = searchController.searchBar
+        }
+        
+        searchController.delegate = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.delegate = self // Monitor when the search button is tapped.
+        self.definesPresentationContext = true
     }
 
     // MARK: - Table view data source
@@ -65,4 +95,33 @@ class ArtistsVC: UITableViewController {
             vc.artist = artist
         }
     }
+}
+
+extension ArtistsVC: UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        if let searchText = searchController.searchBar.text, !searchText.isEmpty {
+            artistsFiltered = artistsUnfiltered.filterBy(searchText: searchText)
+        } else {
+            artistsFiltered = artistsUnfiltered
+        }
+        sections = AlphabeticSection<Artist>.group(artistsFiltered)
+        tableView.reloadData()
+    }
+    
+}
+
+extension ArtistsVC: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
+        updateSearchResults(for: searchController)
+    }
+    
+}
+
+extension ArtistsVC: UISearchControllerDelegate {
 }

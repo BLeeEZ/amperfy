@@ -60,7 +60,7 @@ class SearchVC: UITableViewController {
         /** Specify that this view controller determines how the search controller is presented.
          The search controller should be presented modally and match the physical size of this view controller.
          */
-        definesPresentationContext = true
+        self.definesPresentationContext = true
     }
 
     // MARK: - Table view data source
