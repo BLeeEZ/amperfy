@@ -446,6 +446,7 @@
                     <connections>
                         <segue destination="CbP-zj-PDn" kind="show" identifier="toArtistDetail" id="tfW-38-Y3k"/>
                         <segue destination="CiG-al-lkI" kind="show" identifier="toAlbumDetail" id="axa-3B-EfE"/>
+                        <segue destination="5fS-Oh-qFf" kind="show" identifier="toPlaylistDetail" id="whh-XI-a5P"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3tw-4G-Oye" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -916,8 +917,9 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="GrB-fu-hYZ"/>
-        <segue reference="sdx-Gn-m0J"/>
-        <segue reference="PtL-O3-n85"/>
+        <segue reference="axa-3B-EfE"/>
+        <segue reference="tfW-38-Y3k"/>
+        <segue reference="whh-XI-a5P"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="music_library" width="30" height="30"/>

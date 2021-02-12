@@ -3,6 +3,9 @@ import UIKit
 class SearchVC: UITableViewController {
 
     var appDelegate: AppDelegate!
+    var playlistsAll: [Playlist]!
+    var playlistsUnfiltered: [Playlist]!
+    var playlistsFiltered: [Playlist]!
     var artistsAll: [Artist]!
     var artistsUnfiltered: [Artist]!
     var artistsFiltered: [Artist]!
@@ -20,12 +23,14 @@ class SearchVC: UITableViewController {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
 
         configureSearchController()
+        tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        playlistsAll = appDelegate.library.getPlaylists().sortAlphabeticallyAscending()
         artistsAll = appDelegate.library.getArtists().sortAlphabeticallyAscending()
         albumsAll = appDelegate.library.getAlbums().sortAlphabeticallyAscending()
         songsAll = appDelegate.library.getSongs().sortAlphabeticallyAscending()
@@ -71,6 +76,8 @@ class SearchVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
+        case LibraryElement.Playlist.rawValue:
+            return "Playlists"
         case LibraryElement.Artist.rawValue:
             return "Artists"
         case LibraryElement.Album.rawValue:
@@ -84,6 +91,8 @@ class SearchVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
+        case LibraryElement.Playlist.rawValue:
+            return playlistsFiltered.count
         case LibraryElement.Artist.rawValue:
             return artistsFiltered.count
         case LibraryElement.Album.rawValue:
@@ -97,6 +106,11 @@ class SearchVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section {
+        case LibraryElement.Playlist.rawValue:
+            let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
+            let playlist = playlistsFiltered[indexPath.row]
+            cell.display(playlist: playlist)
+            return cell
         case LibraryElement.Artist.rawValue:
             let cell: ArtistTableCell = dequeueCell(for: tableView, at: indexPath)
             let artist = artistsFiltered[indexPath.row]
@@ -119,6 +133,8 @@ class SearchVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         switch section {
+        case LibraryElement.Playlist.rawValue:
+            return playlistsFiltered.count != 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
         case LibraryElement.Artist.rawValue:
             return artistsFiltered.count != 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
         case LibraryElement.Album.rawValue:
@@ -132,6 +148,8 @@ class SearchVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch indexPath.section {
+        case LibraryElement.Playlist.rawValue:
+            return PlaylistTableCell.rowHeight
         case LibraryElement.Artist.rawValue:
             return ArtistTableCell.rowHeight
         case LibraryElement.Album.rawValue:
@@ -145,6 +163,9 @@ class SearchVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.section {
+        case LibraryElement.Playlist.rawValue:
+            let playlist = playlistsFiltered[indexPath.row]
+            performSegue(withIdentifier: Segues.toPlaylistDetail.rawValue, sender: playlist)
         case LibraryElement.Artist.rawValue:
             let artist = artistsFiltered[indexPath.row]
             performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
@@ -158,6 +179,10 @@ class SearchVC: UITableViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         switch segue.identifier {
+        case Segues.toPlaylistDetail.rawValue:
+            let vc = segue.destination as! PlaylistDetailVC
+            let playlist = sender as? Playlist
+            vc.playlist = playlist
         case Segues.toArtistDetail.rawValue:
             let vc = segue.destination as! ArtistDetailVC
             let artist = sender as? Artist
@@ -176,10 +201,12 @@ extension SearchVC: UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {
         if let searchText = searchController.searchBar.text, !searchText.isEmpty {
+            playlistsFiltered = playlistsUnfiltered.filterBy(searchText: searchText)
             artistsFiltered = artistsUnfiltered.filterBy(searchText: searchText)
             albumsFiltered = albumsUnfiltered.filterBy(searchText: searchText)
             songsFiltered = songsUnfiltered.filterBy(searchText: searchText)
         } else {
+            playlistsFiltered = playlistsUnfiltered
             artistsFiltered = artistsUnfiltered
             albumsFiltered = albumsUnfiltered
             songsFiltered = songsUnfiltered
@@ -203,10 +230,12 @@ extension SearchVC: UISearchBarDelegate {
     func updateDataBasedOnScope() {
         switch searchController.searchBar.selectedScopeButtonIndex {
         case 1:
+            playlistsUnfiltered = [Playlist]()
             artistsUnfiltered = [Artist]()
             albumsUnfiltered = [Album]()
             songsUnfiltered = songsAll.filterCached()
         default:
+            playlistsUnfiltered = playlistsAll
             artistsUnfiltered = artistsAll
             albumsUnfiltered = albumsAll
             songsUnfiltered = songsAll

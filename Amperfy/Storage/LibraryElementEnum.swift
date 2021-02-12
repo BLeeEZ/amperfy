@@ -1,7 +1,8 @@
 import Foundation
 
 enum LibraryElement: Int, CaseIterable {
-    case Artist = 0
-    case Album = 1
-    case Song = 2
+    case Playlist = 0
+    case Artist = 1
+    case Album = 2
+    case Song = 3
 }
