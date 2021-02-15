@@ -12,13 +12,13 @@ class ArtistDetailVC: UITableViewController {
         tableView.register(nibName: SongTableCell.typeName)
         
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ArtistDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
-        if let (fixedView, headerView) = ViewBuilder<ArtistDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ArtistDetailTableHeader.frameHeight)) {
-            headerView.prepare(toWorkOnArtist: artist, rootView: self)
-            tableView.tableHeaderView?.addSubview(fixedView)
+        if let artistDetailTableHeaderView = ViewBuilder<ArtistDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ArtistDetailTableHeader.frameHeight)) {
+            artistDetailTableHeaderView.prepare(toWorkOnArtist: artist, rootView: self)
+            tableView.tableHeaderView?.addSubview(artistDetailTableHeaderView)
         }
-        if let (fixedView, headerView) = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: ArtistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            headerView.prepare(toWorkOnArtist: artist, with: appDelegate.player)
-            tableView.tableHeaderView?.addSubview(fixedView)
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: ArtistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+            libraryElementDetailTableHeaderView.prepare(toWorkOnArtist: artist, with: appDelegate.player)
+            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
     }
     
@@ -33,7 +33,7 @@ class ArtistDetailVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch section+1 {
+        switch section+2 {
         case LibraryElement.Album.rawValue:
             return "Albums"
         case LibraryElement.Song.rawValue:
@@ -44,7 +44,7 @@ class ArtistDetailVC: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch section+1 {
+        switch section+2 {
         case LibraryElement.Album.rawValue:
             return artist?.albums.count ?? 0
         case LibraryElement.Song.rawValue:
@@ -55,7 +55,7 @@ class ArtistDetailVC: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch indexPath.section+1 {
+        switch indexPath.section+2 {
         case LibraryElement.Album.rawValue:
             let cell: AlbumTableCell = dequeueCell(for: tableView, at: indexPath)
             if let album = artist?.albums[indexPath.row] {
@@ -74,7 +74,7 @@ class ArtistDetailVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        switch section+1 {
+        switch section+2 {
         case LibraryElement.Album.rawValue:
             return artist?.albums.count != 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
         case LibraryElement.Song.rawValue:
@@ -85,7 +85,7 @@ class ArtistDetailVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        switch indexPath.section+1 {
+        switch indexPath.section+2 {
         case LibraryElement.Album.rawValue:
             return AlbumTableCell.rowHeight
         case LibraryElement.Song.rawValue:
@@ -96,7 +96,7 @@ class ArtistDetailVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch indexPath.section+1 {
+        switch indexPath.section+2 {
         case LibraryElement.Album.rawValue:
             if let album = artist?.albums[indexPath.row] {
                 performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)

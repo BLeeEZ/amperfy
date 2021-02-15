@@ -12,13 +12,13 @@ class AlbumDetailVC: UITableViewController {
         tableView.rowHeight = SongTableCell.rowHeight
         
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: AlbumDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
-        if let (fixedView, headerView) = ViewBuilder<AlbumDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: AlbumDetailTableHeader.frameHeight)) {
-            headerView.prepare(toWorkOnAlbum: album, rootView: self)
-            tableView.tableHeaderView?.addSubview(fixedView)
+        if let albumDetailTableHeaderView = ViewBuilder<AlbumDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: AlbumDetailTableHeader.frameHeight)) {
+            albumDetailTableHeaderView.prepare(toWorkOnAlbum: album, rootView: self)
+            tableView.tableHeaderView?.addSubview(albumDetailTableHeaderView)
         }
-        if let (fixedView, headerView) = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: ArtistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            headerView.prepare(toWorkOnAlbum: album, with: appDelegate.player)
-            tableView.tableHeaderView?.addSubview(fixedView)
+        if let artistDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: ArtistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+            artistDetailTableHeaderView.prepare(toWorkOnAlbum: album, with: appDelegate.player)
+            tableView.tableHeaderView?.addSubview(artistDetailTableHeaderView)
         }
     }
     

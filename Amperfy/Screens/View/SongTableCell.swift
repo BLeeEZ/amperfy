@@ -112,9 +112,11 @@ class SongTableCell: UITableViewCell {
     func createAlert(forSong song: Song, rootView: UIViewController, displayMode: SongOperationDisplayModes) -> UIAlertController {
         let alert = UIAlertController(title: "\n\n\n", message: nil, preferredStyle: .actionSheet)
     
-        if let (fixedView, songView) = ViewBuilder<SongActionSheetView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: alert.view.bounds.size.width-30, height: SongActionSheetView.frameHeight)) {
-            songView.display(song: song)
-            alert.view.addSubview(fixedView)
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: alert.view.bounds.size.width, height: SongActionSheetView.frameHeight))
+        if let songActionSheetView = ViewBuilder<SongActionSheetView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: alert.view.bounds.size.width, height: SongActionSheetView.frameHeight)) {
+            songActionSheetView.display(song: song)
+            headerView.addSubview(songActionSheetView)
+            alert.view.addSubview(headerView)
         }
     
         if displayMode != .onlySeperatePlaylists {

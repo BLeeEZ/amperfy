@@ -20,14 +20,14 @@ class PlaylistDetailVC: UITableViewController {
         navigationItem.rightBarButtonItem = editButton
         
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: PlaylistDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
-        if let (fixedView, headerView) = ViewBuilder<PlaylistDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: PlaylistDetailTableHeader.frameHeight)) {
-            headerView.prepare(toWorkOnPlaylist: playlist, rootView: self)
-            tableView.tableHeaderView?.addSubview(fixedView)
-            playlistOperationsView = headerView
+        if let playlistDetailTableHeaderView = ViewBuilder<PlaylistDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: PlaylistDetailTableHeader.frameHeight)) {
+            playlistDetailTableHeaderView.prepare(toWorkOnPlaylist: playlist, rootView: self)
+            tableView.tableHeaderView?.addSubview(playlistDetailTableHeaderView)
+            playlistOperationsView = playlistDetailTableHeaderView
         }
-        if let (fixedView, headerView) = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: PlaylistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            headerView.prepare(toWorkOnPlaylist: playlist, with: appDelegate.player)
-            tableView.tableHeaderView?.addSubview(fixedView)
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: PlaylistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+            libraryElementDetailTableHeaderView.prepare(toWorkOnPlaylist: playlist, with: appDelegate.player)
+            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         self.refreshControl?.addTarget(self, action: #selector(PlaylistsVC.handleRefresh), for: UIControl.Event.valueChanged)
     }

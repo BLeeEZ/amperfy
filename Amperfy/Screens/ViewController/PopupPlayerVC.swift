@@ -13,11 +13,11 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         super.viewDidLoad()
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        if let (fixedView, headerView) = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: playerPlaceholderView.bounds.size.width, height: playerPlaceholderView.bounds.size.height)) {
+        if let createdPlayerView = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: playerPlaceholderView.bounds.size.width, height: playerPlaceholderView.bounds.size.height)) {
             assert(playerPlaceholderView.bounds.size.height >= PlayerView.frameHeight, "Placeholder must provide enough height for player")
-            playerView = headerView
+            playerView = createdPlayerView
             playerView.prepare(toWorkOnRootView: self)
-            playerPlaceholderView.addSubview(fixedView)
+            playerPlaceholderView.addSubview(playerView)
         }
 
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)

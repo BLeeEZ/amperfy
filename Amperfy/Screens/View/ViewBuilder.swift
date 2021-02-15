@@ -9,14 +9,12 @@ class ViewBuilder<ViewType: UIView> {
             ).instantiate(withOwner: nil, options: nil)[0] as? ViewType
     }
     
-    static func createFromNib(withinFixedFrame rect: CGRect) -> (fixedView: UIView, customView: ViewType)? {
+    static func createFromNib(withinFixedFrame rect: CGRect) -> ViewType? {
         guard let nibView: ViewType = createFromNib() else {
             return nil
         }
-        
-        let fixedView = UIView(frame: rect)
-        fixedView.addSubview(nibView)
-        return (fixedView, nibView)
+        nibView.frame = rect
+        return nibView
     }
     
 }

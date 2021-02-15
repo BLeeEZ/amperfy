@@ -14,12 +14,13 @@ class PlaylistSelectorVC: UITableViewController {
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         
-        if let (fixedView, tableHeader) = ViewBuilder<NewPlaylistTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight)) {
-            tableHeader.reactOnCreation() { _ in
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight))
+        if let newPlaylistTableHeaderView = ViewBuilder<NewPlaylistTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight)) {
+            newPlaylistTableHeaderView.reactOnCreation() { _ in
                 self.playlists = self.appDelegate.library.getPlaylists().sortAlphabeticallyAscending()
                 self.tableView.reloadData()
             }
-            tableView.tableHeaderView = fixedView
+            tableView.tableHeaderView?.addSubview(newPlaylistTableHeaderView)
         }
     }
     

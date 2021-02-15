@@ -510,8 +510,9 @@
                                     <outlet property="delegate" destination="ZrD-yX-z8h" id="29g-X4-JqF"/>
                                 </connections>
                             </tableView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KWj-US-4T0">
+                            <view contentMode="scaleToFill" id="KWj-US-4T0">
                                 <rect key="frame" x="0.0" y="44" width="414" height="305"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="305" id="TUy-5Q-8k8"/>
@@ -527,7 +528,7 @@
                             <constraint firstItem="AEg-Xh-QOY" firstAttribute="leading" secondItem="5vd-Ap-Yw9" secondAttribute="leading" id="ZdK-hu-mjo"/>
                             <constraint firstItem="5vd-Ap-Yw9" firstAttribute="trailing" secondItem="KWj-US-4T0" secondAttribute="trailing" id="gXH-Od-Mog"/>
                             <constraint firstItem="5vd-Ap-Yw9" firstAttribute="trailing" secondItem="AEg-Xh-QOY" secondAttribute="trailing" id="h7G-sQ-PEK"/>
-                            <constraint firstItem="KWj-US-4T0" firstAttribute="top" secondItem="5vd-Ap-Yw9" secondAttribute="top" id="qRZ-Ia-A9S"/>
+                            <constraint firstItem="KWj-US-4T0" firstAttribute="top" secondItem="5vd-Ap-Yw9" secondAttribute="top" priority="999" id="qRZ-Ia-A9S"/>
                         </constraints>
                     </view>
                     <connections>
