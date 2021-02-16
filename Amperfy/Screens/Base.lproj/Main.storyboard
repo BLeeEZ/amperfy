@@ -782,7 +782,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Song Cache" id="5C9-MT-vZ3">
+                            <tableViewSection headerTitle="Player" id="5C9-MT-vZ3" userLabel="Player">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="44" id="ZRa-Lk-2uY">
                                         <rect key="frame" x="0.0" y="357.5" width="414" height="44"/>
@@ -791,21 +791,63 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KhG-LL-ekC">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KhG-LL-ekC" userLabel="Song action on tab">
                                                     <rect key="frame" x="16" y="7" width="398" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="iEX-g1-DeY"/>
                                                     </constraints>
-                                                    <state key="normal" title="Delete cached songs"/>
+                                                    <state key="normal" title="Action on song tab">
+                                                        <color key="titleColor" systemColor="labelColor"/>
+                                                    </state>
                                                     <connections>
-                                                        <action selector="deleteSongCachePressed:" destination="Qhm-KH-aq7" eventType="touchUpInside" id="H9l-uu-6SN"/>
+                                                        <segue destination="rsJ-c4-CcZ" kind="show" id="GU2-fD-f6J"/>
+                                                    </connections>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&gt;" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T4I-lF-zaF" userLabel="Select Label">
+                                                    <rect key="frame" x="314" y="12" width="84" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="T4I-lF-zaF" secondAttribute="trailing" constant="16" id="9D2-nV-Afo"/>
+                                                <constraint firstItem="KhG-LL-ekC" firstAttribute="leading" secondItem="DkM-cL-fDU" secondAttribute="leading" constant="16" id="HY1-C7-Tpy"/>
+                                                <constraint firstItem="KhG-LL-ekC" firstAttribute="centerY" secondItem="DkM-cL-fDU" secondAttribute="centerY" id="Iun-nV-G07"/>
+                                                <constraint firstItem="T4I-lF-zaF" firstAttribute="centerY" secondItem="DkM-cL-fDU" secondAttribute="centerY" id="MvS-cu-bNV"/>
+                                                <constraint firstItem="T4I-lF-zaF" firstAttribute="leading" secondItem="DkM-cL-fDU" secondAttribute="trailing" constant="-100" id="Oy1-3A-6wd"/>
+                                                <constraint firstAttribute="trailing" secondItem="KhG-LL-ekC" secondAttribute="trailing" id="yaW-DS-WmD"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Song Cache" id="AI2-kS-IgP">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="44" id="au4-Sv-wsp">
+                                        <rect key="frame" x="0.0" y="457.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="au4-Sv-wsp" id="4cc-nF-yNB">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jl9-q7-yDN">
+                                                    <rect key="frame" x="16" y="7" width="398" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="kTu-Mb-rSx"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Delete cached songs">
+                                                        <color key="titleColor" systemColor="systemRedColor"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="deleteSongCachePressed:" destination="Qhm-KH-aq7" eventType="touchUpInside" id="0Fn-pX-CuT"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="KhG-LL-ekC" firstAttribute="leading" secondItem="DkM-cL-fDU" secondAttribute="leading" constant="16" id="HY1-C7-Tpy"/>
-                                                <constraint firstItem="KhG-LL-ekC" firstAttribute="centerY" secondItem="DkM-cL-fDU" secondAttribute="centerY" id="Iun-nV-G07"/>
-                                                <constraint firstAttribute="trailing" secondItem="KhG-LL-ekC" secondAttribute="trailing" id="yaW-DS-WmD"/>
+                                                <constraint firstAttribute="trailing" secondItem="Jl9-q7-yDN" secondAttribute="trailing" id="GLx-Io-chr"/>
+                                                <constraint firstItem="Jl9-q7-yDN" firstAttribute="centerY" secondItem="4cc-nF-yNB" secondAttribute="centerY" id="Ioc-08-poT"/>
+                                                <constraint firstItem="Jl9-q7-yDN" firstAttribute="leading" secondItem="4cc-nF-yNB" secondAttribute="leading" constant="16" id="kxH-f3-3sS"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -814,7 +856,7 @@
                             <tableViewSection headerTitle="Reset" id="nqc-W9-qKK">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="44" id="6Cx-Vn-wFV">
-                                        <rect key="frame" x="0.0" y="457.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="557.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="6Cx-Vn-wFV" id="cqD-So-7R4">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -825,7 +867,9 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="o87-ve-X5M"/>
                                                     </constraints>
-                                                    <state key="normal" title="Reset app data"/>
+                                                    <state key="normal" title="Reset app data">
+                                                        <color key="titleColor" systemColor="systemRedColor"/>
+                                                    </state>
                                                     <connections>
                                                         <action selector="resetAppPressed:" destination="Qhm-KH-aq7" eventType="touchUpInside" id="IVV-7O-PCz"/>
                                                     </connections>
@@ -843,7 +887,7 @@
                             <tableViewSection id="2lU-Sp-sof">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="44" id="tKf-HH-isM">
-                                        <rect key="frame" x="0.0" y="537.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="637.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tKf-HH-isM" id="ptJ-kC-ghZ">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -854,7 +898,9 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="rjH-Pp-vd6"/>
                                                     </constraints>
-                                                    <state key="normal" title="About"/>
+                                                    <state key="normal" title="About">
+                                                        <color key="titleColor" systemColor="labelColor"/>
+                                                    </state>
                                                     <connections>
                                                         <segue destination="6s0-DO-Zi4" kind="showDetail" id="lcs-uX-3pl"/>
                                                     </connections>
@@ -925,7 +971,106 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7Gt-xY-bek" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2122" y="2508"/>
+            <point key="canvasLocation" x="2486" y="2500"/>
+        </scene>
+        <!--Settings SongActionOnTab-->
+        <scene sceneID="pZt-kV-5uM">
+            <objects>
+                <tableViewController id="rsJ-c4-CcZ" userLabel="Settings SongActionOnTab" customClass="SettingsSongActionOnTabVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="MwS-jY-P2J">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <sections>
+                            <tableViewSection id="G9T-0j-TYJ">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="50" id="PIr-1K-VYk">
+                                        <rect key="frame" x="0.0" y="28" width="414" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="PIr-1K-VYk" id="IQm-Nw-RJE">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ev2-q7-AMH">
+                                                    <rect key="frame" x="25" y="0.0" width="389" height="50"/>
+                                                    <state key="normal" title="Button">
+                                                        <color key="titleColor" systemColor="labelColor"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="playAndErasePlaylistPressed:" destination="rsJ-c4-CcZ" eventType="touchUpInside" id="qrK-7d-9TH"/>
+                                                    </connections>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Check" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1P8-sr-A0h">
+                                                    <rect key="frame" x="344" y="14.5" width="50" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="ev2-q7-AMH" firstAttribute="leading" secondItem="IQm-Nw-RJE" secondAttribute="leading" constant="25" id="0c1-5C-JoD"/>
+                                                <constraint firstAttribute="trailing" secondItem="ev2-q7-AMH" secondAttribute="trailing" id="8jh-XC-8Yj"/>
+                                                <constraint firstItem="1P8-sr-A0h" firstAttribute="leading" secondItem="IQm-Nw-RJE" secondAttribute="trailingMargin" constant="-50" id="Bth-dk-3oE"/>
+                                                <constraint firstItem="1P8-sr-A0h" firstAttribute="centerY" secondItem="IQm-Nw-RJE" secondAttribute="centerY" id="E8p-CZ-K3b"/>
+                                                <constraint firstAttribute="bottom" secondItem="ev2-q7-AMH" secondAttribute="bottom" id="KyU-A2-gY5"/>
+                                                <constraint firstItem="ev2-q7-AMH" firstAttribute="top" secondItem="IQm-Nw-RJE" secondAttribute="top" id="c4b-11-G2U"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="1P8-sr-A0h" secondAttribute="trailing" id="uL3-5E-RzC"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="50" id="ZaR-z3-Uox">
+                                        <rect key="frame" x="0.0" y="78" width="414" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ZaR-z3-Uox" id="FmT-Ci-CRo">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xey-rD-Ppg">
+                                                    <rect key="frame" x="25" y="0.0" width="389" height="50"/>
+                                                    <state key="normal" title="Button">
+                                                        <color key="titleColor" systemColor="labelColor"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="addToPlaylistAndPlayPressed:" destination="rsJ-c4-CcZ" eventType="touchUpInside" id="EJP-j9-gTJ"/>
+                                                    </connections>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Check" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t7O-Aw-9RV">
+                                                    <rect key="frame" x="344" y="14.5" width="50" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailingMargin" secondItem="t7O-Aw-9RV" secondAttribute="trailing" id="Hzy-8c-ius"/>
+                                                <constraint firstItem="xey-rD-Ppg" firstAttribute="leading" secondItem="FmT-Ci-CRo" secondAttribute="leading" constant="25" id="Wad-xL-n8A"/>
+                                                <constraint firstItem="xey-rD-Ppg" firstAttribute="top" secondItem="FmT-Ci-CRo" secondAttribute="top" id="dme-rG-Weg"/>
+                                                <constraint firstItem="t7O-Aw-9RV" firstAttribute="centerY" secondItem="FmT-Ci-CRo" secondAttribute="centerY" id="kNx-Y0-EdR"/>
+                                                <constraint firstAttribute="trailing" secondItem="xey-rD-Ppg" secondAttribute="trailing" id="u1q-tu-4Zm"/>
+                                                <constraint firstItem="t7O-Aw-9RV" firstAttribute="leading" secondItem="FmT-Ci-CRo" secondAttribute="trailingMargin" constant="-50" id="uLt-ie-cS5"/>
+                                                <constraint firstAttribute="bottom" secondItem="xey-rD-Ppg" secondAttribute="bottom" id="xi6-mz-2sO"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="rsJ-c4-CcZ" id="Ygw-jS-9Af"/>
+                            <outlet property="delegate" destination="rsJ-c4-CcZ" id="QWy-dv-zh8"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="XCv-5F-X0R"/>
+                    <connections>
+                        <outlet property="addToPlaylistAndPlayButton" destination="xey-rD-Ppg" id="Eql-eP-9ms"/>
+                        <outlet property="addToPlaylistAndPlayCheckLabel" destination="t7O-Aw-9RV" id="VGT-hl-I4h"/>
+                        <outlet property="playAndErasePlaylistButton" destination="ev2-q7-AMH" id="mff-Dh-Dig"/>
+                        <outlet property="playAndErasePlaylistCheckLabel" destination="1P8-sr-A0h" id="F96-SO-wID"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0hY-Ag-IPO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1757" y="2500"/>
         </scene>
         <!--Latest Songs-->
         <scene sceneID="hyu-9c-dpK">
@@ -982,11 +1127,17 @@
         <systemColor name="groupTableViewBackgroundColor">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

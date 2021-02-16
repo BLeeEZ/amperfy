@@ -7,6 +7,7 @@ enum FontAwesomeIcon: Int {
     case VolumeUp = 0xf028
     case Cloud = 0xf0c2
     case Redo = 0xf01e
+    case Check = 0xf00c
     
     var asString: String {
         return String(format: "%C", self.rawValue)

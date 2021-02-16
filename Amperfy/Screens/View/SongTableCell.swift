@@ -1,9 +1,18 @@
 import UIKit
 import AudioToolbox
 
-enum BehaviourOnTab {
-    case playAndErasePlaylist
-    case playAndKeepPlaylist
+enum SongActionOnTab: Int {
+    case playAndErasePlaylist = 0
+    case hiddenOptionPlayInPopupPlayerPlaylistSelectedSong = 1
+    case addToPlaylistAndPlay = 2
+    
+    var description : String {
+        switch self {
+        case .playAndErasePlaylist: return "Clear current playlist and play song"
+        case .addToPlaylistAndPlay: return "Insert song at the end and play song"
+        case .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong: return "HIDDEN !!!"
+        }
+    }
 }
 
 class SongTableCell: UITableViewCell {
@@ -15,7 +24,7 @@ class SongTableCell: UITableViewCell {
     @IBOutlet weak var downloadProgress: UIProgressView!
     
     static let rowHeight: CGFloat = 56.0
-    var behaviourOnTab: BehaviourOnTab = .playAndErasePlaylist
+    var behaviourOnTab: SongActionOnTab = .playAndErasePlaylist
     var forceTouchDisplayMode: SongOperationDisplayModes = .fullSet
     var isUserTouchInteractionAllowed = true
     private var appDelegate: AppDelegate!
@@ -28,7 +37,7 @@ class SongTableCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        
+        behaviourOnTab = appDelegate.storage.getSettings().songActionOnTab
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
         self.addGestureRecognizer(longPressGesture)
     }
@@ -64,7 +73,7 @@ class SongTableCell: UITableViewCell {
     
     func confToPlayPlaylistIndexOnTab(indexInPlaylist: Int) {
         self.index = indexInPlaylist
-        behaviourOnTab = .playAndKeepPlaylist
+        behaviourOnTab = .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong
         forceTouchDisplayMode = .onlySeperatePlaylists
     }
     
@@ -80,9 +89,13 @@ class SongTableCell: UITableViewCell {
             switch behaviourOnTab {
             case .playAndErasePlaylist:
                 appDelegate.player.play(song: song)
-            case .playAndKeepPlaylist:
+            case .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong:
                 guard let index = index else { return }
                 appDelegate.player.play(songInPlaylistAt: index)
+            case .addToPlaylistAndPlay:
+                appDelegate.player.addToPlaylist(song: song)
+                let indexInPlayerPlaylist = appDelegate.player.playlist.songs.count-1
+                appDelegate.player.play(songInPlaylistAt: indexInPlayerPlaylist)
             }
         }
         isAlertPresented = false

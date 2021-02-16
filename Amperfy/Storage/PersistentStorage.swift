@@ -9,6 +9,8 @@ class PersistentStorage {
         case Password = "password"
         case BackendApi = "backendApi"
         case LibraryIsSynced = "libraryIsSynced"
+        
+        case SongActionOnTab = "songActionOnTab"
     }
 
     init() {
@@ -45,6 +47,18 @@ class PersistentStorage {
     
     func deleteLibraryIsSyncedFlag() {
         UserDefaults.standard.removeObject(forKey: UserDefaultsKey.LibraryIsSynced.rawValue)
+    }
+    
+    func saveSettings(settings: Settings) {
+        UserDefaults.standard.set(settings.songActionOnTab.rawValue, forKey: UserDefaultsKey.SongActionOnTab.rawValue)
+    }
+    
+    func getSettings() -> Settings {
+        if  let songActionOnTabRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongActionOnTab.rawValue) as? Int,
+            let songActionOnTab = SongActionOnTab(rawValue: songActionOnTabRaw) {
+                return Settings(songActionOnTab: songActionOnTab)
+        }
+        return Settings()
     }
     
     func isLibrarySynced() -> Bool {
