@@ -23,8 +23,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         let artistParser = SsArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
         subsonicServerApi.requestArtists(parserDelegate: artistParser)
         albumCount = artistParser.albumCountOfAllArtists
-        addInstForUnknownArtitst(libraryStorage: libraryStorage)
-        
+       
         statusNotifyier?.notifyAlbumsSyncStarted()
         let artists = libraryStorage.getArtists()
         for artist in artists {
@@ -56,12 +55,6 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         syncWave.syncState = .Done
         libraryStorage.saveContext()
         statusNotifyier?.notifySyncFinished()
-    }
-    
-    private func addInstForUnknownArtitst(libraryStorage: LibraryStorage) {
-        let unknownArtist = libraryStorage.createArtist()
-        unknownArtist.id = 0
-        unknownArtist.name = "Unknown Artist"
     }
     
     func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage) {

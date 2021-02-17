@@ -12,20 +12,35 @@ class AlbumParserDelegate: GenericXmlLibParser {
         
  		switch(elementName) {
 		case "album":
-            if !syncWave.isInitialWave, let albumId = Int(attributeDict["id"] ?? "0"), let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
+            guard let albumIdStr = attributeDict["id"] else {
+                os_log("Found album with no id", log: log, type: .error)
+                return
+            }
+            guard let albumId = Int(albumIdStr) else {
+                os_log("Found album non integer id: %s", log: log, type: .error, albumIdStr)
+                return
+            }
+            if !syncWave.isInitialWave, let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
                 albumBuffer = fetchedAlbum
             } else {
                 albumBuffer = libraryStorage.createAlbum()
                 albumBuffer?.syncInfo = syncWave
-                albumBuffer?.id = Int(attributeDict["id"] ?? "0") ?? 0
+                albumBuffer?.id = albumId
             }
 		case "artist":
             if let album = albumBuffer {
-                let artistId = Int(attributeDict["id"] ?? "0") ?? 0
+                guard let artistIdStr = attributeDict["id"] else {
+                    os_log("Found album id %d with no artist id. Album name: %s", log: log, type: .error, album.id, album.name)
+                    return
+                }
+                guard let artistId = Int(artistIdStr) else {
+                    os_log("Found album id %d with non integer artist id %s. Album name: %s", log: log, type: .error, album.id, artistIdStr, album.name)
+                    return
+                }
                 if let artist = libraryStorage.getArtist(id: artistId) {
                     album.artist = artist
                 } else {
-                    os_log("Found album id %d with unknown artist %d", log: log, type: .error, album.id, artistId)
+                    os_log("Found album id %d with unknown artist %d. Album name: %s", log: log, type: .error, album.id, artistId, album.name)
                 }
             }
 		default:

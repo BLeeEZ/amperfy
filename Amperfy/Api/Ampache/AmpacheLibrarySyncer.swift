@@ -30,8 +30,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             statusNotifyier?.notifyArtistSyncStarted()
             let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, ampacheUrlCreator: ampacheXmlServerApi, parseNotifier: statusNotifyier)
             ampacheXmlServerApi.requestArtists(parserDelegate: artistParser)
-            addInstForUnknownArtitst(libraryStorage: libraryStorage)
-            
+
             statusNotifyier?.notifyAlbumsSyncStarted()
             let albumDelegate = AlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: statusNotifyier)
             ampacheXmlServerApi.requestAlbums(parserDelegate: albumDelegate)
@@ -57,13 +56,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             statusNotifyier?.notifySyncFinished()
         }
     }
-    
-    private func addInstForUnknownArtitst(libraryStorage: LibraryStorage) {
-        let unknownArtist = libraryStorage.createArtist()
-        unknownArtist.id = 0
-        unknownArtist.name = "Unknown Artist"
-    }
-    
+
     func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage) {
         let playlistParser = PlaylistParserDelegate(libraryStorage: libraryStorage)
         ampacheXmlServerApi.requestPlaylists(parserDelegate: playlistParser)

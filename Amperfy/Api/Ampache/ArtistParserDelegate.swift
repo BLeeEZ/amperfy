@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 import CoreData
+import os.log
 
 class ArtistParserDelegate: GenericXmlLibParser {
 
@@ -16,7 +17,14 @@ class ArtistParserDelegate: GenericXmlLibParser {
         buffer = ""
 
         if(elementName == "artist") {
-            guard let attributeId = attributeDict["id"], let artistId = Int(attributeId) else { return }
+            guard let artistIdStr = attributeDict["id"] else {
+                os_log("Found artist with no id", log: log, type: .error)
+                return
+            }
+            guard let artistId = Int(artistIdStr) else {
+                os_log("Found artist non integer id: %s", log: log, type: .error, artistIdStr)
+                return
+            }
             if !syncWave.isInitialWave, let fetchedArtist = libraryStorage.getArtist(id: artistId)  {
                 artistBuffer = fetchedArtist
             } else {
