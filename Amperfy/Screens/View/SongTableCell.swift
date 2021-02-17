@@ -156,11 +156,42 @@ class SongTableCell: UITableViewCell {
                 self.appDelegate.downloadManager.download(song: song)
                 self.refresh()
             }))
-
         }
+        alert.addAction(UIAlertAction(title: "Show artist", style: .default, handler: { _ in
+            let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
+            artistDetailVC.artist = song.artist
+            if let navController = self.rootView?.navigationController {
+                navController.pushViewController(artistDetailVC, animated: true)
+            } else {
+                self.closePopupPlayerAndDisplayInLibraryTab(view: artistDetailVC)
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Show album", style: .default, handler: { _ in
+            let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
+            albumDetailVC.album = song.album
+            if let navController = self.rootView?.navigationController {
+                navController.pushViewController(albumDetailVC, animated: true)
+            } else {
+                self.closePopupPlayerAndDisplayInLibraryTab(view: albumDetailVC)
+            }
+        }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         return alert
+    }
+    
+    private func closePopupPlayerAndDisplayInLibraryTab(view: UIViewController) {
+        if let popupPlayerVC = rootView as? PopupPlayerVC,
+           let hostingTabBarVC = popupPlayerVC.hostingTabBarVC {
+            hostingTabBarVC.closePopup(animated: true, completion: { () in
+                if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
+                   hostingTabViewControllers.count > 0,
+                   let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
+                    libraryTabNavVC.pushViewController(view, animated: false)
+                    hostingTabBarVC.selectedIndex = 0
+                }
+            })
+        }
     }
 
 }

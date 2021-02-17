@@ -8,6 +8,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var appDelegate: AppDelegate!
     var player: MusicPlayer!
     var playerView: PlayerView!
+    var hostingTabBarVC: TabBarVC?
     
     override func viewDidLoad() {
         super.viewDidLoad()
