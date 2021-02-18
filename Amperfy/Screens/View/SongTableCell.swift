@@ -19,7 +19,6 @@ class SongTableCell: UITableViewCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
-    @IBOutlet weak var cloudSyncedLabel: UILabel!
     @IBOutlet weak var artworkImage: UIImageView!
     @IBOutlet weak var downloadProgress: UIProgressView!
     
@@ -59,9 +58,7 @@ class SongTableCell: UITableViewCell {
         artistLabel.text = song.artist?.name
         artworkImage.image = song.image
         if song.isCached {
-            cloudSyncedLabel.text = FontAwesomeIcon.Cloud.asString
-        } else {
-            cloudSyncedLabel.text = ""
+            artistLabel.textColor = UIColor.defaultBlue
         }
         if let download = download {
             downloadProgress.isHidden = false
