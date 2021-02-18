@@ -43,18 +43,11 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 
 4. Build and run the "Amperfy" scheme
 
-Attributions
-----------------
-[Ampache](https://github.com/ampache/ampache) by [Ampache](https://github.com/ampache) is licensed under [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html)
+## Attributions
 
-[LNPopupController](https://github.com/LeoNatan/LNPopupController) by [LeoNatan](https://github.com/LeoNatan) is licensed under [MIT License](https://github.com/LeoNatan/LNPopupController/blob/master/LICENSE)
-
-[MarqueeLabel](https://github.com/cbpowell/MarqueeLabel) by [Charles Powell](https://github.com/cbpowell) is licensed under [MIT License](https://github.com/cbpowell/MarqueeLabel/blob/master/LICENSE)
-
-[Font Awesome Icons](https://fontawesome.com/) by [Font Awesome](https://fontawesome.com/) is licensed under [CC BY 4.0 License](https://creativecommons.org/licenses/by/4.0/)
-
-[Font Awesome Fonts](https://fontawesome.com/) by [Font Awesome](https://fontawesome.com/) is licensed under [SIL OFL 1.1 License](https://scripts.sil.org/OFL)
-
-[iOS 11 Glyphs](https://icons8.com/ios) by [Icons8](https://icons8.com) is licensed under [Good Boy License](https://icons8.com/good-boy-license/)
+- [LNPopupController](https://github.com/LeoNatan/LNPopupController) by [LeoNatan](https://github.com/LeoNatan) is licensed under [MIT License](https://github.com/LeoNatan/LNPopupController/blob/master/LICENSE)
+- [MarqueeLabel](https://github.com/cbpowell/MarqueeLabel) by [Charles Powell](https://github.com/cbpowell) is licensed under [MIT License](https://github.com/cbpowell/MarqueeLabel/blob/master/LICENSE)
+- [Font Awesome](https://fontawesome.com/) by [Font Awesome](https://fontawesome.com/) is licensed under [Font Awesome Free License](https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt)
+- [iOS 11 Glyphs](https://icons8.com/ios) by [Icons8](https://icons8.com) is licensed under [Good Boy License](https://icons8.com/good-boy-license/)
 
 **Amperfy license:** [GPLv3](https://github.com/BLeeEZ/Amperfy/blob/master/LICENSE)

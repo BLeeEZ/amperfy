@@ -836,11 +836,11 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="rjH-Pp-vd6"/>
                                                     </constraints>
-                                                    <state key="normal" title="About">
+                                                    <state key="normal" title="License">
                                                         <color key="titleColor" systemColor="labelColor"/>
                                                     </state>
                                                     <connections>
-                                                        <segue destination="6s0-DO-Zi4" kind="show" id="LXh-Tp-myE"/>
+                                                        <segue destination="6s0-DO-Zi4" kind="show" id="QuP-W4-jKG"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&gt;" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N9E-ZS-2nh" userLabel="Select Label">
@@ -913,21 +913,23 @@
             </objects>
             <point key="canvasLocation" x="2121.739130434783" y="1765.8482142857142"/>
         </scene>
-        <!--About-->
+        <!--License-->
         <scene sceneID="I3u-G9-7pr">
             <objects>
-                <viewController title="About" id="6s0-DO-Zi4" customClass="AboutVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="License" id="6s0-DO-Zi4" userLabel="License" customClass="LicenseVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="5kl-Ya-3fC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vZx-T1-TgZ" userLabel="About Text View">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vZx-T1-TgZ" userLabel="License Text View">
                                 <rect key="frame" x="0.0" y="88" width="414" height="725"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <attributedString key="attributedText">
-                                    <fragment content="About text will be set in view controller">
+                                    <fragment content="License text will be set in view controller">
                                         <attributes>
+                                            <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             <font key="NSFont" metaFont="menu" size="14"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
                                 </attributedString>
@@ -937,15 +939,15 @@
                         <viewLayoutGuide key="safeArea" id="AUl-SB-v6c"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="vZx-T1-TgZ" firstAttribute="leading" secondItem="AUl-SB-v6c" secondAttribute="leading" id="Mhs-Q3-nj0"/>
-                            <constraint firstItem="vZx-T1-TgZ" firstAttribute="top" secondItem="AUl-SB-v6c" secondAttribute="top" id="jCm-Y1-Pg1"/>
-                            <constraint firstItem="AUl-SB-v6c" firstAttribute="bottom" secondItem="vZx-T1-TgZ" secondAttribute="bottom" id="o44-Jj-gyS"/>
-                            <constraint firstItem="AUl-SB-v6c" firstAttribute="trailing" secondItem="vZx-T1-TgZ" secondAttribute="trailing" id="rij-eQ-ZsW"/>
+                            <constraint firstItem="vZx-T1-TgZ" firstAttribute="top" secondItem="AUl-SB-v6c" secondAttribute="top" id="8We-vk-xKg"/>
+                            <constraint firstItem="vZx-T1-TgZ" firstAttribute="bottom" secondItem="AUl-SB-v6c" secondAttribute="bottom" id="Hve-ct-Jwo"/>
+                            <constraint firstItem="vZx-T1-TgZ" firstAttribute="leading" secondItem="AUl-SB-v6c" secondAttribute="leading" id="XHu-BP-4p8"/>
+                            <constraint firstItem="vZx-T1-TgZ" firstAttribute="trailing" secondItem="AUl-SB-v6c" secondAttribute="trailing" id="y44-Dt-C02"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="About" id="8q4-Lg-5uh"/>
+                    <navigationItem key="navigationItem" title="License" id="8q4-Lg-5uh"/>
                     <connections>
-                        <outlet property="aboutTextView" destination="vZx-T1-TgZ" id="TUL-pP-N1H"/>
+                        <outlet property="licenseTextView" destination="vZx-T1-TgZ" id="dB7-Ty-Vco"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7Gt-xY-bek" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -957,7 +959,7 @@
             <objects>
                 <tableViewController id="rsJ-c4-CcZ" userLabel="Settings SongActionOnTab" customClass="SettingsSongActionOnTabVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="MwS-jY-P2J">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <sections>
@@ -1094,7 +1096,7 @@
             <objects>
                 <tableViewController id="3j9-EZ-8oG" userLabel="Settings Server" customClass="SettingsServerVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="Gb8-mf-9aU">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <sections>
@@ -1510,7 +1512,7 @@
             <objects>
                 <tableViewController title="Settings" id="FAi-G9-LVC" userLabel="Settings Player" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="TVS-0o-sp2">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <sections>
