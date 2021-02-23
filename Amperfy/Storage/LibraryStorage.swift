@@ -217,10 +217,10 @@ class LibraryStorage {
         return playerData
     }
     
-    func getArtist(id: Int) -> Artist? {
+    func getArtist(id: String) -> Artist? {
         var foundArtist: Artist? = nil
         let fr: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: id))
+        fr.predicate = NSPredicate(format: "id == %@", NSString(string: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -233,10 +233,10 @@ class LibraryStorage {
         return foundArtist
     }
     
-    func getAlbum(id: Int) -> Album? {
+    func getAlbum(id: String) -> Album? {
         var foundAlbum: Album? = nil
         let fr: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: id))
+        fr.predicate = NSPredicate(format: "id == %@", NSString(string: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -249,10 +249,10 @@ class LibraryStorage {
         return foundAlbum
     }
     
-    func getSong(id: Int) -> Song? {
+    func getSong(id: String) -> Song? {
         var foundSong: Song? = nil
         let fr: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: id))
+        fr.predicate = NSPredicate(format: "id == %@", NSString(string: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -265,10 +265,10 @@ class LibraryStorage {
         return foundSong
     }
 
-    func getPlaylist(id: Int) -> Playlist? {
+    func getPlaylist(id: String) -> Playlist? {
         var foundPlaylist: Playlist? = nil
         let fr: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSNumber(integerLiteral: Int(id)))
+        fr.predicate = NSPredicate(format: "id == %@", NSString(string: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?

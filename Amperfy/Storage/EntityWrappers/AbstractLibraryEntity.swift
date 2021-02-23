@@ -9,9 +9,9 @@ public class AbstractLibraryEntity: NSObject, Identifyable {
         self.managedObject = managedObject
     }
     
-    var id: Int {
-        get { return Int(managedObject.id) }
-        set { managedObject.id = Int32(newValue) }
+    var id: String {
+        get { return managedObject.id }
+        set { managedObject.id = newValue }
     }
     var artwork: Artwork? {
         get {

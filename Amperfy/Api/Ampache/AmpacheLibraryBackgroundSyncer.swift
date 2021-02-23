@@ -41,9 +41,11 @@ class AmpacheLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Background
         if syncWave.syncState == .Artists, isRunning {
             var allParsed = false
             repeat {
+                var syncIndex = Int(syncWave.syncIndexToContinue) ?? 0
                 let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, ampacheUrlCreator: ampacheXmlServerApi)
-                ampacheXmlServerApi.requestArtists(parserDelegate: artistParser, addDate: addDate, startIndex: syncWave.syncIndexToContinue, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
-                syncWave.syncIndexToContinue += artistParser.parsedCount
+                ampacheXmlServerApi.requestArtists(parserDelegate: artistParser, addDate: addDate, startIndex: syncIndex, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+                syncIndex += artistParser.parsedCount
+                syncWave.syncIndexToContinue = String(syncIndex)
                 allParsed = artistParser.parsedCount == 0
             } while(!allParsed && isRunning)
 
@@ -56,9 +58,11 @@ class AmpacheLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Background
         if syncWave.syncState == .Albums, isRunning {
             var allParsed = false
             repeat {
+                var syncIndex = Int(syncWave.syncIndexToContinue) ?? 0
                 let albumParser = AlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave)
-                ampacheXmlServerApi.requestAlbums(parserDelegate: albumParser, addDate: addDate, startIndex: syncWave.syncIndexToContinue, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
-                syncWave.syncIndexToContinue += albumParser.parsedCount
+                ampacheXmlServerApi.requestAlbums(parserDelegate: albumParser, addDate: addDate, startIndex: syncIndex, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+                syncIndex += albumParser.parsedCount
+                syncWave.syncIndexToContinue = String(syncIndex)
                 allParsed = albumParser.parsedCount == 0
             } while(!allParsed && isRunning)
 
@@ -71,9 +75,11 @@ class AmpacheLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Background
         if syncWave.syncState == .Songs, isRunning {
             var allParsed = false
             repeat {
+                var syncIndex = Int(syncWave.syncIndexToContinue) ?? 0
                 let songParser = SongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave)
-                ampacheXmlServerApi.requestSongs(parserDelegate: songParser, addDate: addDate, startIndex: syncWave.syncIndexToContinue, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
-                syncWave.syncIndexToContinue += songParser.parsedCount
+                ampacheXmlServerApi.requestSongs(parserDelegate: songParser, addDate: addDate, startIndex: syncIndex, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+                syncIndex += songParser.parsedCount
+                syncWave.syncIndexToContinue = String(syncIndex)
                 allParsed = songParser.parsedCount == 0
             } while(!allParsed && isRunning)
 

@@ -12,12 +12,8 @@ class SongParserDelegate: GenericXmlLibParser {
         
         switch(elementName) {
         case "song":
-            guard let songIdStr = attributeDict["id"] else {
+            guard let songId = attributeDict["id"] else {
                 os_log("Found song with no id", log: log, type: .error)
-                return
-            }
-            guard let songId = Int(songIdStr) else {
-                os_log("Found song non integer id: %s", log: log, type: .error, songIdStr)
                 return
             }
             if !syncWave.isInitialWave, let fetchedSong = libraryStorage.getSong(id: songId)  {
@@ -25,16 +21,12 @@ class SongParserDelegate: GenericXmlLibParser {
             } else {
                 songBuffer = libraryStorage.createSong()
                 songBuffer?.syncInfo = syncWave
-                songBuffer?.id = Int(attributeDict["id"] ?? "0") ?? 0
+                songBuffer?.id = songId
             }
         case "artist":
             if let song = songBuffer {
-                guard let artistIdStr = attributeDict["id"] else {
+                guard let artistId = attributeDict["id"] else {
                     os_log("Found song id %d with no artist id. Title: %s", log: log, type: .error, song.id, song.title)
-                    return
-                }
-                guard let artistId = Int(artistIdStr) else {
-                    os_log("Found song id %d with non integer artist id %s. Title: %s", log: log, type: .error, song.id, artistIdStr, song.title)
                     return
                 }
                 if let artist = libraryStorage.getArtist(id: artistId) {
@@ -45,12 +37,8 @@ class SongParserDelegate: GenericXmlLibParser {
             }
         case "album":
             if let song = songBuffer {
-                guard let albumIdStr = attributeDict["id"] else {
+                guard let albumId = attributeDict["id"] else {
                     os_log("Found song id %d with no album id. Title: %s", log: log, type: .error, songBuffer!.id, song.title)
-                    return
-                }
-                guard let albumId = Int(albumIdStr) else {
-                    os_log("Found song id %d with non integer album id %s. Title: %s", log: log, type: .error, songBuffer!.id, albumIdStr, song.title)
                     return
                 }
                 if let album = libraryStorage.getAlbum(id: albumId)  {

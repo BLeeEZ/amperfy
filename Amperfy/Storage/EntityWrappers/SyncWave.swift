@@ -25,16 +25,16 @@ public class SyncWave: NSObject {
             return SyncState(rawValue: Int(managedObject.syncState)) ?? .Artists
         }
         set {
-            syncIndexToContinue = 0
+            syncIndexToContinue = ""
             managedObject.syncState = Int16(newValue.rawValue)
         }
     }
-    var syncIndexToContinue: Int {
+    var syncIndexToContinue: String {
         get {
-            return Int(managedObject.syncIndexToContinue)
+            return managedObject.syncIndexToContinue
         }
         set {
-            managedObject.syncIndexToContinue = Int32(newValue)
+            managedObject.syncIndexToContinue = newValue
         }
     }
     var isInitialWave: Bool {

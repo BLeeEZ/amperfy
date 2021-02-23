@@ -42,9 +42,9 @@ class MusicPlayerTest: XCTestCase {
         playerData = storage.getPlayerData()
         testPlayer = MusicPlayer(coreData: playerData, backendAudioPlayer: backendPlayer)
         
-        guard let songCachedFetched = storage.getSong(id: 36) else { XCTFail(); return }
+        guard let songCachedFetched = storage.getSong(id: "36") else { XCTFail(); return }
         songCached = songCachedFetched
-        guard let songToDownloadFetched = storage.getSong(id: 3) else { XCTFail(); return }
+        guard let songToDownloadFetched = storage.getSong(id: "3") else { XCTFail(); return }
         songToDownload = songToDownloadFetched
         guard let playlistCached = storage.getPlaylist(id: cdHelper.seeder.playlists[1].id) else { XCTFail(); return }
         playlistThreeCached = playlistCached

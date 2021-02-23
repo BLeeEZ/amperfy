@@ -12,12 +12,8 @@ class AlbumParserDelegate: GenericXmlLibParser {
         
  		switch(elementName) {
 		case "album":
-            guard let albumIdStr = attributeDict["id"] else {
+            guard let albumId = attributeDict["id"] else {
                 os_log("Found album with no id", log: log, type: .error)
-                return
-            }
-            guard let albumId = Int(albumIdStr) else {
-                os_log("Found album non integer id: %s", log: log, type: .error, albumIdStr)
                 return
             }
             if !syncWave.isInitialWave, let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
@@ -29,12 +25,8 @@ class AlbumParserDelegate: GenericXmlLibParser {
             }
 		case "artist":
             if let album = albumBuffer {
-                guard let artistIdStr = attributeDict["id"] else {
+                guard let artistId = attributeDict["id"] else {
                     os_log("Found album id %d with no artist id. Album name: %s", log: log, type: .error, album.id, album.name)
-                    return
-                }
-                guard let artistId = Int(artistIdStr) else {
-                    os_log("Found album id %d with non integer artist id %s. Album name: %s", log: log, type: .error, album.id, artistIdStr, album.name)
                     return
                 }
                 if let artist = libraryStorage.getArtist(id: artistId) {

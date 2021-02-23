@@ -6,7 +6,7 @@ class AlbumTest: XCTestCase {
     var cdHelper: CoreDataHelper!
     var storage: LibraryStorage!
     var testAlbum: Album!
-    let testId = 23489
+    let testId = "23489"
 
     override func setUp() {
         cdHelper = CoreDataHelper()
@@ -20,7 +20,7 @@ class AlbumTest: XCTestCase {
     
     func testCreation() {
         let album = storage.createAlbum()
-        XCTAssertEqual(album.id, 0)
+        XCTAssertEqual(album.id, "")
         XCTAssertEqual(album.identifier, "Unknown artist")
         XCTAssertEqual(album.name, "Unknown artist")
         XCTAssertEqual(album.year, 0)

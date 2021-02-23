@@ -17,12 +17,8 @@ class ArtistParserDelegate: GenericXmlLibParser {
         buffer = ""
 
         if(elementName == "artist") {
-            guard let artistIdStr = attributeDict["id"] else {
+            guard let artistId = attributeDict["id"] else {
                 os_log("Found artist with no id", log: log, type: .error)
-                return
-            }
-            guard let artistId = Int(artistIdStr) else {
-                os_log("Found artist non integer id: %s", log: log, type: .error, artistIdStr)
                 return
             }
             if !syncWave.isInitialWave, let fetchedArtist = libraryStorage.getArtist(id: artistId)  {

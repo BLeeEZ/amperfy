@@ -2,7 +2,7 @@ import Foundation
 import os.log
 
 protocol SubsonicUrlCreator {
-    func getArtUrlString(forArtistId: Int) -> String
+    func getArtUrlString(forArtistId: String) -> String
 }
 
 class SubsonicServerApi {
@@ -22,7 +22,7 @@ class SubsonicServerApi {
         return "\(credentials.serverUrl)/rest/\(forAction).view?u=\(userUrl)&p=\(passwordUrl)&v=\(version)&c=\(AppDelegate.name)"
     }
     
-    private func urlString(forAction: String, id: Int) -> String {
+    private func urlString(forAction: String, id: String) -> String {
         return urlString(forAction: forAction) + "&id=\(id)"
     }
     
@@ -41,10 +41,20 @@ class SubsonicServerApi {
             return
         }
         
-        let parser = XMLParser(contentsOf: url)!
+        guard let parser = XMLParser(contentsOf: url) else {
+            os_log("Couldn't load the ping response.", log: log, type: .error)
+            isValidCredentials = false
+            return
+        }
+        
         let curDelegate = PingParserDelegate()
         parser.delegate = curDelegate
         let success = parser.parse()
+        if let error = parser.parserError {
+            isValidCredentials = false
+            os_log("Error during login parsing: %s", log: log, type: .error, error.localizedDescription)
+            return
+        }
         if success, curDelegate.isAuthValid {
             isValidCredentials = true
         } else {
@@ -75,12 +85,12 @@ class SubsonicServerApi {
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
     
-    func requestArtist(parserDelegate: XMLParserDelegate, id: Int) {
+    func requestArtist(parserDelegate: XMLParserDelegate, id: String) {
         let urlPath = urlString(forAction: "getArtist", id: id)
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
     
-    func requestAlbum(parserDelegate: XMLParserDelegate, id: Int) {
+    func requestAlbum(parserDelegate: XMLParserDelegate, id: String) {
         let urlPath = urlString(forAction: "getAlbum", id: id)
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
@@ -90,7 +100,7 @@ class SubsonicServerApi {
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
 
-    func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: Int) {
+    func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: String) {
         let urlPath = urlString(forAction: "getPlaylist", id: id)
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
@@ -102,7 +112,7 @@ class SubsonicServerApi {
         request(fromUrlString: urlPath, viaXmlParser: parserDelegate)
     }
 
-    func requestPlaylistUpdate(parserDelegate: XMLParserDelegate, playlist: Playlist, songIndicesToRemove: [Int], songIdsToAdd: [Int]) {
+    func requestPlaylistUpdate(parserDelegate: XMLParserDelegate, playlist: Playlist, songIndicesToRemove: [Int], songIdsToAdd: [String]) {
         var urlPath = urlString(forAction: "updatePlaylist")
         urlPath += "&playlistId=\(playlist.id)"
         let playlistNameUrl = playlist.name.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? "InvalidPlaylistName"
@@ -126,7 +136,7 @@ class SubsonicServerApi {
 }
 
 extension SubsonicServerApi: SubsonicUrlCreator {
-    func getArtUrlString(forArtistId id: Int) -> String {
+    func getArtUrlString(forArtistId id: String) -> String {
         return urlString(forAction: "getCoverArt", id: id)
     }
 }

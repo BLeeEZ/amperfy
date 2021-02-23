@@ -12,7 +12,7 @@ extension SyncWaveMO {
     @NSManaged public var dateOfLastClean: Date?
     @NSManaged public var dateOfLastUpdate: Date?
     @NSManaged public var id: Int16
-    @NSManaged public var syncIndexToContinue: Int32
+    @NSManaged public var syncIndexToContinue: String
     @NSManaged public var syncState: Int16
     @NSManaged public var albums: NSOrderedSet?
     @NSManaged public var artists: NSOrderedSet?

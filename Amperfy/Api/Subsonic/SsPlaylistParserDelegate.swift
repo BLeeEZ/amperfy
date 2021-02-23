@@ -17,15 +17,14 @@ class SsPlaylistParserDelegate: GenericXmlParser {
         buffer = ""
         
         if(elementName == "playlist") {
-            guard let attributeId = attributeDict["id"],
-                let playlistId = Int(attributeId),
+            guard let playlistId = attributeDict["id"],
                 let attributePlaylistName = attributeDict["name"] else {
                     return
             }
             
             if playlist != nil {
                 playlist?.id = playlistId
-            } else if playlistId != 0 {
+            } else if playlistId != "" {
                 if let fetchedPlaylist = libraryStorage.getPlaylist(id: playlistId)  {
                     playlist = fetchedPlaylist
                 } else {
@@ -33,7 +32,7 @@ class SsPlaylistParserDelegate: GenericXmlParser {
                     playlist?.id = playlistId
                 }
             } else {
-                os_log("Error: Playlist could not be parsed -> id is 0", log: log, type: .error)
+                os_log("Error: Playlist could not be parsed -> id is not given", log: log, type: .error)
                 return
             }
             

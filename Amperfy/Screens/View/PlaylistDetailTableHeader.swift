@@ -85,7 +85,7 @@ class PlaylistDetailTableHeader: UIView {
         let storage = appDelegate.storage
         let alert = UIAlertController(title: playlist.name, message: nil, preferredStyle: .actionSheet)
         
-        if playlist.id != 0 {
+        if playlist.id != "" {
             alert.addAction(UIAlertAction(title: "Download from server", style: .default, handler: { _ in
                 storage.persistentContainer.performBackgroundTask() { (context) in
                     let backgroundStorage = LibraryStorage(context: context)

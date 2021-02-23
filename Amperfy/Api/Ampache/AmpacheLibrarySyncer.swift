@@ -65,9 +65,9 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     
     func syncDown(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks? = nil) {
         os_log("Download playlist \"%s\" from server", log: log, type: .info, playlist.name)
-        guard playlist.id != 0 else { statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist); return }
+        guard playlist.id != "" else { statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist); return }
         validatePlaylistId(playlist: playlist, libraryStorage: libraryStorage)
-        guard playlist.id != 0 else { statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist); return }
+        guard playlist.id != "" else { statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist); return }
 
         os_log("Sync songs of playlist \"%s\"", log: log, type: .info, playlist.name)
         statusNotifyier?.notifyPlaylistWillCleared()
@@ -81,7 +81,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     func syncUpload(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks? = nil) {
         os_log("Upload playlist \"%s\" to server", log: log, type: .info, playlist.name)
         validatePlaylistId(playlist: playlist, libraryStorage: libraryStorage)
-        if playlist.id == 0 {
+        if playlist.id == "" {
             os_log("Create playlist on server", log: log, type: .info)
             let playlistParser = PlaylistParserDelegate(libraryStorage: libraryStorage)
             playlistParser.playlist = playlist

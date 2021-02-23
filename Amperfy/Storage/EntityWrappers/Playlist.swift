@@ -46,12 +46,12 @@ public class Playlist: NSObject {
     var items: [PlaylistItem] {
         return sortedPlaylistItems
     }
-    var id: Int {
+    var id: String {
         get {
-            return Int(managedObject.id)
+            return managedObject.id
         }
         set {
-            managedObject.id = Int32(newValue)
+            managedObject.id = newValue
             storage.saveContext()
         }
     }

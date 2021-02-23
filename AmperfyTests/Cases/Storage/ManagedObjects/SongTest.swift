@@ -6,7 +6,7 @@ class SongTest: XCTestCase {
     var cdHelper: CoreDataHelper!
     var storage: LibraryStorage!
     var testSong: Song!
-    let testId = 2345
+    let testId = "2345"
 
     override func setUp() {
         cdHelper = CoreDataHelper()
@@ -20,7 +20,7 @@ class SongTest: XCTestCase {
     
     func testCreation() {
         let song = storage.createSong()
-        XCTAssertEqual(song.id, 0)
+        XCTAssertEqual(song.id, "")
         XCTAssertEqual(song.artwork?.image, Artwork.defaultImage)
         XCTAssertEqual(song.title, "Unknown title")
         XCTAssertEqual(song.track, 0)

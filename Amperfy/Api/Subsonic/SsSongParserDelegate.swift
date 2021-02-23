@@ -17,13 +17,10 @@ class SsSongParserDelegate: GenericXmlLibParser {
         buffer = ""
         
         if(elementName == "song") {
-            guard let attributeId = attributeDict["id"],
-                let songId = Int(attributeId),
+            guard let songId = attributeDict["id"],
                 let attributeSongTitle = attributeDict["title"],
-                let attributeArtistId = attributeDict["artistId"],
-                let artistId = Int(attributeArtistId),
-                let attributeAlbumId = attributeDict["albumId"],
-                let albumId = Int(attributeAlbumId) else {
+                let artistId = attributeDict["artistId"],
+                let albumId = attributeDict["albumId"] else {
                     return
             }
             

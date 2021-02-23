@@ -65,7 +65,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     
     func syncDown(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks?) {
         os_log("Download playlist \"%s\" from server", log: log, type: .info, playlist.name)
-        guard playlist.id != 0 else { statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist); return }
+        guard playlist.id != "" else { statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist); return }
         os_log("Sync songs of playlist \"%s\"", log: log, type: .info, playlist.name)
         statusNotifyier?.notifyPlaylistWillCleared()
         playlist.removeAllSongs()
@@ -77,10 +77,10 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     
     func syncUpload(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks?) {
         os_log("Upload playlist \"%s\" to server", log: log, type: .info, playlist.name)
-        if playlist.id == 0 {
+        if playlist.id == "" {
             createPlaylistRemote(playlist: playlist, libraryStorage: libraryStorage)
         }
-        guard playlist.id != 0 else {
+        guard playlist.id != "" else {
             os_log("Playlist id could not be obtained", log: log, type: .info)
             return
         }
@@ -91,9 +91,9 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         subsonicServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
         
         if !parser.playlistHasBeenDetected {
-            playlist.id = 0
+            playlist.id = ""
             createPlaylistRemote(playlist: playlist, libraryStorage: libraryStorage)
-            guard playlist.id != 0 else {
+            guard playlist.id != "" else {
                 os_log("Playlist id could not be obtained", log: log, type: .info)
                 return
             }
@@ -112,7 +112,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
             songIndicesToRemove.append(item.order)
         }
 
-        var songIdsToAdd = [Int]()
+        var songIdsToAdd = [String]()
         for item in playlist.items {
             if let songItem = item.song {
                 songIdsToAdd.append(songItem.id)
@@ -132,7 +132,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         let playlistParser = SsPlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
         subsonicServerApi.requestPlaylistCreate(parserDelegate: playlistParser, playlist: playlist)
         // Old api version -> need to match the created playlist via name
-        if playlist.id == 0 {
+        if playlist.id == "" {
             updatePlaylistIdViaItsName(playlist: playlist, libraryStorage: libraryStorage)
         }
     }
@@ -141,7 +141,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         syncDownPlaylistsWithoutSongs(libraryStorage: libraryStorage)
         let playlists = libraryStorage.getPlaylists()
         let nameMatchingPlaylists = playlists.filter{ filterPlaylist in
-            if filterPlaylist.name == playlist.name, filterPlaylist.id != 0 {
+            if filterPlaylist.name == playlist.name, filterPlaylist.id != "" {
                 return true
             }
             return false

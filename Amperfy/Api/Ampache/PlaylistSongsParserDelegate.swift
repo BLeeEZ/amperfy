@@ -19,7 +19,7 @@ class PlaylistSongsParserDelegate: GenericXmlParser {
         
         switch(elementName) {
         case "song":
-            if let songId = Int(attributeDict["id"] ?? "0"), let fetchedSong = libraryStorage.getSong(id: songId) {
+            if let songId = attributeDict["id"], let fetchedSong = libraryStorage.getSong(id: songId) {
                 playlistItemBuffer = libraryStorage.createPlaylistItem()
                 playlistItemBuffer?.song = fetchedSong
             }

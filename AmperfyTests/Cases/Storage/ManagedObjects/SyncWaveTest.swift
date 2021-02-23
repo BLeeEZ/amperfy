@@ -21,7 +21,7 @@ class SyncWaveTest: XCTestCase {
     func checkCreation() {
         XCTAssertEqual(testSyncWave.id, 0)
         XCTAssertEqual(testSyncWave.syncState, SyncState.Artists)
-        XCTAssertEqual(testSyncWave.syncIndexToContinue, 0)
+        XCTAssertEqual(testSyncWave.syncIndexToContinue, "")
         XCTAssertTrue(testSyncWave.isInitialWave)
         XCTAssertFalse(testSyncWave.isDone)
         XCTAssertEqual(testSyncWave.libraryChangeDates.dateOfLastAdd.compare(nowDate), ComparisonResult.orderedDescending)
@@ -35,7 +35,7 @@ class SyncWaveTest: XCTestCase {
         let syncWave = storage.createSyncWave()
         XCTAssertEqual(syncWave.id, 1)
         XCTAssertEqual(syncWave.syncState, SyncState.Artists)
-        XCTAssertEqual(syncWave.syncIndexToContinue, 0)
+        XCTAssertEqual(syncWave.syncIndexToContinue, "")
         XCTAssertFalse(syncWave.isInitialWave)
         XCTAssertFalse(syncWave.isDone)
         XCTAssertEqual(syncWave.libraryChangeDates.dateOfLastAdd.compare(nowDate), ComparisonResult.orderedDescending)
@@ -81,11 +81,11 @@ class SyncWaveTest: XCTestCase {
         guard let song = storage.getSong(id: testSongId) else { XCTFail(); return }
         song.syncInfo = testSyncWave
         
-        testSyncWave.syncIndexToContinue = 20
-        XCTAssertEqual(testSyncWave.syncIndexToContinue, 20)
+        testSyncWave.syncIndexToContinue = "20"
+        XCTAssertEqual(testSyncWave.syncIndexToContinue, "20")
         storage.saveContext()
         guard let songFetched = storage.getSong(id: testSongId) else { XCTFail(); return }
-        XCTAssertEqual(songFetched.syncInfo?.syncIndexToContinue, 20)
+        XCTAssertEqual(songFetched.syncInfo?.syncIndexToContinue, "20")
     }
     
     func testLibraryChangeDatesAndSetMetaData() {

@@ -3,7 +3,7 @@ import CoreData
 import os.log
 
 protocol AmpacheUrlCreationable {
-    func getArtUrlString(forArtistId: Int) -> String
+    func getArtUrlString(forArtistId: String) -> String
 }
 
 
@@ -202,14 +202,14 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestPlaylist(parserDelegate: XMLParserDelegate, id: Int) {
+    func requestPlaylist(parserDelegate: XMLParserDelegate, id: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist")
         apiUrlComponent.addQueryItem(name: "filter", value: id)
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: Int) {
+    func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_songs")
         apiUrlComponent.addQueryItem(name: "filter", value: id)
@@ -224,7 +224,7 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestPlaylistDelete(id: Int) {
+    func requestPlaylistDelete(id: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_delete")
         apiUrlComponent.addQueryItem(name: "filter", value: id)
@@ -235,7 +235,7 @@ class AmpacheXmlServerApi {
         }
     }
 
-    func requestPlaylist(addSongId: Int, toPlaylistId: Int) {
+    func requestPlaylist(addSongId: String, toPlaylistId: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_add_song")
         apiUrlComponent.addQueryItem(name: "filter", value: toPlaylistId)
@@ -247,7 +247,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylist(removeSongIndex: Int, fromPlaylistId: Int) {
+    func requestPlaylist(removeSongIndex: Int, fromPlaylistId: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_remove_song")
         apiUrlComponent.addQueryItem(name: "filter", value: fromPlaylistId)
@@ -309,7 +309,7 @@ class AmpacheXmlServerApi {
 }
 
 extension AmpacheXmlServerApi: AmpacheUrlCreationable {
-    func getArtUrlString(forArtistId id: Int) -> String {
+    func getArtUrlString(forArtistId id: String) -> String {
         guard let hostname = credentials?.serverUrl, var url = URL(string: hostname) else { return "" }
         url.appendPathComponent("image.php")
         guard var urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return "" }

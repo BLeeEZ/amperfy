@@ -16,7 +16,7 @@ class PlaylistParserDelegate: GenericXmlParser {
     private func resetPlaylistInCaseOfError() {
         if playlist != nil {
             os_log("Error: Playlist has been removed on server -> local id reset", log: log, type: .error)
-            playlist?.id = 0
+            playlist?.id = ""
             playlist = nil
         }
     }
@@ -26,24 +26,20 @@ class PlaylistParserDelegate: GenericXmlParser {
         
         switch(elementName) {
         case "playlist":
-            guard let attributeId = attributeDict["id"] else {
-                os_log("Error: Playlist could not be parsed -> id invalid", log: log, type: .error)
+            guard let playlistId = attributeDict["id"] else {
+                os_log("Error: Playlist could not be parsed -> id is not given", log: log, type: .error)
                 resetPlaylistInCaseOfError()
                 return
             }
-            guard let playlistId = Int(attributeId) else {
-                if attributeId.contains("smart_") {
-                    os_log("Smart playlists are currently ignored: %s", log: log, type: .debug, attributeId)
-                } else {
-                    os_log("Playlist Ids must be Integers: %s", log: log, type: .debug, attributeId)
-                }
+            guard !playlistId.hasPrefix("smart_") else {
+                os_log("Smart playlists are currently ignored: %s", log: log, type: .debug, playlistId)
                 resetPlaylistInCaseOfError()
                 return
             }
             
             if playlist != nil {
                 playlist?.id = playlistId
-            } else if playlistId != 0 {
+            } else if playlistId != "" {
                 if let fetchedPlaylist = libraryStorage.getPlaylist(id: playlistId)  {
                     playlist = fetchedPlaylist
                 } else {
@@ -51,7 +47,7 @@ class PlaylistParserDelegate: GenericXmlParser {
                     playlist?.id = playlistId
                 }
             } else {
-                os_log("Error: Playlist could not be parsed -> id is 0", log: log, type: .error)
+                os_log("Error: Playlist could not be parsed -> id is not given", log: log, type: .error)
             }
         default:
             break

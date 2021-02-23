@@ -48,7 +48,7 @@ class PlaylistTest: XCTestCase {
     func testCreation() {
         let playlist = storage.createPlaylist()
         XCTAssertEqual(playlist.items.count, 0)
-        XCTAssertEqual(playlist.id, 0)
+        XCTAssertEqual(playlist.id, "")
         XCTAssertEqual(playlist.lastSongIndex, 0)
         XCTAssertFalse(playlist.hasCachedSongs)
         
@@ -56,14 +56,14 @@ class PlaylistTest: XCTestCase {
         playlist.name = name
         XCTAssertEqual(playlist.name, name)
         
-        let id = 12345
+        let id = "12345"
         playlist.id = id
         XCTAssertEqual(playlist.id, id)
     }
     
     func testFetch() {
         let playlist = storage.createPlaylist()
-        let id = 12345
+        let id = "12345"
         let name = "Test 234"
         playlist.name = name
         playlist.id = id

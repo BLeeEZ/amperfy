@@ -8,7 +8,7 @@ extension PlaylistMO {
         return NSFetchRequest<PlaylistMO>(entityName: "Playlist")
     }
 
-    @NSManaged public var id: Int32
+    @NSManaged public var id: String
     @NSManaged public var name: String?
     @NSManaged public var items: NSSet?
     @NSManaged public var playersNormalPlaylist: PlayerMO?

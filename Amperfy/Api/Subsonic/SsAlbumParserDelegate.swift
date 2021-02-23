@@ -18,11 +18,9 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
         buffer = ""
         
         if(elementName == "album") {
-            guard let attributeId = attributeDict["id"],
-                let albumId = Int(attributeId),
+            guard let albumId = attributeDict["id"],
                 let attributeAlbumtName = attributeDict["name"],
-                let attributeArtistId = attributeDict["artistId"],
-                let artistId = Int(attributeArtistId),
+                let artistId = attributeDict["artistId"],
                 let attributeSongCount = attributeDict["songCount"],
                 let songCount = Int(attributeSongCount) else {
                     return

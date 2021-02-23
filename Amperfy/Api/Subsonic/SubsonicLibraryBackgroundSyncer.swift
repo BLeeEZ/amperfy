@@ -42,21 +42,21 @@ class SubsonicLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Backgroun
         }
         if syncWave.syncState == .Albums, isRunning {
             let allArtists = libraryStorage.getArtists()
-            let artistsLeft = allArtists.filter {
-                return $0.id > syncWave.syncIndexToContinue
+            let artistsLeftUnsorted = allArtists.filter {
+                return $0.id.localizedStandardCompare(syncWave.syncIndexToContinue) == ComparisonResult.orderedDescending
             }
-            let artistsSorted = artistsLeft.sorted{
-                return $0.id < $1.id
+            let artistsLeftSorted = artistsLeftUnsorted.sorted {
+                return $0.id.localizedStandardCompare($1.id) == ComparisonResult.orderedAscending
             }
             os_log("Lib resync: Albums parsing start", log: log, type: .info)
-            for artist in artistsSorted {
+            for artist in artistsLeftSorted {
                 let albumDelegate = SsAlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
                 subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artist.id)
-                syncWave.syncIndexToContinue = Int(artist.id)
+                syncWave.syncIndexToContinue = artist.id
                 if(!isRunning) { break }
             }
 
-            if artistsSorted.isEmpty || syncWave.syncIndexToContinue == artistsSorted.last?.id ?? 0 {
+            if artistsLeftSorted.isEmpty || syncWave.syncIndexToContinue == artistsLeftSorted.last?.id ?? "" {
                 os_log("Lib resync: Albums parsing done", log: log, type: .info)
                 syncWave.syncState = .Songs
             }
@@ -64,21 +64,21 @@ class SubsonicLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Backgroun
         }
         if syncWave.syncState == .Songs, isRunning {
             let allAlbums = libraryStorage.getAlbums()
-            let albumsLeft = allAlbums.filter {
-                return $0.id > syncWave.syncIndexToContinue
+            let albumsLeftUnsorted = allAlbums.filter {
+                return $0.id.localizedStandardCompare(syncWave.syncIndexToContinue) == ComparisonResult.orderedDescending
             }
-            let albumsSorted = albumsLeft.sorted{
-                return $0.id < $1.id
+            let albumsLeftSorted = albumsLeftUnsorted.sorted{
+                return $0.id.localizedStandardCompare($1.id) == ComparisonResult.orderedAscending
             }
             os_log("Lib resync: Songs parsing start", log: log, type: .info)
-            for album in albumsSorted {
+            for album in albumsLeftSorted {
                 let songDelegate = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
                 subsonicServerApi.requestAlbum(parserDelegate: songDelegate, id: album.id)
-                syncWave.syncIndexToContinue = Int(album.id)
+                syncWave.syncIndexToContinue = album.id
                 if(!isRunning) { break }
             }
 
-            if albumsSorted.isEmpty || syncWave.syncIndexToContinue == albumsSorted.last?.id ?? 0 {
+            if albumsLeftSorted.isEmpty || syncWave.syncIndexToContinue == albumsLeftSorted.last?.id ?? "" {
                 os_log("Lib resync: Songs parsing done", log: log, type: .info)
                 syncWave.syncState = .Done
             }

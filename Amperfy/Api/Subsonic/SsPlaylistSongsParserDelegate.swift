@@ -19,8 +19,7 @@ class SsPlaylistSongsParserDelegate: GenericXmlParser {
         buffer = ""
 
         if elementName == "playlist" {
-            guard let attributeId = attributeDict["id"],
-                let playlistId = Int(attributeId),
+            guard let playlistId = attributeDict["id"],
                 let attributePlaylistName = attributeDict["name"] else {
                     return
             }
@@ -30,8 +29,7 @@ class SsPlaylistSongsParserDelegate: GenericXmlParser {
         }
         
         if elementName == "entry" {
-            guard let attributeId = attributeDict["id"],
-                let songEntryId = Int(attributeId),
+            guard let songEntryId = attributeDict["id"],
                 let fetchedSong = libraryStorage.getSong(id: songEntryId) else {
                     return
             }
