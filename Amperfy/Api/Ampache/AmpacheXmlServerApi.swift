@@ -102,6 +102,11 @@ class AmpacheXmlServerApi {
         let curDelegate = AuthParserDelegate()
         parser.delegate = curDelegate
         let success = parser.parse()
+        if let error = parser.parserError {
+            authHandshake = nil
+            os_log("Error during AuthPars: %s", log: log, type: .error, error.localizedDescription)
+            return
+        }
         if success && curDelegate.authHandshake != nil {
             authHandshake = curDelegate.authHandshake
         } else {

@@ -52,8 +52,19 @@ class LoginVC: UIViewController {
             credentials.backendApi = authenticatedApi
             appDelegate.storage.saveLoginCredentials(credentials: credentials)
             performSegue(withIdentifier: "toSync", sender: self)
+        } catch let e as AuthenticationError {
+            switch e.kind {
+            case .notAbleToLogin:
+                showErrorMsg(message: "Not able to login, please check credentials!")
+            case .invalidUrl:
+                showErrorMsg(message: "Server url is invalid!")
+            case .requestStatusError:
+                showErrorMsg(message: "Requesting server url finished with status response error code '\(e.message)'!")
+            case .downloadError:
+                showErrorMsg(message: e.message)
+            }
         } catch {
-            showErrorMsg(message: "Not able to login, please check credentials!")
+            showErrorMsg(message: "Not able to login!")
         }
     }
 

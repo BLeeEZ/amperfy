@@ -15,8 +15,16 @@ enum BackenApiType: Int {
     }
 }
 
-enum AuthenticationError: Error {
-    case notAbleToLogin
+struct AuthenticationError: Error {
+    enum ErrorKind {
+        case notAbleToLogin
+        case invalidUrl
+        case requestStatusError
+        case downloadError
+    }
+    
+    var message: String = ""
+    let kind: ErrorKind
 }
 
 class BackendProxy {
@@ -52,6 +60,7 @@ class BackendProxy {
     }()
 
     func login(credentials: LoginCredentials) throws -> BackenApiType {
+        try checkServerReachablity(credentials: credentials)
         ampacheApi.authenticate(credentials: credentials)
         if ampacheApi.isAuthenticated() {
             selectedApi = .ampache
@@ -62,7 +71,41 @@ class BackendProxy {
             selectedApi = .subsonic
             return .subsonic
         }
-        throw AuthenticationError.notAbleToLogin
+        throw AuthenticationError(kind: .notAbleToLogin)
+    }
+    
+    private func checkServerReachablity(credentials: LoginCredentials) throws {
+        guard let serverUrl = URL(string: credentials.serverUrl) else {
+            throw AuthenticationError(kind: .invalidUrl)
+        }
+            
+        let group = DispatchGroup()
+        group.enter()
+        
+        let sessionConfig = URLSessionConfiguration.default
+        let session = URLSession(configuration: sessionConfig)
+        let request = URLRequest(url: serverUrl)
+        var downloadError: AuthenticationError? = nil
+        let task = session.downloadTask(with: request) { (tempLocalUrl, response, error) in
+            if let error = error {
+                downloadError = AuthenticationError(message: error.localizedDescription, kind: .downloadError)
+            } else {
+                if let statusCode = (response as? HTTPURLResponse)?.statusCode {
+                    if statusCode > 400 {
+                        downloadError = AuthenticationError(message: "\(statusCode)", kind: .requestStatusError)
+                    } else {
+                        os_log("Server url is reachable. Status code: %d", log: self.log, type: .info, statusCode)
+                    }
+                }
+            }
+            group.leave()
+        }
+        task.resume()
+        group.wait()
+        
+        if let error = downloadError {
+            throw error
+        }
     }
 
 }
