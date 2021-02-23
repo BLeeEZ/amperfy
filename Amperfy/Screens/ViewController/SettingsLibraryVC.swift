@@ -17,27 +17,57 @@ class SettingsLibraryVC: UITableViewController {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         
-        artistsCountLabel.text = String(appDelegate.library.getArtists().count)
-        albumsCountLabel.text = String(appDelegate.library.getAlbums().count)
-        let songs = appDelegate.library.getSongs()
-        songsCountLabel.text = String(songs.count)
-        playlistsCountLabel.text = String(appDelegate.library.getPlaylists().count)
-        
-        let cachedSongs = songs.filterCached()
-        cachedSongsCountLabel.text = String(cachedSongs.count)
-        var cachedSongSize = 0
-        for song in cachedSongs {
-            cachedSongSize += song.fileData?.sizeInKB ?? 0
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let storage = LibraryStorage(context: context)
+
+            let artists = storage.getArtists()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.artistsCountLabel.text = String(artists.count)
+            }
+            
+            let albums = storage.getAlbums()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.albumsCountLabel.text = String(albums.count)
+            }
+            
+            let songs = storage.getSongs()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.songsCountLabel.text = String(songs.count)
+            }
+            
+            let playlists = storage.getPlaylists()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.playlistsCountLabel.text = String(playlists.count)
+            }
+            
+            let cachedSongs = songs.filterCached()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.cachedSongsCountLabel.text = String(cachedSongs.count)
+            }
+            
+            var cachedSongSize = 0
+            var cachedSongSizeLabelText = ""
+            for song in cachedSongs {
+                cachedSongSize += song.fileData?.sizeInKB ?? 0
+            }
+            let cachedSongSizeFloat = Float(cachedSongSize)
+            let cachedSongSizeInMB = cachedSongSizeFloat / 1000.0
+            let cachedSongSizeInGB = cachedSongSizeInMB / 1000.0
+            if cachedSongSizeInMB < 1000.0 {
+                cachedSongSizeLabelText = NSString(format: "%.2f", cachedSongSizeInMB) as String + " MB"
+            } else {
+                cachedSongSizeLabelText = NSString(format: "%.2f", cachedSongSizeInGB) as String + " GB"
+            }
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.cachedSongsSizeLabel.text = cachedSongSizeLabelText
+            }
         }
-        let cachedSongSizeFloat = Float(cachedSongSize)
-        let cachedSongSizeInMB = cachedSongSizeFloat / 1000.0
-        let cachedSongSizeInGB = cachedSongSizeInMB / 1000.0
-        if cachedSongSizeInMB < 1000.0 {
-            cachedSongsSizeLabel.text = NSString(format: "%.2f", cachedSongSizeInMB) as String + " MB"
-        } else {
-            cachedSongsSizeLabel.text = NSString(format: "%.2f", cachedSongSizeInGB) as String + " GB"
-        }
-        
     }
     
     @IBAction func deleteSongCachePressed(_ sender: Any) {
