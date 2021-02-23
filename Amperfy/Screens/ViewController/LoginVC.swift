@@ -30,7 +30,11 @@ class LoginVC: UIViewController {
     
     func login() {
         guard let serverUrl = serverUrlTF.text, !serverUrl.isEmpty else {
-            showErrorMsg(message: "No server address given!")
+            showErrorMsg(message: "No server url given!")
+            return
+        }
+        guard serverUrl.hasPrefix("https://") || serverUrl.hasPrefix("http://") else {
+            showErrorMsg(message: "Please provide either 'https://' or 'http://' in your server url.")
             return
         }
         guard let username = usernameTF.text, !username.isEmpty else {
