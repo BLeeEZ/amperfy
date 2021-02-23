@@ -42,13 +42,13 @@ class SsSongParserDelegate: GenericXmlLibParser {
             if let artist = libraryStorage.getArtist(id: artistId) {
                 songBuffer?.artist = artist
             } else {
-                os_log("Found song id %d with unknown artist %d", log: log, type: .error, songId, artistId)
+                os_log("Found song id %s with unknown artist id %s", log: log, type: .error, songId, artistId)
             }
 
             if let album = libraryStorage.getAlbum(id: albumId) {
                 songBuffer?.album = album
             } else {
-                os_log("Found song id %d with unknown album %d", log: log, type: .error, songId, albumId)
+                os_log("Found song id %s with unknown album id %s", log: log, type: .error, songId, albumId)
             }
         }
     }

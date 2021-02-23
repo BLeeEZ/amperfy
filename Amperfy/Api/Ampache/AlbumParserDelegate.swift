@@ -26,13 +26,13 @@ class AlbumParserDelegate: GenericXmlLibParser {
 		case "artist":
             if let album = albumBuffer {
                 guard let artistId = attributeDict["id"] else {
-                    os_log("Found album id %d with no artist id. Album name: %s", log: log, type: .error, album.id, album.name)
+                    os_log("Found album id %s with no artist id. Album name: %s", log: log, type: .error, album.id, album.name)
                     return
                 }
                 if let artist = libraryStorage.getArtist(id: artistId) {
                     album.artist = artist
                 } else {
-                    os_log("Found album id %d with unknown artist %d. Album name: %s", log: log, type: .error, album.id, artistId, album.name)
+                    os_log("Found album id %s with unknown artist %s. Album name: %s", log: log, type: .error, album.id, artistId, album.name)
                 }
             }
 		default:

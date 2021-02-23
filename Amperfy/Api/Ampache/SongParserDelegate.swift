@@ -26,25 +26,25 @@ class SongParserDelegate: GenericXmlLibParser {
         case "artist":
             if let song = songBuffer {
                 guard let artistId = attributeDict["id"] else {
-                    os_log("Found song id %d with no artist id. Title: %s", log: log, type: .error, song.id, song.title)
+                    os_log("Found song id %s with no artist id. Title: %s", log: log, type: .error, song.id, song.title)
                     return
                 }
                 if let artist = libraryStorage.getArtist(id: artistId) {
                     song.artist = artist
                 } else {
-                    os_log("Found song id %d with unknown artist %d. Title: %s", log: log, type: .error, song.id, artistId, song.title)
+                    os_log("Found song id %s with unknown artist id %s. Title: %s", log: log, type: .error, song.id, artistId, song.title)
                 }
             }
         case "album":
             if let song = songBuffer {
                 guard let albumId = attributeDict["id"] else {
-                    os_log("Found song id %d with no album id. Title: %s", log: log, type: .error, songBuffer!.id, song.title)
+                    os_log("Found song id %s with no album id. Title: %s", log: log, type: .error, song.id, song.title)
                     return
                 }
                 if let album = libraryStorage.getAlbum(id: albumId)  {
                     song.album = album
                 } else {
-                    os_log("Found song id %d with unknown album %d. Title: %s", log: log, type: .error, songBuffer!.id, albumId, song.title)
+                    os_log("Found song id %s with unknown album id %s. Title: %s", log: log, type: .error, song.id, albumId, song.title)
                 }
             }
         default:

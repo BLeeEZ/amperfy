@@ -44,7 +44,7 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
             if let artist = libraryStorage.getArtist(id: artistId) {
                 albumBuffer?.artist = artist
             } else {
-                os_log("Found album id %d with unknown artist %d", log: log, type: .error, albumId, artistId)
+                os_log("Found album id %s with unknown artist id %s", log: log, type: .error, albumId, artistId)
             }
             
             songCountOfAlbum += songCount

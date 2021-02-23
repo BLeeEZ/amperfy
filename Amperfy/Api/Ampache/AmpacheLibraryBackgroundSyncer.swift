@@ -50,7 +50,7 @@ class AmpacheLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Background
             } while(!allParsed && isRunning)
 
             if allParsed {
-                os_log("Lib resync: %d Artists parsed", log: log, type: .info, syncWave.syncIndexToContinue)
+                os_log("Lib resync: %s Artists parsed", log: log, type: .info, syncWave.syncIndexToContinue)
                 syncWave.syncState = .Albums
             }
             libraryStorage.saveContext()
@@ -67,7 +67,7 @@ class AmpacheLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Background
             } while(!allParsed && isRunning)
 
             if allParsed {
-                os_log("Lib resync: %d Albums parsed", log: log, type: .info, syncWave.syncIndexToContinue)
+                os_log("Lib resync: %s Albums parsed", log: log, type: .info, syncWave.syncIndexToContinue)
                 syncWave.syncState = .Songs
             }
             libraryStorage.saveContext()
@@ -84,7 +84,7 @@ class AmpacheLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Background
             } while(!allParsed && isRunning)
 
             if allParsed {
-                os_log("Lib resync: %d Songs parsed", log: log, type: .info, syncWave.syncIndexToContinue)
+                os_log("Lib resync: %s Songs parsed", log: log, type: .info, syncWave.syncIndexToContinue)
                 syncWave.syncState = .Done
             }
             libraryStorage.saveContext()
