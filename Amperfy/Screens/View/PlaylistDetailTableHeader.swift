@@ -86,7 +86,7 @@ class PlaylistDetailTableHeader: UIView {
         let alert = UIAlertController(title: playlist.name, message: nil, preferredStyle: .actionSheet)
         
         if playlist.id != "" {
-            alert.addAction(UIAlertAction(title: "Download from server", style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: "Update from server", style: .default, handler: { _ in
                 storage.persistentContainer.performBackgroundTask() { (context) in
                     let backgroundStorage = LibraryStorage(context: context)
                     let syncer = self.appDelegate.backendApi.createLibrarySyncer()
@@ -103,7 +103,7 @@ class PlaylistDetailTableHeader: UIView {
                 syncer.syncUpload(playlist: playlistAsync, libraryStorage: backgroundStorage, statusNotifyier: statusNotifyier)
             }
         }))
-        alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "Download all songs", style: .default, handler: { _ in
             for song in playlist.songs {
                 if !song.isCached {
                     self.appDelegate.downloadManager.download(song: song)
