@@ -22,6 +22,12 @@ class SettingsVC: UITableViewController {
         }
     }
     
+    @IBAction func issueReportPressed(_ sender: Any) {
+        if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {
+            UIApplication.shared.open(url)
+        }
+    }
+    
     @IBAction func resetAppPressed(_ sender: Any) {
         let alert = UIAlertController(title: "Reset app data", message: "Are you sure to reset app data?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in
