@@ -3,10 +3,11 @@ import UIKit
 class PlaylistsVC: UITableViewController {
 
     var appDelegate: AppDelegate!
-    var playlistsUnfiltered: [Playlist]!
-    var playlistsFiltered: [Playlist]!
+    var playlistsUnfiltered = [Playlist]()
+    var playlistsFiltered = [Playlist]()
     
     private let searchController = UISearchController(searchResultsController: nil)
+    private let loadingSpinner = SpinnerViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,11 +17,16 @@ class PlaylistsVC: UITableViewController {
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         self.refreshControl?.addTarget(self, action: #selector(PlaylistsVC.handleRefresh), for: UIControl.Event.valueChanged)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        playlistsUnfiltered = appDelegate.library.getPlaylists().sortAlphabeticallyAscending()
-        updateSearchResults(for: searchController)
+
+        loadingSpinner.display(on: self)
+        self.appDelegate.library.getPlaylistsAsync() { albums in
+            let sortedPlaylists = albums.sortAlphabeticallyAscending()
+            DispatchQueue.main.async {
+                self.playlistsUnfiltered = sortedPlaylists
+                self.updateSearchResults(for: self.searchController)
+                self.loadingSpinner.hide()
+            }
+        }
     }
     
     private func configureSearchController() {

@@ -3,11 +3,12 @@ import UIKit
 class AlbumsVC: UITableViewController {
 
     var appDelegate: AppDelegate!
-    var albumsUnfiltered: [Album]!
-    var albumsFiltered: [Album]!
+    var albumsUnfiltered = [Album]()
+    var albumsFiltered = [Album]()
     var sections = [AlphabeticSection<Album>]()
     
     private let searchController = UISearchController(searchResultsController: nil)
+    private let loadingSpinner = SpinnerViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,11 +17,16 @@ class AlbumsVC: UITableViewController {
         configureSearchController()
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.rowHeight = AlbumTableCell.rowHeight
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        albumsUnfiltered = appDelegate.library.getAlbums().sortAlphabeticallyAscending()
-        updateSearchResults(for: searchController)
+
+        loadingSpinner.display(on: self)
+        self.appDelegate.library.getAlbumsAsync() { albums in
+            let sortedAlbums = albums.sortAlphabeticallyAscending()
+            DispatchQueue.main.async {
+                self.albumsUnfiltered = sortedAlbums
+                self.updateSearchResults(for: self.searchController)
+                self.loadingSpinner.hide()
+            }
+        }
     }
     
     private func configureSearchController() {

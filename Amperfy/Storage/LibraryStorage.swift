@@ -119,10 +119,26 @@ class LibraryStorage {
             for artistMO in foundArtists {
                 artists.append(Artist(managedObject: artistMO))
             }
-        }
-        catch {}
+        } catch {}
         
         return artists
+    }
+    
+    func getArtistsAsync(completion: @escaping (_ artists: Array<Artist>) -> Void) {
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (asynchronousFetchResult) -> Void in
+            var artists = Array<Artist>()
+            guard let foundArtists = asynchronousFetchResult.finalResult else {
+                return
+            }
+            for artistMO in foundArtists {
+                artists.append(Artist(managedObject: artistMO))
+            }
+            completion(artists)
+        }
+        do {
+            try context.execute(asynchronousFetchRequest)
+        } catch {}
     }
     
     func getAlbums() -> Array<Album> {
@@ -134,10 +150,26 @@ class LibraryStorage {
             for albumMO in foundAlbums {
                 albums.append(Album(managedObject: albumMO))
             }
-        }
-        catch {}
+        } catch {}
         
         return albums
+    }
+
+    func getAlbumsAsync(completion: @escaping (_ albums: Array<Album>) -> Void) {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (asynchronousFetchResult) -> Void in
+            var albums = Array<Album>()
+            guard let foundAlbums = asynchronousFetchResult.finalResult else {
+                return
+            }
+            for albumMO in foundAlbums {
+                albums.append(Album(managedObject: albumMO))
+            }
+            completion(albums)
+        }
+        do {
+            try context.execute(asynchronousFetchRequest)
+        } catch {}
     }
     
     func getSongs() -> Array<Song> {
@@ -149,28 +181,61 @@ class LibraryStorage {
             for songMO in foundSongs {
                 songs.append(Song(managedObject: songMO))
             }
-        }
-        catch {}
+        } catch {}
         
         return songs
     }
+
+    func getSongsAsync(completion: @escaping (_ songs: Array<Song>) -> Void) {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (asynchronousFetchResult) -> Void in
+            var songs = Array<Song>()
+            guard let foundSongs = asynchronousFetchResult.finalResult else {
+                return
+            }
+            for songMO in foundSongs {
+                songs.append(Song(managedObject: songMO))
+            }
+            completion(songs)
+        }
+        do {
+            try context.execute(asynchronousFetchRequest)
+        } catch {}
+    }
     
     func getPlaylists() -> Array<Playlist> {
-        var foundPlaylists = Array<Playlist>()
-        let fr: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "playersNormalPlaylist == nil && playersShuffledPlaylist == nil")
+        var playlists = Array<Playlist>()
+        var foundPlaylists = Array<PlaylistMO>()
+        let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "playersNormalPlaylist == nil && playersShuffledPlaylist == nil")
         do {
-            let result = try context.fetch(fr) as NSArray?
-            if let playlists = result as? Array<PlaylistMO> {
-                for playlist in playlists {
-                    let wrappedPlaylist = Playlist(storage: self, managedObject: playlist)
-                    foundPlaylists.append(wrappedPlaylist)
-                }
+            foundPlaylists = try context.fetch(fetchRequest)
+            for playlist in foundPlaylists {
+                let wrappedPlaylist = Playlist(storage: self, managedObject: playlist)
+                playlists.append(wrappedPlaylist)
             }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
+        } catch {}
+        
+        return playlists
+    }
+
+    func getPlaylistsAsync(completion: @escaping (_ playlists: Array<Playlist>) -> Void) {
+        let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "playersNormalPlaylist == nil && playersShuffledPlaylist == nil")
+        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (asynchronousFetchResult) -> Void in
+            var playlists = Array<Playlist>()
+            guard let foundPlaylists = asynchronousFetchResult.finalResult else {
+                return
+            }
+            for playlist in foundPlaylists {
+                let wrappedPlaylist = Playlist(storage: self, managedObject: playlist)
+                playlists.append(wrappedPlaylist)
+            }
+            completion(playlists)
         }
-        return foundPlaylists
+        do {
+            try context.execute(asynchronousFetchRequest)
+        } catch {}
     }
     
     func getPlayerData() -> PlayerData {

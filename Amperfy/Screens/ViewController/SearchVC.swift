@@ -3,20 +3,25 @@ import UIKit
 class SearchVC: UITableViewController {
 
     var appDelegate: AppDelegate!
-    var playlistsAll: [Playlist]!
-    var playlistsUnfiltered: [Playlist]!
-    var playlistsFiltered: [Playlist]!
-    var artistsAll: [Artist]!
-    var artistsUnfiltered: [Artist]!
-    var artistsFiltered: [Artist]!
-    var albumsAll: [Album]!
-    var albumsUnfiltered: [Album]!
-    var albumsFiltered: [Album]!
-    var songsAll: [Song]!
-    var songsUnfiltered: [Song]!
-    var songsFiltered: [Song]!
+    var playlistsAll = [Playlist]()
+    var playlistsUnfiltered = [Playlist]()
+    var playlistsFiltered = [Playlist]()
+    var isPlaylistsFetchDone = false
+    var artistsAll = [Artist]()
+    var artistsUnfiltered = [Artist]()
+    var artistsFiltered = [Artist]()
+    var isArtistsFetchDone = false
+    var albumsAll = [Album]()
+    var albumsUnfiltered = [Album]()
+    var albumsFiltered = [Album]()
+    var isAlbumsFetchDone = false
+    var songsAll = [Song]()
+    var songsUnfiltered = [Song]()
+    var songsFiltered = [Song]()
+    var isSongsFetchDone = false
 
     private let searchController = UISearchController(searchResultsController: nil)
+    private let loadingSpinner = SpinnerViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,15 +32,48 @@ class SearchVC: UITableViewController {
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
+
+        loadingSpinner.display(on: self)
+        self.appDelegate.library.getPlaylistsAsync() { albums in
+            let sortedPlaylists = albums.sortAlphabeticallyAscending()
+            DispatchQueue.main.async {
+                self.playlistsAll = sortedPlaylists
+                self.isPlaylistsFetchDone = true
+                self.reloadViewIfAllFetchesAreDone()
+            }
+        }
+        self.appDelegate.library.getArtistsAsync() { artists in
+            let sortedArtists = artists.sortAlphabeticallyAscending()
+            DispatchQueue.main.async {
+                self.artistsAll = sortedArtists
+                self.isArtistsFetchDone = true
+                self.reloadViewIfAllFetchesAreDone()
+            }
+        }
+        self.appDelegate.library.getAlbumsAsync() { albums in
+            let sortedAlbums = albums.sortAlphabeticallyAscending()
+            DispatchQueue.main.async {
+                self.albumsAll = sortedAlbums
+                self.isAlbumsFetchDone = true
+                self.reloadViewIfAllFetchesAreDone()
+            }
+        }
+        self.appDelegate.library.getSongsAsync() { songs in
+            let sortedSongs = songs.sortAlphabeticallyAscending()
+            DispatchQueue.main.async {
+                self.songsAll = sortedSongs
+                self.isSongsFetchDone = true
+                self.reloadViewIfAllFetchesAreDone()
+            }
+        }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        playlistsAll = appDelegate.library.getPlaylists().sortAlphabeticallyAscending()
-        artistsAll = appDelegate.library.getArtists().sortAlphabeticallyAscending()
-        albumsAll = appDelegate.library.getAlbums().sortAlphabeticallyAscending()
-        songsAll = appDelegate.library.getSongs().sortAlphabeticallyAscending()
-        updateDataBasedOnScope()
-        updateSearchResults(for: searchController)
+    private func reloadViewIfAllFetchesAreDone() {
+        if isPlaylistsFetchDone, isArtistsFetchDone, isAlbumsFetchDone, isSongsFetchDone {
+            updateDataBasedOnScope()
+            updateSearchResults(for: self.searchController)
+            self.loadingSpinner.hide()
+        }
     }
 
     private func configureSearchController() {
@@ -67,7 +105,7 @@ class SearchVC: UITableViewController {
          */
         self.definesPresentationContext = true
     }
-
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -200,6 +238,7 @@ class SearchVC: UITableViewController {
 extension SearchVC: UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {
+        updateDataBasedOnScope()
         if let searchText = searchController.searchBar.text, !searchText.isEmpty {
             playlistsFiltered = playlistsUnfiltered.filterBy(searchText: searchText)
             artistsFiltered = artistsUnfiltered.filterBy(searchText: searchText)
@@ -223,7 +262,6 @@ extension SearchVC: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
-        updateDataBasedOnScope()
         updateSearchResults(for: searchController)
     }
     

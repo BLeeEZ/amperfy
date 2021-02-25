@@ -3,12 +3,13 @@ import UIKit
 class SongVC: UITableViewController {
     
     var appDelegate: AppDelegate!
-    var songsAll: [Song]!
-    var songsUnfiltered: [Song]!
-    var songsFiltered: [Song]!
+    var songsAll = [Song]()
+    var songsUnfiltered = [Song]()
+    var songsFiltered = [Song]()
     var sections = [AlphabeticSection<Song>]()
 
     private let searchController = UISearchController(searchResultsController: nil)
+    private let loadingSpinner = SpinnerViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,14 +18,18 @@ class SongVC: UITableViewController {
         configureSearchController()
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
+        
+        loadingSpinner.display(on: self)
+        self.appDelegate.library.getSongsAsync() { songs in
+            let sortedSongs = songs.sortAlphabeticallyAscending()
+            DispatchQueue.main.async {
+                self.songsAll = sortedSongs
+                self.updateSearchResults(for: self.searchController)
+                self.loadingSpinner.hide()
+            }
+        }
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        songsAll = appDelegate.library.getSongs().sortAlphabeticallyAscending()
-        updateDataBasedOnScope()
-        updateSearchResults(for: searchController)
-    }
-    
+
     private func configureSearchController() {
         searchController.searchResultsUpdater = self
         searchController.searchBar.autocapitalizationType = .none
@@ -90,6 +95,7 @@ class SongVC: UITableViewController {
 extension SongVC: UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {
+        updateDataBasedOnScope()
         if let searchText = searchController.searchBar.text, !searchText.isEmpty {
             songsFiltered = songsUnfiltered.filterBy(searchText: searchText)
         } else {
@@ -108,7 +114,6 @@ extension SongVC: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
-        updateDataBasedOnScope()
         updateSearchResults(for: searchController)
     }
     
