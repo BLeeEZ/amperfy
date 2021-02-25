@@ -21,6 +21,11 @@ extension String {
         let dateFormatter = ISO8601DateFormatter()
         return dateFormatter.date(from: self)
     }
+    
+    static func generateRandomString(ofLength length: Int) -> String {
+        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<length).map{ _ in letters.randomElement()! })
+    }
 }
 
 extension UIColor {
