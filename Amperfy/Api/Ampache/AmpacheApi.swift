@@ -7,6 +7,14 @@ class AmpacheApi: BackendApi {
     init(ampacheXmlServerApi: AmpacheXmlServerApi) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
     }
+    
+    public var clientApiVersion: String {
+        return ampacheXmlServerApi.clientApiVersion
+    }
+    
+    public var serverApiVersion: String {
+        return ampacheXmlServerApi.serverApiVersion ?? "-"
+    }
 
     func provideCredentials(credentials: LoginCredentials) {
         ampacheXmlServerApi.provideCredentials(credentials: credentials)

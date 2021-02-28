@@ -9,10 +9,14 @@ protocol AmpacheUrlCreationable {
 
 class AmpacheXmlServerApi {
     
+    static let maxItemCountToPollAtOnce: Int = 500
+    
+    var serverApiVersion: String?
+    let clientApiVersion = "350001"
+    
     private let log = OSLog(subsystem: AppDelegate.name, category: "Ampache")
     private var credentials: LoginCredentials?
     private var authHandshake: AuthentificationHandshake?
-    static let maxItemCountToPollAtOnce: Int = 500
     
     var artistCount: Int {
         reauthenticateIfNeccessary()
@@ -90,7 +94,7 @@ class AmpacheXmlServerApi {
         urlComp.addQueryItem(name: "action", value: "handshake")
         urlComp.addQueryItem(name: "auth", value: passphrase)
         urlComp.addQueryItem(name: "timestamp", value: timestamp)
-        urlComp.addQueryItem(name: "version", value: "350001")
+        urlComp.addQueryItem(name: "version", value: clientApiVersion)
         urlComp.addQueryItem(name: "user", value: credentials.username)
         guard let url = urlComp.url else {
             os_log("Ampache authentication url is invalid: %s", log: log, type: .error, urlComp.description)
@@ -102,6 +106,11 @@ class AmpacheXmlServerApi {
         let curDelegate = AuthParserDelegate()
         parser.delegate = curDelegate
         let success = parser.parse()
+        if let serverApiVersion = curDelegate.serverApiVersion {
+            self.serverApiVersion = serverApiVersion
+            os_log("The server API version is '%s'", log: log, type: .info, serverApiVersion)
+            os_log("The client API version is '%s'", log: log, type: .info, clientApiVersion)
+        }
         if let error = parser.parserError {
             authHandshake = nil
             os_log("Error during AuthPars: %s", log: log, type: .error, error.localizedDescription)

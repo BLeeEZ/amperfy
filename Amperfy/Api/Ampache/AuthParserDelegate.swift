@@ -5,6 +5,7 @@ import CoreData
 class AuthParserDelegate: GenericXmlParser {
     
     var authHandshake: AuthentificationHandshake?
+    var serverApiVersion: String?
     private var authBuffer = AuthentificationHandshake()
     private let safetyOffsetTimeBeforeSessionExpireInMinutes:TimeInterval = -5.0 * 60.0
     
@@ -16,6 +17,8 @@ class AuthParserDelegate: GenericXmlParser {
         switch(elementName) {
         case "auth":
             authBuffer.token = buffer
+        case "api":
+            serverApiVersion = buffer
         case "session_expire":
             authBuffer.sessionExpire = buffer.asIso8601Date ?? Date()
             authBuffer.reauthenicateTime = Date(timeInterval: safetyOffsetTimeBeforeSessionExpireInMinutes, since: authBuffer.sessionExpire)

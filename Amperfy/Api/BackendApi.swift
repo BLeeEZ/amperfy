@@ -37,6 +37,8 @@ protocol BackgroundLibrarySyncer {
 }
 
 protocol BackendApi {
+    var clientApiVersion: String { get }
+    var serverApiVersion: String { get }
     func provideCredentials(credentials: LoginCredentials)
     func authenticate(credentials: LoginCredentials) 
     func isAuthenticated() -> Bool

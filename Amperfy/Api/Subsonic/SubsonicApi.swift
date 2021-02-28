@@ -8,6 +8,14 @@ class SubsonicApi: BackendApi {
     init(subsonicServerApi: SubsonicServerApi) {
         self.subsonicServerApi = subsonicServerApi
     }
+    
+    public var clientApiVersion: String {
+        return subsonicServerApi.clientApiVersion.description
+    }
+    
+    public var serverApiVersion: String {
+        return subsonicServerApi.serverApiVersion?.description ?? "-"
+    }
 
     func provideCredentials(credentials: LoginCredentials) {
         subsonicServerApi.provideCredentials(credentials: credentials)

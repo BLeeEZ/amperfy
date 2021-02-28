@@ -111,6 +111,14 @@ class BackendProxy {
 }
     
 extension BackendProxy: BackendApi {
+  
+    public var clientApiVersion: String {
+        return activeApi.clientApiVersion
+    }
+    
+    public var serverApiVersion: String {
+        return activeApi.serverApiVersion
+    }
     
     func provideCredentials(credentials: LoginCredentials) {
         activeApi.provideCredentials(credentials: credentials)

@@ -10,11 +10,12 @@ class SubsonicServerApi {
     static let defaultClientApiVersionWithToken = SubsonicVersion(major: 1, minor: 13, patch: 0)
     static let defaultClientApiVersionPreToken = SubsonicVersion(major: 1, minor: 11, patch: 0)
     
+    var serverApiVersion: SubsonicVersion?
+    var clientApiVersion = defaultClientApiVersionWithToken
+    
     private let log = OSLog(subsystem: AppDelegate.name, category: "Subsonic")
     private var credentials: LoginCredentials?
     private var isValidCredentials = false
-    private var clientApiVersion = defaultClientApiVersionWithToken
-    private var serverApiVersion: SubsonicVersion?
 
     private func generateAuthenticationToken(password: String, salt: String) -> String {
         // Calculate the authentication token as follows: token = md5(password + salt).
