@@ -2,8 +2,8 @@ import Foundation
 import UIKit
 
 enum SongOperationDisplayModes {
-    case fullSet
-    case onlySeperatePlaylists
+    case libraryCell
+    case playerCell
 }
 
 class CommonScreenOperations {

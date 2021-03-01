@@ -21,10 +21,11 @@ class SongTableCell: UITableViewCell {
     @IBOutlet weak var artistLabel: UILabel!
     @IBOutlet weak var artworkImage: UIImageView!
     @IBOutlet weak var downloadProgress: UIProgressView!
+    @IBOutlet weak var reorderLabel: UILabel?
     
     static let rowHeight: CGFloat = 56.0
     var behaviourOnTab: SongActionOnTab = .playAndErasePlaylist
-    var forceTouchDisplayMode: SongOperationDisplayModes = .fullSet
+    var displayMode: SongOperationDisplayModes = .libraryCell
     var isUserTouchInteractionAllowed = true
     private var appDelegate: AppDelegate!
     private var song: Song?
@@ -45,9 +46,10 @@ class SongTableCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
-    func display(song: Song, rootView: UIViewController, download: Download? = nil) {
+    func display(song: Song, rootView: UIViewController, displayMode: SongOperationDisplayModes = .libraryCell, download: Download? = nil) {
         self.song = song
         self.rootView = rootView
+        self.displayMode = displayMode
         self.download = download
         refresh()
     }
@@ -57,6 +59,13 @@ class SongTableCell: UITableViewCell {
         titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         artistLabel.text = song.artist?.name
         artworkImage.image = song.image
+        if let reorderLabel = self.reorderLabel {
+            if displayMode == .playerCell {
+                reorderLabel.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Bars.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
+            } else {
+                reorderLabel.removeFromSuperview()
+            }
+        }
         if song.isCached {
             artistLabel.textColor = UIColor.defaultBlue
         }
@@ -71,11 +80,10 @@ class SongTableCell: UITableViewCell {
     func confToPlayPlaylistIndexOnTab(indexInPlaylist: Int) {
         self.index = indexInPlaylist
         behaviourOnTab = .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong
-        forceTouchDisplayMode = .onlySeperatePlaylists
     }
     
     func displayAsPlaying() {
-        let attributedText = NSMutableAttributedString(string: FontAwesomeIcon.VolumeUp.asString + " ", attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.VolumeUp.fontName, size: 17)!])
+        let attributedText = NSMutableAttributedString(string: FontAwesomeIcon.VolumeUp.asString + " ", attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
         attributedText.append(NSMutableAttributedString(string: titleLabel.text ?? "", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]))
         titleLabel.attributedText = attributedText
     }
@@ -113,7 +121,7 @@ class SongTableCell: UITableViewCell {
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.impactOccurred()
             isAlertPresented = true
-            let alert = createAlert(forSong: song, rootView: rootView, displayMode: forceTouchDisplayMode)
+            let alert = createAlert(forSong: song, rootView: rootView, displayMode: displayMode)
             alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
             rootView.present(alert, animated: true, completion: nil)
         }
@@ -129,7 +137,7 @@ class SongTableCell: UITableViewCell {
             alert.view.addSubview(headerView)
         }
     
-        if displayMode != .onlySeperatePlaylists {
+        if displayMode != .playerCell {
             alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
                 self.appDelegate.player.play(song: song)
                 }))

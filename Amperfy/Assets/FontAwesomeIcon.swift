@@ -8,12 +8,13 @@ enum FontAwesomeIcon: Int {
     case Cloud = 0xf0c2
     case Redo = 0xf01e
     case Check = 0xf00c
+    case Bars = 0xf0c9
     
     var asString: String {
         return String(format: "%C", self.rawValue)
     }
     
-    var fontName: String {
+    static var fontName: String {
         return "FontAwesome5FreeSolid"
     }
 }

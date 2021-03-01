@@ -1,6 +1,6 @@
 import UIKit
 
-class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITableViewDragDelegate, UITableViewDropDelegate {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var playerPlaceholderView: UIView!
@@ -14,6 +14,9 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         super.viewDidLoad()
         self.tableView.delegate = self
         self.tableView.dataSource = self
+        self.tableView.dragDelegate = self
+        self.tableView.dropDelegate = self
+        self.tableView.dragInteractionEnabled = true
         if let createdPlayerView = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: playerPlaceholderView.bounds.size.width, height: playerPlaceholderView.bounds.size.height)) {
             assert(playerPlaceholderView.bounds.size.height >= PlayerView.frameHeight, "Placeholder must provide enough height for player")
             playerView = createdPlayerView
@@ -27,7 +30,6 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate.downloadManager.addNotifier(self)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
-        tableView.isEditing = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -50,7 +52,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         let song = player.playlist.songs[indexPath.row]
         
-        cell.display(song: song, rootView: self)
+        cell.display(song: song, rootView: self, displayMode: .playerCell)
         cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: indexPath.row)
         if let currentlyPlaingIndex = player.currentlyPlaying?.index, indexPath.row == currentlyPlaingIndex {
             cell.displayAsPlaying()
@@ -74,8 +76,26 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
     // Override to support conditional rearranging of the table view.
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-    // Return false if you do not want the item to be re-orderable.
-    return true
+        // Return false if you do not want the item to be re-orderable.
+        return true
+    }
+    
+    // MARK: - UITableViewDragDelegate
+    func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        // Create empty DragItem -> we are using tableView(_:moveRowAt:to:) method
+        let itemProvider = NSItemProvider(object: String("") as NSItemProviderWriting)
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+        return [dragItem]
+    }
+
+    // MARK: - UITableViewDropDelegate
+    func tableView(_ tableView: UITableView, canHandle session: UIDropSession) -> Bool {
+        return session.canLoadObjects(ofClass: NSString.self)
+    }
+
+    func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
+        // Local drags with one item go through the existing tableView(_:moveRowAt:to:) method on the data source
+        return
     }
     
     func optionsPressed() {
