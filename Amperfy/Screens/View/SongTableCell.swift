@@ -31,6 +31,9 @@ class SongTableCell: UITableViewCell {
     private var song: Song?
     private var download: Download?
     private var index: Int?
+    public var indexInPlaylist: Int? {
+        return index
+    }
     private var rootView: UIViewController?
     private var isAlertPresented = false
 
@@ -80,12 +83,6 @@ class SongTableCell: UITableViewCell {
     func confToPlayPlaylistIndexOnTab(indexInPlaylist: Int) {
         self.index = indexInPlaylist
         behaviourOnTab = .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong
-    }
-    
-    func displayAsPlaying() {
-        let attributedText = NSMutableAttributedString(string: FontAwesomeIcon.VolumeUp.asString + " ", attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
-        attributedText.append(NSMutableAttributedString(string: titleLabel.text ?? "", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]))
-        titleLabel.attributedText = attributedText
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

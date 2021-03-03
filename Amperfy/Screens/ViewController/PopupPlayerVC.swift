@@ -1,5 +1,47 @@
 import UIKit
 
+class PopupPlaylistGrouper {
+    
+    let sectionNames = ["Previous", "Next"]
+    var sections: [[Song]]
+    private var playIndex: Int
+    
+    init(player: MusicPlayer) {
+        playIndex = player.currentlyPlaying?.index ?? 0
+        
+        let playlist = player.playlist
+        var played = [Song]()
+        if playIndex > 0 {
+            played = Array(playlist.songs[0...playIndex-1])
+        }
+        var next = [Song]()
+        if playlist.songs.count > 0, playIndex < playlist.songs.count-1 {
+            next = Array(playlist.songs[(playIndex+1)...])
+        }
+        sections = [played, next]
+    }
+    
+    func convertIndexPathToPlaylistIndex(indexPath: IndexPath) -> Int {
+        var playlistIndex = indexPath.row
+        if indexPath.section == 1 {
+            playlistIndex += (1 + sections[0].count)
+        }
+        return playlistIndex
+    }
+    
+    func convertPlaylistIndexToIndexPath(playlistIndex: Int) -> IndexPath? {
+        if playlistIndex == playIndex {
+            return nil
+        }
+        if playlistIndex < playIndex {
+            return IndexPath(row: playlistIndex, section: 0)
+        } else {
+            return IndexPath(row: playlistIndex-playIndex-1, section: 1)
+        }
+    }
+    
+}
+
 class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITableViewDragDelegate, UITableViewDropDelegate {
 
     @IBOutlet weak var tableView: UITableView!
@@ -8,6 +50,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var appDelegate: AppDelegate!
     var player: MusicPlayer!
     var playerView: PlayerView!
+    var groupedPlaylist: PopupPlaylistGrouper!
     var hostingTabBarVC: TabBarVC?
     
     override func viewDidLoad() {
@@ -28,50 +71,103 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         player = appDelegate.player
         player.addNotifier(notifier: self)
         appDelegate.downloadManager.addNotifier(self)
+        groupedPlaylist = PopupPlaylistGrouper(player: player)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.tableView.reloadData()
+        reloadData()
         self.playerView.viewWillAppear(animated)
+    }
+    
+    func reloadData() {
+        groupedPlaylist = PopupPlaylistGrouper(player: player)
+        tableView.reloadData()
     }
 
     // MARK: - Table view data source
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return groupedPlaylist.sectionNames[section]
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return CommonScreenOperations.tableSectionHeightLarge
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return player.playlist.songs.count
+        return groupedPlaylist.sections[section].count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SongTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
-        
-        let song = player.playlist.songs[indexPath.row]
-        
+        let song = groupedPlaylist.sections[indexPath.section][indexPath.row]
         cell.display(song: song, rootView: self, displayMode: .playerCell)
-        cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: indexPath.row)
-        if let currentlyPlaingIndex = player.currentlyPlaying?.index, indexPath.row == currentlyPlaingIndex {
-            cell.displayAsPlaying()
-        }
-        
+        let playlistIndex = groupedPlaylist.convertIndexPathToPlaylistIndex(indexPath: indexPath)
+        cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: playlistIndex)
         return cell
     }
     
     // Override to support editing the table view.
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            player.removeFromPlaylist(at: indexPath.row)
+            let deletedPlaylistIndex = groupedPlaylist.convertIndexPathToPlaylistIndex(indexPath: indexPath)
+            for i in deletedPlaylistIndex+1...player.playlist.songs.count {
+                if let targetIndexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: i),
+                   let cell =  tableView.cellForRow(at: targetIndexPath) as? SongTableCell,
+                   var newIndex = cell.indexInPlaylist {
+                    newIndex -= 1
+                    cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: newIndex)
+                }
+            }
+            player.removeFromPlaylist(at: groupedPlaylist.convertIndexPathToPlaylistIndex(indexPath: indexPath))
+            groupedPlaylist = PopupPlaylistGrouper(player: player)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
 
     // Override to support rearranging the table view.
     func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        player.movePlaylistSong(fromIndex: fromIndexPath.row, to: to.row)
+        let fromPlaylistIndex = groupedPlaylist.convertIndexPathToPlaylistIndex(indexPath: fromIndexPath)
+        var toPlaylistIndex = groupedPlaylist.convertIndexPathToPlaylistIndex(indexPath: to)
+        
+        guard fromIndexPath != to else {
+            return
+        }
+        if to.section == 1, fromIndexPath.section != to.section {
+            toPlaylistIndex -= 1
+        }
+        if fromPlaylistIndex < toPlaylistIndex {
+            for i in fromPlaylistIndex+1...toPlaylistIndex {
+                if let targetIndexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: i),
+                   let cell =  tableView.cellForRow(at: targetIndexPath) as? SongTableCell,
+                   var newIndex = cell.indexInPlaylist {
+                    newIndex -= 1
+                    cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: newIndex)
+                }
+            }
+        } else {
+            for i in toPlaylistIndex...fromPlaylistIndex-1 {
+                if let targetIndexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: i),
+                   let cell =  tableView.cellForRow(at: targetIndexPath) as? SongTableCell,
+                   var newIndex = cell.indexInPlaylist {
+                        newIndex += 1
+                        cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: newIndex)
+                }
+            }
+        }
+        if let cell =  tableView.cellForRow(at: fromIndexPath) as? SongTableCell {
+            let newIndex = toPlaylistIndex
+            cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: newIndex)
+        }
+
+        player.movePlaylistSong(fromIndex: fromPlaylistIndex, to: toPlaylistIndex)
+        groupedPlaylist = PopupPlaylistGrouper(player: player)
     }
 
     // Override to support conditional rearranging of the table view.
@@ -103,7 +199,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         alert.addAction(UIAlertAction(title: "Clear", style: .default, handler: { _ in
             self.appDelegate.player.cleanPlaylist()
-            self.tableView.reloadData()
+            self.reloadData()
         }))
         alert.addAction(UIAlertAction(title: "Add all to playlist", style: .default, handler: { _ in
             let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
@@ -123,23 +219,20 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 extension PopupPlayerVC: MusicPlayable {
 
     func didStartPlaying(playlistItem: PlaylistItem) {
-        tableView.reloadData()
+        self.reloadData()
     }
     
     func didPause() {
     }
     
     func didStopPlaying(playlistItem: PlaylistItem?) {
-        if let stoppedPlaylistItem = playlistItem, let index = stoppedPlaylistItem.index, let cell = self.tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? SongTableCell {
-            cell.refresh()
-        }
     }
 
     func didElapsedTimeChange() {
     }
     
     func didPlaylistChange() {
-        tableView.reloadData()
+        self.reloadData()
     }
 
 }
@@ -151,7 +244,7 @@ extension PopupPlayerVC: SongDownloadViewUpdatable {
         case .finished:
             let indicesOfDownloadedSong = player.playlist.songs.allIndices(of: updatedRequest.element)
             for index in indicesOfDownloadedSong {
-                if let cell = self.tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? SongTableCell {
+                if let indexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: index), let cell = self.tableView.cellForRow(at: indexPath) as? SongTableCell {
                     cell.refresh()
                 }
             }
