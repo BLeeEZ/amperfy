@@ -18,14 +18,20 @@ class PlaylistDetailVC: UITableViewController {
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(startEditing))
         doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(endEditing))
         navigationItem.rightBarButtonItem = editButton
+        if playlist?.isSmartPlaylist ?? false {
+            navigationItem.rightBarButtonItem?.isEnabled = false
+        }
         
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: PlaylistDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
-        if let playlistDetailTableHeaderView = ViewBuilder<PlaylistDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: PlaylistDetailTableHeader.frameHeight)) {
+        let playlistTableHeaderFrameHeight = PlaylistDetailTableHeader.frameHeight
+        
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: playlistTableHeaderFrameHeight + LibraryElementDetailTableHeaderView.frameHeight))
+
+        if let playlistDetailTableHeaderView = ViewBuilder<PlaylistDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: playlistTableHeaderFrameHeight)) {
             playlistDetailTableHeaderView.prepare(toWorkOnPlaylist: playlist, rootView: self)
             tableView.tableHeaderView?.addSubview(playlistDetailTableHeaderView)
             playlistOperationsView = playlistDetailTableHeaderView
         }
-        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: PlaylistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: playlistTableHeaderFrameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(toWorkOnPlaylist: playlist, with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
@@ -80,6 +86,7 @@ class PlaylistDetailVC: UITableViewController {
         if editingStyle == .delete {
             playlist?.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
+            playlistOperationsView?.refresh()
         }
     }
     

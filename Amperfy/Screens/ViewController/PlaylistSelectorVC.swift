@@ -10,14 +10,14 @@ class PlaylistSelectorVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        playlists = appDelegate.library.getPlaylists().sortAlphabeticallyAscending()
+        playlists = appDelegate.library.getPlaylists().filterRegualarPlaylists().sortAlphabeticallyAscending()
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight))
         if let newPlaylistTableHeaderView = ViewBuilder<NewPlaylistTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight)) {
             newPlaylistTableHeaderView.reactOnCreation() { _ in
-                self.playlists = self.appDelegate.library.getPlaylists().sortAlphabeticallyAscending()
+                self.playlists = self.appDelegate.library.getPlaylists().filterRegualarPlaylists().sortAlphabeticallyAscending()
                 self.tableView.reloadData()
             }
             tableView.tableHeaderView?.addSubview(newPlaylistTableHeaderView)

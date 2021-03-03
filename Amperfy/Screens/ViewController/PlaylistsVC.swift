@@ -3,6 +3,7 @@ import UIKit
 class PlaylistsVC: UITableViewController {
 
     var appDelegate: AppDelegate!
+    var playlistsAll = [Playlist]()
     var playlistsUnfiltered = [Playlist]()
     var playlistsFiltered = [Playlist]()
     
@@ -22,7 +23,7 @@ class PlaylistsVC: UITableViewController {
         self.appDelegate.library.getPlaylistsAsync() { albums in
             let sortedPlaylists = albums.sortAlphabeticallyAscending()
             DispatchQueue.main.async {
-                self.playlistsUnfiltered = sortedPlaylists
+                self.playlistsAll = sortedPlaylists
                 self.updateSearchResults(for: self.searchController)
                 self.loadingSpinner.hide()
             }
@@ -32,6 +33,9 @@ class PlaylistsVC: UITableViewController {
     private func configureSearchController() {
         searchController.searchResultsUpdater = self
         searchController.searchBar.autocapitalizationType = .none
+        if appDelegate.backendProxy.selectedApi == .ampache {
+            searchController.searchBar.scopeButtonTitles = ["All", "User Playlists", "Smart Playlists"]
+        }
 
         if #available(iOS 11.0, *) {
             // For iOS 11 and later, place the search bar in the navigation bar.
@@ -113,6 +117,7 @@ class PlaylistsVC: UITableViewController {
 extension PlaylistsVC: UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {
+        updateDataBasedOnScope()
         if let searchText = searchController.searchBar.text, !searchText.isEmpty {
             playlistsFiltered = playlistsUnfiltered.filterBy(searchText: searchText)
         } else {
@@ -132,7 +137,17 @@ extension PlaylistsVC: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         updateSearchResults(for: searchController)
     }
-    
+
+    func updateDataBasedOnScope() {
+        switch searchController.searchBar.selectedScopeButtonIndex {
+        case 1:
+            playlistsUnfiltered = playlistsAll.filterRegualarPlaylists()
+        case 2:
+            playlistsUnfiltered = playlistsAll.filterSmartPlaylists()
+        default:
+            playlistsUnfiltered = playlistsAll
+        }
+    }
 }
 
 extension PlaylistsVC: UISearchControllerDelegate {

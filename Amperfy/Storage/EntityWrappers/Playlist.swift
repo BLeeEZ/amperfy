@@ -64,6 +64,9 @@ public class Playlist: NSObject {
             storage.saveContext()
         }
     }
+    var isSmartPlaylist: Bool {
+        return id.hasPrefix("smart_")
+    }
     var lastSongIndex: Int {
         guard songs.count > 0 else { return 0 }
         return songs.count-1
@@ -244,3 +247,20 @@ extension Playlist: Identifyable {
     
 }
 
+extension Array where Element: Playlist {
+    
+    func filterRegualarPlaylists() -> [Element] {
+        let filteredArray = self.filter { element in
+            return !element.isSmartPlaylist
+        }
+        return filteredArray
+    }
+
+    func filterSmartPlaylists() -> [Element] {
+        let filteredArray = self.filter { element in
+            return element.isSmartPlaylist
+        }
+        return filteredArray
+    }
+    
+}

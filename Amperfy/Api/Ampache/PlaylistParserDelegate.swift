@@ -31,11 +31,6 @@ class PlaylistParserDelegate: GenericXmlParser {
                 resetPlaylistInCaseOfError()
                 return
             }
-            guard !playlistId.hasPrefix("smart_") else {
-                os_log("Smart playlists are currently ignored: %s", log: log, type: .debug, playlistId)
-                resetPlaylistInCaseOfError()
-                return
-            }
             
             if playlist != nil {
                 playlist?.id = playlistId
