@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="56" id="gve-H7-PxP" customClass="ArtistTableCell" customModule="Amperfy" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="375" height="56"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="68" id="gve-H7-PxP" customClass="ArtistTableCell" customModule="Amperfy" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="68"/>
             <autoresizingMask key="autoresizingMask"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gve-H7-PxP" id="4aT-Z7-2jl">
-                <rect key="frame" x="0.0" y="0.0" width="375" height="55.5"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gve-H7-PxP" id="4aT-Z7-2jl">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="68"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZWe-re-U6e">
-                        <rect key="frame" x="64" y="8" width="295" height="39.5"/>
+                        <rect key="frame" x="72" y="11" width="287" height="46"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="MKV-RW-ITd" userLabel="Art" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
-                        <rect key="frame" x="8" y="4" width="48" height="48"/>
+                        <rect key="frame" x="16" y="11" width="48" height="48"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="MKV-RW-ITd" secondAttribute="height" multiplier="1:1" id="4mb-dO-Xu4"/>
                             <constraint firstAttribute="height" constant="48" id="Rms-0h-ITJ"/>
@@ -33,12 +31,12 @@
                     </imageView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="ZWe-re-U6e" secondAttribute="trailing" constant="16" id="9tO-1D-PDW"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="ZWe-re-U6e" secondAttribute="trailing" id="9tO-1D-PDW"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="leading" secondItem="MKV-RW-ITd" secondAttribute="trailing" constant="8" id="LuL-b5-m52"/>
-                    <constraint firstAttribute="bottom" secondItem="ZWe-re-U6e" secondAttribute="bottom" constant="8" id="TvY-Kp-nYQ"/>
-                    <constraint firstItem="ZWe-re-U6e" firstAttribute="top" secondItem="4aT-Z7-2jl" secondAttribute="top" constant="8" id="ZXs-eS-5vO"/>
-                    <constraint firstItem="MKV-RW-ITd" firstAttribute="top" secondItem="4aT-Z7-2jl" secondAttribute="top" constant="4" id="fcN-PG-Lfu"/>
-                    <constraint firstItem="MKV-RW-ITd" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leading" constant="8" id="gIw-WX-LLe"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="ZWe-re-U6e" secondAttribute="bottom" id="TvY-Kp-nYQ"/>
+                    <constraint firstItem="ZWe-re-U6e" firstAttribute="top" secondItem="4aT-Z7-2jl" secondAttribute="topMargin" id="ZXs-eS-5vO"/>
+                    <constraint firstItem="MKV-RW-ITd" firstAttribute="top" secondItem="4aT-Z7-2jl" secondAttribute="topMargin" id="fcN-PG-Lfu"/>
+                    <constraint firstItem="MKV-RW-ITd" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="gIw-WX-LLe"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>

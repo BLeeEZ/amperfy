@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -14,8 +14,8 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aFp-vU-e7e" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="16" y="16" width="150" height="30"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aFp-vU-e7e" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                    <rect key="frame" x="16" y="0.0" width="150" height="30"/>
                     <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="150" id="wMX-TZ-gTK"/>
@@ -28,8 +28,8 @@
                         <action selector="playAllButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="phc-Oa-Z7W"/>
                     </connections>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bqP-jY-7uf" userLabel="Add All To Play Next Button" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="209" y="16" width="150" height="30"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bqP-jY-7uf" userLabel="Add All To Play Next Button" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                    <rect key="frame" x="209" y="0.0" width="150" height="30"/>
                     <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <state key="normal" title="Add to play next">
                         <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -39,15 +39,15 @@
                     </connections>
                 </button>
             </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
-                <constraint firstItem="aFp-vU-e7e" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="2Yr-YR-hF8"/>
-                <constraint firstItem="aFp-vU-e7e" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="HJm-oF-A1z"/>
+                <constraint firstItem="aFp-vU-e7e" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="2Yr-YR-hF8"/>
+                <constraint firstItem="aFp-vU-e7e" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="HJm-oF-A1z"/>
                 <constraint firstItem="bqP-jY-7uf" firstAttribute="width" secondItem="aFp-vU-e7e" secondAttribute="width" id="bXO-4e-2vP"/>
                 <constraint firstItem="bqP-jY-7uf" firstAttribute="height" secondItem="aFp-vU-e7e" secondAttribute="height" id="cbL-m0-n79"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="bqP-jY-7uf" secondAttribute="trailing" constant="16" id="dQR-cD-vQF"/>
+                <constraint firstAttribute="trailingMargin" secondItem="bqP-jY-7uf" secondAttribute="trailing" id="dQR-cD-vQF"/>
                 <constraint firstItem="bqP-jY-7uf" firstAttribute="centerY" secondItem="aFp-vU-e7e" secondAttribute="centerY" id="knR-BP-snu"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <connections>
                 <outlet property="addAllToPlaylistButton" destination="bqP-jY-7uf" id="BdA-xb-n9g"/>
                 <outlet property="playAllButton" destination="aFp-vU-e7e" id="pTl-kf-Ow2"/>

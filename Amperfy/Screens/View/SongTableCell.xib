@@ -10,15 +10,15 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="56" id="pd9-97-MJI" customClass="SongTableCell" customModule="Amperfy" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="468" height="56"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="default" indentationWidth="10" rowHeight="70" id="pd9-97-MJI" customClass="SongTableCell" customModule="Amperfy" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="468" height="70"/>
             <autoresizingMask key="autoresizingMask"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="pd9-97-MJI" id="WOq-tb-OTF">
-                <rect key="frame" x="0.0" y="0.0" width="468" height="56"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="pd9-97-MJI" id="WOq-tb-OTF">
+                <rect key="frame" x="0.0" y="0.0" width="468" height="70"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hPr-VQ-rTt">
-                        <rect key="frame" x="72" y="8" width="352" height="22"/>
+                        <rect key="frame" x="72" y="11" width="352" height="22"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="XXp-uK-dh5"/>
                         </constraints>
@@ -27,7 +27,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nJe-7h-3tU">
-                        <rect key="frame" x="72" y="32" width="352" height="16"/>
+                        <rect key="frame" x="72" y="35" width="352" height="16"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="16" id="Lp3-VV-zM5"/>
                         </constraints>
@@ -36,17 +36,17 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Kb7-OT-MQ5" userLabel="Artwork" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
-                        <rect key="frame" x="16" y="4" width="48" height="48"/>
+                        <rect key="frame" x="16" y="11" width="48" height="48"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="Kb7-OT-MQ5" secondAttribute="height" multiplier="1:1" id="fhb-YD-hTx"/>
                             <constraint firstAttribute="width" constant="48" id="iSI-nj-yJY"/>
                         </constraints>
                     </imageView>
                     <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="moK-d1-lj1">
-                        <rect key="frame" x="72" y="48.5" width="380" height="4"/>
+                        <rect key="frame" x="72" y="55" width="380" height="4"/>
                     </progressView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="=" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4OZ-v0-bY2" userLabel="Reorder Label">
-                        <rect key="frame" x="432" y="18" width="20" height="20"/>
+                        <rect key="frame" x="432" y="25" width="20" height="20"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="20" id="jYs-KG-jTv"/>
                             <constraint firstAttribute="height" constant="20" id="mc6-Iq-tQ8"/>
@@ -60,10 +60,10 @@
                     <constraint firstItem="4OZ-v0-bY2" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="trailing" constant="8" id="AUO-iE-pDI"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="top" secondItem="hPr-VQ-rTt" secondAttribute="bottom" constant="2" id="E4f-kL-YK1"/>
                     <constraint firstAttribute="trailingMargin" secondItem="4OZ-v0-bY2" secondAttribute="trailing" id="GoY-7G-GF0"/>
-                    <constraint firstAttribute="bottom" secondItem="moK-d1-lj1" secondAttribute="bottom" constant="3.5" id="Ldd-iy-NFu"/>
-                    <constraint firstItem="hPr-VQ-rTt" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="top" constant="8" id="PbZ-KR-6Uu"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="moK-d1-lj1" secondAttribute="bottom" id="Ldd-iy-NFu"/>
+                    <constraint firstItem="hPr-VQ-rTt" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="PbZ-KR-6Uu"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="Pwh-zQ-8MT"/>
-                    <constraint firstItem="Kb7-OT-MQ5" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="top" constant="4" id="RGP-0j-GXj"/>
+                    <constraint firstItem="Kb7-OT-MQ5" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="RGP-0j-GXj"/>
                     <constraint firstItem="Kb7-OT-MQ5" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leadingMargin" id="Uld-ix-WQV"/>
                     <constraint firstItem="moK-d1-lj1" firstAttribute="leading" secondItem="nJe-7h-3tU" secondAttribute="leading" id="Yix-AI-aoZ"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="leading" secondItem="Kb7-OT-MQ5" secondAttribute="trailing" constant="8" id="YjP-mp-fEC"/>

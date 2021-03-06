@@ -1,20 +1,12 @@
 import UIKit
 
-class AlbumTableCell: UITableViewCell {
+class AlbumTableCell: BasicTableCell {
     
     @IBOutlet weak var albumLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
     @IBOutlet weak var artworkImage: UIImageView!
     
-    static let rowHeight: CGFloat = 56.0
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-    }
+    static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
     
     func display(album: Album) {
         albumLabel.text = album.name

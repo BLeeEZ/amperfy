@@ -4,7 +4,9 @@ import MarqueeLabel
 
 class PlayerView: UIView {
   
-    static let frameHeight: CGFloat = 305.0
+    static let frameHeight: CGFloat = 249 + margin.top + margin.bottom
+    static let margin = UIEdgeInsets(top: 40, left: UIView.defaultMarginX, bottom: 20, right: UIView.defaultMarginX)
+    
     private var appDelegate: AppDelegate!
     private var player: MusicPlayer!
     private var rootView: PopupPlayerVC?
@@ -22,6 +24,7 @@ class PlayerView: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        self.layoutMargins = PlayerView.margin
         player = appDelegate.player
         player.addNotifier(notifier: self)
     }

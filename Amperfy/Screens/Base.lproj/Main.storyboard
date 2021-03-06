@@ -503,7 +503,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="AEg-Xh-QOY">
-                                <rect key="frame" x="0.0" y="349" width="414" height="513"/>
+                                <rect key="frame" x="0.0" y="326" width="414" height="536"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <connections>
                                     <outlet property="dataSource" destination="ZrD-yX-z8h" id="eFB-yA-jFo"/>
@@ -511,11 +511,11 @@
                                 </connections>
                             </tableView>
                             <view contentMode="scaleToFill" id="KWj-US-4T0">
-                                <rect key="frame" x="0.0" y="44" width="414" height="305"/>
+                                <rect key="frame" x="0.0" y="44" width="414" height="282"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="305" id="TUy-5Q-8k8"/>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="800" id="TUy-5Q-8k8"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -995,7 +995,7 @@
             <objects>
                 <tableViewController id="rsJ-c4-CcZ" userLabel="Settings SongActionOnTab" customClass="SettingsSongActionOnTabVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="MwS-jY-P2J">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <sections>
@@ -1622,7 +1622,7 @@
             <objects>
                 <tableViewController title="Settings" id="FAi-G9-LVC" userLabel="Settings Player" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="TVS-0o-sp2">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <sections>

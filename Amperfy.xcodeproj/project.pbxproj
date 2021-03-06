@@ -49,6 +49,7 @@
 		504C719123BAD112001F82C7 /* SongTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504C719023BAD112001F82C7 /* SongTest.swift */; };
 		5058708E21DEB07F0043896F /* SongAlphabetSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708D21DEB07F0043896F /* SongAlphabetSection.swift */; };
 		5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */; };
+		50675E6D25F61164005737FD /* BasicTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50675E6C25F61163005737FD /* BasicTableCell.swift */; };
 		506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */; };
 		506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */; };
 		50763F1922AD942A00D062A0 /* AlbumDetailTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50763F1722AD942A00D062A0 /* AlbumDetailTableHeader.xib */; };
@@ -245,6 +246,7 @@
 		5058708D21DEB07F0043896F /* SongAlphabetSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongAlphabetSection.swift; sourceTree = "<group>"; };
 		5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupPlayerVC.swift; sourceTree = "<group>"; };
 		5067016125E3ADA200A3EF89 /* Amperfy v5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v5.xcdatamodel"; sourceTree = "<group>"; };
+		50675E6C25F61163005737FD /* BasicTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableCell.swift; sourceTree = "<group>"; };
 		506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v2.xcdatamodel"; sourceTree = "<group>"; };
 		506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsServerVC.swift; sourceTree = "<group>"; };
 		506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLibraryVC.swift; sourceTree = "<group>"; };
@@ -426,6 +428,7 @@
 				5029E0382235A8EC0027F96F /* CommonString.swift */,
 				5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */,
 				5002565625E69DC700674CE1 /* SpinnerViewController.swift */,
+				50675E6C25F61163005737FD /* BasicTableCell.swift */,
 			);
 			path = Basics;
 			sourceTree = "<group>";
@@ -1035,6 +1038,7 @@
 				5086F8832239A2B700546F5A /* GenericLibraryBackgroundSyncer.swift in Sources */,
 				5086F876223852F200546F5A /* SubsonicApi.swift in Sources */,
 				500BB45721CAA73700D367CF /* PersistentStorage.swift in Sources */,
+				50675E6D25F61164005737FD /* BasicTableCell.swift in Sources */,
 				50BA930821D75C5600E5901D /* AuthentificationHandshake.swift in Sources */,
 				5020BD2325DC027E00CDD37A /* Settings.swift in Sources */,
 				502C0045224C0B1400DA0D1E /* SubsonicArtworkBackgroundSyncer.swift in Sources */,

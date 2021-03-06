@@ -5,14 +5,16 @@ class AlbumDetailTableHeader: UIView {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var albumImage: UIImageView!
     
-    static let frameHeight: CGFloat = 133.0
+    static let frameHeight: CGFloat = 113.0 + margin.top + margin.bottom
+    static let margin = UIView.defaultMarginTopElement
     private var album: Album?
     private var appDelegate: AppDelegate!
     private var rootView: AlbumDetailVC?
     
     required init?(coder aDecoder: NSCoder) {
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         super.init(coder: aDecoder)
+        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        self.layoutMargins = AlbumDetailTableHeader.margin
     }
     
     func prepare(toWorkOnAlbum album: Album?, rootView: AlbumDetailVC? ) {

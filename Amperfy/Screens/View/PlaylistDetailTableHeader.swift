@@ -14,16 +14,17 @@ class PlaylistDetailTableHeader: UIView {
     @IBOutlet weak var smartPlaylistLabel: UILabel!
     @IBOutlet weak var songCountLabel: UILabel!
     
-    static let frameHeight: CGFloat = 120.0
+    static let frameHeight: CGFloat = 100.0 + margin.top + margin.bottom
+    static let margin = UIView.defaultMarginTopElement
     
     private var playlist: Playlist?
     private var appDelegate: AppDelegate!
     private var rootView: PlaylistDetailVC?
     
     required init?(coder aDecoder: NSCoder) {
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         super.init(coder: aDecoder)
-        self.layoutMargins = UIView.defaultMarginTopElement
+        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        self.layoutMargins = PlaylistDetailTableHeader.margin
     }
     
     func prepare(toWorkOnPlaylist playlist: Playlist?, rootView: PlaylistDetailVC) {

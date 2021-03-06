@@ -5,14 +5,17 @@ class ArtistDetailTableHeader: UIView {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var artistImage: UIImageView!
     
-    static let frameHeight: CGFloat = 133.0
+    static let frameHeight: CGFloat = 125.0 + margin.top + margin.bottom
+    static let margin = UIView.defaultMarginTopElement
+    
     private var artist: Artist?
     private var appDelegate: AppDelegate!
     private var rootView: ArtistDetailVC?
     
     required init?(coder aDecoder: NSCoder) {
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         super.init(coder: aDecoder)
+        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        self.layoutMargins = ArtistDetailTableHeader.margin
     }
     
     func prepare(toWorkOnArtist artist: Artist?, rootView: ArtistDetailVC? ) {

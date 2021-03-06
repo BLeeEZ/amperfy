@@ -6,18 +6,20 @@ class NewPlaylistTableHeader: UIView {
 
     @IBOutlet weak var nameTextField: UITextField!
     
-    static let frameHeight: CGFloat = 56.0
+    static let frameHeight: CGFloat = 30.0 + margin.top + margin.bottom
+    static let margin = UIEdgeInsets(top: 10, left: UIView.defaultMarginX, bottom: 5, right: UIView.defaultMarginX)
+    
     private var appDelegate: AppDelegate!
     private var creationResponder: PlaylistCreationResponder?
 
     override init(frame: CGRect) {
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         super.init(frame: frame)
     }
     
     required init?(coder aDecoder: NSCoder) {
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         super.init(coder: aDecoder)
+        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        self.layoutMargins = NewPlaylistTableHeader.margin
     }
 
     @IBAction func createPlaylistButtonPressed(_ sender: Any) {

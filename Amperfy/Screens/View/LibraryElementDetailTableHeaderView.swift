@@ -5,12 +5,18 @@ class LibraryElementDetailTableHeaderView: UIView {
     @IBOutlet weak var playAllButton: UIButton!
     @IBOutlet weak var addAllToPlaylistButton: UIButton!
     
-    static let frameHeight: CGFloat = 62.0
+    static let frameHeight: CGFloat = 30.0 + margin.top + margin.bottom
+    static let margin = UIView.defaultMarginMiddleElement
     
     private var artist: Artist?
     private var album: Album?
     private var playlist: Playlist?
     private var player: MusicPlayer?
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.layoutMargins = LibraryElementDetailTableHeaderView.margin
+    }
     
     @IBAction func playAllButtonPressed(_ sender: Any) {
         if let artist = artist {

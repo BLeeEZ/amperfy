@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -17,16 +15,15 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="New playlist name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2R8-vQ-Rg4">
-                    <rect key="frame" x="30" y="35" width="247" height="30"/>
+                    <rect key="frame" x="16" y="0.0" width="275" height="30"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="30" id="Tah-W6-ZOT"/>
                     </constraints>
-                    <nil key="textColor"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits"/>
                 </textField>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aNt-bX-pEf">
-                    <rect key="frame" x="285" y="35" width="60" height="30"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aNt-bX-pEf">
+                    <rect key="frame" x="299" y="0.0" width="60" height="30"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="60" id="Eng-0s-D0B"/>
                     </constraints>
@@ -36,18 +33,19 @@
                     </connections>
                 </button>
             </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
                 <constraint firstItem="aNt-bX-pEf" firstAttribute="leading" secondItem="2R8-vQ-Rg4" secondAttribute="trailing" constant="8" id="1j8-P9-qBz"/>
-                <constraint firstItem="2R8-vQ-Rg4" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="30" id="524-G1-ykZ"/>
+                <constraint firstItem="2R8-vQ-Rg4" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="524-G1-ykZ"/>
                 <constraint firstItem="aNt-bX-pEf" firstAttribute="height" secondItem="2R8-vQ-Rg4" secondAttribute="height" id="9pW-2j-nFZ"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="aNt-bX-pEf" secondAttribute="trailing" constant="30" id="Ftr-mx-d44"/>
+                <constraint firstAttribute="trailingMargin" secondItem="aNt-bX-pEf" secondAttribute="trailing" id="Ftr-mx-d44"/>
                 <constraint firstItem="aNt-bX-pEf" firstAttribute="centerY" secondItem="2R8-vQ-Rg4" secondAttribute="centerY" id="Jss-WI-Apu"/>
-                <constraint firstItem="2R8-vQ-Rg4" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="15" id="n50-VF-Dwr"/>
+                <constraint firstItem="2R8-vQ-Rg4" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="n50-VF-Dwr"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <connections>
                 <outlet property="nameTextField" destination="2R8-vQ-Rg4" id="84p-0y-IMv"/>
             </connections>
+            <point key="canvasLocation" x="-316" y="133"/>
         </view>
     </objects>
 </document>

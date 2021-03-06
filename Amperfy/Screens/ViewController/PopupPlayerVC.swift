@@ -60,8 +60,9 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.tableView.dragDelegate = self
         self.tableView.dropDelegate = self
         self.tableView.dragInteractionEnabled = true
+        
+        playerPlaceholderView.frame.size.height = PlayerView.frameHeight
         if let createdPlayerView = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: playerPlaceholderView.bounds.size.width, height: playerPlaceholderView.bounds.size.height)) {
-            assert(playerPlaceholderView.bounds.size.height >= PlayerView.frameHeight, "Placeholder must provide enough height for player")
             playerView = createdPlayerView
             playerView.prepare(toWorkOnRootView: self)
             playerPlaceholderView.addSubview(playerView)

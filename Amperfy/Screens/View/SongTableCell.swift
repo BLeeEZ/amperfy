@@ -15,7 +15,7 @@ enum SongActionOnTab: Int {
     }
 }
 
-class SongTableCell: UITableViewCell {
+class SongTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
@@ -23,11 +23,11 @@ class SongTableCell: UITableViewCell {
     @IBOutlet weak var downloadProgress: UIProgressView!
     @IBOutlet weak var reorderLabel: UILabel?
     
-    static let rowHeight: CGFloat = 56.0
+    static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
+    
     var behaviourOnTab: SongActionOnTab = .playAndErasePlaylist
     var displayMode: SongOperationDisplayModes = .libraryCell
     var isUserTouchInteractionAllowed = true
-    private var appDelegate: AppDelegate!
     private var song: Song?
     private var download: Download?
     private var index: Int?
@@ -39,14 +39,9 @@ class SongTableCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         behaviourOnTab = appDelegate.storage.getSettings().songActionOnTab
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
         self.addGestureRecognizer(longPressGesture)
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
     }
     
     func display(song: Song, rootView: UIViewController, displayMode: SongOperationDisplayModes = .libraryCell, download: Download? = nil) {

@@ -1,6 +1,6 @@
 import UIKit
 
-class PlaylistTableCell: UITableViewCell {
+class PlaylistTableCell: BasicTableCell {
 
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var art1Image: UIImageView!
@@ -8,15 +8,7 @@ class PlaylistTableCell: UITableViewCell {
     @IBOutlet weak var art3Image: UIImageView!
     @IBOutlet weak var art4Image: UIImageView!
     
-    static let rowHeight: CGFloat = 88.0
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-    }
+    static let rowHeight: CGFloat = 80.0 + margin.bottom + margin.top
     
     func display(playlist: Playlist) {
         nameLabel.text = playlist.name
