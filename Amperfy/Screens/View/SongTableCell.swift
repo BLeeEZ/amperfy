@@ -6,6 +6,8 @@ enum SongActionOnTab: Int {
     case hiddenOptionPlayInPopupPlayerPlaylistSelectedSong = 1
     case addToPlaylistAndPlay = 2
     
+    static let defaultValue: SongActionOnTab = .addToPlaylistAndPlay
+    
     var description : String {
         switch self {
         case .playAndErasePlaylist: return "Clear current playlist and play song"

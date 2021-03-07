@@ -47,6 +47,8 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var playerPlaceholderView: UIView!
     
+    private var playerViewToTableViewConstraint: NSLayoutConstraint?
+    
     var appDelegate: AppDelegate!
     var player: MusicPlayer!
     var playerView: PlayerView!
@@ -60,8 +62,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.tableView.dragDelegate = self
         self.tableView.dropDelegate = self
         self.tableView.dragInteractionEnabled = true
-        
-        playerPlaceholderView.frame.size.height = PlayerView.frameHeight
+              
         if let createdPlayerView = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: playerPlaceholderView.bounds.size.width, height: playerPlaceholderView.bounds.size.height)) {
             playerView = createdPlayerView
             playerView.prepare(toWorkOnRootView: self)
@@ -79,12 +80,62 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     override func viewWillAppear(_ animated: Bool) {
         reloadData()
+        adjustConstraintsForCompactPlayer()
         self.playerView.viewWillAppear(animated)
     }
-    
+
     func reloadData() {
         groupedPlaylist = PopupPlaylistGrouper(player: player)
         tableView.reloadData()
+    }
+    
+    // MARK: - PopupPlayer frame height animation
+    
+    var availableFrameHeightForLargePlayer: CGFloat {
+        let playerOriginPoint = self.playerView.convert(self.playerView.frame.origin, to: self.view)
+        return self.view.frame.size.height - playerOriginPoint.y
+    }
+    
+    func renderAnimationForCompactPlayer(ofHight: CGFloat, animationDuration: TimeInterval) {
+        UIView.animate(withDuration: animationDuration, animations: ({
+            self.playerPlaceholderView.frame.size.height = ofHight
+            self.view.layoutIfNeeded()
+        }), completion: ({ _ in
+            self.adjustConstraintsForCompactPlayer()
+            self.view.layoutIfNeeded()
+        }))
+    }
+    
+    func renderAnimationForLargePlayer(animationDuration: TimeInterval) {
+        UIView.animate(withDuration: animationDuration, animations: ({
+            self.playerPlaceholderView.frame.size.height = self.availableFrameHeightForLargePlayer
+            self.adjustConstraintsForLargePlayer()
+            self.view.layoutIfNeeded()
+        }), completion: nil)
+    }
+    
+    func adjustConstraintsForCompactPlayer() {
+        playerViewToTableViewConstraint?.isActive = false
+        playerViewToTableViewConstraint = NSLayoutConstraint(item: self.tableView!,
+                               attribute: .bottom,
+                               relatedBy: .equal,
+                               toItem: self.view,
+                               attribute: .bottom,
+                               multiplier: 1.0,
+                               constant: 0)
+        playerViewToTableViewConstraint?.isActive = true
+    }
+    
+    func adjustConstraintsForLargePlayer() {
+        playerViewToTableViewConstraint?.isActive = false
+        playerViewToTableViewConstraint = NSLayoutConstraint(item: self.tableView!,
+                               attribute: .bottom,
+                               relatedBy: .greaterThanOrEqual,
+                               toItem: self.view,
+                               attribute: .bottom,
+                               multiplier: 1.0,
+                               constant: 0)
+        playerViewToTableViewConstraint?.isActive = true
     }
 
     // MARK: - Table view data source

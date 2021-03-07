@@ -11,6 +11,7 @@ class PersistentStorage {
         case LibraryIsSynced = "libraryIsSynced"
         
         case SongActionOnTab = "songActionOnTab"
+        case PlayerDisplayStyle = "playerDisplayStyle"
     }
 
     init() {
@@ -40,7 +41,7 @@ class PersistentStorage {
         } 
         return nil
     }
-    
+
     func saveLibraryIsSyncedFlag() {
         UserDefaults.standard.set(true, forKey: UserDefaultsKey.LibraryIsSynced.rawValue)
     }
@@ -51,14 +52,17 @@ class PersistentStorage {
     
     func saveSettings(settings: Settings) {
         UserDefaults.standard.set(settings.songActionOnTab.rawValue, forKey: UserDefaultsKey.SongActionOnTab.rawValue)
+        UserDefaults.standard.set(settings.playerDisplayStyle.rawValue, forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue)
     }
     
     func getSettings() -> Settings {
-        if  let songActionOnTabRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongActionOnTab.rawValue) as? Int,
-            let songActionOnTab = SongActionOnTab(rawValue: songActionOnTabRaw) {
-                return Settings(songActionOnTab: songActionOnTab)
-        }
-        return Settings()
+        let songActionOnTabRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongActionOnTab.rawValue) as? Int ?? SongActionOnTab.defaultValue.rawValue
+        let songActionOnTab = SongActionOnTab(rawValue: songActionOnTabRaw) ?? SongActionOnTab.defaultValue
+        
+        let playerDisplayStyleRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue) as? Int ?? PlayerDisplayStyle.defaultValue.rawValue
+        let playerDisplayStyle = PlayerDisplayStyle(rawValue: playerDisplayStyleRaw) ?? PlayerDisplayStyle.defaultValue
+        
+        return Settings(songActionOnTab: songActionOnTab, playerDisplayStyle: playerDisplayStyle)
     }
     
     func isLibrarySynced() -> Bool {

@@ -502,8 +502,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="AEg-Xh-QOY">
-                                <rect key="frame" x="0.0" y="326" width="414" height="536"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" contentViewInsetsToSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AEg-Xh-QOY">
+                                <rect key="frame" x="0.0" y="326" width="414" height="570"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <connections>
                                     <outlet property="dataSource" destination="ZrD-yX-z8h" id="eFB-yA-jFo"/>
@@ -514,21 +514,17 @@
                                 <rect key="frame" x="0.0" y="44" width="414" height="282"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="800" id="TUy-5Q-8k8"/>
-                                </constraints>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="5vd-Ap-Yw9"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="KWj-US-4T0" firstAttribute="leading" secondItem="5vd-Ap-Yw9" secondAttribute="leading" id="I7U-7e-RgY"/>
-                            <constraint firstItem="AEg-Xh-QOY" firstAttribute="top" secondItem="KWj-US-4T0" secondAttribute="bottom" id="KHh-v6-ejR"/>
-                            <constraint firstItem="5vd-Ap-Yw9" firstAttribute="bottom" secondItem="AEg-Xh-QOY" secondAttribute="bottom" id="PIp-ta-yoP"/>
-                            <constraint firstItem="AEg-Xh-QOY" firstAttribute="leading" secondItem="5vd-Ap-Yw9" secondAttribute="leading" id="ZdK-hu-mjo"/>
-                            <constraint firstItem="5vd-Ap-Yw9" firstAttribute="trailing" secondItem="KWj-US-4T0" secondAttribute="trailing" id="gXH-Od-Mog"/>
-                            <constraint firstItem="5vd-Ap-Yw9" firstAttribute="trailing" secondItem="AEg-Xh-QOY" secondAttribute="trailing" id="h7G-sQ-PEK"/>
-                            <constraint firstItem="KWj-US-4T0" firstAttribute="top" secondItem="5vd-Ap-Yw9" secondAttribute="top" priority="999" id="qRZ-Ia-A9S"/>
+                            <constraint firstItem="AEg-Xh-QOY" firstAttribute="top" secondItem="KWj-US-4T0" secondAttribute="bottom" id="0hW-Xj-irh"/>
+                            <constraint firstItem="KWj-US-4T0" firstAttribute="leading" secondItem="0WA-1Z-yPH" secondAttribute="leading" id="I7U-7e-RgY"/>
+                            <constraint firstAttribute="bottom" secondItem="AEg-Xh-QOY" secondAttribute="bottom" placeholder="YES" id="N37-tW-lWl"/>
+                            <constraint firstItem="AEg-Xh-QOY" firstAttribute="leading" secondItem="0WA-1Z-yPH" secondAttribute="leading" id="ZdK-hu-mjo"/>
+                            <constraint firstAttribute="trailing" secondItem="KWj-US-4T0" secondAttribute="trailing" id="gXH-Od-Mog"/>
+                            <constraint firstAttribute="trailing" secondItem="AEg-Xh-QOY" secondAttribute="trailing" id="h7G-sQ-PEK"/>
                         </constraints>
                     </view>
                     <connections>
