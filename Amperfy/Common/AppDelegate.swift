@@ -49,6 +49,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.player.configureRemoteCommands(commandCenter: MPRemoteCommandCenter.shared())
     }
     
+    var isKeepScreenAlive: Bool {
+        get { return UIApplication.shared.isIdleTimerDisabled }
+        set { UIApplication.shared.isIdleTimerDisabled = newValue }
+    }
+    
     func configureDefaultNavigationBarStyle() {
         UINavigationBar.appearance().shadowImage = UIImage()
     }

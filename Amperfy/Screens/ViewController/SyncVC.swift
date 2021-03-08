@@ -1,7 +1,7 @@
 import UIKit
 import Foundation
 
-class SyncVC: UIViewController, SyncCallbacks {
+class SyncVC: UIViewController {
 
     var appDelegate: AppDelegate!
     var parsedObjectCount: Int = 0
@@ -18,6 +18,7 @@ class SyncVC: UIViewController, SyncCallbacks {
         progressBar.setProgress(0.0, animated: true)
         progressInfo.text = ""
         progressLabel.text = String(format: "%.1f", 0.0) + "%"
+        appDelegate.isKeepScreenAlive = true
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -43,6 +44,10 @@ class SyncVC: UIViewController, SyncCallbacks {
         self.progressBar.setProgress(percentParsed, animated: true)
         self.progressLabel.text = String(format: "%.1f", percentParsed * 100) + "%"
     }
+
+}
+
+extension SyncVC: SyncCallbacks {
     
     func notifyParsedObject() {
         DispatchQueue.main.async { [weak self] in
@@ -91,6 +96,7 @@ class SyncVC: UIViewController, SyncCallbacks {
     
     func notifySyncFinished() {
         DispatchQueue.main.async { [weak self] in
+            self?.appDelegate.isKeepScreenAlive = false
             self?.performSegue(withIdentifier: "toLibrary", sender: self)
         }
     }
