@@ -18,7 +18,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hPr-VQ-rTt">
-                        <rect key="frame" x="72" y="11" width="352" height="22"/>
+                        <rect key="frame" x="72" y="14" width="352" height="22"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="XXp-uK-dh5"/>
                         </constraints>
@@ -27,7 +27,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nJe-7h-3tU">
-                        <rect key="frame" x="72" y="35" width="352" height="16"/>
+                        <rect key="frame" x="72" y="38" width="352" height="16"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="16" id="Lp3-VV-zM5"/>
                         </constraints>
@@ -61,7 +61,7 @@
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="top" secondItem="hPr-VQ-rTt" secondAttribute="bottom" constant="2" id="E4f-kL-YK1"/>
                     <constraint firstAttribute="trailingMargin" secondItem="4OZ-v0-bY2" secondAttribute="trailing" id="GoY-7G-GF0"/>
                     <constraint firstAttribute="bottomMargin" secondItem="moK-d1-lj1" secondAttribute="bottom" id="Ldd-iy-NFu"/>
-                    <constraint firstItem="hPr-VQ-rTt" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="PbZ-KR-6Uu"/>
+                    <constraint firstItem="hPr-VQ-rTt" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" constant="3" id="PbZ-KR-6Uu"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="Pwh-zQ-8MT"/>
                     <constraint firstItem="Kb7-OT-MQ5" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="RGP-0j-GXj"/>
                     <constraint firstItem="Kb7-OT-MQ5" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leadingMargin" id="Uld-ix-WQV"/>

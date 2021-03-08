@@ -164,9 +164,7 @@ class PlayerView: UIView {
             self.songTitleLargeLabel.alpha = 0
             self.artistNameCompactLabel.alpha = 1
             self.artistNameLargeLabel.alpha = 0
-        }), completion: ({ _ in
-
-        }))
+        }), completion: nil)
         
         rootView.renderAnimationForCompactPlayer(ofHight: PlayerView.frameHeightCompact, animationDuration: animationDuration)
 

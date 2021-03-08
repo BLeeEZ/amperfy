@@ -18,20 +18,29 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hM0-yx-hsO">
-                        <rect key="frame" x="72" y="35" width="333" height="16"/>
+                        <rect key="frame" x="72" y="28" width="333" height="15"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="16" id="dnN-rs-XET"/>
+                            <constraint firstAttribute="height" constant="15" id="dnN-rs-XET"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" systemColor="secondaryLabelColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ah3-fC-zQQ" userLabel="Info Label">
+                        <rect key="frame" x="72" y="44" width="333" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="15" id="1Hs-Po-1o2"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                         <color key="textColor" systemColor="secondaryLabelColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Album" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHk-4e-H8f">
-                        <rect key="frame" x="72" y="11" width="333" height="22"/>
+                        <rect key="frame" x="72" y="11" width="333" height="16"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="22" id="vsJ-7z-xj1"/>
+                            <constraint firstAttribute="height" constant="16" id="vsJ-7z-xj1"/>
                         </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
@@ -45,11 +54,14 @@
                 </subviews>
                 <constraints>
                     <constraint firstItem="Bfg-4d-rHy" firstAttribute="leading" secondItem="OYQ-xE-eM6" secondAttribute="leadingMargin" id="6lo-ue-pEa"/>
+                    <constraint firstItem="Ah3-fC-zQQ" firstAttribute="trailing" secondItem="WHk-4e-H8f" secondAttribute="trailing" id="FKb-9N-5KF"/>
                     <constraint firstItem="Bfg-4d-rHy" firstAttribute="top" secondItem="OYQ-xE-eM6" secondAttribute="topMargin" id="HOb-jD-APT"/>
+                    <constraint firstItem="Ah3-fC-zQQ" firstAttribute="leading" secondItem="WHk-4e-H8f" secondAttribute="leading" id="RBH-lb-zMh"/>
                     <constraint firstAttribute="trailingMargin" secondItem="WHk-4e-H8f" secondAttribute="trailing" id="RkP-Jd-aR6"/>
-                    <constraint firstItem="hM0-yx-hsO" firstAttribute="top" secondItem="WHk-4e-H8f" secondAttribute="bottom" constant="2" id="Va4-qM-Jim"/>
+                    <constraint firstItem="hM0-yx-hsO" firstAttribute="top" secondItem="WHk-4e-H8f" secondAttribute="bottom" constant="1" id="Va4-qM-Jim"/>
                     <constraint firstItem="hM0-yx-hsO" firstAttribute="leading" secondItem="WHk-4e-H8f" secondAttribute="leading" id="YGw-dA-n5A"/>
                     <constraint firstItem="WHk-4e-H8f" firstAttribute="leading" secondItem="Bfg-4d-rHy" secondAttribute="trailing" constant="8" id="aEU-gE-pw6"/>
+                    <constraint firstItem="Ah3-fC-zQQ" firstAttribute="top" secondItem="hM0-yx-hsO" secondAttribute="bottom" constant="1" id="cSg-ID-H4M"/>
                     <constraint firstItem="hM0-yx-hsO" firstAttribute="trailing" secondItem="WHk-4e-H8f" secondAttribute="trailing" id="iXf-6M-Qpj"/>
                     <constraint firstItem="WHk-4e-H8f" firstAttribute="top" secondItem="OYQ-xE-eM6" secondAttribute="topMargin" id="qLJ-MI-qeU"/>
                 </constraints>
@@ -58,6 +70,7 @@
                 <outlet property="albumLabel" destination="WHk-4e-H8f" id="ohx-DI-VsD"/>
                 <outlet property="artistLabel" destination="hM0-yx-hsO" id="37o-uX-paA"/>
                 <outlet property="artworkImage" destination="Bfg-4d-rHy" id="glS-T7-ZbK"/>
+                <outlet property="infoLabel" destination="Ah3-fC-zQQ" id="YLL-zm-iRb"/>
             </connections>
             <point key="canvasLocation" x="-348" y="-367.01649175412297"/>
         </tableViewCell>
