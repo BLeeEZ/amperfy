@@ -8,6 +8,16 @@ extension Bool {
     }
 }
 
+extension Int {
+    mutating func setOtherRandomValue(in targetRange: ClosedRange<Int>) {
+        var newValue = 0
+        repeat {
+            newValue = Int.random(in: targetRange)
+        } while (newValue == self)
+        self = newValue
+    }
+}
+
 extension String {
     func isFoundBy(searchText: String) -> Bool {
         return self.lowercased().contains(searchText.lowercased())
@@ -29,6 +39,50 @@ extension String {
 }
 
 extension UIColor {
+    convenience init(hue: CGFloat, saturation: CGFloat, lightness: CGFloat, alpha: CGFloat) {
+        precondition(0...1 ~= hue &&
+                     0...1 ~= saturation &&
+                     0...1 ~= lightness &&
+                     0...1 ~= alpha, "input range is out of range 0...1")
+        
+        // from HSL TO HSB
+        var newSaturation: CGFloat = 0.0
+        let brightness = lightness + saturation * min(lightness, 1-lightness)
+        if brightness == 0 {
+            newSaturation = 0.0
+        } else {
+            newSaturation = 2 * (1 - lightness / brightness)
+        }
+        self.init(hue: hue, saturation: newSaturation, brightness: brightness, alpha: alpha)
+    }
+    
+    func getHue(_ hue: UnsafeMutablePointer<CGFloat>?, saturation targetSaturation: UnsafeMutablePointer<CGFloat>?, lightness targetLightness: UnsafeMutablePointer<CGFloat>?, alpha targetAlpha: UnsafeMutablePointer<CGFloat>?) -> Bool {
+        var saturation, brightness, alpha: CGFloat
+        (saturation, brightness, alpha) = (0.0, 0.0, 0.0)
+        self.getHue(hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        // from HSB TO HSL
+        var newSaturation: CGFloat = 0.0
+        let lightness = brightness * (1 - saturation / 2)
+        if lightness == 0 || lightness == 1 {
+            newSaturation = 0.0
+        } else {
+            newSaturation = (brightness-lightness) / (min(lightness, 1-lightness))
+        }
+
+        targetSaturation?.pointee = newSaturation
+        targetLightness?.pointee = lightness
+        targetAlpha?.pointee = alpha
+        return true
+    }
+    
+    func getWithLightness(of: CGFloat) -> UIColor{
+        precondition(0...1 ~= of, "input range is out of range 0...1")
+        var hue, saturation, lightness, alpha: CGFloat
+        (hue, saturation, lightness, alpha) = (0.0, 0.0, 0.0, 0.0)
+        _ = self.getHue(&hue, saturation: &saturation, lightness: &lightness, alpha: &alpha)
+        return UIColor(hue: hue, saturation: saturation, lightness: of, alpha: alpha)
+    }
+    
     static var defaultBlue: UIColor {
         return UIView().tintColor
     }
@@ -145,6 +199,16 @@ extension UIView {
         } else {
             return true
         }
+    }
+    
+    func setGradientBackground(colorTop: UIColor, colorBottom: UIColor) {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [colorBottom.cgColor, colorTop.cgColor]
+        gradientLayer.startPoint = CGPoint(x: 0.5, y: 1.0)
+        gradientLayer.endPoint = CGPoint(x: 0.5, y: 0.0)
+        gradientLayer.locations = [0, 1]
+        gradientLayer.frame = bounds
+        layer.insertSublayer(gradientLayer, at: 0)
     }
 }
 

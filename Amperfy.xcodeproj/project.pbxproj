@@ -32,6 +32,9 @@
 		500BB45621CAA73700D367CF /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500BB45421CAA73700D367CF /* Library.swift */; };
 		500BB45721CAA73700D367CF /* PersistentStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500BB45521CAA73700D367CF /* PersistentStorage.swift */; };
 		500BB49721CAAA2700D367CF /* Amperfy.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */; };
+		500EB36825F8B3EB00B4B998 /* Corners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500EB36725F8B3EB00B4B998 /* Corners.swift */; };
+		500EB36C25F8B42800B4B998 /* AnimatedGradientLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */; };
+		500EB37025F8B4D200B4B998 /* PopupPlaylistGrouper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500EB36F25F8B4D200B4B998 /* PopupPlaylistGrouper.swift */; };
 		500ECAE422B26B9500A3CF84 /* LicenseVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500ECAE322B26B9500A3CF84 /* LicenseVC.swift */; };
 		502040302202341500ED48A3 /* PlaylistParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020402F2202341500ED48A3 /* PlaylistParserDelegate.swift */; };
 		502040322202469100ED48A3 /* ErrorParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502040312202469100ED48A3 /* ErrorParserDelegate.swift */; };
@@ -228,6 +231,9 @@
 		500BB45421CAA73700D367CF /* Library.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		500BB45521CAA73700D367CF /* PersistentStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistentStorage.swift; sourceTree = "<group>"; };
 		500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Amperfy.xcdatamodel; sourceTree = "<group>"; };
+		500EB36725F8B3EB00B4B998 /* Corners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Corners.swift; sourceTree = "<group>"; };
+		500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedGradientLayer.swift; sourceTree = "<group>"; };
+		500EB36F25F8B4D200B4B998 /* PopupPlaylistGrouper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupPlaylistGrouper.swift; sourceTree = "<group>"; };
 		500ECAE322B26B9500A3CF84 /* LicenseVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LicenseVC.swift; sourceTree = "<group>"; };
 		5020402F2202341500ED48A3 /* PlaylistParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistParserDelegate.swift; sourceTree = "<group>"; };
 		502040312202469100ED48A3 /* ErrorParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorParserDelegate.swift; sourceTree = "<group>"; };
@@ -429,6 +435,8 @@
 				5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */,
 				5002565625E69DC700674CE1 /* SpinnerViewController.swift */,
 				50675E6C25F61163005737FD /* BasicTableCell.swift */,
+				500EB36725F8B3EB00B4B998 /* Corners.swift */,
+				500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */,
 			);
 			path = Basics;
 			sourceTree = "<group>";
@@ -695,6 +703,7 @@
 			children = (
 				50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */,
 				5058708D21DEB07F0043896F /* SongAlphabetSection.swift */,
+				500EB36F25F8B4D200B4B998 /* PopupPlaylistGrouper.swift */,
 				50C16C0F21E5463E00F086F0 /* ArtistsVC.swift */,
 				50C16C1921E704EC00F086F0 /* ArtistDetailVC.swift */,
 				50C16C1721E704CE00F086F0 /* AlbumsVC.swift */,
@@ -991,6 +1000,7 @@
 				506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */,
 				5007CE4121EF5F4300BC5CBA /* PlaylistsVC.swift in Sources */,
 				50C16C1A21E704EC00F086F0 /* ArtistDetailVC.swift in Sources */,
+				500EB37025F8B4D200B4B998 /* PopupPlaylistGrouper.swift in Sources */,
 				50F81EEC23BF6B1E00EAAC3E /* ArtworkMO+CoreDataClass.swift in Sources */,
 				50F81EDF23BF6B1E00EAAC3E /* PlaylistMO+CoreDataProperties.swift in Sources */,
 				50C16BF321E0A3B500F086F0 /* PlayerData.swift in Sources */,
@@ -1020,6 +1030,7 @@
 				5020BD2725DC0A8100CDD37A /* SettingsSongActionOnTabVC.swift in Sources */,
 				5077F93A221F40130099CA91 /* SynchronizedArray.swift in Sources */,
 				50B8A16F23AA618A00BAD8AF /* MarqueeLabel.swift in Sources */,
+				500EB36C25F8B42800B4B998 /* AnimatedGradientLayer.swift in Sources */,
 				5009863E2208CC1E0057A1A6 /* BasicButton.swift in Sources */,
 				50C16C2821E8680A00F086F0 /* CommonScreenOperations.swift in Sources */,
 				5077F938221F24C10099CA91 /* Download.swift in Sources */,
@@ -1084,6 +1095,7 @@
 				50BA92EF21CBF45D00E5901D /* AlbumParserDelegate.swift in Sources */,
 				50A738812244B03700D3F2D4 /* SsSongParserDelegate.swift in Sources */,
 				50F8CA2D21FAD5400084F8D8 /* Reachabilty.swift in Sources */,
+				500EB36825F8B3EB00B4B998 /* Corners.swift in Sources */,
 				5086F88122399F3700546F5A /* SubsonicLibrarySyncer.swift in Sources */,
 				50BA932321DA6AFA00E5901D /* FontAwesomeIcon.swift in Sources */,
 				508FDE4A21F44E91005A0724 /* BackendAudioPlayer.swift in Sources */,

@@ -206,6 +206,7 @@
                 </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="Byk-rx-3Lv" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="09a-HO-3ex"/>
                 <constraint firstItem="pOR-k2-6Vf" firstAttribute="leading" secondItem="zQR-aF-4SD" secondAttribute="trailing" constant="8" placeholder="YES" id="1Tc-Wz-ga6"/>

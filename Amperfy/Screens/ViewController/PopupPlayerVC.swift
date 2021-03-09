@@ -1,48 +1,6 @@
 import UIKit
 
-class PopupPlaylistGrouper {
-    
-    let sectionNames = ["Previous", "Next"]
-    var sections: [[Song]]
-    private var playIndex: Int
-    
-    init(player: MusicPlayer) {
-        playIndex = player.currentlyPlaying?.index ?? 0
-        
-        let playlist = player.playlist
-        var played = [Song]()
-        if playIndex > 0 {
-            played = Array(playlist.songs[0...playIndex-1])
-        }
-        var next = [Song]()
-        if playlist.songs.count > 0, playIndex < playlist.songs.count-1 {
-            next = Array(playlist.songs[(playIndex+1)...])
-        }
-        sections = [played, next]
-    }
-    
-    func convertIndexPathToPlaylistIndex(indexPath: IndexPath) -> Int {
-        var playlistIndex = indexPath.row
-        if indexPath.section == 1 {
-            playlistIndex += (1 + sections[0].count)
-        }
-        return playlistIndex
-    }
-    
-    func convertPlaylistIndexToIndexPath(playlistIndex: Int) -> IndexPath? {
-        if playlistIndex == playIndex {
-            return nil
-        }
-        if playlistIndex < playIndex {
-            return IndexPath(row: playlistIndex, section: 0)
-        } else {
-            return IndexPath(row: playlistIndex-playIndex-1, section: 1)
-        }
-    }
-    
-}
-
-class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITableViewDragDelegate, UITableViewDropDelegate {
+class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate, UITableViewDragDelegate, UITableViewDropDelegate {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var playerPlaceholderView: UIView!
@@ -54,6 +12,27 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var playerView: PlayerView!
     var groupedPlaylist: PopupPlaylistGrouper!
     var hostingTabBarVC: TabBarVC?
+    
+    var colorPaletteDarkMode: [UIColor] = []
+    var colorPaletteLightMode: [UIColor] = []
+    var backgroundColorIndex = 0
+    let backgroundColorCount = 12
+    let lightnessDarkMode: CGFloat = 0.2
+    let lightnessLightMode: CGFloat = 0.8
+    let backgroundColorAnimationDuration: TimeInterval = 2
+    lazy var backgroundColorGradient: AnimatedGradientLayer = {
+        let gradientLayer = AnimatedGradientLayer()
+        gradientLayer.colors = [
+            UIColor.white.cgColor,
+            UIColor.white.cgColor
+        ]
+        gradientLayer.startPoint = Corners.topLeft.asPoint()
+        gradientLayer.endPoint = Corners.bottomRight.asPoint()
+        gradientLayer.locations = [0, 1]
+        gradientLayer.frame = view.bounds
+        view.layer.insertSublayer(gradientLayer, at: 0)
+        return gradientLayer
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -76,9 +55,18 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         groupedPlaylist = PopupPlaylistGrouper(player: player)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
+        tableView.backgroundColor = UIColor.clear
+        
+        for i in 0...backgroundColorCount-1 {
+            let hue = CGFloat(i)/CGFloat(12)
+            colorPaletteLightMode.append( UIColor(hue: hue, saturation: 1.0, lightness: lightnessLightMode, alpha: 1.0) )
+            colorPaletteDarkMode.append( UIColor(hue: hue, saturation: 1.0, lightness: lightnessDarkMode, alpha: 1.0) )
+        }
+        changeBackgroundGradient()
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         reloadData()
         adjustConstraintsForCompactPlayer()
         self.playerView.viewWillAppear(animated)
@@ -87,6 +75,45 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func reloadData() {
         groupedPlaylist = PopupPlaylistGrouper(player: player)
         tableView.reloadData()
+    }
+    
+    func changeBackgroundGradient() {
+        backgroundColorIndex.setOtherRandomValue(in: 0...backgroundColorCount-1)
+        var targetColor = colorPaletteLightMode[backgroundColorIndex]
+        var baseColor = UIColor.white
+        if traitCollection.userInterfaceStyle == .dark {
+            targetColor = colorPaletteDarkMode[backgroundColorIndex]
+            baseColor = UIColor.black
+        }
+
+        let firstCorner = backgroundColorGradient.oldStartCorner?.rotateRandomly() ?? .topRight
+        let secondCorner = firstCorner.opposed()
+        
+        backgroundColorGradient.setColors([targetColor.cgColor, baseColor.cgColor],
+                        newStartCorner: firstCorner,
+                        newEndCorner: secondCorner,
+                        animated: true,
+                        withDuration: backgroundColorAnimationDuration,
+                        timingFunctionName: .linear)
+    }
+    
+    // handle dark/light mode change
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        if traitCollection.userInterfaceStyle == .dark {
+            backgroundColorGradient.setColors([colorPaletteDarkMode[backgroundColorIndex].cgColor,
+                                               UIColor.black.cgColor],
+                                            animated: true,
+                                            withDuration: backgroundColorAnimationDuration,
+                                            timingFunctionName: .linear)
+        } else {
+            backgroundColorGradient.setColors([colorPaletteLightMode[backgroundColorIndex].cgColor,
+                                               UIColor.white.cgColor],
+                                            animated: true,
+                                            withDuration: backgroundColorAnimationDuration,
+                                            timingFunctionName: .linear)
+        }
     }
     
     // MARK: - PopupPlayer frame height animation
@@ -143,9 +170,15 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
-    
+
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return groupedPlaylist.sectionNames[section]
+    }
+
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        guard let headerView = view as? UITableViewHeaderFooterView else { return }
+        headerView.backgroundView = UIView()
+        headerView.backgroundView?.backgroundColor = UIColor.clear
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -162,6 +195,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         cell.display(song: song, rootView: self, displayMode: .playerCell)
         let playlistIndex = groupedPlaylist.convertIndexPathToPlaylistIndex(indexPath: indexPath)
         cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: playlistIndex)
+        cell.backgroundColor = UIColor.clear
         return cell
     }
     
@@ -228,6 +262,19 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         return true
     }
     
+    // MARK: - UIScrollViewDelegate
+    // Hide cells under transparent table section
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        for cell in tableView.visibleCells {
+            let hiddenFrameHeight = scrollView.contentOffset.y + CommonScreenOperations.tableSectionHeightLarge - cell.frame.origin.y
+            if (hiddenFrameHeight >= 0 || hiddenFrameHeight <= cell.frame.size.height) {
+                if let basicCell = cell as? BasicTableCell {
+                    basicCell.maskCell(fromTop: hiddenFrameHeight)
+                }
+            }
+        }
+    }
+    
     // MARK: - UITableViewDragDelegate
     func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
         // Create empty DragItem -> we are using tableView(_:moveRowAt:to:) method
@@ -272,6 +319,7 @@ extension PopupPlayerVC: MusicPlayable {
 
     func didStartPlaying(playlistItem: PlaylistItem) {
         self.reloadData()
+        self.changeBackgroundGradient()
     }
     
     func didPause() {
