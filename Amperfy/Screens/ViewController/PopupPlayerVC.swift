@@ -12,28 +12,8 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var playerView: PlayerView!
     var groupedPlaylist: PopupPlaylistGrouper!
     var hostingTabBarVC: TabBarVC?
-    
-    var colorPaletteDarkMode: [UIColor] = []
-    var colorPaletteLightMode: [UIColor] = []
-    var backgroundColorIndex = 0
-    let backgroundColorCount = 12
-    let lightnessDarkMode: CGFloat = 0.2
-    let lightnessLightMode: CGFloat = 0.8
-    let backgroundColorAnimationDuration: TimeInterval = 2
-    lazy var backgroundColorGradient: AnimatedGradientLayer = {
-        let gradientLayer = AnimatedGradientLayer()
-        gradientLayer.colors = [
-            UIColor.white.cgColor,
-            UIColor.white.cgColor
-        ]
-        gradientLayer.startPoint = Corners.topLeft.asPoint()
-        gradientLayer.endPoint = Corners.bottomRight.asPoint()
-        gradientLayer.locations = [0, 1]
-        gradientLayer.frame = view.bounds
-        view.layer.insertSublayer(gradientLayer, at: 0)
-        return gradientLayer
-    }()
-    
+    var backgroundColorGradient: PopupAnimatedGradientLayer!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.delegate = self
@@ -41,28 +21,24 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.tableView.dragDelegate = self
         self.tableView.dropDelegate = self
         self.tableView.dragInteractionEnabled = true
-              
+            
+        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        player = appDelegate.player
+        player.addNotifier(notifier: self)
+        appDelegate.downloadManager.addNotifier(self)
+        groupedPlaylist = PopupPlaylistGrouper(player: player)
+        backgroundColorGradient = PopupAnimatedGradientLayer(view: view)
+        changeBackgroundGradient()
+        
         if let createdPlayerView = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: playerPlaceholderView.bounds.size.width, height: playerPlaceholderView.bounds.size.height)) {
             playerView = createdPlayerView
             playerView.prepare(toWorkOnRootView: self)
             playerPlaceholderView.addSubview(playerView)
         }
 
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        player = appDelegate.player
-        player.addNotifier(notifier: self)
-        appDelegate.downloadManager.addNotifier(self)
-        groupedPlaylist = PopupPlaylistGrouper(player: player)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
         tableView.backgroundColor = UIColor.clear
-        
-        for i in 0...backgroundColorCount-1 {
-            let hue = CGFloat(i)/CGFloat(12)
-            colorPaletteLightMode.append( UIColor(hue: hue, saturation: 1.0, lightness: lightnessLightMode, alpha: 1.0) )
-            colorPaletteDarkMode.append( UIColor(hue: hue, saturation: 1.0, lightness: lightnessDarkMode, alpha: 1.0) )
-        }
-        changeBackgroundGradient()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -77,42 +53,27 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tableView.reloadData()
     }
     
-    func changeBackgroundGradient() {
-        backgroundColorIndex.setOtherRandomValue(in: 0...backgroundColorCount-1)
-        var targetColor = colorPaletteLightMode[backgroundColorIndex]
-        var baseColor = UIColor.white
-        if traitCollection.userInterfaceStyle == .dark {
-            targetColor = colorPaletteDarkMode[backgroundColorIndex]
-            baseColor = UIColor.black
-        }
-
-        let firstCorner = backgroundColorGradient.oldStartCorner?.rotateRandomly() ?? .topRight
-        let secondCorner = firstCorner.opposed()
-        
-        backgroundColorGradient.setColors([targetColor.cgColor, baseColor.cgColor],
-                        newStartCorner: firstCorner,
-                        newEndCorner: secondCorner,
-                        animated: true,
-                        withDuration: backgroundColorAnimationDuration,
-                        timingFunctionName: .linear)
+    func changeBackgroundGradient(toMatchArtwork: UIImage? = nil) {
+        backgroundColorGradient.changeBackground(style: traitCollection.userInterfaceStyle, toMatchArtwork: toMatchArtwork)
     }
     
     // handle dark/light mode change
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-
-        if traitCollection.userInterfaceStyle == .dark {
-            backgroundColorGradient.setColors([colorPaletteDarkMode[backgroundColorIndex].cgColor,
-                                               UIColor.black.cgColor],
-                                            animated: true,
-                                            withDuration: backgroundColorAnimationDuration,
-                                            timingFunctionName: .linear)
-        } else {
-            backgroundColorGradient.setColors([colorPaletteLightMode[backgroundColorIndex].cgColor,
-                                               UIColor.white.cgColor],
-                                            animated: true,
-                                            withDuration: backgroundColorAnimationDuration,
-                                            timingFunctionName: .linear)
+        backgroundColorGradient.applyStyleChange(traitCollection.userInterfaceStyle)
+    }
+    
+    func scrollToNextPlayingRow() {
+        if let nextPlayingIndex = groupedPlaylist.nextPlayingtIndexPath {
+            // Moving at first one row off, after that we move to the correct row
+            // With that we definitely trigger the function scrollViewDidScroll to call
+            // Otherwise some cells are hidden or ar displayed behind the table section
+            if let afterNextPlayingtIndexPath = groupedPlaylist.afterNextPlayingtIndexPath {
+                tableView.scrollToRow(at: afterNextPlayingtIndexPath, at: .top, animated: false)
+            } else if let beforeCurrentlyPlayingtIndexPath = groupedPlaylist.beforeCurrentlyPlayingtIndexPath {
+                tableView.scrollToRow(at: beforeCurrentlyPlayingtIndexPath, at: .top, animated: false)
+            }
+            tableView.scrollToRow(at: nextPlayingIndex, at: .top, animated: true)
         }
     }
     
@@ -319,7 +280,6 @@ extension PopupPlayerVC: MusicPlayable {
 
     func didStartPlaying(playlistItem: PlaylistItem) {
         self.reloadData()
-        self.changeBackgroundGradient()
     }
     
     func didPause() {

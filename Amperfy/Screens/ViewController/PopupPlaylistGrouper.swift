@@ -21,6 +21,32 @@ class PopupPlaylistGrouper {
         sections = [played, next]
     }
     
+    var beforeCurrentlyPlayingtIndexPath: IndexPath? {
+        if sections[0].count > 0 {
+            return IndexPath(row: sections[0].count-1, section: 0)
+        } else {
+            return nil
+        }
+    }
+    
+    var nextPlayingtIndexPath: IndexPath? {
+        if sections[1].count > 0 {
+            return IndexPath(row: 0, section: 1)
+        } else if sections[0].count > 0 {
+            return IndexPath(row: sections[0].count-1, section: 0)
+        } else {
+            return nil
+        }
+    }
+    
+    var afterNextPlayingtIndexPath: IndexPath? {
+        if sections[1].count > 1 {
+            return IndexPath(row: 1, section: 1)
+        } else {
+            return nil
+        }
+    }
+    
     func convertIndexPathToPlaylistIndex(indexPath: IndexPath) -> Int {
         var playlistIndex = indexPath.row
         if indexPath.section == 1 {

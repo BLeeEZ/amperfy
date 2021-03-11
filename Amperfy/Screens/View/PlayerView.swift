@@ -126,6 +126,7 @@ class PlayerView: UIView {
         
     private func renderAnimation(animationDuration: TimeInterval = defaultAnimationDuration) {
         if displayStyle == .compact {
+            rootView?.scrollToNextPlayingRow()
             renderAnimationSwitchToCompact(animationDuration: animationDuration)
         } else {
             renderAnimationSwitchToLarge(animationDuration: animationDuration)
@@ -297,6 +298,11 @@ class PlayerView: UIView {
             rootView?.popupItem.title = songInfo.title
             rootView?.popupItem.subtitle = songInfo.artist?.name
             rootView?.popupItem.image = songInfo.image
+            if songInfo.image == Artwork.defaultImage {
+                rootView?.changeBackgroundGradient()
+            } else {
+                rootView?.changeBackgroundGradient(toMatchArtwork: songInfo.image)
+            }
         } else {
             songTitleCompactLabel.text = "No song playing"
             songTitleLargeLabel.text = "No song playing"
@@ -306,6 +312,7 @@ class PlayerView: UIView {
             rootView?.popupItem.title = "No song playing"
             rootView?.popupItem.subtitle = ""
             rootView?.popupItem.image = Artwork.defaultImage
+            rootView?.changeBackgroundGradient()
         }
     }
 
