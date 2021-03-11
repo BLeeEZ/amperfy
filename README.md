@@ -8,7 +8,7 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 
 <img src=".github/Screenshots/Player.png" width="250" alt="Screenshot of the Amperfy player" /> &nbsp;
 <img src=".github/Screenshots/Search.png" width="250" alt="Screenshot of the Amperfy search" /> &nbsp;
-<img src=".github/Screenshots/Artist.png" width="250" alt="Screenshot of the Amperfy artist" />
+<img src=".github/Screenshots/Library.png" width="250" alt="Screenshot of the Amperfy library" />
 
 ## Features
 
