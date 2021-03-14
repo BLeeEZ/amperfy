@@ -3,6 +3,7 @@ import UIKit
 class AlbumsVC: UITableViewController {
 
     var appDelegate: AppDelegate!
+    var albumsAsyncFetch = AsynchronousFetch(result: nil)
     var albumsUnfiltered = [Album]()
     var albumsFiltered = [Album]()
     var sections = [AlphabeticSection<Album>]()
@@ -17,16 +18,24 @@ class AlbumsVC: UITableViewController {
         configureSearchController()
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.rowHeight = AlbumTableCell.rowHeight
-
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        albumsUnfiltered = [Album]()
+        self.updateSearchResults(for: self.searchController)
         loadingSpinner.display(on: self)
-        self.appDelegate.library.getAlbumsAsync() { albums in
-            let sortedAlbums = albums.sortAlphabeticallyAscending()
-            DispatchQueue.main.async {
-                self.albumsUnfiltered = sortedAlbums
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundLibrary = LibraryStorage(context: context)
+            self.albumsAsyncFetch = backgroundLibrary.getAlbumsAsync(forMainContex: self.appDelegate.storage.context) { albums in
+                self.albumsUnfiltered = albums.sortAlphabeticallyAscending()
                 self.updateSearchResults(for: self.searchController)
                 self.loadingSpinner.hide()
             }
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.albumsAsyncFetch.cancle()
     }
     
     private func configureSearchController() {

@@ -29,7 +29,6 @@
 		500B7D4521EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500B7D4421EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib */; };
 		500B7D4721EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */; };
 		500B7D4921EDD6250083ED6F /* ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4821EDD6250083ED6F /* ViewBuilder.swift */; };
-		500BB45621CAA73700D367CF /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500BB45421CAA73700D367CF /* Library.swift */; };
 		500BB45721CAA73700D367CF /* PersistentStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500BB45521CAA73700D367CF /* PersistentStorage.swift */; };
 		500BB49721CAAA2700D367CF /* Amperfy.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */; };
 		500EB36825F8B3EB00B4B998 /* Corners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500EB36725F8B3EB00B4B998 /* Corners.swift */; };
@@ -228,7 +227,6 @@
 		500B7D4421EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LibraryElementDetailTableHeaderView.xib; sourceTree = "<group>"; };
 		500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryElementDetailTableHeaderView.swift; sourceTree = "<group>"; };
 		500B7D4821EDD6250083ED6F /* ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewBuilder.swift; sourceTree = "<group>"; };
-		500BB45421CAA73700D367CF /* Library.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		500BB45521CAA73700D367CF /* PersistentStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistentStorage.swift; sourceTree = "<group>"; };
 		500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Amperfy.xcdatamodel; sourceTree = "<group>"; };
 		500EB36725F8B3EB00B4B998 /* Corners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Corners.swift; sourceTree = "<group>"; };
@@ -647,7 +645,6 @@
 				5020402E2202271000ED48A3 /* ManagedObjects */,
 				50C16C3321EB454100F086F0 /* BackgroundSyncerManager.swift */,
 				500BB45521CAA73700D367CF /* PersistentStorage.swift */,
-				500BB45421CAA73700D367CF /* Library.swift */,
 				50BA930521D5715D00E5901D /* LibraryStorage.swift */,
 				50C16C2121E7A38A00F086F0 /* Identifyable.swift */,
 				500B7D4221ECFCDD0083ED6F /* LibraryElementEnum.swift */,
@@ -1075,7 +1072,6 @@
 				5086F87F22399D1900546F5A /* SubsonicServerApi.swift in Sources */,
 				5086F887223BD68C00546F5A /* SsArtistParserDelegate.swift in Sources */,
 				502040322202469100ED48A3 /* ErrorParserDelegate.swift in Sources */,
-				500BB45621CAA73700D367CF /* Library.swift in Sources */,
 				50F81EDE23BF6B1E00EAAC3E /* PlaylistMO+CoreDataClass.swift in Sources */,
 				50BA930421D10F0000E5901D /* SyncVC.swift in Sources */,
 				50B798A923B6E5FF00551E62 /* PlaylistItem.swift in Sources */,

@@ -3,6 +3,7 @@ import UIKit
 class SongVC: UITableViewController {
     
     var appDelegate: AppDelegate!
+    var songsAsyncFetch = AsynchronousFetch(result: nil)
     var songsAll = [Song]()
     var songsUnfiltered = [Song]()
     var songsFiltered = [Song]()
@@ -18,16 +19,24 @@ class SongVC: UITableViewController {
         configureSearchController()
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        songsAll = [Song]()
+        self.updateSearchResults(for: self.searchController)
         loadingSpinner.display(on: self)
-        self.appDelegate.library.getSongsAsync() { songs in
-            let sortedSongs = songs.sortAlphabeticallyAscending()
-            DispatchQueue.main.async {
-                self.songsAll = sortedSongs
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundLibrary = LibraryStorage(context: context)
+            self.songsAsyncFetch = backgroundLibrary.getSongsAsync(forMainContex: self.appDelegate.storage.context) { songs in
+                self.songsAll = songs.sortAlphabeticallyAscending()
                 self.updateSearchResults(for: self.searchController)
                 self.loadingSpinner.hide()
             }
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.songsAsyncFetch.cancle()
     }
 
     private func configureSearchController() {

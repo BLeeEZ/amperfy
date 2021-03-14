@@ -1,4 +1,5 @@
 import UIKit
+import CoreData
 
 class SearchVC: UITableViewController {
 
@@ -6,20 +7,24 @@ class SearchVC: UITableViewController {
     var playlistsAll = [Playlist]()
     var playlistsUnfiltered = [Playlist]()
     var playlistsFiltered = [Playlist]()
-    var isPlaylistsFetchDone = false
+    var playlistsAsyncFetch = AsynchronousFetch(result: nil)
+    private var playlistsFetchSemaphore = DispatchSemaphore(value: 0)
     var artistsAll = [Artist]()
     var artistsUnfiltered = [Artist]()
     var artistsFiltered = [Artist]()
-    var isArtistsFetchDone = false
+    var artistsAsyncFetch = AsynchronousFetch(result: nil)
+    private var artistsFetchSemaphore = DispatchSemaphore(value: 0)
     var albumsAll = [Album]()
     var albumsUnfiltered = [Album]()
     var albumsFiltered = [Album]()
-    var isAlbumsFetchDone = false
+    var albumsAsyncFetch = AsynchronousFetch(result: nil)
+    private var albumsFetchSemaphore = DispatchSemaphore(value: 0)
     var songsAll = [Song]()
     var songsUnfiltered = [Song]()
     var songsFiltered = [Song]()
-    var isSongsFetchDone = false
-
+    var songsAsyncFetch = AsynchronousFetch(result: nil)
+    private var songsFetchSemaphore = DispatchSemaphore(value: 0)
+    
     private let searchController = UISearchController(searchResultsController: nil)
     private let loadingSpinner = SpinnerViewController()
 
@@ -32,48 +37,61 @@ class SearchVC: UITableViewController {
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
-
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        playlistsAll = [Playlist]()
+        artistsAll = [Artist]()
+        albumsAll = [Album]()
+        songsAll = [Song]()
+        updateSearchResults(for: self.searchController)
+        
+        playlistsFetchSemaphore = DispatchSemaphore(value: 0)
+        artistsFetchSemaphore = DispatchSemaphore(value: 0)
+        albumsFetchSemaphore = DispatchSemaphore(value: 0)
+        songsFetchSemaphore = DispatchSemaphore(value: 0)
+        
         loadingSpinner.display(on: self)
-        self.appDelegate.library.getPlaylistsAsync() { albums in
-            let sortedPlaylists = albums.sortAlphabeticallyAscending()
-            DispatchQueue.main.async {
-                self.playlistsAll = sortedPlaylists
-                self.isPlaylistsFetchDone = true
-                self.reloadViewIfAllFetchesAreDone()
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundLibrary = LibraryStorage(context: context)
+            self.playlistsAsyncFetch = backgroundLibrary.getPlaylistsAsync(forMainContex: self.appDelegate.storage.context) { playlists in
+                self.playlistsAll = playlists.sortAlphabeticallyAscending()
+                self.playlistsFetchSemaphore.signal()
+            }
+            self.artistsAsyncFetch = backgroundLibrary.getArtistsAsync(forMainContex: self.appDelegate.storage.context) { artists in
+                self.artistsAll = artists.sortAlphabeticallyAscending()
+                self.artistsFetchSemaphore.signal()
+            }
+            self.albumsAsyncFetch = backgroundLibrary.getAlbumsAsync(forMainContex: self.appDelegate.storage.context) { albums in
+                self.albumsAll = albums.sortAlphabeticallyAscending()
+                self.albumsFetchSemaphore.signal()
+            }
+            self.songsAsyncFetch = backgroundLibrary.getSongsAsync(forMainContex: self.appDelegate.storage.context) { songs in
+                self.songsAll = songs.sortAlphabeticallyAscending()
+                self.songsFetchSemaphore.signal()
             }
         }
-        self.appDelegate.library.getArtistsAsync() { artists in
-            let sortedArtists = artists.sortAlphabeticallyAscending()
+        DispatchQueue.global().async {
+            self.playlistsFetchSemaphore.wait()
+            self.artistsFetchSemaphore.wait()
+            self.albumsFetchSemaphore.wait()
+            self.songsFetchSemaphore.wait()
             DispatchQueue.main.async {
-                self.artistsAll = sortedArtists
-                self.isArtistsFetchDone = true
-                self.reloadViewIfAllFetchesAreDone()
-            }
-        }
-        self.appDelegate.library.getAlbumsAsync() { albums in
-            let sortedAlbums = albums.sortAlphabeticallyAscending()
-            DispatchQueue.main.async {
-                self.albumsAll = sortedAlbums
-                self.isAlbumsFetchDone = true
-                self.reloadViewIfAllFetchesAreDone()
-            }
-        }
-        self.appDelegate.library.getSongsAsync() { songs in
-            let sortedSongs = songs.sortAlphabeticallyAscending()
-            DispatchQueue.main.async {
-                self.songsAll = sortedSongs
-                self.isSongsFetchDone = true
                 self.reloadViewIfAllFetchesAreDone()
             }
         }
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        playlistsAsyncFetch.cancle()
+        artistsAsyncFetch.cancle()
+        albumsAsyncFetch.cancle()
+        songsAsyncFetch.cancle()
+    }
+    
     private func reloadViewIfAllFetchesAreDone() {
-        if isPlaylistsFetchDone, isArtistsFetchDone, isAlbumsFetchDone, isSongsFetchDone {
-            updateDataBasedOnScope()
-            updateSearchResults(for: self.searchController)
-            self.loadingSpinner.hide()
-        }
+        updateSearchResults(for: self.searchController)
+        self.loadingSpinner.hide()
     }
 
     private func configureSearchController() {

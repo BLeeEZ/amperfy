@@ -19,9 +19,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var backendApi: BackendApi = {
         return backendProxy
     }()
-    lazy var library = {
-        return Library(storage: persistentLibraryStorage)
-    }()
     lazy var player = {
         return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), backendAudioPlayer: BackendAudioPlayer(songDownloader: downloadManager))
     }()

@@ -3,6 +3,7 @@ import UIKit
 class ArtistsVC: UITableViewController {
 
     var appDelegate: AppDelegate!
+    var artistsAsyncFetch = AsynchronousFetch(result: nil)
     var artistsUnfiltered = [Artist]()
     var artistsFiltered = [Artist]()
     var sections = [AlphabeticSection<Artist>]()
@@ -17,16 +18,24 @@ class ArtistsVC: UITableViewController {
         configureSearchController()
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.rowHeight = ArtistTableCell.rowHeight
-
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        artistsUnfiltered = [Artist]()
+        self.updateSearchResults(for: self.searchController)
         loadingSpinner.display(on: self)
-        self.appDelegate.library.getArtistsAsync() { artists in
-            let sortedArtists = artists.sortAlphabeticallyAscending()
-            DispatchQueue.main.async {
-                self.artistsUnfiltered = sortedArtists
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundLibrary = LibraryStorage(context: context)
+            self.artistsAsyncFetch = backgroundLibrary.getArtistsAsync(forMainContex: self.appDelegate.storage.context) { artists in
+                self.artistsUnfiltered = artists.sortAlphabeticallyAscending()
                 self.updateSearchResults(for: self.searchController)
                 self.loadingSpinner.hide()
             }
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.artistsAsyncFetch.cancle()
     }
     
     private func configureSearchController() {

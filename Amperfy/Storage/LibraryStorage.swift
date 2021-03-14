@@ -2,6 +2,23 @@ import Foundation
 import CoreData
 import os.log
 
+class AsynchronousFetch {
+    
+    private let fetchResult: NSPersistentStoreAsynchronousResult?
+    var wasRequestingSuccessful: Bool {
+        return fetchResult != nil
+    }
+    
+    init(result: NSPersistentStoreAsynchronousResult?) {
+        fetchResult = result
+    }
+    
+    func cancle() {
+        fetchResult?.cancel()
+    }
+    
+}
+
 class LibraryStorage {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "LibraryStorage")
@@ -124,21 +141,26 @@ class LibraryStorage {
         return artists
     }
     
-    func getArtistsAsync(completion: @escaping (_ artists: Array<Artist>) -> Void) {
+    func getArtistsAsync(forMainContex: NSManagedObjectContext, completion: @escaping (_ artists: Array<Artist>) -> Void) -> AsynchronousFetch {
+        var asyncFetch = AsynchronousFetch(result: nil)
         let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
-        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (asynchronousFetchResult) -> Void in
-            var artists = Array<Artist>()
-            guard let foundArtists = asynchronousFetchResult.finalResult else {
-                return
+        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (fetchResult) -> Void in
+            DispatchQueue.main.async {
+                var artists = Array<Artist>()
+                if let foundArtists = fetchResult.finalResult {
+                    artists = foundArtists.lazy
+                        .compactMap{ $0.objectID }
+                        .compactMap{ forMainContex.object(with: $0) as? ArtistMO }
+                        .compactMap{ Artist(managedObject: $0) }
+                }
+                completion(artists)
             }
-            for artistMO in foundArtists {
-                artists.append(Artist(managedObject: artistMO))
-            }
-            completion(artists)
         }
         do {
-            try context.execute(asynchronousFetchRequest)
+            let asynchronousFetchResult = try context.execute(asynchronousFetchRequest) as? NSPersistentStoreAsynchronousResult
+            asyncFetch = AsynchronousFetch(result: asynchronousFetchResult)
         } catch {}
+        return asyncFetch
     }
     
     func getAlbums() -> Array<Album> {
@@ -155,21 +177,26 @@ class LibraryStorage {
         return albums
     }
 
-    func getAlbumsAsync(completion: @escaping (_ albums: Array<Album>) -> Void) {
+    func getAlbumsAsync(forMainContex: NSManagedObjectContext, completion: @escaping (_ albums: Array<Album>) -> Void) -> AsynchronousFetch {
+        var asyncFetch = AsynchronousFetch(result: nil)
         let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (asynchronousFetchResult) -> Void in
-            var albums = Array<Album>()
-            guard let foundAlbums = asynchronousFetchResult.finalResult else {
-                return
+        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (fetchResult) -> Void in
+            DispatchQueue.main.async {
+                var albums = Array<Album>()
+                if let foundAlbums = fetchResult.finalResult {
+                    albums = foundAlbums.lazy
+                        .compactMap{ $0.objectID }
+                        .compactMap{ forMainContex.object(with: $0) as? AlbumMO }
+                        .compactMap{ Album(managedObject: $0) }
+                }
+                completion(albums)
             }
-            for albumMO in foundAlbums {
-                albums.append(Album(managedObject: albumMO))
-            }
-            completion(albums)
         }
         do {
-            try context.execute(asynchronousFetchRequest)
+            let asynchronousFetchResult = try context.execute(asynchronousFetchRequest) as? NSPersistentStoreAsynchronousResult
+            asyncFetch = AsynchronousFetch(result: asynchronousFetchResult)
         } catch {}
+        return asyncFetch
     }
     
     func getSongs() -> Array<Song> {
@@ -186,21 +213,26 @@ class LibraryStorage {
         return songs
     }
 
-    func getSongsAsync(completion: @escaping (_ songs: Array<Song>) -> Void) {
+    func getSongsAsync(forMainContex: NSManagedObjectContext, completion: @escaping (_ songs: Array<Song>) -> Void) -> AsynchronousFetch {
+        var asyncFetch = AsynchronousFetch(result: nil)
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (asynchronousFetchResult) -> Void in
-            var songs = Array<Song>()
-            guard let foundSongs = asynchronousFetchResult.finalResult else {
-                return
+        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (fetchResult) -> Void in
+            DispatchQueue.main.async {
+                var songs = Array<Song>()
+                if let foundSongs = fetchResult.finalResult {
+                    songs = foundSongs.lazy
+                        .compactMap{ $0.objectID }
+                        .compactMap{ forMainContex.object(with: $0) as? SongMO }
+                        .compactMap{ Song(managedObject: $0) }
+                }
+                completion(songs)
             }
-            for songMO in foundSongs {
-                songs.append(Song(managedObject: songMO))
-            }
-            completion(songs)
         }
         do {
-            try context.execute(asynchronousFetchRequest)
+            let asynchronousFetchResult = try context.execute(asynchronousFetchRequest) as? NSPersistentStoreAsynchronousResult
+            asyncFetch = AsynchronousFetch(result: asynchronousFetchResult)
         } catch {}
+        return asyncFetch
     }
     
     func getPlaylists() -> Array<Playlist> {
@@ -219,23 +251,27 @@ class LibraryStorage {
         return playlists
     }
 
-    func getPlaylistsAsync(completion: @escaping (_ playlists: Array<Playlist>) -> Void) {
+    func getPlaylistsAsync(forMainContex: NSManagedObjectContext, completion: @escaping (_ playlists: Array<Playlist>) -> Void) -> AsynchronousFetch {
+        var asyncFetch = AsynchronousFetch(result: nil)
         let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "playersNormalPlaylist == nil && playersShuffledPlaylist == nil")
-        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (asynchronousFetchResult) -> Void in
-            var playlists = Array<Playlist>()
-            guard let foundPlaylists = asynchronousFetchResult.finalResult else {
-                return
+        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (fetchResult) -> Void in
+            DispatchQueue.main.async {
+                var playlists = Array<Playlist>()
+                if let foundPlaylists = fetchResult.finalResult {
+                    playlists = foundPlaylists.lazy
+                        .compactMap{ $0.objectID }
+                        .compactMap{ forMainContex.object(with: $0) as? PlaylistMO }
+                        .compactMap{ Playlist(storage: LibraryStorage(context: forMainContex), managedObject: $0) }
+                }
+                completion(playlists)
             }
-            for playlist in foundPlaylists {
-                let wrappedPlaylist = Playlist(storage: self, managedObject: playlist)
-                playlists.append(wrappedPlaylist)
-            }
-            completion(playlists)
         }
         do {
-            try context.execute(asynchronousFetchRequest)
+            let asynchronousFetchResult = try context.execute(asynchronousFetchRequest) as? NSPersistentStoreAsynchronousResult
+            asyncFetch = AsynchronousFetch(result: asynchronousFetchResult)
         } catch {}
+        return asyncFetch
     }
     
     func getPlayerData() -> PlayerData {

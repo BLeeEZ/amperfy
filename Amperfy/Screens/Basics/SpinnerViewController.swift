@@ -2,7 +2,9 @@ import Foundation
 import UIKit
 
 class SpinnerViewController: UIViewController {
-    var spinner = UIActivityIndicatorView(style: .whiteLarge)
+    
+    private var spinner = UIActivityIndicatorView(style: .whiteLarge)
+    private var isDisplayed = false
 
     override func loadView() {
         view = UIView()
@@ -30,15 +32,21 @@ class SpinnerViewController: UIViewController {
     }
     
     func display(on hostVC: UIViewController) {
-        hostVC.addChild(self)
-        self.view.frame = hostVC.view.frame
-        hostVC.view.addSubview(self.view)
-        self.didMove(toParent: hostVC)
+        if !isDisplayed {
+            hostVC.addChild(self)
+            self.view.frame = hostVC.view.frame
+            hostVC.view.addSubview(self.view)
+            self.didMove(toParent: hostVC)
+            isDisplayed = true
+        }
     }
     
     func hide() {
-        self.willMove(toParent: nil)
-        self.view.removeFromSuperview()
-        self.removeFromParent()
+        if isDisplayed {
+            self.willMove(toParent: nil)
+            self.view.removeFromSuperview()
+            self.removeFromParent()
+            isDisplayed = false
+        }
     }
 }

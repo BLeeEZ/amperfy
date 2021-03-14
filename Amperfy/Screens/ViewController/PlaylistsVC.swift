@@ -3,6 +3,7 @@ import UIKit
 class PlaylistsVC: UITableViewController {
 
     var appDelegate: AppDelegate!
+    var playlistsAsyncFetch = AsynchronousFetch(result: nil)
     var playlistsAll = [Playlist]()
     var playlistsUnfiltered = [Playlist]()
     var playlistsFiltered = [Playlist]()
@@ -18,16 +19,24 @@ class PlaylistsVC: UITableViewController {
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         self.refreshControl?.addTarget(self, action: #selector(PlaylistsVC.handleRefresh), for: UIControl.Event.valueChanged)
-
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        playlistsAll = [Playlist]()
+        self.updateSearchResults(for: self.searchController)
         loadingSpinner.display(on: self)
-        self.appDelegate.library.getPlaylistsAsync() { albums in
-            let sortedPlaylists = albums.sortAlphabeticallyAscending()
-            DispatchQueue.main.async {
-                self.playlistsAll = sortedPlaylists
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundLibrary = LibraryStorage(context: context)
+            self.playlistsAsyncFetch = backgroundLibrary.getPlaylistsAsync(forMainContex: self.appDelegate.storage.context) { playlists in
+                self.playlistsAll = playlists.sortAlphabeticallyAscending()
                 self.updateSearchResults(for: self.searchController)
                 self.loadingSpinner.hide()
             }
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.playlistsAsyncFetch.cancle()
     }
     
     private func configureSearchController() {
@@ -84,7 +93,7 @@ class PlaylistsVC: UITableViewController {
             playlistsFiltered.remove(at: indexPath.row)
             appDelegate.persistentLibraryStorage.deletePlaylist(playlist)
             appDelegate.persistentLibraryStorage.saveContext()
-            playlistsUnfiltered = appDelegate.library.getPlaylists().sortAlphabeticallyAscending()
+            playlistsAll = playlistsAll.filter{ $0.managedObject.objectID != playlist.managedObject.objectID }
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
@@ -100,12 +109,10 @@ class PlaylistsVC: UITableViewController {
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let storage = LibraryStorage(context: context)
-            syncer.syncDownPlaylistsWithoutSongs(libraryStorage: storage)
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.playlistsUnfiltered = self.appDelegate.library.getPlaylists().sortAlphabeticallyAscending()
+            let backgroundLibrary = LibraryStorage(context: context)
+            syncer.syncDownPlaylistsWithoutSongs(libraryStorage: backgroundLibrary)
+            self.playlistsAsyncFetch = backgroundLibrary.getPlaylistsAsync(forMainContex: self.appDelegate.storage.context) { playlists in
+                self.playlistsAll = playlists.sortAlphabeticallyAscending()
                 self.updateSearchResults(for: self.searchController)
                 refreshControl.endRefreshing()
             }

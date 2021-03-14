@@ -14,23 +14,24 @@ public class Playlist: NSObject {
     
     private var sortedPlaylistItems: [PlaylistItem] {
         var sortedItems = [PlaylistItem]()
-        let sortedItemsMO = (managedObject.items!.allObjects as! [PlaylistItemMO]).sorted(by: { $0.order < $1.order })
-        for itemMO in sortedItemsMO {
-            sortedItems.append(PlaylistItem(storage: storage, managedObject: itemMO))
+        guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else {
+            return sortedItems
         }
+        sortedItems = itemsMO.lazy
+            .sorted(by: { $0.order < $1.order })
+            .compactMap{ PlaylistItem(storage: storage, managedObject: $0) }
         return sortedItems
     }
+    
     private var sortedCachedPlaylistItems: [PlaylistItem] {
-        let cachedItemsMO = managedObject.items!.filter{ entry in
-            let item = entry as! PlaylistItemMO
-            return item.song?.file != nil
-        }
-        let sortedItemsMO = (cachedItemsMO as! [PlaylistItemMO]).sorted(by: { $0.order < $1.order })
-        
         var sortedCachedItems = [PlaylistItem]()
-        for itemMO in sortedItemsMO {
-            sortedCachedItems.append(PlaylistItem(storage: storage, managedObject: itemMO))
+        guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else {
+            return sortedCachedItems
         }
+        sortedCachedItems = itemsMO.lazy
+            .filter{ return $0.song?.file != nil }
+            .sorted(by: { $0.order < $1.order })
+            .compactMap{ PlaylistItem(storage: storage, managedObject: $0) }
         return sortedCachedItems
     }
     
