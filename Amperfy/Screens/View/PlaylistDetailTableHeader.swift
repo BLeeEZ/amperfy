@@ -14,7 +14,7 @@ class PlaylistDetailTableHeader: UIView {
     @IBOutlet weak var smartPlaylistLabel: UILabel!
     @IBOutlet weak var songCountLabel: UILabel!
     
-    static let frameHeight: CGFloat = 100.0 + margin.top + margin.bottom
+    static let frameHeight: CGFloat = 109.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginTopElement
     
     private var playlist: Playlist?

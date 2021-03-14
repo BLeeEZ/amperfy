@@ -4,8 +4,9 @@ class AlbumDetailTableHeader: UIView {
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var albumImage: UIImageView!
+    @IBOutlet weak var infoLabel: UILabel!
     
-    static let frameHeight: CGFloat = 113.0 + margin.top + margin.bottom
+    static let frameHeight: CGFloat = 150.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginTopElement
     private var album: Album?
     private var appDelegate: AppDelegate!
@@ -25,6 +26,7 @@ class AlbumDetailTableHeader: UIView {
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
         albumImage.image = album.image
+        infoLabel.text = "\(album.songs.count) Songs"
     }
 
     @IBAction func optionsButtonPressed(_ sender: Any) {

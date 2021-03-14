@@ -16,9 +16,9 @@ class AlbumDetailVC: UITableViewController {
             albumDetailTableHeaderView.prepare(toWorkOnAlbum: album, rootView: self)
             tableView.tableHeaderView?.addSubview(albumDetailTableHeaderView)
         }
-        if let artistDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: ArtistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            artistDetailTableHeaderView.prepare(toWorkOnAlbum: album, with: appDelegate.player)
-            tableView.tableHeaderView?.addSubview(artistDetailTableHeaderView)
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: AlbumDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+            libraryElementDetailTableHeaderView.prepare(toWorkOnAlbum: album, with: appDelegate.player)
+            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
     }
     

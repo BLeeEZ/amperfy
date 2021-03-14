@@ -4,8 +4,9 @@ class ArtistDetailTableHeader: UIView {
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var artistImage: UIImageView!
+    @IBOutlet weak var infoLabel: UILabel!
     
-    static let frameHeight: CGFloat = 125.0 + margin.top + margin.bottom
+    static let frameHeight: CGFloat = 150.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginTopElement
     
     private var artist: Artist?
@@ -26,6 +27,19 @@ class ArtistDetailTableHeader: UIView {
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
         artistImage.image = artist.image
+        var infoText = ""
+        if artist.albums.count == 1 {
+            infoText += "1 Album"
+        } else {
+            infoText += "\(artist.albums.count) Albums"
+        }
+        infoText += " \(CommonString.oneMiddleDot) "
+        if artist.songs.count == 1 {
+            infoText += "1 Song"
+        } else {
+            infoText += "\(artist.songs.count) Songs"
+        }
+        infoLabel.text = infoText
     }
 
     @IBAction func optionsButtonPressed(_ sender: Any) {

@@ -5,6 +5,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -14,6 +15,12 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="152 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iPX-Fa-tH3" userLabel="Info Label">
+                    <rect key="frame" x="16" y="133" width="67.5" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="j2g-G9-4Tx" userLabel="Album Image" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="16" y="0.0" width="125" height="125"/>
                     <constraints>
@@ -47,17 +54,25 @@
             <constraints>
                 <constraint firstAttribute="trailingMargin" secondItem="8vs-AB-Tkb" secondAttribute="trailing" id="1ud-wl-WLN"/>
                 <constraint firstItem="Arb-mj-xt4" firstAttribute="leading" secondItem="j2g-G9-4Tx" secondAttribute="trailing" constant="8" id="BHq-Zz-cv5"/>
+                <constraint firstItem="iPX-Fa-tH3" firstAttribute="top" secondItem="j2g-G9-4Tx" secondAttribute="bottom" constant="8" id="Oje-7y-tAi"/>
                 <constraint firstItem="8vs-AB-Tkb" firstAttribute="bottom" secondItem="j2g-G9-4Tx" secondAttribute="bottom" id="RiV-3e-Ius"/>
                 <constraint firstAttribute="trailingMargin" secondItem="Arb-mj-xt4" secondAttribute="trailing" id="WhT-tv-ylP"/>
                 <constraint firstItem="Arb-mj-xt4" firstAttribute="top" secondItem="j2g-G9-4Tx" secondAttribute="top" id="lKL-n3-1k8"/>
                 <constraint firstItem="j2g-G9-4Tx" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="qd9-8J-O5v"/>
+                <constraint firstItem="iPX-Fa-tH3" firstAttribute="leading" secondItem="j2g-G9-4Tx" secondAttribute="leading" id="wSc-js-aAJ"/>
                 <constraint firstItem="j2g-G9-4Tx" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="x2q-BN-MO2"/>
             </constraints>
             <connections>
                 <outlet property="albumImage" destination="j2g-G9-4Tx" id="qu0-cF-54N"/>
+                <outlet property="infoLabel" destination="iPX-Fa-tH3" id="j5K-fE-JvF"/>
                 <outlet property="nameLabel" destination="Arb-mj-xt4" id="LqP-ig-30T"/>
             </connections>
-            <point key="canvasLocation" x="-31" y="133"/>
+            <point key="canvasLocation" x="-31.199999999999999" y="132.68365817091455"/>
         </view>
     </objects>
+    <resources>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>
