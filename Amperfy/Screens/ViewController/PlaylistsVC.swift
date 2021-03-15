@@ -108,29 +108,80 @@ class PlaylistsVC: UITableViewController {
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
             let backgroundLibrary = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+            
+            let oldSortedPlaylists = backgroundLibrary.getPlaylists().sortAlphabeticallyAscending()
             syncer.syncDownPlaylistsWithoutSongs(libraryStorage: backgroundLibrary)
+            let newSortedPlaylists = backgroundLibrary.getPlaylists().sortAlphabeticallyAscending()
+            let newAddedPlaylists = newSortedPlaylists.filter{ !oldSortedPlaylists.contains($0) }
+
+            for addedPlaylist in newAddedPlaylists {
+                syncer.syncDown(playlist: addedPlaylist, libraryStorage: backgroundLibrary, statusNotifyier: nil)
+            }
+            
             self.playlistsAsyncFetch = backgroundLibrary.getPlaylistsAsync(forMainContex: self.appDelegate.storage.context) { playlists in
-                self.playlistsAll = playlists.sortAlphabeticallyAscending()
-                self.updateSearchResults(for: self.searchController)
-                refreshControl.endRefreshing()
+                let newSortedPlaylists = playlists.sortAlphabeticallyAscending()
+                self.animateTableViewUpdate(withNewPlaylists: newSortedPlaylists)
+                self.refreshControl?.endRefreshing()
             }
         }
+    }
+    
+    private func animateTableViewUpdate(withNewPlaylists newPlaylists: [Playlist]) {
+        let newPlaylistsFilteredByScope = filterBasedOnOnScope(playlists: newPlaylists)
+        let newFilteredPlaylists = filterSearchResults(for: searchController, playlists: newPlaylistsFilteredByScope)
+        let oldFilteredPlaylists = filterBasedOnOnScope(playlists: playlistsAll)
+        
+        var commonPlaylists = [Playlist]()
+        var playlistsDeleted = [IndexPath]()
+        var playlistsAdded = [IndexPath]()
+        
+        for (index, playlist) in oldFilteredPlaylists.enumerated() {
+            if newFilteredPlaylists.contains(playlist) {
+                commonPlaylists.append(playlist)
+            } else {
+                playlistsDeleted.append(IndexPath(row: index, section: 0))
+            }
+        }
+        for (index, playlist) in newFilteredPlaylists.enumerated() {
+            if !commonPlaylists.contains(playlist) {
+                playlistsAdded.append(IndexPath(row: index, section: 0))
+            }
+        }
+        
+        tableView.beginUpdates()
+        tableView.deleteRows(at: playlistsDeleted, with: .automatic)
+        tableView.insertRows(at: playlistsAdded, with: .bottom)
+        self.playlistsAll = newPlaylists
+        self.updateSearchResults(for: self.searchController, isTableReloadNeeded: false)
+        tableView.endUpdates()
     }
     
 }
 
 extension PlaylistsVC: UISearchResultsUpdating {
     
-    func updateSearchResults(for searchController: UISearchController) {
-        updateDataBasedOnScope()
+    func filterSearchResults(for searchController: UISearchController, playlists: [Playlist]) -> [Playlist]  {
+        var filteredPlaylists = [Playlist]()
         if let searchText = searchController.searchBar.text, !searchText.isEmpty {
-            playlistsFiltered = playlistsUnfiltered.filterBy(searchText: searchText)
+            filteredPlaylists = playlists.filterBy(searchText: searchText)
         } else {
-            playlistsFiltered = playlistsUnfiltered
+            filteredPlaylists = playlists
         }
-        tableView.reloadData()
+        return filteredPlaylists
+    }
+    
+    func updateSearchResults(for searchController: UISearchController, isTableReloadNeeded: Bool) {
+        playlistsUnfiltered = filterBasedOnOnScope(playlists: playlistsAll)
+        playlistsFiltered = filterSearchResults(for: searchController, playlists: playlistsUnfiltered)
+        if isTableReloadNeeded {
+            tableView.reloadData()
+        }
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        updateSearchResults(for: searchController, isTableReloadNeeded: true)
     }
     
 }
@@ -144,18 +195,22 @@ extension PlaylistsVC: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         updateSearchResults(for: searchController)
     }
-
-    func updateDataBasedOnScope() {
+    
+    func filterBasedOnOnScope(playlists: [Playlist]) -> [Playlist] {
+        var filteredPlaylists = [Playlist]()
         switch searchController.searchBar.selectedScopeButtonIndex {
         case 1:
-            playlistsUnfiltered = playlistsAll.filterRegualarPlaylists()
+            filteredPlaylists = playlists.filterRegualarPlaylists()
         case 2:
-            playlistsUnfiltered = playlistsAll.filterSmartPlaylists()
+            filteredPlaylists = playlists.filterSmartPlaylists()
         default:
-            playlistsUnfiltered = playlistsAll
+            filteredPlaylists = playlists
         }
+        return filteredPlaylists
     }
+
 }
 
 extension PlaylistsVC: UISearchControllerDelegate {
 }
+
