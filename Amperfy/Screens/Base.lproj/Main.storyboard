@@ -1757,7 +1757,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IDq-Rn-c12" userLabel="Value">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IDq-Rn-c12" userLabel="Value">
                                                     <rect key="frame" x="294" y="5" width="100" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="dux-KY-Ocg"/>
@@ -1775,11 +1775,16 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="5Wy-ux-O8s" userLabel="Spinner">
+                                                    <rect key="frame" x="374" y="10" width="20" height="20"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="leadingMargin" secondItem="6EB-Ym-qzl" secondAttribute="trailing" constant="-150" id="24H-Ht-XcY"/>
                                                 <constraint firstItem="IDq-Rn-c12" firstAttribute="leading" secondItem="jLI-pw-RIZ" secondAttribute="trailingMargin" constant="-100" id="CBF-6g-vHo"/>
+                                                <constraint firstItem="5Wy-ux-O8s" firstAttribute="centerY" secondItem="jLI-pw-RIZ" secondAttribute="centerY" id="HYT-U8-Gpv"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="IDq-Rn-c12" secondAttribute="trailing" id="ZXH-k3-isq"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="5Wy-ux-O8s" secondAttribute="trailing" id="jia-cz-Gi4"/>
                                                 <constraint firstItem="6EB-Ym-qzl" firstAttribute="centerY" secondItem="jLI-pw-RIZ" secondAttribute="centerY" id="nBn-YP-zib"/>
                                                 <constraint firstItem="6EB-Ym-qzl" firstAttribute="leading" secondItem="jLI-pw-RIZ" secondAttribute="leadingMargin" id="om2-YV-Ead"/>
                                                 <constraint firstItem="IDq-Rn-c12" firstAttribute="centerY" secondItem="jLI-pw-RIZ" secondAttribute="centerY" id="spu-Xb-vLh"/>
@@ -1793,7 +1798,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OaM-sv-EGG" userLabel="Value">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OaM-sv-EGG" userLabel="Value">
                                                     <rect key="frame" x="294" y="5" width="100" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="dgI-Jg-VyS"/>
@@ -1811,11 +1816,16 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="b1P-EU-cSS" userLabel="Spinner">
+                                                    <rect key="frame" x="374" y="10" width="20" height="20"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="OaM-sv-EGG" firstAttribute="centerY" secondItem="YE3-CN-PQH" secondAttribute="centerY" id="0kT-LN-M3L"/>
                                                 <constraint firstItem="Beu-87-Tgo" firstAttribute="centerY" secondItem="YE3-CN-PQH" secondAttribute="centerY" id="8L2-7D-ReJ"/>
                                                 <constraint firstAttribute="leadingMargin" secondItem="Beu-87-Tgo" secondAttribute="trailing" constant="-150" id="CeK-rC-sdP"/>
+                                                <constraint firstItem="b1P-EU-cSS" firstAttribute="centerY" secondItem="YE3-CN-PQH" secondAttribute="centerY" id="QzO-Bq-qRe"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="b1P-EU-cSS" secondAttribute="trailing" id="UVp-2q-z9m"/>
                                                 <constraint firstItem="OaM-sv-EGG" firstAttribute="leading" secondItem="YE3-CN-PQH" secondAttribute="trailingMargin" constant="-100" id="cqD-D5-IRD"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="OaM-sv-EGG" secondAttribute="trailing" id="oyX-df-6Ll"/>
                                                 <constraint firstItem="Beu-87-Tgo" firstAttribute="leading" secondItem="YE3-CN-PQH" secondAttribute="leadingMargin" id="xY9-s5-mrU"/>
@@ -1862,7 +1872,9 @@
                         <outlet property="albumsCountLabel" destination="KgV-m6-5E6" id="bRO-2g-ob0"/>
                         <outlet property="artistsCountLabel" destination="Thx-6G-fSC" id="HSr-Ci-J1L"/>
                         <outlet property="cachedSongsCountLabel" destination="IDq-Rn-c12" id="Era-EP-6wg"/>
+                        <outlet property="cachedSongsCountSpinner" destination="5Wy-ux-O8s" id="OuR-sQ-3dh"/>
                         <outlet property="cachedSongsSizeLabel" destination="OaM-sv-EGG" id="foo-YG-xn3"/>
+                        <outlet property="cachedSongsSizeSpinner" destination="b1P-EU-cSS" id="5fI-gv-Ztd"/>
                         <outlet property="playlistsCountLabel" destination="c9v-4o-ykS" id="y6d-Qf-35a"/>
                         <outlet property="songsCountLabel" destination="wam-6j-yLi" id="uAg-x4-OHc"/>
                     </connections>

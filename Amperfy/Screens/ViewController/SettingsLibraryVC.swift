@@ -11,7 +11,9 @@ class SettingsLibraryVC: UITableViewController {
     @IBOutlet weak var playlistsCountLabel: UILabel!
     
     @IBOutlet weak var cachedSongsCountLabel: UILabel!
+    @IBOutlet weak var cachedSongsCountSpinner: UIActivityIndicatorView!
     @IBOutlet weak var cachedSongsSizeLabel: UILabel!
+    @IBOutlet weak var cachedSongsSizeSpinner: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,6 +49,7 @@ class SettingsLibraryVC: UITableViewController {
             let cachedSongs = songs.filterCached()
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
+                self.cachedSongsCountSpinner.isHidden = true
                 self.cachedSongsCountLabel.text = String(cachedSongs.count)
             }
             
@@ -65,6 +68,7 @@ class SettingsLibraryVC: UITableViewController {
             }
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
+                self.cachedSongsSizeSpinner.isHidden = true
                 self.cachedSongsSizeLabel.text = cachedSongSizeLabelText
             }
         }
