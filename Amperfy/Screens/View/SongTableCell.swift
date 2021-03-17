@@ -68,6 +68,8 @@ class SongTableCell: BasicTableCell {
         }
         if song.isCached {
             artistLabel.textColor = UIColor.defaultBlue
+        } else  {
+            artistLabel.textColor = UIColor.secondaryLabelColor
         }
         if let download = download {
             downloadProgress.isHidden = false

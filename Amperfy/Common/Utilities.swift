@@ -86,6 +86,22 @@ extension UIColor {
     static var defaultBlue: UIColor {
         return UIView().tintColor
     }
+    
+    static var labelColor: UIColor {
+        if #available(iOS 13.0, *) {
+            return UIColor.label
+        } else {
+            return UIColor.black
+        }
+    }
+    
+    static var secondaryLabelColor: UIColor {
+        if #available(iOS 13.0, *) {
+            return UIColor.secondaryLabel
+        } else {
+            return UIColor.systemGray
+        }
+    }
 }
 
 extension NSObject {
