@@ -23,6 +23,8 @@ class DownloadRequest<Element: NSObject>: Equatable {
     var url: URL?
     var download: Download?
     private let finishSync = DispatchGroup()
+    private var isFinished = false
+    private var queue = DispatchQueue(label: "DownloadRequest")
     
     init(priority: Priority, element: Element, title: String, notifier: SongDownloadNotifiable?) {
         self.priority = priority
@@ -45,11 +47,20 @@ class DownloadRequest<Element: NSObject>: Equatable {
     
     func cancelDownload() {
         download?.task?.cancel()
-        finishSync.leave()
+        markAsFinished()
     }
     
     func finished() {
-        finishSync.leave()
+        markAsFinished()
+    }
+    
+    private func markAsFinished() {
+        queue.sync {
+            if !isFinished {
+                isFinished = true
+                finishSync.leave()
+            }
+        }
     }
     
 }

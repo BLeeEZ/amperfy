@@ -136,6 +136,7 @@
 		50C16C2821E8680A00F086F0 /* CommonScreenOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */; };
 		50C16C3221EA77C700F086F0 /* AmpacheArtworkSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C3121EA77C700F086F0 /* AmpacheArtworkSyncer.swift */; };
 		50C16C3421EB454100F086F0 /* BackgroundSyncerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C3321EB454100F086F0 /* BackgroundSyncerManager.swift */; };
+		50CA8E972601E06500C90791 /* DownloadSlotCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */; };
 		50D92CCB25E3ED700017E91D /* MappingModelV4toV5.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 50D92CCA25E3ED700017E91D /* MappingModelV4toV5.xcmappingmodel */; };
 		50D92CCF25E3FE560017E91D /* MigrationPolicyV4toV5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D92CCE25E3FE560017E91D /* MigrationPolicyV4toV5.swift */; };
 		50E964AA25E8E20E00E3210F /* SubsonicVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E964A925E8E20E00E3210F /* SubsonicVersion.swift */; };
@@ -344,6 +345,7 @@
 		50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonScreenOperations.swift; sourceTree = "<group>"; };
 		50C16C3121EA77C700F086F0 /* AmpacheArtworkSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheArtworkSyncer.swift; sourceTree = "<group>"; };
 		50C16C3321EB454100F086F0 /* BackgroundSyncerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSyncerManager.swift; sourceTree = "<group>"; };
+		50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSlotCounter.swift; sourceTree = "<group>"; };
 		50D92CCA25E3ED700017E91D /* MappingModelV4toV5.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = MappingModelV4toV5.xcmappingmodel; sourceTree = "<group>"; };
 		50D92CCE25E3FE560017E91D /* MigrationPolicyV4toV5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationPolicyV4toV5.swift; sourceTree = "<group>"; };
 		50E964A925E8E20E00E3210F /* SubsonicVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersion.swift; sourceTree = "<group>"; };
@@ -412,6 +414,7 @@
 			isa = PBXGroup;
 			children = (
 				5077F937221F24C10099CA91 /* Download.swift */,
+				50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */,
 				5077F933221DAB5C0099CA91 /* DownloadManager.swift */,
 				50073BE222319868000130D8 /* DownloadDelegate.swift */,
 				50073BDC222EFF01000130D8 /* DownloadRequest.swift */,
@@ -1005,6 +1008,7 @@
 				50073BDD222EFF01000130D8 /* DownloadRequest.swift in Sources */,
 				5029E03B2235ABB80027F96F /* OptionsBarButtonItem.swift in Sources */,
 				500B7D4721EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift in Sources */,
+				50CA8E972601E06500C90791 /* DownloadSlotCounter.swift in Sources */,
 				50C16C2421E7A3AC00F086F0 /* ClockTime.swift in Sources */,
 				50BA92FC21CD841B00E5901D /* MusicPlayer.swift in Sources */,
 				506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */,

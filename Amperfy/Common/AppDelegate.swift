@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return backendProxy
     }()
     lazy var player = {
-        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), backendAudioPlayer: BackendAudioPlayer(songDownloader: downloadManager))
+        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), downloadManager: downloadManager, backendAudioPlayer: BackendAudioPlayer(songDownloader: downloadManager))
     }()
     lazy var downloadManager: DownloadManager = {
         let requestManager = RequestManager()
@@ -76,6 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return true
         }
         backgroundSyncerManager.start()
+        downloadManager.start()
     
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()
         self.window?.rootViewController = initialViewController
@@ -108,6 +109,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        if storage.getLoginCredentials() != nil, storage.isLibrarySynced() {
+            downloadManager.stopAndWait()
+        }
         persistentLibraryStorage.saveContext()
     }
 

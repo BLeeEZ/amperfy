@@ -22,6 +22,7 @@ class SyncVC: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        self.appDelegate.downloadManager.stopAndWait()
         self.appDelegate.backgroundSyncerManager.stopAndWait()
         self.appDelegate.storage.deleteLibraryIsSyncedFlag()
         self.appDelegate.persistentLibraryStorage.cleanStorage()
@@ -33,6 +34,7 @@ class SyncVC: UIViewController {
             self.syncer?.sync(libraryStorage: backgroundLibrary, statusNotifyier: self)
             self.appDelegate.storage.saveLibraryIsSyncedFlag()
             self.appDelegate.backgroundSyncerManager.start()
+            self.appDelegate.downloadManager.start()
         }
     }
     

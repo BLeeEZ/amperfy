@@ -30,6 +30,8 @@ enum RepeatMode: Int16 {
 
 class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
+    static let preDownloadCount = 3
+    
     var playlist: Playlist { 
         return coreData.playlist
     }
@@ -65,12 +67,14 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
 
     private var coreData: PlayerData
+    private var downloadManager: DownloadManager
     private let backendAudioPlayer: BackendAudioPlayer
     private var notifierList = [MusicPlayable]()
     private let currentSongReplayInsteadPlayPreviousTimeInSec = 5.0
     
-    init(coreData: PlayerData, backendAudioPlayer: BackendAudioPlayer) {
+    init(coreData: PlayerData, downloadManager: DownloadManager, backendAudioPlayer: BackendAudioPlayer) {
         self.coreData = coreData
+        self.downloadManager = downloadManager
         self.backendAudioPlayer = backendAudioPlayer
         super.init()
         self.backendAudioPlayer.responder = self
@@ -120,6 +124,22 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         let playlistItem = playlist.items[playlistIndex]
         backendAudioPlayer.requestToPlay(playlistItem: playlistItem, reactionToError: reactionToError)
         coreData.currentSongIndex = playlistIndex
+        preDownloadNextSongs(playlistIndex: playlistIndex)
+    }
+    
+    private func preDownloadNextSongs(playlistIndex: Int) {
+        var nextSongsCount = (playlist.songs.count-1) - playlistIndex
+        if nextSongsCount > Self.preDownloadCount {
+            nextSongsCount = Self.preDownloadCount
+        }
+        if nextSongsCount > 0 {
+            for i in 1...nextSongsCount {
+                let nextSongIndex = playlistIndex + i
+                if let song = playlist.items[nextSongIndex].song, !song.isCached {
+                    downloadManager.download(song: song)
+                }
+            }
+        }
     }
     
     func notifySongPreparationFinished() {

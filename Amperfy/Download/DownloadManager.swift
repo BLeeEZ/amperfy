@@ -34,10 +34,8 @@ class DownloadManager: SongDownloadable {
     private let urlDownloader: UrlDownloader
     private let downloadDelegate: DownloadManagerDelegate
     
-    private static let parallelDownloadCount = 4
-    private let parallelDlSemaphore = DispatchSemaphore(value: parallelDownloadCount)
-    private let parallelDlDispatchGroup = DispatchGroup()
-    private let startStopSemaphore = DispatchSemaphore(value: 1)
+
+    private let downloadSlotCounter = DownloadSlotCounter(maximumActiveDownloads: 4)
     private let activeDispatchGroup = DispatchGroup()
     private var isRunning = false
     private var isActive = false
@@ -64,24 +62,19 @@ class DownloadManager: SongDownloadable {
             }
             self.notifyViewRequestChange(addedRequest, updateReason: .added)
         }
-        start()
     }
 
-    private func start() {
-        startStopSemaphore.wait()
+    func start() {
         isRunning = true
         if !isActive {
             isActive = true
             downloadInBackground()
         }
-        startStopSemaphore.signal()
     }
 
-    func stop() {
-        startStopSemaphore.wait()
+    private func stop() {
         isRunning = false
         requestManager.cancelDownloads()
-        startStopSemaphore.signal()
     }
 
     func stopAndWait() {
@@ -95,25 +88,25 @@ class DownloadManager: SongDownloadable {
             os_log("DownloadManager start", log: self.log, type: .info)
             
             while self.isRunning {
+                self.downloadSlotCounter.waitForDownloadSlot()
                 
-                self.parallelDlSemaphore.wait()
-                self.parallelDlDispatchGroup.enter()
                 guard let request = self.requestManager.getAndMarkNextRequestToDownload() else {
-                    self.parallelDlSemaphore.signal()
-                    self.parallelDlDispatchGroup.leave()
-                    break
+                    self.downloadSlotCounter.downloadFinished()
+                    // wait some time and poll for new requests
+                    sleep(1)
+                    continue
                 }
                 self.notifyViewRequestChange(request, updateReason: .started)
 
                 self.storage.persistentContainer.performBackgroundTask() { (context) in
                     self.manageDownload(request: request, context: context)
                     self.notifyViewRequestChange(request, updateReason: .finished)
-                    self.parallelDlSemaphore.signal()
-                    self.parallelDlDispatchGroup.leave()
+                    self.downloadSlotCounter.downloadFinished()
                 }
             }
-            self.parallelDlDispatchGroup.wait()
-            os_log("DownloadManager done", log: self.log, type: .info)
+            os_log("DownloadManager wait till all active downloads finished", log: self.log, type: .info)
+            self.downloadSlotCounter.waitTillAllDownloadsFinished()
+            os_log("DownloadManager stopped", log: self.log, type: .info)
             self.isActive = false
             self.activeDispatchGroup.leave()
         }
