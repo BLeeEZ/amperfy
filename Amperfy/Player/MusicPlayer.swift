@@ -67,12 +67,12 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
 
     private var coreData: PlayerData
-    private var downloadManager: DownloadManager
+    private var downloadManager: SongDownloadable
     private let backendAudioPlayer: BackendAudioPlayer
     private var notifierList = [MusicPlayable]()
     private let currentSongReplayInsteadPlayPreviousTimeInSec = 5.0
     
-    init(coreData: PlayerData, downloadManager: DownloadManager, backendAudioPlayer: BackendAudioPlayer) {
+    init(coreData: PlayerData, downloadManager: SongDownloadable, backendAudioPlayer: BackendAudioPlayer) {
         self.coreData = coreData
         self.downloadManager = downloadManager
         self.backendAudioPlayer = backendAudioPlayer
@@ -136,7 +136,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
             for i in 1...nextSongsCount {
                 let nextSongIndex = playlistIndex + i
                 if let song = playlist.items[nextSongIndex].song, !song.isCached {
-                    downloadManager.download(song: song)
+                    downloadManager.download(song: song, notifier: nil, priority: .low)
                 }
             }
         }

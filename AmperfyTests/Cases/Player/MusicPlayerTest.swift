@@ -40,7 +40,7 @@ class MusicPlayerTest: XCTestCase {
         songDownloader = MOCK_SongDownloader()
         backendPlayer = BackendAudioPlayer(songDownloader: songDownloader)
         playerData = storage.getPlayerData()
-        testPlayer = MusicPlayer(coreData: playerData, backendAudioPlayer: backendPlayer)
+        testPlayer = MusicPlayer(coreData: playerData, downloadManager: songDownloader, backendAudioPlayer: backendPlayer)
         
         guard let songCachedFetched = storage.getSong(id: "36") else { XCTFail(); return }
         songCached = songCachedFetched
@@ -88,6 +88,25 @@ class MusicPlayerTest: XCTestCase {
         let song = songDownloader.songArg[2]
         markAsCached(song: song)
         notifier?.finished(downloading: song, error: nil)
+    }
+    
+    func nthDownloadFinshedSuccessfuly(n: Int) {
+        XCTAssertGreaterThanOrEqual(songDownloader.downloadCount, n)
+        guard songDownloader.downloadCount >= n else { return }
+        let notifier = songDownloader.notifierArg[n-1]
+        let song = songDownloader.songArg[n-1]
+        markAsCached(song: song)
+        notifier?.finished(downloading: song, error: nil)
+    }
+    
+    func allDownloadsFinshedSuccessfuly() {
+        guard songDownloader.downloadCount > 0 else { return }
+        for i in 0...songDownloader.downloadCount-1 {
+            let notifier = songDownloader.notifierArg[i]
+            let song = songDownloader.songArg[i]
+            markAsCached(song: song)
+            notifier?.finished(downloading: song, error: nil)
+        }
     }
     
     func firstDownloadFailed(with: DownloadError) {
@@ -219,7 +238,7 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 1)
         firstDownloadFailed(with: .fetchFailed)
-        secondDownloadFinshedSuccessfuly()
+        nthDownloadFinshedSuccessfuly(n: 1+MusicPlayer.preDownloadCount)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
     }
@@ -228,7 +247,7 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 1, reactionToError: .playNext)
         firstDownloadFailed(with: .fetchFailed)
-        secondDownloadFinshedSuccessfuly()
+        nthDownloadFinshedSuccessfuly(n: 1+MusicPlayer.preDownloadCount)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
     }
@@ -245,7 +264,7 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 5, reactionToError: .playPrevious)
         firstDownloadFailed(with: .fetchFailed)
-        secondDownloadFinshedSuccessfuly()
+        nthDownloadFinshedSuccessfuly(n: MusicPlayer.preDownloadCount)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 4)
     }
@@ -370,7 +389,7 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.playPreviousOrReplay()
-        firstDownloadFinshedSuccessfuly()
+        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
         XCTAssertEqual(testPlayer.elapsedTime, 0.0)
     }
@@ -393,10 +412,10 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.playPrevious()
-        firstDownloadFinshedSuccessfuly()
+        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
         testPlayer.playPrevious()
-        secondDownloadFinshedSuccessfuly()
+        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 1)
     }
     
@@ -434,7 +453,7 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.pause()
         testPlayer.playPrevious()
-        firstDownloadFinshedSuccessfuly()
+        allDownloadsFinshedSuccessfuly()
         XCTAssertTrue(testPlayer.isPlaying)
     }
     
@@ -517,10 +536,10 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.playNext()
-        firstDownloadFinshedSuccessfuly()
+        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 4)
         testPlayer.playNext()
-        secondDownloadFinshedSuccessfuly()
+        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 5)
     }
     
@@ -539,9 +558,9 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.repeatMode = .all
         testPlayer.play(songInPlaylistAt: 8)
         testPlayer.playNext()
-        firstDownloadFinshedSuccessfuly()
+        allDownloadsFinshedSuccessfuly()
         testPlayer.playNext()
-        secondDownloadFinshedSuccessfuly()
+        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 1)
     }
     
@@ -558,7 +577,7 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.pause()
         testPlayer.playNext()
-        firstDownloadFinshedSuccessfuly()
+        allDownloadsFinshedSuccessfuly()
         XCTAssertTrue(testPlayer.isPlaying)
     }
     
