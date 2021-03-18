@@ -778,6 +778,7 @@
                                                 <constraint firstItem="PbM-S5-2zk" firstAttribute="centerY" secondItem="OmF-Bv-HGA" secondAttribute="centerY" id="doI-fx-bJ3"/>
                                                 <constraint firstItem="TX9-7q-eOW" firstAttribute="leading" secondItem="OmF-Bv-HGA" secondAttribute="trailingMargin" constant="-50" id="eU7-Wf-7WC"/>
                                                 <constraint firstItem="rcw-EC-sYk" firstAttribute="centerY" secondItem="OmF-Bv-HGA" secondAttribute="centerY" id="fKG-Sq-yiP"/>
+                                                <constraint firstItem="xi1-lN-HcH" firstAttribute="leading" secondItem="OmF-Bv-HGA" secondAttribute="leadingMargin" constant="17" id="haL-34-2Cx"/>
                                                 <constraint firstItem="PbM-S5-2zk" firstAttribute="leading" secondItem="rcw-EC-sYk" secondAttribute="trailing" constant="16" id="nZ4-Ms-yKe"/>
                                                 <constraint firstItem="xi1-lN-HcH" firstAttribute="trailing" secondItem="rcw-EC-sYk" secondAttribute="trailing" id="udn-Pi-YyA"/>
                                             </constraints>
@@ -1775,7 +1776,7 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="5Wy-ux-O8s" userLabel="Spinner">
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="5Wy-ux-O8s" userLabel="Spinner">
                                                     <rect key="frame" x="374" y="10" width="20" height="20"/>
                                                 </activityIndicatorView>
                                             </subviews>
@@ -1816,7 +1817,7 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="b1P-EU-cSS" userLabel="Spinner">
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="b1P-EU-cSS" userLabel="Spinner">
                                                     <rect key="frame" x="374" y="10" width="20" height="20"/>
                                                 </activityIndicatorView>
                                             </subviews>

@@ -19,6 +19,14 @@ class SettingsLibraryVC: UITableViewController {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         
+        if #available(iOS 13.0, *) {
+            self.cachedSongsCountSpinner.style = .medium
+            self.cachedSongsSizeSpinner.style = .medium
+        } else {
+            self.cachedSongsCountSpinner.style = .gray
+            self.cachedSongsSizeSpinner.style = .gray
+        }
+        
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
             let storage = LibraryStorage(context: context)
 
