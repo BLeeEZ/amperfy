@@ -15,6 +15,10 @@ class MOCK_SongDownloader: SongDownloadable {
         priorityArg.append(priority)
     }
     
+    func updateStreamingUrl(forSong song: Song) -> URL? {
+        return nil
+    }
+    
     func isNoDownloadRequested() -> Bool {
         return downloadCount == 0
     }
@@ -64,58 +68,6 @@ class MusicPlayerTest: XCTestCase {
         song.file?.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
     }
     
-    func firstDownloadFinshedSuccessfuly() {
-        XCTAssertGreaterThanOrEqual(songDownloader.downloadCount, 1)
-        guard let notifier = songDownloader.notifierArg.first  else { XCTFail(); return }
-        guard let song = songDownloader.songArg.first  else { XCTFail(); return }
-        markAsCached(song: song)
-        notifier?.finished(downloading: song, error: nil)
-    }
-    
-    func secondDownloadFinshedSuccessfuly() {
-        XCTAssertGreaterThanOrEqual(songDownloader.downloadCount, 2)
-        guard songDownloader.downloadCount >= 2 else { return }
-        let notifier = songDownloader.notifierArg[1]
-        let song = songDownloader.songArg[1]
-        markAsCached(song: song)
-        notifier?.finished(downloading: song, error: nil)
-    }
-    
-    func thirdDownloadFinshedSuccessfuly() {
-        XCTAssertGreaterThanOrEqual(songDownloader.downloadCount, 3)
-        guard songDownloader.downloadCount >= 3 else { return }
-        let notifier = songDownloader.notifierArg[2]
-        let song = songDownloader.songArg[2]
-        markAsCached(song: song)
-        notifier?.finished(downloading: song, error: nil)
-    }
-    
-    func nthDownloadFinshedSuccessfuly(n: Int) {
-        XCTAssertGreaterThanOrEqual(songDownloader.downloadCount, n)
-        guard songDownloader.downloadCount >= n else { return }
-        let notifier = songDownloader.notifierArg[n-1]
-        let song = songDownloader.songArg[n-1]
-        markAsCached(song: song)
-        notifier?.finished(downloading: song, error: nil)
-    }
-    
-    func allDownloadsFinshedSuccessfuly() {
-        guard songDownloader.downloadCount > 0 else { return }
-        for i in 0...songDownloader.downloadCount-1 {
-            let notifier = songDownloader.notifierArg[i]
-            let song = songDownloader.songArg[i]
-            markAsCached(song: song)
-            notifier?.finished(downloading: song, error: nil)
-        }
-    }
-    
-    func firstDownloadFailed(with: DownloadError) {
-        XCTAssertGreaterThanOrEqual(songDownloader.downloadCount, 1)
-        guard let notifier = songDownloader.notifierArg.first  else { XCTFail(); return }
-        guard let song = songDownloader.songArg.first  else { XCTFail(); return }
-        notifier?.finished(downloading: song, error: with)
-    }
-    
     func testCreation() {
         XCTAssertFalse(testPlayer.isPlaying)
         XCTAssertFalse(testPlayer.isShuffle)
@@ -146,46 +98,11 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(songDownloader.isNoDownloadRequested())
     }
     
-    func testPlay_OneSongToDownload_IsPlayingFalse_BeforeDownloadFinished() {
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.play()
-        XCTAssertFalse(testPlayer.isPlaying)
-    }
-    
     func testPlay_OneSongToDownload_IsPlayingTrue_AfterSuccessfulDownload() {
         testPlayer.addToPlaylist(song: songToDownload)
         testPlayer.play()
-        firstDownloadFinshedSuccessfuly()
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying?.song, songToDownload)
-    }
-    
-    func testPlay_OneSongToDownload_IsPlayingFalse_AfterAlreadyDownloaded() {
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.play()
-        firstDownloadFailed(with: .alreadyDownloaded)
-        XCTAssertFalse(testPlayer.isPlaying)
-    }
-    
-    func testPlay_OneSongToDownload_IsPlayingFalse_AfterFetchFailed() {
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.play()
-        firstDownloadFailed(with: .fetchFailed)
-        XCTAssertFalse(testPlayer.isPlaying)
-    }
-    
-    func testPlay_OneSongToDownload_IsPlayingFalse_AfterUrlInvalid() {
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.play()
-        firstDownloadFailed(with: .urlInvalid)
-        XCTAssertFalse(testPlayer.isPlaying)
-    }
-    
-    func testPlay_OneSongToDownload_IsPlayingFalse_AfterNoConnectivity() {
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.play()
-        firstDownloadFailed(with: .noConnectivity)
-        XCTAssertFalse(testPlayer.isPlaying)
     }
     
     func testPlay_OneSongToDownload_CheckDownloadRequest() {
@@ -229,89 +146,10 @@ class MusicPlayerTest: XCTestCase {
     func testPlaySongInPlaylistAt_FetchSuccess_FullPlaylist() {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 2)
-        firstDownloadFinshedSuccessfuly()
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
     }
-    
-    func testPlaySongInPlaylistAt_FetchFailed_DefaultReaction() {
-        prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 1)
-        firstDownloadFailed(with: .fetchFailed)
-        nthDownloadFinshedSuccessfuly(n: 1+MusicPlayer.preDownloadCount)
-        XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
-    }
-    
-    func testPlaySongInPlaylistAt_FetchFailed_PlayNextReaction() {
-        prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 1, reactionToError: .playNext)
-        firstDownloadFailed(with: .fetchFailed)
-        nthDownloadFinshedSuccessfuly(n: 1+MusicPlayer.preDownloadCount)
-        XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
-    }
-    
-    func testPlaySongInPlaylistAt_FetchFailed_PlayNextCachedReaction() {
-        prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 1, reactionToError: .playNextCached)
-        firstDownloadFailed(with: .fetchFailed)
-        XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.index, 3)
-    }
-    
-    func testPlaySongInPlaylistAt_FetchFailed_PlayPreviousReaction() {
-        prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 5, reactionToError: .playPrevious)
-        firstDownloadFailed(with: .fetchFailed)
-        nthDownloadFinshedSuccessfuly(n: MusicPlayer.preDownloadCount)
-        XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.index, 4)
-    }
-    
-    func testPlaySongInPlaylistAt_FetchFailed_PlayPreviousCachedReaction() {
-        prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 5, reactionToError: .playPreviousCached)
-        firstDownloadFailed(with: .fetchFailed)
-        XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.index, 3)
-    }
-    
-    func testPlaySongInPlaylistAt_FetchFailed_PlayPrevious_NotAvailable() {
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.play(songInPlaylistAt: 0, reactionToError: .playPrevious)
-        firstDownloadFailed(with: .fetchFailed)
-        XCTAssertFalse(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.order, 0)
-    }
-    
-    func testPlaySongInPlaylistAt_FetchFailed_PlayPreviousCached_NotAvailable() {
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.play(songInPlaylistAt: 2, reactionToError: .playPreviousCached)
-        firstDownloadFailed(with: .fetchFailed)
-        XCTAssertFalse(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.order, 0)
-    }
-    
-    func testPlaySongInPlaylistAt_FetchFailed_PlayNext_NotAvailable() {
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.play(songInPlaylistAt: 0, reactionToError: .playNext)
-        firstDownloadFailed(with: .fetchFailed)
-        XCTAssertFalse(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.order, 0)
-    }
-    
-    func testPlaySongInPlaylistAt_FetchFailed_PlayNextCached_NotAvailable() {
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.addToPlaylist(song: songToDownload)
-        testPlayer.play(songInPlaylistAt: 1, reactionToError: .playNextCached)
-        firstDownloadFailed(with: .fetchFailed)
-        XCTAssertFalse(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.order, 0)
-    }
+
     
     func testPause_EmptyPlaylist() {
         testPlayer.pause()
@@ -389,7 +227,6 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.playPreviousOrReplay()
-        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
         XCTAssertEqual(testPlayer.elapsedTime, 0.0)
     }
@@ -412,17 +249,14 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.playPrevious()
-        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
         testPlayer.playPrevious()
-        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 1)
     }
     
     func testPlayPrevious_AtStart() {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 0)
-        firstDownloadFinshedSuccessfuly()
         testPlayer.playPrevious()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 0)
         testPlayer.playPrevious()
@@ -433,9 +267,7 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.repeatMode = .all
         testPlayer.play(songInPlaylistAt: 1)
-        firstDownloadFinshedSuccessfuly()
         testPlayer.playPrevious()
-        secondDownloadFinshedSuccessfuly()
         testPlayer.playPrevious()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 8)
     }
@@ -453,7 +285,6 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.pause()
         testPlayer.playPrevious()
-        allDownloadsFinshedSuccessfuly()
         XCTAssertTrue(testPlayer.isPlaying)
     }
     
@@ -461,7 +292,6 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.playPrevious()
-        firstDownloadFinshedSuccessfuly()
         XCTAssertTrue(testPlayer.isPlaying)
     }
     
@@ -536,21 +366,18 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.playNext()
-        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 4)
         testPlayer.playNext()
-        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 5)
     }
     
     func testPlayNext_AtStart() {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 0)
-        firstDownloadFinshedSuccessfuly()
         testPlayer.playNext()
-        XCTAssertEqual(testPlayer.currentlyPlaying?.index, 0)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.index, 1)
         testPlayer.playNext()
-        XCTAssertEqual(testPlayer.currentlyPlaying?.index, 0)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
     }
     
     func testPlayNext_RepeatAll() {
@@ -558,9 +385,7 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.repeatMode = .all
         testPlayer.play(songInPlaylistAt: 8)
         testPlayer.playNext()
-        allDownloadsFinshedSuccessfuly()
         testPlayer.playNext()
-        allDownloadsFinshedSuccessfuly()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 1)
     }
     
@@ -577,7 +402,6 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.pause()
         testPlayer.playNext()
-        allDownloadsFinshedSuccessfuly()
         XCTAssertTrue(testPlayer.isPlaying)
     }
     
@@ -585,7 +409,6 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.play(songInPlaylistAt: 3)
         testPlayer.playNext()
-        firstDownloadFinshedSuccessfuly()
         XCTAssertTrue(testPlayer.isPlaying)
     }
     

@@ -17,15 +17,26 @@ class DownloadDelegate: DownloadManagerDelegate {
         }
         return try updateDownloadUrl(forSong: song)
     }
+    
+    func updateStreamingUrl(forSong song: Song) -> URL? {
+        return backendApi.generateUrl(forStreamingSong: song)
+    }
 
     private func updateDownloadUrl(forSong song: Song) throws -> URL {
         guard Reachability.isConnectedToNetwork() else {
             throw DownloadError.noConnectivity
         }
-        guard let url = backendApi.generateUrl(forSong: song) else {
+        guard let url = backendApi.generateUrl(forDownloadingSong: song) else {
             throw DownloadError.urlInvalid
         }
         return url
+    }
+    
+    func validateDownloadedData(request: DownloadRequest<Song>) -> ResponseError? {
+        guard let download = request.download, let data = download.resumeData else {
+            return ResponseError(statusCode: 0, message: "Invalid download")
+        }
+        return backendApi.checkForErrorResponse(inData: data)
     }
 
     func completedDownload(request: DownloadRequest<Song>, context: NSManagedObjectContext) {

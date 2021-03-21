@@ -136,7 +136,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
             for i in 1...nextSongsCount {
                 let nextSongIndex = playlistIndex + i
                 if let song = playlist.items[nextSongIndex].song, !song.isCached {
-                    downloadManager.download(song: song, notifier: nil, priority: .low)
+                    downloadManager.download(song: song, notifier: nil, priority: .high)
                 }
             }
         }

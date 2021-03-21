@@ -29,14 +29,22 @@ class SubsonicApi: BackendApi {
         return subsonicServerApi.isAuthenticated()
     }
 
-    func generateUrl(forSong song: Song) -> URL? {
-        return subsonicServerApi.generateUrl(forSong: song)
+    func generateUrl(forDownloadingSong song: Song) -> URL? {
+        return subsonicServerApi.generateUrl(forDownloadingSong: song)
+    }
+
+    func generateUrl(forStreamingSong song: Song) -> URL? {
+        return subsonicServerApi.generateUrl(forStreamingSong: song)
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {
         return subsonicServerApi.generateUrl(forArtwork: artwork)
     }
 
+    func checkForErrorResponse(inData data: Data) -> ResponseError? {
+        return subsonicServerApi.checkForErrorResponse(inData: data)
+    }
+    
     func createLibrarySyncer() -> LibrarySyncer {
         return SubsonicLibrarySyncer(subsonicServerApi: subsonicServerApi)
     }

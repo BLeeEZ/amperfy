@@ -128,8 +128,12 @@ class SubsonicServerApi {
         return isValidCredentials
     }
     
-    func generateUrl(forSong song: Song) -> URL? {
+    func generateUrl(forDownloadingSong song: Song) -> URL? {
         return createAuthenticatedApiUrlComponent(forAction: "download", id: song.id)?.url
+    }
+    
+    func generateUrl(forStreamingSong song: Song) -> URL? {
+        return createAuthenticatedApiUrlComponent(forAction: "stream", id: song.id)?.url
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {
@@ -180,6 +184,14 @@ class SubsonicServerApi {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "createPlaylist") else { return }
         urlComp.addQueryItem(name: "name", value: playlist.name)
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
+    func checkForErrorResponse(inData data: Data) -> ResponseError? {
+        let errorParser = SsErrorParserDelegate()
+        let parser = XMLParser(data: data)
+        parser.delegate = errorParser
+        parser.parse()
+        return errorParser.responseError
     }
 
     func requestPlaylistUpdate(parserDelegate: XMLParserDelegate, playlist: Playlist, songIndicesToRemove: [Int], songIdsToAdd: [String]) {

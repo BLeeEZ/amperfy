@@ -28,12 +28,20 @@ class AmpacheApi: BackendApi {
         return ampacheXmlServerApi.isAuthenticated()
     }
 
-    func generateUrl(forSong song: Song) -> URL? {
-        return ampacheXmlServerApi.generateUrl(forSong: song)
+    func generateUrl(forDownloadingSong song: Song) -> URL? {
+        return ampacheXmlServerApi.generateUrl(forDownloadingSong: song)
+    }
+
+    func generateUrl(forStreamingSong song: Song) -> URL? {
+        return ampacheXmlServerApi.generateUrl(forStreamingSong: song)
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {
         return ampacheXmlServerApi.generateUrl(forArtwork: artwork)
+    }
+    
+    func checkForErrorResponse(inData data: Data) -> ResponseError? {
+        return ampacheXmlServerApi.checkForErrorResponse(inData: data)
     }
 
     func createLibrarySyncer() -> LibrarySyncer {

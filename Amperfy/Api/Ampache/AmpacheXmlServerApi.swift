@@ -245,7 +245,7 @@ class AmpacheXmlServerApi {
         let errorParser = ErrorParserDelegate()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
         if let error = errorParser.error {
-            os_log("%d: %s", log: log, type: .error, error.code, error.message)
+            os_log("%d: %s", log: log, type: .error, error.statusCode, error.message)
         }
     }
 
@@ -257,7 +257,7 @@ class AmpacheXmlServerApi {
         let errorParser = ErrorParserDelegate()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
         if let error = errorParser.error {
-            os_log("%d: %s", log: log, type: .error, error.code, error.message)
+            os_log("%d: %s", log: log, type: .error, error.statusCode, error.message)
         }
     }
     
@@ -269,7 +269,7 @@ class AmpacheXmlServerApi {
         let errorParser = ErrorParserDelegate()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
         if let error = errorParser.error {
-            os_log("%d: %s", log: log, type: .error, error.code, error.message)
+            os_log("%d: %s", log: log, type: .error, error.statusCode, error.message)
         }
     }
 
@@ -288,16 +288,28 @@ class AmpacheXmlServerApi {
         return authHandshake
     }
     
-    func generateUrl(forSong song: Song) -> URL? {
+    func generateUrl(forDownloadingSong song: Song) -> URL? {
         guard var urlString = song.url else { return nil }
         updateUrlToken(urlString: &urlString)
         return URL(string: urlString)
+    }
+    
+    func generateUrl(forStreamingSong song: Song) -> URL? {
+        return generateUrl(forDownloadingSong: song)
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {
         var updatedUrl = artwork.url
         updateUrlToken(urlString: &updatedUrl)
         return URL(string: updatedUrl)
+    }
+    
+    func checkForErrorResponse(inData data: Data) -> ResponseError? {
+        let errorParser = ErrorParserDelegate()
+        let parser = XMLParser(data: data)
+        parser.delegate = errorParser
+        parser.parse()
+        return errorParser.error
     }
     
     private func updateUrlToken(urlString: inout String) {

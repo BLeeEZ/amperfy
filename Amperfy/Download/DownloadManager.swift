@@ -7,10 +7,12 @@ enum DownloadError: Error {
     case noConnectivity
     case alreadyDownloaded
     case fetchFailed
+    case apiErrorResponse
 }
 
 protocol SongDownloadable {
     func download(song: Song, notifier: SongDownloadNotifiable?, priority: Priority)
+    func updateStreamingUrl(forSong song: Song) -> URL?
 }
 
 protocol SongDownloadNotifiable {
@@ -23,7 +25,9 @@ protocol SongDownloadViewUpdatable {
 
 protocol DownloadManagerDelegate {
     func prepareDownload(forRequest request: DownloadRequest<Song>, context: NSManagedObjectContext) throws -> URL
+    func validateDownloadedData(request: DownloadRequest<Song>) -> ResponseError?
     func completedDownload(request: DownloadRequest<Song>, context: NSManagedObjectContext)
+    func updateStreamingUrl(forSong song: Song) -> URL?
 }
 
 class DownloadManager: SongDownloadable {
@@ -62,6 +66,10 @@ class DownloadManager: SongDownloadable {
             }
             self.notifyViewRequestChange(addedRequest, updateReason: .added)
         }
+    }
+    
+    func updateStreamingUrl(forSong song: Song) -> URL? {
+        return downloadDelegate.updateStreamingUrl(forSong: song)
     }
 
     func start() {
@@ -118,6 +126,10 @@ class DownloadManager: SongDownloadable {
             os_log("Fetching %s ...", log: self.log, type: .info, request.title)
             let url = try downloadDelegate.prepareDownload(forRequest: request, context: context)
             try self.urlDownloader.fetch(url: url, request: request)
+            if let responseError = downloadDelegate.validateDownloadedData(request: request) {
+                os_log("Fetching %s API-ERROR StatusCode: %d, Message: %s", log: log, type: .error, request.title, responseError.statusCode, responseError.message)
+                throw DownloadError.apiErrorResponse
+            }
             os_log("Fetching %s SUCCESS (%{iec-bytes}d)", log: self.log, type: .info, request.title, request.download?.resumeData?.count ?? 0)
             downloadDelegate.completedDownload(request: request, context: context)
         } catch let fetchError as DownloadError {

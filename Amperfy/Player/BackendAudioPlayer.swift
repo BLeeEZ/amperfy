@@ -104,11 +104,12 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         guard let song = playlistItem.song else { return }
         if song.isCached {
             insertCachedSong(playlistItem: playlistItem)
-            self.continuePlay()
-            self.reactToInsertationFinish(playlistItem: playlistItem)
         } else {
-            songDownloader.download(song: song, notifier: self, priority: .high)
+            insertStreamSong(playlistItem: playlistItem)
+            songDownloader.download(song: song, notifier: nil, priority: .high)
         }
+        self.continuePlay()
+        self.reactToInsertationFinish(playlistItem: playlistItem)
         semaphore.signal()
     }
     
@@ -119,6 +120,16 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         player.pause()
         player.replaceCurrentItem(with: nil)
         let item = AVPlayerItem(url: url)
+        player.replaceCurrentItem(with: item)
+        NotificationCenter.default.addObserver(self, selector: #selector(songFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
+    }
+    
+    private func insertStreamSong(playlistItem: PlaylistItem) {
+        guard let song = playlistItem.song, let streamUrl = songDownloader.updateStreamingUrl(forSong: song) else { return }
+        os_log(.default, "Streaming song: %s", song.displayString)
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+        let item = AVPlayerItem(url: streamUrl)
         player.replaceCurrentItem(with: item)
         NotificationCenter.default.addObserver(self, selector: #selector(songFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
     }

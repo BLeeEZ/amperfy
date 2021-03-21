@@ -27,6 +27,11 @@ struct AuthenticationError: Error {
     let kind: ErrorKind
 }
 
+struct ResponseError {
+    var statusCode: Int = 0
+    var message: String = ""
+}
+
 class BackendProxy {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "BackendProxy")
@@ -132,12 +137,20 @@ extension BackendProxy: BackendApi {
         return activeApi.isAuthenticated()
     }
     
-    func generateUrl(forSong song: Song) -> URL? {
-        return activeApi.generateUrl(forSong: song)
+    func generateUrl(forDownloadingSong song: Song) -> URL? {
+        return activeApi.generateUrl(forDownloadingSong: song)
+    }
+    
+    func generateUrl(forStreamingSong song: Song) -> URL? {
+        return activeApi.generateUrl(forStreamingSong: song)
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {
         return activeApi.generateUrl(forArtwork: artwork)
+    }
+    
+    func checkForErrorResponse(inData data: Data) -> ResponseError? {
+        return activeApi.checkForErrorResponse(inData: data)
     }
     
     func createLibrarySyncer() -> LibrarySyncer {
