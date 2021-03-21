@@ -1323,6 +1323,40 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="STU-lr-rz8">
+                                        <rect key="frame" x="0.0" y="98" width="414" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="STU-lr-rz8" id="dIl-DG-KUm">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TUs-iY-boT" userLabel="InsertAsNextSongNoPlay">
+                                                    <rect key="frame" x="20" y="0.0" width="394" height="40"/>
+                                                    <state key="normal" title="InsertAsNextSongNoPlay">
+                                                        <color key="titleColor" systemColor="labelColor"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="insertAsNextSongNoPlayPressed:" destination="rsJ-c4-CcZ" eventType="touchUpInside" id="CTx-dx-sM5"/>
+                                                    </connections>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Check" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xda-yP-Stp">
+                                                    <rect key="frame" x="344" y="9.5" width="50" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailingMargin" secondItem="xda-yP-Stp" secondAttribute="trailing" id="CXg-Fe-vzF"/>
+                                                <constraint firstItem="xda-yP-Stp" firstAttribute="leading" secondItem="dIl-DG-KUm" secondAttribute="trailingMargin" constant="-50" id="DBI-uA-26y"/>
+                                                <constraint firstAttribute="bottom" secondItem="TUs-iY-boT" secondAttribute="bottom" id="fSG-xf-Hzj"/>
+                                                <constraint firstAttribute="trailing" secondItem="TUs-iY-boT" secondAttribute="trailing" id="gF1-JR-kew"/>
+                                                <constraint firstItem="TUs-iY-boT" firstAttribute="top" secondItem="dIl-DG-KUm" secondAttribute="top" id="j2h-Bx-NxM"/>
+                                                <constraint firstItem="TUs-iY-boT" firstAttribute="leading" secondItem="dIl-DG-KUm" secondAttribute="leadingMargin" id="j2v-Yp-LKq"/>
+                                                <constraint firstItem="xda-yP-Stp" firstAttribute="centerY" secondItem="dIl-DG-KUm" secondAttribute="centerY" id="pyG-4y-8Cw"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -1335,6 +1369,8 @@
                     <connections>
                         <outlet property="addToPlaylistAndPlayButton" destination="xey-rD-Ppg" id="HeA-vY-PtK"/>
                         <outlet property="addToPlaylistAndPlayCheckLabel" destination="t7O-Aw-9RV" id="DLr-VB-fFW"/>
+                        <outlet property="insertAsNextSongNoPlayButton" destination="TUs-iY-boT" id="SxP-fo-aRL"/>
+                        <outlet property="insertAsNextSongNoPlayCheckLabel" destination="xda-yP-Stp" id="6m7-S5-F2G"/>
                         <outlet property="playAndErasePlaylistButton" destination="ev2-q7-AMH" id="5HP-M2-Z2F"/>
                         <outlet property="playAndErasePlaylistCheckLabel" destination="1P8-sr-A0h" id="Tdz-MV-4yd"/>
                     </connections>

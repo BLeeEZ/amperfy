@@ -9,6 +9,8 @@ class SettingsSongActionOnTabVC: UITableViewController {
     @IBOutlet weak var playAndErasePlaylistCheckLabel: UILabel!
     @IBOutlet weak var addToPlaylistAndPlayButton: UIButton!
     @IBOutlet weak var addToPlaylistAndPlayCheckLabel: UILabel!
+    @IBOutlet weak var insertAsNextSongNoPlayButton: UIButton!
+    @IBOutlet weak var insertAsNextSongNoPlayCheckLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,17 +20,21 @@ class SettingsSongActionOnTabVC: UITableViewController {
 
         playAndErasePlaylistButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.playAndErasePlaylist.description, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]),  for: .normal)
         addToPlaylistAndPlayButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.addToPlaylistAndPlay.description, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]), for: .normal)
+        insertAsNextSongNoPlayButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.insertAsNextSongNoPlay.description, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]), for: .normal)
 
         let checkIconText = NSMutableAttributedString(string: FontAwesomeIcon.Check.asString + " " , attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
         playAndErasePlaylistCheckLabel.text = ""
         addToPlaylistAndPlayCheckLabel.text = ""
+        insertAsNextSongNoPlayCheckLabel.text = ""
         switch settings.songActionOnTab {
         case .playAndErasePlaylist:
             playAndErasePlaylistCheckLabel.attributedText = checkIconText
+        case .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong:
+            break
         case .addToPlaylistAndPlay:
             addToPlaylistAndPlayCheckLabel.attributedText = checkIconText
-        default:
-            break
+        case .insertAsNextSongNoPlay:
+            insertAsNextSongNoPlayCheckLabel.attributedText = checkIconText
         }
     }
     
@@ -46,4 +52,11 @@ class SettingsSongActionOnTabVC: UITableViewController {
         navigationController?.popToRootViewController(animated: true)
     }
     
+    @IBAction func insertAsNextSongNoPlayPressed(_ sender: Any) {
+        let settings = appDelegate.storage.getSettings()
+        settings.songActionOnTab = .insertAsNextSongNoPlay
+        appDelegate.storage.saveSettings(settings: settings)
+        navigationController?.popToRootViewController(animated: true)
+    }
+
 }

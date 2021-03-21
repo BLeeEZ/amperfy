@@ -5,6 +5,7 @@ enum SongActionOnTab: Int {
     case playAndErasePlaylist = 0
     case hiddenOptionPlayInPopupPlayerPlaylistSelectedSong = 1
     case addToPlaylistAndPlay = 2
+    case insertAsNextSongNoPlay = 3
     
     static let defaultValue: SongActionOnTab = .addToPlaylistAndPlay
     
@@ -12,6 +13,7 @@ enum SongActionOnTab: Int {
         switch self {
         case .playAndErasePlaylist: return "Clear current playlist and play song"
         case .addToPlaylistAndPlay: return "Insert song at the end and play song"
+        case .insertAsNextSongNoPlay: return "Insert as next song to play"
         case .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong: return "HIDDEN !!!"
         }
     }
@@ -27,7 +29,6 @@ class SongTableCell: BasicTableCell {
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     
-    var behaviourOnTab: SongActionOnTab = .playAndErasePlaylist
     var displayMode: SongOperationDisplayModes = .libraryCell
     var isUserTouchInteractionAllowed = true
     private var song: Song?
@@ -38,10 +39,11 @@ class SongTableCell: BasicTableCell {
     }
     private var rootView: UIViewController?
     private var isAlertPresented = false
+    private var isCellInPopupPlayer = false
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        behaviourOnTab = appDelegate.storage.getSettings().songActionOnTab
+        isCellInPopupPlayer = false
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
         self.addGestureRecognizer(longPressGesture)
     }
@@ -81,11 +83,14 @@ class SongTableCell: BasicTableCell {
     
     func confToPlayPlaylistIndexOnTab(indexInPlaylist: Int) {
         self.index = indexInPlaylist
-        behaviourOnTab = .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong
+        isCellInPopupPlayer = true
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let song = song else { return }
+        
+        let behaviourOnTab = isCellInPopupPlayer ? .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong :  appDelegate.storage.getSettings().songActionOnTab
+        
         if isUserTouchInteractionAllowed, !isAlertPresented {
             switch behaviourOnTab {
             case .playAndErasePlaylist:
@@ -97,6 +102,12 @@ class SongTableCell: BasicTableCell {
                 appDelegate.player.addToPlaylist(song: song)
                 let indexInPlayerPlaylist = appDelegate.player.playlist.songs.count-1
                 appDelegate.player.play(songInPlaylistAt: indexInPlayerPlaylist)
+            case .insertAsNextSongNoPlay:
+                appDelegate.player.addToPlaylist(song: song)
+                let addedSongIndexInPlayerPlaylist = appDelegate.player.playlist.songs.count-1
+                if let curPlayingIndex = appDelegate.player.currentlyPlaying?.index {
+                    appDelegate.player.movePlaylistSong(fromIndex: addedSongIndexInPlayerPlaylist, to: curPlayingIndex+1)
+                }
             }
         }
         isAlertPresented = false
