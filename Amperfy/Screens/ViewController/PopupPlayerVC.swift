@@ -260,6 +260,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         alert.addAction(UIAlertAction(title: "Clear", style: .default, handler: { _ in
             self.appDelegate.player.cleanPlaylist()
             self.reloadData()
+            self.playerView.refreshPlayer()
         }))
         alert.addAction(UIAlertAction(title: "Add all to playlist", style: .default, handler: { _ in
             let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
@@ -286,6 +287,7 @@ extension PopupPlayerVC: MusicPlayable {
     }
     
     func didStopPlaying(playlistItem: PlaylistItem?) {
+        self.reloadData()
     }
 
     func didElapsedTimeChange() {

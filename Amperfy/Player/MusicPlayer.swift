@@ -110,10 +110,9 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     func removeFromPlaylist(at index: Int) {
         guard index < playlist.songs.count else { return }
-        let toBeRemovedSong = playlist.songs[index]
         if playlist.songs.count <= 1 {
             stop()
-        } else if toBeRemovedSong == coreData.currentSong {
+        } else if index == coreData.currentSongIndex {
             playNext()
         }
         coreData.removeSongFromPlaylist(at: index)
@@ -243,9 +242,10 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
     
     func stop() {
-        notifyPlayerStopped(playlistItem: currentlyPlaying)
+        let stoppedPlaylistItem = currentlyPlaying
         backendAudioPlayer.stop()
         coreData.currentSongIndex = 0
+        notifyPlayerStopped(playlistItem: stoppedPlaylistItem)
     }
     
     func togglePlay() {

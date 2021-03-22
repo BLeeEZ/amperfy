@@ -288,8 +288,10 @@ class PlayerView: UIView {
         rootView?.popupItem.trailingBarButtonItems = [ barButtonItem ]
     }
     
-    func refreshSongInfo(song: Song? = nil) {
-        if let songInfo = song {
+    func refreshSongInfo() {
+        if player.playlist.songs.count > 0 {
+            let songIndex = player.currentlyPlaying?.index ?? 0
+            let songInfo = player.playlist.songs[songIndex]
             songTitleCompactLabel.text = songInfo.title
             songTitleLargeLabel.text = songInfo.title
             artistNameCompactLabel.text = songInfo.artist?.name
@@ -341,7 +343,7 @@ class PlayerView: UIView {
     }
     
     func refreshPlayer() {
-        refreshSongInfo(song: player.currentlyPlaying?.song)
+        refreshSongInfo()
         refreshPlayButtonTitle()
         refreshSongTime()
         refreshRepeatButton()
@@ -393,7 +395,7 @@ extension PlayerView: MusicPlayable {
     
     func didStopPlaying(playlistItem: PlaylistItem?) {
         refreshPlayer()
-        refreshSongInfo(song: nil)
+        refreshSongInfo()
     }
 
     func didElapsedTimeChange() {
