@@ -65,14 +65,6 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func scrollToNextPlayingRow() {
         if let nextPlayingIndex = groupedPlaylist.nextPlayingtIndexPath {
-            // Moving at first one row off, after that we move to the correct row
-            // With that we definitely trigger the function scrollViewDidScroll to call
-            // Otherwise some cells are hidden or ar displayed behind the table section
-            if let afterNextPlayingtIndexPath = groupedPlaylist.afterNextPlayingtIndexPath {
-                tableView.scrollToRow(at: afterNextPlayingtIndexPath, at: .top, animated: false)
-            } else if let beforeCurrentlyPlayingtIndexPath = groupedPlaylist.beforeCurrentlyPlayingtIndexPath {
-                tableView.scrollToRow(at: beforeCurrentlyPlayingtIndexPath, at: .top, animated: false)
-            }
             tableView.scrollToRow(at: nextPlayingIndex, at: .top, animated: true)
         }
     }
@@ -140,6 +132,10 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         guard let headerView = view as? UITableViewHeaderFooterView else { return }
         headerView.backgroundView = UIView()
         headerView.backgroundView?.backgroundColor = UIColor.clear
+        headerView.textLabel?.font = UIFont.systemFont(ofSize: 20)
+        headerView.textLabel?.textColor = UIColor.labelColor
+        // text needs to be overridden here, otherwise the text is completely capital
+        headerView.textLabel?.text = groupedPlaylist.sectionNames[section]
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -224,16 +220,8 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     // MARK: - UIScrollViewDelegate
-    // Hide cells under transparent table section
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        for cell in tableView.visibleCells {
-            let hiddenFrameHeight = scrollView.contentOffset.y + CommonScreenOperations.tableSectionHeightLarge - cell.frame.origin.y
-            if (hiddenFrameHeight >= 0 || hiddenFrameHeight <= cell.frame.size.height) {
-                if let basicCell = cell as? BasicTableCell {
-                    basicCell.maskCell(fromTop: hiddenFrameHeight)
-                }
-            }
-        }
+        return
     }
     
     // MARK: - UITableViewDragDelegate
