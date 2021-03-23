@@ -100,16 +100,12 @@ class AmpacheXmlServerApi {
             os_log("Ampache authentication url is invalid: %s", log: log, type: .error, urlComp.description)
             return
         }
-        os_log("%s", log: log, type: .default, url.absoluteString)
-        
         let parser = XMLParser(contentsOf: url)!
         let curDelegate = AuthParserDelegate()
         parser.delegate = curDelegate
         let success = parser.parse()
         if let serverApiVersion = curDelegate.serverApiVersion {
             self.serverApiVersion = serverApiVersion
-            os_log("The server API version is '%s'", log: log, type: .info, serverApiVersion)
-            os_log("The client API version is '%s'", log: log, type: .info, clientApiVersion)
         }
         if let error = parser.parserError {
             authHandshake = nil
