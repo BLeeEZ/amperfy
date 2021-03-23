@@ -243,14 +243,14 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func optionsPressed() {
-        let alert = UIAlertController(title: "Next songs", message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Player", message: nil, preferredStyle: .actionSheet)
         
-        alert.addAction(UIAlertAction(title: "Clear", style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "Clear playlist", style: .default, handler: { _ in
             self.appDelegate.player.cleanPlaylist()
             self.reloadData()
             self.playerView.refreshPlayer()
         }))
-        alert.addAction(UIAlertAction(title: "Add all to playlist", style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "Add all songs to playlist", style: .default, handler: { _ in
             let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
             selectPlaylistVC.songsToAdd = self.appDelegate.player.playlist.songs
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)

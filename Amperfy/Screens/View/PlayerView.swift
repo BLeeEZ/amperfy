@@ -28,6 +28,7 @@ class PlayerView: UIView {
     private var player: MusicPlayer!
     private var rootView: PopupPlayerVC?
     private var displayStyle: PlayerDisplayStyle!
+    private var lastDisplayedSong: Song?
     
     @IBOutlet weak var songTitleCompactLabel: MarqueeLabel!
     @IBOutlet weak var songTitleLargeLabel: MarqueeLabel!
@@ -300,11 +301,14 @@ class PlayerView: UIView {
             rootView?.popupItem.title = songInfo.title
             rootView?.popupItem.subtitle = songInfo.artist?.name
             rootView?.popupItem.image = songInfo.image
-            if songInfo.image == Artwork.defaultImage {
-                rootView?.changeBackgroundGradient()
-            } else {
-                rootView?.changeBackgroundGradient(toMatchArtwork: songInfo.image)
+            if lastDisplayedSong != songInfo {
+                if songInfo.image == Artwork.defaultImage {
+                    rootView?.changeBackgroundGradient()
+                } else {
+                    rootView?.changeBackgroundGradient(toMatchArtwork: songInfo.image)
+                }
             }
+            lastDisplayedSong = songInfo
         } else {
             songTitleCompactLabel.text = "No song playing"
             songTitleLargeLabel.text = "No song playing"
@@ -314,7 +318,7 @@ class PlayerView: UIView {
             rootView?.popupItem.title = "No song playing"
             rootView?.popupItem.subtitle = ""
             rootView?.popupItem.image = Artwork.defaultImage
-            rootView?.changeBackgroundGradient()
+            lastDisplayedSong = nil
         }
     }
 
