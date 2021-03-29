@@ -18,9 +18,7 @@ class AlbumsVC: UITableViewController {
         configureSearchController()
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.rowHeight = AlbumTableCell.rowHeight
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
+
         albumsUnfiltered = [Album]()
         self.updateSearchResults(for: self.searchController)
         loadingSpinner.display(on: self)

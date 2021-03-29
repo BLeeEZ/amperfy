@@ -19,9 +19,7 @@ class PlaylistsVC: UITableViewController {
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         self.refreshControl?.addTarget(self, action: #selector(PlaylistsVC.handleRefresh), for: UIControl.Event.valueChanged)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
+
         playlistsAll = [Playlist]()
         self.updateSearchResults(for: self.searchController)
         loadingSpinner.display(on: self)

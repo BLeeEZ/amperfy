@@ -19,9 +19,7 @@ class SongVC: UITableViewController {
         configureSearchController()
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
+
         songsAll = [Song]()
         self.updateSearchResults(for: self.searchController)
         loadingSpinner.display(on: self)

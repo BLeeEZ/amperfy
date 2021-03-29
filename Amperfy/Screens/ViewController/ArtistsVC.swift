@@ -18,9 +18,7 @@ class ArtistsVC: UITableViewController {
         configureSearchController()
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.rowHeight = ArtistTableCell.rowHeight
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
+
         artistsUnfiltered = [Artist]()
         self.updateSearchResults(for: self.searchController)
         loadingSpinner.display(on: self)
