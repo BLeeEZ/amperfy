@@ -26,7 +26,11 @@ class AlbumDetailTableHeader: UIView {
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
         albumImage.image = album.image
-        infoLabel.text = "\(album.songs.count) Songs"
+        var infoText = "\(album.songs.count) Songs"
+        if album.year != 0 {
+            infoText += " \(CommonString.oneMiddleDot) Year: \(album.year)"
+        }
+        infoLabel.text = infoText
     }
 
     @IBAction func optionsButtonPressed(_ sender: Any) {
