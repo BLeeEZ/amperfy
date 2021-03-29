@@ -42,7 +42,7 @@ public class Album: AbstractLibraryEntity {
         for songMO in songsMO {
             returnSongs.append(Song(managedObject: songMO))
         }
-        return returnSongs
+        return returnSongs.sortByTrackNumber()
     }
     var hasCachedSongs: Bool {
         return songs.hasCachedSongs

@@ -101,7 +101,7 @@ extension Array where Element: Song {
     }
     
     func filterCustomArt() -> [Element] {
-        let filteredArray = self.filter{ element in
+        let filteredArray = self.filter { element in
             return element.image != Artwork.defaultImage
         }
         return filteredArray
@@ -114,6 +114,12 @@ extension Array where Element: Song {
             }
         }
         return false
+    }
+    
+    func sortByTrackNumber() -> [Element] {
+        return self.sorted {
+            return $0.track < $1.track
+        }
     }
     
 }
