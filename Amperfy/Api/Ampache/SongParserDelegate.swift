@@ -60,6 +60,10 @@ class SongParserDelegate: GenericXmlLibParser {
             songBuffer?.track = Int(buffer) ?? 0
         case "url":
             songBuffer?.url = buffer
+        case "year":
+            songBuffer?.year = Int(buffer) ?? 0
+        case "time":
+            songBuffer?.duration = Int(buffer) ?? 0
         case "art":
             songBuffer?.artwork?.url = buffer
         case "song":

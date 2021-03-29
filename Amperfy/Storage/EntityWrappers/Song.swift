@@ -22,6 +22,20 @@ public class Song: AbstractLibraryEntity {
          get { return Int(managedObject.track) }
          set { managedObject.track = Int16(newValue) }
      }
+     var year: Int {
+        get { return Int(managedObject.year) }
+        set { managedObject.year = Int16(newValue) }
+     }
+     var duration: Int? {
+        get { return managedObject.duration?.intValue }
+        set {
+            if let newValue = newValue {
+                managedObject.duration = NSNumber(integerLiteral: newValue)
+            } else {
+                managedObject.duration = nil
+            }
+        }
+     }
      var url: String? {
          get { return managedObject.url }
          set { managedObject.url = newValue }
