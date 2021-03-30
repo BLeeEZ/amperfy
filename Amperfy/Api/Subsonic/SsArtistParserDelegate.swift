@@ -6,7 +6,6 @@ class SsArtistParserDelegate: GenericXmlLibParser {
 
     private var subsonicUrlCreator: SubsonicUrlCreator
     private var artistBuffer: Artist?
-    var albumCountOfAllArtists = 0
 
     init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.subsonicUrlCreator = subsonicUrlCreator
@@ -17,22 +16,19 @@ class SsArtistParserDelegate: GenericXmlLibParser {
         buffer = ""
 
         if(elementName == "artist") {
-            guard let artistId = attributeDict["id"],
-                let attributeArtistName = attributeDict["name"],
-                let attributeAlbumCount = attributeDict["albumCount"],
-                let albumCount = Int(attributeAlbumCount) else {
-                    return 
-            }
+            guard let artistId = attributeDict["id"] else { return }
+            
             if !syncWave.isInitialWave, let fetchedArtist = libraryStorage.getArtist(id: artistId)  {
                 artistBuffer = fetchedArtist
             } else {
                 artistBuffer = libraryStorage.createArtist()
                 artistBuffer?.syncInfo = syncWave
                 artistBuffer?.id = artistId
-                artistBuffer?.name = attributeArtistName
+                if let attributeArtistName = attributeDict["name"] {
+                    artistBuffer?.name = attributeArtistName
+                }
                 artistBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: artistId)
             }
-            albumCountOfAllArtists += albumCount
 		}    
     }
     
@@ -40,7 +36,6 @@ class SsArtistParserDelegate: GenericXmlLibParser {
 		switch(elementName) {
 		case "artist":
             parsedCount += 1
-            parseNotifier?.notifyParsedObject()
             artistBuffer = nil
 		default:
 			break

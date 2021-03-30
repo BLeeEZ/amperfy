@@ -19,13 +19,12 @@ class SsPlaylistSongsParserDelegate: GenericXmlParser {
         buffer = ""
 
         if elementName == "playlist" {
-            guard let playlistId = attributeDict["id"],
-                let attributePlaylistName = attributeDict["name"] else {
-                    return
-            }
+            guard let playlistId = attributeDict["id"] else { return }
             playlistHasBeenDetected = true
             playlist.id = playlistId
-            playlist.name = attributePlaylistName
+            if let attributePlaylistName = attributeDict["name"] {
+                playlist.name = attributePlaylistName
+            }
         }
         
         if elementName == "entry" {

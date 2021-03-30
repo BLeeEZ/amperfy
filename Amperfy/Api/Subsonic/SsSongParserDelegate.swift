@@ -7,6 +7,8 @@ class SsSongParserDelegate: GenericXmlLibParser {
     
     private var subsonicUrlCreator: SubsonicUrlCreator
     private var songBuffer: Song?
+    var guessedArtist: Artist?
+    var guessedAlbum: Album?
     
     init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.subsonicUrlCreator = subsonicUrlCreator
@@ -19,7 +21,7 @@ class SsSongParserDelegate: GenericXmlLibParser {
         if(elementName == "song") {
             guard let songId = attributeDict["id"] else { return }
             
-            if !syncWave.isInitialWave, let fetchedSong = libraryStorage.getSong(id: songId)  {
+            if let fetchedSong = libraryStorage.getSong(id: songId)  {
                 songBuffer = fetchedSong
             } else {
                 songBuffer = libraryStorage.createSong()
@@ -42,7 +44,9 @@ class SsSongParserDelegate: GenericXmlLibParser {
             }
             
             if let artistId = attributeDict["artistId"] {
-                if let artist = libraryStorage.getArtist(id: artistId) {
+                if let guessedArtist = guessedArtist, guessedArtist.id == artistId {
+                    songBuffer?.artist = guessedArtist
+                } else if let artist = libraryStorage.getArtist(id: artistId) {
                     songBuffer?.artist = artist
                 } else {
                     os_log("Found song id %s with unknown artist id %s", log: log, type: .error, songId, artistId)
@@ -52,7 +56,9 @@ class SsSongParserDelegate: GenericXmlLibParser {
             }
 
             if let albumId = attributeDict["albumId"] {
-                if let album = libraryStorage.getAlbum(id: albumId) {
+                if let guessedAlbum = guessedAlbum, guessedAlbum.id == albumId {
+                    songBuffer?.album = guessedAlbum
+                } else if let album = libraryStorage.getAlbum(id: albumId) {
                     songBuffer?.album = album
                     songBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: albumId)
                 } else {
@@ -68,7 +74,6 @@ class SsSongParserDelegate: GenericXmlLibParser {
         switch(elementName) {
         case "song":
             parsedCount += 1
-            parseNotifier?.notifyParsedObject()
             songBuffer = nil
         default:
             break

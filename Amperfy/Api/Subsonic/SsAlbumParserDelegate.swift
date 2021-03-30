@@ -7,7 +7,6 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
     
     private var subsonicUrlCreator: SubsonicUrlCreator
     private var albumBuffer: Album?
-    var songCountOfAlbum = 0
     
     init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.subsonicUrlCreator = subsonicUrlCreator
@@ -18,15 +17,9 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
         buffer = ""
         
         if(elementName == "album") {
-            guard let albumId = attributeDict["id"],
-                let attributeAlbumtName = attributeDict["name"],
-                let artistId = attributeDict["artistId"],
-                let attributeSongCount = attributeDict["songCount"],
-                let songCount = Int(attributeSongCount) else {
-                    return
-            }
+            guard let albumId = attributeDict["id"] else { return }
 
-            if !syncWave.isInitialWave, let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
+            if let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
                 albumBuffer = fetchedAlbum
             } else {
                 albumBuffer = libraryStorage.createAlbum()
@@ -34,20 +27,20 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
             
             albumBuffer?.syncInfo = syncWave
             albumBuffer?.id = albumId
-            albumBuffer?.name = attributeAlbumtName
+            if let attributeAlbumtName = attributeDict["name"] {
+                albumBuffer?.name = attributeAlbumtName
+            }
             albumBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: albumId)
             
             if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
                 albumBuffer?.year = year
             }
             
-            if let artist = libraryStorage.getArtist(id: artistId) {
+            if let artistId = attributeDict["artistId"], let artist = libraryStorage.getArtist(id: artistId) {
                 albumBuffer?.artist = artist
             } else {
-                os_log("Found album id %s with unknown artist id %s", log: log, type: .error, albumId, artistId)
+                os_log("Found album id %s with unknown artist", log: log, type: .error, albumId)
             }
-            
-            songCountOfAlbum += songCount
         }
     }
     
@@ -55,7 +48,6 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
         switch(elementName) {
         case "album":
             parsedCount += 1
-            parseNotifier?.notifyParsedObject()
             albumBuffer = nil
         default:
             break

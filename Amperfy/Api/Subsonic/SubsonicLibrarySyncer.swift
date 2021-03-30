@@ -22,21 +22,25 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         statusNotifyier?.notifyArtistSyncStarted()
         let artistParser = SsArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
         subsonicServerApi.requestArtists(parserDelegate: artistParser)
-        albumCount = artistParser.albumCountOfAllArtists
-       
-        statusNotifyier?.notifyAlbumsSyncStarted()
+        
         let artists = libraryStorage.getArtists()
+        albumCount = artists.count
+        statusNotifyier?.notifyAlbumsSyncStarted()
         for artist in artists {
             let albumDelegate = SsAlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
             subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artist.id)
-            songCount += albumDelegate.songCountOfAlbum
+            statusNotifyier?.notifyParsedObject()
         }
 
-        statusNotifyier?.notifySongsSyncStarted()
         let albums = libraryStorage.getAlbums()
+        songCount = albums.count
+        statusNotifyier?.notifySongsSyncStarted()
         for album in albums {
             let songDelegate = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
+            songDelegate.guessedArtist = album.artist
+            songDelegate.guessedAlbum = album
             subsonicServerApi.requestAlbum(parserDelegate: songDelegate, id: album.id)
+            statusNotifyier?.notifyParsedObject()
         }
         
         statusNotifyier?.notifyPlaylistSyncStarted()
