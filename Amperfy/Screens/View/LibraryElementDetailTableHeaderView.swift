@@ -39,56 +39,39 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     private func playAllSongsofArtist(artist: Artist) {
-        guard let player = player else {
-            return
-        }
+        guard let player = player else { return }
         player.cleanPlaylist()
         addArtistSongsToPlaylist(artist: artist)
         player.play()
     }
     
     private func addArtistSongsToPlaylist(artist: Artist) {
-        if let player = player {
-            for song in artist.songs {
-                player.addToPlaylist(song: song)
-            }
-        }
+        guard let player = player else { return }
+        player.addToPlaylist(songs: artist.songs)
     }
     
     private func playAllSongsInAlbum(album: Album) {
-        guard let player = player else {
-            return
-        }
+        guard let player = player else { return }
         player.cleanPlaylist()
         addAlbumSongsToPlaylist(album: album)
         player.play()
     }
     
     private func addAlbumSongsToPlaylist(album: Album) {
-        guard let player = player else {
-            return
-        }
-        for song in album.songs {
-            player.addToPlaylist(song: song)
-        }
+        guard let player = player else { return }
+        player.addToPlaylist(songs: album.songs)
     }
     
     private func playAllSongsInPlaylist(playlist: Playlist) {
-        guard let player = player else {
-            return
-        }
+        guard let player = player else { return }
         player.cleanPlaylist()
         addPlaylistSongsToPlaylist(playlist: playlist)
         player.play()
     }
     
     private func addPlaylistSongsToPlaylist(playlist: Playlist) {
-        guard let player = player else {
-            return
-        }
-        for song in playlist.songs {
-            player.addToPlaylist(song: song)
-        }
+        guard let player = player else { return }
+        player.addToPlaylist(songs: playlist.songs)
     }
     
     func prepare(toWorkOnArtist artist: Artist?, with player: MusicPlayer) {

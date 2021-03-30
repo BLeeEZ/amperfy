@@ -49,6 +49,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
             playlist.removeAllSongs()
             let parser = SsPlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
             subsonicServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
+            playlist.ensureConsistentItemOrder()
             statusNotifyier?.notifyParsedObject()
         }
         
@@ -71,6 +72,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         playlist.removeAllSongs()
         let parser = SsPlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
         subsonicServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
+        playlist.ensureConsistentItemOrder()
         libraryStorage.saveContext()
         statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist)
     }

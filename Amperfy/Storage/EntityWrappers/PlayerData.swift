@@ -132,6 +132,11 @@ public class PlayerData: NSObject {
         shuffledPlaylist.append(song: song)
     }
     
+    func addToPlaylist(songs: [Song]) {
+        normalPlaylist.append(songs: songs)
+        shuffledPlaylist.append(songs: songs)
+    }
+    
     func removeAllSongs() {
         currentSongIndex = 0
         normalPlaylist.removeAllSongs()

@@ -48,6 +48,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 playlist.removeAllSongs()
                 let parser = PlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
                 ampacheXmlServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
+                playlist.ensureConsistentItemOrder()
                 statusNotifyier?.notifyParsedObject()
             }
         
@@ -74,6 +75,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         playlist.removeAllSongs()
         let parser = PlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
         ampacheXmlServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
+        playlist.ensureConsistentItemOrder()
         libraryStorage.saveContext()
         statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist)
     }

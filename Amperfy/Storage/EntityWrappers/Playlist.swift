@@ -134,18 +134,22 @@ public class Playlist: NSObject {
     }
     
     func append(song: Song) {
-        let playlistItem = storage.createPlaylistItem()
-        playlistItem.order = managedObject.items!.count
-        playlistItem.playlist = self
-        playlistItem.song = song
+        createPlaylistItem(forSong: song)
         storage.saveContext()
-        ensureConsistentItemOrder()
     }
 
     func append(songs songsToAppend: [Song]) {
         for song in songsToAppend {
-            append(song: song)
+            createPlaylistItem(forSong: song)
         }
+        storage.saveContext()
+    }
+    
+    private func createPlaylistItem(forSong song: Song) {
+        let playlistItem = storage.createPlaylistItem()
+        playlistItem.order = managedObject.items!.count
+        playlistItem.playlist = self
+        playlistItem.song = song
     }
 
     func add(item: PlaylistItem) {
@@ -169,7 +173,6 @@ public class Playlist: NSObject {
         localSortedPlaylistItems[fromIndex].order = targetOrder
         
         storage.saveContext()
-        ensureConsistentItemOrder()
     }
     
     func remove(at index: Int) {
@@ -182,7 +185,6 @@ public class Playlist: NSObject {
             }
             storage.deletePlaylistItem(item: itemToBeRemoved)
             storage.saveContext()
-            ensureConsistentItemOrder()
         }
     }
     
@@ -219,16 +221,16 @@ public class Playlist: NSObject {
         }
     }
 
-    private func ensureConsistentItemOrder() {
+    func ensureConsistentItemOrder() {
         var hasInconsistencyDetected = false
         for (index, item) in sortedPlaylistItems.enumerated() {
             if item.order != index {
-                os_log(.debug, "Playlist inconsistency detected! Order: %d  Index: %d", item.order, index)
                 item.order = index
                 hasInconsistencyDetected = true
             }
         }
         if hasInconsistencyDetected {
+            os_log(.debug, "Playlist inconsistency detected and fixed!")
             storage.saveContext()
         }
     }

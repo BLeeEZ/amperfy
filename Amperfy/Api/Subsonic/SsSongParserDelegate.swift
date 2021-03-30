@@ -28,7 +28,6 @@ class SsSongParserDelegate: GenericXmlLibParser {
             songBuffer?.syncInfo = syncWave
             songBuffer?.id = songId
             
-            
             if let attributeTitle = attributeDict["title"] {
                 songBuffer?.title = attributeTitle
             }

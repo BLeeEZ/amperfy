@@ -104,6 +104,10 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         coreData.addToPlaylist(song: song)
     }
     
+    func addToPlaylist(songs: [Song]) {
+        coreData.addToPlaylist(songs: songs)
+    }
+    
     func movePlaylistSong(fromIndex: Int, to: Int) {
         coreData.movePlaylistSong(fromIndex: fromIndex, to: to)
     }

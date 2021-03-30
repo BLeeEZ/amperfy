@@ -129,7 +129,8 @@ class PlaylistsVC: UITableViewController {
     private func animateTableViewUpdate(withNewPlaylists newPlaylists: [Playlist]) {
         let newPlaylistsFilteredByScope = filterBasedOnOnScope(playlists: newPlaylists)
         let newFilteredPlaylists = filterSearchResults(for: searchController, playlists: newPlaylistsFilteredByScope)
-        let oldFilteredPlaylists = filterBasedOnOnScope(playlists: playlistsAll)
+        let oldPlaylistsFilteredByScope = filterBasedOnOnScope(playlists: playlistsAll)
+        let oldFilteredPlaylists = filterSearchResults(for: searchController, playlists: oldPlaylistsFilteredByScope)
         
         var commonPlaylists = [Playlist]()
         var playlistsDeleted = [IndexPath]()
