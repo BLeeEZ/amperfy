@@ -43,6 +43,10 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 
 4. Build and run the "Amperfy" scheme
 
+## Beta test releases
+
+For more information, and to participate in the public beta releases, please visit [Amperfy Beta](https://github.com/BLeeEZ/amperfy/issues/25).
+
 ## Attributions
 
 - [LNPopupController](https://github.com/LeoNatan/LNPopupController) by [LeoNatan](https://github.com/LeoNatan) is licensed under [MIT License](https://github.com/LeoNatan/LNPopupController/blob/master/LICENSE)
