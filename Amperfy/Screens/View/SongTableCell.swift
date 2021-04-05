@@ -70,7 +70,9 @@ class SongTableCell: BasicTableCell {
         }
         if song.isCached {
             artistLabel.textColor = UIColor.defaultBlue
-        } else  {
+        } else if isCellInPopupPlayer {
+            artistLabel.textColor = UIColor.labelColor
+        } else {
             artistLabel.textColor = UIColor.secondaryLabelColor
         }
         if let download = download {
@@ -84,6 +86,7 @@ class SongTableCell: BasicTableCell {
     func confToPlayPlaylistIndexOnTab(indexInPlaylist: Int) {
         self.index = indexInPlaylist
         isCellInPopupPlayer = true
+        refresh()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

@@ -269,8 +269,15 @@ class PlayerView: UIView {
         artistNameLargeLabel.speed = .rate(20.0)
         artistNameLargeLabel.fadeLength = 10.0
         
-        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .lightGray, for: UIControl.State.normal)
-        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .lightGray, for: UIControl.State.highlighted)
+        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
+        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
+    }
+    
+    // handle dark/light mode change
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
+        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
     }
     
     func refreshPlayButtonTitle() {
@@ -379,9 +386,9 @@ class PlayerView: UIView {
     
     func refreshDisplayPlaylistButton() {
         if displayStyle == .compact {
-            displayPlaylistButton.tintColor = UIColor.defaultBlue
+            displayPlaylistButton.tintColor = .defaultBlue
         } else {
-            displayPlaylistButton.tintColor = UIColor.lightGray
+            displayPlaylistButton.tintColor = .labelColor
         }
     }
     
