@@ -214,11 +214,18 @@ public class Playlist: NSObject {
     }
     
     func shuffle() {
-        if songs.count > 0 {
-            for i in 0..<songs.count {
-                movePlaylistSong(fromIndex: i, to: Int.random(in: 0..<songs.count))
-            }
+        let localSortedPlaylistItems = sortedPlaylistItems
+        let songCount = localSortedPlaylistItems.count
+        guard songCount > 0 else { return }
+        
+        var shuffeldIndexes = [Int]()
+        shuffeldIndexes += 0...songCount-1
+        shuffeldIndexes = shuffeldIndexes.shuffled()
+        
+        for i in 0..<songCount {
+            localSortedPlaylistItems[i].order = shuffeldIndexes[i]
         }
+        storage.saveContext()
     }
 
     func ensureConsistentItemOrder() {

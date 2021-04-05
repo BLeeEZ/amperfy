@@ -90,6 +90,7 @@ class PlayerView: UIView {
     @IBAction func shuffleButtonPushed(_ sender: Any) {
         player.isShuffle.toggle()
         refreshShuffleButton()
+        rootView?.scrollToNextPlayingRow()
     }
     
     @IBAction func currentSongTimeSliderChanged(_ sender: Any) {
