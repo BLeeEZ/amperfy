@@ -116,11 +116,7 @@ class PlaylistDetailTableHeader: UIView {
             }))
         }
         alert.addAction(UIAlertAction(title: "Download all songs", style: .default, handler: { _ in
-            for song in playlist.songs {
-                if !song.isCached {
-                    self.appDelegate.downloadManager.download(song: song)
-                }
-            }
+            self.appDelegate.downloadManager.download(songs: playlist.songs)
         }))
         if playlist.hasCachedSongs {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in

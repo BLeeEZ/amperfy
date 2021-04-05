@@ -13,17 +13,23 @@ enum Priority {
     case low
 }
 
+enum DownloadPhase {
+    case waitingToStart
+    case preparedToDownloading
+    case activeDownloading
+    case finished
+}
+
 class DownloadRequest<Element: NSObject>: Equatable {
     
     let priority: Priority
     let title: String
     let element: Element
     let notifier: SongDownloadNotifiable?
-    var markedToStart = false
     var url: URL?
     var download: Download?
+    private(set) var phase = DownloadPhase.waitingToStart
     private let finishSync = DispatchGroup()
-    private var isFinished = false
     private var queue = DispatchQueue(label: "DownloadRequest")
     
     init(priority: Priority, element: Element, title: String, notifier: SongDownloadNotifiable?) {
@@ -38,7 +44,20 @@ class DownloadRequest<Element: NSObject>: Equatable {
     }
     
     func started() {
-        finishSync.enter()
+        queue.sync {
+            if phase != .finished {
+                phase = .activeDownloading
+                finishSync.enter()
+            }
+        }
+    }
+    
+    func preparedToDownload() {
+        queue.sync {
+            if phase != .finished {
+                phase = .preparedToDownloading
+            }
+        }
     }
     
     func waitTillFinished() {
@@ -56,10 +75,10 @@ class DownloadRequest<Element: NSObject>: Equatable {
     
     private func markAsFinished() {
         queue.sync {
-            if !isFinished {
-                isFinished = true
+            if phase == .activeDownloading {
                 finishSync.leave()
             }
+            phase = .finished
         }
     }
     

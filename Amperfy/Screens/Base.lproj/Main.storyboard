@@ -804,7 +804,7 @@
                                                         <constraint firstAttribute="height" constant="30" id="7wx-L0-O7r"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                                    <state key="normal" title="Active Downloads">
+                                                    <state key="normal" title="Downloads">
                                                         <color key="titleColor" systemColor="labelColor"/>
                                                     </state>
                                                 </button>
@@ -871,7 +871,7 @@
                             <outlet property="delegate" destination="0yB-ih-px5" id="Th4-qL-CJ1"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Active Downloads" id="hg7-nw-O6v"/>
+                    <navigationItem key="navigationItem" title="Downloads" id="hg7-nw-O6v"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UUy-Fi-V0W" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

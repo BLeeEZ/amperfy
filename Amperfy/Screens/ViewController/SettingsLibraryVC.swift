@@ -89,6 +89,7 @@ class SettingsLibraryVC: UITableViewController {
             self.appDelegate.downloadManager.stopAndWait()
             self.appDelegate.persistentLibraryStorage.deleteCompleteSongCache()
             self.appDelegate.persistentLibraryStorage.saveContext()
+            self.appDelegate.downloadManager.start()
         }))
         alert.addAction(UIAlertAction(title: "No", style: .default , handler: nil))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()

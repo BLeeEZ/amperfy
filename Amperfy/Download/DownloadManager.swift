@@ -45,8 +45,8 @@ class DownloadManager: SongDownloadable {
     private var isActive = false
     private var viewNotifiers = [SongDownloadViewUpdatable]()
     
-    var queuedRequests: [DownloadRequest<Song>] {
-        return requestManager.queuedRequests
+    var requestQueues: DownloadRequestQueues {
+        return requestManager.requestQueues
     }
     
     init(storage: PersistentStorage, requestManager: RequestManager, urlDownloader: UrlDownloader, downloadDelegate: DownloadManagerDelegate) {
@@ -58,13 +58,23 @@ class DownloadManager: SongDownloadable {
     
     func download(song: Song, notifier: SongDownloadNotifiable? = nil, priority: Priority = .low) {
         guard !song.isCached else { return }
-        
         let newRequest = DownloadRequest(priority: priority, element: song, title: song.displayString, notifier: notifier)
-        requestManager.add(request: newRequest) { addedRequest, removedRequest in
+        self.requestManager.add(request: newRequest) { addedRequest, removedRequest in
             if let removedRequest = removedRequest {
                 self.notifyViewRequestChange(removedRequest, updateReason: .removed)
             }
             self.notifyViewRequestChange(addedRequest, updateReason: .added)
+        }
+    }
+    
+    func download(songs: [Song]) {
+        var requests = [DownloadRequest<Song>]()
+        for song in songs {
+            guard !song.isCached else { continue }
+            requests.append(DownloadRequest(priority: .low, element: song, title: song.displayString, notifier: nil))
+        }
+        if requests.count > 0 {
+            self.requestManager.add(requests: requests)
         }
     }
     
@@ -82,12 +92,16 @@ class DownloadManager: SongDownloadable {
 
     private func stop() {
         isRunning = false
-        requestManager.cancelDownloads()
+        cancelDownloads()
     }
 
     func stopAndWait() {
         stop()
         activeDispatchGroup.wait()
+    }
+    
+    func cancelDownloads() {
+        requestManager.cancelDownloads()
     }
     
     private func downloadInBackground() {
@@ -98,7 +112,7 @@ class DownloadManager: SongDownloadable {
             while self.isRunning {
                 self.downloadSlotCounter.waitForDownloadSlot()
                 
-                guard let request = self.requestManager.getAndMarkNextRequestToDownload() else {
+                guard let request = self.requestManager.getNextRequestToDownload() else {
                     self.downloadSlotCounter.downloadFinished()
                     // wait some time and poll for new requests
                     sleep(1)
@@ -139,6 +153,7 @@ class DownloadManager: SongDownloadable {
             os_log("Fetching %s FAILED", log: self.log, type: .info, request.title)
             downloadError = DownloadError.fetchFailed
         }
+        self.requestManager.informDownloadCompleted(request: request)
         DispatchQueue.main.async {
             request.notifier?.finished(downloading: request.element, error: downloadError)
         }
