@@ -12,20 +12,11 @@ class SettingsLibraryVC: UITableViewController {
     
     @IBOutlet weak var cachedSongsCountLabel: UILabel!
     @IBOutlet weak var cachedSongsCountSpinner: UIActivityIndicatorView!
-    @IBOutlet weak var cachedSongsSizeLabel: UILabel!
-    @IBOutlet weak var cachedSongsSizeSpinner: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        
-        if #available(iOS 13.0, *) {
-            self.cachedSongsCountSpinner.style = .medium
-            self.cachedSongsSizeSpinner.style = .medium
-        } else {
-            self.cachedSongsCountSpinner.style = .gray
-            self.cachedSongsSizeSpinner.style = .gray
-        }
+        self.cachedSongsCountSpinner.style = UIActivityIndicatorView.defaultStyle
         
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
             let storage = LibraryStorage(context: context)
@@ -59,25 +50,6 @@ class SettingsLibraryVC: UITableViewController {
                 guard let self = self else { return }
                 self.cachedSongsCountSpinner.isHidden = true
                 self.cachedSongsCountLabel.text = String(cachedSongs.count)
-            }
-            
-            var cachedSongSize = 0
-            var cachedSongSizeLabelText = ""
-            for song in cachedSongs {
-                cachedSongSize += song.fileData?.sizeInKB ?? 0
-            }
-            let cachedSongSizeFloat = Float(cachedSongSize)
-            let cachedSongSizeInMB = cachedSongSizeFloat / 1000.0
-            let cachedSongSizeInGB = cachedSongSizeInMB / 1000.0
-            if cachedSongSizeInMB < 1000.0 {
-                cachedSongSizeLabelText = NSString(format: "%.2f", cachedSongSizeInMB) as String + " MB"
-            } else {
-                cachedSongSizeLabelText = NSString(format: "%.2f", cachedSongSizeInGB) as String + " GB"
-            }
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.cachedSongsSizeSpinner.isHidden = true
-                self.cachedSongsSizeLabel.text = cachedSongSizeLabelText
             }
         }
     }

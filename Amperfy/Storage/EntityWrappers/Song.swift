@@ -92,7 +92,7 @@ public class Song: AbstractLibraryEntity {
     }
 
     var isCached: Bool {
-        if let _ = managedObject.file?.data {
+        if managedObject.file != nil {
             return true
         }
         return false

@@ -1828,49 +1828,8 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="hgT-1X-Nqi">
-                                        <rect key="frame" x="0.0" y="311.5" width="414" height="40"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hgT-1X-Nqi" id="YE3-CN-PQH">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OaM-sv-EGG" userLabel="Value">
-                                                    <rect key="frame" x="294" y="5" width="100" height="30"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="dgI-Jg-VyS"/>
-                                                    </constraints>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Song Cache Size" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Beu-87-Tgo" userLabel="Description">
-                                                    <rect key="frame" x="20" y="5" width="150" height="30"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="2D5-Fw-O8d"/>
-                                                    </constraints>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="b1P-EU-cSS" userLabel="Spinner">
-                                                    <rect key="frame" x="374" y="10" width="20" height="20"/>
-                                                </activityIndicatorView>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="OaM-sv-EGG" firstAttribute="centerY" secondItem="YE3-CN-PQH" secondAttribute="centerY" id="0kT-LN-M3L"/>
-                                                <constraint firstItem="Beu-87-Tgo" firstAttribute="centerY" secondItem="YE3-CN-PQH" secondAttribute="centerY" id="8L2-7D-ReJ"/>
-                                                <constraint firstAttribute="leadingMargin" secondItem="Beu-87-Tgo" secondAttribute="trailing" constant="-150" id="CeK-rC-sdP"/>
-                                                <constraint firstItem="b1P-EU-cSS" firstAttribute="centerY" secondItem="YE3-CN-PQH" secondAttribute="centerY" id="QzO-Bq-qRe"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="b1P-EU-cSS" secondAttribute="trailing" id="UVp-2q-z9m"/>
-                                                <constraint firstItem="OaM-sv-EGG" firstAttribute="leading" secondItem="YE3-CN-PQH" secondAttribute="trailingMargin" constant="-100" id="cqD-D5-IRD"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="OaM-sv-EGG" secondAttribute="trailing" id="oyX-df-6Ll"/>
-                                                <constraint firstItem="Beu-87-Tgo" firstAttribute="leading" secondItem="YE3-CN-PQH" secondAttribute="leadingMargin" id="xY9-s5-mrU"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="zbD-fA-ds8">
-                                        <rect key="frame" x="0.0" y="351.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="311.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zbD-fA-ds8" id="sYm-ek-akd">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -1910,8 +1869,6 @@
                         <outlet property="artistsCountLabel" destination="Thx-6G-fSC" id="HSr-Ci-J1L"/>
                         <outlet property="cachedSongsCountLabel" destination="IDq-Rn-c12" id="Era-EP-6wg"/>
                         <outlet property="cachedSongsCountSpinner" destination="5Wy-ux-O8s" id="OuR-sQ-3dh"/>
-                        <outlet property="cachedSongsSizeLabel" destination="OaM-sv-EGG" id="foo-YG-xn3"/>
-                        <outlet property="cachedSongsSizeSpinner" destination="b1P-EU-cSS" id="5fI-gv-Ztd"/>
                         <outlet property="playlistsCountLabel" destination="c9v-4o-ykS" id="y6d-Qf-35a"/>
                         <outlet property="songsCountLabel" destination="wam-6j-yLi" id="uAg-x4-OHc"/>
                     </connections>
