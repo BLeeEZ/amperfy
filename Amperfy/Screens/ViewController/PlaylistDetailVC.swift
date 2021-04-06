@@ -32,7 +32,7 @@ class PlaylistDetailVC: UITableViewController {
             playlistOperationsView = playlistDetailTableHeaderView
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: playlistTableHeaderFrameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(toWorkOnPlaylist: playlist, with: appDelegate.player)
+            libraryElementDetailTableHeaderView.prepare(songContainer: playlist, with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         self.refreshControl?.addTarget(self, action: #selector(PlaylistsVC.handleRefresh), for: UIControl.Event.valueChanged)

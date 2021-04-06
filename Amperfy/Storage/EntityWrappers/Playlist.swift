@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import os.log
 
-public class Playlist: NSObject {
+public class Playlist: NSObject, SongContainable {
     
     let managedObject: PlaylistMO
     private let storage: LibraryStorage

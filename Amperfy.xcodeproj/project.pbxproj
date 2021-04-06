@@ -52,6 +52,7 @@
 		504C719123BAD112001F82C7 /* SongTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504C719023BAD112001F82C7 /* SongTest.swift */; };
 		5058708E21DEB07F0043896F /* SongAlphabetSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708D21DEB07F0043896F /* SongAlphabetSection.swift */; };
 		5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */; };
+		505905BC261D980C007C34CB /* SongContainable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505905BB261D980C007C34CB /* SongContainable.swift */; };
 		50675E6D25F61164005737FD /* BasicTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50675E6C25F61163005737FD /* BasicTableCell.swift */; };
 		506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */; };
 		506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */; };
@@ -252,6 +253,7 @@
 		504C719023BAD112001F82C7 /* SongTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTest.swift; sourceTree = "<group>"; };
 		5058708D21DEB07F0043896F /* SongAlphabetSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongAlphabetSection.swift; sourceTree = "<group>"; };
 		5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupPlayerVC.swift; sourceTree = "<group>"; };
+		505905BB261D980C007C34CB /* SongContainable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongContainable.swift; sourceTree = "<group>"; };
 		5067016125E3ADA200A3EF89 /* Amperfy v5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v5.xcdatamodel"; sourceTree = "<group>"; };
 		50675E6C25F61163005737FD /* BasicTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableCell.swift; sourceTree = "<group>"; };
 		506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v2.xcdatamodel"; sourceTree = "<group>"; };
@@ -632,6 +634,7 @@
 				50B798A823B6E5FF00551E62 /* PlaylistItem.swift */,
 				50F81E9323BE1AFD00EAAC3E /* SongFile.swift */,
 				50F81E9723BE4C1800EAAC3E /* SyncWave.swift */,
+				505905BB261D980C007C34CB /* SongContainable.swift */,
 			);
 			path = EntityWrappers;
 			sourceTree = "<group>";
@@ -1112,6 +1115,7 @@
 				50A7388522452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift in Sources */,
 				50F81EE123BF6B1E00EAAC3E /* AbstractLibraryEntityMO+CoreDataProperties.swift in Sources */,
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
+				505905BC261D980C007C34CB /* SongContainable.swift in Sources */,
 				502C0041224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift in Sources */,
 				50F81EE423BF6B1E00EAAC3E /* SyncWaveMO+CoreDataClass.swift in Sources */,
 				50F81EEA23BF6B1E00EAAC3E /* PlaylistItemMO+CoreDataClass.swift in Sources */,

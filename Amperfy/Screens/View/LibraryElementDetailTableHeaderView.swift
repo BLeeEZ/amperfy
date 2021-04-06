@@ -8,9 +8,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     static let frameHeight: CGFloat = 30.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginMiddleElement
     
-    private var artist: Artist?
-    private var album: Album?
-    private var playlist: Playlist?
+    private var songContainer: SongContainable?
     private var player: MusicPlayer?
     
     required init?(coder aDecoder: NSCoder) {
@@ -19,73 +17,19 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     @IBAction func playAllButtonPressed(_ sender: Any) {
-        if let artist = artist {
-            playAllSongsofArtist(artist: artist)
-        } else if let album = album {
-            playAllSongsInAlbum(album: album)
-        } else if let playlist = playlist {
-            playAllSongsInPlaylist(playlist: playlist)
-        }
+        guard let songContainer = songContainer, let player = player else { return }
+        player.cleanPlaylist()
+        player.addToPlaylist(songs: songContainer.songs)
+        player.play()
     }
     
     @IBAction func addAllToPlayNextButtonPressed(_ sender: Any) {
-        if let artist = artist {
-            addArtistSongsToPlaylist(artist: artist)
-        } else if let album = album {
-            addAlbumSongsToPlaylist(album: album)
-        } else if let playlist = playlist {
-            addPlaylistSongsToPlaylist(playlist: playlist)
-        }
+        guard let songContainer = songContainer, let player = player else { return }
+        player.addToPlaylist(songs: songContainer.songs)
     }
     
-    private func playAllSongsofArtist(artist: Artist) {
-        guard let player = player else { return }
-        player.cleanPlaylist()
-        addArtistSongsToPlaylist(artist: artist)
-        player.play()
-    }
-    
-    private func addArtistSongsToPlaylist(artist: Artist) {
-        guard let player = player else { return }
-        player.addToPlaylist(songs: artist.songs)
-    }
-    
-    private func playAllSongsInAlbum(album: Album) {
-        guard let player = player else { return }
-        player.cleanPlaylist()
-        addAlbumSongsToPlaylist(album: album)
-        player.play()
-    }
-    
-    private func addAlbumSongsToPlaylist(album: Album) {
-        guard let player = player else { return }
-        player.addToPlaylist(songs: album.songs)
-    }
-    
-    private func playAllSongsInPlaylist(playlist: Playlist) {
-        guard let player = player else { return }
-        player.cleanPlaylist()
-        addPlaylistSongsToPlaylist(playlist: playlist)
-        player.play()
-    }
-    
-    private func addPlaylistSongsToPlaylist(playlist: Playlist) {
-        guard let player = player else { return }
-        player.addToPlaylist(songs: playlist.songs)
-    }
-    
-    func prepare(toWorkOnArtist artist: Artist?, with player: MusicPlayer) {
-        self.artist = artist
-        self.player = player
-    }
-    
-    func prepare(toWorkOnAlbum album: Album?, with player: MusicPlayer) {
-        self.album = album
-        self.player = player
-    }
-    
-    func prepare(toWorkOnPlaylist playlist: Playlist?, with player: MusicPlayer) {
-        self.playlist = playlist
+    func prepare(songContainer: SongContainable?, with player: MusicPlayer) {
+        self.songContainer = songContainer
         self.player = player
     }
     
