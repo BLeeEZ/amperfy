@@ -24,11 +24,12 @@ class PlayerView: UIView {
     static private let margin = UIEdgeInsets(top: 0, left: UIView.defaultMarginX, bottom: 20, right: UIView.defaultMarginX)
     static private let defaultAnimationDuration = TimeInterval(0.50)
     
+    var lastDisplayedSong: Song?
+    
     private var appDelegate: AppDelegate!
     private var player: MusicPlayer!
     private var rootView: PopupPlayerVC?
     private var displayStyle: PlayerDisplayStyle!
-    private var lastDisplayedSong: Song?
     
     @IBOutlet weak var songTitleCompactLabel: MarqueeLabel!
     @IBOutlet weak var songTitleLargeLabel: MarqueeLabel!
@@ -309,13 +310,7 @@ class PlayerView: UIView {
             rootView?.popupItem.title = songInfo.title
             rootView?.popupItem.subtitle = songInfo.artist?.name
             rootView?.popupItem.image = songInfo.image
-            if lastDisplayedSong != songInfo {
-                if songInfo.image == Artwork.defaultImage {
-                    rootView?.changeBackgroundGradient()
-                } else {
-                    rootView?.changeBackgroundGradient(toMatchArtwork: songInfo.image)
-                }
-            }
+            rootView?.changeBackgroundGradient(forSong: songInfo)
             lastDisplayedSong = songInfo
         } else {
             songTitleCompactLabel.text = "No song playing"

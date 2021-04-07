@@ -13,6 +13,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var groupedPlaylist: PopupPlaylistGrouper!
     var hostingTabBarVC: TabBarVC?
     var backgroundColorGradient: PopupAnimatedGradientLayer!
+    let backgroundGradientDelayTime: UInt32 = 2
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,7 +29,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate.downloadManager.addNotifier(self)
         groupedPlaylist = PopupPlaylistGrouper(player: player)
         backgroundColorGradient = PopupAnimatedGradientLayer(view: view)
-        changeBackgroundGradient()
+        backgroundColorGradient.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
         
         if let createdPlayerView = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: playerPlaceholderView.bounds.size.width, height: playerPlaceholderView.bounds.size.height)) {
             playerView = createdPlayerView
@@ -53,8 +54,27 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tableView.reloadData()
     }
     
-    func changeBackgroundGradient(toMatchArtwork: UIImage? = nil) {
-        backgroundColorGradient.changeBackground(style: traitCollection.userInterfaceStyle, toMatchArtwork: toMatchArtwork)
+    func changeBackgroundGradient(forSong song: Song) {
+        var customColor: UIColor?
+        let songArtwork = song.image
+
+        if playerView.lastDisplayedSong != song {
+            DispatchQueue.global().async {
+                if songArtwork != Artwork.defaultImage {
+                    customColor = songArtwork.averageColor()
+                }
+                sleep(self.backgroundGradientDelayTime)
+                DispatchQueue.main.async {
+                    if self.playerView.lastDisplayedSong == song {
+                        if let customColor = customColor {
+                            self.backgroundColorGradient.changeBackground(style: self.traitCollection.userInterfaceStyle, customColor: customColor)
+                        } else {
+                            self.backgroundColorGradient.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
+                        }
+                    }
+                }
+            }
+        }
     }
     
     // handle dark/light mode change

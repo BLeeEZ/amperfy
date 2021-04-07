@@ -83,10 +83,10 @@ class PopupAnimatedGradientLayer {
     let lightnessDarkMode: CGFloat = 0.3
     let lightnessLightMode: CGFloat = 0.7
     var backgroundColorIndex = 0
-    var artworkColor: UIColor?
+    var customColor: UIColor?
     private var coloredCornerColor: UIColor {
-        if let artworkColor = artworkColor {
-            return artworkColor
+        if let customColor = customColor {
+            return customColor
         } else {
             return colorPalette[backgroundColorIndex]
         }
@@ -104,13 +104,14 @@ class PopupAnimatedGradientLayer {
         }
     }
     
-    func changeBackground( style: UIUserInterfaceStyle, toMatchArtwork: UIImage? = nil) {
-        if let artwork = toMatchArtwork {
-            artworkColor = artwork.averageColor()
-        } else {
-            artworkColor = nil
-            backgroundColorIndex.setOtherRandomValue(in: 0...colorPalette.count-1)
-        }
+    func changeBackground(withStyleAndRandomColor style: UIUserInterfaceStyle) {
+        customColor = nil
+        backgroundColorIndex.setOtherRandomValue(in: 0...colorPalette.count-1)
+        applyChange(style: style)
+    }
+    
+    func changeBackground(style: UIUserInterfaceStyle, customColor: UIColor) {
+        self.customColor = customColor
         applyChange(style: style)
     }
     
