@@ -12,11 +12,20 @@ class SettingsLibraryVC: UITableViewController {
     
     @IBOutlet weak var cachedSongsCountLabel: UILabel!
     @IBOutlet weak var cachedSongsCountSpinner: UIActivityIndicatorView!
+    @IBOutlet weak var cachedSongsSizeLabel: UILabel!
+    @IBOutlet weak var cachedSongsSizeSpinner: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        self.cachedSongsCountSpinner.style = UIActivityIndicatorView.defaultStyle
+        
+        if #available(iOS 13.0, *) {
+            self.cachedSongsCountSpinner.style = .medium
+            self.cachedSongsSizeSpinner.style = .medium
+        } else {
+            self.cachedSongsCountSpinner.style = .gray
+            self.cachedSongsSizeSpinner.style = .gray
+        }
         
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
             let storage = LibraryStorage(context: context)
@@ -44,12 +53,31 @@ class SettingsLibraryVC: UITableViewController {
                 guard let self = self else { return }
                 self.playlistsCountLabel.text = String(playlists.count)
             }
-            
-            let cachedSongs = songs.filterCached()
+
+            var cachedSongSizeInKB = songs.filterCached().reduce(0) { $0 + $1.fileData?.sizeInKB }
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.cachedSongsCountSpinner.isHidden = true
                 self.cachedSongsCountLabel.text = String(cachedSongs.count)
+            }
+            
+            var cachedSongSizeLabelText = ""
+            // This variable name is a bit awkward, blame camelCase. 
+            // cachedSongSizeInKBFloat is preferable but reads like kbfloat
+            let cachedSongSizeFloatInKB = Float(cachedSongSize)
+
+            // Only calculate cached song sizes in MB or GB when needed
+            if cachedSongSizeInKB < 1000000.0 {
+                let cachedSongSizeInMB = cachedSongSizeFloatInKB / 1000.0
+                cachedSongSizeLabelText = NSString(format: "%.2f", cachedSongSizeInMB) as String + " MB"
+            } else {
+                let cachedSongSizeInGB = cachedSongSizeInMB / 1000.0
+                cachedSongSizeLabelText = NSString(format: "%.2f", cachedSongSizeInGB) as String + " GB"
+            }
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.cachedSongsSizeSpinner.isHidden = true
+                self.cachedSongsSizeLabel.text = cachedSongSizeLabelText
             }
         }
     }

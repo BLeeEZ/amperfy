@@ -92,7 +92,7 @@ public class Song: AbstractLibraryEntity {
     }
 
     var isCached: Bool {
-        if managedObject.file != nil {
+        if let _ = managedObject.file?.data {
             return true
         }
         return false
@@ -107,11 +107,14 @@ public class Song: AbstractLibraryEntity {
 
 extension Array where Element: Song {
     
+    // I think the function name could be better here, you're returning an
+    // array of cached songs, not merely filtering them as the name would imply
+    // simply `cached` might be a better name, this goes for the other filter
+    // functions too. This is a nitpick however.
     func filterCached() -> [Element] {
-        let filteredArray = self.filter { element in
-            return element.isCached
-        }
-        return filteredArray
+        // The shorthand form here might be wrong but in general why create a
+        // variable if you're going to return it immediately anyways?
+        return self.filter { $0.isCached }
     }
     
     func filterCustomArt() -> [Element] {
