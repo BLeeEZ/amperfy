@@ -327,11 +327,9 @@ class PlayerView: UIView {
 
     func refreshSongTime() {
         if player.currentlyPlaying != nil {
-            let elapsedTime = player.elapsedTime.isFinite ? Int(player.elapsedTime) : 0
-            let elapsedClockTime = ClockTime(timeInSeconds: elapsedTime)
+            let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
             elapsedTimeLabel.text = elapsedClockTime.asShortString()
-            let playerDuration = player.duration.isFinite ? player.duration : 0.0
-            let remainingTime = ClockTime(timeInSeconds: Int(player.elapsedTime - ceil(playerDuration)))
+            let remainingTime = ClockTime(timeInSeconds: Int(player.elapsedTime - ceil(player.duration)))
             remainingTimeLabel.text = remainingTime.asShortString()
             currentSongTimeSlider.minimumValue = 0.0
             currentSongTimeSlider.maximumValue = Float(player.duration)

@@ -39,16 +39,19 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     
     var responder: BackendAudioPlayerNotifiable?
     var elapsedTime: Double {
-        if !player.currentTime().seconds.isFinite {
+        guard player.currentItem?.status == AVPlayerItem.Status.readyToPlay else {
             return 0.0
         }
-        return player.currentTime().seconds
+        let elapsedTimeInSeconds = player.currentTime().seconds
+        guard elapsedTimeInSeconds.isFinite else {
+            return 0.0
+        }
+        return elapsedTimeInSeconds
     }
     var duration: Double {
-        guard let duration = player.currentItem?.asset.duration.seconds else {
-            return 0.0
-        }
-        if !duration.isFinite {
+        guard player.currentItem?.status == AVPlayerItem.Status.readyToPlay,
+              let duration = player.currentItem?.asset.duration.seconds,
+              duration.isFinite else {
             return 0.0
         }
         return duration
