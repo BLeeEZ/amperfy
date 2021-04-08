@@ -212,6 +212,24 @@ class LibraryStorage {
         
         return songs
     }
+    
+    func getCachedSongSizeInKB() -> Int {
+        var foundSongFiles = [NSDictionary]()
+        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: "SongFile")
+        fetchRequest.propertiesToFetch = ["data"]
+        fetchRequest.resultType = .dictionaryResultType
+        do {
+            foundSongFiles = try context.fetch(fetchRequest)
+        } catch {}
+        
+        var cachedSongSizeInKB = 0
+        for songFile in foundSongFiles {
+            if let fileData = songFile["data"] as? NSData {
+                cachedSongSizeInKB += fileData.sizeInKB
+            }
+        }
+        return cachedSongSizeInKB
+    }
 
     func getSongsAsync(forMainContex: NSManagedObjectContext, completion: @escaping (_ songs: Array<Song>) -> Void) -> AsynchronousFetch {
         var asyncFetch = AsynchronousFetch(result: nil)

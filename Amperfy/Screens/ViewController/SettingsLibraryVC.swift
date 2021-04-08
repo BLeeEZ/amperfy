@@ -12,6 +12,8 @@ class SettingsLibraryVC: UITableViewController {
     
     @IBOutlet weak var cachedSongsCountLabel: UILabel!
     @IBOutlet weak var cachedSongsCountSpinner: UIActivityIndicatorView!
+    @IBOutlet weak var cachedSongsSizeLabel: UILabel!
+    @IBOutlet weak var cachedSongsSizeSpinner: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +52,21 @@ class SettingsLibraryVC: UITableViewController {
                 guard let self = self else { return }
                 self.cachedSongsCountSpinner.isHidden = true
                 self.cachedSongsCountLabel.text = String(cachedSongs.count)
+            }
+            
+            var cachedSongSizeLabelText = ""
+            let cachedSongSizeInKB = Float(storage.getCachedSongSizeInKB())
+            let cachedSongSizeInMB = cachedSongSizeInKB / 1000.0
+            let cachedSongSizeInGB = cachedSongSizeInMB / 1000.0
+            if cachedSongSizeInMB < 1000.0 {
+                cachedSongSizeLabelText = NSString(format: "%.2f", cachedSongSizeInMB) as String + " MB"
+            } else {
+                cachedSongSizeLabelText = NSString(format: "%.2f", cachedSongSizeInGB) as String + " GB"
+            }
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.cachedSongsSizeSpinner.isHidden = true
+                self.cachedSongsSizeLabel.text = cachedSongSizeLabelText
             }
         }
     }
