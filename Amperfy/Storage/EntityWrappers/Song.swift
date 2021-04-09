@@ -3,7 +3,12 @@ import CoreData
 import UIKit
 
 public class Song: AbstractLibraryEntity {
-    
+     /*
+     Avoid direct access to the SongFile.
+     Direct access will result in loading the file into memory and
+     it sticks there till the song is removed from memory.
+     This will result in memory overflow for an array of songs.
+     */
      let managedObject: SongMO
 
      init(managedObject: SongMO) {
@@ -53,16 +58,6 @@ public class Song: AbstractLibraryEntity {
              return Artist(managedObject: artistMO)
          }
          set { managedObject.artist = newValue?.managedObject }
-     }
-     var file: SongFile? {
-         get {
-            guard let songFileMO = managedObject.file else { return nil }
-            return SongFile(managedObject: songFileMO)
-        }
-        set { managedObject.file = newValue?.managedObject }
-     }
-     var fileData: Data? {
-         return managedObject.file?.data
      }
      var syncInfo: SyncWave? {
          get {

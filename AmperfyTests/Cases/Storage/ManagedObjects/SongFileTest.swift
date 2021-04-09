@@ -30,13 +30,11 @@ class SongFileTest: XCTestCase {
         testSongFile.data = testData
         XCTAssertEqual(testSongFile.info?.id, songId)
         XCTAssertEqual(testSongFile.data, testData)
-        XCTAssertEqual(song.file?.data, testData)
         storage.saveContext()
         guard let songFetched = storage.getSong(id: songId) else { XCTFail(); return }
-        guard let songFileFetched = songFetched.file else { XCTFail(); return }
+        guard let songFileFetched = storage.getSongFile(forSong: songFetched) else { XCTFail(); return }
         XCTAssertEqual(songFileFetched.info?.id, songId)
         XCTAssertEqual(songFileFetched.data, testData)
-        XCTAssertEqual(songFetched.file?.data, testData)
     }
 
 }

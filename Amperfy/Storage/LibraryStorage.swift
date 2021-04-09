@@ -3,7 +3,6 @@ import CoreData
 import os.log
 
 class AsynchronousFetch {
-    
     private let fetchResult: NSPersistentStoreAsynchronousResult?
     var wasRequestingSuccessful: Bool {
         return fetchResult != nil
@@ -16,10 +15,13 @@ class AsynchronousFetch {
     func cancle() {
         fetchResult?.cancel()
     }
-    
 }
 
-class LibraryStorage {
+protocol SongFileCachable {
+    func getSongFile(forSong song: Song) -> SongFile?
+}
+
+class LibraryStorage: SongFileCachable {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "LibraryStorage")
     private var context: NSManagedObjectContext
@@ -58,35 +60,35 @@ class LibraryStorage {
     }
 
     func deleteCache(ofSong song: Song) {
-        if let songFile = song.file {
+        if let songFile = getSongFile(forSong: song) {
             deleteSongFile(songFile: songFile)
-            song.file = nil
+            song.managedObject.file = nil
         }
     }
 
     func deleteCache(ofPlaylist playlist: Playlist) {
         for song in playlist.songs {
-            if let songFile = song.file {
+            if let songFile = getSongFile(forSong: song) {
                 deleteSongFile(songFile: songFile)
-                song.file = nil
+                song.managedObject.file = nil
             }
         }
     }
     
     func deleteCache(ofArtist artist: Artist) {
         for song in artist.songs {
-            if let songFile = song.file {
+            if let songFile = getSongFile(forSong: song) {
                 deleteSongFile(songFile: songFile)
-                song.file = nil
+                song.managedObject.file = nil
             }
         }
     }
     
     func deleteCache(ofAlbum album: Album) {
         for song in album.songs {
-            if let songFile = song.file {
+            if let songFile = getSongFile(forSong: song) {
                 deleteSongFile(songFile: songFile)
-                song.file = nil
+                song.managedObject.file = nil
             }
         }
     }
@@ -382,6 +384,23 @@ class LibraryStorage {
             os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
         }
         return foundSong
+    }
+    
+    func getSongFile(forSong song: Song) -> SongFile? {
+        guard song.isCached else { return nil }
+        var foundSongFile: SongFile? = nil
+        let fr: NSFetchRequest<SongFileMO> = SongFileMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "info.id == %@", NSString(string: song.id))
+        fr.fetchLimit = 1
+        do {
+            let result = try context.fetch(fr) as NSArray?
+            if let songFiles = result, songFiles.count > 0, let songFile = songFiles[0] as? SongFileMO  {
+                foundSongFile = SongFile(managedObject: songFile)
+            }
+        } catch {
+            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
+        }
+        return foundSongFile
     }
 
     func getPlaylist(id: String) -> Playlist? {

@@ -29,6 +29,7 @@ struct PlayRequest {
 class BackendAudioPlayer: SongDownloadNotifiable {
 
     private let songDownloader: SongDownloadable
+    private let songCache: SongFileCachable
     private let player = AVPlayer()
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     private var latestPlayRequest: PlayRequest?
@@ -60,8 +61,9 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         return player.currentItem != nil
     }
     
-    init(songDownloader: SongDownloadable) {
+    init(songDownloader: SongDownloadable, songCache: SongFileCachable) {
         self.songDownloader = songDownloader
+        self.songCache = songCache
         
         player.addPeriodicTimeObserver(forInterval: updateElapsedTimeInterval, queue: DispatchQueue.main) { [weak self] time in
             if let self = self {
@@ -117,7 +119,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     }
     
     private func insertCachedSong(playlistItem: PlaylistItem) {
-        guard let song = playlistItem.song, let songData = song.fileData else { return }
+        guard let song = playlistItem.song, let songData = songCache.getSongFile(forSong: song)?.data else { return }
         os_log(.default, "Play song: %s", song.displayString)
         let url = createLocalUrl(songData: songData)
         player.pause()

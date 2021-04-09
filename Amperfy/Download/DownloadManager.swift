@@ -153,6 +153,8 @@ class DownloadManager: SongDownloadable {
             os_log("Fetching %s FAILED", log: self.log, type: .info, request.title)
             downloadError = DownloadError.fetchFailed
         }
+        // remove data from request to free memory
+        request.download?.resumeData = nil
         self.requestManager.informDownloadCompleted(request: request)
         DispatchQueue.main.async {
             request.notifier?.finished(downloading: request.element, error: downloadError)

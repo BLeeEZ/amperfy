@@ -42,7 +42,7 @@ class MusicPlayerTest: XCTestCase {
         cdHelper = CoreDataHelper()
         storage = cdHelper.createSeededStorage()
         songDownloader = MOCK_SongDownloader()
-        backendPlayer = BackendAudioPlayer(songDownloader: songDownloader)
+        backendPlayer = BackendAudioPlayer(songDownloader: songDownloader, songCache: storage)
         playerData = storage.getPlayerData()
         testPlayer = MusicPlayer(coreData: playerData, downloadManager: songDownloader, backendAudioPlayer: backendPlayer)
         
@@ -64,8 +64,9 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func markAsCached(song: Song) {
-        song.file = storage.createSongFile()
-        song.file?.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
+        let songFile = storage.createSongFile()
+        songFile.info = song
+        songFile.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
     }
     
     func testCreation() {
