@@ -30,7 +30,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
 
     private let songDownloader: SongDownloadable
     private let songCache: SongFileCachable
-    private let player = AVPlayer()
+    private let player: AVPlayer
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     private var latestPlayRequest: PlayRequest?
     private let semaphore = DispatchSemaphore(value: 1)
@@ -61,7 +61,8 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         return player.currentItem != nil
     }
     
-    init(songDownloader: SongDownloadable, songCache: SongFileCachable) {
+    init(mediaPlayer: AVPlayer, songDownloader: SongDownloadable, songCache: SongFileCachable) {
+        self.player = mediaPlayer
         self.songDownloader = songDownloader
         self.songCache = songCache
         
