@@ -77,10 +77,10 @@
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zaZ-s9-erE" userLabel="Repeat Button">
-                    <rect key="frame" x="77.5" y="258" width="60" height="25"/>
+                    <rect key="frame" x="77.5" y="258" width="60" height="45"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="60" id="VJG-iL-rq6"/>
-                        <constraint firstAttribute="height" constant="25" id="t7J-xl-4Bc"/>
+                        <constraint firstAttribute="height" constant="45" id="t7J-xl-4Bc"/>
                     </constraints>
                     <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="18"/>
                     <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -95,10 +95,10 @@
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhL-mu-zks" userLabel="Shuffle Button">
-                    <rect key="frame" x="255" y="258" width="25" height="25"/>
+                    <rect key="frame" x="245" y="258" width="45" height="45"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="mhL-mu-zks" secondAttribute="height" multiplier="1:1" id="2P5-5Q-SoR"/>
-                        <constraint firstAttribute="width" constant="25" id="4pq-Gs-5H2"/>
+                        <constraint firstAttribute="width" constant="45" id="4pq-Gs-5H2"/>
                     </constraints>
                     <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="20"/>
                     <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -144,12 +144,13 @@
                     </constraints>
                 </imageView>
                 <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
-                    <rect key="frame" x="175" y="258" width="25" height="25"/>
+                    <rect key="frame" x="165" y="258" width="45" height="45"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="25" id="5uL-80-PHj"/>
+                        <constraint firstAttribute="width" constant="45" id="5uL-80-PHj"/>
                         <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="P7Y-F5-gln"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <inset key="imageEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                     <state key="normal" image="playlist"/>
                     <connections>
                         <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
