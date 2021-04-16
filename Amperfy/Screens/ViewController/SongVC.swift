@@ -1,139 +1,37 @@
 import UIKit
+import CoreData
 
-class SongVC: UITableViewController {
+class SongVC: SingleFetchedResultsTableViewController<SongMO> {
+
+    private var fetchedResultsController: SongFetchedResultsController!
     
-    var appDelegate: AppDelegate!
-    var songsAsyncFetch = AsynchronousFetch(result: nil)
-    var songsAll = [Song]()
-    var songsUnfiltered = [Song]()
-    var songsFiltered = [Song]()
-    var sections = [AlphabeticSection<Song>]()
-
-    private let searchController = UISearchController(searchResultsController: nil)
-    private let loadingSpinner = SpinnerViewController()
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         
-        configureSearchController()
+        fetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
+        fetchedResultsController.delegate = self
+        singleFetchedResultsController = fetchedResultsController
+        
+        configureSearchController(scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
-
-        songsAll = [Song]()
-        self.updateSearchResults(for: self.searchController)
-        loadingSpinner.display(on: self)
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let backgroundLibrary = LibraryStorage(context: context)
-            self.songsAsyncFetch = backgroundLibrary.getSongsAsync(forMainContex: self.appDelegate.storage.context) { songs in
-                self.songsAll = songs.sortAlphabeticallyAscending()
-                self.updateSearchResults(for: self.searchController)
-                self.loadingSpinner.hide()
-            }
-        }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        self.songsAsyncFetch.cancle()
-    }
-
-    private func configureSearchController() {
-        searchController.searchResultsUpdater = self
-        searchController.searchBar.autocapitalizationType = .none
-        searchController.searchBar.scopeButtonTitles = ["All", "Cached"]
-
-        if #available(iOS 11.0, *) {
-            // For iOS 11 and later, place the search bar in the navigation bar.
-            navigationItem.searchController = searchController
-            // Make the search bar always visible.
-            navigationItem.hidesSearchBarWhenScrolling = false
-        } else {
-            // For iOS 10 and earlier, place the search controller's search bar in the table view's header.
-            tableView.tableHeaderView = searchController.searchBar
-        }
-        
-        searchController.delegate = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.delegate = self // Monitor when the search button is tapped.
-        self.definesPresentationContext = true
-    }
-
-    // MARK: - Table view data source
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return sections.count
-    }
-    
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        let section = sections[section]
-        return section.sectionName
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return CommonScreenOperations.tableSectionHeightLarge
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let section = self.sections[section]
-        return section.entries.count
+    override func viewWillAppear(_ animated: Bool) {
+        fetchedResultsController.fetch()
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
-
-        let section = self.sections[indexPath.section]
-        let song = section.entries[indexPath.row]
-        
+        let song = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(song: song, rootView: self)
-
         return cell
     }
     
-    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        var indexTitles = [String]()
-        for section in sections {
-            indexTitles.append(section.sectionName)
-        }
-        return indexTitles
-    }
-    
-}
-
-extension SongVC: UISearchResultsUpdating {
-    
-    func updateSearchResults(for searchController: UISearchController) {
-        updateDataBasedOnScope()
-        if let searchText = searchController.searchBar.text, !searchText.isEmpty {
-            songsFiltered = songsUnfiltered.filterBy(searchText: searchText)
-        } else {
-            songsFiltered = songsUnfiltered
-        }
-        sections = AlphabeticSection<Song>.group(songsFiltered)
+    override func updateSearchResults(for searchController: UISearchController) {
+        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "", onlyCachedSongs: (searchController.searchBar.selectedScopeButtonIndex == 1))
         tableView.reloadData()
     }
     
 }
 
-extension SongVC: UISearchBarDelegate {
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.resignFirstResponder()
-    }
-    
-    func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
-        updateSearchResults(for: searchController)
-    }
-    
-    func updateDataBasedOnScope() {
-        switch searchController.searchBar.selectedScopeButtonIndex {
-        case 1:
-            songsUnfiltered = songsAll.filterCached()
-        default:
-            songsUnfiltered = songsAll
-        }
-    }
-    
-}
-
-extension SongVC: UISearchControllerDelegate {
-}

@@ -2,23 +2,17 @@ import Foundation
 import CoreData
 import os.log
 
-class AsynchronousFetch {
-    private let fetchResult: NSPersistentStoreAsynchronousResult?
-    var wasRequestingSuccessful: Bool {
-        return fetchResult != nil
-    }
-    
-    init(result: NSPersistentStoreAsynchronousResult?) {
-        fetchResult = result
-    }
-    
-    func cancle() {
-        fetchResult?.cancel()
-    }
-}
-
 protocol SongFileCachable {
     func getSongFile(forSong song: Song) -> SongFile?
+}
+
+
+enum PlaylistSearchCategory: Int {
+    case all = 0
+    case userOnly = 1
+    case smartOnly = 2
+    
+    static let defaultValue: PlaylistSearchCategory = .all
 }
 
 class LibraryStorage: SongFileCachable {
@@ -129,10 +123,26 @@ class LibraryStorage: SongFileCachable {
         return SyncWave(managedObject: syncWaveMO)
     }
     
+    var artistsFetchRequest: NSFetchRequest<ArtistMO> {
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        return fetchRequest
+    }
+    
+    func getArtistsFetchPredicate(searchText: String) -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        if searchText.count > 0 {
+            predicate = NSPredicate(format: "name contains[cd] %@", searchText, searchText)
+        }
+        return predicate
+    }
+
     func getArtists() -> Array<Artist> {
         var artists = Array<Artist>()
         var foundArtists = Array<ArtistMO>()
-        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+        let fetchRequest = artistsFetchRequest
         do {
             foundArtists = try context.fetch(fetchRequest)
             for artistMO in foundArtists {
@@ -143,32 +153,26 @@ class LibraryStorage: SongFileCachable {
         return artists
     }
     
-    func getArtistsAsync(forMainContex: NSManagedObjectContext, completion: @escaping (_ artists: Array<Artist>) -> Void) -> AsynchronousFetch {
-        var asyncFetch = AsynchronousFetch(result: nil)
-        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
-        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (fetchResult) -> Void in
-            DispatchQueue.main.async {
-                var artists = Array<Artist>()
-                if let foundArtists = fetchResult.finalResult {
-                    artists = foundArtists.lazy
-                        .compactMap{ $0.objectID }
-                        .compactMap{ forMainContex.object(with: $0) as? ArtistMO }
-                        .compactMap{ Artist(managedObject: $0) }
-                }
-                completion(artists)
-            }
+    var albumsFetchRequest: NSFetchRequest<AlbumMO> {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        return fetchRequest
+    }
+    
+    func getAlbumsFetchPredicate(searchText: String) -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        if searchText.count > 0 {
+            predicate = NSPredicate(format: "name contains[cd] %@", searchText, searchText)
         }
-        do {
-            let asynchronousFetchResult = try context.execute(asynchronousFetchRequest) as? NSPersistentStoreAsynchronousResult
-            asyncFetch = AsynchronousFetch(result: asynchronousFetchResult)
-        } catch {}
-        return asyncFetch
+        return predicate
     }
     
     func getAlbums() -> Array<Album> {
         var albums = Array<Album>()
         var foundAlbums = Array<AlbumMO>()
-        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        let fetchRequest = albumsFetchRequest
         do {
             foundAlbums = try context.fetch(fetchRequest)
             for albumMO in foundAlbums {
@@ -178,33 +182,61 @@ class LibraryStorage: SongFileCachable {
         
         return albums
     }
-
-    func getAlbumsAsync(forMainContex: NSManagedObjectContext, completion: @escaping (_ albums: Array<Album>) -> Void) -> AsynchronousFetch {
-        var asyncFetch = AsynchronousFetch(result: nil)
-        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (fetchResult) -> Void in
-            DispatchQueue.main.async {
-                var albums = Array<Album>()
-                if let foundAlbums = fetchResult.finalResult {
-                    albums = foundAlbums.lazy
-                        .compactMap{ $0.objectID }
-                        .compactMap{ forMainContex.object(with: $0) as? AlbumMO }
-                        .compactMap{ Album(managedObject: $0) }
-                }
-                completion(albums)
-            }
+        
+    var songsFetchRequest: NSFetchRequest<SongMO> {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "title", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        return fetchRequest
+    }
+    
+    func getSongsFetchPredicate(searchText: String, onlyCachedSongs isOnlyCachedSongs: Bool) -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        var predicateFormats = [String]()
+        var predicateArgs = [Any]()
+        
+        if searchText.count > 0 {
+            predicateFormats.append("(title contains[cd] %@)")
+            predicateArgs.append(searchText)
         }
-        do {
-            let asynchronousFetchResult = try context.execute(asynchronousFetchRequest) as? NSPersistentStoreAsynchronousResult
-            asyncFetch = AsynchronousFetch(result: asynchronousFetchResult)
-        } catch {}
-        return asyncFetch
+        if isOnlyCachedSongs {
+            predicateFormats.append("(file != nil)")
+        }
+        
+        if predicateFormats.count > 0 {
+            let predicateFormat = predicateFormats.joined(separator: " && ")
+            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
+        }
+        return predicate
+    }
+    
+    func getSongsFetchPredicate(ofSyncWave syncWave: SyncWave?, searchText: String, onlyCachedSongs isOnlyCachedSongs: Bool) -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        var predicateFormats = [String]()
+        var predicateArgs = [Any]()
+        
+        predicateFormats.append("(syncInfo.id == %@)")
+        predicateArgs.append(syncWave?.id ?? "0")
+        
+        if searchText.count > 0 {
+            predicateFormats.append("(title contains[cd] %@)")
+            predicateArgs.append(searchText)
+        }
+        if isOnlyCachedSongs {
+            predicateFormats.append("(file != nil)")
+        }
+        if predicateFormats.count > 0 {
+            let predicateFormat = predicateFormats.joined(separator: " && ")
+            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
+        }
+        return predicate
     }
     
     func getSongs() -> Array<Song> {
         var songs = Array<Song>()
         var foundSongs = Array<SongMO>()
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        let fetchRequest = songsFetchRequest
         do {
             foundSongs = try context.fetch(fetchRequest)
             for songMO in foundSongs {
@@ -232,34 +264,54 @@ class LibraryStorage: SongFileCachable {
         }
         return cachedSongSizeInKB
     }
-
-    func getSongsAsync(forMainContex: NSManagedObjectContext, completion: @escaping (_ songs: Array<Song>) -> Void) -> AsynchronousFetch {
-        var asyncFetch = AsynchronousFetch(result: nil)
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (fetchResult) -> Void in
-            DispatchQueue.main.async {
-                var songs = Array<Song>()
-                if let foundSongs = fetchResult.finalResult {
-                    songs = foundSongs.lazy
-                        .compactMap{ $0.objectID }
-                        .compactMap{ forMainContex.object(with: $0) as? SongMO }
-                        .compactMap{ Song(managedObject: $0) }
-                }
-                completion(songs)
-            }
+    
+    var playlistsFetchRequest: NSFetchRequest<PlaylistMO> {
+        let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        var predicateFormats = [String]()
+        predicateFormats.append("(playersNormalPlaylist == nil)")
+        predicateFormats.append("(playersShuffledPlaylist == nil)")
+        fetchRequest.predicate = NSPredicate(format: predicateFormats.joined(separator: " && "))
+        return fetchRequest
+    }
+    
+    func getPlaylistsFetchPredicate(searchText: String, playlistSearchCategory: PlaylistSearchCategory) -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        var predicateFormats = [String]()
+        var predicateArgs = [Any]()
+        
+        predicateFormats.append("(playersNormalPlaylist == nil)")
+        predicateFormats.append("(playersShuffledPlaylist == nil)")
+        
+        if searchText.count > 0 {
+            predicateFormats.append("(name contains[cd] %@)")
+            predicateArgs.append(searchText)
         }
-        do {
-            let asynchronousFetchResult = try context.execute(asynchronousFetchRequest) as? NSPersistentStoreAsynchronousResult
-            asyncFetch = AsynchronousFetch(result: asynchronousFetchResult)
-        } catch {}
-        return asyncFetch
+        
+        switch playlistSearchCategory {
+        case .all:
+            break
+        case .userOnly:
+            predicateFormats.append("(NOT (id BEGINSWITH %@))")
+            predicateArgs.append(Playlist.smartPlaylistIdPrefix)
+        case .smartOnly:
+            predicateFormats.append("(id BEGINSWITH %@)")
+            predicateArgs.append(Playlist.smartPlaylistIdPrefix)
+        }
+        
+        if predicateFormats.count > 0 {
+            let predicateFormat = predicateFormats.joined(separator: " && ")
+            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
+        }
+        return predicate
     }
     
     func getPlaylists() -> Array<Playlist> {
         var playlists = Array<Playlist>()
         var foundPlaylists = Array<PlaylistMO>()
-        let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "playersNormalPlaylist == nil && playersShuffledPlaylist == nil")
+        let fetchRequest = playlistsFetchRequest
         do {
             foundPlaylists = try context.fetch(fetchRequest)
             for playlist in foundPlaylists {
@@ -269,29 +321,6 @@ class LibraryStorage: SongFileCachable {
         } catch {}
         
         return playlists
-    }
-
-    func getPlaylistsAsync(forMainContex: NSManagedObjectContext, completion: @escaping (_ playlists: Array<Playlist>) -> Void) -> AsynchronousFetch {
-        var asyncFetch = AsynchronousFetch(result: nil)
-        let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "playersNormalPlaylist == nil && playersShuffledPlaylist == nil")
-        let asynchronousFetchRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { (fetchResult) -> Void in
-            DispatchQueue.main.async {
-                var playlists = Array<Playlist>()
-                if let foundPlaylists = fetchResult.finalResult {
-                    playlists = foundPlaylists.lazy
-                        .compactMap{ $0.objectID }
-                        .compactMap{ forMainContex.object(with: $0) as? PlaylistMO }
-                        .compactMap{ Playlist(storage: LibraryStorage(context: forMainContex), managedObject: $0) }
-                }
-                completion(playlists)
-            }
-        }
-        do {
-            let asynchronousFetchResult = try context.execute(asynchronousFetchRequest) as? NSPersistentStoreAsynchronousResult
-            asyncFetch = AsynchronousFetch(result: asynchronousFetchResult)
-        } catch {}
-        return asyncFetch
     }
     
     func getPlayerData() -> PlayerData {

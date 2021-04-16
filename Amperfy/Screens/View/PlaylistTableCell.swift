@@ -23,17 +23,19 @@ class PlaylistTableCell: BasicTableCell {
             artImage.image = Artwork.defaultImage
         }
         
-        let customArtworkSongs = playlist.songs.filterCustomArt()
-        for (index, artImage) in images.enumerated() {
-            guard customArtworkSongs.count > index else { break }
-            artImage.image = customArtworkSongs[index].image
+        if playlist.songCount < 500 {
+            let customArtworkSongs = playlist.songs.filterCustomArt()
+            for (index, artImage) in images.enumerated() {
+                guard customArtworkSongs.count > index else { break }
+                artImage.image = customArtworkSongs[index].image
+            }
         }
         
         var infoText = ""
-        if playlist.songs.count == 1 {
+        if playlist.songCount == 1 {
             infoText += "1 Song"
         } else {
-            infoText += "\(playlist.songs.count) Songs"
+            infoText += "\(playlist.songCount) Songs"
         }
         if playlist.isSmartPlaylist {
             infoText += " \(CommonString.oneMiddleDot) Smart Playlist"

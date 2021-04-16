@@ -4,6 +4,8 @@ import os.log
 
 public class Playlist: NSObject, SongContainable {
     
+    static let smartPlaylistIdPrefix = "smart_"
+    
     let managedObject: PlaylistMO
     private let storage: LibraryStorage
     
@@ -35,14 +37,19 @@ public class Playlist: NSObject, SongContainable {
         return sortedCachedItems
     }
     
+    var songCount: Int {
+        return managedObject.items?.count ?? 0
+    }
     var songs: [Song] {
-        var songArray = [Song]()
-        for playlistItem in sortedPlaylistItems {
-            if let song = playlistItem.song {
-                songArray.append(song)
-            }
+        var sortedSongs = [Song]()
+        guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else {
+            return sortedSongs
         }
-        return songArray
+        sortedSongs = itemsMO.lazy
+            .sorted(by: { $0.order < $1.order })
+            .compactMap{ $0.song }
+            .compactMap{ Song(managedObject: $0) }
+        return sortedSongs
     }
     var items: [PlaylistItem] {
         return sortedPlaylistItems
@@ -66,7 +73,7 @@ public class Playlist: NSObject, SongContainable {
         }
     }
     var isSmartPlaylist: Bool {
-        return id.hasPrefix("smart_")
+        return id.hasPrefix(Self.smartPlaylistIdPrefix)
     }
     var lastSongIndex: Int {
         guard songs.count > 0 else { return 0 }

@@ -103,32 +103,19 @@ public class Song: AbstractLibraryEntity {
 extension Array where Element: Song {
     
     func filterCached() -> [Element] {
-        let filteredArray = self.filter { element in
-            return element.isCached
-        }
-        return filteredArray
+        return self.filter{ $0.isCached }
     }
     
     func filterCustomArt() -> [Element] {
-        let filteredArray = self.filter { element in
-            return element.image != Artwork.defaultImage
-        }
-        return filteredArray
+        return self.filter{ $0.image != Artwork.defaultImage }
     }
     
     var hasCachedSongs: Bool {
-        for song in self {
-            if song.isCached {
-                return true
-            }
-        }
-        return false
+        return self.lazy.filter{ $0.isCached }.first != nil
     }
     
     func sortByTrackNumber() -> [Element] {
-        return self.sorted {
-            return $0.track < $1.track
-        }
+        return self.sorted{ $0.track < $1.track }
     }
     
 }

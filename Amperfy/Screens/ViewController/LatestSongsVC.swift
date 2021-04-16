@@ -1,15 +1,19 @@
 import UIKit
+import CoreData
 
-class LatestSongsVC: UITableViewController {
-    
-    var actionButton: UIBarButtonItem!
-    var appDelegate: AppDelegate!
-    var latestSyncWave: SyncWave?
+class LatestSongsVC: SingleFetchedResultsTableViewController<SongMO> {
+
+    private var fetchedResultsController: LatestSongsFetchedResultsController!
+    private var actionButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        latestSyncWave = appDelegate.persistentLibraryStorage.getLatestSyncWave()
+        
+        fetchedResultsController = LatestSongsFetchedResultsController(managedObjectContext: appDelegate.storage.context)
+        fetchedResultsController.delegate = self
+        singleFetchedResultsController = fetchedResultsController
+        
+        configureSearchController(scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
         actionButton = UIBarButtonItem(title: "...", style: .plain, target: self, action: #selector(operateOnAll))
@@ -17,52 +21,37 @@ class LatestSongsVC: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.tableView.reloadData()
+        fetchedResultsController.fetch()
     }
-    
-    // MARK: - Table view data source
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return latestSyncWave?.songs.count ?? 0
-    }
-    
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
-        
-        guard let wave = latestSyncWave else { return cell }
-        let song = wave.songs[indexPath.row]
-        
+        let song = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(song: song, rootView: self)
-        
         return cell
     }
-    
+
     @objc private func operateOnAll() {
-        guard let syncWave = latestSyncWave else { return }
+        guard let fetchedObjects = self.fetchedResultsController.fetchedObjects else { return }
+        let songs = fetchedObjects.compactMap{ Song(managedObject: $0) }
+        
         let alert = UIAlertController(title: "Latest songs", message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-            for song in syncWave.songs {
-                if !song.isCached {
-                    self.appDelegate.downloadManager.download(song: song)
-                }
-            }
+            self.appDelegate.downloadManager.download(songs: songs)
         }))
-        if syncWave.hasCachedSongs {
+        if songs.hasCachedSongs {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
-                syncWave.songs.forEach{ song in
+                songs.forEach{ song in
                     self.appDelegate.persistentLibraryStorage.deleteCache(ofSong: song)
                 }
+                self.appDelegate.persistentLibraryStorage.saveContext()
                 self.tableView.reloadData()
             }))
         }
         alert.addAction(UIAlertAction(title: "Add all to playlist", style: .default, handler: { _ in
             let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.songsToAdd = syncWave.songs
+            selectPlaylistVC.songsToAdd = songs
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
             self.present(selectPlaylistNav, animated: true, completion: nil)
         }))
@@ -72,4 +61,10 @@ class LatestSongsVC: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
+    override func updateSearchResults(for searchController: UISearchController) {
+        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "", onlyCachedSongs: (searchController.searchBar.selectedScopeButtonIndex == 1))
+        tableView.reloadData()
+    }
+    
 }
+
