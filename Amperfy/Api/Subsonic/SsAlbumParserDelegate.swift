@@ -16,30 +16,28 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         buffer = ""
         
-        if(elementName == "album") {
+        if elementName == "album" {
             guard let albumId = attributeDict["id"] else { return }
 
             if let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
                 albumBuffer = fetchedAlbum
             } else {
                 albumBuffer = libraryStorage.createAlbum()
+                albumBuffer?.id = albumId
+                albumBuffer?.syncInfo = syncWave
+                
+                if let attributeAlbumtName = attributeDict["name"] {
+                    albumBuffer?.name = attributeAlbumtName
+                }
+                albumBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: albumId)
+                
+                if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
+                    albumBuffer?.year = year
+                }
             }
             
-            albumBuffer?.syncInfo = syncWave
-            albumBuffer?.id = albumId
-            if let attributeAlbumtName = attributeDict["name"] {
-                albumBuffer?.name = attributeAlbumtName
-            }
-            albumBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: albumId)
-            
-            if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
-                albumBuffer?.year = year
-            }
-            
-            if let artistId = attributeDict["artistId"], let artist = libraryStorage.getArtist(id: artistId) {
+            if albumBuffer?.artist == nil, let artistId = attributeDict["artistId"], let artist = libraryStorage.getArtist(id: artistId) {
                 albumBuffer?.artist = artist
-            } else {
-                os_log("Found album id %s with unknown artist", log: log, type: .error, albumId)
             }
         }
     }

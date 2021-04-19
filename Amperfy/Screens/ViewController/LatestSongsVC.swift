@@ -9,11 +9,10 @@ class LatestSongsVC: SingleFetchedResultsTableViewController<SongMO> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fetchedResultsController = LatestSongsFetchedResultsController(managedObjectContext: appDelegate.storage.context)
-        fetchedResultsController.delegate = self
+        fetchedResultsController = LatestSongsFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController(scopeButtonTitles: ["All", "Cached"])
+        configureSearchController(placeholder: "Search in \"Latest Songs\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
         actionButton = UIBarButtonItem(title: "...", style: .plain, target: self, action: #selector(operateOnAll))

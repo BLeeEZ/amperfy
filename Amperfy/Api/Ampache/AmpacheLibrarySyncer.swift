@@ -1,6 +1,7 @@
 import Foundation
 import CoreData
 import os.log
+import UIKit
 
 class AmpacheLibrarySyncer: LibrarySyncer {
     
@@ -22,40 +23,92 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         self.ampacheXmlServerApi = ampacheXmlServerApi
     }
     
-    func sync(libraryStorage: LibraryStorage, statusNotifyier: SyncCallbacks? = nil) {
-        if let libMetaData = ampacheXmlServerApi.requesetLibraryMetaData() {
-            let syncWave = libraryStorage.createSyncWave()
-            syncWave.setMetaData(fromLibraryChangeDates: libMetaData.libraryChangeDates)
+    func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks? = nil) {
+        guard let libMetaData = ampacheXmlServerApi.requesetLibraryMetaData() else { return }
+        
+        let downloadSlotCounter = DownloadSlotCounter(maximumActiveDownloads: 5)
+        let currentLibraryStorage = LibraryStorage(context: currentContext)
 
-            statusNotifyier?.notifyArtistSyncStarted()
-            let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, ampacheUrlCreator: ampacheXmlServerApi, parseNotifier: statusNotifyier)
-            ampacheXmlServerApi.requestArtists(parserDelegate: artistParser)
+        let syncWave = currentLibraryStorage.createSyncWave()
+        syncWave.setMetaData(fromLibraryChangeDates: libMetaData.libraryChangeDates)
+        currentLibraryStorage.saveContext()
 
-            statusNotifyier?.notifyAlbumsSyncStarted()
-            let albumDelegate = AlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: statusNotifyier)
-            ampacheXmlServerApi.requestAlbums(parserDelegate: albumDelegate)
-            
-            statusNotifyier?.notifySongsSyncStarted()
-            let songParser = SongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: statusNotifyier)
-            ampacheXmlServerApi.requestSongs(parserDelegate: songParser)
-            
-            let playlistParser = PlaylistParserDelegate(libraryStorage: libraryStorage)
-            ampacheXmlServerApi.requestPlaylists(parserDelegate: playlistParser)
-            playlistCount = libraryStorage.getPlaylists().count
-            statusNotifyier?.notifyPlaylistSyncStarted()
-            // Request the songs in all playlists
-            for playlist in libraryStorage.getPlaylists() {
-                playlist.removeAllSongs()
-                let parser = PlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
-                ampacheXmlServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
-                playlist.ensureConsistentItemOrder()
+        statusNotifyier?.notifyArtistSyncStarted()
+        let pollCountArtist = (ampacheXmlServerApi.artistCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+        for i in 0...pollCountArtist {
+            downloadSlotCounter.waitForDownloadSlot()
+            persistentContainer.performBackgroundTask() { (context) in
+                let libraryStorage = LibraryStorage(context: context)
+                let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
+                let syncWaveContext = SyncWave(managedObject: syncWaveMO)
+                let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, ampacheUrlCreator: self.ampacheXmlServerApi, parseNotifier: statusNotifyier)
+                self.ampacheXmlServerApi.requestArtists(parserDelegate: artistParser, startIndex: i*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+                libraryStorage.saveContext()
+                downloadSlotCounter.downloadFinished()
+            }
+        }
+        downloadSlotCounter.waitTillAllDownloadsFinished()
+
+        statusNotifyier?.notifyAlbumsSyncStarted()
+        let pollCountAlbum = (ampacheXmlServerApi.albumCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+        for i in 0...pollCountAlbum {
+            downloadSlotCounter.waitForDownloadSlot()
+            persistentContainer.performBackgroundTask() { (context) in
+                let libraryStorage = LibraryStorage(context: context)
+                let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
+                let syncWaveContext = SyncWave(managedObject: syncWaveMO)
+                let albumDelegate = AlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, parseNotifier: statusNotifyier)
+                self.ampacheXmlServerApi.requestAlbums(parserDelegate: albumDelegate, startIndex: i*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+                libraryStorage.saveContext()
+                downloadSlotCounter.downloadFinished()
+            }
+        }
+        downloadSlotCounter.waitTillAllDownloadsFinished()
+        
+        statusNotifyier?.notifySongsSyncStarted()
+        let pollCountSong = (ampacheXmlServerApi.songCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+        for i in 0...pollCountSong {
+            downloadSlotCounter.waitForDownloadSlot()
+            persistentContainer.performBackgroundTask() { (context) in
+                let libraryStorage = LibraryStorage(context: context)
+                let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
+                let syncWaveContext = SyncWave(managedObject: syncWaveMO)
+                let songParser = SongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, parseNotifier: statusNotifyier)
+                self.ampacheXmlServerApi.requestSongs(parserDelegate: songParser, startIndex: i*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+                libraryStorage.saveContext()
+                downloadSlotCounter.downloadFinished()
+            }
+        }
+        downloadSlotCounter.waitTillAllDownloadsFinished()
+        
+        let playlistParser = PlaylistParserDelegate(libraryStorage: currentLibraryStorage)
+        ampacheXmlServerApi.requestPlaylists(parserDelegate: playlistParser)
+        currentLibraryStorage.saveContext()
+        let playlists = currentLibraryStorage.getPlaylists()
+        playlistCount = playlists.count
+        
+        statusNotifyier?.notifyPlaylistSyncStarted()
+        for playlist in playlists {
+            downloadSlotCounter.waitForDownloadSlot()
+            persistentContainer.performBackgroundTask() { (context) in
+                let libraryStorage = LibraryStorage(context: context)
+                let playlistMO = try! context.existingObject(with: playlist.managedObject.objectID) as! PlaylistMO
+                let playlistContext = Playlist(storage: libraryStorage, managedObject: playlistMO)
+                playlistContext.removeAllSongs()
+                let parser = PlaylistSongsParserDelegate(playlist: playlistContext, libraryStorage: libraryStorage)
+                self.ampacheXmlServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlistContext.id)
+                playlistContext.ensureConsistentItemOrder()
+                libraryStorage.saveContext()
                 statusNotifyier?.notifyParsedObject()
+                downloadSlotCounter.downloadFinished()
             }
         
-            syncWave.syncState = .Done
-            libraryStorage.saveContext()
-            statusNotifyier?.notifySyncFinished()
         }
+        downloadSlotCounter.waitTillAllDownloadsFinished()
+        
+        syncWave.syncState = .Done
+        currentLibraryStorage.saveContext()
+        statusNotifyier?.notifySyncFinished()
     }
 
     func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage) {

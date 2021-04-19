@@ -21,7 +21,9 @@ class SsPlaylistSongsParserDelegate: GenericXmlParser {
         if elementName == "playlist" {
             guard let playlistId = attributeDict["id"] else { return }
             playlistHasBeenDetected = true
-            playlist.id = playlistId
+            if playlist.id != playlistId {
+                playlist.id = playlistId
+            }
             if let attributePlaylistName = attributeDict["name"] {
                 playlist.name = attributePlaylistName
             }

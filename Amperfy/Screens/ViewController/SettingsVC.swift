@@ -34,14 +34,25 @@ class SettingsVC: UITableViewController {
             self.appDelegate.player.stop()
             self.appDelegate.downloadManager.stopAndWait()
             self.appDelegate.backgroundSyncerManager.stopAndWait()
+            self.appDelegate.storage.context.reset()
             self.appDelegate.storage.deleteLoginCredentials()
             self.appDelegate.persistentLibraryStorage.cleanStorage()
+            self.deleteViewControllerCaches()
             self.appDelegate.reinit()
             self.performSegue(withIdentifier: Segues.toLogin.rawValue, sender: nil)
         }))
         alert.addAction(UIAlertAction(title: "No", style: .default , handler: nil))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         self.present(alert, animated: true)
+    }
+    
+    private func deleteViewControllerCaches() {
+        ArtistFetchedResultsController.deleteCache()
+        AlbumFetchedResultsController.deleteCache()
+        SongFetchedResultsController.deleteCache()
+        PlaylistFetchedResultsController.deleteCache()
+        LatestSongsFetchedResultsController.deleteCache()
+        PlaylistSelectorFetchedResultsController.deleteCache()
     }
     
 }

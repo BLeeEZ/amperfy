@@ -20,15 +20,16 @@ class SearchVC: BasicTableViewController {
         songFetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
         songFetchedResultsController.delegate = self
         
-        configureSearchController(scopeButtonTitles: ["All", "Cached"])
+        configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
+        tableView.separatorStyle = .none
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        // Fetch will only via search be perfromed in this view
+        // Only search performes fetches in this view
     }
 
     // MARK: - Table view data source
@@ -165,16 +166,19 @@ class SearchVC: BasicTableViewController {
             artistFetchedResultsController.search(searchText: searchText)
             albumFetchedResultsController.search(searchText: searchText)
             songFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
+            tableView.separatorStyle = .singleLine
         } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
             playlistFetchedResultsController.clearResults()
             artistFetchedResultsController.clearResults()
             albumFetchedResultsController.clearResults()
             songFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
+            tableView.separatorStyle = .singleLine
         } else {
             playlistFetchedResultsController.clearResults()
             artistFetchedResultsController.clearResults()
             albumFetchedResultsController.clearResults()
             songFetchedResultsController.clearResults()
+            tableView.separatorStyle = .none
         }
         tableView.reloadData()
     }
@@ -182,13 +186,13 @@ class SearchVC: BasicTableViewController {
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         var section: Int = 0
         switch controller {
-        case playlistFetchedResultsController:
+        case playlistFetchedResultsController.fetchResultsController:
             section = LibraryElement.Playlist.rawValue
-        case artistFetchedResultsController:
+        case artistFetchedResultsController.fetchResultsController:
             section = LibraryElement.Artist.rawValue
-        case albumFetchedResultsController:
+        case albumFetchedResultsController.fetchResultsController:
             section = LibraryElement.Album.rawValue
-        case songFetchedResultsController:
+        case songFetchedResultsController.fetchResultsController:
             section = LibraryElement.Song.rawValue
         default:
             return

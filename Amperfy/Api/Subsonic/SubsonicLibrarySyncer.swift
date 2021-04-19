@@ -1,4 +1,5 @@
 import Foundation
+import CoreData
 import os.log
 
 class SubsonicLibrarySyncer: LibrarySyncer {
@@ -15,50 +16,88 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         self.subsonicServerApi = subsonicServerApi
     }
     
-    func sync(libraryStorage: LibraryStorage, statusNotifyier: SyncCallbacks?) {
-        let syncWave = libraryStorage.createSyncWave()
+    func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?) {
+        let downloadSlotCounter = DownloadSlotCounter(maximumActiveDownloads: 5)
+        let currentLibraryStorage = LibraryStorage(context: currentContext)
+
+        let syncWave = currentLibraryStorage.createSyncWave()
         syncWave.setMetaData(fromLibraryChangeDates: LibraryChangeDates())
+        currentLibraryStorage.saveContext()
         
         statusNotifyier?.notifyArtistSyncStarted()
-        let artistParser = SsArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
+        let artistParser = SsArtistParserDelegate(libraryStorage: currentLibraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
         subsonicServerApi.requestArtists(parserDelegate: artistParser)
-        
-        let artists = libraryStorage.getArtists()
+        currentLibraryStorage.saveContext()
+         
+        let artists = currentLibraryStorage.getArtists()
         albumCount = artists.count
         statusNotifyier?.notifyAlbumsSyncStarted()
         for artist in artists {
-            let albumDelegate = SsAlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
-            subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artist.id)
-            statusNotifyier?.notifyParsedObject()
+            downloadSlotCounter.waitForDownloadSlot()
+            persistentContainer.performBackgroundTask() { (context) in
+                let libraryStorage = LibraryStorage(context: context)
+                let artistMO = try! context.existingObject(with: artist.managedObject.objectID) as! ArtistMO
+                let artistContext = Artist(managedObject: artistMO)
+                let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
+                let syncWaveContext = SyncWave(managedObject: syncWaveMO)
+                let albumDelegate = SsAlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
+                self.subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artistContext.id)
+                libraryStorage.saveContext()
+                statusNotifyier?.notifyParsedObject()
+                downloadSlotCounter.downloadFinished()
+            }
         }
+        downloadSlotCounter.waitTillAllDownloadsFinished()
 
-        let albums = libraryStorage.getAlbums()
+        let albums = currentLibraryStorage.getAlbums()
         songCount = albums.count
         statusNotifyier?.notifySongsSyncStarted()
         for album in albums {
-            let songDelegate = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
-            songDelegate.guessedArtist = album.artist
-            songDelegate.guessedAlbum = album
-            subsonicServerApi.requestAlbum(parserDelegate: songDelegate, id: album.id)
-            statusNotifyier?.notifyParsedObject()
+            downloadSlotCounter.waitForDownloadSlot()
+            persistentContainer.performBackgroundTask() { (context) in
+                let libraryStorage = LibraryStorage(context: context)
+                let albumMO = try! context.existingObject(with: album.managedObject.objectID) as! AlbumMO
+                let albumContext = Album(managedObject: albumMO)
+                let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
+                let syncWaveContext = SyncWave(managedObject: syncWaveMO)
+                let songDelegate = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
+                songDelegate.guessedArtist = albumContext.artist
+                songDelegate.guessedAlbum = albumContext
+                self.subsonicServerApi.requestAlbum(parserDelegate: songDelegate, id: albumContext.id)
+                libraryStorage.saveContext()
+                statusNotifyier?.notifyParsedObject()
+                downloadSlotCounter.downloadFinished()
+            }
         }
-        
+        downloadSlotCounter.waitTillAllDownloadsFinished()
+
         statusNotifyier?.notifyPlaylistSyncStarted()
-        let playlistParser = SsPlaylistParserDelegate(libraryStorage: libraryStorage)
+        let playlistParser = SsPlaylistParserDelegate(libraryStorage: currentLibraryStorage)
         subsonicServerApi.requestPlaylists(parserDelegate: playlistParser)
-        playlistCount = libraryStorage.getPlaylists().count
+        currentLibraryStorage.saveContext()
+        
+        let playlists = currentLibraryStorage.getPlaylists()
+        playlistCount = playlists.count
         statusNotifyier?.notifyPlaylistSyncStarted()
-        // Request the songs in all playlists
-        for playlist in libraryStorage.getPlaylists() {
-            playlist.removeAllSongs()
-            let parser = SsPlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
-            subsonicServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
-            playlist.ensureConsistentItemOrder()
-            statusNotifyier?.notifyParsedObject()
+        for playlist in playlists {
+            downloadSlotCounter.waitForDownloadSlot()
+            persistentContainer.performBackgroundTask() { (context) in
+                let libraryStorage = LibraryStorage(context: context)
+                let playlistMO = try! context.existingObject(with: playlist.managedObject.objectID) as! PlaylistMO
+                let playlistContext = Playlist(storage: libraryStorage, managedObject: playlistMO)
+                playlistContext.removeAllSongs()
+                let parser = SsPlaylistSongsParserDelegate(playlist: playlistContext, libraryStorage: libraryStorage)
+                self.subsonicServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlistContext.id)
+                playlist.ensureConsistentItemOrder()
+                libraryStorage.saveContext()
+                statusNotifyier?.notifyParsedObject()
+                downloadSlotCounter.downloadFinished()
+            }
         }
+        downloadSlotCounter.waitTillAllDownloadsFinished()
         
         syncWave.syncState = .Done
-        libraryStorage.saveContext()
+        currentLibraryStorage.saveContext()
         statusNotifyier?.notifySyncFinished()
     }
     

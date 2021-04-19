@@ -9,10 +9,9 @@ class SongVC: SingleFetchedResultsTableViewController<SongMO> {
         super.viewDidLoad()
         
         fetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
-        fetchedResultsController.delegate = self
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController(scopeButtonTitles: ["All", "Cached"])
+        configureSearchController(placeholder: "Search in \"Songs\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
     }

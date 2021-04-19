@@ -9,10 +9,9 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         super.viewDidLoad()
         
         fetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
-        fetchedResultsController.delegate = self
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController()
+        configureSearchController(placeholder: "Search in \"Albums\"")
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.rowHeight = AlbumTableCell.rowHeight
     }

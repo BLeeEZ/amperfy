@@ -115,6 +115,10 @@ class LibraryStorage: SongFileCachable {
     func deletePlaylistItem(item: PlaylistItem) {
         context.delete(item.managedObject)
     }
+    
+    func deleteSyncWave(item: SyncWave) {
+        context.delete(item.managedObject)
+    }
 
     func createSyncWave() -> SyncWave {
         let syncWaveCount = Int16(getSyncWaves().count)
@@ -490,6 +494,25 @@ class LibraryStorage: SongFileCachable {
         var latestSyncWave: SyncWave? = nil
         let fr: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
         fr.predicate = NSPredicate(format: "id == max(id)")
+        fr.fetchLimit = 1
+        do {
+            let result = try self.context.fetch(fr).first
+            if let latestSyncWaveMO = result {
+                latestSyncWave = SyncWave(managedObject: latestSyncWaveMO)
+            }
+        } catch {
+            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
+        }
+        return latestSyncWave
+    }
+    
+    func getLatestSyncWaveWithChanges() -> SyncWave? {
+        var latestSyncWave: SyncWave? = nil
+        let fr: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "songs.@count > 0")
+        fr.sortDescriptors = [
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
         fr.fetchLimit = 1
         do {
             let result = try self.context.fetch(fr).first

@@ -179,6 +179,7 @@
 		50F81EEE23BF6B1E00EAAC3E /* SongMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81EDA23BF6B1E00EAAC3E /* SongMO+CoreDataClass.swift */; };
 		50F81EEF23BF6B1E00EAAC3E /* SongMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81EDB23BF6B1E00EAAC3E /* SongMO+CoreDataProperties.swift */; };
 		50F8CA2D21FAD5400084F8D8 /* Reachabilty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */; };
+		50FBE7DE262DD86500114278 /* BasicFetchedResultsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FBE7DD262DD86500114278 /* BasicFetchedResultsController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -395,6 +396,7 @@
 		50F81EDA23BF6B1E00EAAC3E /* SongMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SongMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50F81EDB23BF6B1E00EAAC3E /* SongMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SongMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachabilty.swift; sourceTree = "<group>"; };
+		50FBE7DD262DD86500114278 /* BasicFetchedResultsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicFetchedResultsController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -668,6 +670,7 @@
 				50BA930521D5715D00E5901D /* LibraryStorage.swift */,
 				50C16C2121E7A38A00F086F0 /* Identifyable.swift */,
 				500B7D4221ECFCDD0083ED6F /* LibraryElementEnum.swift */,
+				50FBE7DD262DD86500114278 /* BasicFetchedResultsController.swift */,
 				50120A2026280C9200B037B1 /* FetchedResultsControllers.swift */,
 			);
 			path = Storage;
@@ -1048,6 +1051,7 @@
 				5086F8832239A2B700546F5A /* GenericLibraryBackgroundSyncer.swift in Sources */,
 				5086F876223852F200546F5A /* SubsonicApi.swift in Sources */,
 				500BB45721CAA73700D367CF /* PersistentStorage.swift in Sources */,
+				50FBE7DE262DD86500114278 /* BasicFetchedResultsController.swift in Sources */,
 				50675E6D25F61164005737FD /* BasicTableCell.swift in Sources */,
 				50BA930821D75C5600E5901D /* AuthentificationHandshake.swift in Sources */,
 				5020BD2325DC027E00CDD37A /* Settings.swift in Sources */,

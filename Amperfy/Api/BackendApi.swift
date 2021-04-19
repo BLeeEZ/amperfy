@@ -1,4 +1,5 @@
 import Foundation
+import CoreData
 
 protocol ParsedObjectNotifiable {
     func notifyParsedObject()
@@ -23,7 +24,7 @@ protocol LibrarySyncer {
     var albumCount: Int { get }
     var songCount: Int { get }
     var playlistCount: Int { get }
-    func sync(libraryStorage: LibraryStorage, statusNotifyier: SyncCallbacks?)
+    func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?)
     func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage)
     func syncDown(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks?)
     func syncUpload(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks?)

@@ -38,6 +38,19 @@ extension String {
     }
 }
 
+extension Array {
+    func chunked(intoSubarrayCount chunkCount: Int) -> [[Element]] {
+        let chuckSize: Int = Int(ceil(Float(count)/Float(chunkCount)))
+        return chunked(intoSubarraySize: chuckSize)
+    }
+    
+    func chunked(intoSubarraySize size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0 ..< Swift.min($0 + size, count)])
+        }
+    }
+}
+
 extension UIColor {
     convenience init(hue: CGFloat, saturation: CGFloat, lightness: CGFloat, alpha: CGFloat) {
         precondition(0...1 ~= hue &&

@@ -68,8 +68,10 @@ public class Playlist: NSObject, SongContainable {
             return managedObject.name ?? ""
         }
         set {
-            managedObject.name = newValue
-            storage.saveContext()
+            if managedObject.name != newValue {
+                managedObject.name = newValue
+                storage.saveContext()
+            }
         }
     }
     var isSmartPlaylist: Bool {

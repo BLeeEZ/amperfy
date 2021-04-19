@@ -6,16 +6,15 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     var songToAdd: Song?
     var songsToAdd: [Song]?
     
-    private var fetchedResultsController: PlaylistFetchedResultsController!
+    private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
-        fetchedResultsController.delegate = self
+        fetchedResultsController = PlaylistSelectorFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController()
+        configureSearchController(placeholder: "Search in \"Playlists\"", showSearchBarAtEnter: true)
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         
@@ -26,7 +25,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.search(searchText: "", playlistSearchCategory: .userOnly)
+        fetchedResultsController.fetch()
     }
     
     @IBAction func cancelButtonPressed(_ sender: UIBarButtonItem) {
@@ -66,7 +65,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
     override func updateSearchResults(for searchController: UISearchController) {
         let searchText = searchController.searchBar.text ?? ""
-        fetchedResultsController.search(searchText: searchText, playlistSearchCategory: .userOnly)
+        fetchedResultsController.search(searchText: searchText)
         tableView.reloadData()
     }
     

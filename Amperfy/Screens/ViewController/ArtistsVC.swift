@@ -9,10 +9,9 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         super.viewDidLoad()
         
         fetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
-        fetchedResultsController.delegate = self
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController()
+        configureSearchController(placeholder: "Search in \"Artists\"")
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.rowHeight = ArtistTableCell.rowHeight
     }

@@ -4,22 +4,29 @@ import CoreData
 
 class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewController where ResultType : NSFetchRequestResult {
     
-    var singleFetchedResultsController: NSFetchedResultsController<ResultType>?
+    private var singleFetchController: BasicFetchedResultsController<ResultType>?
+    var singleFetchedResultsController: BasicFetchedResultsController<ResultType>? {
+        set {
+            singleFetchController = newValue
+            singleFetchController?.delegate = self
+        }
+        get { return singleFetchController }
+    }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return singleFetchedResultsController?.sections?.count ?? 0
+        return singleFetchController?.numberOfSections ?? 0
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return singleFetchedResultsController?.sectionIndexTitles[section]
+        return singleFetchController?.titleForHeader(inSection: section)
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return singleFetchedResultsController?.sections?[section].numberOfObjects ?? 0
+        return singleFetchController?.numberOfRows(inSection: section) ?? 0
     }
     
     override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        return singleFetchedResultsController?.sectionIndexTitles
+        return singleFetchController?.sectionIndexTitles
     }
     
 }
@@ -34,16 +41,16 @@ class BasicTableViewController: UITableViewController {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
     }
     
-    func configureSearchController(scopeButtonTitles: [String]? = nil) {
+    func configureSearchController(placeholder: String?, scopeButtonTitles: [String]? = nil, showSearchBarAtEnter: Bool = false) {
         searchController.searchResultsUpdater = self
         searchController.searchBar.autocapitalizationType = .none
         searchController.searchBar.scopeButtonTitles = scopeButtonTitles
+        searchController.searchBar.placeholder = placeholder
 
         if #available(iOS 11.0, *) {
             // For iOS 11 and later, place the search bar in the navigation bar.
             navigationItem.searchController = searchController
-            // Make the search bar always visible.
-            navigationItem.hidesSearchBarWhenScrolling = false
+            navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
         } else {
             // For iOS 10 and earlier, place the search controller's search bar in the table view's header.
             tableView.tableHeaderView = searchController.searchBar
@@ -56,7 +63,7 @@ class BasicTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return CommonScreenOperations.tableSectionHeightLarge
+        return 0.0
     }
 
 }
