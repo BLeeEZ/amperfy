@@ -31,7 +31,12 @@ class PlaylistSongsParserDelegate: GenericXmlParser {
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "playlisttrack":
-            playlistItemBuffer?.order = Int(buffer) ?? 0
+            var order = 0
+            if let playlistItemOrder = Int(buffer), playlistItemOrder > 0 {
+                // Ampache playlist order is one-based -> Amperfy playlist order is zero-based
+                order = playlistItemOrder - 1
+            }
+            playlistItemBuffer?.order = order
         case "song":
             if let item = playlistItemBuffer {
                 playlist.add(item: item)
