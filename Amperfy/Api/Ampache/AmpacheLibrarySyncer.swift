@@ -32,6 +32,10 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         let syncWave = currentLibraryStorage.createSyncWave()
         syncWave.setMetaData(fromLibraryChangeDates: libMetaData.libraryChangeDates)
         currentLibraryStorage.saveContext()
+        
+        let genreParser = GenreParserDelegate(libraryStorage: currentLibraryStorage, syncWave: syncWave)
+        self.ampacheXmlServerApi.requestGenres(parserDelegate: genreParser)
+        currentLibraryStorage.saveContext()
 
         statusNotifyier?.notifyArtistSyncStarted()
         let pollCountArtist = (ampacheXmlServerApi.artistCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)

@@ -13,7 +13,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.layoutMargins = LibraryElementDetailTableHeaderView.margin
+        self.layoutMargins = Self.margin
     }
     
     @IBAction func playAllButtonPressed(_ sender: Any) {

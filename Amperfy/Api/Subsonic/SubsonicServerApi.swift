@@ -155,6 +155,11 @@ class SubsonicServerApi {
         return serverApiVersion
     }
 
+    func requestGenres(parserDelegate: XMLParserDelegate) {
+        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getGenres") else { return }
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+
     func requestArtists(parserDelegate: XMLParserDelegate) {
         guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getArtists") else { return }
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)

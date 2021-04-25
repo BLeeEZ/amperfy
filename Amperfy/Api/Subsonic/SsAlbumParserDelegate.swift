@@ -39,6 +39,17 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
             if albumBuffer?.artist == nil, let artistId = attributeDict["artistId"], let artist = libraryStorage.getArtist(id: artistId) {
                 albumBuffer?.artist = artist
             }
+            
+            if albumBuffer?.genre == nil, let genreName = attributeDict["genre"] {
+                if let genre = libraryStorage.getGenre(name: genreName) {
+                    albumBuffer?.genre = genre
+                } else {
+                    let genre = libraryStorage.createGenre()
+                    genre.name = genreName
+                    genre.syncInfo = syncWave
+                    albumBuffer?.genre = genre
+                }
+            }
         }
     }
     

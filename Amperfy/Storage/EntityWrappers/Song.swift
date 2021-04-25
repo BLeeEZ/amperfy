@@ -20,7 +20,7 @@ public class Song: AbstractLibraryEntity {
          return managedObject.objectID
      }
      var title: String {
-         get { return managedObject.title ?? "Unknown title" }
+         get { return managedObject.title ?? "Unknown Title" }
          set { managedObject.title = newValue }
      }
      var track: Int {
@@ -31,15 +31,25 @@ public class Song: AbstractLibraryEntity {
         get { return Int(managedObject.year) }
         set { managedObject.year = Int16(newValue) }
      }
-     var duration: Int? {
-        get { return managedObject.duration?.intValue }
-        set {
-            if let newValue = newValue {
-                managedObject.duration = NSNumber(integerLiteral: newValue)
-            } else {
-                managedObject.duration = nil
-            }
-        }
+     var duration: Int {
+        get { return Int(managedObject.duration) }
+        set { managedObject.duration = Int16(newValue) }
+     }
+     var size: Int {
+        get { return Int(managedObject.size) }
+        set { managedObject.size = Int32(newValue) }
+     }
+     var bitrate: Int { // byte per second
+        get { return Int(managedObject.bitrate) }
+        set { managedObject.bitrate = Int32(newValue) }
+     }
+     var contentType: String? {
+        get { return managedObject.contentType }
+        set { managedObject.contentType = newValue }
+     }
+     var disk: String? {
+        get { return managedObject.disk }
+        set { managedObject.disk = newValue }
      }
      var url: String? {
          get { return managedObject.url }
@@ -59,6 +69,12 @@ public class Song: AbstractLibraryEntity {
          }
          set { managedObject.artist = newValue?.managedObject }
      }
+     var genre: Genre? {
+         get {
+             guard let genreMO = managedObject.genre else { return nil }
+             return Genre(managedObject: genreMO) }
+         set { managedObject.genre = newValue?.managedObject }
+     }
      var syncInfo: SyncWave? {
          get {
              guard let syncInfoMO = managedObject.syncInfo else { return nil }
@@ -68,6 +84,30 @@ public class Song: AbstractLibraryEntity {
     
     var displayString: String {
         return "\(managedObject.artist?.name ?? "Unknown artist") - \(title)"
+    }
+    
+    var detailInfo: String {
+        var info = displayString
+        info += " ("
+        let albumName = album?.name ?? "-"
+        info += "album: \(albumName),"
+        let genreName = genre?.name ?? "-"
+        info += " genre: \(genreName),"
+        
+        info += " id: \(id),"
+        info += " track: \(track),"
+        info += " year: \(year),"
+        info += " duration: \(duration),"
+        let diskInfo =  disk ?? "-"
+        info += " disk: \(diskInfo),"
+        info += " size: \(size),"
+        let contentTypeInfo = contentType ?? "-"
+        info += " contentType: \(contentTypeInfo),"
+        info += " bitrate: \(bitrate)"
+
+        
+        info += ")"
+        return info
     }
     
     override var identifier: String {

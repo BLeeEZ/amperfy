@@ -11,6 +11,7 @@ extension AlbumMO {
     @NSManaged public var name: String?
     @NSManaged public var year: Int16
     @NSManaged public var artist: ArtistMO?
+    @NSManaged public var genre: GenreMO?
     @NSManaged public var songs: NSOrderedSet?
     @NSManaged public var syncInfo: SyncWaveMO?
 

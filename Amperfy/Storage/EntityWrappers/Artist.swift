@@ -28,7 +28,7 @@ public class Artist: AbstractLibraryEntity, SongContainable {
     }
     
     var name: String {
-        get { return managedObject.name ?? "Unknown artist" }
+        get { return managedObject.name ?? "Unknown Artist" }
         set { managedObject.name = newValue }
     }
     var albums: [Album] {
@@ -38,6 +38,12 @@ public class Artist: AbstractLibraryEntity, SongContainable {
             returnAlbums.append(Album(managedObject: albumMO))
         }
         return returnAlbums
+    }
+    var genre: Genre? {
+        get {
+            guard let genreMO = managedObject.genre else { return nil }
+            return Genre(managedObject: genreMO) }
+        set { managedObject.genre = newValue?.managedObject }
     }
     var syncInfo: SyncWave? {
         get {

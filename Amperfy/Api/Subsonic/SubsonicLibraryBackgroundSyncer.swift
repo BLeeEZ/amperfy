@@ -75,6 +75,7 @@ class SubsonicLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Backgroun
                 let songDelegate = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
                 songDelegate.guessedArtist = album.artist
                 songDelegate.guessedAlbum = album
+                songDelegate.guessedGenre = album.genre
                 subsonicServerApi.requestAlbum(parserDelegate: songDelegate, id: album.id)
                 syncWave.syncIndexToContinue = album.id
                 if(!isRunning) { break }

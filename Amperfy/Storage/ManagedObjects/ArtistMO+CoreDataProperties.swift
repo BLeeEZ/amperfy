@@ -10,6 +10,7 @@ extension ArtistMO {
 
     @NSManaged public var name: String?
     @NSManaged public var albums: NSOrderedSet?
+    @NSManaged public var genre: GenreMO?
     @NSManaged public var songs: NSOrderedSet?
     @NSManaged public var syncInfo: SyncWaveMO?
 

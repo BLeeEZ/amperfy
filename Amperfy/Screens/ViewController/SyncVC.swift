@@ -31,6 +31,7 @@ class SyncVC: UIViewController {
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
             self.syncer = self.appDelegate.backendApi.createLibrarySyncer()
             self.syncer?.sync(currentContext: context, persistentContainer: self.appDelegate.storage.persistentContainer, statusNotifyier: self)
+            self.appDelegate.storage.librarySyncVersion = .newestVersion
             self.appDelegate.storage.saveLibraryIsSyncedFlag()
             self.appDelegate.backgroundSyncerManager.start()
             self.appDelegate.downloadManager.start()

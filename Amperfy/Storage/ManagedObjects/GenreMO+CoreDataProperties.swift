@@ -2,27 +2,22 @@ import Foundation
 import CoreData
 
 
-extension SyncWaveMO {
+extension GenreMO {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<SyncWaveMO> {
-        return NSFetchRequest<SyncWaveMO>(entityName: "SyncWave")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<GenreMO> {
+        return NSFetchRequest<GenreMO>(entityName: "Genre")
     }
 
-    @NSManaged public var dateOfLastAdd: Date?
-    @NSManaged public var dateOfLastClean: Date?
-    @NSManaged public var dateOfLastUpdate: Date?
-    @NSManaged public var id: Int16
-    @NSManaged public var syncIndexToContinue: String
-    @NSManaged public var syncState: Int16
+    @NSManaged public var name: String?
     @NSManaged public var albums: NSOrderedSet?
     @NSManaged public var artists: NSOrderedSet?
     @NSManaged public var songs: NSOrderedSet?
-    @NSManaged public var genres: NSOrderedSet?
+    @NSManaged public var syncInfo: SyncWaveMO?
 
 }
 
 // MARK: Generated accessors for albums
-extension SyncWaveMO {
+extension GenreMO {
 
     @objc(insertObject:inAlbumsAtIndex:)
     @NSManaged public func insertIntoAlbums(_ value: AlbumMO, at idx: Int)
@@ -57,7 +52,7 @@ extension SyncWaveMO {
 }
 
 // MARK: Generated accessors for artists
-extension SyncWaveMO {
+extension GenreMO {
 
     @objc(insertObject:inArtistsAtIndex:)
     @NSManaged public func insertIntoArtists(_ value: ArtistMO, at idx: Int)
@@ -92,7 +87,7 @@ extension SyncWaveMO {
 }
 
 // MARK: Generated accessors for songs
-extension SyncWaveMO {
+extension GenreMO {
 
     @objc(insertObject:inSongsAtIndex:)
     @NSManaged public func insertIntoSongs(_ value: SongMO, at idx: Int)
@@ -123,40 +118,5 @@ extension SyncWaveMO {
 
     @objc(removeSongs:)
     @NSManaged public func removeFromSongs(_ values: NSOrderedSet)
-
-}
-
-// MARK: Generated accessors for genres
-extension SyncWaveMO {
-
-    @objc(insertObject:inGenresAtIndex:)
-    @NSManaged public func insertIntoGenres(_ value: GenreMO, at idx: Int)
-
-    @objc(removeObjectFromGenresAtIndex:)
-    @NSManaged public func removeFromGenres(at idx: Int)
-
-    @objc(insertGenres:atIndexes:)
-    @NSManaged public func insertIntoGenres(_ values: [GenreMO], at indexes: NSIndexSet)
-
-    @objc(removeGenresAtIndexes:)
-    @NSManaged public func removeFromGenres(at indexes: NSIndexSet)
-
-    @objc(replaceObjectInGenresAtIndex:withObject:)
-    @NSManaged public func replaceGenres(at idx: Int, with value: GenreMO)
-
-    @objc(replaceGenresAtIndexes:withGenres:)
-    @NSManaged public func replaceGenres(at indexes: NSIndexSet, with values: [GenreMO])
-
-    @objc(addGenresObject:)
-    @NSManaged public func addToGenres(_ value: GenreMO)
-
-    @objc(removeGenresObject:)
-    @NSManaged public func removeFromGenres(_ value: GenreMO)
-
-    @objc(addGenres:)
-    @NSManaged public func addToGenres(_ values: NSOrderedSet)
-
-    @objc(removeGenres:)
-    @NSManaged public func removeFromGenres(_ values: NSOrderedSet)
 
 }

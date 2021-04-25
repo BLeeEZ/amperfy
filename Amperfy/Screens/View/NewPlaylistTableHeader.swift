@@ -18,7 +18,7 @@ class NewPlaylistTableHeader: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        self.layoutMargins = NewPlaylistTableHeader.margin
+        self.layoutMargins = Self.margin
     }
 
     @IBAction func createPlaylistButtonPressed(_ sender: Any) {

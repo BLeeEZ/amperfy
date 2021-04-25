@@ -72,11 +72,10 @@ class AmpacheXmlServerApi {
 
     private func createAuthenticatedApiUrlComponent() -> URLComponents? {
         reauthenticateIfNeccessary()
-        guard 
-        let apiUrl = createApiUrl(),
-        let auth = authHandshake,
-        var urlComp = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false)
-        else { return nil }
+        guard let apiUrl = createApiUrl(),
+            let auth = authHandshake,
+            var urlComp = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false)
+          else { return nil }
         urlComp.addQueryItem(name: "auth", value: auth.token)
         return urlComp
     }
@@ -126,6 +125,12 @@ class AmpacheXmlServerApi {
                 authenticate(credentials: cred)
             }
         }
+    }
+    
+    func requestGenres(parserDelegate: XMLParserDelegate) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "genres")
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
 
     func requestArtists(parserDelegate: XMLParserDelegate) {

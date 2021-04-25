@@ -24,7 +24,7 @@ class PlaylistDetailTableHeader: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        self.layoutMargins = PlaylistDetailTableHeader.margin
+        self.layoutMargins = Self.margin
     }
     
     func prepare(toWorkOnPlaylist playlist: Playlist?, rootView: PlaylistDetailVC) {

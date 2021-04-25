@@ -6,5 +6,6 @@ enum Segues: String {
     case toArtistDetail
     case toAlbumDetail
     case toPlaylistDetail
+    case toGenreDetail
     
 }

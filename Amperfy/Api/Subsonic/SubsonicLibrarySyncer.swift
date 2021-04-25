@@ -24,6 +24,10 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         syncWave.setMetaData(fromLibraryChangeDates: LibraryChangeDates())
         currentLibraryStorage.saveContext()
         
+        let genreParser = SsGenreParserDelegate(libraryStorage: currentLibraryStorage, syncWave: syncWave, parseNotifier: statusNotifyier)
+        subsonicServerApi.requestGenres(parserDelegate: genreParser)
+        currentLibraryStorage.saveContext()
+        
         statusNotifyier?.notifyArtistSyncStarted()
         let artistParser = SsArtistParserDelegate(libraryStorage: currentLibraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
         subsonicServerApi.requestArtists(parserDelegate: artistParser)
@@ -63,6 +67,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
                 let songDelegate = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
                 songDelegate.guessedArtist = albumContext.artist
                 songDelegate.guessedAlbum = albumContext
+                songDelegate.guessedGenre = albumContext.genre
                 self.subsonicServerApi.requestAlbum(parserDelegate: songDelegate, id: albumContext.id)
                 libraryStorage.saveContext()
                 statusNotifyier?.notifyParsedObject()

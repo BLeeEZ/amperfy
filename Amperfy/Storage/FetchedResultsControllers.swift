@@ -1,6 +1,29 @@
 import Foundation
 import CoreData
 
+class GenreFetchedResultsController: BasicFetchedResultsController<GenreMO> {
+    
+    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        let library = LibraryStorage(context: context)
+        let fetchRequest = library.genresFetchRequest
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+    
+    func getWrappedEntity(at indexPath: IndexPath) -> Genre {
+        let genreMO = fetchResultsController.object(at: indexPath)
+        return Genre(managedObject: genreMO)
+    }
+    
+    func search(searchText: String) {
+        if searchText.count > 0 {
+            search(predicate: library.getGenresFetchPredicate(searchText: searchText))
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
 class ArtistFetchedResultsController: BasicFetchedResultsController<ArtistMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {

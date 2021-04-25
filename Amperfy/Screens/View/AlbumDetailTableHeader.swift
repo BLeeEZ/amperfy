@@ -15,7 +15,7 @@ class AlbumDetailTableHeader: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        self.layoutMargins = AlbumDetailTableHeader.margin
+        self.layoutMargins = Self.margin
     }
     
     func prepare(toWorkOnAlbum album: Album?, rootView: AlbumDetailVC? ) {

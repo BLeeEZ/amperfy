@@ -16,7 +16,7 @@ public class Album: AbstractLibraryEntity, SongContainable {
     }
     
     var name: String {
-        get { return managedObject.name ?? "Unknown artist" }
+        get { return managedObject.name ?? "Unknown Album" }
         set { managedObject.name = newValue }
     }
     var year: Int {
@@ -29,6 +29,12 @@ public class Album: AbstractLibraryEntity, SongContainable {
             return Artist(managedObject: artistMO)
         }
         set { managedObject.artist = newValue?.managedObject }
+    }
+    var genre: Genre? {
+        get {
+            guard let genreMO = managedObject.genre else { return nil }
+            return Genre(managedObject: genreMO) }
+        set { managedObject.genre = newValue?.managedObject }
     }
     var syncInfo: SyncWave? {
         get {

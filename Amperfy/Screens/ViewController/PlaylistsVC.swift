@@ -11,7 +11,11 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         fetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController(placeholder: "Search in \"Playlists\"", scopeButtonTitles: ["All", "User Playlists", "Smart Playlists"])
+        var searchTiles: [String]? = nil
+        if appDelegate.backendProxy.selectedApi == .ampache {
+            searchTiles = ["All", "User Playlists", "Smart Playlists"]
+         }
+        configureSearchController(placeholder: "Search in \"Playlists\"", scopeButtonTitles: searchTiles)
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)

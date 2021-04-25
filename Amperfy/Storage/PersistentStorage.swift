@@ -12,6 +12,7 @@ class PersistentStorage {
         
         case SongActionOnTab = "songActionOnTab"
         case PlayerDisplayStyle = "playerDisplayStyle"
+        case LibrarySyncVersion = "librarySyncVersion"
     }
 
     init() {
@@ -70,6 +71,19 @@ class PersistentStorage {
             return false
         }
         return isLibrarySynced
+    }
+    
+    var librarySyncVersion: LibrarySyncVersion {
+        get {
+            if let raw = UserDefaults.standard.object(forKey: UserDefaultsKey.LibrarySyncVersion.rawValue) as? Int,
+               let version = LibrarySyncVersion(rawValue: raw) {
+                    return version
+            }
+            return LibrarySyncVersion.v6
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.LibrarySyncVersion.rawValue)
+        }
     }
 
     

@@ -16,6 +16,15 @@ class FetchedResultsControllerSectioner {
     }
 }
 
+extension GenreMO {
+    @objc public var section: String {
+        self.willAccessValue(forKey: "section")
+        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.name)
+        self.didAccessValue(forKey: "section")
+        return section
+    }
+}
+
 extension ArtistMO {
     @objc public var section: String {
         self.willAccessValue(forKey: "section")

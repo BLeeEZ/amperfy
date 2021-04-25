@@ -6,6 +6,7 @@ import os.log
 class AlbumParserDelegate: GenericXmlLibParser {
     
     var albumBuffer: Album?
+    var genreIdToCreate: String?
     
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         buffer = ""
@@ -35,6 +36,15 @@ class AlbumParserDelegate: GenericXmlLibParser {
                     os_log("Found album id %s with unknown artist %s. Album name: %s", log: log, type: .error, album.id, artistId, album.name)
                 }
             }
+        case "genre":
+            if let album = albumBuffer {
+                guard let genreId = attributeDict["id"] else { return }
+                if let genre = libraryStorage.getGenre(id: genreId) {
+                    album.genre = genre
+                } else {
+                    genreIdToCreate = genreId
+                }
+            }
 		default:
 			break
 		}
@@ -52,6 +62,16 @@ class AlbumParserDelegate: GenericXmlLibParser {
             albumBuffer?.year = Int(buffer) ?? 0
         case "art":
             albumBuffer?.artwork?.url = buffer
+        case "genre":
+            if let genreId = genreIdToCreate {
+                os_log("Genre <%s> with id %s has been created", log: log, type: .error, genreId, buffer)
+                let genre = libraryStorage.createGenre()
+                genre.id = genreId
+                genre.name = buffer
+                genre.syncInfo = syncWave
+                albumBuffer?.genre = genre
+                genreIdToCreate = nil
+            }
 		default:
 			break
 		}

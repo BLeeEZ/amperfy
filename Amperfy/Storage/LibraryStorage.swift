@@ -6,13 +6,24 @@ protocol SongFileCachable {
     func getSongFile(forSong song: Song) -> SongFile?
 }
 
-
 enum PlaylistSearchCategory: Int {
     case all = 0
     case userOnly = 1
     case smartOnly = 2
-    
+
     static let defaultValue: PlaylistSearchCategory = .all
+}
+
+enum LibrarySyncVersion: Int, Comparable {
+    case v6 = 0
+    case v7 = 1 // Genres added
+    
+    static let newestVersion: LibrarySyncVersion = .v7
+    static let defaultValue: LibrarySyncVersion = .v6
+    
+    static func < (lhs: LibrarySyncVersion, rhs: LibrarySyncVersion) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
 }
 
 class LibraryStorage: SongFileCachable {
@@ -24,7 +35,12 @@ class LibraryStorage: SongFileCachable {
         self.context = context
     }
     
-    static let entitiesToDelete = [Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName]
+    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName]
+    
+    func createGenre() -> Genre {
+        let genreMO = GenreMO(context: context)
+        return Genre(managedObject: genreMO)
+    }
     
     func createArtist() -> Artist {
         let artistMO = ArtistMO(context: context)
@@ -62,6 +78,15 @@ class LibraryStorage: SongFileCachable {
 
     func deleteCache(ofPlaylist playlist: Playlist) {
         for song in playlist.songs {
+            if let songFile = getSongFile(forSong: song) {
+                deleteSongFile(songFile: songFile)
+                song.managedObject.file = nil
+            }
+        }
+    }
+    
+    func deleteCache(ofGenre genre: Genre) {
+        for song in genre.songs {
             if let songFile = getSongFile(forSong: song) {
                 deleteSongFile(songFile: songFile)
                 song.managedObject.file = nil
@@ -125,6 +150,36 @@ class LibraryStorage: SongFileCachable {
         let syncWaveMO = SyncWaveMO(context: context)
         syncWaveMO.id = syncWaveCount
         return SyncWave(managedObject: syncWaveMO)
+    }
+    
+    var genresFetchRequest: NSFetchRequest<GenreMO> {
+        let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        return fetchRequest
+    }
+    
+    func getGenresFetchPredicate(searchText: String) -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        if searchText.count > 0 {
+            predicate = NSPredicate(format: "name contains[cd] %@", searchText, searchText)
+        }
+        return predicate
+    }
+    
+    func getGenres() -> Array<Genre> {
+        var genres = Array<Genre>()
+        var foundGenres = Array<GenreMO>()
+        let fetchRequest = genresFetchRequest
+        do {
+            foundGenres = try context.fetch(fetchRequest)
+            genres = foundGenres.compactMap {
+                Genre(managedObject: $0)
+            }
+        } catch {}
+        
+        return genres
     }
     
     var artistsFetchRequest: NSFetchRequest<ArtistMO> {
@@ -369,6 +424,38 @@ class LibraryStorage: SongFileCachable {
         }
         
         return playerData
+    }
+    
+    func getGenre(id: String) -> Genre? {
+        var foundGenre: Genre? = nil
+        let fr: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "id == %@", NSString(string: id))
+        fr.fetchLimit = 1
+        do {
+            let result = try context.fetch(fr) as NSArray?
+            if let genres = result, genres.count > 0, let genre = genres[0] as? GenreMO {
+                foundGenre = Genre(managedObject: genre)
+            }
+        } catch {
+            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
+        }
+        return foundGenre
+    }
+    
+    func getGenre(name: String) -> Genre? {
+        var foundGenre: Genre? = nil
+        let fr: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "name == %@", NSString(string: name))
+        fr.fetchLimit = 1
+        do {
+            let result = try context.fetch(fr) as NSArray?
+            if let genres = result, genres.count > 0, let genre = genres[0] as? GenreMO {
+                foundGenre = Genre(managedObject: genre)
+            }
+        } catch {
+            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
+        }
+        return foundGenre
     }
     
     func getArtist(id: String) -> Artist? {
