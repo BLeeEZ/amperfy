@@ -51,6 +51,10 @@ class AmpacheApi: BackendApi {
     func createLibraryBackgroundSyncer() -> BackgroundLibrarySyncer {
         return AmpacheLibraryBackgroundSyncer(ampacheXmlServerApi: ampacheXmlServerApi)
     }
+    
+    func createLibraryVersionBackgroundResyncer() -> BackgroundLibraryVersionResyncer {
+        return AmpacheLibraryVersionBackgroundResyncer(ampacheXmlServerApi: ampacheXmlServerApi)
+    }
 
     func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer {
         return AmpacheArtworkSyncer(ampacheXmlServerApi: ampacheXmlServerApi)

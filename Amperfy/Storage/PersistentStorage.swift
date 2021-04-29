@@ -48,7 +48,7 @@ class PersistentStorage {
     }
     
     func deleteLibraryIsSyncedFlag() {
-        UserDefaults.standard.removeObject(forKey: UserDefaultsKey.LibraryIsSynced.rawValue)
+        UserDefaults.standard.set(false, forKey: UserDefaultsKey.LibraryIsSynced.rawValue)
     }
     
     func saveSettings(settings: Settings) {

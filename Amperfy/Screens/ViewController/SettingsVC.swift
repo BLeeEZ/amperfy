@@ -37,6 +37,7 @@ class SettingsVC: UITableViewController {
             self.appDelegate.storage.context.reset()
             self.appDelegate.storage.deleteLoginCredentials()
             self.appDelegate.persistentLibraryStorage.cleanStorage()
+            self.appDelegate.storage.deleteLibraryIsSyncedFlag()
             self.deleteViewControllerCaches()
             self.appDelegate.reinit()
             self.performSegue(withIdentifier: Segues.toLogin.rawValue, sender: nil)

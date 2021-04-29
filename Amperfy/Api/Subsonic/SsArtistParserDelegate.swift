@@ -16,18 +16,24 @@ class SsArtistParserDelegate: GenericXmlLibParser {
         buffer = ""
 
         if elementName == "artist" {
-            guard let artistId = attributeDict["id"],
-                  libraryStorage.getArtist(id: artistId) == nil // info already synced -> skip
-                else { return }
+            guard let artistId = attributeDict["id"] else { return }
+            var isArtistCreated = false
             
-            artistBuffer = libraryStorage.createArtist()
-            artistBuffer?.id = artistId
-            artistBuffer?.syncInfo = syncWave
-
-            if let attributeArtistName = attributeDict["name"] {
-                artistBuffer?.name = attributeArtistName
+            if let fetchedArtist = libraryStorage.getArtist(id: artistId)  {
+                artistBuffer = fetchedArtist
+            } else {
+                artistBuffer = libraryStorage.createArtist()
+                artistBuffer?.id = artistId
+                artistBuffer?.syncInfo = syncWave
+                isArtistCreated = true
             }
-            artistBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: artistId)
+            
+            if isArtistCreated || isLibraryVersionResync {
+                if let attributeArtistName = attributeDict["name"] {
+                    artistBuffer?.name = attributeArtistName
+                }
+                artistBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: artistId)
+            }
 		}    
     }
     

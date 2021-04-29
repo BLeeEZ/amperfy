@@ -200,14 +200,18 @@ class SearchVC: BasicTableViewController {
         
         switch type {
         case .insert:
-            tableView.insertRows(at: [IndexPath(row: newIndexPath!.row, section: section)], with: .bottom)
+            rowsToInsert.append(IndexPath(row: newIndexPath!.row, section: section))
         case .delete:
-            tableView.deleteRows(at: [IndexPath(row: indexPath!.row, section: section)], with: .left)
+            rowsToDelete.append(IndexPath(row: indexPath!.row, section: section))
         case .move:
-            tableView.deleteRows(at: [IndexPath(row: indexPath!.row, section: section)], with: .top)
-            tableView.insertRows(at: [IndexPath(row: newIndexPath!.row, section: section)], with: .bottom)
+            if indexPath! != newIndexPath! {
+                rowsToInsert.append(IndexPath(row: newIndexPath!.row, section: section))
+                rowsToDelete.append(IndexPath(row: indexPath!.row, section: section))
+            } else {
+                rowsToUpdate.append(IndexPath(row: indexPath!.row, section: section))
+            }
         case .update:
-            tableView.reloadRows(at: [IndexPath(row: indexPath!.row, section: section)], with: .none)
+            rowsToUpdate.append(IndexPath(row: indexPath!.row, section: section))
         @unknown default:
             break
         }

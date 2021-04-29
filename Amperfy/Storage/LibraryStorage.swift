@@ -14,9 +14,19 @@ enum PlaylistSearchCategory: Int {
     static let defaultValue: PlaylistSearchCategory = .all
 }
 
-enum LibrarySyncVersion: Int, Comparable {
+enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible {
     case v6 = 0
     case v7 = 1 // Genres added
+    
+    var description : String {
+        switch self {
+        case .v6: return "v6"
+        case .v7: return "v7"
+        }
+    }
+    var isNewestVersion: Bool {
+        return self == Self.newestVersion
+    }
     
     static let newestVersion: LibrarySyncVersion = .v7
     static let defaultValue: LibrarySyncVersion = .v6
@@ -155,7 +165,8 @@ class LibraryStorage: SongFileCachable {
     var genresFetchRequest: NSFetchRequest<GenreMO> {
         let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
         ]
         return fetchRequest
     }
@@ -185,7 +196,8 @@ class LibraryStorage: SongFileCachable {
     var artistsFetchRequest: NSFetchRequest<ArtistMO> {
         let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
         ]
         return fetchRequest
     }
@@ -215,7 +227,8 @@ class LibraryStorage: SongFileCachable {
     var albumsFetchRequest: NSFetchRequest<AlbumMO> {
         let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
         ]
         return fetchRequest
     }
@@ -245,7 +258,8 @@ class LibraryStorage: SongFileCachable {
     var songsFetchRequest: NSFetchRequest<SongMO> {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "title", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: "title", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
         ]
         return fetchRequest
     }
@@ -327,7 +341,8 @@ class LibraryStorage: SongFileCachable {
     var playlistsFetchRequest: NSFetchRequest<PlaylistMO> {
         let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
         ]
         var predicateFormats = [String]()
         predicateFormats.append("(playersNormalPlaylist == nil)")

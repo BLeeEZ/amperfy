@@ -22,6 +22,7 @@ class GenericXmlLibParser: GenericXmlParser {
     var libraryStorage: LibraryStorage
     var syncWave: SyncWave
     var parseNotifier: ParsedObjectNotifiable?
+    var isLibraryVersionResync = false
     
     init(libraryStorage: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.libraryStorage = libraryStorage

@@ -30,11 +30,18 @@ protocol LibrarySyncer {
     func syncUpload(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks?)
 }
 
-protocol BackgroundLibrarySyncer {
+protocol AbstractBackgroundLibrarySyncer {
     var isActive: Bool { get }
-    func syncInBackground(libraryStorage: LibraryStorage)
     func stop()
     func stopAndWait()
+}
+
+protocol BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
+    func syncInBackground(libraryStorage: LibraryStorage)
+}
+
+protocol BackgroundLibraryVersionResyncer: AbstractBackgroundLibrarySyncer {
+    func resyncDueToNewLibraryVersionInBackground(libraryStorage: LibraryStorage, libraryVersion: LibrarySyncVersion)
 }
 
 protocol BackendApi {
@@ -49,5 +56,6 @@ protocol BackendApi {
     func checkForErrorResponse(inData data: Data) -> ResponseError?
     func createLibrarySyncer() -> LibrarySyncer
     func createLibraryBackgroundSyncer() -> BackgroundLibrarySyncer
+    func createLibraryVersionBackgroundResyncer() -> BackgroundLibraryVersionResyncer
     func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer
 }

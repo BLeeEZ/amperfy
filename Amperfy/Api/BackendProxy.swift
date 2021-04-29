@@ -161,6 +161,10 @@ extension BackendProxy: BackendApi {
         return activeApi.createLibraryBackgroundSyncer()
     }
 
+    func createLibraryVersionBackgroundResyncer() -> BackgroundLibraryVersionResyncer {
+        return activeApi.createLibraryVersionBackgroundResyncer()
+    }
+
     func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer {
         return activeApi.createArtworkBackgroundSyncer()
     }

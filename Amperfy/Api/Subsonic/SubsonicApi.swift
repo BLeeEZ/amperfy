@@ -52,6 +52,10 @@ class SubsonicApi: BackendApi {
     func createLibraryBackgroundSyncer() -> BackgroundLibrarySyncer {
         return SubsonicLibraryBackgroundSyncer(subsonicServerApi: subsonicServerApi)
     }
+    
+    func createLibraryVersionBackgroundResyncer() -> BackgroundLibraryVersionResyncer {
+        return SubsonicLibraryVersionBackgroundResyncer(subsonicServerApi: subsonicServerApi)
+    }
 
     func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer {
         return SubsonicArtworkBackgroundSyncer(subsonicServerApi: subsonicServerApi)

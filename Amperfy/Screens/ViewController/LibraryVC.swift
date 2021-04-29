@@ -14,6 +14,10 @@ class LibraryVC: UITableViewController {
         configureAsteriskStyle()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        tableView.reloadData()
+    }
+    
     func configureAsteriskStyle() {
         latestSongAsteriskLabel.layer.cornerRadius = 6.5
         latestSongAsteriskLabel.layer.masksToBounds = true

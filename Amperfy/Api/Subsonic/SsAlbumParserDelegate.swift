@@ -18,14 +18,18 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
         
         if elementName == "album" {
             guard let albumId = attributeDict["id"] else { return }
-
+            var isAlbumCreated = false
+            
             if let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
                 albumBuffer = fetchedAlbum
             } else {
                 albumBuffer = libraryStorage.createAlbum()
                 albumBuffer?.id = albumId
                 albumBuffer?.syncInfo = syncWave
-                
+                isAlbumCreated = true
+            }
+            
+            if isAlbumCreated || isLibraryVersionResync {
                 if let attributeAlbumtName = attributeDict["name"] {
                     albumBuffer?.name = attributeAlbumtName
                 }
@@ -47,6 +51,7 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
                     let genre = libraryStorage.createGenre()
                     genre.name = genreName
                     genre.syncInfo = syncWave
+                    os_log("Genre <%s> has been created", log: log, type: .error, genreName)
                     albumBuffer?.genre = genre
                 }
             }

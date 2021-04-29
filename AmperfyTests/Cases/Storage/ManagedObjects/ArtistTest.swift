@@ -21,8 +21,8 @@ class ArtistTest: XCTestCase {
     func testCreation() {
         let artist = storage.createArtist()
         XCTAssertEqual(artist.id, "")
-        XCTAssertEqual(artist.identifier, "Unknown artist")
-        XCTAssertEqual(artist.name, "Unknown artist")
+        XCTAssertEqual(artist.identifier, "Unknown Artist")
+        XCTAssertEqual(artist.name, "Unknown Artist")
         XCTAssertEqual(artist.songs.count, 0)
         XCTAssertFalse(artist.hasCachedSongs)
         XCTAssertEqual(artist.albums.count, 0)

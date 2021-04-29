@@ -22,14 +22,14 @@ class SongTest: XCTestCase {
         let song = storage.createSong()
         XCTAssertEqual(song.id, "")
         XCTAssertEqual(song.artwork?.image, Artwork.defaultImage)
-        XCTAssertEqual(song.title, "Unknown title")
+        XCTAssertEqual(song.title, "Unknown Title")
         XCTAssertEqual(song.track, 0)
         XCTAssertEqual(song.url, nil)
         XCTAssertEqual(song.album, nil)
         XCTAssertEqual(song.artist, nil)
         XCTAssertEqual(song.syncInfo, nil)
-        XCTAssertEqual(song.displayString, "Unknown artist - Unknown title")
-        XCTAssertEqual(song.identifier, "Unknown title")
+        XCTAssertEqual(song.displayString, "Unknown Artist - Unknown Title")
+        XCTAssertEqual(song.identifier, "Unknown Title")
         XCTAssertEqual(song.image, Artwork.defaultImage)
         XCTAssertFalse(song.isCached)
     }
@@ -56,12 +56,12 @@ class SongTest: XCTestCase {
         let testTitle = "Alright"
         testSong.title = testTitle
         XCTAssertEqual(testSong.title, testTitle)
-        XCTAssertEqual(testSong.displayString, "Unknown artist - " + testTitle)
+        XCTAssertEqual(testSong.displayString, "Unknown Artist - " + testTitle)
         XCTAssertEqual(testSong.identifier, testTitle)
         storage.saveContext()
         guard let songFetched = storage.getSong(id: testId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.title, testTitle)
-        XCTAssertEqual(songFetched.displayString, "Unknown artist - " + testTitle)
+        XCTAssertEqual(songFetched.displayString, "Unknown Artist - " + testTitle)
         XCTAssertEqual(songFetched.identifier, testTitle)
     }
     

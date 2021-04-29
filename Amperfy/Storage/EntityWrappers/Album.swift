@@ -17,30 +17,40 @@ public class Album: AbstractLibraryEntity, SongContainable {
     
     var name: String {
         get { return managedObject.name ?? "Unknown Album" }
-        set { managedObject.name = newValue }
+        set {
+            if managedObject.name != newValue { managedObject.name = newValue }
+        }
     }
     var year: Int {
         get { return Int(managedObject.year) }
-        set { managedObject.year = Int16(newValue) }
+        set {
+            if managedObject.year != Int16(newValue) { managedObject.year = Int16(newValue) }
+        }
     }
     var artist: Artist? {
         get {
             guard let artistMO = managedObject.artist else { return nil }
             return Artist(managedObject: artistMO)
         }
-        set { managedObject.artist = newValue?.managedObject }
+        set {
+            if managedObject.artist != newValue?.managedObject { managedObject.artist = newValue?.managedObject }
+        }
     }
     var genre: Genre? {
         get {
             guard let genreMO = managedObject.genre else { return nil }
             return Genre(managedObject: genreMO) }
-        set { managedObject.genre = newValue?.managedObject }
+        set {
+            if managedObject.genre != newValue?.managedObject { managedObject.genre = newValue?.managedObject }
+        }
     }
     var syncInfo: SyncWave? {
         get {
             guard let syncInfoMO = managedObject.syncInfo else { return nil }
             return SyncWave(managedObject: syncInfoMO) }
-        set { managedObject.syncInfo = newValue?.managedObject }
+        set {
+            if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
+        }
     }
     var songs: [Song] {
         guard let songsSet = managedObject.songs, let songsMO = songsSet.array as? [SongMO] else { return [Song]() }

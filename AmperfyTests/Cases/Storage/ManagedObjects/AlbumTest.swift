@@ -21,8 +21,8 @@ class AlbumTest: XCTestCase {
     func testCreation() {
         let album = storage.createAlbum()
         XCTAssertEqual(album.id, "")
-        XCTAssertEqual(album.identifier, "Unknown artist")
-        XCTAssertEqual(album.name, "Unknown artist")
+        XCTAssertEqual(album.identifier, "Unknown Album")
+        XCTAssertEqual(album.name, "Unknown Album")
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.artist, nil)
         XCTAssertEqual(album.syncInfo, nil)

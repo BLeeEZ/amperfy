@@ -8,6 +8,11 @@ enum SyncState: Int {
     case Done
 }
 
+enum SyncType: Int {
+    case newEntries = 0
+    case versionResync = 1
+}
+
 public class SyncWave: NSObject {
     
     let managedObject: SyncWaveMO
@@ -29,13 +34,22 @@ public class SyncWave: NSObject {
             managedObject.syncState = Int16(newValue.rawValue)
         }
     }
-    var syncIndexToContinue: String {
+    var syncType: SyncType {
         get {
-            return managedObject.syncIndexToContinue
+            return SyncType(rawValue: Int(managedObject.syncType)) ?? .newEntries
         }
         set {
-            managedObject.syncIndexToContinue = newValue
+            syncIndexToContinue = ""
+            managedObject.syncType = Int16(newValue.rawValue)
         }
+    }
+    var syncIndexToContinue: String {
+        get { return managedObject.syncIndexToContinue }
+        set { managedObject.syncIndexToContinue = newValue }
+    }
+    var version: LibrarySyncVersion {
+        get { return LibrarySyncVersion(rawValue: Int(managedObject.version)) ?? .defaultValue }
+        set { managedObject.version = Int16(newValue.rawValue) }
     }
     var isInitialWave: Bool {
         return managedObject.id == 0

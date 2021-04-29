@@ -11,14 +11,18 @@ public class AbstractLibraryEntity: NSObject, Identifyable {
     
     var id: String {
         get { return managedObject.id }
-        set { managedObject.id = newValue }
+        set {
+            if managedObject.id != newValue { managedObject.id = newValue }
+        }
     }
     var artwork: Artwork? {
         get {
             guard let artworkMO = managedObject.artwork else { return nil }
             return Artwork(managedObject: artworkMO)
         }
-        set { managedObject.artwork = newValue?.managedObject }
+        set {
+            if managedObject.artwork != newValue?.managedObject { managedObject.artwork = newValue?.managedObject }
+        }
     }
     var image: UIImage {
         guard let img = artwork?.image else {

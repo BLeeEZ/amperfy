@@ -21,6 +21,7 @@ class SsSongParserDelegate: GenericXmlLibParser {
         
         if elementName == "song" {
             guard let songId = attributeDict["id"] else { return }
+            var isSongCreated = false
             
             if let fetchedSong = libraryStorage.getSong(id: songId)  {
                 songBuffer = fetchedSong
@@ -28,7 +29,10 @@ class SsSongParserDelegate: GenericXmlLibParser {
                 songBuffer = libraryStorage.createSong()
                 songBuffer?.id = songId
                 songBuffer?.syncInfo = syncWave
-                
+                isSongCreated = true
+            }
+            
+            if isSongCreated || isLibraryVersionResync {
                 if let attributeTitle = attributeDict["title"] {
                     songBuffer?.title = attributeTitle
                 }
@@ -81,6 +85,7 @@ class SsSongParserDelegate: GenericXmlLibParser {
                     let genre = libraryStorage.createGenre()
                     genre.name = genreName
                     genre.syncInfo = syncWave
+                    os_log("Genre <%s> has been created", log: log, type: .error, genreName)
                     songBuffer?.genre = genre
                 }
             }

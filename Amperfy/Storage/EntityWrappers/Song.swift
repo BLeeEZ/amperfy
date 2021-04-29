@@ -21,69 +21,95 @@ public class Song: AbstractLibraryEntity {
      }
      var title: String {
          get { return managedObject.title ?? "Unknown Title" }
-         set { managedObject.title = newValue }
+         set {
+            if managedObject.title != newValue { managedObject.title = newValue }
+         }
      }
      var track: Int {
          get { return Int(managedObject.track) }
-         set { managedObject.track = Int16(newValue) }
+         set {
+            if managedObject.track != Int16(newValue) { managedObject.track = Int16(newValue) }
+         }
      }
      var year: Int {
         get { return Int(managedObject.year) }
-        set { managedObject.year = Int16(newValue) }
+        set {
+            if managedObject.year != Int16(newValue) { managedObject.year = Int16(newValue) }
+        }
      }
      var duration: Int {
         get { return Int(managedObject.duration) }
-        set { managedObject.duration = Int16(newValue) }
+        set {
+            if managedObject.duration != Int16(newValue) { managedObject.duration = Int16(newValue) }
+        }
      }
      var size: Int {
         get { return Int(managedObject.size) }
-        set { managedObject.size = Int32(newValue) }
+        set {
+            if managedObject.size != Int32(newValue) { managedObject.size = Int32(newValue) }
+        }
      }
      var bitrate: Int { // byte per second
         get { return Int(managedObject.bitrate) }
-        set { managedObject.bitrate = Int32(newValue) }
+        set {
+            if managedObject.bitrate != Int32(newValue) { managedObject.bitrate = Int32(newValue) }
+        }
      }
      var contentType: String? {
         get { return managedObject.contentType }
-        set { managedObject.contentType = newValue }
+        set {
+            if managedObject.contentType != newValue { managedObject.contentType = newValue }
+        }
      }
      var disk: String? {
         get { return managedObject.disk }
-        set { managedObject.disk = newValue }
+        set {
+            if managedObject.disk != newValue { managedObject.disk = newValue }
+        }
      }
      var url: String? {
          get { return managedObject.url }
-         set { managedObject.url = newValue }
+         set {
+            if managedObject.url != newValue { managedObject.url = newValue }
+         }
      }
      var album: Album? {
          get {
              guard let albumMO = managedObject.album else { return nil }
              return Album(managedObject: albumMO)
          }
-         set { managedObject.album = newValue?.managedObject }
+         set {
+            if managedObject.album != newValue?.managedObject { managedObject.album = newValue?.managedObject }
+         }
      }
      var artist: Artist? {
          get {
              guard let artistMO = managedObject.artist else { return nil }
              return Artist(managedObject: artistMO)
          }
-         set { managedObject.artist = newValue?.managedObject }
+         set {
+            if managedObject.artist != newValue?.managedObject { managedObject.artist = newValue?.managedObject }
+         }
      }
      var genre: Genre? {
          get {
              guard let genreMO = managedObject.genre else { return nil }
              return Genre(managedObject: genreMO) }
-         set { managedObject.genre = newValue?.managedObject }
+         set {
+            if managedObject.genre != newValue?.managedObject { managedObject.genre = newValue?.managedObject }
+         }
      }
      var syncInfo: SyncWave? {
          get {
              guard let syncInfoMO = managedObject.syncInfo else { return nil }
              return SyncWave(managedObject: syncInfoMO) }
-         set { managedObject.syncInfo = newValue?.managedObject }
+         set {
+            if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
+         }
      }
     
     var displayString: String {
-        return "\(managedObject.artist?.name ?? "Unknown artist") - \(title)"
+        return "\(managedObject.artist?.name ?? "Unknown Artist") - \(title)"
     }
     
     var detailInfo: String {

@@ -86,7 +86,7 @@ class SongParserDelegate: GenericXmlLibParser {
             songBuffer?.disk = buffer
         case "genre":
             if let genreId = genreIdToCreate {
-                os_log("Genre <%s> with id %s has been created", log: log, type: .error, genreId, buffer)
+                os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
                 let genre = libraryStorage.createGenre()
                 genre.id = genreId
                 genre.name = buffer

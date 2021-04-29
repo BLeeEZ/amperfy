@@ -153,6 +153,8 @@
 		50C16C2821E8680A00F086F0 /* CommonScreenOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */; };
 		50C16C3221EA77C700F086F0 /* AmpacheArtworkSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C3121EA77C700F086F0 /* AmpacheArtworkSyncer.swift */; };
 		50C16C3421EB454100F086F0 /* BackgroundSyncerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C3321EB454100F086F0 /* BackgroundSyncerManager.swift */; };
+		50C4FCBF26393F01009B967B /* AmpacheLibraryVersionBackgroundResyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C4FCBE26393F01009B967B /* AmpacheLibraryVersionBackgroundResyncer.swift */; };
+		50C4FCC52639581B009B967B /* SubsonicLibraryVersionBackgroundResyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C4FCC42639581B009B967B /* SubsonicLibraryVersionBackgroundResyncer.swift */; };
 		50CA8E972601E06500C90791 /* DownloadSlotCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */; };
 		50D92CCB25E3ED700017E91D /* MappingModelV4toV5.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 50D92CCA25E3ED700017E91D /* MappingModelV4toV5.xcmappingmodel */; };
 		50D92CCF25E3FE560017E91D /* MigrationPolicyV4toV5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D92CCE25E3FE560017E91D /* MigrationPolicyV4toV5.swift */; };
@@ -381,6 +383,8 @@
 		50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonScreenOperations.swift; sourceTree = "<group>"; };
 		50C16C3121EA77C700F086F0 /* AmpacheArtworkSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheArtworkSyncer.swift; sourceTree = "<group>"; };
 		50C16C3321EB454100F086F0 /* BackgroundSyncerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSyncerManager.swift; sourceTree = "<group>"; };
+		50C4FCBE26393F01009B967B /* AmpacheLibraryVersionBackgroundResyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheLibraryVersionBackgroundResyncer.swift; sourceTree = "<group>"; };
+		50C4FCC42639581B009B967B /* SubsonicLibraryVersionBackgroundResyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicLibraryVersionBackgroundResyncer.swift; sourceTree = "<group>"; };
 		50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSlotCounter.swift; sourceTree = "<group>"; };
 		50D92CCA25E3ED700017E91D /* MappingModelV4toV5.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = MappingModelV4toV5.xcmappingmodel; sourceTree = "<group>"; };
 		50D92CCE25E3FE560017E91D /* MigrationPolicyV4toV5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationPolicyV4toV5.swift; sourceTree = "<group>"; };
@@ -604,6 +608,7 @@
 				5086F87E22399D1900546F5A /* SubsonicServerApi.swift */,
 				5086F88022399F3700546F5A /* SubsonicLibrarySyncer.swift */,
 				502C0042224C091800DA0D1E /* SubsonicLibraryBackgroundSyncer.swift */,
+				50C4FCC42639581B009B967B /* SubsonicLibraryVersionBackgroundResyncer.swift */,
 				502C0044224C0B1400DA0D1E /* SubsonicArtworkBackgroundSyncer.swift */,
 				5086F884223A1E4600546F5A /* PingParserDelegate.swift */,
 				50973ADC2636E4C4005497CA /* SsGenreParserDelegate.swift */,
@@ -710,6 +715,7 @@
 				5083861B21C828E200C4BB32 /* AmpacheXmlServerApi.swift */,
 				50BA930121D1019B00E5901D /* AmpacheLibrarySyncer.swift */,
 				502C0040224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift */,
+				50C4FCBE26393F01009B967B /* AmpacheLibraryVersionBackgroundResyncer.swift */,
 				50C16C3121EA77C700F086F0 /* AmpacheArtworkSyncer.swift */,
 				50BA930721D75C5600E5901D /* AuthentificationHandshake.swift */,
 				5083861921C827E600C4BB32 /* AuthParserDelegate.swift */,
@@ -1101,6 +1107,7 @@
 				50BA930021CFDEBD00E5901D /* LibraryVC.swift in Sources */,
 				50BA92FA21CC37F800E5901D /* SongVC.swift in Sources */,
 				50F81EE623BF6B1E00EAAC3E /* PlayerMO+CoreDataClass.swift in Sources */,
+				50C4FCBF26393F01009B967B /* AmpacheLibraryVersionBackgroundResyncer.swift in Sources */,
 				500B7D4921EDD6250083ED6F /* ViewBuilder.swift in Sources */,
 				50120A2126280C9200B037B1 /* FetchedResultsControllers.swift in Sources */,
 				50F81EE323BF6B1E00EAAC3E /* SongFileMO+CoreDataProperties.swift in Sources */,
@@ -1114,6 +1121,7 @@
 				508FDE3621F1E130005A0724 /* NewPlaylistTableHeader.swift in Sources */,
 				50A7388322451ED200D3F2D4 /* SsPlaylistParserDelegate.swift in Sources */,
 				507361CC2632AB91005F151D /* Genre.swift in Sources */,
+				50C4FCC52639581B009B967B /* SubsonicLibraryVersionBackgroundResyncer.swift in Sources */,
 				50F81EEE23BF6B1E00EAAC3E /* SongMO+CoreDataClass.swift in Sources */,
 				5077F955222C58A10099CA91 /* GenericXmlParser.swift in Sources */,
 				5086F885223A1E4600546F5A /* PingParserDelegate.swift in Sources */,

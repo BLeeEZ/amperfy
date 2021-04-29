@@ -28,13 +28,19 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
     override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
         return singleFetchController?.sectionIndexTitles
     }
-    
+
 }
 
 class BasicTableViewController: UITableViewController {
     
     var appDelegate: AppDelegate!
     let searchController = UISearchController(searchResultsController: nil)
+    
+    private static let changeCountToPerformeDataReload = 30
+    var sectionChanges = false
+    var rowsToInsert = [IndexPath]()
+    var rowsToDelete = [IndexPath]()
+    var rowsToUpdate = [IndexPath]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,43 +77,56 @@ class BasicTableViewController: UITableViewController {
 extension BasicTableViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView.beginUpdates()
+        sectionChanges = false
+        rowsToInsert = [IndexPath]()
+        rowsToDelete = [IndexPath]()
+        rowsToUpdate = [IndexPath]()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView.endUpdates()
+        let changeCount = rowsToInsert.count +
+            rowsToDelete.count +
+            rowsToUpdate.count
+        
+        if sectionChanges || (changeCount > Self.changeCountToPerformeDataReload) {
+            tableView.reloadData()
+        } else {
+            tableView.beginUpdates()
+            if !rowsToInsert.isEmpty {
+                tableView.insertRows(at: rowsToInsert, with: .bottom)
+            }
+            if !rowsToDelete.isEmpty {
+                tableView.deleteRows(at: rowsToDelete, with: .left)
+            }
+            if !rowsToUpdate.isEmpty {
+                tableView.reloadRows(at: rowsToUpdate, with: .none)
+            }
+            tableView.endUpdates()
+        }
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .insert:
-            tableView.insertRows(at: [newIndexPath!], with: .bottom)
+            rowsToInsert.append(newIndexPath!)
         case .delete:
-            tableView.deleteRows(at: [indexPath!], with: .left)
+            rowsToDelete.append(indexPath!)
         case .move:
-            tableView.deleteRows(at: [indexPath!], with: .top)
-            tableView.insertRows(at: [newIndexPath!], with: .bottom)
+            if indexPath! != newIndexPath! {
+                rowsToInsert.append(newIndexPath!)
+                rowsToDelete.append(indexPath!)
+            } else {
+                rowsToUpdate.append(indexPath!)
+            }
         case .update:
-            tableView.reloadRows(at: [indexPath!], with: .none)
+            rowsToUpdate.append(indexPath!)
         @unknown default:
             break
         }
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        switch type {
-        case .insert:
-            tableView.insertSections([sectionIndex], with: .bottom)
-        case .delete:
-            tableView.deleteSections([sectionIndex], with: .left)
-        case .move:
-            tableView.deleteSections([sectionIndex], with: .top)
-            tableView.insertSections([sectionIndex], with: .bottom)
-        case .update:
-            tableView.reloadSections([sectionIndex], with: .none)
-        @unknown default:
-            break
-        }
+        sectionChanges = true
     }
     
 }

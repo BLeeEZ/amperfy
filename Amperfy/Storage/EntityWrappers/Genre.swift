@@ -13,7 +13,9 @@ public class Genre: AbstractLibraryEntity, SongContainable {
     
     var name: String {
         get { return managedObject.name ?? "Unknown Genre" }
-        set { managedObject.name = newValue }
+        set {
+            if managedObject.name != newValue { managedObject.name = newValue }
+        }
     }
     override var identifier: String {
         return name
@@ -43,7 +45,9 @@ public class Genre: AbstractLibraryEntity, SongContainable {
         get {
             guard let syncInfoMO = managedObject.syncInfo else { return nil }
             return SyncWave(managedObject: syncInfoMO) }
-        set { managedObject.syncInfo = newValue?.managedObject }
+        set {
+            if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
+        }
     }
 
 }
