@@ -6,6 +6,7 @@ protocol ParsedObjectNotifiable {
 }
 
 protocol SyncCallbacks: ParsedObjectNotifiable {
+    func notifyGenreSyncStarted()
     func notifyArtistSyncStarted()
     func notifyAlbumsSyncStarted()
     func notifySongsSyncStarted()

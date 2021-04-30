@@ -60,6 +60,15 @@ extension SyncVC: SyncCallbacks {
         }
     }
     
+    func notifyGenreSyncStarted() {
+        DispatchQueue.main.async { [weak self] in
+            self?.progressInfo.text = "Syncing genres ..."
+            self?.libObjectsToParseCount = 1
+            self?.parsedObjectCount = 0
+            self?.updateSyncInfo()
+        }
+    }
+    
     func notifyArtistSyncStarted() {
         DispatchQueue.main.async { [weak self] in
             self?.progressInfo.text = "Syncing artists ..."

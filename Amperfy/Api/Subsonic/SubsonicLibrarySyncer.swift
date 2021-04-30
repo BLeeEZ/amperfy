@@ -24,6 +24,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         syncWave.setMetaData(fromLibraryChangeDates: LibraryChangeDates())
         currentLibraryStorage.saveContext()
         
+        statusNotifyier?.notifyGenreSyncStarted()
         let genreParser = SsGenreParserDelegate(libraryStorage: currentLibraryStorage, syncWave: syncWave, parseNotifier: statusNotifyier)
         subsonicServerApi.requestGenres(parserDelegate: genreParser)
         currentLibraryStorage.saveContext()

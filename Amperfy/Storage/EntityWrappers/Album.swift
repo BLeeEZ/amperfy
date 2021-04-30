@@ -24,7 +24,8 @@ public class Album: AbstractLibraryEntity, SongContainable {
     var year: Int {
         get { return Int(managedObject.year) }
         set {
-            if managedObject.year != Int16(newValue) { managedObject.year = Int16(newValue) }
+            guard newValue > Int16.min, newValue < Int16.max, managedObject.year != Int16(newValue) else { return }
+            managedObject.year = Int16(newValue)
         }
     }
     var artist: Artist? {

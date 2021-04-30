@@ -3,111 +3,116 @@ import CoreData
 import UIKit
 
 public class Song: AbstractLibraryEntity {
-     /*
-     Avoid direct access to the SongFile.
-     Direct access will result in loading the file into memory and
-     it sticks there till the song is removed from memory.
-     This will result in memory overflow for an array of songs.
-     */
-     let managedObject: SongMO
+    /*
+    Avoid direct access to the SongFile.
+    Direct access will result in loading the file into memory and
+    it sticks there till the song is removed from memory.
+    This will result in memory overflow for an array of songs.
+    */
+    let managedObject: SongMO
 
-     init(managedObject: SongMO) {
-         self.managedObject = managedObject
-         super.init(managedObject: managedObject)
-     }
+    init(managedObject: SongMO) {
+        self.managedObject = managedObject
+        super.init(managedObject: managedObject)
+    }
 
-     var objectID: NSManagedObjectID {
-         return managedObject.objectID
-     }
-     var title: String {
-         get { return managedObject.title ?? "Unknown Title" }
-         set {
+    var objectID: NSManagedObjectID {
+        return managedObject.objectID
+    }
+    var title: String {
+        get { return managedObject.title ?? "Unknown Title" }
+        set {
             if managedObject.title != newValue { managedObject.title = newValue }
-         }
-     }
-     var track: Int {
-         get { return Int(managedObject.track) }
-         set {
-            if managedObject.track != Int16(newValue) { managedObject.track = Int16(newValue) }
-         }
-     }
-     var year: Int {
+        }
+    }
+    var track: Int {
+        get { return Int(managedObject.track) }
+        set {
+            guard newValue > Int16.min, newValue < Int16.max, managedObject.track != Int16(newValue) else { return }
+            managedObject.track = Int16(newValue)
+        }
+    }
+    var year: Int {
         get { return Int(managedObject.year) }
         set {
-            if managedObject.year != Int16(newValue) { managedObject.year = Int16(newValue) }
+            guard newValue > Int16.min, newValue < Int16.max, managedObject.year != Int16(newValue) else { return }
+            managedObject.year = Int16(newValue)
         }
-     }
-     var duration: Int {
+    }
+    var duration: Int {
         get { return Int(managedObject.duration) }
         set {
-            if managedObject.duration != Int16(newValue) { managedObject.duration = Int16(newValue) }
+            guard newValue > Int16.min, newValue < Int16.max, managedObject.duration != Int16(newValue) else { return }
+            managedObject.duration = Int16(newValue)
         }
-     }
-     var size: Int {
+    }
+    var size: Int {
         get { return Int(managedObject.size) }
         set {
-            if managedObject.size != Int32(newValue) { managedObject.size = Int32(newValue) }
+            guard newValue > Int32.min, newValue < Int32.max, managedObject.size != Int32(newValue) else { return }
+            managedObject.size = Int32(newValue)
         }
-     }
-     var bitrate: Int { // byte per second
+    }
+    var bitrate: Int { // byte per second
         get { return Int(managedObject.bitrate) }
         set {
-            if managedObject.bitrate != Int32(newValue) { managedObject.bitrate = Int32(newValue) }
+            guard newValue > Int32.min, newValue < Int32.max, managedObject.bitrate != Int32(newValue) else { return }
+            managedObject.bitrate = Int32(newValue)
         }
-     }
-     var contentType: String? {
+    }
+    var contentType: String? {
         get { return managedObject.contentType }
         set {
             if managedObject.contentType != newValue { managedObject.contentType = newValue }
         }
-     }
-     var disk: String? {
+    }
+    var disk: String? {
         get { return managedObject.disk }
         set {
             if managedObject.disk != newValue { managedObject.disk = newValue }
         }
-     }
-     var url: String? {
-         get { return managedObject.url }
-         set {
+    }
+    var url: String? {
+        get { return managedObject.url }
+        set {
             if managedObject.url != newValue { managedObject.url = newValue }
-         }
-     }
-     var album: Album? {
-         get {
-             guard let albumMO = managedObject.album else { return nil }
-             return Album(managedObject: albumMO)
-         }
-         set {
+        }
+    }
+    var album: Album? {
+        get {
+            guard let albumMO = managedObject.album else { return nil }
+            return Album(managedObject: albumMO)
+        }
+        set {
             if managedObject.album != newValue?.managedObject { managedObject.album = newValue?.managedObject }
-         }
-     }
-     var artist: Artist? {
-         get {
-             guard let artistMO = managedObject.artist else { return nil }
-             return Artist(managedObject: artistMO)
-         }
-         set {
+        }
+    }
+    var artist: Artist? {
+        get {
+            guard let artistMO = managedObject.artist else { return nil }
+            return Artist(managedObject: artistMO)
+        }
+        set {
             if managedObject.artist != newValue?.managedObject { managedObject.artist = newValue?.managedObject }
-         }
-     }
-     var genre: Genre? {
-         get {
-             guard let genreMO = managedObject.genre else { return nil }
-             return Genre(managedObject: genreMO) }
-         set {
+        }
+    }
+    var genre: Genre? {
+        get {
+            guard let genreMO = managedObject.genre else { return nil }
+            return Genre(managedObject: genreMO) }
+        set {
             if managedObject.genre != newValue?.managedObject { managedObject.genre = newValue?.managedObject }
-         }
-     }
-     var syncInfo: SyncWave? {
-         get {
-             guard let syncInfoMO = managedObject.syncInfo else { return nil }
-             return SyncWave(managedObject: syncInfoMO) }
-         set {
+        }
+    }
+    var syncInfo: SyncWave? {
+        get {
+            guard let syncInfoMO = managedObject.syncInfo else { return nil }
+            return SyncWave(managedObject: syncInfoMO) }
+        set {
             if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
-         }
-     }
-    
+        }
+    }
+
     var displayString: String {
         return "\(managedObject.artist?.name ?? "Unknown Artist") - \(title)"
     }
