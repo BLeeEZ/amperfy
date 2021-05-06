@@ -2,33 +2,24 @@ import Foundation
 import UIKit
 import CoreData
 
-class PlaylistSongsParserDelegate: GenericXmlParser {
+class PlaylistSongsParserDelegate: SongParserDelegate {
 
     let playlist: Playlist
-    let libraryStorage: LibraryStorage
-    var playlistItemBuffer: PlaylistItem?
+    var items: [PlaylistItem]
 
-    init(playlist: Playlist, libraryStorage: LibraryStorage) {
+    init(playlist: Playlist, libraryStorage: LibraryStorage, syncWave: SyncWave) {
         self.playlist = playlist
-        self.libraryStorage = libraryStorage
-        super.init()
+        self.items = playlist.items
+        super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: nil)
     }
     
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        buffer = ""
+    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
+        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
+    }
+    
+    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
         
-        switch(elementName) {
-        case "song":
-            if let songId = attributeDict["id"], let fetchedSong = libraryStorage.getSong(id: songId) {
-                playlistItemBuffer = libraryStorage.createPlaylistItem()
-                playlistItemBuffer?.song = fetchedSong
-            }
-        default:
-            break
-        }
-    }
-    
-    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "playlisttrack":
             var order = 0
@@ -36,18 +27,24 @@ class PlaylistSongsParserDelegate: GenericXmlParser {
                 // Ampache playlist order is one-based -> Amperfy playlist order is zero-based
                 order = playlistItemOrder - 1
             }
-            playlistItemBuffer?.order = order
-        case "song":
-            if let item = playlistItemBuffer {
-                playlist.add(item: item)
+            var item: PlaylistItem?
+            if order < items.count {
+                item = items[order]
+            } else {
+                item = libraryStorage.createPlaylistItem()
+                item?.order = order
+                playlist.add(item: item!)
             }
-            playlistItemBuffer = nil
+            item?.song = songBuffer
+        case "root":
+            if items.count > parsedCount {
+                for i in Array(parsedCount...items.count-1) {
+                    libraryStorage.deletePlaylistItem(item: items[i])
+                }
+            }
         default:
             break
         }
-        
-        buffer = ""
     }
-
 
 }

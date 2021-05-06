@@ -3,7 +3,6 @@ import CoreData
 
 class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
-    var songToAdd: Song?
     var songsToAdd: [Song]?
     
     private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
@@ -26,6 +25,11 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         fetchedResultsController.fetch()
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundLibrary = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+            syncer.syncDownPlaylistsWithoutSongs(libraryStorage: backgroundLibrary)
+        }
     }
     
     @IBAction func cancelButtonPressed(_ sender: UIBarButtonItem) {
@@ -46,11 +50,17 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
-        if let song = songToAdd {
-            playlist.append(song: song)
-        }
         if let songs = songsToAdd {
             playlist.append(songs: songs)
+            appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+                let backgroundStorage = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                let playlistAsync = playlist.getManagedObject(in: context, storage: backgroundStorage)
+                let songsAsync = songs.compactMap {
+                    Song(managedObject: context.object(with: $0.objectID) as! SongMO)
+                }
+                syncer.syncUpload(playlistToAddSongs: playlistAsync, songs: songsAsync, libraryStorage: backgroundStorage)
+            }
         }
         dismiss()
     }

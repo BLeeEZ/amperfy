@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20D91" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20E232" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="AbstractLibraryEntity" representedClassName="AbstractLibraryEntityMO" isAbstract="YES" elementID="AbstractLibraryElementMO" syncable="YES">
         <attribute name="id" attributeType="String" defaultValueString=""/>
         <relationship name="artwork" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Artwork" inverseName="owners" inverseEntity="Artwork"/>
     </entity>
     <entity name="Album" representedClassName="AlbumMO" parentEntity="AbstractLibraryEntity" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="songCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="year" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="albums" inverseEntity="Artist"/>
         <relationship name="genre" optional="YES" maxCount="1" deletionRule="Nullify" ordered="YES" destinationEntity="Genre" inverseName="albums" inverseEntity="Genre"/>
@@ -13,6 +14,7 @@
         <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWave" inverseName="albums" inverseEntity="SyncWave"/>
     </entity>
     <entity name="Artist" representedClassName="ArtistMO" parentEntity="AbstractLibraryEntity" syncable="YES">
+        <attribute name="albumCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="albums" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Album" inverseName="artist" inverseEntity="Album"/>
         <relationship name="genre" optional="YES" maxCount="1" deletionRule="Nullify" ordered="YES" destinationEntity="Genre" inverseName="artists" inverseEntity="Genre"/>
@@ -42,6 +44,7 @@
     <entity name="Playlist" representedClassName="PlaylistMO" syncable="YES">
         <attribute name="id" attributeType="String" defaultValueString=""/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="songCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistItem" inverseName="playlist" inverseEntity="PlaylistItem" elementID="entries"/>
         <relationship name="playersNormalPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="normalPlaylist" inverseEntity="Player" elementID="currentlyPlaying"/>
         <relationship name="playersShuffledPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="shuffledPlaylist" inverseEntity="Player"/>
@@ -88,12 +91,12 @@
     </entity>
     <elements>
         <element name="AbstractLibraryEntity" positionX="-30561.8125" positionY="-8377.35546875" width="128" height="59"/>
-        <element name="Album" positionX="-30672.00390625" positionY="-8275.76953125" width="128" height="119"/>
-        <element name="Artist" positionX="-30559.515625" positionY="-8017.5703125" width="128" height="104"/>
+        <element name="Album" positionX="-30672.00390625" positionY="-8275.76953125" width="128" height="134"/>
+        <element name="Artist" positionX="-30559.515625" positionY="-8017.5703125" width="128" height="119"/>
         <element name="Artwork" positionX="-30271.51171875" positionY="-8396.6953125" width="128" height="103"/>
         <element name="Genre" positionX="-30465" positionY="-8235" width="128" height="104"/>
         <element name="Player" positionX="-29890.359375" positionY="-8230.625" width="128" height="104"/>
-        <element name="Playlist" positionX="-30080.7734375" positionY="-8216.7734375" width="128" height="104"/>
+        <element name="Playlist" positionX="-30080.7734375" positionY="-8216.7734375" width="128" height="119"/>
         <element name="PlaylistItem" positionX="-30254.0078125" positionY="-8216.28125" width="128" height="74"/>
         <element name="Song" positionX="-30463.86328125" positionY="-8276.4765625" width="128" height="254"/>
         <element name="SongFile" positionX="-30352.42578125" positionY="-8090.62109375" width="128" height="59"/>

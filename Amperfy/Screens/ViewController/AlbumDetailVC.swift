@@ -1,13 +1,17 @@
 import UIKit
 
-class AlbumDetailVC: UITableViewController {
+class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
 
-    var appDelegate: AppDelegate!
-    var album: Album?
+    var album: Album!
+    private var fetchedResultsController: AlbumSongsFetchedResultsController!
+    private var detailOperationsView: AlbumDetailTableHeader?
 
     override func viewDidLoad() {
         super.viewDidLoad() 
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        fetchedResultsController = AlbumSongsFetchedResultsController(forAlbum: album, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        singleFetchedResultsController = fetchedResultsController
+        
+        configureSearchController(placeholder: "Search in \"Album\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
         
@@ -15,6 +19,7 @@ class AlbumDetailVC: UITableViewController {
         if let albumDetailTableHeaderView = ViewBuilder<AlbumDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: AlbumDetailTableHeader.frameHeight)) {
             albumDetailTableHeaderView.prepare(toWorkOnAlbum: album, rootView: self)
             tableView.tableHeaderView?.addSubview(albumDetailTableHeaderView)
+            detailOperationsView = albumDetailTableHeaderView
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: AlbumDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(songContainer: album, with: appDelegate.player)
@@ -23,25 +28,27 @@ class AlbumDetailVC: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.tableView.reloadData()
-    }
-
-    // MARK: - Table view data source
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        fetchedResultsController.fetch()
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let libraryStorage = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+            syncer.sync(album: self.album, libraryStorage: libraryStorage)
+            DispatchQueue.main.async {
+                self.detailOperationsView?.refresh()
+            }
+        }
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return album?.songs.count ?? 0
-    }
-
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
-        if let song = album?.songs[indexPath.row] {
-            cell.display(song: song, rootView: self)
-        }
+        let song = fetchedResultsController.getWrappedEntity(at: indexPath)
+        cell.display(song: song, rootView: self)
         return cell
+    }
+    
+    override func updateSearchResults(for searchController: UISearchController) {
+        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "", onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1 )
+        tableView.reloadData()
     }
     
 }

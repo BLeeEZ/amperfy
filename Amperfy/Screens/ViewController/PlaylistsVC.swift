@@ -23,6 +23,11 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         fetchedResultsController.fetch()
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundLibrary = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+            syncer.syncDownPlaylistsWithoutSongs(libraryStorage: backgroundLibrary)
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -41,6 +46,12 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
+            appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+                let backgroundStorage = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                let playlistAsync = playlist.getManagedObject(in: context, storage: backgroundStorage)
+                syncer.syncUpload(playlistToDelete: playlistAsync)
+            }
             appDelegate.persistentLibraryStorage.deletePlaylist(playlist)
             appDelegate.persistentLibraryStorage.saveContext()
         }
@@ -58,16 +69,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
             let backgroundLibrary = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            
-            let oldSortedPlaylists = backgroundLibrary.getPlaylists().sortAlphabeticallyAscending()
             syncer.syncDownPlaylistsWithoutSongs(libraryStorage: backgroundLibrary)
-            let newSortedPlaylists = backgroundLibrary.getPlaylists().sortAlphabeticallyAscending()
-            let newAddedPlaylists = newSortedPlaylists.filter{ !oldSortedPlaylists.contains($0) }
-
-            for addedPlaylist in newAddedPlaylists {
-                syncer.syncDown(playlist: addedPlaylist, libraryStorage: backgroundLibrary, statusNotifyier: nil)
-            }
-            
             DispatchQueue.main.async {
                 self.refreshControl?.endRefreshing()
             }

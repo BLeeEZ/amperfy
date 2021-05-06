@@ -146,10 +146,11 @@ public class Song: AbstractLibraryEntity {
     }
 
     override var image: UIImage {
-        if let curAlbum = album, !curAlbum.isOrphaned {
-            if super.image != Artwork.defaultImage {
-                return super.image
-            }
+        if let curAlbum = album, !curAlbum.isOrphaned, curAlbum.image != Artwork.defaultImage {
+            return curAlbum.image
+        }
+        if super.image != Artwork.defaultImage {
+            return super.image
         }
         if let artistArt = artist?.artwork?.image {
             return artistArt

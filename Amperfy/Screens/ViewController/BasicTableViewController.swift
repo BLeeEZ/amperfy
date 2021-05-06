@@ -38,6 +38,7 @@ class BasicTableViewController: UITableViewController {
     
     private static let changeCountToPerformeDataReload = 30
     var sectionChanges = false
+    var noAnimationAtNextDataChange = false
     var rowsToInsert = [IndexPath]()
     var rowsToDelete = [IndexPath]()
     var rowsToUpdate = [IndexPath]()
@@ -88,8 +89,9 @@ extension BasicTableViewController: NSFetchedResultsControllerDelegate {
             rowsToDelete.count +
             rowsToUpdate.count
         
-        if sectionChanges || (changeCount > Self.changeCountToPerformeDataReload) {
+        if noAnimationAtNextDataChange || sectionChanges || (changeCount > Self.changeCountToPerformeDataReload) {
             tableView.reloadData()
+            noAnimationAtNextDataChange = false
         } else {
             tableView.beginUpdates()
             if !rowsToInsert.isEmpty {
@@ -120,6 +122,26 @@ extension BasicTableViewController: NSFetchedResultsControllerDelegate {
             }
         case .update:
             rowsToUpdate.append(indexPath!)
+        @unknown default:
+            break
+        }
+    }
+    
+    func applyChangesOfMultiRowType(determinedSection section: Int, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        switch type {
+        case .insert:
+            rowsToInsert.append(IndexPath(row: newIndexPath!.row, section: section))
+        case .delete:
+            rowsToDelete.append(IndexPath(row: indexPath!.row, section: section))
+        case .move:
+            if indexPath! != newIndexPath! {
+                rowsToInsert.append(IndexPath(row: newIndexPath!.row, section: section))
+                rowsToDelete.append(IndexPath(row: indexPath!.row, section: section))
+            } else {
+                rowsToUpdate.append(IndexPath(row: indexPath!.row, section: section))
+            }
+        case .update:
+            rowsToUpdate.append(IndexPath(row: indexPath!.row, section: section))
         @unknown default:
             break
         }

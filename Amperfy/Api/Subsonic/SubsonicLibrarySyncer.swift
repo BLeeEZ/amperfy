@@ -53,58 +53,33 @@ class SubsonicLibrarySyncer: LibrarySyncer {
             }
         }
         downloadSlotCounter.waitTillAllDownloadsFinished()
-
-        let albums = currentLibraryStorage.getAlbums()
-        songCount = albums.count
-        statusNotifyier?.notifySongsSyncStarted()
-        for album in albums {
-            downloadSlotCounter.waitForDownloadSlot()
-            persistentContainer.performBackgroundTask() { (context) in
-                let libraryStorage = LibraryStorage(context: context)
-                let albumMO = try! context.existingObject(with: album.managedObject.objectID) as! AlbumMO
-                let albumContext = Album(managedObject: albumMO)
-                let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
-                let syncWaveContext = SyncWave(managedObject: syncWaveMO)
-                let songDelegate = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
-                songDelegate.guessedArtist = albumContext.artist
-                songDelegate.guessedAlbum = albumContext
-                songDelegate.guessedGenre = albumContext.genre
-                self.subsonicServerApi.requestAlbum(parserDelegate: songDelegate, id: albumContext.id)
-                libraryStorage.saveContext()
-                statusNotifyier?.notifyParsedObject()
-                downloadSlotCounter.downloadFinished()
-            }
-        }
-        downloadSlotCounter.waitTillAllDownloadsFinished()
-
+        
         statusNotifyier?.notifyPlaylistSyncStarted()
         let playlistParser = SsPlaylistParserDelegate(libraryStorage: currentLibraryStorage)
         subsonicServerApi.requestPlaylists(parserDelegate: playlistParser)
         currentLibraryStorage.saveContext()
-        
-        let playlists = currentLibraryStorage.getPlaylists()
-        playlistCount = playlists.count
-        statusNotifyier?.notifyPlaylistSyncStarted()
-        for playlist in playlists {
-            downloadSlotCounter.waitForDownloadSlot()
-            persistentContainer.performBackgroundTask() { (context) in
-                let libraryStorage = LibraryStorage(context: context)
-                let playlistMO = try! context.existingObject(with: playlist.managedObject.objectID) as! PlaylistMO
-                let playlistContext = Playlist(storage: libraryStorage, managedObject: playlistMO)
-                playlistContext.removeAllSongs()
-                let parser = SsPlaylistSongsParserDelegate(playlist: playlistContext, libraryStorage: libraryStorage)
-                self.subsonicServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlistContext.id)
-                playlist.ensureConsistentItemOrder()
-                libraryStorage.saveContext()
-                statusNotifyier?.notifyParsedObject()
-                downloadSlotCounter.downloadFinished()
-            }
-        }
-        downloadSlotCounter.waitTillAllDownloadsFinished()
-        
+
         syncWave.syncState = .Done
         currentLibraryStorage.saveContext()
         statusNotifyier?.notifySyncFinished()
+    }
+    
+    func sync(artist: Artist, libraryStorage: LibraryStorage) {
+        guard let syncWave = libraryStorage.getLatestSyncWave() else { return }
+        let artistParser = SsArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestArtist(parserDelegate: artistParser, id: artist.id)
+        for album in artist.albums {
+            let songParser = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave)
+            subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+        }
+        libraryStorage.saveContext()
+    }
+    
+    func sync(album: Album, libraryStorage: LibraryStorage) {
+        guard let syncWave = libraryStorage.getLatestSyncWave() else { return }
+        let songParser = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave)
+        subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+        libraryStorage.saveContext()
     }
     
     func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage) {
@@ -113,74 +88,64 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         libraryStorage.saveContext()
     }
     
-    func syncDown(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks?) {
+    func syncDown(playlist: Playlist, libraryStorage: LibraryStorage) {
+        guard let syncWave = libraryStorage.getLatestSyncWave() else { return }
         os_log("Download playlist \"%s\" from server", log: log, type: .info, playlist.name)
-        guard playlist.id != "" else { statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist); return }
+        guard playlist.id != "" else { return }
         os_log("Sync songs of playlist \"%s\"", log: log, type: .info, playlist.name)
-        statusNotifyier?.notifyPlaylistWillCleared()
-        playlist.removeAllSongs()
-        let parser = SsPlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
+        let parser = SsPlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage, syncWave: syncWave)
         subsonicServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
         playlist.ensureConsistentItemOrder()
         libraryStorage.saveContext()
-        statusNotifyier?.notifyPlaylistSyncFinished(playlist: playlist)
     }
     
-    func syncUpload(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks?) {
-        os_log("Upload playlist \"%s\" to server", log: log, type: .info, playlist.name)
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], libraryStorage: LibraryStorage) {
+        guard let syncWave = libraryStorage.getLatestSyncWave() else { return }
+        os_log("Upload SongsAdded on playlist \"%s\"", log: log, type: .info, playlist.name)
         if playlist.id == "" {
-            createPlaylistRemote(playlist: playlist, libraryStorage: libraryStorage)
+            createPlaylistRemote(playlist: playlist, libraryStorage: libraryStorage, syncWave: syncWave)
         }
         guard playlist.id != "" else {
             os_log("Playlist id could not be obtained", log: log, type: .info)
             return
         }
-
-        os_log("Request playlist songs from remote for following clear request", log: log, type: .info)
-        let playlistForRemoteClear = libraryStorage.createPlaylist()
-        var parser = SsPlaylistSongsParserDelegate(playlist: playlistForRemoteClear, libraryStorage: libraryStorage)
-        subsonicServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
         
-        if !parser.playlistHasBeenDetected {
-            playlist.id = ""
-            createPlaylistRemote(playlist: playlist, libraryStorage: libraryStorage)
-            guard playlist.id != "" else {
-                os_log("Playlist id could not be obtained", log: log, type: .info)
-                return
-            }
-            parser = SsPlaylistSongsParserDelegate(playlist: playlistForRemoteClear, libraryStorage: libraryStorage)
-            subsonicServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
-        }
-        
-        guard parser.playlistHasBeenDetected else {
-            os_log("Playlist songs could not be obtained", log: log, type: .info)
-            return
-        }
-
-        os_log("Update remote playlist songs", log: log, type: .info)
-        var songIndicesToRemove = [Int]()
-        for item in playlistForRemoteClear.items {
-            songIndicesToRemove.append(item.order)
-        }
-
-        var songIdsToAdd = [String]()
-        for item in playlist.items {
-            if let songItem = item.song {
-                songIdsToAdd.append(songItem.id)
-            }
-        }
-
+        let songIdsToAdd = songs.compactMap{ $0.id }
         let updateResponseParser = PingParserDelegate()
-        subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: songIndicesToRemove, songIdsToAdd: songIdsToAdd)
-
-        libraryStorage.deletePlaylist(playlistForRemoteClear)
-        libraryStorage.saveContext()
-        statusNotifyier?.notifyPlaylistUploadFinished(success: true)
+        subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: [], songIdsToAdd: songIdsToAdd)
     }
     
-    private func createPlaylistRemote(playlist: Playlist, libraryStorage: LibraryStorage) {
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, libraryStorage: LibraryStorage) {
+        os_log("Upload SongDelete on playlist \"%s\"", log: log, type: .info, playlist.name)
+        let updateResponseParser = PingParserDelegate()
+        subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: [index], songIdsToAdd: [])
+    }
+    
+    func syncUpload(playlistToUpdateOrder playlist: Playlist, libraryStorage: LibraryStorage) {
+        os_log("Upload OrderChange on playlist \"%s\"", log: log, type: .info, playlist.name)
+        let songIndicesToRemove = Array(0...playlist.songCount-1)
+        let songIdsToAdd = playlist.songs.compactMap{ $0.id }
+        let updateResponseParser = PingParserDelegate()
+        subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: songIndicesToRemove, songIdsToAdd: songIdsToAdd)
+    }
+    
+    func syncUpload(playlistToDelete playlist: Playlist) {
+        os_log("Upload Delete playlist \"%s\"", log: log, type: .info, playlist.name)
+        let updateResponseParser = PingParserDelegate()
+        subsonicServerApi.requestPlaylistDelete(parserDelegate: updateResponseParser, playlist: playlist)
+    }
+    
+    func searchSongs(searchText: String, libraryStorage: LibraryStorage) {
+        guard let syncWave = libraryStorage.getLatestSyncWave(), searchText.count > 0 else { return }
+        os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
+        let parser = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave)
+        subsonicServerApi.requestSearchSongs(parserDelegate: parser, searchText: searchText)
+        libraryStorage.saveContext()
+    }
+    
+    private func createPlaylistRemote(playlist: Playlist, libraryStorage: LibraryStorage, syncWave: SyncWave) {
         os_log("Create playlist on server", log: log, type: .info)
-        let playlistParser = SsPlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage)
+        let playlistParser = SsPlaylistSongsParserDelegate(playlist: playlist, libraryStorage: libraryStorage, syncWave: syncWave)
         subsonicServerApi.requestPlaylistCreate(parserDelegate: playlistParser, playlist: playlist)
         // Old api version -> need to match the created playlist via name
         if playlist.id == "" {

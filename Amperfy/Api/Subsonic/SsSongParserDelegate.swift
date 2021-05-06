@@ -5,21 +5,15 @@ import os.log
 
 class SsSongParserDelegate: GenericXmlLibParser {
     
-    private var subsonicUrlCreator: SubsonicUrlCreator
-    private var songBuffer: Song?
+    var songBuffer: Song?
     var guessedArtist: Artist?
     var guessedAlbum: Album?
     var guessedGenre: Genre?
     
-    init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.subsonicUrlCreator = subsonicUrlCreator
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
-    }
-    
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         buffer = ""
         
-        if elementName == "song" {
+        if elementName == "song" || elementName == "entry" {
             guard let songId = attributeDict["id"] else { return }
             var isSongCreated = false
             
@@ -72,7 +66,6 @@ class SsSongParserDelegate: GenericXmlLibParser {
                     songBuffer?.album = guessedAlbum
                 } else if let album = libraryStorage.getAlbum(id: albumId) {
                     songBuffer?.album = album
-                    songBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: albumId)
                 }
             }
             
@@ -93,12 +86,9 @@ class SsSongParserDelegate: GenericXmlLibParser {
     }
     
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        switch(elementName) {
-        case "song":
+        if elementName == "song" || elementName == "entry" {
             parsedCount += 1
             songBuffer = nil
-        default:
-            break
         }
         
         buffer = ""

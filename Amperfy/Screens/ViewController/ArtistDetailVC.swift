@@ -1,20 +1,29 @@
 import UIKit
+import CoreData
 
-class ArtistDetailVC: UITableViewController {
+class ArtistDetailVC: BasicTableViewController {
 
-    var appDelegate: AppDelegate!
-    var artist: Artist?
+    var artist: Artist!
+    private var albumsFetchedResultsController: ArtistAlbumsItemsFetchedResultsController!
+    private var songsFetchedResultsController: ArtistSongsItemsFetchedResultsController!
+    private var detailOperationsView: ArtistDetailTableHeader?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        
+        albumsFetchedResultsController = ArtistAlbumsItemsFetchedResultsController(for: artist, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        albumsFetchedResultsController.delegate = self
+        songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(for: artist, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        songsFetchedResultsController.delegate = self
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
         
+        configureSearchController(placeholder: "Albums and Songs", scopeButtonTitles: ["All", "Cached"])
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ArtistDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
         if let artistDetailTableHeaderView = ViewBuilder<ArtistDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ArtistDetailTableHeader.frameHeight)) {
             artistDetailTableHeaderView.prepare(toWorkOnArtist: artist, rootView: self)
             tableView.tableHeaderView?.addSubview(artistDetailTableHeaderView)
+            detailOperationsView = artistDetailTableHeaderView
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: ArtistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(songContainer: artist, with: appDelegate.player)
@@ -23,7 +32,16 @@ class ArtistDetailVC: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.tableView.reloadData()
+        albumsFetchedResultsController.fetch()
+        songsFetchedResultsController.fetch()
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let libraryStorage = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+            syncer.sync(artist: self.artist, libraryStorage: libraryStorage)
+            DispatchQueue.main.async {
+                self.detailOperationsView?.refresh()
+            }
+        }
     }
 
     // MARK: - Table view data source
@@ -46,9 +64,9 @@ class ArtistDetailVC: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section+2 {
         case LibraryElement.Album.rawValue:
-            return artist?.albums.count ?? 0
+            return albumsFetchedResultsController.sections?[0].numberOfObjects ?? 0
         case LibraryElement.Song.rawValue:
-            return artist?.songs.count ?? 0
+            return songsFetchedResultsController.sections?[0].numberOfObjects ?? 0
         default:
             return 0
         }
@@ -58,15 +76,13 @@ class ArtistDetailVC: UITableViewController {
         switch indexPath.section+2 {
         case LibraryElement.Album.rawValue:
             let cell: AlbumTableCell = dequeueCell(for: tableView, at: indexPath)
-            if let album = artist?.albums[indexPath.row] {
-                cell.display(album: album)
-            }
+            let album = albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            cell.display(album: album)
             return cell
         case LibraryElement.Song.rawValue:
             let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
-            if let song = artist?.songs[indexPath.row] {
-                cell.display(song: song, rootView: self)
-            }
+            let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            cell.display(song: song, rootView: self)
             return cell
         default:
             return UITableViewCell()
@@ -76,9 +92,9 @@ class ArtistDetailVC: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         switch section+2 {
         case LibraryElement.Album.rawValue:
-            return artist?.albums.count != 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
+            return albumsFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
         case LibraryElement.Song.rawValue:
-            return artist?.songs.count != 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
+            return songsFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
         default:
             return 0.0
         }
@@ -98,9 +114,8 @@ class ArtistDetailVC: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.section+2 {
         case LibraryElement.Album.rawValue:
-            if let album = artist?.albums[indexPath.row] {
-                performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
-            }
+            let album = albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
         case LibraryElement.Song.rawValue: break
         default: break
         }
@@ -112,6 +127,38 @@ class ArtistDetailVC: UITableViewController {
             let album = sender as? Album
             vc.album = album
         }
+    }
+    
+    override func updateSearchResults(for searchController: UISearchController) {
+        guard let searchText = searchController.searchBar.text else { return }
+        if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
+            albumsFetchedResultsController.search(searchText: searchText)
+            songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
+        } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
+            albumsFetchedResultsController.clearResults()
+            songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
+        } else {
+            albumsFetchedResultsController.showAllResults()
+            songsFetchedResultsController.showAllResults()
+        }
+        tableView.reloadData()
+    }
+    
+    override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        var section: Int = 0
+        switch controller {
+        case albumsFetchedResultsController.fetchResultsController:
+            section = LibraryElement.Album.rawValue - 2
+        case songsFetchedResultsController.fetchResultsController:
+            section = LibraryElement.Song.rawValue - 2
+        default:
+            return
+        }
+        
+        super.applyChangesOfMultiRowType(determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
+    }
+    
+    override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
     }
     
 }

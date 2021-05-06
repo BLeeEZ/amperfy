@@ -14,21 +14,21 @@ protocol SyncCallbacks: ParsedObjectNotifiable {
     func notifySyncFinished()
 }
 
-protocol PlaylistSyncCallbacks {
-    func notifyPlaylistWillCleared()
-    func notifyPlaylistSyncFinished(playlist: Playlist)
-    func notifyPlaylistUploadFinished(success: Bool)
-}
-
 protocol LibrarySyncer {
     var artistCount: Int { get }
     var albumCount: Int { get }
     var songCount: Int { get }
     var playlistCount: Int { get }
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?)
+    func sync(artist: Artist, libraryStorage: LibraryStorage)
+    func sync(album: Album, libraryStorage: LibraryStorage)
     func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage)
-    func syncDown(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks?)
-    func syncUpload(playlist: Playlist, libraryStorage: LibraryStorage, statusNotifyier: PlaylistSyncCallbacks?)
+    func syncDown(playlist: Playlist, libraryStorage: LibraryStorage)
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], libraryStorage: LibraryStorage)
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, libraryStorage: LibraryStorage)
+    func syncUpload(playlistToUpdateOrder playlist: Playlist, libraryStorage: LibraryStorage)
+    func syncUpload(playlistToDelete playlist: Playlist)
+    func searchSongs(searchText: String, libraryStorage: LibraryStorage)
 }
 
 protocol AbstractBackgroundLibrarySyncer {

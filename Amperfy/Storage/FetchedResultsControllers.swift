@@ -1,7 +1,7 @@
 import Foundation
 import CoreData
 
-class GenreFetchedResultsController: BasicFetchedResultsController<GenreMO> {
+class GenreFetchedResultsController: CachedFetchedResultsController<GenreMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         let library = LibraryStorage(context: context)
@@ -24,7 +24,88 @@ class GenreFetchedResultsController: BasicFetchedResultsController<GenreMO> {
 
 }
 
-class ArtistFetchedResultsController: BasicFetchedResultsController<ArtistMO> {
+class GenreArtistsFetchedResultsController: BasicFetchedResultsController<ArtistMO> {
+    
+    let genre: Genre
+    
+    init(for genre: Genre, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        self.genre = genre
+        let library = LibraryStorage(context: context)
+        let fetchRequest = library.getArtistsFetchRequest(forGenre: genre)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+    
+    func getWrappedEntity(at indexPath: IndexPath) -> Artist {
+        let artistMO = fetchResultsController.object(at: indexPath)
+        let artist = Artist(managedObject: artistMO)
+        return artist
+    }
+    
+    func search(searchText: String) {
+        if searchText.count > 0 {
+            search(predicate: library.getArtistsFetchPredicate(forGenre: genre, searchText: searchText))
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
+class GenreAlbumsFetchedResultsController: BasicFetchedResultsController<AlbumMO> {
+    
+    let genre: Genre
+    
+    init(for genre: Genre, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        self.genre = genre
+        let library = LibraryStorage(context: context)
+        let fetchRequest = library.getAlbumsFetchRequest(forGenre: genre)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+    
+    func getWrappedEntity(at indexPath: IndexPath) -> Album {
+        let albumMO = fetchResultsController.object(at: indexPath)
+        let album = Album(managedObject: albumMO)
+        return album
+    }
+    
+    func search(searchText: String) {
+        if searchText.count > 0 {
+            search(predicate: library.getAlbumsFetchPredicate(forGenre: genre, searchText: searchText))
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
+class GenreSongsFetchedResultsController: BasicFetchedResultsController<SongMO> {
+    
+    let genre: Genre
+    
+    init(for genre: Genre, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        self.genre = genre
+        let library = LibraryStorage(context: context)
+        let fetchRequest = library.getSongsFetchRequest(forGenre: genre)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+    
+    func getWrappedEntity(at indexPath: IndexPath) -> Song {
+        let songMO = fetchResultsController.object(at: indexPath)
+        let song = Song(managedObject: songMO)
+        return song
+    }
+    
+    func search(searchText: String, onlyCachedSongs: Bool) {
+        if searchText.count > 0 || onlyCachedSongs {
+            search(predicate: library.getSongsFetchPredicate(forGenre: genre, searchText: searchText, onlyCachedSongs: onlyCachedSongs))
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
+class ArtistFetchedResultsController: CachedFetchedResultsController<ArtistMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         let library = LibraryStorage(context: context)
@@ -48,7 +129,61 @@ class ArtistFetchedResultsController: BasicFetchedResultsController<ArtistMO> {
 
 }
 
-class AlbumFetchedResultsController: BasicFetchedResultsController<AlbumMO> {
+class ArtistAlbumsItemsFetchedResultsController: BasicFetchedResultsController<AlbumMO> {
+
+    let artist: Artist
+    
+    init(for artist: Artist, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        self.artist = artist
+        let library = LibraryStorage(context: context)
+        let fetchRequest = library.getAlbumsFetchRequest(forArtist: artist)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+
+    func getWrappedEntity(at indexPath: IndexPath) -> Album {
+        let albumMO = fetchResultsController.object(at: indexPath)
+        let album = Album(managedObject: albumMO)
+        return album
+    }
+
+    func search(searchText: String) {
+        if searchText.count > 0 {
+            search(predicate: library.getAlbumsFetchPredicate(forArtist: artist, searchText: searchText))
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
+class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsController<SongMO> {
+
+    let artist: Artist
+    
+    init(for artist: Artist, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        self.artist = artist
+        let library = LibraryStorage(context: context)
+        let fetchRequest = library.getSongsFetchRequest(forArtist: artist)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+
+    func getWrappedEntity(at indexPath: IndexPath) -> Song {
+        let songMO = fetchResultsController.object(at: indexPath)
+        let song = Song(managedObject: songMO)
+        return song
+    }
+
+    func search(searchText: String, onlyCachedSongs: Bool) {
+        if searchText.count > 0 || onlyCachedSongs {
+            search(predicate: library.getSongsFetchPredicate(forArtist: artist, searchText: searchText, onlyCachedSongs: onlyCachedSongs))
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
+class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         let library = LibraryStorage(context: context)
@@ -72,7 +207,7 @@ class AlbumFetchedResultsController: BasicFetchedResultsController<AlbumMO> {
 
 }
 
-class SongFetchedResultsController: BasicFetchedResultsController<SongMO> {
+class SongFetchedResultsController: CachedFetchedResultsController<SongMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         let library = LibraryStorage(context: context)
@@ -96,7 +231,7 @@ class SongFetchedResultsController: BasicFetchedResultsController<SongMO> {
 
 }
 
-class LatestSongsFetchedResultsController: BasicFetchedResultsController<SongMO> {
+class LatestSongsFetchedResultsController: CachedFetchedResultsController<SongMO> {
     
     private let latestSyncWave: SyncWave?
     
@@ -124,7 +259,61 @@ class LatestSongsFetchedResultsController: BasicFetchedResultsController<SongMO>
 
 }
 
-class PlaylistFetchedResultsController: BasicFetchedResultsController<PlaylistMO> {
+class AlbumSongsFetchedResultsController: BasicFetchedResultsController<SongMO> {
+    
+    let album: Album
+    
+    init(forAlbum album: Album, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        self.album = album
+        let library = LibraryStorage(context: context)
+        let fetchRequest = library.getSongsFetchRequest(forAlbum: album)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+    
+    func getWrappedEntity(at indexPath: IndexPath) -> Song {
+        let songMO = fetchResultsController.object(at: indexPath)
+        let song = Song(managedObject: songMO)
+        return song
+    }
+    
+    func search(searchText: String, onlyCachedSongs: Bool) {
+        if searchText.count > 0 || onlyCachedSongs {
+            search(predicate: library.getSongsFetchPredicate(forAlbum: album, searchText: searchText, onlyCachedSongs: onlyCachedSongs))
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
+class PlaylistItemsFetchedResultsController: BasicFetchedResultsController<PlaylistItemMO> {
+
+    let playlist: Playlist
+    
+    init(forPlaylist playlist: Playlist, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        self.playlist = playlist
+        let library = LibraryStorage(context: context)
+        let fetchRequest = library.getPlaylistItemsFetchRequest(for: playlist)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+
+    func getWrappedEntity(at indexPath: IndexPath) -> PlaylistItem {
+        let itemMO = fetchResultsController.object(at: indexPath)
+        let item = PlaylistItem(storage: library, managedObject: itemMO)
+        return item
+    }
+
+    func search(searchText: String) {
+        if searchText.count > 0 {
+            search(predicate: library.getPlaylistItemsFetchPredicate(for: playlist, searchText: searchText))
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
+class PlaylistFetchedResultsController: CachedFetchedResultsController<PlaylistMO> {
 
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         let library = LibraryStorage(context: context)
@@ -148,7 +337,7 @@ class PlaylistFetchedResultsController: BasicFetchedResultsController<PlaylistMO
 
 }
 
-class PlaylistSelectorFetchedResultsController: BasicFetchedResultsController<PlaylistMO> {
+class PlaylistSelectorFetchedResultsController: CachedFetchedResultsController<PlaylistMO> {
 
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         let library = LibraryStorage(context: context)

@@ -162,6 +162,11 @@ class SearchVC: BasicTableViewController {
     override func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
+            appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+                let backgroundLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.searchSongs(searchText: searchText, libraryStorage: backgroundLibrary)
+            }
             playlistFetchedResultsController.search(searchText: searchText, playlistSearchCategory: .all)
             artistFetchedResultsController.search(searchText: searchText)
             albumFetchedResultsController.search(searchText: searchText)
@@ -198,23 +203,7 @@ class SearchVC: BasicTableViewController {
             return
         }
         
-        switch type {
-        case .insert:
-            rowsToInsert.append(IndexPath(row: newIndexPath!.row, section: section))
-        case .delete:
-            rowsToDelete.append(IndexPath(row: indexPath!.row, section: section))
-        case .move:
-            if indexPath! != newIndexPath! {
-                rowsToInsert.append(IndexPath(row: newIndexPath!.row, section: section))
-                rowsToDelete.append(IndexPath(row: indexPath!.row, section: section))
-            } else {
-                rowsToUpdate.append(IndexPath(row: indexPath!.row, section: section))
-            }
-        case .update:
-            rowsToUpdate.append(IndexPath(row: indexPath!.row, section: section))
-        @unknown default:
-            break
-        }
+        super.applyChangesOfMultiRowType(determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
     }
     
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {

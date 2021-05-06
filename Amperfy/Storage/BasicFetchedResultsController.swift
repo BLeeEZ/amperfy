@@ -79,15 +79,13 @@ extension NSFetchedResultsController {
 }
 
 class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSFetchRequestResult  {
-    
-    let library: LibraryStorage
-    let managedObjectContext: NSManagedObjectContext
-    
+  
     var fetchResultsController: NSFetchedResultsController<ResultType>
-    private let allFetchResulsController: NSFetchedResultsController<ResultType>
-    private let searchFetchResulsController: NSFetchedResultsController<ResultType>
+    let managedObjectContext: NSManagedObjectContext
+    let defaultPredicate: NSPredicate?
+    let library: LibraryStorage
     
-    private var delegateInternal: NSFetchedResultsControllerDelegate?
+    var delegateInternal: NSFetchedResultsControllerDelegate?
     var delegate: NSFetchedResultsControllerDelegate? {
         set {
             delegateInternal = newValue
@@ -96,19 +94,30 @@ class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSF
         get { return delegateInternal }
     }
     
-    private var isSearchActiveInternal = false
-    var isSearchActive: Bool {
-        set {
-            isSearchActiveInternal = newValue
-            fetchResultsController.delegate = nil
-            if isSearchActiveInternal {
-                fetchResultsController = searchFetchResulsController
-            } else {
-                fetchResultsController = allFetchResulsController
-            }
-            fetchResultsController.delegate = delegateInternal
-        }
-        get { return isSearchActiveInternal }
+    init(managedObjectContext context: NSManagedObjectContext, fetchRequest: NSFetchRequest<ResultType>, isGroupedInAlphabeticSections: Bool) {
+        managedObjectContext = context
+        library = LibraryStorage(context: context)
+        defaultPredicate = fetchRequest.predicate?.copy() as? NSPredicate
+        let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? "section" : nil
+        fetchResultsController = NSFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
+    }
+    
+    func search(predicate: NSPredicate?) {
+        fetchResultsController.fetchRequest.predicate = predicate
+        fetchResultsController.fetch()
+    }
+    
+    func fetch() {
+        fetchResultsController.fetch()
+    }
+    
+    func clearResults() {
+        fetchResultsController.clearResults()
+    }
+    
+    func showAllResults() {
+        fetchResultsController.fetchRequest.predicate = defaultPredicate
+        fetch()
     }
     
     var fetchedObjects: [ResultType]? {
@@ -117,39 +126,6 @@ class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSF
     
     var sections: [NSFetchedResultsSectionInfo]? {
         return fetchResultsController.sections
-    }
-    
-    init(managedObjectContext context: NSManagedObjectContext, fetchRequest: NSFetchRequest<ResultType>, isGroupedInAlphabeticSections: Bool) {
-        managedObjectContext = context
-        library = LibraryStorage(context: context)
-        let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? "section" : nil
-        allFetchResulsController = NSFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: Self.typeName)
-        searchFetchResulsController = NSFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
-        fetchResultsController = allFetchResulsController
-    }
-    
-    func search(predicate: NSPredicate?) {
-        isSearchActive = true
-        searchFetchResulsController.fetchRequest.predicate = predicate
-        searchFetchResulsController.fetch()
-    }
-    
-    func showAllResults() {
-        fetch()
-    }
-    
-    static func deleteCache() {
-        NSFetchedResultsController<ResultType>.deleteCache(withName: Self.typeName)
-    }
-    
-    func fetch() {
-        isSearchActive = false
-        allFetchResulsController.fetch()
-    }
-    
-    func clearResults() {
-        isSearchActive = true
-        searchFetchResulsController.clearResults()
     }
     
     var numberOfSections: Int {
@@ -166,6 +142,60 @@ class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSF
     
     var sectionIndexTitles: [String]? {
         return fetchResultsController.sectionIndexTitles
+    }
+    
+}
+
+class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<ResultType> where ResultType : NSFetchRequestResult  {
+    
+    private let allFetchResulsController: NSFetchedResultsController<ResultType>
+    private let searchFetchResulsController: NSFetchedResultsController<ResultType>
+    
+    private var isSearchActiveInternal = false
+    var isSearchActive: Bool {
+        set {
+            isSearchActiveInternal = newValue
+            fetchResultsController.delegate = nil
+            if isSearchActiveInternal {
+                fetchResultsController = searchFetchResulsController
+            } else {
+                fetchResultsController = allFetchResulsController
+            }
+            fetchResultsController.delegate = delegateInternal
+        }
+        get { return isSearchActiveInternal }
+    }
+    
+    override init(managedObjectContext context: NSManagedObjectContext, fetchRequest: NSFetchRequest<ResultType>, isGroupedInAlphabeticSections: Bool) {
+        let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? "section" : nil
+        allFetchResulsController = NSFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: Self.typeName)
+        searchFetchResulsController = NSFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        fetchResultsController = allFetchResulsController
+    }
+    
+    override func search(predicate: NSPredicate?) {
+        isSearchActive = true
+        searchFetchResulsController.fetchRequest.predicate = predicate
+        searchFetchResulsController.fetch()
+    }
+    
+    static func deleteCache() {
+        NSFetchedResultsController<ResultType>.deleteCache(withName: Self.typeName)
+    }
+    
+    override func fetch() {
+        isSearchActive = false
+        allFetchResulsController.fetch()
+    }
+    
+    override func showAllResults() {
+        fetch()
+    }
+    
+    override func clearResults() {
+        isSearchActive = true
+        searchFetchResulsController.clearResults()
     }
     
 }

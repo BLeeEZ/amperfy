@@ -45,6 +45,8 @@ class ArtistParserDelegate: GenericXmlLibParser {
 		switch(elementName) {
 		case "name":
             artistBuffer?.name = buffer
+        case "albumcount":
+            artistBuffer?.albumCount = Int(buffer) ?? 0
         case "genre":
             if let genreId = genreIdToCreate {
                 os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)

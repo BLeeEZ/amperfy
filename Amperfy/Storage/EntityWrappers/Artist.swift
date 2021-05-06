@@ -33,6 +33,13 @@ public class Artist: AbstractLibraryEntity, SongContainable {
             if managedObject.name != newValue { managedObject.name = newValue }
         }
     }
+    var albumCount: Int {
+        get { return Int(managedObject.albumCount) }
+        set {
+            guard newValue > Int16.min, newValue < Int16.max, managedObject.albumCount != Int16(newValue) else { return }
+            managedObject.albumCount = Int16(newValue)
+        }
+    }
     var albums: [Album] {
         guard let albumsSet = managedObject.albums, let albumsMO = albumsSet.array as? [AlbumMO] else { return [Album]() }
         var returnAlbums = [Album]()

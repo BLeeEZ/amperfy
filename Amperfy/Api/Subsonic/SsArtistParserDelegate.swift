@@ -27,7 +27,9 @@ class SsArtistParserDelegate: GenericXmlLibParser {
                 artistBuffer?.syncInfo = syncWave
                 isArtistCreated = true
             }
-            
+            if let attributeAlbumCount = attributeDict["albumCount"], let albumCount = Int(attributeAlbumCount) {
+                artistBuffer?.albumCount = albumCount
+            }
             if isArtistCreated || isLibraryVersionResync {
                 if let attributeArtistName = attributeDict["name"] {
                     artistBuffer?.name = attributeArtistName

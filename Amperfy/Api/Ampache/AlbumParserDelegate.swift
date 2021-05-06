@@ -17,7 +17,7 @@ class AlbumParserDelegate: GenericXmlLibParser {
                 os_log("Found album with no id", log: log, type: .error)
                 return
             }
-            if !syncWave.isInitialWave, let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
+            if let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
                 albumBuffer = fetchedAlbum
             } else {
                 albumBuffer = libraryStorage.createAlbum()
@@ -60,6 +60,8 @@ class AlbumParserDelegate: GenericXmlLibParser {
             albumBuffer = nil
 		case "year":
             albumBuffer?.year = Int(buffer) ?? 0
+        case "songcount":
+            albumBuffer?.songCount = Int(buffer) ?? 0
         case "art":
             albumBuffer?.artwork?.url = buffer
         case "genre":

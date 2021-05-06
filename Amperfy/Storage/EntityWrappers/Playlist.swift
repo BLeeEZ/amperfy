@@ -14,6 +14,11 @@ public class Playlist: NSObject, SongContainable {
         self.managedObject = managedObject
     }
     
+    func getManagedObject(in context: NSManagedObjectContext, storage libraryStorage: LibraryStorage) -> Playlist {
+        let playlistMO = context.object(with: managedObject.objectID) as! PlaylistMO
+        return Playlist(storage: libraryStorage, managedObject: playlistMO)
+    }
+    
     private var sortedPlaylistItems: [PlaylistItem] {
         var sortedItems = [PlaylistItem]()
         guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else {
@@ -38,7 +43,11 @@ public class Playlist: NSObject, SongContainable {
     }
     
     var songCount: Int {
-        return managedObject.items?.count ?? 0
+        get { return Int(managedObject.songCount) }
+        set {
+            guard newValue > Int16.min, newValue < Int16.max, managedObject.songCount != Int16(newValue) else { return }
+            managedObject.songCount = Int16(newValue)
+        }
     }
     var songs: [Song] {
         var sortedSongs = [Song]()
@@ -144,6 +153,7 @@ public class Playlist: NSObject, SongContainable {
     
     func append(song: Song) {
         createPlaylistItem(forSong: song)
+        songCount += 1
         storage.saveContext()
     }
 
@@ -151,6 +161,7 @@ public class Playlist: NSObject, SongContainable {
         for song in songsToAppend {
             createPlaylistItem(forSong: song)
         }
+        songCount += songsToAppend.count
         storage.saveContext()
     }
     
@@ -162,6 +173,7 @@ public class Playlist: NSObject, SongContainable {
     }
 
     func add(item: PlaylistItem) {
+        songCount += 1
         managedObject.addToItems(item.managedObject)
     }
     
@@ -193,6 +205,7 @@ public class Playlist: NSObject, SongContainable {
                 }
             }
             storage.deletePlaylistItem(item: itemToBeRemoved)
+            songCount -= 1
             storage.saveContext()
         }
     }
@@ -201,6 +214,7 @@ public class Playlist: NSObject, SongContainable {
         for item in items {
             if item.song?.id == song.id {
                 remove(at: Int(item.order))
+                songCount -= 1
                 break
             }
         }
@@ -219,6 +233,7 @@ public class Playlist: NSObject, SongContainable {
         for item in sortedPlaylistItems {
             storage.deletePlaylistItem(item: item)
         }
+        songCount = 0
         storage.saveContext()
     }
     

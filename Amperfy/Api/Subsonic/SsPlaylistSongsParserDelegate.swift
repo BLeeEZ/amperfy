@@ -3,20 +3,20 @@ import UIKit
 import CoreData
 import os.log
 
-class SsPlaylistSongsParserDelegate: GenericXmlParser {
+class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
     
     private let playlist: Playlist
-    private let libraryStorage: LibraryStorage
+    var items: [PlaylistItem]
     public private(set) var playlistHasBeenDetected = false
     
-    init(playlist: Playlist, libraryStorage: LibraryStorage) {
+    init(playlist: Playlist, libraryStorage: LibraryStorage, syncWave: SyncWave) {
         self.playlist = playlist
-        self.libraryStorage = libraryStorage
-        super.init()
+        self.items = playlist.items
+        super.init(libraryStorage: libraryStorage, syncWave: syncWave)
     }
     
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        buffer = ""
+    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
+        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
 
         if elementName == "playlist" {
             guard let playlistId = attributeDict["id"] else { return }
@@ -27,25 +27,36 @@ class SsPlaylistSongsParserDelegate: GenericXmlParser {
             if let attributePlaylistName = attributeDict["name"] {
                 playlist.name = attributePlaylistName
             }
+            if let attributeSongCount = attributeDict["songCount"], let songCount = Int(attributeSongCount) {
+                playlist.songCount = songCount
+            }
         }
         
         if elementName == "entry" {
-            guard let songEntryId = attributeDict["id"],
-                let fetchedSong = libraryStorage.getSong(id: songEntryId) else {
-                    return
-            }
+            let order = Int(parsedCount)
+            var item: PlaylistItem?
             
-            let playlistItem = libraryStorage.createPlaylistItem()
-            playlistItem.order = Int(parsedCount)
-            playlistItem.song = fetchedSong
-            playlist.add(item: playlistItem)
+            if order < items.count {
+                item = items[order]
+            } else {
+                item = libraryStorage.createPlaylistItem()
+                item?.order = order
+                playlist.add(item: item!)
+            }
+            item?.song = songBuffer
         }
     }
     
-    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
+        
         switch(elementName) {
-        case "entry":
-            parsedCount += 1
+        case "playlist":
+            if items.count > parsedCount {
+                for i in Array(parsedCount...items.count-1) {
+                    libraryStorage.deletePlaylistItem(item: items[i])
+                }
+            }
         default:
             break
         }

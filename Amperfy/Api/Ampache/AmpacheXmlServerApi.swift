@@ -12,7 +12,7 @@ class AmpacheXmlServerApi {
     static let maxItemCountToPollAtOnce: Int = 500
     
     var serverApiVersion: String?
-    let clientApiVersion = "350001"
+    let clientApiVersion = "500000"
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "Ampache")
     private var credentials: LoginCredentials?
@@ -159,6 +159,27 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
+    func requestArtistAlbums(of artist: Artist, parserDelegate: XMLParserDelegate) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "artist_albums")
+        apiUrlComponent.addQueryItem(name: "filter", value: artist.id)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
+    func requestArtistSongs(of artist: Artist, parserDelegate: XMLParserDelegate) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "artist_songs")
+        apiUrlComponent.addQueryItem(name: "filter", value: artist.id)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
+    func requestAlbumSongs(of album: Album, parserDelegate: XMLParserDelegate) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "album_songs")
+        apiUrlComponent.addQueryItem(name: "filter", value: album.id)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
     func requestAlbums(parserDelegate: XMLParserDelegate) {
         reauthenticateIfNeccessary()
         guard let auth = authHandshake else { return }
@@ -239,41 +260,65 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestPlaylistDelete(id: String) {
+    func requestPlaylistDelete(playlist: Playlist) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_delete")
-        apiUrlComponent.addQueryItem(name: "filter", value: id)
+        apiUrlComponent.addQueryItem(name: "filter", value: playlist.id)
         let errorParser = ErrorParserDelegate()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
         if let error = errorParser.error {
-            os_log("%d: %s", log: log, type: .error, error.statusCode, error.message)
-        }
-    }
-
-    func requestPlaylist(addSongId: String, toPlaylistId: String) {
-        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
-        apiUrlComponent.addQueryItem(name: "action", value: "playlist_add_song")
-        apiUrlComponent.addQueryItem(name: "filter", value: toPlaylistId)
-        apiUrlComponent.addQueryItem(name: "song", value: addSongId)
-        let errorParser = ErrorParserDelegate()
-        request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
-        if let error = errorParser.error {
-            os_log("%d: %s", log: log, type: .error, error.statusCode, error.message)
+            os_log("Ampache Error %d: %s", log: log, type: .error, error.statusCode, error.message)
         }
     }
     
-    func requestPlaylist(removeSongIndex: Int, fromPlaylistId: String) {
+    func requestPlaylistAddSong(playlist: Playlist, song: Song) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
-        apiUrlComponent.addQueryItem(name: "action", value: "playlist_remove_song")
-        apiUrlComponent.addQueryItem(name: "filter", value: fromPlaylistId)
-        apiUrlComponent.addQueryItem(name: "track", value: removeSongIndex)
+        apiUrlComponent.addQueryItem(name: "action", value: "playlist_add_song")
+        apiUrlComponent.addQueryItem(name: "filter", value: playlist.id)
+        apiUrlComponent.addQueryItem(name: "song", value: song.id)
         let errorParser = ErrorParserDelegate()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
         if let error = errorParser.error {
-            os_log("%d: %s", log: log, type: .error, error.statusCode, error.message)
+            os_log("Ampache Error %d: %s", log: log, type: .error, error.statusCode, error.message)
         }
     }
-
+    
+    func requestPlaylistDeleteItem(playlist: Playlist, index: Int) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "playlist_remove_song")
+        apiUrlComponent.addQueryItem(name: "filter", value: playlist.id)
+        apiUrlComponent.addQueryItem(name: "track", value: index + 1)
+        let errorParser = ErrorParserDelegate()
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
+        if let error = errorParser.error {
+            os_log("Ampache Error %d: %s", log: log, type: .error, error.statusCode, error.message)
+        }
+    }
+    
+    func requestPlaylistEdit(playlist: Playlist) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "playlist_edit")
+        apiUrlComponent.addQueryItem(name: "filter", value: playlist.id)
+        let playlistSongs = playlist.songs
+        if playlistSongs.count > 0 {
+            apiUrlComponent.addQueryItem(name: "items", value: playlist.songs.compactMap{ $0.id }.joined(separator: ","))
+            apiUrlComponent.addQueryItem(name: "tracks", value: Array(1...playlist.songs.count).compactMap{"\($0)"}.joined(separator: ","))
+        }
+        let errorParser = ErrorParserDelegate()
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
+        if let error = errorParser.error {
+            os_log("Ampache Error %d: %s", log: log, type: .error, error.statusCode, error.message)
+        }
+    }
+    
+    func requestSearchSongs(parserDelegate: XMLParserDelegate, searchText: String) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "search_songs")
+        apiUrlComponent.addQueryItem(name: "filter", value: searchText)
+        apiUrlComponent.addQueryItem(name: "limit", value: 40)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
     private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: XMLParserDelegate) {
         guard let url = fromUrlComponent.url else {
             os_log("URL could not be created: %s", log: log, type: .error, fromUrlComponent.description)

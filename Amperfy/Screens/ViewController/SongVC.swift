@@ -28,7 +28,13 @@ class SongVC: SingleFetchedResultsTableViewController<SongMO> {
     }
     
     override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "", onlyCachedSongs: (searchController.searchBar.selectedScopeButtonIndex == 1))
+        let searchText = searchController.searchBar.text ?? ""
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundLibrary = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+            syncer.searchSongs(searchText: searchText, libraryStorage: backgroundLibrary)
+        }
+        fetchedResultsController.search(searchText: searchText, onlyCachedSongs: (searchController.searchBar.selectedScopeButtonIndex == 1))
         tableView.reloadData()
     }
     

@@ -157,7 +157,7 @@ class SongTableCell: BasicTableCell {
         }
         alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
             let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.songToAdd = song
+            selectPlaylistVC.songsToAdd = [song]
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
             rootView.present(selectPlaylistNav, animated: true, completion: nil)
         }))

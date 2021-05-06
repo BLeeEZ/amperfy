@@ -53,6 +53,13 @@ public class Album: AbstractLibraryEntity, SongContainable {
             if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
         }
     }
+    var songCount: Int {
+        get { return Int(managedObject.songCount) }
+        set {
+            guard newValue > Int16.min, newValue < Int16.max, managedObject.songCount != Int16(newValue) else { return }
+            managedObject.songCount = Int16(newValue)
+        }
+    }
     var songs: [Song] {
         guard let songsSet = managedObject.songs, let songsMO = songsSet.array as? [SongMO] else { return [Song]() }
         var returnSongs = [Song]()

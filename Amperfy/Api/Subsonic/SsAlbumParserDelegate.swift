@@ -43,6 +43,9 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
             if albumBuffer?.artist == nil, let artistId = attributeDict["artistId"], let artist = libraryStorage.getArtist(id: artistId) {
                 albumBuffer?.artist = artist
             }
+            if let attributeSongCount = attributeDict["songCount"], let songCount = Int(attributeSongCount) {
+                albumBuffer?.songCount = songCount
+            }
             
             if albumBuffer?.genre == nil, let genreName = attributeDict["genre"] {
                 if let genre = libraryStorage.getGenre(name: genreName) {

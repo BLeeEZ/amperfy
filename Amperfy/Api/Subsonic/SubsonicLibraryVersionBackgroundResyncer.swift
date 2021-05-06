@@ -62,32 +62,6 @@ class SubsonicLibraryVersionBackgroundResyncer: GenericLibraryBackgroundSyncer, 
 
             if artistsLeftSorted.isEmpty || syncWave.syncIndexToContinue == artistsLeftSorted.last?.id ?? "" {
                 os_log("Lib version resync: Albums parsing done", log: log, type: .info)
-                syncWave.syncState = .Songs
-            }
-            libraryStorage.saveContext()
-        }
-        if syncWave.syncState == .Songs, isRunning {
-            let allAlbums = libraryStorage.getAlbums()
-            let albumsLeftUnsorted = allAlbums.filter {
-                return $0.id.localizedStandardCompare(syncWave.syncIndexToContinue) == ComparisonResult.orderedDescending
-            }
-            let albumsLeftSorted = albumsLeftUnsorted.sorted{
-                return $0.id.localizedStandardCompare($1.id) == ComparisonResult.orderedAscending
-            }
-            os_log("Lib version resync: Songs parsing start", log: log, type: .info)
-            for album in albumsLeftSorted {
-                let songDelegate = SsSongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-                songDelegate.isLibraryVersionResync = true
-                songDelegate.guessedArtist = album.artist
-                songDelegate.guessedAlbum = album
-                songDelegate.guessedGenre = album.genre
-                subsonicServerApi.requestAlbum(parserDelegate: songDelegate, id: album.id)
-                syncWave.syncIndexToContinue = album.id
-                if(!isRunning) { break }
-            }
-
-            if albumsLeftSorted.isEmpty || syncWave.syncIndexToContinue == albumsLeftSorted.last?.id ?? "" {
-                os_log("Lib version resync: Songs parsing done", log: log, type: .info)
                 syncWave.syncState = .Done
             }
             libraryStorage.saveContext()

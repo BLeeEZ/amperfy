@@ -53,6 +53,8 @@ class PlaylistParserDelegate: GenericXmlParser {
         switch(elementName) {
         case "name":
             playlist?.name = buffer
+        case "items":
+            playlist?.songCount = Int(buffer) ?? 0
         case "playlist":
             playlist = nil
         default:

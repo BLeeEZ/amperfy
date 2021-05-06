@@ -6,6 +6,7 @@ import os.log
 class SongParserDelegate: GenericXmlLibParser {
 
     var songBuffer: Song?
+    var artworkUrlString: String?
     var genreIdToCreate: String?
     
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
@@ -17,7 +18,7 @@ class SongParserDelegate: GenericXmlLibParser {
                 os_log("Found song with no id", log: log, type: .error)
                 return
             }
-            if !syncWave.isInitialWave, let fetchedSong = libraryStorage.getSong(id: songId)  {
+            if let fetchedSong = libraryStorage.getSong(id: songId)  {
                 songBuffer = fetchedSong
             } else {
                 songBuffer = libraryStorage.createSong()
@@ -75,7 +76,7 @@ class SongParserDelegate: GenericXmlLibParser {
         case "time":
             songBuffer?.duration = Int(buffer) ?? 0
         case "art":
-            songBuffer?.artwork?.url = buffer
+            artworkUrlString = buffer
         case "size":
             songBuffer?.size = Int(buffer) ?? 0
         case "bitrate":
@@ -95,9 +96,8 @@ class SongParserDelegate: GenericXmlLibParser {
                 genreIdToCreate = nil
             }
         case "song":
-            if let song = songBuffer, let artwork = song.artwork, let album = song.album {
-                libraryStorage.deleteArtwork(artwork: artwork)
-                song.artwork = album.artwork
+            if let song = songBuffer, let songArtwork = song.artwork, songArtwork.url.isEmpty, song.album != nil, let songArtworkUrlString = artworkUrlString {
+                songArtwork.url = songArtworkUrlString
             }
             parsedCount += 1
             parseNotifier?.notifyParsedObject()

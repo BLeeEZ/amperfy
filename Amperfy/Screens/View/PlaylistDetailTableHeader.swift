@@ -40,11 +40,14 @@ class PlaylistDetailTableHeader: UIView {
         nameTextField.text = playlist.name
         nameLabel.text = playlist.name
         refreshArtworks(playlist: playlist)
-        songCountLabel.text = "\(playlist.songs.count) Songs"
+        if playlist.songCount == 1 {
+            songCountLabel.text = "1 Song"
+        } else {
+            songCountLabel.text = "\(playlist.songCount) Songs"
+        }
         if !playlist.isSmartPlaylist {
             smartPlaylistLabel.isHidden = true
         }
-        
     }
     
     func refreshArtworks(playlist: Playlist?) {
@@ -85,36 +88,16 @@ class PlaylistDetailTableHeader: UIView {
     
     @IBAction func optionsButtonPressed(_ sender: Any) {
         if let playlist = self.playlist, let rootView = self.rootView {
-            let alert = createAlert(forPlaylist: playlist, statusNotifyier: rootView)
+            let alert = createAlert(forPlaylist: playlist)
             alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
             rootView.present(alert, animated: true, completion: nil)
         }
     }
 
-    func createAlert(forPlaylist playlist: Playlist, statusNotifyier: PlaylistSyncCallbacks) -> UIAlertController {
+    func createAlert(forPlaylist playlist: Playlist) -> UIAlertController {
         let storage = appDelegate.storage
         let alert = UIAlertController(title: playlist.name, message: nil, preferredStyle: .actionSheet)
         
-        if playlist.id != "" {
-            alert.addAction(UIAlertAction(title: "Update from server", style: .default, handler: { _ in
-                storage.persistentContainer.performBackgroundTask() { (context) in
-                    let backgroundStorage = LibraryStorage(context: context)
-                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                    guard let playlistAsync = backgroundStorage.getPlaylist(id: playlist.id) else { return }
-                    syncer.syncDown(playlist: playlistAsync, libraryStorage: backgroundStorage, statusNotifyier: statusNotifyier)
-                }
-            }))
-        }
-        if !playlist.isSmartPlaylist {
-            alert.addAction(UIAlertAction(title: "Upload to server", style: .default, handler: { _ in
-                storage.persistentContainer.performBackgroundTask() { (context) in
-                    let backgroundStorage = LibraryStorage(context: context)
-                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                    guard let playlistAsync = backgroundStorage.getPlaylist(viaPlaylistFromOtherContext: playlist) else { return }
-                    syncer.syncUpload(playlist: playlistAsync, libraryStorage: backgroundStorage, statusNotifyier: statusNotifyier)
-                }
-            }))
-        }
         alert.addAction(UIAlertAction(title: "Download all songs", style: .default, handler: { _ in
             self.appDelegate.downloadManager.download(songs: playlist.songs)
         }))

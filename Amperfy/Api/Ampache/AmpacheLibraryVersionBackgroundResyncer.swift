@@ -66,24 +66,6 @@ class AmpacheLibraryVersionBackgroundResyncer: GenericLibraryBackgroundSyncer, B
 
             if allParsed {
                 os_log("Lib version resync: %s Albums parsed", log: log, type: .info, syncWave.syncIndexToContinue)
-                syncWave.syncState = .Songs
-            }
-            libraryStorage.saveContext()
-        }
-        if syncWave.syncState == .Songs, isRunning {
-            os_log("Lib version resync: Songs parsing start", log: log, type: .info)
-            var allParsed = false
-            repeat {
-                var syncIndex = Int(syncWave.syncIndexToContinue) ?? 0
-                let songParser = SongParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave)
-                ampacheXmlServerApi.requestSongs(parserDelegate: songParser, startIndex: syncIndex)
-                syncIndex += songParser.parsedCount
-                syncWave.syncIndexToContinue = String(syncIndex)
-                allParsed = songParser.parsedCount == 0
-            } while(!allParsed && isRunning)
-
-            if allParsed {
-                os_log("Lib version resync: %s Songs parsed", log: log, type: .info, syncWave.syncIndexToContinue)
                 syncWave.syncState = .Done
             }
             libraryStorage.saveContext()

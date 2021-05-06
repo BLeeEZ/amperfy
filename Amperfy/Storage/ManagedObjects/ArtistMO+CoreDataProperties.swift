@@ -9,6 +9,7 @@ extension ArtistMO {
     }
 
     @NSManaged public var name: String?
+    @NSManaged public var albumCount: Int16
     @NSManaged public var albums: NSOrderedSet?
     @NSManaged public var genre: GenreMO?
     @NSManaged public var songs: NSOrderedSet?

@@ -1,9 +1,9 @@
 import UIKit
 
-class PlaylistDetailVC: UITableViewController {
+class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> {
 
-    var appDelegate: AppDelegate!
-    var playlist: Playlist?
+    private var fetchedResultsController: PlaylistItemsFetchedResultsController!
+    var playlist: Playlist!
     
     var editButton: UIBarButtonItem!
     var doneButton: UIBarButtonItem!
@@ -11,6 +11,9 @@ class PlaylistDetailVC: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        fetchedResultsController = PlaylistItemsFetchedResultsController(forPlaylist: playlist, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        singleFetchedResultsController = fetchedResultsController
+        
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
@@ -39,7 +42,16 @@ class PlaylistDetailVC: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.tableView.reloadData()
+        fetchedResultsController.fetch()
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundStorage = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+            let playlistAsync = self.playlist.getManagedObject(in: context, storage: backgroundStorage)
+            syncer.syncDown(playlist: playlistAsync, libraryStorage: backgroundStorage)
+            DispatchQueue.main.async {
+                self.playlistOperationsView?.refresh()
+            }
+        }
     }
     
     @objc private func startEditing() {
@@ -54,23 +66,12 @@ class PlaylistDetailVC: UITableViewController {
         playlistOperationsView?.endEditing()
     }
     
-    // MARK: - Table view data source
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return playlist?.songs.count ?? 0
-    }
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
-        
-        if let song = playlist?.songs[indexPath.row] {
+        let playlistItem = fetchedResultsController.getWrappedEntity(at: indexPath)
+        if let song = playlistItem.song {
             cell.display(song: song, rootView: self)
         }
-        
         return cell
     }
     
@@ -84,15 +85,27 @@ class PlaylistDetailVC: UITableViewController {
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            playlist?.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            playlistOperationsView?.refresh()
+            playlist.remove(at: indexPath.row)
+            self.playlistOperationsView?.refresh()
+            appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+                let backgroundStorage = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                let playlistAsync = self.playlist.getManagedObject(in: context, storage: backgroundStorage)
+                syncer.syncUpload(playlistToDeleteSong: playlistAsync, index: indexPath.row, libraryStorage: backgroundStorage)
+            }
         }
     }
     
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        playlist?.movePlaylistSong(fromIndex: fromIndexPath.row, to: to.row)
+        noAnimationAtNextDataChange = true
+        playlist.movePlaylistSong(fromIndex: fromIndexPath.row, to: to.row)
+        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundStorage = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+            let playlistAsync = self.playlist.getManagedObject(in: context, storage: backgroundStorage)
+            syncer.syncUpload(playlistToUpdateOrder: playlistAsync, libraryStorage: backgroundStorage)
+        }
     }
     
     // Override to support conditional rearranging of the table view.
@@ -105,47 +118,11 @@ class PlaylistDetailVC: UITableViewController {
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
             let backgroundStorage = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            guard let playlistMain = self.playlist, let playlistAsync = backgroundStorage.getPlaylist(id: playlistMain.id) else { return }
-            syncer.syncDown(playlist: playlistAsync, libraryStorage: backgroundStorage, statusNotifyier: self)
-        }
-    }
-    
-}
-
-extension PlaylistDetailVC: PlaylistSyncCallbacks {
-    
-    func notifyPlaylistWillCleared() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.playlist = nil
-            self.tableView.reloadData()
-            self.playlistOperationsView?.refreshArtworks(playlist: nil)
-        }
-    }
-    
-    func notifyPlaylistSyncFinished(playlist: Playlist) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.playlist = self.appDelegate.persistentLibraryStorage.getPlaylist(id: playlist.id)
-            self.tableView.reloadData()
-            self.playlistOperationsView?.refresh()
-            self.refreshControl?.endRefreshing()
-        }
-    }
-
-    func notifyPlaylistUploadFinished(success: Bool) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            if success {
-                let alert = UIAlertController(title: "Upload successful", message: nil, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-                self.present(alert, animated: true, completion: nil)
-            } else {
-                let alert = UIAlertController(title: "Upload failed", message: nil, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-                self.present(alert, animated: true, completion: nil)
+            let playlistAsync = self.playlist.getManagedObject(in: context, storage: backgroundStorage)
+            syncer.syncDown(playlist: playlistAsync, libraryStorage: backgroundStorage)
+            DispatchQueue.main.async {
+                self.playlistOperationsView?.refresh()
+                self.refreshControl?.endRefreshing()
             }
         }
     }

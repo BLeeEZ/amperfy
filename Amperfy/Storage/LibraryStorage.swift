@@ -209,6 +209,35 @@ class LibraryStorage: SongFileCachable {
         }
         return predicate
     }
+    
+    func getArtistsFetchRequest(forGenre genre: Genre) -> NSFetchRequest<ArtistMO> {
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        fetchRequest.predicate = getArtistsFetchPredicate(forGenre: genre)
+        return fetchRequest
+    }
+    
+    func getArtistsFetchPredicate(forGenre genre: Genre, searchText: String = "") -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        var predicateFormats = [String]()
+        var predicateArgs = [Any]()
+        
+        predicateFormats.append("(genre == %@)")
+        predicateArgs.append(genre.managedObject.objectID)
+        if searchText.count > 0 {
+            predicateFormats.append("(name contains[cd] %@)")
+            predicateArgs.append(searchText)
+        }
+        
+        if predicateFormats.count > 0 {
+            let predicateFormat = predicateFormats.joined(separator: " && ")
+            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
+        }
+        return predicate
+    }
 
     func getArtists() -> Array<Artist> {
         var artists = Array<Artist>()
@@ -241,6 +270,64 @@ class LibraryStorage: SongFileCachable {
         return predicate
     }
     
+    func getAlbumsFetchRequest(forArtist artist: Artist) -> NSFetchRequest<AlbumMO> {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        fetchRequest.predicate = getAlbumsFetchPredicate(forArtist: artist)
+        return fetchRequest
+    }
+    
+    func getAlbumsFetchPredicate(forArtist artist: Artist, searchText: String = "") -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        var predicateFormats = [String]()
+        var predicateArgs = [Any]()
+        
+        predicateFormats.append("(artist == %@)")
+        predicateArgs.append(artist.managedObject.objectID)
+        if searchText.count > 0 {
+            predicateFormats.append("(name contains[cd] %@)")
+            predicateArgs.append(searchText)
+        }
+        
+        if predicateFormats.count > 0 {
+            let predicateFormat = predicateFormats.joined(separator: " && ")
+            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
+        }
+        return predicate
+    }
+    
+    func getAlbumsFetchRequest(forGenre genre: Genre) -> NSFetchRequest<AlbumMO> {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        fetchRequest.predicate = getAlbumsFetchPredicate(forGenre: genre)
+        return fetchRequest
+    }
+    
+    func getAlbumsFetchPredicate(forGenre genre: Genre, searchText: String = "") -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        var predicateFormats = [String]()
+        var predicateArgs = [Any]()
+        
+        predicateFormats.append("(genre == %@)")
+        predicateArgs.append(genre.managedObject.objectID)
+        if searchText.count > 0 {
+            predicateFormats.append("(name contains[cd] %@)")
+            predicateArgs.append(searchText)
+        }
+        
+        if predicateFormats.count > 0 {
+            let predicateFormat = predicateFormats.joined(separator: " && ")
+            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
+        }
+        return predicate
+    }
+    
     func getAlbums() -> Array<Album> {
         var albums = Array<Album>()
         var foundAlbums = Array<AlbumMO>()
@@ -253,6 +340,102 @@ class LibraryStorage: SongFileCachable {
         } catch {}
         
         return albums
+    }
+    
+    func getSongsFetchRequest(forGenre genre: Genre) -> NSFetchRequest<SongMO> {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "track", ascending: true),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        fetchRequest.predicate = getSongsFetchPredicate(forGenre: genre, onlyCachedSongs: false)
+        return fetchRequest
+    }
+    
+    func getSongsFetchPredicate(forGenre genre: Genre, searchText: String = "", onlyCachedSongs isOnlyCachedSongs: Bool) -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        var predicateFormats = [String]()
+        var predicateArgs = [Any]()
+        
+        predicateFormats.append("(genre == %@)")
+        predicateArgs.append(genre.managedObject.objectID)
+        if searchText.count > 0 {
+            predicateFormats.append("(title contains[cd] %@)")
+            predicateArgs.append(searchText)
+        }
+        if isOnlyCachedSongs {
+            predicateFormats.append("(file != nil)")
+        }
+        
+        if predicateFormats.count > 0 {
+            let predicateFormat = predicateFormats.joined(separator: " && ")
+            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
+        }
+        return predicate
+    }
+    
+    func getSongsFetchRequest(forAlbum album: Album) -> NSFetchRequest<SongMO> {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "track", ascending: true),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        fetchRequest.predicate = getSongsFetchPredicate(forAlbum: album, onlyCachedSongs: false)
+        return fetchRequest
+    }
+    
+    func getSongsFetchPredicate(forAlbum album: Album, searchText: String = "", onlyCachedSongs isOnlyCachedSongs: Bool) -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        var predicateFormats = [String]()
+        var predicateArgs = [Any]()
+        
+        predicateFormats.append("(album == %@)")
+        predicateArgs.append(album.managedObject.objectID)
+        if searchText.count > 0 {
+            predicateFormats.append("(title contains[cd] %@)")
+            predicateArgs.append(searchText)
+        }
+        if isOnlyCachedSongs {
+            predicateFormats.append("(file != nil)")
+        }
+        
+        if predicateFormats.count > 0 {
+            let predicateFormat = predicateFormats.joined(separator: " && ")
+            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
+        }
+        return predicate
+    }
+    
+    func getSongsFetchRequest(forArtist artist: Artist) -> NSFetchRequest<SongMO> {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "title", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        fetchRequest.predicate = getSongsFetchPredicate(forArtist: artist, onlyCachedSongs: false)
+        return fetchRequest
+    }
+    
+    func getSongsFetchPredicate(forArtist artist: Artist, searchText: String = "", onlyCachedSongs isOnlyCachedSongs: Bool) -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        var predicateFormats = [String]()
+        var predicateArgs = [Any]()
+        
+        predicateFormats.append("(artist == %@)")
+        predicateArgs.append(artist.managedObject.objectID)
+        if searchText.count > 0 {
+            predicateFormats.append("(title contains[cd] %@)")
+            predicateArgs.append(searchText)
+        }
+        if isOnlyCachedSongs {
+            predicateFormats.append("(file != nil)")
+        }
+        
+        if predicateFormats.count > 0 {
+            let predicateFormat = predicateFormats.joined(separator: " && ")
+            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
+        }
+        return predicate
     }
         
     var songsFetchRequest: NSFetchRequest<SongMO> {
@@ -395,6 +578,34 @@ class LibraryStorage: SongFileCachable {
         } catch {}
         
         return playlists
+    }
+    
+    func getPlaylistItemsFetchRequest(for playlist: Playlist) -> NSFetchRequest<PlaylistItemMO> {
+        let fetchRequest: NSFetchRequest<PlaylistItemMO> = PlaylistItemMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "order", ascending: true)
+        ]
+        fetchRequest.predicate = getPlaylistItemsFetchPredicate(for: playlist)
+        return fetchRequest
+    }
+    
+    func getPlaylistItemsFetchPredicate(for playlist: Playlist, searchText: String = "") -> NSPredicate? {
+        var predicate: NSPredicate? = nil
+        var predicateFormats = [String]()
+        var predicateArgs = [Any]()
+        
+        predicateFormats.append("(playlist == %@)")
+        predicateArgs.append(playlist.managedObject.objectID)
+        if searchText.count > 0 {
+            predicateFormats.append("(song.title contains[cd] %@)")
+            predicateArgs.append(searchText)
+        }
+        
+        if predicateFormats.count > 0 {
+            let predicateFormat = predicateFormats.joined(separator: " && ")
+            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
+        }
+        return predicate
     }
     
     func getPlayerData() -> PlayerData {

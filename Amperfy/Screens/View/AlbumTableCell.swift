@@ -14,10 +14,10 @@ class AlbumTableCell: BasicTableCell {
         artistLabel.text = album.artist?.name
         artworkImage.image = album.image
         var infoText = ""
-        if album.songs.count == 1 {
+        if album.songCount == 1 {
             infoText += "1 Song"
         } else {
-            infoText += "\(album.songs.count) Songs"
+            infoText += "\(album.songCount) Songs"
         }
         infoLabel.text = infoText
     }

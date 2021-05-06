@@ -22,11 +22,21 @@ class AlbumDetailTableHeader: UIView {
         guard let album = album else { return }
         self.album = album
         self.rootView = rootView
+        refresh()
+    }
+    
+    func refresh() {
+        guard let album = album else { return }
         nameLabel.text = album.name
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
         albumImage.image = album.image
-        var infoText = "\(album.songs.count) Songs"
+        var infoText = ""
+        if album.songCount == 1 {
+            infoText += "1 Song"
+        } else {
+            infoText += "\(album.songCount) Songs"
+        }
         if album.year != 0 {
             infoText += " \(CommonString.oneMiddleDot) Year: \(album.year)"
         }
