@@ -25,12 +25,6 @@ class GenreTableCell: BasicTableCell {
         } else {
             infoText += "\(genre.albums.count) Albums"
         }
-        infoText += " \(CommonString.oneMiddleDot) "
-        if genre.songs.count == 1 {
-            infoText += "1 Song"
-        } else {
-            infoText += "\(genre.songs.count) Songs"
-        }
         infoLabel.text = infoText
     }
 
