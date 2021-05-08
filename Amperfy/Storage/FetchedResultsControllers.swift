@@ -4,19 +4,13 @@ import CoreData
 class GenreFetchedResultsController: CachedFetchedResultsController<GenreMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
-        let library = LibraryStorage(context: context)
-        let fetchRequest = library.genresFetchRequest
+        let fetchRequest = GenreMO.identifierSortedFetchRequest
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Genre {
-        let genreMO = fetchResultsController.object(at: indexPath)
-        return Genre(managedObject: genreMO)
-    }
-    
+        
     func search(searchText: String) {
         if searchText.count > 0 {
-            search(predicate: library.getGenresFetchPredicate(searchText: searchText))
+            search(predicate: GenreMO.getIdentifierBasedSearchPredicate(searchText: searchText))
         } else {
             showAllResults()
         }
@@ -31,19 +25,18 @@ class GenreArtistsFetchedResultsController: BasicFetchedResultsController<Artist
     init(for genre: Genre, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         self.genre = genre
         let library = LibraryStorage(context: context)
-        let fetchRequest = library.getArtistsFetchRequest(forGenre: genre)
+        let fetchRequest = ArtistMO.identifierSortedFetchRequest
+        fetchRequest.predicate = library.getFetchPredicate(forGenre: genre)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Artist {
-        let artistMO = fetchResultsController.object(at: indexPath)
-        let artist = Artist(managedObject: artistMO)
-        return artist
     }
     
     func search(searchText: String) {
         if searchText.count > 0 {
-            search(predicate: library.getArtistsFetchPredicate(forGenre: genre, searchText: searchText))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicate(forGenre: genre),
+                ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -58,19 +51,18 @@ class GenreAlbumsFetchedResultsController: BasicFetchedResultsController<AlbumMO
     init(for genre: Genre, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         self.genre = genre
         let library = LibraryStorage(context: context)
-        let fetchRequest = library.getAlbumsFetchRequest(forGenre: genre)
+        let fetchRequest = AlbumMO.identifierSortedFetchRequest
+        fetchRequest.predicate = library.getFetchPredicate(forGenre: genre)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Album {
-        let albumMO = fetchResultsController.object(at: indexPath)
-        let album = Album(managedObject: albumMO)
-        return album
     }
     
     func search(searchText: String) {
         if searchText.count > 0 {
-            search(predicate: library.getAlbumsFetchPredicate(forGenre: genre, searchText: searchText))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicate(forGenre: genre),
+                ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -85,19 +77,19 @@ class GenreSongsFetchedResultsController: BasicFetchedResultsController<SongMO> 
     init(for genre: Genre, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         self.genre = genre
         let library = LibraryStorage(context: context)
-        let fetchRequest = library.getSongsFetchRequest(forGenre: genre)
+        let fetchRequest = SongMO.identifierSortedFetchRequest
+        fetchRequest.predicate = library.getFetchPredicate(forGenre: genre)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Song {
-        let songMO = fetchResultsController.object(at: indexPath)
-        let song = Song(managedObject: songMO)
-        return song
     }
     
     func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
-            search(predicate: library.getSongsFetchPredicate(forGenre: genre, searchText: searchText, onlyCachedSongs: onlyCachedSongs))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicate(forGenre: genre),
+                SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -108,20 +100,13 @@ class GenreSongsFetchedResultsController: BasicFetchedResultsController<SongMO> 
 class ArtistFetchedResultsController: CachedFetchedResultsController<ArtistMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
-        let library = LibraryStorage(context: context)
-        let fetchRequest = library.artistsFetchRequest
+        let fetchRequest = ArtistMO.identifierSortedFetchRequest
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Artist {
-        let artistMO = fetchResultsController.object(at: indexPath)
-        let artist = Artist(managedObject: artistMO)
-        return artist
     }
     
     func search(searchText: String) {
         if searchText.count > 0 {
-            search(predicate: library.getArtistsFetchPredicate(searchText: searchText))
+            search(predicate: ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText))
         } else {
             showAllResults()
         }
@@ -136,19 +121,18 @@ class ArtistAlbumsItemsFetchedResultsController: BasicFetchedResultsController<A
     init(for artist: Artist, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         self.artist = artist
         let library = LibraryStorage(context: context)
-        let fetchRequest = library.getAlbumsFetchRequest(forArtist: artist)
+        let fetchRequest = AlbumMO.identifierSortedFetchRequest
+        fetchRequest.predicate = library.getFetchPredicate(forArtist: artist)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-
-    func getWrappedEntity(at indexPath: IndexPath) -> Album {
-        let albumMO = fetchResultsController.object(at: indexPath)
-        let album = Album(managedObject: albumMO)
-        return album
     }
 
     func search(searchText: String) {
         if searchText.count > 0 {
-            search(predicate: library.getAlbumsFetchPredicate(forArtist: artist, searchText: searchText))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicate(forArtist: artist),
+                ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -163,19 +147,19 @@ class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsController<So
     init(for artist: Artist, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         self.artist = artist
         let library = LibraryStorage(context: context)
-        let fetchRequest = library.getSongsFetchRequest(forArtist: artist)
+        let fetchRequest = SongMO.identifierSortedFetchRequest
+        fetchRequest.predicate = library.getFetchPredicate(forArtist: artist)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-
-    func getWrappedEntity(at indexPath: IndexPath) -> Song {
-        let songMO = fetchResultsController.object(at: indexPath)
-        let song = Song(managedObject: songMO)
-        return song
     }
 
     func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
-            search(predicate: library.getSongsFetchPredicate(forArtist: artist, searchText: searchText, onlyCachedSongs: onlyCachedSongs))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicate(forArtist: artist),
+                SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -186,20 +170,13 @@ class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsController<So
 class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
-        let library = LibraryStorage(context: context)
-        let fetchRequest = library.albumsFetchRequest
+        let fetchRequest = AlbumMO.identifierSortedFetchRequest
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Album {
-        let albumMO = fetchResultsController.object(at: indexPath)
-        let album = Album(managedObject: albumMO)
-        return album
     }
     
     func search(searchText: String) {
         if searchText.count > 0 {
-            search(predicate: library.getAlbumsFetchPredicate(searchText: searchText))
+            search(predicate: AlbumMO.getIdentifierBasedSearchPredicate(searchText: searchText))
         } else {
             showAllResults()
         }
@@ -210,20 +187,17 @@ class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
 class SongFetchedResultsController: CachedFetchedResultsController<SongMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
-        let library = LibraryStorage(context: context)
-        let fetchRequest = library.songsFetchRequest
+        let fetchRequest = SongMO.identifierSortedFetchRequest
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Song {
-        let songMO = fetchResultsController.object(at: indexPath)
-        let song = Song(managedObject: songMO)
-        return song
     }
     
     func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
-            search(predicate: library.getSongsFetchPredicate(searchText: searchText, onlyCachedSongs: onlyCachedSongs))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -233,25 +207,24 @@ class SongFetchedResultsController: CachedFetchedResultsController<SongMO> {
 
 class LatestSongsFetchedResultsController: CachedFetchedResultsController<SongMO> {
     
-    private let latestSyncWave: SyncWave?
+    private let latestSyncWave: SyncWave
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         let library = LibraryStorage(context: context)
-        latestSyncWave = library.getLatestSyncWaveWithChanges()
-        let fetchRequest = library.songsFetchRequest
-        fetchRequest.predicate = library.getSongsFetchPredicate(ofSyncWave: latestSyncWave, searchText: "", onlyCachedSongs: false)
+        latestSyncWave = library.getLatestSyncWaveWithChanges()!
+        let fetchRequest = SongMO.identifierSortedFetchRequest
+        fetchRequest.predicate = library.getFetchPredicate(forSyncWave: latestSyncWave)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Song {
-        let songMO = fetchResultsController.object(at: indexPath)
-        let song = Song(managedObject: songMO)
-        return song
     }
     
     func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
-            search(predicate: library.getSongsFetchPredicate(ofSyncWave: latestSyncWave, searchText: searchText, onlyCachedSongs: onlyCachedSongs))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicate(forSyncWave: latestSyncWave),
+                SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -266,19 +239,19 @@ class AlbumSongsFetchedResultsController: BasicFetchedResultsController<SongMO> 
     init(forAlbum album: Album, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         self.album = album
         let library = LibraryStorage(context: context)
-        let fetchRequest = library.getSongsFetchRequest(forAlbum: album)
+        let fetchRequest = SongMO.trackNumberSortedFetchRequest
+        fetchRequest.predicate = library.getFetchPredicate(forAlbum: album)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Song {
-        let songMO = fetchResultsController.object(at: indexPath)
-        let song = Song(managedObject: songMO)
-        return song
     }
     
     func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
-            search(predicate: library.getSongsFetchPredicate(forAlbum: album, searchText: searchText, onlyCachedSongs: onlyCachedSongs))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicate(forAlbum: album),
+                SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -293,19 +266,18 @@ class PlaylistItemsFetchedResultsController: BasicFetchedResultsController<Playl
     init(forPlaylist playlist: Playlist, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         self.playlist = playlist
         let library = LibraryStorage(context: context)
-        let fetchRequest = library.getPlaylistItemsFetchRequest(for: playlist)
+        let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
+        fetchRequest.predicate = library.getFetchPredicate(forPlaylist: playlist)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-
-    func getWrappedEntity(at indexPath: IndexPath) -> PlaylistItem {
-        let itemMO = fetchResultsController.object(at: indexPath)
-        let item = PlaylistItem(storage: library, managedObject: itemMO)
-        return item
     }
 
     func search(searchText: String) {
         if searchText.count > 0 {
-            search(predicate: library.getPlaylistItemsFetchPredicate(for: playlist, searchText: searchText))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicate(forPlaylist: playlist),
+                PlaylistItemMO.getFetchPredicate(forSongWithTitle: searchText)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -316,20 +288,19 @@ class PlaylistItemsFetchedResultsController: BasicFetchedResultsController<Playl
 class PlaylistFetchedResultsController: CachedFetchedResultsController<PlaylistMO> {
 
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
-        let library = LibraryStorage(context: context)
-        let fetchRequest = library.playlistsFetchRequest
+        let fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Playlist {
-        let playlistMO = fetchResultsController.object(at: indexPath)
-        let playlist = Playlist(storage: LibraryStorage(context: self.managedObjectContext), managedObject: playlistMO)
-        return playlist
     }
     
     func search(searchText: String, playlistSearchCategory: PlaylistSearchCategory) {
         if searchText.count > 0 || playlistSearchCategory != .defaultValue {
-            search(predicate: library.getPlaylistsFetchPredicate(searchText: searchText, playlistSearchCategory: playlistSearchCategory))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                PlaylistMO.excludeSystemPlaylistsFetchPredicate,
+                PlaylistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(forPlaylistSearchCategory: playlistSearchCategory)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -341,20 +312,22 @@ class PlaylistSelectorFetchedResultsController: CachedFetchedResultsController<P
 
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         let library = LibraryStorage(context: context)
-        let fetchRequest = library.playlistsFetchRequest
-        fetchRequest.predicate = library.getPlaylistsFetchPredicate(searchText: "", playlistSearchCategory: .userOnly)
+        let fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            PlaylistMO.excludeSystemPlaylistsFetchPredicate,
+            library.getFetchPredicate(forPlaylistSearchCategory: .userOnly)
+        ])
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func getWrappedEntity(at indexPath: IndexPath) -> Playlist {
-        let playlistMO = fetchResultsController.object(at: indexPath)
-        let playlist = Playlist(storage: LibraryStorage(context: self.managedObjectContext), managedObject: playlistMO)
-        return playlist
     }
     
     func search(searchText: String) {
         if searchText.count > 0 {
-            search(predicate: library.getPlaylistsFetchPredicate(searchText: searchText, playlistSearchCategory: .userOnly))
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                PlaylistMO.excludeSystemPlaylistsFetchPredicate,
+                PlaylistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(forPlaylistSearchCategory: .userOnly)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }

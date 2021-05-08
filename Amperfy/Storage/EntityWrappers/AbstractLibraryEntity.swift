@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-public class AbstractLibraryEntity: NSObject, Identifyable {
+public class AbstractLibraryEntity: NSObject {
 
     private let managedObject: AbstractLibraryEntityMO
     
@@ -29,9 +29,6 @@ public class AbstractLibraryEntity: NSObject, Identifyable {
             return Artwork.defaultImage
         }
         return img
-    }
-    var identifier: String {
-        return ""
     }
     
     override public func isEqual(_ object: Any?) -> Bool {

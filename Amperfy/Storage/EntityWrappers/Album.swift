@@ -11,10 +11,9 @@ public class Album: AbstractLibraryEntity, SongContainable {
         super.init(managedObject: managedObject)
     }
     
-    override var identifier: String {
+    var identifier: String {
         return name
     }
-    
     var name: String {
         get { return managedObject.name ?? "Unknown Album" }
         set {

@@ -2,6 +2,23 @@ import Foundation
 import CoreData
 
 @objc(SongMO)
-public class SongMO: AbstractLibraryEntityMO {
+public final class SongMO: AbstractLibraryEntityMO {
+
+}
+
+extension SongMO: CoreDataIdentifyable {
+    
+    static var identifierKey: WritableKeyPath<SongMO, String?> {
+        return \SongMO.title
+    }
+    
+    static var trackNumberSortedFetchRequest: NSFetchRequest<SongMO> {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "track", ascending: true),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        return fetchRequest
+    }
 
 }

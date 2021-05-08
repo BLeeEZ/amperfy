@@ -383,3 +383,7 @@ extension UIImage {
         return result
     }
 }
+
+extension NSPredicate {
+    static var alwaysTrue = NSPredicate(format: "nil == nil")
+}

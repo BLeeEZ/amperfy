@@ -95,7 +95,6 @@ class PlaylistDetailTableHeader: UIView {
     }
 
     func createAlert(forPlaylist playlist: Playlist) -> UIAlertController {
-        let storage = appDelegate.storage
         let alert = UIAlertController(title: playlist.name, message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Download all songs", style: .default, handler: { _ in

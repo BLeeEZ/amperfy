@@ -146,6 +146,48 @@ class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSF
     
 }
 
+extension BasicFetchedResultsController where ResultType == GenreMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> Genre {
+        let genreMO = fetchResultsController.object(at: indexPath)
+        return Genre(managedObject: genreMO)
+    }
+}
+
+extension BasicFetchedResultsController where ResultType == ArtistMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> Artist {
+        let artistMO = fetchResultsController.object(at: indexPath)
+        return Artist(managedObject: artistMO)
+    }
+}
+
+extension BasicFetchedResultsController where ResultType == AlbumMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> Album {
+        let albumMO = fetchResultsController.object(at: indexPath)
+        return Album(managedObject: albumMO)
+    }
+}
+
+extension BasicFetchedResultsController where ResultType == SongMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> Song {
+        let songMO = fetchResultsController.object(at: indexPath)
+        return Song(managedObject: songMO)
+    }
+}
+
+extension BasicFetchedResultsController where ResultType == PlaylistMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> Playlist {
+        let playlistMO = fetchResultsController.object(at: indexPath)
+        return Playlist(storage: LibraryStorage(context: self.managedObjectContext), managedObject: playlistMO)
+    }
+}
+
+extension BasicFetchedResultsController where ResultType == PlaylistItemMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> PlaylistItem {
+        let itemMO = fetchResultsController.object(at: indexPath)
+        return PlaylistItem(storage: library, managedObject: itemMO)
+    }
+}
+
 class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<ResultType> where ResultType : NSFetchRequestResult  {
     
     private let allFetchResulsController: NSFetchedResultsController<ResultType>

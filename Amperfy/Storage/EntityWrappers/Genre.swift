@@ -11,14 +11,14 @@ public class Genre: AbstractLibraryEntity, SongContainable {
         super.init(managedObject: managedObject)
     }
     
+    var identifier: String {
+        return name
+    }
     var name: String {
         get { return managedObject.name ?? "Unknown Genre" }
         set {
             if managedObject.name != newValue { managedObject.name = newValue }
         }
-    }
-    override var identifier: String {
-        return name
     }
     var artists: [Artist] {
         guard let artistsSet = managedObject.artists, let artistsMO = artistsSet.array as? [ArtistMO] else { return [Artist]() }

@@ -11,7 +11,7 @@ public class Artist: AbstractLibraryEntity, SongContainable {
         super.init(managedObject: managedObject)
     }
     
-    override var identifier: String {
+    var identifier: String {
         return name
     }
     

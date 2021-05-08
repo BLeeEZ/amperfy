@@ -23,39 +23,39 @@ class SettingsLibraryVC: UITableViewController {
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
             let storage = LibraryStorage(context: context)
 
-            let artists = storage.getArtists()
+            let artistCount = storage.artistCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.artistsCountLabel.text = String(artists.count)
+                self.artistsCountLabel.text = String(artistCount)
             }
             
-            let albums = storage.getAlbums()
+            let albumCount = storage.albumCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.albumsCountLabel.text = String(albums.count)
+                self.albumsCountLabel.text = String(albumCount)
             }
             
-            let songs = storage.getSongs()
+            let songCount = storage.songCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.songsCountLabel.text = String(songs.count)
+                self.songsCountLabel.text = String(songCount)
             }
             
-            let playlists = storage.getPlaylists()
+            let playlistCount = storage.playlistCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.playlistsCountLabel.text = String(playlists.count)
+                self.playlistsCountLabel.text = String(playlistCount)
             }
             
-            let cachedSongs = songs.filterCached()
+            let cachedSongCount = storage.cachedSongCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.cachedSongsCountSpinner.isHidden = true
-                self.cachedSongsCountLabel.text = String(cachedSongs.count)
+                self.cachedSongsCountLabel.text = String(cachedSongCount)
             }
             
             var cachedSongSizeLabelText = ""
-            let cachedSongSizeInKB = Float(storage.getCachedSongSizeInKB())
+            let cachedSongSizeInKB = Float(storage.cachedSongSizeInKB)
             let cachedSongSizeInMB = cachedSongSizeInKB / 1000.0
             let cachedSongSizeInGB = cachedSongSizeInMB / 1000.0
             if cachedSongSizeInMB < 1000.0 {

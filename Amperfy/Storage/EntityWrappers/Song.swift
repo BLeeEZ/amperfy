@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Song: AbstractLibraryEntity {
+public class Song: AbstractLibraryEntity, Identifyable {
     /*
     Avoid direct access to the SongFile.
     Direct access will result in loading the file into memory and
@@ -141,7 +141,7 @@ public class Song: AbstractLibraryEntity {
         return info
     }
     
-    override var identifier: String {
+    var identifier: String {
         return title
     }
 

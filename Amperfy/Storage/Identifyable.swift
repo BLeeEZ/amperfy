@@ -1,7 +1,41 @@
 import Foundation
+import CoreData
 
 protocol Identifyable {
     var identifier: String { get }
+    associatedtype ManagedObjectType where ManagedObjectType : CoreDataIdentifyable
+    var managedObject: ManagedObjectType { get }
+}
+
+protocol CoreDataIdentifyable where Self: NSFetchRequestResult {
+    static var identifierKey: WritableKeyPath<Self, String?> { get }
+    static var identifierKeyString: String { get }
+    static var identifierSortedFetchRequest: NSFetchRequest<Self> { get }
+    static func getIdentifierBasedSearchPredicate(searchText: String) -> NSPredicate
+    static func fetchRequest() -> NSFetchRequest<Self>
+}
+
+extension CoreDataIdentifyable {
+    static var identifierKeyString: String {
+        return NSExpression(forKeyPath: Self.identifierKey).keyPath
+    }
+    
+    static func getIdentifierBasedSearchPredicate(searchText: String) -> NSPredicate {
+        var predicate: NSPredicate = NSPredicate.alwaysTrue
+        if searchText.count > 0 {
+            predicate = NSPredicate(format: "%K contains[cd] %@", Self.identifierKeyString, searchText)
+        }
+        return predicate
+    }
+    
+    static var identifierSortedFetchRequest: NSFetchRequest<Self> {
+        let fetchRequest: NSFetchRequest<Self> = Self.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        return fetchRequest
+    }
 }
 
 extension Array where Element: Identifyable {

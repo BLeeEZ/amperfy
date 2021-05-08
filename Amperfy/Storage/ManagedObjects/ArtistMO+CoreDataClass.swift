@@ -2,6 +2,14 @@ import Foundation
 import CoreData
 
 @objc(ArtistMO)
-public class ArtistMO: AbstractLibraryEntityMO {
+public final class ArtistMO: AbstractLibraryEntityMO {
 
+}
+
+extension ArtistMO: CoreDataIdentifyable {   
+    
+    static var identifierKey: WritableKeyPath<ArtistMO, String?> {
+        return \ArtistMO.name
+    }
+    
 }

@@ -14,30 +14,10 @@ enum PlaylistSearchCategory: Int {
     static let defaultValue: PlaylistSearchCategory = .all
 }
 
-enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible {
-    case v6 = 0
-    case v7 = 1 // Genres added
-    
-    var description : String {
-        switch self {
-        case .v6: return "v6"
-        case .v7: return "v7"
-        }
-    }
-    var isNewestVersion: Bool {
-        return self == Self.newestVersion
-    }
-    
-    static let newestVersion: LibrarySyncVersion = .v7
-    static let defaultValue: LibrarySyncVersion = .v6
-    
-    static func < (lhs: LibrarySyncVersion, rhs: LibrarySyncVersion) -> Bool {
-        return lhs.rawValue < rhs.rawValue
-    }
-}
-
 class LibraryStorage: SongFileCachable {
     
+    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName]
+
     private let log = OSLog(subsystem: AppDelegate.name, category: "LibraryStorage")
     private var context: NSManagedObjectContext
     
@@ -45,7 +25,67 @@ class LibraryStorage: SongFileCachable {
         self.context = context
     }
     
-    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName]
+    var artistCount: Int {
+        var count = 0
+        do {
+            count = try context.count(for: ArtistMO.fetchRequest())
+        } catch {}
+        return count
+    }
+    
+    var albumCount: Int {
+        var count = 0
+        do {
+            count = try context.count(for: AlbumMO.fetchRequest())
+        } catch {}
+        return count
+    }
+    
+    var songCount: Int {
+        var count = 0
+        do {
+            count = try context.count(for: SongMO.fetchRequest())
+        } catch {}
+        return count
+    }
+    
+    var cachedSongCount: Int {
+        var count = 0
+        let request: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        request.predicate = NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
+        do {
+            count = try context.count(for: request)
+        } catch {}
+        return count
+    }
+    
+    var playlistCount: Int {
+        var count = 0
+        let request: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
+        request.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
+        do {
+            count = try context.count(for: request)
+        } catch {}
+        return count
+    }
+    
+    var cachedSongSizeInKB: Int {
+        var foundSongFiles = [NSDictionary]()
+        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: SongFile.typeName)
+        fetchRequest.propertiesToFetch = [#keyPath(SongFileMO.data)]
+        fetchRequest.resultType = .dictionaryResultType
+        do {
+            foundSongFiles = try context.fetch(fetchRequest)
+        } catch {}
+        
+        var cachedSongSizeInKB = 0
+        for songFile in foundSongFiles {
+            if let fileData = songFile[#keyPath(SongFileMO.data)] as? NSData {
+                cachedSongSizeInKB += fileData.sizeInKB
+            }
+        }
+        return cachedSongSizeInKB
+    }
     
     func createGenre() -> Genre {
         let genreMO = GenreMO(context: context)
@@ -162,87 +202,49 @@ class LibraryStorage: SongFileCachable {
         return SyncWave(managedObject: syncWaveMO)
     }
     
-    var genresFetchRequest: NSFetchRequest<GenreMO> {
-        let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        return fetchRequest
+    func getFetchPredicate(forSyncWave syncWave: SyncWave) -> NSPredicate {
+        return NSPredicate(format: "(syncInfo == %@)", syncWave.managedObject.objectID)
     }
     
-    func getGenresFetchPredicate(searchText: String) -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        if searchText.count > 0 {
-            predicate = NSPredicate(format: "name contains[cd] %@", searchText, searchText)
+    func getFetchPredicate(forGenre genre: Genre) -> NSPredicate {
+        return NSPredicate(format: "genre == %@", genre.managedObject.objectID)
+    }
+    
+    func getFetchPredicate(forArtist artist: Artist) -> NSPredicate {
+        return NSPredicate(format: "artist == %@", artist.managedObject.objectID)
+    }
+    
+    func getFetchPredicate(forAlbum album: Album) -> NSPredicate {
+        return NSPredicate(format: "album == %@", album.managedObject.objectID)
+    }
+    
+    func getFetchPredicate(forPlaylist playlist: Playlist) -> NSPredicate {
+        return NSPredicate(format: "%K == %@", #keyPath(PlaylistItemMO.playlist), playlist.managedObject.objectID)
+    }
+    
+    func getFetchPredicate(onlyCachedSongs: Bool) -> NSPredicate {
+        if onlyCachedSongs {
+            return NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
+        } else {
+            return NSPredicate.alwaysTrue
         }
-        return predicate
     }
     
-    func getGenres() -> Array<Genre> {
-        var genres = Array<Genre>()
-        var foundGenres = Array<GenreMO>()
-        let fetchRequest = genresFetchRequest
-        do {
-            foundGenres = try context.fetch(fetchRequest)
-            genres = foundGenres.compactMap {
-                Genre(managedObject: $0)
-            }
-        } catch {}
-        
-        return genres
-    }
-    
-    var artistsFetchRequest: NSFetchRequest<ArtistMO> {
-        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        return fetchRequest
-    }
-    
-    func getArtistsFetchPredicate(searchText: String) -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        if searchText.count > 0 {
-            predicate = NSPredicate(format: "name contains[cd] %@", searchText, searchText)
+    func getFetchPredicate(forPlaylistSearchCategory playlistSearchCategory: PlaylistSearchCategory) -> NSPredicate {
+        switch playlistSearchCategory {
+        case .all:
+            return NSPredicate.alwaysTrue
+        case .userOnly:
+            return NSPredicate(format: "NOT (%K BEGINSWITH %@)", #keyPath(PlaylistMO.id), Playlist.smartPlaylistIdPrefix)
+        case .smartOnly:
+            return NSPredicate(format: "%K BEGINSWITH %@", #keyPath(PlaylistMO.id), Playlist.smartPlaylistIdPrefix)
         }
-        return predicate
-    }
-    
-    func getArtistsFetchRequest(forGenre genre: Genre) -> NSFetchRequest<ArtistMO> {
-        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        fetchRequest.predicate = getArtistsFetchPredicate(forGenre: genre)
-        return fetchRequest
-    }
-    
-    func getArtistsFetchPredicate(forGenre genre: Genre, searchText: String = "") -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        var predicateFormats = [String]()
-        var predicateArgs = [Any]()
-        
-        predicateFormats.append("(genre == %@)")
-        predicateArgs.append(genre.managedObject.objectID)
-        if searchText.count > 0 {
-            predicateFormats.append("(name contains[cd] %@)")
-            predicateArgs.append(searchText)
-        }
-        
-        if predicateFormats.count > 0 {
-            let predicateFormat = predicateFormats.joined(separator: " && ")
-            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
-        }
-        return predicate
     }
 
     func getArtists() -> Array<Artist> {
         var artists = Array<Artist>()
         var foundArtists = Array<ArtistMO>()
-        let fetchRequest = artistsFetchRequest
+        let fetchRequest = ArtistMO.identifierSortedFetchRequest
         do {
             foundArtists = try context.fetch(fetchRequest)
             for artistMO in foundArtists {
@@ -253,85 +255,10 @@ class LibraryStorage: SongFileCachable {
         return artists
     }
     
-    var albumsFetchRequest: NSFetchRequest<AlbumMO> {
-        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        return fetchRequest
-    }
-    
-    func getAlbumsFetchPredicate(searchText: String) -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        if searchText.count > 0 {
-            predicate = NSPredicate(format: "name contains[cd] %@", searchText, searchText)
-        }
-        return predicate
-    }
-    
-    func getAlbumsFetchRequest(forArtist artist: Artist) -> NSFetchRequest<AlbumMO> {
-        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        fetchRequest.predicate = getAlbumsFetchPredicate(forArtist: artist)
-        return fetchRequest
-    }
-    
-    func getAlbumsFetchPredicate(forArtist artist: Artist, searchText: String = "") -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        var predicateFormats = [String]()
-        var predicateArgs = [Any]()
-        
-        predicateFormats.append("(artist == %@)")
-        predicateArgs.append(artist.managedObject.objectID)
-        if searchText.count > 0 {
-            predicateFormats.append("(name contains[cd] %@)")
-            predicateArgs.append(searchText)
-        }
-        
-        if predicateFormats.count > 0 {
-            let predicateFormat = predicateFormats.joined(separator: " && ")
-            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
-        }
-        return predicate
-    }
-    
-    func getAlbumsFetchRequest(forGenre genre: Genre) -> NSFetchRequest<AlbumMO> {
-        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        fetchRequest.predicate = getAlbumsFetchPredicate(forGenre: genre)
-        return fetchRequest
-    }
-    
-    func getAlbumsFetchPredicate(forGenre genre: Genre, searchText: String = "") -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        var predicateFormats = [String]()
-        var predicateArgs = [Any]()
-        
-        predicateFormats.append("(genre == %@)")
-        predicateArgs.append(genre.managedObject.objectID)
-        if searchText.count > 0 {
-            predicateFormats.append("(name contains[cd] %@)")
-            predicateArgs.append(searchText)
-        }
-        
-        if predicateFormats.count > 0 {
-            let predicateFormat = predicateFormats.joined(separator: " && ")
-            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
-        }
-        return predicate
-    }
-    
     func getAlbums() -> Array<Album> {
         var albums = Array<Album>()
         var foundAlbums = Array<AlbumMO>()
-        let fetchRequest = albumsFetchRequest
+        let fetchRequest = AlbumMO.identifierSortedFetchRequest
         do {
             foundAlbums = try context.fetch(fetchRequest)
             for albumMO in foundAlbums {
@@ -341,158 +268,11 @@ class LibraryStorage: SongFileCachable {
         
         return albums
     }
-    
-    func getSongsFetchRequest(forGenre genre: Genre) -> NSFetchRequest<SongMO> {
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "track", ascending: true),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        fetchRequest.predicate = getSongsFetchPredicate(forGenre: genre, onlyCachedSongs: false)
-        return fetchRequest
-    }
-    
-    func getSongsFetchPredicate(forGenre genre: Genre, searchText: String = "", onlyCachedSongs isOnlyCachedSongs: Bool) -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        var predicateFormats = [String]()
-        var predicateArgs = [Any]()
-        
-        predicateFormats.append("(genre == %@)")
-        predicateArgs.append(genre.managedObject.objectID)
-        if searchText.count > 0 {
-            predicateFormats.append("(title contains[cd] %@)")
-            predicateArgs.append(searchText)
-        }
-        if isOnlyCachedSongs {
-            predicateFormats.append("(file != nil)")
-        }
-        
-        if predicateFormats.count > 0 {
-            let predicateFormat = predicateFormats.joined(separator: " && ")
-            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
-        }
-        return predicate
-    }
-    
-    func getSongsFetchRequest(forAlbum album: Album) -> NSFetchRequest<SongMO> {
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "track", ascending: true),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        fetchRequest.predicate = getSongsFetchPredicate(forAlbum: album, onlyCachedSongs: false)
-        return fetchRequest
-    }
-    
-    func getSongsFetchPredicate(forAlbum album: Album, searchText: String = "", onlyCachedSongs isOnlyCachedSongs: Bool) -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        var predicateFormats = [String]()
-        var predicateArgs = [Any]()
-        
-        predicateFormats.append("(album == %@)")
-        predicateArgs.append(album.managedObject.objectID)
-        if searchText.count > 0 {
-            predicateFormats.append("(title contains[cd] %@)")
-            predicateArgs.append(searchText)
-        }
-        if isOnlyCachedSongs {
-            predicateFormats.append("(file != nil)")
-        }
-        
-        if predicateFormats.count > 0 {
-            let predicateFormat = predicateFormats.joined(separator: " && ")
-            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
-        }
-        return predicate
-    }
-    
-    func getSongsFetchRequest(forArtist artist: Artist) -> NSFetchRequest<SongMO> {
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "title", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        fetchRequest.predicate = getSongsFetchPredicate(forArtist: artist, onlyCachedSongs: false)
-        return fetchRequest
-    }
-    
-    func getSongsFetchPredicate(forArtist artist: Artist, searchText: String = "", onlyCachedSongs isOnlyCachedSongs: Bool) -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        var predicateFormats = [String]()
-        var predicateArgs = [Any]()
-        
-        predicateFormats.append("(artist == %@)")
-        predicateArgs.append(artist.managedObject.objectID)
-        if searchText.count > 0 {
-            predicateFormats.append("(title contains[cd] %@)")
-            predicateArgs.append(searchText)
-        }
-        if isOnlyCachedSongs {
-            predicateFormats.append("(file != nil)")
-        }
-        
-        if predicateFormats.count > 0 {
-            let predicateFormat = predicateFormats.joined(separator: " && ")
-            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
-        }
-        return predicate
-    }
-        
-    var songsFetchRequest: NSFetchRequest<SongMO> {
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "title", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        return fetchRequest
-    }
-    
-    func getSongsFetchPredicate(searchText: String, onlyCachedSongs isOnlyCachedSongs: Bool) -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        var predicateFormats = [String]()
-        var predicateArgs = [Any]()
-        
-        if searchText.count > 0 {
-            predicateFormats.append("(title contains[cd] %@)")
-            predicateArgs.append(searchText)
-        }
-        if isOnlyCachedSongs {
-            predicateFormats.append("(file != nil)")
-        }
-        
-        if predicateFormats.count > 0 {
-            let predicateFormat = predicateFormats.joined(separator: " && ")
-            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
-        }
-        return predicate
-    }
-    
-    func getSongsFetchPredicate(ofSyncWave syncWave: SyncWave?, searchText: String, onlyCachedSongs isOnlyCachedSongs: Bool) -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        var predicateFormats = [String]()
-        var predicateArgs = [Any]()
-        
-        predicateFormats.append("(syncInfo.id == %@)")
-        predicateArgs.append(syncWave?.id ?? "0")
-        
-        if searchText.count > 0 {
-            predicateFormats.append("(title contains[cd] %@)")
-            predicateArgs.append(searchText)
-        }
-        if isOnlyCachedSongs {
-            predicateFormats.append("(file != nil)")
-        }
-        if predicateFormats.count > 0 {
-            let predicateFormat = predicateFormats.joined(separator: " && ")
-            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
-        }
-        return predicate
-    }
-    
+
     func getSongs() -> Array<Song> {
         var songs = Array<Song>()
         var foundSongs = Array<SongMO>()
-        let fetchRequest = songsFetchRequest
+        let fetchRequest = SongMO.identifierSortedFetchRequest
         do {
             foundSongs = try context.fetch(fetchRequest)
             for songMO in foundSongs {
@@ -503,72 +283,11 @@ class LibraryStorage: SongFileCachable {
         return songs
     }
     
-    func getCachedSongSizeInKB() -> Int {
-        var foundSongFiles = [NSDictionary]()
-        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: "SongFile")
-        fetchRequest.propertiesToFetch = ["data"]
-        fetchRequest.resultType = .dictionaryResultType
-        do {
-            foundSongFiles = try context.fetch(fetchRequest)
-        } catch {}
-        
-        var cachedSongSizeInKB = 0
-        for songFile in foundSongFiles {
-            if let fileData = songFile["data"] as? NSData {
-                cachedSongSizeInKB += fileData.sizeInKB
-            }
-        }
-        return cachedSongSizeInKB
-    }
-    
-    var playlistsFetchRequest: NSFetchRequest<PlaylistMO> {
-        let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "name", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        var predicateFormats = [String]()
-        predicateFormats.append("(playersNormalPlaylist == nil)")
-        predicateFormats.append("(playersShuffledPlaylist == nil)")
-        fetchRequest.predicate = NSPredicate(format: predicateFormats.joined(separator: " && "))
-        return fetchRequest
-    }
-    
-    func getPlaylistsFetchPredicate(searchText: String, playlistSearchCategory: PlaylistSearchCategory) -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        var predicateFormats = [String]()
-        var predicateArgs = [Any]()
-        
-        predicateFormats.append("(playersNormalPlaylist == nil)")
-        predicateFormats.append("(playersShuffledPlaylist == nil)")
-        
-        if searchText.count > 0 {
-            predicateFormats.append("(name contains[cd] %@)")
-            predicateArgs.append(searchText)
-        }
-        
-        switch playlistSearchCategory {
-        case .all:
-            break
-        case .userOnly:
-            predicateFormats.append("(NOT (id BEGINSWITH %@))")
-            predicateArgs.append(Playlist.smartPlaylistIdPrefix)
-        case .smartOnly:
-            predicateFormats.append("(id BEGINSWITH %@)")
-            predicateArgs.append(Playlist.smartPlaylistIdPrefix)
-        }
-        
-        if predicateFormats.count > 0 {
-            let predicateFormat = predicateFormats.joined(separator: " && ")
-            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
-        }
-        return predicate
-    }
-    
     func getPlaylists() -> Array<Playlist> {
         var playlists = Array<Playlist>()
         var foundPlaylists = Array<PlaylistMO>()
-        let fetchRequest = playlistsFetchRequest
+        let fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
         do {
             foundPlaylists = try context.fetch(fetchRequest)
             for playlist in foundPlaylists {
@@ -578,34 +297,6 @@ class LibraryStorage: SongFileCachable {
         } catch {}
         
         return playlists
-    }
-    
-    func getPlaylistItemsFetchRequest(for playlist: Playlist) -> NSFetchRequest<PlaylistItemMO> {
-        let fetchRequest: NSFetchRequest<PlaylistItemMO> = PlaylistItemMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "order", ascending: true)
-        ]
-        fetchRequest.predicate = getPlaylistItemsFetchPredicate(for: playlist)
-        return fetchRequest
-    }
-    
-    func getPlaylistItemsFetchPredicate(for playlist: Playlist, searchText: String = "") -> NSPredicate? {
-        var predicate: NSPredicate? = nil
-        var predicateFormats = [String]()
-        var predicateArgs = [Any]()
-        
-        predicateFormats.append("(playlist == %@)")
-        predicateArgs.append(playlist.managedObject.objectID)
-        if searchText.count > 0 {
-            predicateFormats.append("(song.title contains[cd] %@)")
-            predicateArgs.append(searchText)
-        }
-        
-        if predicateFormats.count > 0 {
-            let predicateFormat = predicateFormats.joined(separator: " && ")
-            predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
-        }
-        return predicate
     }
     
     func getPlayerData() -> PlayerData {
@@ -655,7 +346,7 @@ class LibraryStorage: SongFileCachable {
     func getGenre(id: String) -> Genre? {
         var foundGenre: Genre? = nil
         let fr: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSString(string: id))
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(GenreMO.id), NSString(string: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -671,7 +362,7 @@ class LibraryStorage: SongFileCachable {
     func getGenre(name: String) -> Genre? {
         var foundGenre: Genre? = nil
         let fr: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "name == %@", NSString(string: name))
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(GenreMO.name), NSString(string: name))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -687,7 +378,7 @@ class LibraryStorage: SongFileCachable {
     func getArtist(id: String) -> Artist? {
         var foundArtist: Artist? = nil
         let fr: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSString(string: id))
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(ArtistMO.id), NSString(string: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -703,7 +394,7 @@ class LibraryStorage: SongFileCachable {
     func getAlbum(id: String) -> Album? {
         var foundAlbum: Album? = nil
         let fr: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSString(string: id))
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(AlbumMO.id), NSString(string: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -719,7 +410,7 @@ class LibraryStorage: SongFileCachable {
     func getSong(id: String) -> Song? {
         var foundSong: Song? = nil
         let fr: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSString(string: id))
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(SongMO.id), NSString(string: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -736,7 +427,7 @@ class LibraryStorage: SongFileCachable {
         guard song.isCached else { return nil }
         var foundSongFile: SongFile? = nil
         let fr: NSFetchRequest<SongFileMO> = SongFileMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "info.id == %@", NSString(string: song.id))
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(SongFileMO.info.id), NSString(string: song.id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -752,7 +443,7 @@ class LibraryStorage: SongFileCachable {
     func getPlaylist(id: String) -> Playlist? {
         var foundPlaylist: Playlist? = nil
         let fr: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == %@", NSString(string: id))
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(PlaylistMO.id), NSString(string: id))
         fr.fetchLimit = 1
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -774,7 +465,7 @@ class LibraryStorage: SongFileCachable {
         var foundArtworks = [Artwork]()
         
         let fr: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "status == %@", NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue)))
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.status), NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue)))
         fr.fetchLimit = fetchCount
         do {
             let result = try context.fetch(fr) as NSArray?
@@ -806,7 +497,7 @@ class LibraryStorage: SongFileCachable {
     func getLatestSyncWave() -> SyncWave? {
         var latestSyncWave: SyncWave? = nil
         let fr: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "id == max(id)")
+        fr.predicate = NSPredicate(format: "%K == max(%K)", #keyPath(SyncWaveMO.id), #keyPath(SyncWaveMO.id))
         fr.fetchLimit = 1
         do {
             let result = try self.context.fetch(fr).first
@@ -822,9 +513,9 @@ class LibraryStorage: SongFileCachable {
     func getLatestSyncWaveWithChanges() -> SyncWave? {
         var latestSyncWave: SyncWave? = nil
         let fr: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "songs.@count > 0")
+        fr.predicate = NSPredicate(format: "%K.@count > 0", #keyPath(SyncWaveMO.songs))
         fr.sortDescriptors = [
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: "id", ascending: false, selector: #selector(NSString.caseInsensitiveCompare))
         ]
         fr.fetchLimit = 1
         do {

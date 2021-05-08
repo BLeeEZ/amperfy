@@ -45,6 +45,7 @@
 		502040342203865400ED48A3 /* PlaylistSongsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502040332203865400ED48A3 /* PlaylistSongsParserDelegate.swift */; };
 		5020BD2325DC027E00CDD37A /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020BD2225DC027E00CDD37A /* Settings.swift */; };
 		5020BD2725DC0A8100CDD37A /* SettingsSongActionOnTabVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020BD2625DC0A8100CDD37A /* SettingsSongActionOnTabVC.swift */; };
+		50223EF3264543EA007445BC /* LibrarySyncVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50223EF2264543EA007445BC /* LibrarySyncVersion.swift */; };
 		5029E0392235A8EC0027F96F /* CommonString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E0382235A8EC0027F96F /* CommonString.swift */; };
 		5029E03B2235ABB80027F96F /* OptionsBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */; };
 		502C0041224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502C0040224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift */; };
@@ -265,6 +266,7 @@
 		502040332203865400ED48A3 /* PlaylistSongsParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistSongsParserDelegate.swift; sourceTree = "<group>"; };
 		5020BD2225DC027E00CDD37A /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		5020BD2625DC0A8100CDD37A /* SettingsSongActionOnTabVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSongActionOnTabVC.swift; sourceTree = "<group>"; };
+		50223EF2264543EA007445BC /* LibrarySyncVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySyncVersion.swift; sourceTree = "<group>"; };
 		5029E0382235A8EC0027F96F /* CommonString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonString.swift; sourceTree = "<group>"; };
 		5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsBarButtonItem.swift; sourceTree = "<group>"; };
 		502C0040224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmpacheLibraryBackgroundSyncer.swift; sourceTree = "<group>"; };
@@ -700,6 +702,7 @@
 				50C16C3321EB454100F086F0 /* BackgroundSyncerManager.swift */,
 				500BB45521CAA73700D367CF /* PersistentStorage.swift */,
 				50BA930521D5715D00E5901D /* LibraryStorage.swift */,
+				50223EF2264543EA007445BC /* LibrarySyncVersion.swift */,
 				50C16C2121E7A38A00F086F0 /* Identifyable.swift */,
 				500B7D4221ECFCDD0083ED6F /* LibraryElementEnum.swift */,
 				50FBE7DD262DD86500114278 /* BasicFetchedResultsController.swift */,
@@ -1119,6 +1122,7 @@
 				500B7D4321ECFCDD0083ED6F /* LibraryElementEnum.swift in Sources */,
 				508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */,
 				508FDE3621F1E130005A0724 /* NewPlaylistTableHeader.swift in Sources */,
+				50223EF3264543EA007445BC /* LibrarySyncVersion.swift in Sources */,
 				50A7388322451ED200D3F2D4 /* SsPlaylistParserDelegate.swift in Sources */,
 				507361CC2632AB91005F151D /* Genre.swift in Sources */,
 				50C4FCC52639581B009B967B /* SubsonicLibraryVersionBackgroundResyncer.swift in Sources */,

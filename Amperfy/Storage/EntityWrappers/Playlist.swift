@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import os.log
 
-public class Playlist: NSObject, SongContainable {
+public class Playlist: NSObject, SongContainable, Identifyable {
     
     static let smartPlaylistIdPrefix = "smart_"
     
@@ -12,6 +12,10 @@ public class Playlist: NSObject, SongContainable {
     init(storage: LibraryStorage, managedObject: PlaylistMO) {
         self.storage = storage
         self.managedObject = managedObject
+    }
+    
+    var identifier: String {
+        return name
     }
     
     func getManagedObject(in context: NSManagedObjectContext, storage libraryStorage: LibraryStorage) -> Playlist {
@@ -271,14 +275,6 @@ public class Playlist: NSObject, SongContainable {
         return managedObject == object.managedObject
     }
 
-}
-
-extension Playlist: Identifyable {
-    
-    var identifier: String {
-        return name
-    }
-    
 }
 
 extension Array where Element: Playlist {
