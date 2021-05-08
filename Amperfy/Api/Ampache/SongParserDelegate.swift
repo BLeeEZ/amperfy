@@ -96,7 +96,7 @@ class SongParserDelegate: GenericXmlLibParser {
                 genreIdToCreate = nil
             }
         case "song":
-            if let song = songBuffer, let songArtwork = song.artwork, songArtwork.url.isEmpty, song.album != nil, let songArtworkUrlString = artworkUrlString {
+            if let song = songBuffer, let songArtwork = song.artwork, songArtwork.url.isEmpty, song.isOrphaned, let songArtworkUrlString = artworkUrlString {
                 songArtwork.url = songArtworkUrlString
             }
             parsedCount += 1

@@ -112,6 +112,10 @@ public class Song: AbstractLibraryEntity, Identifyable {
             if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
         }
     }
+    var isOrphaned: Bool {
+        guard let album = album else { return true }
+        return album.isOrphaned
+    }
 
     var displayString: String {
         return "\(managedObject.artist?.name ?? "Unknown Artist") - \(title)"
