@@ -510,25 +510,6 @@ class LibraryStorage: SongFileCachable {
         return latestSyncWave
     }
     
-    func getLatestSyncWaveWithChanges() -> SyncWave? {
-        var latestSyncWave: SyncWave? = nil
-        let fr: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K.@count > 0", #keyPath(SyncWaveMO.songs))
-        fr.sortDescriptors = [
-            NSSortDescriptor(key: "id", ascending: false, selector: #selector(NSString.caseInsensitiveCompare))
-        ]
-        fr.fetchLimit = 1
-        do {
-            let result = try self.context.fetch(fr).first
-            if let latestSyncWaveMO = result {
-                latestSyncWave = SyncWave(managedObject: latestSyncWaveMO)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return latestSyncWave
-    }
-    
     func cleanStorage() {
         for entityToDelete in LibraryStorage.entitiesToDelete {
             clearStorage(ofType: entityToDelete)

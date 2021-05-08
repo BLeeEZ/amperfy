@@ -205,33 +205,6 @@ class SongFetchedResultsController: CachedFetchedResultsController<SongMO> {
 
 }
 
-class LatestSongsFetchedResultsController: CachedFetchedResultsController<SongMO> {
-    
-    private let latestSyncWave: SyncWave
-    
-    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
-        let library = LibraryStorage(context: context)
-        latestSyncWave = library.getLatestSyncWaveWithChanges()!
-        let fetchRequest = SongMO.identifierSortedFetchRequest
-        fetchRequest.predicate = library.getFetchPredicate(forSyncWave: latestSyncWave)
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-    }
-    
-    func search(searchText: String, onlyCachedSongs: Bool) {
-        if searchText.count > 0 || onlyCachedSongs {
-            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                library.getFetchPredicate(forSyncWave: latestSyncWave),
-                SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
-            ])
-            search(predicate: predicate)
-        } else {
-            showAllResults()
-        }
-    }
-
-}
-
 class AlbumSongsFetchedResultsController: BasicFetchedResultsController<SongMO> {
     
     let album: Album

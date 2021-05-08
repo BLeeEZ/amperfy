@@ -76,7 +76,6 @@
 		5077F936221E6D0E0099CA91 /* DownloadsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F935221E6D0E0099CA91 /* DownloadsVC.swift */; };
 		5077F938221F24C10099CA91 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F937221F24C10099CA91 /* Download.swift */; };
 		5077F93A221F40130099CA91 /* SynchronizedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F939221F40130099CA91 /* SynchronizedArray.swift */; };
-		5077F93C2222CFCA0099CA91 /* LatestSongsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F93B2222CFCA0099CA91 /* LatestSongsVC.swift */; };
 		5077F93E222489510099CA91 /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F93D222489510099CA91 /* SettingsVC.swift */; };
 		5077F95122279DF40099CA91 /* PlaytimeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F95022279DF40099CA91 /* PlaytimeSlider.swift */; };
 		5077F95322283FED0099CA91 /* RoundedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F95222283FED0099CA91 /* RoundedImage.swift */; };
@@ -299,7 +298,6 @@
 		5077F935221E6D0E0099CA91 /* DownloadsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsVC.swift; sourceTree = "<group>"; };
 		5077F937221F24C10099CA91 /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
 		5077F939221F40130099CA91 /* SynchronizedArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedArray.swift; sourceTree = "<group>"; };
-		5077F93B2222CFCA0099CA91 /* LatestSongsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatestSongsVC.swift; sourceTree = "<group>"; };
 		5077F93D222489510099CA91 /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		5077F95022279DF40099CA91 /* PlaytimeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaytimeSlider.swift; sourceTree = "<group>"; };
 		5077F95222283FED0099CA91 /* RoundedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedImage.swift; sourceTree = "<group>"; };
@@ -769,7 +767,6 @@
 				50C16C1721E704CE00F086F0 /* AlbumsVC.swift */,
 				50C16C1B21E7051700F086F0 /* AlbumDetailVC.swift */,
 				50BA92F921CC37F800E5901D /* SongVC.swift */,
-				5077F93B2222CFCA0099CA91 /* LatestSongsVC.swift */,
 				5007CE4021EF5F4300BC5CBA /* PlaylistsVC.swift */,
 				5007CE4621EF6A8E00BC5CBA /* PlaylistDetailVC.swift */,
 				50065EB321F0584D0066FC32 /* PlaylistSelectorVC.swift */,
@@ -1116,7 +1113,6 @@
 				50F81EE323BF6B1E00EAAC3E /* SongFileMO+CoreDataProperties.swift in Sources */,
 				5086F87D22397B9A00546F5A /* AmpacheApi.swift in Sources */,
 				50763F1A22AD942A00D062A0 /* AlbumDetailTableHeader.swift in Sources */,
-				5077F93C2222CFCA0099CA91 /* LatestSongsVC.swift in Sources */,
 				5083861A21C827E600C4BB32 /* AuthParserDelegate.swift in Sources */,
 				50BA930221D1019B00E5901D /* AmpacheLibrarySyncer.swift in Sources */,
 				500B7D4321ECFCDD0083ED6F /* LibraryElementEnum.swift in Sources */,
