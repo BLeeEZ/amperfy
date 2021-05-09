@@ -15,7 +15,6 @@ class SsSongParserDelegate: GenericXmlLibParser {
         
         if elementName == "song" || elementName == "entry" {
             guard let songId = attributeDict["id"] else { return }
-            var isSongCreated = false
             
             if let fetchedSong = libraryStorage.getSong(id: songId)  {
                 songBuffer = fetchedSong
@@ -23,34 +22,31 @@ class SsSongParserDelegate: GenericXmlLibParser {
                 songBuffer = libraryStorage.createSong()
                 songBuffer?.id = songId
                 songBuffer?.syncInfo = syncWave
-                isSongCreated = true
             }
             
-            if isSongCreated || isLibraryVersionResync {
-                if let attributeTitle = attributeDict["title"] {
-                    songBuffer?.title = attributeTitle
-                }
-                if let attributeTrack = attributeDict["track"], let track = Int(attributeTrack) {
-                    songBuffer?.track = track
-                }
-                if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
-                    songBuffer?.year = year
-                }
-                if let attributeDuration = attributeDict["duration"], let duration = Int(attributeDuration) {
-                    songBuffer?.duration = duration
-                }
-                if let attributeSize = attributeDict["size"], let size = Int(attributeSize) {
-                    songBuffer?.size = size
-                }
-                if let attributeBitrate = attributeDict["bitRate"], let bitrate = Int(attributeBitrate) {
-                    songBuffer?.bitrate = bitrate * 1000 // kb per second -> save as byte per second
-                }
-                if let contentType = attributeDict["contentType"] {
-                    songBuffer?.contentType = contentType
-                }
-                if let disk = attributeDict["discNumber"] {
-                    songBuffer?.disk = disk
-                }
+            if let attributeTitle = attributeDict["title"] {
+                songBuffer?.title = attributeTitle
+            }
+            if let attributeTrack = attributeDict["track"], let track = Int(attributeTrack) {
+                songBuffer?.track = track
+            }
+            if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
+                songBuffer?.year = year
+            }
+            if let attributeDuration = attributeDict["duration"], let duration = Int(attributeDuration) {
+                songBuffer?.duration = duration
+            }
+            if let attributeSize = attributeDict["size"], let size = Int(attributeSize) {
+                songBuffer?.size = size
+            }
+            if let attributeBitrate = attributeDict["bitRate"], let bitrate = Int(attributeBitrate) {
+                songBuffer?.bitrate = bitrate * 1000 // kb per second -> save as byte per second
+            }
+            if let contentType = attributeDict["contentType"] {
+                songBuffer?.contentType = contentType
+            }
+            if let disk = attributeDict["discNumber"] {
+                songBuffer?.disk = disk
             }
 
             if songBuffer?.artist == nil, let artistId = attributeDict["artistId"] {

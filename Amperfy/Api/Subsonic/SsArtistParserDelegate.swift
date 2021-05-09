@@ -17,7 +17,6 @@ class SsArtistParserDelegate: GenericXmlLibParser {
 
         if elementName == "artist" {
             guard let artistId = attributeDict["id"] else { return }
-            var isArtistCreated = false
             
             if let fetchedArtist = libraryStorage.getArtist(id: artistId)  {
                 artistBuffer = fetchedArtist
@@ -25,16 +24,16 @@ class SsArtistParserDelegate: GenericXmlLibParser {
                 artistBuffer = libraryStorage.createArtist()
                 artistBuffer?.id = artistId
                 artistBuffer?.syncInfo = syncWave
-                isArtistCreated = true
             }
             if let attributeAlbumCount = attributeDict["albumCount"], let albumCount = Int(attributeAlbumCount) {
                 artistBuffer?.albumCount = albumCount
             }
-            if isArtistCreated || isLibraryVersionResync {
-                if let attributeArtistName = attributeDict["name"] {
-                    artistBuffer?.name = attributeArtistName
-                }
-                artistBuffer?.artwork?.url = subsonicUrlCreator.getArtUrlString(forArtistId: artistId)
+
+            if let attributeArtistName = attributeDict["name"] {
+                artistBuffer?.name = attributeArtistName
+            }
+            if let artistArtwork = artistBuffer?.artwork, artistArtwork.url.isEmpty {
+                artistArtwork.url = subsonicUrlCreator.getArtUrlString(forArtistId: artistId)
             }
 		}    
     }

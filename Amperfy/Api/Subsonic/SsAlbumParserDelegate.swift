@@ -18,7 +18,6 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
         
         if elementName == "album" {
             guard let albumId = attributeDict["id"] else { return }
-            var isAlbumCreated = false
             
             if let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
                 albumBuffer = fetchedAlbum
@@ -26,20 +25,17 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
                 albumBuffer = libraryStorage.createAlbum()
                 albumBuffer?.id = albumId
                 albumBuffer?.syncInfo = syncWave
-                isAlbumCreated = true
             }
             
-            if isAlbumCreated || isLibraryVersionResync {
-                if let attributeAlbumtName = attributeDict["name"] {
-                    albumBuffer?.name = attributeAlbumtName
-                }
-                if let albumArtwork = albumBuffer?.artwork, albumArtwork.url.isEmpty {
-                    albumArtwork.url = subsonicUrlCreator.getArtUrlString(forArtistId: albumId)
-                }
-                
-                if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
-                    albumBuffer?.year = year
-                }
+            if let attributeAlbumtName = attributeDict["name"] {
+                albumBuffer?.name = attributeAlbumtName
+            }
+            if let albumArtwork = albumBuffer?.artwork, albumArtwork.url.isEmpty {
+                albumArtwork.url = subsonicUrlCreator.getArtUrlString(forArtistId: albumId)
+            }
+            
+            if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
+                albumBuffer?.year = year
             }
             
             if albumBuffer?.artist == nil, let artistId = attributeDict["artistId"], let artist = libraryStorage.getArtist(id: artistId) {

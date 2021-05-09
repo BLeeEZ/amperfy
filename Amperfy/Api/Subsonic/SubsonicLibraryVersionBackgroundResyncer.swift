@@ -36,7 +36,6 @@ class SubsonicLibraryVersionBackgroundResyncer: GenericLibraryBackgroundSyncer, 
         if syncWave.syncState == .Artists, isRunning {
             os_log("Lib version resync: Artist parsing start", log: log, type: .info)
             let artistDelegate = SsArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-            artistDelegate.isLibraryVersionResync = true
             subsonicServerApi.requestArtists(parserDelegate: artistDelegate)
 
             os_log("Lib version resync: Artist parsing done", log: log, type: .info)
@@ -54,7 +53,6 @@ class SubsonicLibraryVersionBackgroundResyncer: GenericLibraryBackgroundSyncer, 
             os_log("Lib version resync: Albums parsing start", log: log, type: .info)
             for artist in artistsLeftSorted {
                 let albumDelegate = SsAlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-                albumDelegate.isLibraryVersionResync = true
                 subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artist.id)
                 syncWave.syncIndexToContinue = artist.id
                 if(!isRunning) { break }
