@@ -28,35 +28,35 @@ public class Song: AbstractLibraryEntity, Identifyable {
     var track: Int {
         get { return Int(managedObject.track) }
         set {
-            guard newValue > Int16.min, newValue < Int16.max, managedObject.track != Int16(newValue) else { return }
+            guard Int16.isValid(value: newValue), managedObject.track != Int16(newValue) else { return }
             managedObject.track = Int16(newValue)
         }
     }
     var year: Int {
         get { return Int(managedObject.year) }
         set {
-            guard newValue > Int16.min, newValue < Int16.max, managedObject.year != Int16(newValue) else { return }
+            guard Int16.isValid(value: newValue), managedObject.year != Int16(newValue) else { return }
             managedObject.year = Int16(newValue)
         }
     }
     var duration: Int {
         get { return Int(managedObject.duration) }
         set {
-            guard newValue > Int16.min, newValue < Int16.max, managedObject.duration != Int16(newValue) else { return }
+            guard Int16.isValid(value: newValue), managedObject.duration != Int16(newValue) else { return }
             managedObject.duration = Int16(newValue)
         }
     }
     var size: Int {
         get { return Int(managedObject.size) }
         set {
-            guard newValue > Int32.min, newValue < Int32.max, managedObject.size != Int32(newValue) else { return }
+            guard Int32.isValid(value: newValue), managedObject.size != Int32(newValue) else { return }
             managedObject.size = Int32(newValue)
         }
     }
     var bitrate: Int { // byte per second
         get { return Int(managedObject.bitrate) }
         set {
-            guard newValue > Int32.min, newValue < Int32.max, managedObject.bitrate != Int32(newValue) else { return }
+            guard Int32.isValid(value: newValue), managedObject.bitrate != Int32(newValue) else { return }
             managedObject.bitrate = Int32(newValue)
         }
     }

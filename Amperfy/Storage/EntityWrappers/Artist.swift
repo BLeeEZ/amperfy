@@ -36,7 +36,7 @@ public class Artist: AbstractLibraryEntity, SongContainable {
     var albumCount: Int {
         get { return Int(managedObject.albumCount) }
         set {
-            guard newValue > Int16.min, newValue < Int16.max, managedObject.albumCount != Int16(newValue) else { return }
+            guard Int16.isValid(value: newValue), managedObject.albumCount != Int16(newValue) else { return }
             managedObject.albumCount = Int16(newValue)
         }
     }

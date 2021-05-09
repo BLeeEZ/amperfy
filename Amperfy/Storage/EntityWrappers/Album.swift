@@ -23,7 +23,7 @@ public class Album: AbstractLibraryEntity, SongContainable {
     var year: Int {
         get { return Int(managedObject.year) }
         set {
-            guard newValue > Int16.min, newValue < Int16.max, managedObject.year != Int16(newValue) else { return }
+            guard Int16.isValid(value: newValue), managedObject.year != Int16(newValue) else { return }
             managedObject.year = Int16(newValue)
         }
     }
@@ -55,7 +55,7 @@ public class Album: AbstractLibraryEntity, SongContainable {
     var songCount: Int {
         get { return Int(managedObject.songCount) }
         set {
-            guard newValue > Int16.min, newValue < Int16.max, managedObject.songCount != Int16(newValue) else { return }
+            guard Int16.isValid(value: newValue), managedObject.songCount != Int16(newValue) else { return }
             managedObject.songCount = Int16(newValue)
         }
     }

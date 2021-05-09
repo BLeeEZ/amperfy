@@ -25,7 +25,7 @@ public class PlaylistItem: NSObject {
     var order: Int {
         get { return Int(managedObject.order) }
         set {
-            guard newValue > Int32.min, newValue < Int32.max, managedObject.order != Int32(newValue) else { return }
+            guard Int32.isValid(value: newValue), managedObject.order != Int32(newValue) else { return }
             managedObject.order = Int32(newValue)
         }
      }

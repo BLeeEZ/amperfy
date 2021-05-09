@@ -8,6 +8,18 @@ extension Bool {
     }
 }
 
+extension Int16 {
+    static func isValid(value: Int) -> Bool {
+        return !((value < Int16.min) || (value > Int16.max))
+    }
+}
+
+extension Int32 {
+    static func isValid(value: Int) -> Bool {
+        return !((value < Int32.min) || (value > Int32.max))
+    }
+}
+
 extension Int {
     mutating func setOtherRandomValue(in targetRange: ClosedRange<Int>) {
         var newValue = 0
