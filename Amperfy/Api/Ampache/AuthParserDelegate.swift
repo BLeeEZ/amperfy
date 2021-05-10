@@ -34,6 +34,10 @@ class AuthParserDelegate: GenericXmlParser {
             authBuffer.artistCount = Int(buffer) ?? 0
         case "albums":
             authBuffer.albumCount = Int(buffer) ?? 0
+        case "genres":
+            authBuffer.genreCount = Int(buffer) ?? 0
+        case "playlists":
+            authBuffer.playlistCount = Int(buffer) ?? 0
         case "tags":
             authBuffer.tagCount = Int(buffer) ?? 0
         case "videos":

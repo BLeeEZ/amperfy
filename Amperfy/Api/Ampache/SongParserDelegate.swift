@@ -100,7 +100,7 @@ class SongParserDelegate: GenericXmlLibParser {
                 songArtwork.url = songArtworkUrlString
             }
             parsedCount += 1
-            parseNotifier?.notifyParsedObject()
+            parseNotifier?.notifyParsedObject(ofType: .song)
             songBuffer = nil
         default:
             break

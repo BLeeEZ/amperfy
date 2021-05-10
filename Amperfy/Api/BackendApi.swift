@@ -1,16 +1,20 @@
 import Foundation
 import CoreData
 
+enum ParsedObjectType {
+    case artist
+    case album
+    case song
+    case playlist
+    case genre
+}
+
 protocol ParsedObjectNotifiable {
-    func notifyParsedObject()
+    func notifyParsedObject(ofType parsedObjectType: ParsedObjectType)
 }
 
 protocol SyncCallbacks: ParsedObjectNotifiable {
-    func notifyGenreSyncStarted()
-    func notifyArtistSyncStarted()
-    func notifyAlbumsSyncStarted()
-    func notifySongsSyncStarted()
-    func notifyPlaylistSyncStarted()
+    func notifySyncStarted(ofType parsedObjectType: ParsedObjectType)
     func notifySyncFinished()
 }
 
@@ -18,6 +22,7 @@ protocol LibrarySyncer {
     var artistCount: Int { get }
     var albumCount: Int { get }
     var songCount: Int { get }
+    var genreCount: Int { get }
     var playlistCount: Int { get }
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?)
     func sync(artist: Artist, libraryStorage: LibraryStorage)

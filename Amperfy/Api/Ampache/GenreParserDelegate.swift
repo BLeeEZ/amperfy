@@ -7,10 +7,6 @@ class GenreParserDelegate: GenericXmlLibParser {
 
     var genreBuffer: Genre?
 
-    init(libraryStorage: LibraryStorage, syncWave: SyncWave) {
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: nil)
-    }
-
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         buffer = ""
 
@@ -35,7 +31,7 @@ class GenreParserDelegate: GenericXmlLibParser {
             genreBuffer?.name = buffer
         case "genre":
             parsedCount += 1
-            parseNotifier?.notifyParsedObject()
+            parseNotifier?.notifyParsedObject(ofType: .genre)
             genreBuffer = nil
         default:
             break

@@ -29,11 +29,9 @@ class AuthentificationHandshake {
     var songCount: Int = 0
     var artistCount: Int = 0
     var albumCount: Int = 0
+    var genreCount: Int = 0
+    var playlistCount: Int = 0
     var tagCount: Int = 0
     var videoCount: Int = 0
-    
-    var objectsToParseCount: Int {
-        return artistCount + albumCount + songCount
-    }
 
 }

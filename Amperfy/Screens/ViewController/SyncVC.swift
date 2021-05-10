@@ -4,7 +4,10 @@ import Foundation
 class SyncVC: UIViewController {
 
     var appDelegate: AppDelegate!
+    var state: ParsedObjectType = .genre
+    let syncSemaphore = DispatchSemaphore(value: 1)
     var parsedObjectCount: Int = 0
+    var parsedObjectPercent: Float = 0.0
     var libObjectsToParseCount: Int = 1
     var syncer: LibrarySyncer?
     
@@ -38,71 +41,64 @@ class SyncVC: UIViewController {
         }
     }
     
-    private func updateSyncInfo() {
-        var percentParsed: Float = 0.0
-        if self.libObjectsToParseCount > 0 {
-            percentParsed = Float(self.parsedObjectCount) / Float(self.libObjectsToParseCount)
+    private func updateSyncInfo(infoText: String? = nil, percentParsed: Float = 0.0) {
+        DispatchQueue.main.async {
+            if let infoText = infoText {
+                self.progressInfo.text = infoText
+            }
+            self.progressBar.setProgress(percentParsed, animated: true)
+            self.progressLabel.text = String(format: "%.1f", percentParsed * 100) + "%"
         }
-        self.progressBar.setProgress(percentParsed, animated: true)
-        self.progressLabel.text = String(format: "%.1f", percentParsed * 100) + "%"
     }
 
 }
 
 extension SyncVC: SyncCallbacks {
     
-    func notifyParsedObject() {
-        DispatchQueue.main.async { [weak self] in
-            if let self = self {
-                self.parsedObjectCount += 1
-                self.updateSyncInfo()
-            }
+    func notifyParsedObject(ofType parsedObjectType: ParsedObjectType) {
+        syncSemaphore.wait()
+        guard parsedObjectType == state else {
+            syncSemaphore.signal()
+            return
         }
+        self.parsedObjectCount += 1
+        
+        var parsePercent: Float = 0.0
+        if self.libObjectsToParseCount > 0 {
+            parsePercent = Float(self.parsedObjectCount) / Float(self.libObjectsToParseCount)
+        }
+        let percentDiff = Int(parsePercent*1000)-Int(self.parsedObjectPercent*1000)
+        if percentDiff > 0 {
+            self.updateSyncInfo(percentParsed: parsePercent)
+        }
+        self.parsedObjectPercent = parsePercent
+        syncSemaphore.signal()
     }
     
-    func notifyGenreSyncStarted() {
-        DispatchQueue.main.async { [weak self] in
-            self?.progressInfo.text = "Syncing genres ..."
-            self?.libObjectsToParseCount = 1
-            self?.parsedObjectCount = 0
-            self?.updateSyncInfo()
+    func notifySyncStarted(ofType parsedObjectType: ParsedObjectType) {
+        syncSemaphore.wait()
+        self.parsedObjectCount = 0
+        self.parsedObjectPercent = 0.0
+        self.state = parsedObjectType
+        
+        switch parsedObjectType {
+        case .artist:
+            self.libObjectsToParseCount = self.syncer?.artistCount ?? 1
+            self.updateSyncInfo(infoText: "Syncing artists ...", percentParsed: 0.0)
+        case .album:
+            self.libObjectsToParseCount = self.syncer?.albumCount ?? 1
+            self.updateSyncInfo(infoText: "Syncing albums ...", percentParsed: 0.0)
+        case .song:
+            self.libObjectsToParseCount = self.syncer?.songCount ?? 1
+            self.updateSyncInfo(infoText: "Syncing songs ...", percentParsed: 0.0)
+        case .playlist:
+            self.libObjectsToParseCount = self.syncer?.playlistCount ?? 1
+            self.updateSyncInfo(infoText: "Syncing playlists ...", percentParsed: 0.0)
+        case .genre:
+            self.libObjectsToParseCount = self.syncer?.genreCount ?? 1
+            self.updateSyncInfo(infoText: "Syncing genres ...", percentParsed: 0.0)
         }
-    }
-    
-    func notifyArtistSyncStarted() {
-        DispatchQueue.main.async { [weak self] in
-            self?.progressInfo.text = "Syncing artists ..."
-            self?.libObjectsToParseCount = self?.syncer?.artistCount ?? 1
-            self?.parsedObjectCount = 0
-            self?.updateSyncInfo()
-        }
-    }
-    
-    func notifyAlbumsSyncStarted() {
-        DispatchQueue.main.async { [weak self] in
-            self?.progressInfo.text = "Syncing albums ..."
-            self?.libObjectsToParseCount = self?.syncer?.albumCount ?? 1
-            self?.parsedObjectCount = 0
-            self?.updateSyncInfo()
-        }
-    }
-    
-    func notifySongsSyncStarted() {
-        DispatchQueue.main.async { [weak self] in
-            self?.progressInfo.text = "Syncing songs ..."
-            self?.libObjectsToParseCount = self?.syncer?.songCount ?? 1
-            self?.parsedObjectCount = 0
-            self?.updateSyncInfo()
-        }
-    }
-    
-    func notifyPlaylistSyncStarted() {
-        DispatchQueue.main.async { [weak self] in
-            self?.progressInfo.text = "Syncing playlists ..."
-            self?.libObjectsToParseCount = self?.syncer?.playlistCount ?? 1
-            self?.parsedObjectCount = 0
-            self?.updateSyncInfo()
-        }
+        syncSemaphore.signal()
     }
     
     func notifySyncFinished() {

@@ -30,6 +30,14 @@ class AmpacheXmlServerApi {
         reauthenticateIfNeccessary()
         return authHandshake?.songCount ?? 0
     }
+    var genreCount: Int {
+        reauthenticateIfNeccessary()
+        return authHandshake?.genreCount ?? 0
+    }
+    var playlistCount: Int {
+        reauthenticateIfNeccessary()
+        return authHandshake?.playlistCount ?? 0
+    }
 
     var defaultArtworkUrl: String {
         reauthenticateIfNeccessary()

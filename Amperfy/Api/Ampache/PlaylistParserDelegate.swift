@@ -3,14 +3,14 @@ import UIKit
 import CoreData
 import os.log
 
-class PlaylistParserDelegate: GenericXmlParser {
+class PlaylistParserDelegate: GenericNotifiableXmlParser {
     
     var playlist: Playlist?
     var libraryStorage: LibraryStorage
     
-    init(libraryStorage: LibraryStorage) {
+    init(libraryStorage: LibraryStorage, parseNotifier: ParsedObjectNotifiable?) {
         self.libraryStorage = libraryStorage
-        super.init()
+        super.init(parseNotifier: parseNotifier)
     }
     
     private func resetPlaylistInCaseOfError() {
@@ -57,6 +57,7 @@ class PlaylistParserDelegate: GenericXmlParser {
             playlist?.songCount = Int(buffer) ?? 0
         case "playlist":
             playlist = nil
+            parseNotifier?.notifyParsedObject(ofType: .playlist)
         default:
             break
         }

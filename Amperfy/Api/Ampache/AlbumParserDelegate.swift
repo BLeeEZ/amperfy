@@ -56,7 +56,7 @@ class AlbumParserDelegate: GenericXmlLibParser {
             albumBuffer?.name = buffer
 		case "album":
             parsedCount += 1
-			parseNotifier?.notifyParsedObject()
+            parseNotifier?.notifyParsedObject(ofType: .album)
             albumBuffer = nil
 		case "year":
             albumBuffer?.year = Int(buffer) ?? 0

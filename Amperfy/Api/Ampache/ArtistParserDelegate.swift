@@ -59,7 +59,7 @@ class ArtistParserDelegate: GenericXmlLibParser {
             }
 		case "artist":
             parsedCount += 1
-            parseNotifier?.notifyParsedObject()
+            parseNotifier?.notifyParsedObject(ofType: .artist)
             artistBuffer = nil
 		default:
 			break
