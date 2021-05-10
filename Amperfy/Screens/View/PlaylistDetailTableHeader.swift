@@ -40,11 +40,14 @@ class PlaylistDetailTableHeader: UIView {
         nameTextField.text = playlist.name
         nameLabel.text = playlist.name
         refreshArtworks(playlist: playlist)
+        var infoText = ""
         if playlist.songCount == 1 {
-            songCountLabel.text = "1 Song"
+            infoText += "1 Song"
         } else {
-            songCountLabel.text = "\(playlist.songCount) Songs"
+            infoText += "\(playlist.songCount) Songs"
         }
+        infoText += " \(CommonString.oneMiddleDot) \(playlist.duration.asDurationString)"
+        songCountLabel.text = infoText
         if !playlist.isSmartPlaylist {
             smartPlaylistLabel.isHidden = true
         }

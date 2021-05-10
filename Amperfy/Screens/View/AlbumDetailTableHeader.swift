@@ -37,8 +37,9 @@ class AlbumDetailTableHeader: UIView {
         } else {
             infoText += "\(album.songCount) Songs"
         }
+        infoText += " \(CommonString.oneMiddleDot) \(album.duration.asDurationString)"
         if album.year != 0 {
-            infoText += " \(CommonString.oneMiddleDot) Year: \(album.year)"
+            infoText += " \(CommonString.oneMiddleDot) Released \(album.year)"
         }
         infoLabel.text = infoText
     }

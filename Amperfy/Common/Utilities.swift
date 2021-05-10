@@ -28,6 +28,13 @@ extension Int {
         } while (newValue == self)
         self = newValue
     }
+    
+    var asDurationString: String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute, .second]
+        formatter.unitsStyle = .abbreviated
+        return formatter.string(from: TimeInterval(self))!
+    }
 }
 
 extension String {
