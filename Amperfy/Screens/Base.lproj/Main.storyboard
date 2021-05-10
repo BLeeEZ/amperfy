@@ -676,57 +676,8 @@
                                             <segue destination="PdJ-u4-MrR" kind="show" id="3Jm-Ho-xhv"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="60" id="Mhs-y7-u9I">
-                                        <rect key="frame" x="0.0" y="198" width="414" height="60"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Mhs-y7-u9I" id="CLW-g3-ApO">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="60"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r8e-rS-wOE" userLabel="Name Button">
-                                                    <rect key="frame" x="66" y="15" width="328" height="30"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="HT4-ln-GnL"/>
-                                                    </constraints>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                                    <state key="normal" title="Playlists">
-                                                        <color key="titleColor" systemColor="labelColor"/>
-                                                    </state>
-                                                </button>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&gt;" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mmL-P5-5so" userLabel="Select Label">
-                                                    <rect key="frame" x="344" y="20" width="50" height="20.5"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YNv-7R-ynG">
-                                                    <rect key="frame" x="20" y="15" width="30" height="30"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="Fj8-q6-bB0"/>
-                                                        <constraint firstAttribute="width" secondItem="YNv-7R-ynG" secondAttribute="height" multiplier="1:1" id="FzU-a0-aPq"/>
-                                                    </constraints>
-                                                    <state key="normal" image="playlist">
-                                                        <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    </state>
-                                                </button>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="mmL-P5-5so" firstAttribute="centerY" secondItem="CLW-g3-ApO" secondAttribute="centerY" id="8GK-O1-jLN"/>
-                                                <constraint firstItem="YNv-7R-ynG" firstAttribute="centerY" secondItem="CLW-g3-ApO" secondAttribute="centerY" id="FMj-bB-xYm"/>
-                                                <constraint firstItem="mmL-P5-5so" firstAttribute="leading" secondItem="CLW-g3-ApO" secondAttribute="trailingMargin" constant="-50" id="IkN-Md-lFt"/>
-                                                <constraint firstItem="r8e-rS-wOE" firstAttribute="centerY" secondItem="CLW-g3-ApO" secondAttribute="centerY" id="P7q-vB-y89"/>
-                                                <constraint firstItem="YNv-7R-ynG" firstAttribute="leading" secondItem="CLW-g3-ApO" secondAttribute="leadingMargin" id="Wxu-9M-wUh"/>
-                                                <constraint firstItem="r8e-rS-wOE" firstAttribute="leading" secondItem="YNv-7R-ynG" secondAttribute="trailing" constant="16" id="ZHh-eG-X63"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="mmL-P5-5so" secondAttribute="trailing" id="lyK-8n-LrD"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="r8e-rS-wOE" secondAttribute="trailing" id="wcg-6J-iPs"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                        <connections>
-                                            <segue destination="1iw-qc-oYh" kind="show" id="xrJ-Pb-8ut"/>
-                                        </connections>
-                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="60" id="2jM-Rh-bzF">
-                                        <rect key="frame" x="0.0" y="258" width="414" height="60"/>
+                                        <rect key="frame" x="0.0" y="198" width="414" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="2jM-Rh-bzF" id="u8E-5C-z9O">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="60"/>
@@ -773,6 +724,55 @@
                                         </tableViewCellContentView>
                                         <connections>
                                             <segue destination="aeq-6R-iJo" kind="show" id="nfI-bR-LP0"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="60" id="Mhs-y7-u9I">
+                                        <rect key="frame" x="0.0" y="258" width="414" height="60"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Mhs-y7-u9I" id="CLW-g3-ApO">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="60"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r8e-rS-wOE" userLabel="Name Button">
+                                                    <rect key="frame" x="66" y="15" width="328" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="HT4-ln-GnL"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                    <state key="normal" title="Playlists">
+                                                        <color key="titleColor" systemColor="labelColor"/>
+                                                    </state>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&gt;" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mmL-P5-5so" userLabel="Select Label">
+                                                    <rect key="frame" x="344" y="20" width="50" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YNv-7R-ynG">
+                                                    <rect key="frame" x="20" y="15" width="30" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="Fj8-q6-bB0"/>
+                                                        <constraint firstAttribute="width" secondItem="YNv-7R-ynG" secondAttribute="height" multiplier="1:1" id="FzU-a0-aPq"/>
+                                                    </constraints>
+                                                    <state key="normal" image="playlist">
+                                                        <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </state>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="mmL-P5-5so" firstAttribute="centerY" secondItem="CLW-g3-ApO" secondAttribute="centerY" id="8GK-O1-jLN"/>
+                                                <constraint firstItem="YNv-7R-ynG" firstAttribute="centerY" secondItem="CLW-g3-ApO" secondAttribute="centerY" id="FMj-bB-xYm"/>
+                                                <constraint firstItem="mmL-P5-5so" firstAttribute="leading" secondItem="CLW-g3-ApO" secondAttribute="trailingMargin" constant="-50" id="IkN-Md-lFt"/>
+                                                <constraint firstItem="r8e-rS-wOE" firstAttribute="centerY" secondItem="CLW-g3-ApO" secondAttribute="centerY" id="P7q-vB-y89"/>
+                                                <constraint firstItem="YNv-7R-ynG" firstAttribute="leading" secondItem="CLW-g3-ApO" secondAttribute="leadingMargin" id="Wxu-9M-wUh"/>
+                                                <constraint firstItem="r8e-rS-wOE" firstAttribute="leading" secondItem="YNv-7R-ynG" secondAttribute="trailing" constant="16" id="ZHh-eG-X63"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="mmL-P5-5so" secondAttribute="trailing" id="lyK-8n-LrD"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="r8e-rS-wOE" secondAttribute="trailing" id="wcg-6J-iPs"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="1iw-qc-oYh" kind="show" id="xrJ-Pb-8ut"/>
                                         </connections>
                                     </tableViewCell>
                                 </cells>
