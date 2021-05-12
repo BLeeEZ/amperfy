@@ -18,8 +18,6 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
     }
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
-        
         switch(elementName) {
         case "playlisttrack":
             var order = 0
@@ -45,6 +43,8 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
         default:
             break
         }
+        
+        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
     }
 
 }

@@ -12,12 +12,4 @@ public class PlaylistItemMO: NSManagedObject {
         return fetchRequest
     }
 
-    static func getFetchPredicate(forSongWithTitle searchText: String) -> NSPredicate {
-        if searchText.count > 0 {
-            return NSPredicate(format: "(%K == %@)", #keyPath(PlaylistItemMO.song.title), searchText)
-        } else {
-            return NSPredicate.alwaysTrue
-        }
-    }
-
 }

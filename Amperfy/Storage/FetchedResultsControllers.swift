@@ -244,18 +244,6 @@ class PlaylistItemsFetchedResultsController: BasicFetchedResultsController<Playl
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
-    func search(searchText: String) {
-        if searchText.count > 0 {
-            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                library.getFetchPredicate(forPlaylist: playlist),
-                PlaylistItemMO.getFetchPredicate(forSongWithTitle: searchText)
-            ])
-            search(predicate: predicate)
-        } else {
-            showAllResults()
-        }
-    }
-
 }
 
 class PlaylistFetchedResultsController: CachedFetchedResultsController<PlaylistMO> {
