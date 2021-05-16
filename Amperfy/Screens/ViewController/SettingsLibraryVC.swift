@@ -23,6 +23,12 @@ class SettingsLibraryVC: UITableViewController {
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
             let storage = LibraryStorage(context: context)
 
+            let playlistCount = storage.playlistCount
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.playlistsCountLabel.text = String(playlistCount)
+            }
+
             let artistCount = storage.artistCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
@@ -39,12 +45,6 @@ class SettingsLibraryVC: UITableViewController {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.songsCountLabel.text = String(songCount)
-            }
-            
-            let playlistCount = storage.playlistCount
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.playlistsCountLabel.text = String(playlistCount)
             }
             
             let cachedSongCount = storage.cachedSongCount

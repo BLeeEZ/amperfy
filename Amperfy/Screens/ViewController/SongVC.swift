@@ -11,13 +11,14 @@ class SongVC: SingleFetchedResultsTableViewController<SongMO> {
         fetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController(placeholder: "Search in \"Songs\"", scopeButtonTitles: ["All", "Cached"])
+        configureSearchController(placeholder: "Search in \"Songs\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
+        tableView.separatorStyle = .none
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
+        // Only search performes fetches in this view
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -28,13 +29,22 @@ class SongVC: SingleFetchedResultsTableViewController<SongMO> {
     }
     
     override func updateSearchResults(for searchController: UISearchController) {
-        let searchText = searchController.searchBar.text ?? ""
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let backgroundLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.searchSongs(searchText: searchText, libraryStorage: backgroundLibrary)
+        guard let searchText = searchController.searchBar.text else { return }
+        if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
+            appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+                let backgroundLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.searchSongs(searchText: searchText, libraryStorage: backgroundLibrary)
+            }
+            fetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
+            tableView.separatorStyle = .singleLine
+        } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
+            fetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
+            tableView.separatorStyle = .singleLine
+        } else {
+            fetchedResultsController.clearResults()
+            tableView.separatorStyle = .none
         }
-        fetchedResultsController.search(searchText: searchText, onlyCachedSongs: (searchController.searchBar.selectedScopeButtonIndex == 1))
         tableView.reloadData()
     }
     
