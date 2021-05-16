@@ -95,6 +95,7 @@ class SongTableCell: BasicTableCell {
         let behaviourOnTab = isCellInPopupPlayer ? .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong :  appDelegate.storage.getSettings().songActionOnTab
         
         if isUserTouchInteractionAllowed, !isAlertPresented {
+            hideSearchBarKeyboardInRootView()
             switch behaviourOnTab {
             case .playAndErasePlaylist:
                 appDelegate.player.play(song: song)
@@ -114,6 +115,12 @@ class SongTableCell: BasicTableCell {
             }
         }
         isAlertPresented = false
+    }
+    
+    private func hideSearchBarKeyboardInRootView() {
+        if let basicRootView = rootView as? BasicTableViewController {
+            basicRootView.searchController.searchBar.endEditing(true)
+        }
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
