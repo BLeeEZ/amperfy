@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20E232" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="18154" systemVersion="20E232" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="AbstractLibraryEntity" representedClassName="AbstractLibraryEntityMO" isAbstract="YES" elementID="AbstractLibraryElementMO" syncable="YES">
         <attribute name="id" attributeType="String" defaultValueString=""/>
         <relationship name="artwork" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Artwork" inverseName="owners" inverseEntity="Artwork"/>
@@ -33,6 +33,13 @@
         <relationship name="artists" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Artist" inverseName="genre" inverseEntity="Artist"/>
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="genre" inverseEntity="Song"/>
         <relationship name="syncInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SyncWave" inverseName="genres" inverseEntity="SyncWave"/>
+    </entity>
+    <entity name="LogEntry" representedClassName="LogEntryMO" syncable="YES">
+        <attribute name="creationDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="message" attributeType="String"/>
+        <attribute name="statusCode" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="suppressionTimeInterval" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="type" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <entity name="Player" representedClassName="PlayerMO" syncable="YES">
         <attribute name="currentSongIndex" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -95,6 +102,7 @@
         <element name="Artist" positionX="-30559.515625" positionY="-8017.5703125" width="128" height="119"/>
         <element name="Artwork" positionX="-30271.51171875" positionY="-8396.6953125" width="128" height="103"/>
         <element name="Genre" positionX="-30465" positionY="-8235" width="128" height="104"/>
+        <element name="LogEntry" positionX="-30474" positionY="-8244" width="128" height="104"/>
         <element name="Player" positionX="-29890.359375" positionY="-8230.625" width="128" height="104"/>
         <element name="Playlist" positionX="-30080.7734375" positionY="-8216.7734375" width="128" height="119"/>
         <element name="PlaylistItem" positionX="-30254.0078125" positionY="-8216.28125" width="128" height="74"/>

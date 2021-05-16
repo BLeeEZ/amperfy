@@ -2,18 +2,14 @@ import Foundation
 import UIKit
 import CoreData
 
-class AuthParserDelegate: GenericXmlParser {
+class AuthParserDelegate: AmpacheXmlParser {
     
     var authHandshake: AuthentificationHandshake?
     var serverApiVersion: String?
     private var authBuffer = AuthentificationHandshake()
     private let safetyOffsetTimeBeforeSessionExpireInMinutes:TimeInterval = -5.0 * 60.0
     
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        buffer = ""
-    }
-    
-    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "auth":
             authBuffer.token = buffer
@@ -48,7 +44,7 @@ class AuthParserDelegate: GenericXmlParser {
             break
         }
         
-        buffer = ""
+        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
     }
     
 }

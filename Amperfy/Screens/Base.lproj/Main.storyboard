@@ -1575,6 +1575,42 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="40" id="Xyw-U9-4cy">
+                                        <rect key="frame" x="0.0" y="268" width="414" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Xyw-U9-4cy" id="VDF-wg-Qnf">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Al7-Bn-gr6" userLabel="EventLog">
+                                                    <rect key="frame" x="20" y="5" width="394" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="WbP-tx-aYz"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Event Log">
+                                                        <color key="titleColor" systemColor="labelColor"/>
+                                                    </state>
+                                                    <connections>
+                                                        <segue destination="ymn-SS-kdp" kind="show" id="IbN-GT-XfC"/>
+                                                    </connections>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&gt;" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oll-oZ-hgN" userLabel="Select Label">
+                                                    <rect key="frame" x="314" y="10" width="84" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="oll-oZ-hgN" firstAttribute="leading" secondItem="VDF-wg-Qnf" secondAttribute="trailing" constant="-100" id="0vT-rB-pXz"/>
+                                                <constraint firstAttribute="trailing" secondItem="oll-oZ-hgN" secondAttribute="trailing" constant="16" id="2m0-yg-sPB"/>
+                                                <constraint firstItem="Al7-Bn-gr6" firstAttribute="centerY" secondItem="VDF-wg-Qnf" secondAttribute="centerY" id="J80-qU-mHp"/>
+                                                <constraint firstItem="oll-oZ-hgN" firstAttribute="centerY" secondItem="VDF-wg-Qnf" secondAttribute="centerY" id="U0l-hm-i7J"/>
+                                                <constraint firstItem="Al7-Bn-gr6" firstAttribute="leading" secondItem="VDF-wg-Qnf" secondAttribute="leadingMargin" id="gtj-yC-dSx"/>
+                                                <constraint firstAttribute="trailing" secondItem="Al7-Bn-gr6" secondAttribute="trailing" id="qUi-cA-Vzi"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -2003,11 +2039,31 @@
             </objects>
             <point key="canvasLocation" x="4707" y="-2760"/>
         </scene>
+        <!--Event Log-->
+        <scene sceneID="gSf-eF-8TY">
+            <objects>
+                <tableViewController title="Event Log" id="ymn-SS-kdp" userLabel="Event Log" customClass="EventLogVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="WWn-ea-eaF">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <gestureRecognizers/>
+                        <connections>
+                            <outlet property="dataSource" destination="ymn-SS-kdp" id="PzB-68-Gn0"/>
+                            <outlet property="delegate" destination="ymn-SS-kdp" id="5P6-bn-lLn"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Event Log" id="Ln5-B6-gL5" userLabel="Event Log"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4n4-Lr-6IO" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1825" y="3190"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="qeK-6j-t1f"/>
-        <segue reference="JPy-r0-4uB"/>
-        <segue reference="qYo-eV-9nj"/>
+        <segue reference="axa-3B-EfE"/>
+        <segue reference="tfW-38-Y3k"/>
+        <segue reference="whh-XI-a5P"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="music_library" width="30" height="30"/>

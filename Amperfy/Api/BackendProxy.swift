@@ -35,6 +35,7 @@ struct ResponseError {
 class BackendProxy {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "BackendProxy")
+    private let errorLogger: ErrorLogger
     private var activeApiType = BackenApiType.ampache
     public var selectedApi: BackenApiType {
         get {
@@ -58,11 +59,15 @@ class BackendProxy {
     }
  
     private lazy var ampacheApi: BackendApi = {
-        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi())
+        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(errorLogger: errorLogger))
     }()
     private lazy var subsonicApi: BackendApi = {
-        return SubsonicApi(subsonicServerApi: SubsonicServerApi())
+        return SubsonicApi(subsonicServerApi: SubsonicServerApi(errorLogger: errorLogger))
     }()
+    
+    init(errorLogger: ErrorLogger) {
+        self.errorLogger = errorLogger
+    }
 
     func login(credentials: LoginCredentials) throws -> BackenApiType {
         try checkServerReachablity(credentials: credentials)

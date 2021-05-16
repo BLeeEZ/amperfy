@@ -35,6 +35,20 @@ extension Int {
         formatter.unitsStyle = .abbreviated
         return formatter.string(from: TimeInterval(self))!
     }
+    
+    var asMinuteString: String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.minute]
+        formatter.unitsStyle = .short
+        return formatter.string(from: TimeInterval(self))!
+    }
+
+    var asDayString: String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.day]
+        formatter.unitsStyle = .short
+        return formatter.string(from: TimeInterval(self))!
+    }
 }
 
 extension String {

@@ -13,10 +13,6 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
         super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: nil)
     }
     
-    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
-    }
-    
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "playlisttrack":

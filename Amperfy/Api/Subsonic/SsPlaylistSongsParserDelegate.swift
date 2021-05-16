@@ -48,8 +48,6 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
     }
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
-        
         switch(elementName) {
         case "playlist":
             if items.count > parsedCount {
@@ -61,7 +59,7 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
             break
         }
         
-        buffer = ""
+        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
     }
     
 }

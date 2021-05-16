@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 import CoreData
 
-class SsArtistParserDelegate: GenericXmlLibParser {
+class SsArtistParserDelegate: SsXmlLibParser {
 
     private var subsonicUrlCreator: SubsonicUrlCreator
     private var artistBuffer: Artist?
@@ -12,8 +12,8 @@ class SsArtistParserDelegate: GenericXmlLibParser {
         super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
     }
 
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        buffer = ""
+    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
+        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
 
         if elementName == "artist" {
             guard let artistId = attributeDict["id"] else { return }
@@ -38,7 +38,7 @@ class SsArtistParserDelegate: GenericXmlLibParser {
 		}    
     }
     
-    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
 		switch(elementName) {
 		case "artist":
             parsedCount += 1
@@ -47,7 +47,7 @@ class SsArtistParserDelegate: GenericXmlLibParser {
 			break
 		}
         
-        buffer = ""
+        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
     }
 
 }

@@ -188,6 +188,13 @@ extension BasicFetchedResultsController where ResultType == PlaylistItemMO {
     }
 }
 
+extension BasicFetchedResultsController where ResultType == LogEntryMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> LogEntry {
+        let itemMO = fetchResultsController.object(at: indexPath)
+        return LogEntry(managedObject: itemMO)
+    }
+}
+
 class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<ResultType> where ResultType : NSFetchRequestResult  {
     
     private let allFetchResulsController: NSFetchedResultsController<ResultType>

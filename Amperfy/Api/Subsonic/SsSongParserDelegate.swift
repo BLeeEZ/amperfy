@@ -3,15 +3,15 @@ import UIKit
 import CoreData
 import os.log
 
-class SsSongParserDelegate: GenericXmlLibParser {
+class SsSongParserDelegate: SsXmlLibParser {
     
     var songBuffer: Song?
     var guessedArtist: Artist?
     var guessedAlbum: Album?
     var guessedGenre: Genre?
     
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        buffer = ""
+    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
+        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
         
         if elementName == "song" || elementName == "entry" {
             guard let songId = attributeDict["id"] else { return }
@@ -81,13 +81,13 @@ class SsSongParserDelegate: GenericXmlLibParser {
         }
     }
     
-    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "song" || elementName == "entry" {
             parsedCount += 1
             songBuffer = nil
         }
         
-        buffer = ""
+        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
     }
     
 }

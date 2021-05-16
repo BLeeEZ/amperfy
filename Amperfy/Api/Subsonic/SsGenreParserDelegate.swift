@@ -2,13 +2,9 @@ import Foundation
 import UIKit
 import CoreData
 
-class SsGenreParserDelegate: GenericXmlLibParser {
-
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        buffer = ""
-    }
+class SsGenreParserDelegate: SsXmlLibParser {
     
-    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
 		switch(elementName) {
 		case "genre":
             let genreName = buffer
@@ -24,7 +20,7 @@ class SsGenreParserDelegate: GenericXmlLibParser {
 			break
 		}
         
-        buffer = ""
+        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
     }
 
 }

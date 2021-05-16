@@ -16,26 +16,3 @@ class GenericXmlParser: NSObject, XMLParserDelegate {
     }
     
 }
-
-class GenericNotifiableXmlParser: GenericXmlParser {
-    
-    var parseNotifier: ParsedObjectNotifiable?
-    
-    init(parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.parseNotifier = parseNotifier
-    }
-    
-}
-
-class GenericXmlLibParser: GenericNotifiableXmlParser {
-    
-    var libraryStorage: LibraryStorage
-    var syncWave: SyncWave
-    
-    init(libraryStorage: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.libraryStorage = libraryStorage
-        self.syncWave = syncWave
-        super.init(parseNotifier: parseNotifier)
-    }
-    
-}

@@ -112,13 +112,13 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         }
         
         let songIdsToAdd = songs.compactMap{ $0.id }
-        let updateResponseParser = PingParserDelegate()
+        let updateResponseParser = SsPingParserDelegate()
         subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: [], songIdsToAdd: songIdsToAdd)
     }
     
     func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, libraryStorage: LibraryStorage) {
         os_log("Upload SongDelete on playlist \"%s\"", log: log, type: .info, playlist.name)
-        let updateResponseParser = PingParserDelegate()
+        let updateResponseParser = SsPingParserDelegate()
         subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: [index], songIdsToAdd: [])
     }
     
@@ -126,13 +126,13 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         os_log("Upload OrderChange on playlist \"%s\"", log: log, type: .info, playlist.name)
         let songIndicesToRemove = Array(0...playlist.songCount-1)
         let songIdsToAdd = playlist.songs.compactMap{ $0.id }
-        let updateResponseParser = PingParserDelegate()
+        let updateResponseParser = SsPingParserDelegate()
         subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: songIndicesToRemove, songIdsToAdd: songIdsToAdd)
     }
     
     func syncUpload(playlistToDelete playlist: Playlist) {
         os_log("Upload Delete playlist \"%s\"", log: log, type: .info, playlist.name)
-        let updateResponseParser = PingParserDelegate()
+        let updateResponseParser = SsPingParserDelegate()
         subsonicServerApi.requestPlaylistDelete(parserDelegate: updateResponseParser, playlist: playlist)
     }
     

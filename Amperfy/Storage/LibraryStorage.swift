@@ -16,7 +16,7 @@ enum PlaylistSearchCategory: Int {
 
 class LibraryStorage: SongFileCachable {
     
-    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName]
+    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName]
 
     private let log = OSLog(subsystem: AppDelegate.name, category: "LibraryStorage")
     private var context: NSManagedObjectContext
@@ -113,6 +113,12 @@ class LibraryStorage: SongFileCachable {
     func createSongFile() -> SongFile {
         let songFileMO = SongFileMO(context: context)
         return SongFile(managedObject: songFileMO)
+    }
+    
+    func createLogEntry() -> LogEntry {
+        let logEntryMO = LogEntryMO(context: context)
+        logEntryMO.creationDate = Date()
+        return LogEntry(managedObject: logEntryMO)
     }
     
     func deleteSongFile(songFile: SongFile) {
@@ -297,6 +303,17 @@ class LibraryStorage: SongFileCachable {
         } catch {}
         
         return playlists
+    }
+    
+    func getLogEntries() -> Array<LogEntry> {
+        var entries = Array<LogEntry>()
+        var foundEntries = Array<LogEntryMO>()
+        let fetchRequest: NSFetchRequest<LogEntryMO> = LogEntryMO.creationDateSortedFetchRequest
+        do {
+            foundEntries = try context.fetch(fetchRequest)
+            entries = foundEntries.compactMap{ LogEntry(managedObject: $0) }
+        } catch {}
+        return entries
     }
     
     func getPlayerData() -> PlayerData {

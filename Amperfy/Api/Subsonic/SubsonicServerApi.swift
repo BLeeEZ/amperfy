@@ -14,8 +14,13 @@ class SubsonicServerApi {
     var clientApiVersion = defaultClientApiVersionWithToken
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "Subsonic")
+    private let errorLogger: ErrorLogger
     private var credentials: LoginCredentials?
     private var isValidCredentials = false
+    
+    init(errorLogger: ErrorLogger) {
+        self.errorLogger = errorLogger
+    }
 
     private func generateAuthenticationToken(password: String, salt: String) -> String {
         // Calculate the authentication token as follows: token = md5(password + salt).
@@ -103,7 +108,7 @@ class SubsonicServerApi {
             return
         }
         
-        let curDelegate = PingParserDelegate()
+        let curDelegate = SsPingParserDelegate()
         parser.delegate = curDelegate
         let success = parser.parse()
         
@@ -145,8 +150,8 @@ class SubsonicServerApi {
     
     func requestServerApiVersion() -> SubsonicVersion? {
         guard let urlComp = createBasicApiUrlComponent(forAction: "ping") else { return nil }
-        let parserDelegate = PingParserDelegate()
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+        let parserDelegate = SsPingParserDelegate()
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate, ignoreErrorResponse: true)
         guard let serverApiVersionString = parserDelegate.serverApiVersion else { return nil }
         guard let serverApiVersion = SubsonicVersion(serverApiVersionString) else {
             os_log("The server API version '%s' could not be parsed to 'SubsonicVersion'", log: log, type: .info, serverApiVersionString)
@@ -155,27 +160,27 @@ class SubsonicServerApi {
         return serverApiVersion
     }
 
-    func requestGenres(parserDelegate: XMLParserDelegate) {
+    func requestGenres(parserDelegate: SsXmlParser) {
         guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getGenres") else { return }
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
 
-    func requestArtists(parserDelegate: XMLParserDelegate) {
+    func requestArtists(parserDelegate: SsXmlParser) {
         guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getArtists") else { return }
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
-    func requestArtist(parserDelegate: XMLParserDelegate, id: String) {
+    func requestArtist(parserDelegate: SsXmlParser, id: String) {
         guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getArtist", id: id) else { return }
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
-    func requestAlbum(parserDelegate: XMLParserDelegate, id: String) {
+    func requestAlbum(parserDelegate: SsXmlParser, id: String) {
         guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getAlbum", id: id) else { return }
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
 
-    func requestSearchSongs(parserDelegate: XMLParserDelegate, searchText: String) {
+    func requestSearchSongs(parserDelegate: SsXmlParser, searchText: String) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "search3") else { return }
         urlComp.addQueryItem(name: "query", value: searchText)
         urlComp.addQueryItem(name: "artistCount", value: 0)
@@ -187,37 +192,40 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
-    func requestPlaylists(parserDelegate: XMLParserDelegate) {
+    func requestPlaylists(parserDelegate: SsXmlParser) {
         guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getPlaylists") else { return }
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
 
-    func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: String) {
+    func requestPlaylistSongs(parserDelegate: SsXmlParser, id: String) {
         guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getPlaylist", id: id) else { return }
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
 
-    func requestPlaylistCreate(parserDelegate: XMLParserDelegate, playlist: Playlist) {
+    func requestPlaylistCreate(parserDelegate: SsXmlParser, playlist: Playlist) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "createPlaylist") else { return }
         urlComp.addQueryItem(name: "name", value: playlist.name)
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
-    func requestPlaylistDelete(parserDelegate: XMLParserDelegate, playlist: Playlist) {
+    func requestPlaylistDelete(parserDelegate: SsXmlParser, playlist: Playlist) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "deletePlaylist") else { return }
         urlComp.addQueryItem(name: "id", value: playlist.id)
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
     func checkForErrorResponse(inData data: Data) -> ResponseError? {
-        let errorParser = SsErrorParserDelegate()
+        let errorParser = SsXmlParser()
         let parser = XMLParser(data: data)
         parser.delegate = errorParser
         parser.parse()
-        return errorParser.responseError
+        if let error = errorParser.error {
+            errorLogger.report(error: error)
+        }
+        return errorParser.error
     }
 
-    func requestPlaylistUpdate(parserDelegate: XMLParserDelegate, playlist: Playlist, songIndicesToRemove: [Int], songIdsToAdd: [String]) {
+    func requestPlaylistUpdate(parserDelegate: SsXmlParser, playlist: Playlist, songIndicesToRemove: [Int], songIdsToAdd: [String]) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "updatePlaylist") else { return }
         urlComp.addQueryItem(name: "playlistId", value: playlist.id)
         urlComp.addQueryItem(name: "name", value: playlist.name)
@@ -230,7 +238,7 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
 
-    private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: XMLParserDelegate) {
+    private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: SsXmlParser, ignoreErrorResponse: Bool = false) {
         guard let url = fromUrlComponent.url else {
             os_log("URL could not be created: %s", log: log, type: .error, fromUrlComponent.description)
             return
@@ -238,6 +246,9 @@ class SubsonicServerApi {
         let parser = XMLParser(contentsOf: url)!
         parser.delegate = parserDelegate
         parser.parse()
+        if !ignoreErrorResponse, let error = parserDelegate.error {
+            errorLogger.report(error: error)
+        }
     }
     
 }

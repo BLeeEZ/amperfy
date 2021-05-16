@@ -13,8 +13,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var persistentLibraryStorage = {
         return LibraryStorage(context: storage.context)
     }()
+    lazy var errorLogger = {
+        return ErrorLogger(app: self, persistentContainer: storage.persistentContainer)
+    }()
     lazy var backendProxy: BackendProxy = {
-        return BackendProxy()
+        return BackendProxy(errorLogger: errorLogger)
     }()
     lazy var backendApi: BackendApi = {
         return backendProxy
@@ -36,6 +39,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func reinit() {
         player.reinit(coreData: persistentLibraryStorage.getPlayerData())
+    }
+    
+    // Must be called from main thread
+    func display(alert: UIAlertController) {
+        guard let rootView = self.window?.rootViewController else { return }
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
+        rootView.present(alert, animated: true, completion: nil)
     }
 
     func configureAudioSessionInterruptionAndRemoteControl() {

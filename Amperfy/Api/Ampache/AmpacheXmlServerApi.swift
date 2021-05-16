@@ -15,6 +15,7 @@ class AmpacheXmlServerApi {
     let clientApiVersion = "500000"
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "Ampache")
+    private let errorLogger: ErrorLogger
     private var credentials: LoginCredentials?
     private var authHandshake: AuthentificationHandshake?
     
@@ -54,6 +55,10 @@ class AmpacheXmlServerApi {
         urlComp.addQueryItem(name: "auth", value: auth.token)
         guard let urlString = urlComp.string else { return ""}
         return urlString
+    }
+    
+    init(errorLogger: ErrorLogger) {
+        self.errorLogger = errorLogger
     }
 
     func isAuthenticated() -> Bool {
@@ -124,6 +129,9 @@ class AmpacheXmlServerApi {
         } else {
             authHandshake = nil
             os_log("Couldn't get a login token.", log: log, type: .error)
+            if let apiError = curDelegate.error {
+                errorLogger.report(error: apiError)
+            }
         }
     }
     
@@ -135,13 +143,13 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestGenres(parserDelegate: XMLParserDelegate) {
+    func requestGenres(parserDelegate: AmpacheXmlParser) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "genres")
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
 
-    func requestArtists(parserDelegate: XMLParserDelegate) {
+    func requestArtists(parserDelegate: AmpacheXmlParser) {
         reauthenticateIfNeccessary()
         guard let auth = authHandshake else { return }
         let pollCount = (auth.artistCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
@@ -150,7 +158,7 @@ class AmpacheXmlServerApi {
         }
     }
 
-    func requestArtists(parserDelegate: XMLParserDelegate, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
+    func requestArtists(parserDelegate: AmpacheXmlParser, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent(), let auth = authHandshake, startIndex < auth.artistCount else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "artists")
         apiUrlComponent.addQueryItem(name: "offset", value: startIndex)
@@ -158,7 +166,7 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
 
-    func requestArtists(parserDelegate: XMLParserDelegate, addDate: Date, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
+    func requestArtists(parserDelegate: AmpacheXmlParser, addDate: Date, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent(), let auth = authHandshake, startIndex < auth.artistCount else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "artists")
         apiUrlComponent.addQueryItem(name: "add", value: addDate.asIso8601String)
@@ -167,28 +175,28 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestArtistAlbums(of artist: Artist, parserDelegate: XMLParserDelegate) {
+    func requestArtistAlbums(of artist: Artist, parserDelegate: AmpacheXmlParser) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "artist_albums")
         apiUrlComponent.addQueryItem(name: "filter", value: artist.id)
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestArtistSongs(of artist: Artist, parserDelegate: XMLParserDelegate) {
+    func requestArtistSongs(of artist: Artist, parserDelegate: AmpacheXmlParser) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "artist_songs")
         apiUrlComponent.addQueryItem(name: "filter", value: artist.id)
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestAlbumSongs(of album: Album, parserDelegate: XMLParserDelegate) {
+    func requestAlbumSongs(of album: Album, parserDelegate: AmpacheXmlParser) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "album_songs")
         apiUrlComponent.addQueryItem(name: "filter", value: album.id)
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestAlbums(parserDelegate: XMLParserDelegate) {
+    func requestAlbums(parserDelegate: AmpacheXmlParser) {
         reauthenticateIfNeccessary()
         guard let auth = authHandshake else { return }
         let pollCount = (auth.albumCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
@@ -197,7 +205,7 @@ class AmpacheXmlServerApi {
         }
     }
 
-    func requestAlbums(parserDelegate: XMLParserDelegate, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
+    func requestAlbums(parserDelegate: AmpacheXmlParser, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent(), let auth = authHandshake, startIndex < auth.albumCount else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "albums")
         apiUrlComponent.addQueryItem(name: "offset", value: startIndex)
@@ -205,7 +213,7 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
 
-    func requestAlbums(parserDelegate: XMLParserDelegate, addDate: Date, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
+    func requestAlbums(parserDelegate: AmpacheXmlParser, addDate: Date, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent(), let auth = authHandshake, startIndex < auth.albumCount else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "albums")
         apiUrlComponent.addQueryItem(name: "add", value: addDate.asIso8601String)
@@ -214,7 +222,7 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
 
-    func requestSongs(parserDelegate: XMLParserDelegate) {
+    func requestSongs(parserDelegate: AmpacheXmlParser) {
         reauthenticateIfNeccessary()
         guard let auth = authHandshake else { return }
         let pollCount = (auth.songCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
@@ -223,7 +231,7 @@ class AmpacheXmlServerApi {
         }
     }
 
-    func requestSongs(parserDelegate: XMLParserDelegate, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
+    func requestSongs(parserDelegate: AmpacheXmlParser, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent(), let auth = authHandshake, startIndex < auth.songCount else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "songs")
         apiUrlComponent.addQueryItem(name: "offset", value: startIndex)
@@ -231,7 +239,7 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestSongs(parserDelegate: XMLParserDelegate, addDate: Date, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
+    func requestSongs(parserDelegate: AmpacheXmlParser, addDate: Date, startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent(), let auth = authHandshake, startIndex < auth.songCount else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "songs")
         apiUrlComponent.addQueryItem(name: "add", value: addDate.asIso8601String)
@@ -240,27 +248,27 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestPlaylists(parserDelegate: XMLParserDelegate) {
+    func requestPlaylists(parserDelegate: AmpacheXmlParser) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlists")
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestPlaylist(parserDelegate: XMLParserDelegate, id: String) {
+    func requestPlaylist(parserDelegate: AmpacheXmlParser, id: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist")
         apiUrlComponent.addQueryItem(name: "filter", value: id)
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestPlaylistSongs(parserDelegate: XMLParserDelegate, id: String) {
+    func requestPlaylistSongs(parserDelegate: AmpacheXmlParser, id: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_songs")
         apiUrlComponent.addQueryItem(name: "filter", value: id)
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestPlaylistCreate(parserDelegate: XMLParserDelegate, playlist: Playlist) {
+    func requestPlaylistCreate(parserDelegate: AmpacheXmlParser, playlist: Playlist) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_create")
         apiUrlComponent.addQueryItem(name: "name", value: playlist.name)
@@ -272,11 +280,8 @@ class AmpacheXmlServerApi {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_delete")
         apiUrlComponent.addQueryItem(name: "filter", value: playlist.id)
-        let errorParser = ErrorParserDelegate()
+        let errorParser = AmpacheXmlParser()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
-        if let error = errorParser.error {
-            os_log("Ampache Error %d: %s", log: log, type: .error, error.statusCode, error.message)
-        }
     }
     
     func requestPlaylistAddSong(playlist: Playlist, song: Song) {
@@ -284,11 +289,8 @@ class AmpacheXmlServerApi {
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_add_song")
         apiUrlComponent.addQueryItem(name: "filter", value: playlist.id)
         apiUrlComponent.addQueryItem(name: "song", value: song.id)
-        let errorParser = ErrorParserDelegate()
+        let errorParser = AmpacheXmlParser()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
-        if let error = errorParser.error {
-            os_log("Ampache Error %d: %s", log: log, type: .error, error.statusCode, error.message)
-        }
     }
     
     func requestPlaylistDeleteItem(playlist: Playlist, index: Int) {
@@ -296,11 +298,8 @@ class AmpacheXmlServerApi {
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_remove_song")
         apiUrlComponent.addQueryItem(name: "filter", value: playlist.id)
         apiUrlComponent.addQueryItem(name: "track", value: index + 1)
-        let errorParser = ErrorParserDelegate()
+        let errorParser = AmpacheXmlParser()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
-        if let error = errorParser.error {
-            os_log("Ampache Error %d: %s", log: log, type: .error, error.statusCode, error.message)
-        }
     }
     
     func requestPlaylistEdit(playlist: Playlist) {
@@ -312,14 +311,11 @@ class AmpacheXmlServerApi {
             apiUrlComponent.addQueryItem(name: "items", value: playlist.songs.compactMap{ $0.id }.joined(separator: ","))
             apiUrlComponent.addQueryItem(name: "tracks", value: Array(1...playlist.songs.count).compactMap{"\($0)"}.joined(separator: ","))
         }
-        let errorParser = ErrorParserDelegate()
+        let errorParser = AmpacheXmlParser()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
-        if let error = errorParser.error {
-            os_log("Ampache Error %d: %s", log: log, type: .error, error.statusCode, error.message)
-        }
     }
     
-    func requestSearchSongs(parserDelegate: XMLParserDelegate, searchText: String) {
+    func requestSearchSongs(parserDelegate: AmpacheXmlParser, searchText: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "search_songs")
         apiUrlComponent.addQueryItem(name: "filter", value: searchText)
@@ -327,7 +323,7 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: XMLParserDelegate) {
+    private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: AmpacheXmlParser) {
         guard let url = fromUrlComponent.url else {
             os_log("URL could not be created: %s", log: log, type: .error, fromUrlComponent.description)
             return
@@ -335,6 +331,9 @@ class AmpacheXmlServerApi {
         let parser = XMLParser(contentsOf: url)!
         parser.delegate = parserDelegate
         parser.parse()
+        if let error = parserDelegate.error {
+            errorLogger.report(error: error)
+        }
     }
 
     func requesetLibraryMetaData() -> AuthentificationHandshake? {
@@ -359,10 +358,13 @@ class AmpacheXmlServerApi {
     }
     
     func checkForErrorResponse(inData data: Data) -> ResponseError? {
-        let errorParser = ErrorParserDelegate()
+        let errorParser = AmpacheXmlParser()
         let parser = XMLParser(data: data)
         parser.delegate = errorParser
         parser.parse()
+        if let error = errorParser.error {
+            errorLogger.report(error: error)
+        }
         return errorParser.error
     }
     

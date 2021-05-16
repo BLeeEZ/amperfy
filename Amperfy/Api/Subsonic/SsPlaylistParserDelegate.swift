@@ -3,7 +3,7 @@ import UIKit
 import CoreData
 import os.log
 
-class SsPlaylistParserDelegate: GenericXmlParser {
+class SsPlaylistParserDelegate: SsXmlParser {
     
     private var playlist: Playlist?
     private let libraryStorage: LibraryStorage
@@ -13,8 +13,8 @@ class SsPlaylistParserDelegate: GenericXmlParser {
         super.init()
     }
 
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        buffer = ""
+    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
+        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
         
         if(elementName == "playlist") {
             guard let playlistId = attributeDict["id"],
@@ -44,7 +44,7 @@ class SsPlaylistParserDelegate: GenericXmlParser {
         }
     }
     
-    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "playlist":
             parsedCount += 1
@@ -53,7 +53,7 @@ class SsPlaylistParserDelegate: GenericXmlParser {
             break
         }
         
-        buffer = ""
+        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
     }
     
 }

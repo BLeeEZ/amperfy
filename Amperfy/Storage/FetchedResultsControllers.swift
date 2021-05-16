@@ -295,3 +295,12 @@ class PlaylistSelectorFetchedResultsController: CachedFetchedResultsController<P
     }
 
 }
+
+class ErrorLogFetchedResultsController: BasicFetchedResultsController<LogEntryMO> {
+
+    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        let fetchRequest = LogEntryMO.creationDateSortedFetchRequest
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+
+}

@@ -3,7 +3,7 @@ import UIKit
 import CoreData
 import os.log
 
-class SsAlbumParserDelegate: GenericXmlLibParser {
+class SsAlbumParserDelegate: SsXmlLibParser {
     
     private var subsonicUrlCreator: SubsonicUrlCreator
     private var albumBuffer: Album?
@@ -13,8 +13,8 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
         super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
     }
     
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        buffer = ""
+    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
+        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
         
         if elementName == "album" {
             guard let albumId = attributeDict["id"] else { return }
@@ -59,7 +59,7 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
         }
     }
     
-    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "album":
             parsedCount += 1
@@ -68,7 +68,7 @@ class SsAlbumParserDelegate: GenericXmlLibParser {
             break
         }
         
-        buffer = ""
+        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
     }
     
 }
