@@ -69,6 +69,11 @@ extension String {
         let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return String((0..<length).map{ _ in letters.randomElement()! })
     }
+    
+    func deletingPrefix(_ prefix: String) -> String {
+        guard self.hasPrefix(prefix) else { return self }
+        return String(self.dropFirst(prefix.count))
+    }
 }
 
 extension Array {

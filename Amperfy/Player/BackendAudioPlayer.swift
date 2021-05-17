@@ -31,6 +31,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     private let songDownloader: SongDownloadable
     private let songCache: SongFileCachable
     private let player: AVPlayer
+    private let errorLogger: ErrorLogger
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     private var latestPlayRequest: PlayRequest?
     private let semaphore = DispatchSemaphore(value: 1)
@@ -61,8 +62,9 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         return player.currentItem != nil
     }
     
-    init(mediaPlayer: AVPlayer, songDownloader: SongDownloadable, songCache: SongFileCachable) {
+    init(mediaPlayer: AVPlayer, errorLogger: ErrorLogger, songDownloader: SongDownloadable, songCache: SongFileCachable) {
         self.player = mediaPlayer
+        self.errorLogger = errorLogger
         self.songDownloader = songDownloader
         self.songCache = songCache
         
@@ -108,11 +110,17 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         semaphore.wait()
         latestPlayRequest = PlayRequest(playlistItem: playlistItem, reactionToError: reactionToError)
         guard let song = playlistItem.song else { return }
-        if song.isCached {
-            insertCachedSong(playlistItem: playlistItem)
+        if !song.isPlayableOniOS, let contentType = song.contentType {
+            player.pause()
+            player.replaceCurrentItem(with: nil)
+            errorLogger.info(message: "Content type \"\(contentType)\" of song \"\(song.displayString)\" is not playable via Amperfy.")
         } else {
-            insertStreamSong(playlistItem: playlistItem)
-            songDownloader.download(song: song, notifier: nil, priority: .high)
+            if song.isCached {
+                insertCachedSong(playlistItem: playlistItem)
+            } else {
+                insertStreamSong(playlistItem: playlistItem)
+                songDownloader.download(song: song, notifier: nil, priority: .high)
+            }
         }
         self.continuePlay()
         self.reactToInsertationFinish(playlistItem: playlistItem)
@@ -123,23 +131,29 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         guard let song = playlistItem.song, let songData = songCache.getSongFile(forSong: song)?.data else { return }
         os_log(.default, "Play song: %s", song.displayString)
         let url = createLocalUrl(songData: songData)
-        player.pause()
-        player.replaceCurrentItem(with: nil)
-        let item = AVPlayerItem(url: url)
-        player.replaceCurrentItem(with: item)
-        NotificationCenter.default.addObserver(self, selector: #selector(songFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
+        insertSong(forSong: song, withUrl: url)
     }
     
     private func insertStreamSong(playlistItem: PlaylistItem) {
         guard let song = playlistItem.song, let streamUrl = songDownloader.updateStreamingUrl(forSong: song) else { return }
         os_log(.default, "Streaming song: %s", song.displayString)
+        insertSong(forSong: song, withUrl: streamUrl)
+    }
+
+    private func insertSong(forSong song: Song, withUrl url: URL) {
         player.pause()
         player.replaceCurrentItem(with: nil)
-        let item = AVPlayerItem(url: streamUrl)
+        var item: AVPlayerItem?
+        if let mimeType = song.iOsCompatibleContentType {
+            let asset: AVURLAsset = AVURLAsset(url: url, options: ["AVURLAssetOutOfBandMIMETypeKey" : mimeType])
+            item = AVPlayerItem(asset: asset)
+        } else {
+            item = AVPlayerItem(url: url)
+        }
         player.replaceCurrentItem(with: item)
         NotificationCenter.default.addObserver(self, selector: #selector(songFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
     }
-
+    
     private func reactToInsertationFinish(playlistItem: PlaylistItem) {
         currentlyPlaying = playlistItem
         self.responder?.notifySongPreparationFinished()

@@ -10,7 +10,11 @@ class LogEntryTableCell: BasicTableCell {
     
     func display(entry: LogEntry) {
         messageLabel.text = entry.message
-        typeLabel.text = "Error \(CommonString.oneMiddleDot) Status code \(entry.statusCode)"
+        var typeLabelText = "\(entry.type.description)"
+        if entry.type == .error {
+            typeLabelText += " \(CommonString.oneMiddleDot) Status code \(entry.statusCode)"
+        }
+        typeLabel.text = typeLabelText
         dateLabel.text = "\(entry.creationDate)"
     }
 

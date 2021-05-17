@@ -3,6 +3,18 @@ import CoreData
 
 enum LogEntryType: Int16 {
     case error = 0
+    case warning = 1
+    case info = 2
+    case debug = 3
+    
+    var description : String {
+        switch self {
+        case .error: return "Error"
+        case .warning: return "Warning"
+        case .info: return "Info"
+        case .debug: return "Debug"
+        }
+    }
 }
 
 public class LogEntry: NSObject {
