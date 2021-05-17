@@ -179,24 +179,28 @@ class SongTableCell: BasicTableCell {
                 self.refresh()
             }))
         }
-        alert.addAction(UIAlertAction(title: "Show artist", style: .default, handler: { _ in
-            let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
-            artistDetailVC.artist = song.artist
-            if let navController = self.rootView?.navigationController {
-                navController.pushViewController(artistDetailVC, animated: true)
-            } else {
-                self.closePopupPlayerAndDisplayInLibraryTab(view: artistDetailVC)
-            }
-        }))
-        alert.addAction(UIAlertAction(title: "Show album", style: .default, handler: { _ in
-            let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
-            albumDetailVC.album = song.album
-            if let navController = self.rootView?.navigationController {
-                navController.pushViewController(albumDetailVC, animated: true)
-            } else {
-                self.closePopupPlayerAndDisplayInLibraryTab(view: albumDetailVC)
-            }
-        }))
+        if let artist = song.artist {
+            alert.addAction(UIAlertAction(title: "Show artist", style: .default, handler: { _ in
+                let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
+                artistDetailVC.artist = artist
+                if let navController = self.rootView?.navigationController {
+                    navController.pushViewController(artistDetailVC, animated: true)
+                } else {
+                    self.closePopupPlayerAndDisplayInLibraryTab(view: artistDetailVC)
+                }
+            }))
+        }
+        if let album = song.album {
+            alert.addAction(UIAlertAction(title: "Show album", style: .default, handler: { _ in
+                let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
+                albumDetailVC.album = album
+                if let navController = self.rootView?.navigationController {
+                    navController.pushViewController(albumDetailVC, animated: true)
+                } else {
+                    self.closePopupPlayerAndDisplayInLibraryTab(view: albumDetailVC)
+                }
+            }))
+        }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         return alert

@@ -53,7 +53,7 @@ class ErrorLogger {
             alertMessage += "Status code: \(error.statusCode)"
             alertMessage += "\n\(error.message)"
             alertMessage += "\n"
-            alertMessage += "\nYou can find the error log at:"
+            alertMessage += "\nYou can find the event log at:"
             alertMessage += "\nSettings -> Server -> Event Log"
             
             let alert = UIAlertController(title: "API Error Occured", message: alertMessage, preferredStyle: .alert)
