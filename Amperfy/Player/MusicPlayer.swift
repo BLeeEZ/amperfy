@@ -94,6 +94,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     private func replayCurrenSong() {
         os_log(.debug, "Replay song")
         seek(toSecond: 0)
+        play()
     }
 
     func seek(toSecond: Double) {
