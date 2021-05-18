@@ -5,10 +5,16 @@ import os.log
 
 class SsSongParserDelegate: SsXmlLibParser {
     
+    private var subsonicUrlCreator: SubsonicUrlCreator
     var songBuffer: Song?
     var guessedArtist: Artist?
     var guessedAlbum: Album?
     var guessedGenre: Genre?
+    
+    init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
+        self.subsonicUrlCreator = subsonicUrlCreator
+        super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
+    }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
@@ -47,6 +53,9 @@ class SsSongParserDelegate: SsXmlLibParser {
             }
             if let disk = attributeDict["discNumber"] {
                 songBuffer?.disk = disk
+            }
+            if let coverArtId = attributeDict["coverArt"], let song = songBuffer, let songArtwork = song.artwork, songArtwork.url.isEmpty, song.isOrphaned {
+                songArtwork.url = subsonicUrlCreator.getArtUrlString(forCoverArtId: coverArtId)
             }
 
             if songBuffer?.artist == nil, let artistId = attributeDict["artistId"] {

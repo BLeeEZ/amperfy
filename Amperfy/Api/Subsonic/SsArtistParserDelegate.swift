@@ -32,8 +32,8 @@ class SsArtistParserDelegate: SsXmlLibParser {
             if let attributeArtistName = attributeDict["name"] {
                 artistBuffer?.name = attributeArtistName
             }
-            if let artistArtwork = artistBuffer?.artwork, artistArtwork.url.isEmpty {
-                artistArtwork.url = subsonicUrlCreator.getArtUrlString(forArtistId: artistId)
+            if let attributeCoverArtId = attributeDict["coverArt"], let artistArtwork = artistBuffer?.artwork, artistArtwork.url.isEmpty {
+                artistArtwork.url = subsonicUrlCreator.getArtUrlString(forCoverArtId: attributeCoverArtId)
             }
 		}    
     }

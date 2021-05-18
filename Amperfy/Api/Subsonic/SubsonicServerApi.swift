@@ -2,7 +2,7 @@ import Foundation
 import os.log
 
 protocol SubsonicUrlCreator {
-    func getArtUrlString(forArtistId: String) -> String
+    func getArtUrlString(forCoverArtId: String) -> String
 }
 
 class SubsonicServerApi {
@@ -142,10 +142,12 @@ class SubsonicServerApi {
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {
-        guard !artwork.owners.isEmpty, let firstOwner = artwork.owners.first else {
-            return nil
-        }
-        return createAuthenticatedApiUrlComponent(forAction: "getCoverArt", id: firstOwner.id)?.url
+        guard let urlComp = URLComponents(string: artwork.url),
+           let queryItems = urlComp.queryItems,
+           let coverArtQuery = queryItems.first(where: {$0.name == "id"}),
+           let coverArtId = coverArtQuery.value
+            else { return nil }
+        return createAuthenticatedApiUrlComponent(forAction: "getCoverArt", id: coverArtId)?.url
     }
     
     func requestServerApiVersion() -> SubsonicVersion? {
@@ -254,7 +256,7 @@ class SubsonicServerApi {
 }
 
 extension SubsonicServerApi: SubsonicUrlCreator {
-    func getArtUrlString(forArtistId id: String) -> String {
+    func getArtUrlString(forCoverArtId id: String) -> String {
         if let apiUrlComponent = createAuthenticatedApiUrlComponent(forAction: "getCoverArt", id: id),
            let url = apiUrlComponent.url {
             return url.absoluteString

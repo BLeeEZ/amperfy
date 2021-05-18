@@ -9,10 +9,10 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
     var items: [PlaylistItem]
     public private(set) var playlistHasBeenDetected = false
     
-    init(playlist: Playlist, libraryStorage: LibraryStorage, syncWave: SyncWave) {
+    init(playlist: Playlist, libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator) {
         self.playlist = playlist
         self.items = playlist.items
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave)
+        super.init(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
     }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
