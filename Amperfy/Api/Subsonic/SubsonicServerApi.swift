@@ -28,7 +28,7 @@ class SubsonicServerApi {
         // using lower case characters for the hex values. The '+' operator represents concatenation of the two strings.
         // Treat the strings as UTF-8 encoded when calculating the hash. Send the result as parameter
         let dataStr = "\(password)\(salt)"
-        let authenticationToken = Hasher.md5Hex(dataString: dataStr)
+        let authenticationToken = StringHasher.md5Hex(dataString: dataStr)
         return authenticationToken
     }
     

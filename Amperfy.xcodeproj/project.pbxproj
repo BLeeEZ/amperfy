@@ -89,7 +89,7 @@
 		5083861C21C828E200C4BB32 /* AmpacheXmlServerApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5083861B21C828E200C4BB32 /* AmpacheXmlServerApi.swift */; };
 		5083862121C97A1C00C4BB32 /* SongParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5083862021C97A1C00C4BB32 /* SongParserDelegate.swift */; };
 		5086F876223852F200546F5A /* SubsonicApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F875223852F200546F5A /* SubsonicApi.swift */; };
-		5086F87922397B2900546F5A /* Hasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87822397B2900546F5A /* Hasher.swift */; };
+		5086F87922397B2900546F5A /* StringHasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87822397B2900546F5A /* StringHasher.swift */; };
 		5086F87B22397B8400546F5A /* BackendApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87A22397B8400546F5A /* BackendApi.swift */; };
 		5086F87D22397B9A00546F5A /* AmpacheApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87C22397B9A00546F5A /* AmpacheApi.swift */; };
 		5086F87F22399D1900546F5A /* SubsonicServerApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87E22399D1900546F5A /* SubsonicServerApi.swift */; };
@@ -326,7 +326,7 @@
 		5083861D21C82E8200C4BB32 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		5083862021C97A1C00C4BB32 /* SongParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongParserDelegate.swift; sourceTree = "<group>"; };
 		5086F875223852F200546F5A /* SubsonicApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicApi.swift; sourceTree = "<group>"; };
-		5086F87822397B2900546F5A /* Hasher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hasher.swift; sourceTree = "<group>"; };
+		5086F87822397B2900546F5A /* StringHasher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringHasher.swift; sourceTree = "<group>"; };
 		5086F87A22397B8400546F5A /* BackendApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendApi.swift; sourceTree = "<group>"; };
 		5086F87C22397B9A00546F5A /* AmpacheApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmpacheApi.swift; sourceTree = "<group>"; };
 		5086F87E22399D1900546F5A /* SubsonicServerApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicServerApi.swift; sourceTree = "<group>"; };
@@ -542,7 +542,7 @@
 				50BA92FD21CED4AF00E5901D /* Utilities.swift */,
 				50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */,
 				5083861D21C82E8200C4BB32 /* BridgingHeader.h */,
-				5086F87822397B2900546F5A /* Hasher.swift */,
+				5086F87822397B2900546F5A /* StringHasher.swift */,
 				5077F939221F40130099CA91 /* SynchronizedArray.swift */,
 				5020BD2225DC027E00CDD37A /* Settings.swift */,
 			);
@@ -1163,7 +1163,7 @@
 				50CDF20C264BC72800F83EF6 /* LogEntry.swift in Sources */,
 				5077F955222C58A10099CA91 /* GenericXmlParser.swift in Sources */,
 				5086F885223A1E4600546F5A /* SsPingParserDelegate.swift in Sources */,
-				5086F87922397B2900546F5A /* Hasher.swift in Sources */,
+				5086F87922397B2900546F5A /* StringHasher.swift in Sources */,
 				5077F95122279DF40099CA91 /* PlaytimeSlider.swift in Sources */,
 				5086F87F22399D1900546F5A /* SubsonicServerApi.swift in Sources */,
 				5086F887223BD68C00546F5A /* SsArtistParserDelegate.swift in Sources */,

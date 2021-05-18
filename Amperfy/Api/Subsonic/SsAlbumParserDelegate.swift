@@ -5,6 +5,7 @@ import os.log
 
 class SsAlbumParserDelegate: SsXmlLibParser {
     
+    var guessedArtist: Artist?
     private var subsonicUrlCreator: SubsonicUrlCreator
     private var albumBuffer: Album?
     
@@ -38,8 +39,12 @@ class SsAlbumParserDelegate: SsXmlLibParser {
                 albumBuffer?.year = year
             }
             
-            if albumBuffer?.artist == nil, let artistId = attributeDict["artistId"], let artist = libraryStorage.getArtist(id: artistId) {
-                albumBuffer?.artist = artist
+            if albumBuffer?.artist == nil, let artistId = attributeDict["artistId"] {
+                if let guessedArtist = guessedArtist, guessedArtist.id == artistId {
+                    albumBuffer?.artist = guessedArtist
+                } else if let artist = libraryStorage.getArtist(id: artistId) {
+                    albumBuffer?.artist = artist
+                }
             }
             if let attributeSongCount = attributeDict["songCount"], let songCount = Int(attributeSongCount) {
                 albumBuffer?.songCount = songCount

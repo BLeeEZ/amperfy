@@ -104,6 +104,10 @@ class LibraryStorage: SongFileCachable {
         return Album(managedObject: albumMO)
     }
     
+    func deleteAlbum(album: Album) {
+        context.delete(album.managedObject)
+    }
+    
     func createSong() -> Song {
         let songMO = SongMO(context: context)
         songMO.artwork = createArtwork().managedObject

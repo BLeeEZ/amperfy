@@ -71,7 +71,7 @@ class AmpacheXmlServerApi {
         // Ampache passphrase: sha256(unixtime + sha256(password)) where '+' denotes concatenation
         // Concatenate timestamp and password hash
         let dataStr = "\(timestamp)\(passwordHash)"
-        let passphrase = Hasher.sha256(dataString: dataStr)
+        let passphrase = StringHasher.sha256(dataString: dataStr)
         return passphrase
     }
 

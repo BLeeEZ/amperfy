@@ -20,7 +20,7 @@ class LoginCredentials {
         self.serverUrl = serverUrl
         self.username = username
         self.password = password
-        self.passwordHash = Hasher.sha256(dataString: password)
+        self.passwordHash = StringHasher.sha256(dataString: password)
         self.backendApi = .notDetected
     }
 

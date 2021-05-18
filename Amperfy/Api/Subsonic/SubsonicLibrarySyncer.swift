@@ -38,22 +38,36 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         let artists = currentLibraryStorage.getArtists()
         albumCount = artists.count
         statusNotifyier?.notifySyncStarted(ofType: .album)
-        for artist in artists {
+        let artistBatches = artists.chunked(intoSubarrayCount: downloadSlotCounter.maxActiveDownloads)
+        for artistBatch in artistBatches {
             downloadSlotCounter.waitForDownloadSlot()
             persistentContainer.performBackgroundTask() { (context) in
                 let libraryStorage = LibraryStorage(context: context)
-                let artistMO = try! context.existingObject(with: artist.managedObject.objectID) as! ArtistMO
-                let artistContext = Artist(managedObject: artistMO)
-                let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
-                let syncWaveContext = SyncWave(managedObject: syncWaveMO)
-                let albumDelegate = SsAlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
-                self.subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artistContext.id)
+                for artist in artistBatch {
+                    let artistMO = try! context.existingObject(with: artist.managedObject.objectID) as! ArtistMO
+                    let artistContext = Artist(managedObject: artistMO)
+                    let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
+                    let syncWaveContext = SyncWave(managedObject: syncWaveMO)
+                    let albumDelegate = SsAlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
+                    albumDelegate.guessedArtist = artistContext
+                    self.subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artistContext.id)
+                    statusNotifyier?.notifyParsedObject(ofType: .album)
+                }
                 libraryStorage.saveContext()
-                statusNotifyier?.notifyParsedObject(ofType: .album)
                 downloadSlotCounter.downloadFinished()
             }
         }
         downloadSlotCounter.waitTillAllDownloadsFinished()
+        // Delete duplicated albums due to concurrence
+        let albums = currentLibraryStorage.getAlbums()
+        var uniqueAlbums: [String: Album] = [:]
+        for album in albums {
+            if uniqueAlbums[album.id] != nil {
+                currentLibraryStorage.deleteAlbum(album: album)
+            } else {
+                uniqueAlbums[album.id] = album
+            }
+        }
         
         statusNotifyier?.notifySyncStarted(ofType: .playlist)
         let playlistParser = SsPlaylistParserDelegate(libraryStorage: currentLibraryStorage)

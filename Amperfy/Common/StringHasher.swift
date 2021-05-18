@@ -1,6 +1,6 @@
 import Foundation
 
-class Hasher {
+class StringHasher {
 
     static func sha256(dataString : String) -> String {
         let data = dataString.data(using: String.Encoding.utf8)! as NSData

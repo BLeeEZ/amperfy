@@ -51,6 +51,7 @@ class SubsonicLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Backgroun
             os_log("Lib resync: Albums parsing start", log: log, type: .info)
             for artist in artistsLeftSorted {
                 let albumDelegate = SsAlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+                albumDelegate.guessedArtist = artist
                 subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artist.id)
                 syncWave.syncIndexToContinue = artist.id
                 if(!isRunning) { break }
