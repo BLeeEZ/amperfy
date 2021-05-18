@@ -14,12 +14,12 @@ class SubsonicServerApi {
     var clientApiVersion = defaultClientApiVersionWithToken
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "Subsonic")
-    private let errorLogger: ErrorLogger
+    private let eventLogger: EventLogger
     private var credentials: LoginCredentials?
     private var isValidCredentials = false
     
-    init(errorLogger: ErrorLogger) {
-        self.errorLogger = errorLogger
+    init(eventLogger: EventLogger) {
+        self.eventLogger = eventLogger
     }
 
     private func generateAuthenticationToken(password: String, salt: String) -> String {
@@ -220,7 +220,7 @@ class SubsonicServerApi {
         parser.delegate = errorParser
         parser.parse()
         if let error = errorParser.error {
-            errorLogger.report(error: error)
+            eventLogger.report(error: error)
         }
         return errorParser.error
     }
@@ -247,7 +247,7 @@ class SubsonicServerApi {
         parser.delegate = parserDelegate
         parser.parse()
         if !ignoreErrorResponse, let error = parserDelegate.error {
-            errorLogger.report(error: error)
+            eventLogger.report(error: error)
         }
     }
     

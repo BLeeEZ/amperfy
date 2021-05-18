@@ -15,7 +15,7 @@ class AmpacheXmlServerApi {
     let clientApiVersion = "500000"
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "Ampache")
-    private let errorLogger: ErrorLogger
+    private let eventLogger: EventLogger
     private var credentials: LoginCredentials?
     private var authHandshake: AuthentificationHandshake?
     
@@ -57,8 +57,8 @@ class AmpacheXmlServerApi {
         return urlString
     }
     
-    init(errorLogger: ErrorLogger) {
-        self.errorLogger = errorLogger
+    init(eventLogger: EventLogger) {
+        self.eventLogger = eventLogger
     }
 
     func isAuthenticated() -> Bool {
@@ -130,7 +130,7 @@ class AmpacheXmlServerApi {
             authHandshake = nil
             os_log("Couldn't get a login token.", log: log, type: .error)
             if let apiError = curDelegate.error {
-                errorLogger.report(error: apiError)
+                eventLogger.report(error: apiError)
             }
         }
     }
@@ -332,7 +332,7 @@ class AmpacheXmlServerApi {
         parser.delegate = parserDelegate
         parser.parse()
         if let error = parserDelegate.error {
-            errorLogger.report(error: error)
+            eventLogger.report(error: error)
         }
     }
 
@@ -363,7 +363,7 @@ class AmpacheXmlServerApi {
         parser.delegate = errorParser
         parser.parse()
         if let error = errorParser.error {
-            errorLogger.report(error: error)
+            eventLogger.report(error: error)
         }
         return errorParser.error
     }

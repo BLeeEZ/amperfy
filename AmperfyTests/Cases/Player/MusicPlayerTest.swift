@@ -53,10 +53,16 @@ class MOCK_SongDownloader: SongDownloadable {
     
 }
 
+class MOCK_AlertDisplayable: AlertDisplayable {
+    func display(alert: UIAlertController) {}
+}
+
 class MusicPlayerTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
     var storage: LibraryStorage!
+    var mockAlertDisplayer: MOCK_AlertDisplayable!
+    var eventLogger: EventLogger!
     var songDownloader: MOCK_SongDownloader!
     var backendPlayer: BackendAudioPlayer!
     var playerData: PlayerData!
@@ -72,7 +78,9 @@ class MusicPlayerTest: XCTestCase {
         storage = cdHelper.createSeededStorage()
         songDownloader = MOCK_SongDownloader()
         mockAVPlayer = MOCK_AVPlayer()
-        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, songDownloader: songDownloader, songCache: storage)
+        mockAlertDisplayer = MOCK_AlertDisplayable()
+        eventLogger = EventLogger(alertDisplayer: mockAlertDisplayer, persistentContainer: cdHelper.persistentContainer)
+        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, songDownloader: songDownloader, songCache: storage)
         playerData = storage.getPlayerData()
         testPlayer = MusicPlayer(coreData: playerData, downloadManager: songDownloader, backendAudioPlayer: backendPlayer)
         

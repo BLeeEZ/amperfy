@@ -157,7 +157,7 @@
 		50C4FCBF26393F01009B967B /* AmpacheLibraryVersionBackgroundResyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C4FCBE26393F01009B967B /* AmpacheLibraryVersionBackgroundResyncer.swift */; };
 		50C4FCC52639581B009B967B /* SubsonicLibraryVersionBackgroundResyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C4FCC42639581B009B967B /* SubsonicLibraryVersionBackgroundResyncer.swift */; };
 		50CA8E972601E06500C90791 /* DownloadSlotCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */; };
-		50CDF202264BB1C000F83EF6 /* ErrorLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF201264BB1C000F83EF6 /* ErrorLogger.swift */; };
+		50CDF202264BB1C000F83EF6 /* EventLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF201264BB1C000F83EF6 /* EventLogger.swift */; };
 		50CDF209264BC6BB00F83EF6 /* LogEntryMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF207264BC6BB00F83EF6 /* LogEntryMO+CoreDataClass.swift */; };
 		50CDF20A264BC6BB00F83EF6 /* LogEntryMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF208264BC6BB00F83EF6 /* LogEntryMO+CoreDataProperties.swift */; };
 		50CDF20C264BC72800F83EF6 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF20B264BC72800F83EF6 /* LogEntry.swift */; };
@@ -395,7 +395,7 @@
 		50C4FCBE26393F01009B967B /* AmpacheLibraryVersionBackgroundResyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheLibraryVersionBackgroundResyncer.swift; sourceTree = "<group>"; };
 		50C4FCC42639581B009B967B /* SubsonicLibraryVersionBackgroundResyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicLibraryVersionBackgroundResyncer.swift; sourceTree = "<group>"; };
 		50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSlotCounter.swift; sourceTree = "<group>"; };
-		50CDF201264BB1C000F83EF6 /* ErrorLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLogger.swift; sourceTree = "<group>"; };
+		50CDF201264BB1C000F83EF6 /* EventLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventLogger.swift; sourceTree = "<group>"; };
 		50CDF207264BC6BB00F83EF6 /* LogEntryMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogEntryMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50CDF208264BC6BB00F83EF6 /* LogEntryMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogEntryMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50CDF20B264BC72800F83EF6 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
@@ -610,7 +610,7 @@
 			children = (
 				5086F87A22397B8400546F5A /* BackendApi.swift */,
 				500B2B302249607B00D14EF4 /* BackendProxy.swift */,
-				50CDF201264BB1C000F83EF6 /* ErrorLogger.swift */,
+				50CDF201264BB1C000F83EF6 /* EventLogger.swift */,
 				5086F8822239A2B700546F5A /* GenericLibraryBackgroundSyncer.swift */,
 				5077F954222C58A10099CA91 /* GenericXmlParser.swift */,
 				50BA92EE21CBF45D00E5901D /* LoginCredentials.swift */,
@@ -1118,7 +1118,7 @@
 				5077F938221F24C10099CA91 /* Download.swift in Sources */,
 				50D92CCB25E3ED700017E91D /* MappingModelV4toV5.xcmappingmodel in Sources */,
 				50E964AA25E8E20E00E3210F /* SubsonicVersion.swift in Sources */,
-				50CDF202264BB1C000F83EF6 /* ErrorLogger.swift in Sources */,
+				50CDF202264BB1C000F83EF6 /* EventLogger.swift in Sources */,
 				50AFA1492632E83100F198DD /* GenreDetailTableHeader.swift in Sources */,
 				50073BE12230245D000130D8 /* UrlDownloader.swift in Sources */,
 				5029E0392235A8EC0027F96F /* CommonString.swift in Sources */,

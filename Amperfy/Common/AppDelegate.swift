@@ -13,17 +13,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var persistentLibraryStorage = {
         return LibraryStorage(context: storage.context)
     }()
-    lazy var errorLogger = {
-        return ErrorLogger(app: self, persistentContainer: storage.persistentContainer)
+    lazy var eventLogger = {
+        return EventLogger(alertDisplayer: self, persistentContainer: storage.persistentContainer)
     }()
     lazy var backendProxy: BackendProxy = {
-        return BackendProxy(errorLogger: errorLogger)
+        return BackendProxy(eventLogger: eventLogger)
     }()
     lazy var backendApi: BackendApi = {
         return backendProxy
     }()
     lazy var player = {
-        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), downloadManager: downloadManager, backendAudioPlayer: BackendAudioPlayer(mediaPlayer: AVPlayer(), errorLogger: errorLogger, songDownloader: downloadManager, songCache: persistentLibraryStorage))
+        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), downloadManager: downloadManager, backendAudioPlayer: BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, songDownloader: downloadManager, songCache: persistentLibraryStorage))
     }()
     lazy var downloadManager: DownloadManager = {
         let requestManager = RequestManager()
@@ -39,14 +39,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func reinit() {
         player.reinit(coreData: persistentLibraryStorage.getPlayerData())
-    }
-    
-    // Must be called from main thread
-    func display(alert: UIAlertController) {
-        guard let rootView = self.window?.rootViewController else { return }
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
-        rootView.present(alert, animated: true, completion: nil)
     }
 
     func configureAudioSessionInterruptionAndRemoteControl() {
@@ -126,6 +118,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         persistentLibraryStorage.saveContext()
     }
 
-
 }
 
+extension AppDelegate: AlertDisplayable {
+    func display(alert: UIAlertController) {
+        guard let rootView = self.window?.rootViewController else { return }
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
+        rootView.present(alert, animated: true, completion: nil)
+    }
+}

@@ -3,16 +3,20 @@ import UIKit
 import CoreData
 import os.log
 
-class ErrorLogger {
+protocol AlertDisplayable {
+    func display(alert: UIAlertController) // Must be called from main thread
+}
+
+class EventLogger {
     
     static private let errorReportOneDaySilentTimeInSec = 60*60*24
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "ErrorLogger")
-    private let appDelegate: AppDelegate
+    private let alertDisplayer: AlertDisplayable
     private let persistentContainer: NSPersistentContainer
     
-    init(app: AppDelegate, persistentContainer: NSPersistentContainer) {
-        self.appDelegate = app
+    init(alertDisplayer: AlertDisplayable, persistentContainer: NSPersistentContainer) {
+        self.alertDisplayer = alertDisplayer
         self.persistentContainer = persistentContainer
     }
     
@@ -30,7 +34,7 @@ class ErrorLogger {
             alert.addAction(UIAlertAction(title: "OK", style: .default , handler: { _ in
                 self.saveInfoPersistent(message: message)
             }))
-            self.appDelegate.display(alert: alert)
+            self.alertDisplayer.display(alert: alert)
         }
     }
     
@@ -63,7 +67,7 @@ class ErrorLogger {
             alert.addAction(UIAlertAction(title: "OK", style: .default , handler: { _ in
                 self.saveErrorPersistent(error: error, suppressionTimeInterval: 0)
             }))
-            self.appDelegate.display(alert: alert)
+            self.alertDisplayer.display(alert: alert)
         }
     }
     

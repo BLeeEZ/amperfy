@@ -31,7 +31,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     private let songDownloader: SongDownloadable
     private let songCache: SongFileCachable
     private let player: AVPlayer
-    private let errorLogger: ErrorLogger
+    private let eventLogger: EventLogger
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     private var latestPlayRequest: PlayRequest?
     private let semaphore = DispatchSemaphore(value: 1)
@@ -62,9 +62,9 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         return player.currentItem != nil
     }
     
-    init(mediaPlayer: AVPlayer, errorLogger: ErrorLogger, songDownloader: SongDownloadable, songCache: SongFileCachable) {
+    init(mediaPlayer: AVPlayer, eventLogger: EventLogger, songDownloader: SongDownloadable, songCache: SongFileCachable) {
         self.player = mediaPlayer
-        self.errorLogger = errorLogger
+        self.eventLogger = eventLogger
         self.songDownloader = songDownloader
         self.songCache = songCache
         
@@ -113,7 +113,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         if !song.isPlayableOniOS, let contentType = song.contentType {
             player.pause()
             player.replaceCurrentItem(with: nil)
-            errorLogger.info(message: "Content type \"\(contentType)\" of song \"\(song.displayString)\" is not playable via Amperfy.")
+            eventLogger.info(message: "Content type \"\(contentType)\" of song \"\(song.displayString)\" is not playable via Amperfy.")
         } else {
             if song.isCached {
                 insertCachedSong(playlistItem: playlistItem)

@@ -35,7 +35,7 @@ struct ResponseError {
 class BackendProxy {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "BackendProxy")
-    private let errorLogger: ErrorLogger
+    private let eventLogger: EventLogger
     private var activeApiType = BackenApiType.ampache
     public var selectedApi: BackenApiType {
         get {
@@ -59,14 +59,14 @@ class BackendProxy {
     }
  
     private lazy var ampacheApi: BackendApi = {
-        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(errorLogger: errorLogger))
+        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(eventLogger: eventLogger))
     }()
     private lazy var subsonicApi: BackendApi = {
-        return SubsonicApi(subsonicServerApi: SubsonicServerApi(errorLogger: errorLogger))
+        return SubsonicApi(subsonicServerApi: SubsonicServerApi(eventLogger: eventLogger))
     }()
     
-    init(errorLogger: ErrorLogger) {
-        self.errorLogger = errorLogger
+    init(eventLogger: EventLogger) {
+        self.eventLogger = eventLogger
     }
 
     func login(credentials: LoginCredentials) throws -> BackenApiType {
