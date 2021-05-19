@@ -46,6 +46,9 @@
 		5020BD2325DC027E00CDD37A /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020BD2225DC027E00CDD37A /* Settings.swift */; };
 		5020BD2725DC0A8100CDD37A /* SettingsSongActionOnTabVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020BD2625DC0A8100CDD37A /* SettingsSongActionOnTabVC.swift */; };
 		50223EF3264543EA007445BC /* LibrarySyncVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50223EF2264543EA007445BC /* LibrarySyncVersion.swift */; };
+		502928852656448000DA3A8F /* SupportVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502928842656448000DA3A8F /* SupportVC.swift */; };
+		5029288726564C6800DA3A8F /* LogData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288626564C6800DA3A8F /* LogData.swift */; };
+		5029288926564F3600DA3A8F /* JSONConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288826564F3600DA3A8F /* JSONConverter.swift */; };
 		5029E0392235A8EC0027F96F /* CommonString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E0382235A8EC0027F96F /* CommonString.swift */; };
 		5029E03B2235ABB80027F96F /* OptionsBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */; };
 		502C0041224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502C0040224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift */; };
@@ -274,6 +277,9 @@
 		5020BD2225DC027E00CDD37A /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		5020BD2625DC0A8100CDD37A /* SettingsSongActionOnTabVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSongActionOnTabVC.swift; sourceTree = "<group>"; };
 		50223EF2264543EA007445BC /* LibrarySyncVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySyncVersion.swift; sourceTree = "<group>"; };
+		502928842656448000DA3A8F /* SupportVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportVC.swift; sourceTree = "<group>"; };
+		5029288626564C6800DA3A8F /* LogData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogData.swift; sourceTree = "<group>"; };
+		5029288826564F3600DA3A8F /* JSONConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONConverter.swift; sourceTree = "<group>"; };
 		5029E0382235A8EC0027F96F /* CommonString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonString.swift; sourceTree = "<group>"; };
 		5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsBarButtonItem.swift; sourceTree = "<group>"; };
 		502C0040224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmpacheLibraryBackgroundSyncer.swift; sourceTree = "<group>"; };
@@ -543,8 +549,10 @@
 				50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */,
 				5083861D21C82E8200C4BB32 /* BridgingHeader.h */,
 				5086F87822397B2900546F5A /* StringHasher.swift */,
+				5029288826564F3600DA3A8F /* JSONConverter.swift */,
 				5077F939221F40130099CA91 /* SynchronizedArray.swift */,
 				5020BD2225DC027E00CDD37A /* Settings.swift */,
+				5029288626564C6800DA3A8F /* LogData.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -802,6 +810,7 @@
 				5077F935221E6D0E0099CA91 /* DownloadsVC.swift */,
 				5077F93D222489510099CA91 /* SettingsVC.swift */,
 				506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */,
+				502928842656448000DA3A8F /* SupportVC.swift */,
 				506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */,
 				5020BD2625DC0A8100CDD37A /* SettingsSongActionOnTabVC.swift */,
 				50CDF20D264BEF5500F83EF6 /* EventLogVC.swift */,
@@ -1115,6 +1124,7 @@
 				500EB36C25F8B42800B4B998 /* AnimatedGradientLayer.swift in Sources */,
 				5009863E2208CC1E0057A1A6 /* BasicButton.swift in Sources */,
 				50C16C2821E8680A00F086F0 /* CommonScreenOperations.swift in Sources */,
+				5029288926564F3600DA3A8F /* JSONConverter.swift in Sources */,
 				5077F938221F24C10099CA91 /* Download.swift in Sources */,
 				50D92CCB25E3ED700017E91D /* MappingModelV4toV5.xcmappingmodel in Sources */,
 				50E964AA25E8E20E00E3210F /* SubsonicVersion.swift in Sources */,
@@ -1164,6 +1174,7 @@
 				5077F955222C58A10099CA91 /* GenericXmlParser.swift in Sources */,
 				5086F885223A1E4600546F5A /* SsPingParserDelegate.swift in Sources */,
 				5086F87922397B2900546F5A /* StringHasher.swift in Sources */,
+				5029288726564C6800DA3A8F /* LogData.swift in Sources */,
 				5077F95122279DF40099CA91 /* PlaytimeSlider.swift in Sources */,
 				5086F87F22399D1900546F5A /* SubsonicServerApi.swift in Sources */,
 				5086F887223BD68C00546F5A /* SsArtistParserDelegate.swift in Sources */,
@@ -1173,6 +1184,7 @@
 				50B798A123B6CA5400551E62 /* Song.swift in Sources */,
 				5077F95322283FED0099CA91 /* RoundedImage.swift in Sources */,
 				50073BDF22301D9A000130D8 /* RequestManager.swift in Sources */,
+				502928852656448000DA3A8F /* SupportVC.swift in Sources */,
 				50C16C3221EA77C700F086F0 /* AmpacheArtworkSyncer.swift in Sources */,
 				50C16C1021E5463E00F086F0 /* ArtistsVC.swift in Sources */,
 				50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */,

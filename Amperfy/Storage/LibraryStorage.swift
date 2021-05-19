@@ -25,6 +25,17 @@ class LibraryStorage: SongFileCachable {
         self.context = context
     }
     
+    func getInfo() -> LibraryInfo {
+        var libraryInfo = LibraryInfo()
+        libraryInfo.artistCount = artistCount
+        libraryInfo.albumCount = albumCount
+        libraryInfo.songCount = songCount
+        libraryInfo.cachedSongCount = cachedSongCount
+        libraryInfo.playlistCount = playlistCount
+        libraryInfo.cachedSongSizeInKB = cachedSongSizeInKB
+        return libraryInfo
+    }
+    
     var artistCount: Int {
         var count = 0
         do {

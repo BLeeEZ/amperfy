@@ -11,7 +11,7 @@ class EventLogger {
     
     static private let errorReportOneDaySilentTimeInSec = 60*60*24
     
-    private let log = OSLog(subsystem: AppDelegate.name, category: "ErrorLogger")
+    private let log = OSLog(subsystem: AppDelegate.name, category: "EventLogger")
     private let alertDisplayer: AlertDisplayable
     private let persistentContainer: NSPersistentContainer
     
@@ -58,7 +58,7 @@ class EventLogger {
             alertMessage += "\n\(error.message)"
             alertMessage += "\n"
             alertMessage += "\nYou can find the event log at:"
-            alertMessage += "\nSettings -> Server -> Event Log"
+            alertMessage += "\nSettings -> Support -> Event Log"
             
             let alert = UIAlertController(title: "API Error Occured", message: alertMessage, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Suppress for \(Self.errorReportOneDaySilentTimeInSec.asDayString)", style: .destructive , handler: { _ in
