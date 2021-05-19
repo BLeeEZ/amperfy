@@ -122,14 +122,20 @@ class ArtistAlbumsItemsFetchedResultsController: BasicFetchedResultsController<A
         self.artist = artist
         let library = LibraryStorage(context: context)
         let fetchRequest = AlbumMO.identifierSortedFetchRequest
-        fetchRequest.predicate = library.getFetchPredicate(forArtist: artist)
+        fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+            library.getFetchPredicate(forArtist: artist),
+            AlbumMO.getFetchPredicateForAlbumsWhoseSongsHave(artist: artist)
+        ])
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
     func search(searchText: String) {
         if searchText.count > 0 {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                library.getFetchPredicate(forArtist: artist),
+                NSCompoundPredicate(orPredicateWithSubpredicates: [
+                    library.getFetchPredicate(forArtist: artist),
+                    AlbumMO.getFetchPredicateForAlbumsWhoseSongsHave(artist: artist)
+                ]),
                 ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText)
             ])
             search(predicate: predicate)
