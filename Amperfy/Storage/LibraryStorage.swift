@@ -32,55 +32,50 @@ class LibraryStorage: SongFileCachable {
         libraryInfo.songCount = songCount
         libraryInfo.cachedSongCount = cachedSongCount
         libraryInfo.playlistCount = playlistCount
-        libraryInfo.cachedSongSizeInKB = cachedSongSizeInKB
+        libraryInfo.cachedSongSize = cachedSongSizeInByte.asByteString
+        libraryInfo.genreCount = genreCount
+        libraryInfo.syncWaveCount = syncWaveCount
+        libraryInfo.artworkCount = artworkCount
         return libraryInfo
     }
     
+    var genreCount: Int {
+        return (try? context.count(for: GenreMO.fetchRequest())) ?? 0
+    }
+    
     var artistCount: Int {
-        var count = 0
-        do {
-            count = try context.count(for: ArtistMO.fetchRequest())
-        } catch {}
-        return count
+        return (try? context.count(for: ArtistMO.fetchRequest())) ?? 0
     }
     
     var albumCount: Int {
-        var count = 0
-        do {
-            count = try context.count(for: AlbumMO.fetchRequest())
-        } catch {}
-        return count
+        return (try? context.count(for: AlbumMO.fetchRequest())) ?? 0
     }
     
     var songCount: Int {
-        var count = 0
-        do {
-            count = try context.count(for: SongMO.fetchRequest())
-        } catch {}
-        return count
+        return (try? context.count(for: SongMO.fetchRequest())) ?? 0
+    }
+    
+    var syncWaveCount: Int {
+        return (try? context.count(for: SyncWaveMO.fetchRequest())) ?? 0
+    }
+    
+    var artworkCount: Int {
+        return (try? context.count(for: ArtworkMO.fetchRequest())) ?? 0
     }
     
     var cachedSongCount: Int {
-        var count = 0
         let request: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         request.predicate = NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
-        do {
-            count = try context.count(for: request)
-        } catch {}
-        return count
+        return (try? context.count(for: request)) ?? 0
     }
     
     var playlistCount: Int {
-        var count = 0
         let request: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         request.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
-        do {
-            count = try context.count(for: request)
-        } catch {}
-        return count
+        return (try? context.count(for: request)) ?? 0
     }
     
-    var cachedSongSizeInKB: Int {
+    var cachedSongSizeInByte: Int64 {
         var foundSongFiles = [NSDictionary]()
         let fetchRequest = NSFetchRequest<NSDictionary>(entityName: SongFile.typeName)
         fetchRequest.propertiesToFetch = [#keyPath(SongFileMO.data)]
@@ -89,13 +84,13 @@ class LibraryStorage: SongFileCachable {
             foundSongFiles = try context.fetch(fetchRequest)
         } catch {}
         
-        var cachedSongSizeInKB = 0
+        var cachedSongSizeInByte: Int64 = 0
         for songFile in foundSongFiles {
             if let fileData = songFile[#keyPath(SongFileMO.data)] as? NSData {
-                cachedSongSizeInKB += fileData.sizeInKB
+                cachedSongSizeInByte += fileData.sizeInByte
             }
         }
-        return cachedSongSizeInKB
+        return cachedSongSizeInByte
     }
     
     func createGenre() -> Genre {
@@ -369,7 +364,7 @@ class LibraryStorage: SongFileCachable {
             playerData = PlayerData(storage: self, managedObject: playerMO, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
             
         } catch {
-            fatalError("Not able to get/create" + PlayerData.entityName)
+            fatalError("Not able to get/create " + PlayerData.entityName)
         }
         
         return playerData

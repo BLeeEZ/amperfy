@@ -20,6 +20,12 @@ extension Int32 {
     }
 }
 
+extension Int64 {
+    var asByteString: String {
+        return ByteCountFormatter.string(fromByteCount: self, countStyle: ByteCountFormatter.CountStyle.decimal)
+    }
+}
+
 extension Int {
     mutating func setOtherRandomValue(in targetRange: ClosedRange<Int>) {
         var newValue = 0
@@ -172,16 +178,8 @@ extension NSObject {
 }
 
 extension NSData {
-    var sizeInKB: Int {
-        return length/1000
-    }
-    var sizeAsString: String {
-        let byteCount = length
-        let bcf = ByteCountFormatter()
-        bcf.allowedUnits = [.useKB]
-        bcf.countStyle = .file
-        let string = bcf.string(fromByteCount: Int64(byteCount))
-        return string
+    var sizeInByte: Int64 {
+        return Int64(length)
     }
 }
 
@@ -197,17 +195,8 @@ extension Data {
         } catch {}
         return data
     }
-    
-    var sizeInKB: Int {
-        return count/1000
-    }
-    var sizeAsString: String {
-        let byteCount = count
-        let bcf = ByteCountFormatter()
-        bcf.allowedUnits = [.useKB]
-        bcf.countStyle = .file
-        let string = bcf.string(fromByteCount: Int64(byteCount))
-        return string
+    var sizeInByte: Int64 {
+        return Int64(count)
     }
 }
 
@@ -424,4 +413,20 @@ extension UIImage {
 
 extension NSPredicate {
     static var alwaysTrue = NSPredicate(format: "nil == nil")
+}
+
+extension UIDevice {
+    var totalDiskCapacityInByte: Int64? {
+        let fileURL = URL(fileURLWithPath:"/")
+        guard let values = try? fileURL.resourceValues(forKeys: [.volumeTotalCapacityKey]),
+              let capacity = values.volumeTotalCapacity else { return nil }
+        return Int64(capacity)
+    }
+    
+    var availableDiskCapacityInByte: Int64? {
+        let fileURL = URL(fileURLWithPath:"/")
+        guard let values = try? fileURL.resourceValues(forKeys: [.volumeAvailableCapacityKey]),
+              let capacity = values.volumeAvailableCapacity else { return nil }
+        return Int64(capacity)
+    }
 }

@@ -11,6 +11,15 @@ enum SongActionOnTab: Int {
     
     var description : String {
         switch self {
+        case .playAndErasePlaylist: return "PlayAndErasePlaylist"
+        case .addToPlaylistAndPlay: return "AddToPlaylistAndPlay"
+        case .insertAsNextSongNoPlay: return "InsertAsNextSongNoPlay"
+        case .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong: return "HiddenOptionPlayInPopupPlayerPlaylistSelectedSong"
+        }
+    }
+    
+    var displayText : String {
+        switch self {
         case .playAndErasePlaylist: return "Clear current playlist and play song"
         case .addToPlaylistAndPlay: return "Insert song at the end and play song"
         case .insertAsNextSongNoPlay: return "Insert as next song to play"

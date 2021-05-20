@@ -16,6 +16,13 @@ enum PlayerDisplayStyle: Int {
             self = .compact
         }
     }
+    
+    var description : String {
+        switch self {
+        case .compact: return "Compact"
+        case .large: return "Large"
+        }
+    }
 }
 
 class PlayerView: UIView {

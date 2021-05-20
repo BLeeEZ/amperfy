@@ -25,24 +25,15 @@ public struct JSONConverter {
 extension Encodable {
 
     func asJSONData() -> Data? {
-        do {
-            if let data = try JSONConverter.encode(self) {
-                return data
-            }
-        } catch {}
-        return nil
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = .prettyPrinted
+        return try? encoder.encode(self)
     }
     
     func asJSONString() -> String {
-        var jsonString = "<no serialized description>"
-        guard let jsonData = asJSONData() else { return jsonString }
-        do {
-            let serialized = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
-            if let description = serialized?.description  {
-                jsonString = description
-            }
-        } catch {}
-        return jsonString
+        guard let jsonData = asJSONData() else { return "<no serialized description>" }
+        return String(decoding: jsonData, as: UTF8.self)
     }
 
 }

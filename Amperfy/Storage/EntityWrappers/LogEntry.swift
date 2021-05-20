@@ -51,3 +51,19 @@ public class LogEntry: NSObject {
     }
 
 }
+
+extension LogEntry: Encodable {
+    
+    enum CodingKeys: String, CodingKey {
+        case creationDate, message, statusCode, type
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(creationDate, forKey: .creationDate)
+        try container.encode(message, forKey: .message)
+        try container.encode(statusCode, forKey: .statusCode)
+        try container.encode(type.description, forKey: .type)
+    }
+
+}

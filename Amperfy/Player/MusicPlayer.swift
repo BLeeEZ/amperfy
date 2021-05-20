@@ -26,6 +26,14 @@ enum RepeatMode: Int16 {
             self = .off
         }
     }
+    
+    var description : String {
+        switch self {
+        case .off: return "Off"
+        case .all: return "All"
+        case .single: return "Single"
+        }
+    }
 }
 
 class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {

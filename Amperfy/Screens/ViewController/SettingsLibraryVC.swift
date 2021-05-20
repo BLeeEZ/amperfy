@@ -54,15 +54,7 @@ class SettingsLibraryVC: UITableViewController {
                 self.cachedSongsCountLabel.text = String(cachedSongCount)
             }
             
-            var cachedSongSizeLabelText = ""
-            let cachedSongSizeInKB = Float(storage.cachedSongSizeInKB)
-            let cachedSongSizeInMB = cachedSongSizeInKB / 1000.0
-            let cachedSongSizeInGB = cachedSongSizeInMB / 1000.0
-            if cachedSongSizeInMB < 1000.0 {
-                cachedSongSizeLabelText = NSString(format: "%.2f", cachedSongSizeInMB) as String + " MB"
-            } else {
-                cachedSongSizeLabelText = NSString(format: "%.2f", cachedSongSizeInGB) as String + " GB"
-            }
+            let cachedSongSizeLabelText = storage.cachedSongSizeInByte.asByteString
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.cachedSongsSizeSpinner.isHidden = true

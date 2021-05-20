@@ -18,9 +18,9 @@ class SettingsSongActionOnTabVC: UITableViewController {
 
         let settings = appDelegate.storage.getSettings()
 
-        playAndErasePlaylistButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.playAndErasePlaylist.description, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]),  for: .normal)
-        addToPlaylistAndPlayButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.addToPlaylistAndPlay.description, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]), for: .normal)
-        insertAsNextSongNoPlayButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.insertAsNextSongNoPlay.description, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]), for: .normal)
+        playAndErasePlaylistButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.playAndErasePlaylist.displayText, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]),  for: .normal)
+        addToPlaylistAndPlayButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.addToPlaylistAndPlay.displayText, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]), for: .normal)
+        insertAsNextSongNoPlayButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.insertAsNextSongNoPlay.displayText, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]), for: .normal)
 
         let checkIconText = NSMutableAttributedString(string: FontAwesomeIcon.Check.asString + " " , attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
         playAndErasePlaylistCheckLabel.text = ""
