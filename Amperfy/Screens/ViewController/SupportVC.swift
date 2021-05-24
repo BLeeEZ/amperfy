@@ -9,6 +9,7 @@ class SupportVC: UITableViewController, MFMailComposeViewControllerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.userStatistics.visited(.settingsSupport)
     }
     
     @IBAction func issueReportPressed(_ sender: Any) {

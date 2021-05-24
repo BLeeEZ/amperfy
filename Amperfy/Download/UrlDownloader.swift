@@ -41,10 +41,10 @@ class UrlDownloader: NSObject, URLSessionDownloadDelegate {
         guard let url = downloadTask.originalRequest?.url, let request = requestManager.getRequest(by: url), let download = request.download else { return }
         
         do {
+            download.isDownloading = false
             let data = try Data(contentsOf: location)
             if data.count > 0 {
                 download.resumeData = data
-                download.isDownloading = false
             } else {
                 download.error = .fetchFailed
             }

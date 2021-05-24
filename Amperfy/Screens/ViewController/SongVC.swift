@@ -7,6 +7,7 @@ class SongVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        appDelegate.userStatistics.visited(.songs)
         
         fetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController

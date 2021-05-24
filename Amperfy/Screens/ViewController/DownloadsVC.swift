@@ -17,6 +17,7 @@ class DownloadsVC: UITableViewController, SongDownloadViewUpdatable {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.userStatistics.visited(.downloads)
         downloadManager = appDelegate.downloadManager
         requestQueues = downloadManager.requestQueues
         requestQueues.waitingRequests.reverse()
@@ -122,7 +123,7 @@ class DownloadsVC: UITableViewController, SongDownloadViewUpdatable {
         }
         
         if let request = request {
-            cell.display(song: request.element, rootView: self)
+            cell.display(song: request.element, rootView: self, download: request.download)
         }
         cell.isUserTouchInteractionAllowed = false
 

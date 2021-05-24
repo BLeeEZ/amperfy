@@ -108,6 +108,7 @@ class PlayerView: UIView {
     }
 
     @IBAction func airplayButtonPushed(_ sender: Any) {
+        appDelegate.userStatistics.usedAction(.airplay)
         let rect = CGRect(x: -100, y: 0, width: 0, height: 0)
         let airplayVolume = MPVolumeView(frame: rect)
         airplayVolume.showsVolumeSlider = false
@@ -126,6 +127,7 @@ class PlayerView: UIView {
     }
     
     @IBAction private func displayPlaylistPressed() {
+        appDelegate.userStatistics.usedAction(.changePlayerDisplayStyle)
         displayStyle.switchToNextStyle()
         let settings = appDelegate.storage.getSettings()
         settings.playerDisplayStyle = displayStyle

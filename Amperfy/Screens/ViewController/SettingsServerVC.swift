@@ -14,6 +14,7 @@ class SettingsServerVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.userStatistics.visited(.settingsServer)
         
         if let loginCredentials = self.appDelegate.storage.getLoginCredentials() {
             serverUrlTF.text = loginCredentials.serverUrl

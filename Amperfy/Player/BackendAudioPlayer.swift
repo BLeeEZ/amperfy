@@ -30,6 +30,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
 
     private let songDownloader: SongDownloadable
     private let songCache: SongFileCachable
+    private let userStatistics: UserStatistics
     private let player: AVPlayer
     private let eventLogger: EventLogger
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
@@ -62,11 +63,12 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         return player.currentItem != nil
     }
     
-    init(mediaPlayer: AVPlayer, eventLogger: EventLogger, songDownloader: SongDownloadable, songCache: SongFileCachable) {
+    init(mediaPlayer: AVPlayer, eventLogger: EventLogger, songDownloader: SongDownloadable, songCache: SongFileCachable, userStatistics: UserStatistics) {
         self.player = mediaPlayer
         self.eventLogger = eventLogger
         self.songDownloader = songDownloader
         self.songCache = songCache
+        self.userStatistics = userStatistics
         
         player.addPeriodicTimeObserver(forInterval: updateElapsedTimeInterval, queue: DispatchQueue.main) { [weak self] time in
             if let self = self {
@@ -130,6 +132,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     private func insertCachedSong(playlistItem: PlaylistItem) {
         guard let song = playlistItem.song, let songData = songCache.getSongFile(forSong: song)?.data else { return }
         os_log(.default, "Play song: %s", song.displayString)
+        userStatistics.playedSong(isPlayedFromCache: true)
         let url = createLocalUrl(songData: songData)
         insertSong(forSong: song, withUrl: url)
     }
@@ -137,6 +140,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     private func insertStreamSong(playlistItem: PlaylistItem) {
         guard let song = playlistItem.song, let streamUrl = songDownloader.updateStreamingUrl(forSong: song) else { return }
         os_log(.default, "Streaming song: %s", song.displayString)
+        userStatistics.playedSong(isPlayedFromCache: false)
         insertSong(forSong: song, withUrl: streamUrl)
     }
 

@@ -106,6 +106,7 @@ class PlaylistDetailTableHeader: UIView {
         if playlist.hasCachedSongs {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.persistentLibraryStorage.deleteCache(ofPlaylist: playlist)
+                self.appDelegate.persistentLibraryStorage.saveContext()
                 if let rootView = self.rootView {
                     rootView.tableView.reloadData()
                 }

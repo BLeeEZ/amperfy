@@ -67,6 +67,7 @@ class GenreDetailTableHeader: UIView {
         if genre.hasCachedSongs {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.persistentLibraryStorage.deleteCache(ofGenre: genre)
+                self.appDelegate.persistentLibraryStorage.saveContext()
                 if let rootView = self.rootView {
                     rootView.tableView.reloadData()
                 }

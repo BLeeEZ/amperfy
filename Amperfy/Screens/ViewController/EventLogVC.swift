@@ -7,6 +7,7 @@ class EventLogVC: SingleFetchedResultsTableViewController<LogEntryMO> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        appDelegate.userStatistics.visited(.eventLog)
         
         fetchedResultsController = ErrorLogFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController

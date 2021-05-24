@@ -18,6 +18,7 @@ class SettingsLibraryVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.userStatistics.visited(.settingsLibrary)
         self.cachedSongsCountSpinner.style = UIActivityIndicatorView.defaultStyle
         
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in

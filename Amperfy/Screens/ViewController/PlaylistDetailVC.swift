@@ -11,10 +11,10 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        appDelegate.userStatistics.visited(.playlistDetail)
         fetchedResultsController = PlaylistItemsFetchedResultsController(forPlaylist: playlist, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
         

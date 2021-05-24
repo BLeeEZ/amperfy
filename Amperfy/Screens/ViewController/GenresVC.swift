@@ -7,6 +7,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        appDelegate.userStatistics.visited(.genres)
         
         fetchedResultsController = GenreFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController

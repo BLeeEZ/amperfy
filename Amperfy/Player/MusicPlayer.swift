@@ -77,13 +77,15 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     private var coreData: PlayerData
     private var downloadManager: SongDownloadable
     private let backendAudioPlayer: BackendAudioPlayer
+    private let userStatistics: UserStatistics
     private var notifierList = [MusicPlayable]()
     private let currentSongReplayInsteadPlayPreviousTimeInSec = 5.0
     
-    init(coreData: PlayerData, downloadManager: SongDownloadable, backendAudioPlayer: BackendAudioPlayer) {
+    init(coreData: PlayerData, downloadManager: SongDownloadable, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
         self.coreData = coreData
         self.downloadManager = downloadManager
         self.backendAudioPlayer = backendAudioPlayer
+        self.userStatistics = userStatistics
         super.init()
         self.backendAudioPlayer.responder = self
     }
@@ -106,6 +108,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
 
     func seek(toSecond: Double) {
+        userStatistics.usedAction(.playerSeek)
         backendAudioPlayer.seek(toSecond: toSecond)
     }
     
@@ -134,6 +137,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     private func prepareSongAndInsertToPlayer(playlistIndex: Int, reactionToError: FetchErrorReaction) {
         guard playlistIndex < playlist.songs.count else { return }
         let playlistItem = playlist.items[playlistIndex]
+        userStatistics.playedSong(repeatMode: repeatMode, isShuffle: isShuffle)
         backendAudioPlayer.requestToPlay(playlistItem: playlistItem, reactionToError: reactionToError)
         coreData.currentSongIndex = playlistIndex
         preDownloadNextSongs(playlistIndex: playlistIndex)

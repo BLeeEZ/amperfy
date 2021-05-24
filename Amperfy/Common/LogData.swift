@@ -9,6 +9,7 @@ public struct LogData: Encodable {
     public var playerInfo: PlayerInfo?
     public var libraryInfo: LibraryInfo?
     public var userSettings: UserSettings?
+    public var userStatistics: [UserStatisticsOverview]?
     public var eventInfo: EventInfo?
     
     static let latestEventsCount = 30
@@ -17,9 +18,9 @@ public struct LogData: Encodable {
         var logData = LogData()
         
         var basicInfo = BasicInfo()
-        basicInfo.appName = "Amperfy"
-        basicInfo.appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
-        basicInfo.appBuildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
+        basicInfo.appName = AppDelegate.name
+        basicInfo.appVersion = AppDelegate.version
+        basicInfo.appBuildNumber = AppDelegate.buildNumber
         logData.basicInfo = basicInfo
         
         var deviceInfo = DeviceInfo()
@@ -32,12 +33,12 @@ public struct LogData: Encodable {
         
         var serverInfo = ServerInfo()
         serverInfo.apiType = appDelegate.backendProxy.selectedApi.description
-        serverInfo.url = appDelegate.storage.getLoginCredentials()?.serverUrl ?? "-"
         serverInfo.isAuthenticated = appDelegate.backendProxy.isAuthenticated()
         serverInfo.apiVersion = appDelegate.backendProxy.serverApiVersion
         logData.serverInfo = serverInfo
         
         logData.libraryInfo = appDelegate.persistentLibraryStorage.getInfo()
+        logData.libraryInfo?.version = appDelegate.storage.librarySyncVersion.description
         
         var playerInfo = PlayerInfo()
         playerInfo.playlistItemCount = appDelegate.player.playlist.items.count
@@ -53,6 +54,9 @@ public struct LogData: Encodable {
         userSettings.songActionOnTab = settings.songActionOnTab.description
         userSettings.playerDisplayStyle = settings.playerDisplayStyle.description
         logData.userSettings = userSettings
+        
+        let allUserStatistics = appDelegate.persistentLibraryStorage.getAllUserStatistics()
+        logData.userStatistics = allUserStatistics.compactMap{ $0.createLogInfo() }
         
         var eventInfo = EventInfo()
         let eventLogs = appDelegate.persistentLibraryStorage.getLogEntries()
@@ -83,7 +87,6 @@ public struct DeviceInfo: Encodable {
 public struct ServerInfo: Encodable {
     public var apiType: String?
     public var apiVersion: String?
-    public var url: String?
     public var isAuthenticated: Bool?
 }
 
@@ -97,6 +100,7 @@ public struct LibraryInfo: Encodable {
     public var syncWaveCount: Int?
     public var artworkCount: Int?
     public var cachedSongSize: String?
+    public var version: String?
 }
 
 public struct PlayerInfo: Encodable {

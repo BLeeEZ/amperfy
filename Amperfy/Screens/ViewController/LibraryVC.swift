@@ -13,6 +13,7 @@ class LibraryVC: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        appDelegate.userStatistics.visited(.library)
         tableView.reloadData()
     }
     

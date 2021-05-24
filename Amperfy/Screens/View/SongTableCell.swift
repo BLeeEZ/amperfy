@@ -70,21 +70,27 @@ class SongTableCell: BasicTableCell {
         titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         artistLabel.text = song.artist?.name
         artworkImage.image = song.image
-        if let reorderLabel = self.reorderLabel {
-            if displayMode == .playerCell {
-                reorderLabel.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Bars.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
-            } else {
-                reorderLabel.removeFromSuperview()
-            }
+        
+        if displayMode == .playerCell {
+            self.reorderLabel?.isHidden = false
+            self.reorderLabel?.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Bars.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
+        } else if download?.error != nil {
+            self.reorderLabel?.isHidden = false
+            self.reorderLabel?.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Exclamation.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 25)!])
+        } else {
+            self.reorderLabel?.isHidden = true
         }
-        if song.isCached {
+        
+        if download?.error != nil {
+            artistLabel.textColor = .systemRed
+        } else if song.isCached {
             artistLabel.textColor = UIColor.defaultBlue
         } else if isCellInPopupPlayer {
             artistLabel.textColor = UIColor.labelColor
         } else {
             artistLabel.textColor = UIColor.secondaryLabelColor
         }
-        if let download = download {
+        if let download = download, download.isDownloading {
             downloadProgress.isHidden = false
             downloadProgress.progress = download.progress
         } else {
@@ -180,6 +186,7 @@ class SongTableCell: BasicTableCell {
         if song.isCached {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.persistentLibraryStorage.deleteCache(ofSong: song)
+                self.appDelegate.persistentLibraryStorage.saveContext()
                 self.refresh()
             }))
         } else {
@@ -190,6 +197,7 @@ class SongTableCell: BasicTableCell {
         }
         if let artist = song.artist {
             alert.addAction(UIAlertAction(title: "Show artist", style: .default, handler: { _ in
+                self.appDelegate.userStatistics.usedAction(.alertGoToArtist)
                 let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
                 artistDetailVC.artist = artist
                 if let navController = self.rootView?.navigationController {
@@ -201,6 +209,7 @@ class SongTableCell: BasicTableCell {
         }
         if let album = song.album {
             alert.addAction(UIAlertAction(title: "Show album", style: .default, handler: { _ in
+                self.appDelegate.userStatistics.usedAction(.alertGoToAlbum)
                 let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
                 albumDetailVC.album = album
                 if let navController = self.rootView?.navigationController {

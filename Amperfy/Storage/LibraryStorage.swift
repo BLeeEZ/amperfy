@@ -131,6 +131,13 @@ class LibraryStorage: SongFileCachable {
         return LogEntry(managedObject: logEntryMO)
     }
     
+    private func createUserStatistics(appVersion: String) -> UserStatistics {
+        let userStatistics = UserStatisticsMO(context: context)
+        userStatistics.creationDate = Date()
+        userStatistics.appVersion = appVersion
+        return UserStatistics(managedObject: userStatistics, libraryStorage: self)
+    }
+    
     func deleteSongFile(songFile: SongFile) {
         context.delete(songFile.managedObject)
     }
@@ -535,6 +542,38 @@ class LibraryStorage: SongFileCachable {
             os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
         }
         return latestSyncWave
+    }
+    
+    func getUserStatistics(appVersion: String) -> UserStatistics {
+        var foundUserStatistics: UserStatisticsMO? = nil
+        let fr: NSFetchRequest<UserStatisticsMO> = UserStatisticsMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(UserStatisticsMO.appVersion), appVersion)
+        fr.fetchLimit = 1
+        do {
+            foundUserStatistics = try self.context.fetch(fr).first
+        } catch {
+            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
+        }
+        
+        if let foundUserStatistics = foundUserStatistics {
+            return UserStatistics(managedObject: foundUserStatistics, libraryStorage: self)
+        } else {
+            os_log("New UserStatistics for app version %s created", log: log, type: .info, appVersion)
+            let createdUserStatistics = createUserStatistics(appVersion: appVersion)
+            saveContext()
+            return createdUserStatistics
+        }
+    }
+    
+    func getAllUserStatistics() -> Array<UserStatistics> {
+        var userStatistics = Array<UserStatistics>()
+        var foundUserStatistics = Array<UserStatisticsMO>()
+        let fetchRequest: NSFetchRequest<UserStatisticsMO> = UserStatisticsMO.fetchRequest()
+        do {
+            foundUserStatistics = try context.fetch(fetchRequest)
+            userStatistics = foundUserStatistics.compactMap{ UserStatistics(managedObject: $0, libraryStorage: self) }
+        } catch {}
+        return userStatistics
     }
     
     func cleanStorage() {

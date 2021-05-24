@@ -12,14 +12,12 @@ class SettingsVC: UITableViewController {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         
-        versionLabel.text = ""
-        if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
-            versionLabel.text = version
-        }
-        buildNumberLabel.text = ""
-        if let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
-            buildNumberLabel.text = buildNumber
-        }
+        versionLabel.text = AppDelegate.version
+        buildNumberLabel.text = AppDelegate.buildNumber
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        appDelegate.userStatistics.visited(.settings)
     }
     
     @IBAction func resetAppPressed(_ sender: Any) {

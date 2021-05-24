@@ -44,6 +44,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        appDelegate.userStatistics.visited(.popupPlayer)
         reloadData()
         adjustConstraintsForCompactPlayer()
         self.playerView.viewWillAppear(animated)
@@ -263,6 +264,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func optionsPressed() {
+        appDelegate.userStatistics.usedAction(.playerOptions)
         let alert = UIAlertController(title: "Player", message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Clear playlist", style: .default, handler: { _ in

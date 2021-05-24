@@ -3,8 +3,15 @@ import MediaPlayer
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    
     static let name = "Amperfy"
+    static var version: String {
+        return (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? ""
+    }
+    static var buildNumber: String {
+        return (Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String) ?? ""
+    }
+    
     var window: UIWindow?
 
     lazy var storage = {
@@ -23,7 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return backendProxy
     }()
     lazy var player = {
-        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), downloadManager: downloadManager, backendAudioPlayer: BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, songDownloader: downloadManager, songCache: persistentLibraryStorage))
+        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), downloadManager: downloadManager, backendAudioPlayer: BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, songDownloader: downloadManager, songCache: persistentLibraryStorage, userStatistics: userStatistics), userStatistics: userStatistics)
     }()
     lazy var downloadManager: DownloadManager = {
         let requestManager = RequestManager()
@@ -35,6 +42,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }()
     lazy var backgroundSyncerManager = {
         return BackgroundSyncerManager(storage: storage, backendApi: backendApi)
+    }()
+    lazy var userStatistics = {
+        return persistentLibraryStorage.getUserStatistics(appVersion: Self.version)
     }()
 
     func reinit() {
@@ -80,7 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         backgroundSyncerManager.start()
         downloadManager.start()
-    
+        userStatistics.sessionStarted()
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()
         self.window?.rootViewController = initialViewController
         self.window?.makeKeyAndVisible()

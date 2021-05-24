@@ -10,6 +10,7 @@ class ArtistDetailVC: BasicTableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        appDelegate.userStatistics.visited(.artistDetail)
         
         albumsFetchedResultsController = ArtistAlbumsItemsFetchedResultsController(for: artist, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
         albumsFetchedResultsController.delegate = self
