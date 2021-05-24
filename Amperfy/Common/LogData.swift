@@ -25,7 +25,7 @@ public struct LogData: Encodable {
         
         var deviceInfo = DeviceInfo()
         let currentDevice = UIDevice.current
-        deviceInfo.device = currentDevice.name
+        deviceInfo.device = currentDevice.model
         deviceInfo.iOSVersion = currentDevice.systemVersion
         deviceInfo.totalDiskCapacity = currentDevice.totalDiskCapacityInByte?.asByteString
         deviceInfo.availableDiskCapacity = currentDevice.availableDiskCapacityInByte?.asByteString
