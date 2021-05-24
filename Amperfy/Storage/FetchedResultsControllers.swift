@@ -121,7 +121,7 @@ class ArtistAlbumsItemsFetchedResultsController: BasicFetchedResultsController<A
     init(for artist: Artist, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         self.artist = artist
         let library = LibraryStorage(context: context)
-        let fetchRequest = AlbumMO.identifierSortedFetchRequest
+        let fetchRequest = AlbumMO.releaseYearSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             library.getFetchPredicate(forArtist: artist),
             AlbumMO.getFetchPredicateForAlbumsWhoseSongsHave(artist: artist)
