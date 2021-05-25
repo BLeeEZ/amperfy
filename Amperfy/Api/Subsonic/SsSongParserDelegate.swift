@@ -19,8 +19,9 @@ class SsSongParserDelegate: SsXmlLibParser {
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
         
-        if elementName == "song" || elementName == "entry" {
+        if elementName == "song" || elementName == "entry" || elementName == "child" {
             guard let songId = attributeDict["id"] else { return }
+            guard let isDir = attributeDict["isDir"], let isDirBool = Bool(isDir), isDirBool == false else { return }
             
             if let fetchedSong = libraryStorage.getSong(id: songId)  {
                 songBuffer = fetchedSong
@@ -91,7 +92,7 @@ class SsSongParserDelegate: SsXmlLibParser {
     }
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        if elementName == "song" || elementName == "entry" {
+        if elementName == "song" || elementName == "entry" || elementName == "child", songBuffer != nil {
             parsedCount += 1
             songBuffer = nil
         }

@@ -15,7 +15,7 @@ class AmpacheXmlServerApi {
     let clientApiVersion = "500000"
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "Ampache")
-    private let eventLogger: EventLogger
+    let eventLogger: EventLogger
     private var credentials: LoginCredentials?
     private var authHandshake: AuthentificationHandshake?
     

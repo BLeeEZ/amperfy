@@ -97,6 +97,28 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         libraryStorage.saveContext()
     }
     
+    func getMusicFolders() -> [MusicFolder] {
+        let musicFolderParser = SsMusicFolderParserDelegate()
+        subsonicServerApi.requestMusicFolders(parserDelegate: musicFolderParser)
+        return musicFolderParser.musicFolders
+    }
+    
+    func getIndexes(musicFolder: MusicFolder, libraryStorage: LibraryStorage) -> MusicIndex {
+        guard let syncWave = libraryStorage.getLatestSyncWave() else { return MusicIndex(musicFolder: musicFolder, shortcuts: nil, directories: nil, songs: nil) }
+        let musicDirectoryParser = SsMusicDirectoryParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestIndexes(parserDelegate: musicDirectoryParser, musicFolderId: musicFolder.id)
+        libraryStorage.saveContext()
+        return MusicIndex(musicFolder: musicFolder, shortcuts: musicDirectoryParser.shortcuts, directories: musicDirectoryParser.musicDirectories, songs: musicDirectoryParser.songsInDirectory)
+    }
+    
+    func getMusicDirectoryContent(of musicDirectory: MusicDirectory, libraryStorage: LibraryStorage) -> MusicDirectory {
+        guard let syncWave = libraryStorage.getLatestSyncWave() else { return MusicDirectory(id: musicDirectory.id, parent: musicDirectory.parent, name: musicDirectory.name, directories: nil, songs: nil) }
+        let musicDirectoryParser = SsMusicDirectoryParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestMusicDirectory(parserDelegate: musicDirectoryParser, id: musicDirectory.id)
+        libraryStorage.saveContext()
+        return MusicDirectory(id: musicDirectory.id, parent: musicDirectory.parent, name: musicDirectory.name, directories: musicDirectoryParser.musicDirectories, songs: musicDirectoryParser.songsInDirectory)
+    }
+    
     func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage) {
         let playlistParser = SsPlaylistParserDelegate(libraryStorage: libraryStorage)
         subsonicServerApi.requestPlaylists(parserDelegate: playlistParser)

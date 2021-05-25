@@ -239,6 +239,23 @@ class SubsonicServerApi {
         }
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
+    
+    func requestMusicFolders(parserDelegate: SsXmlParser) {
+        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getMusicFolders") else { return }
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
+    func requestIndexes(parserDelegate: SsXmlParser, musicFolderId: String) {
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getIndexes") else { return }
+        urlComp.addQueryItem(name: "musicFolderId", value: musicFolderId)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
+    func requestMusicDirectory(parserDelegate: SsXmlParser, id: String) {
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getMusicDirectory") else { return }
+        urlComp.addQueryItem(name: "id", value: id)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
 
     private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: SsXmlParser, ignoreErrorResponse: Bool = false) {
         guard let url = fromUrlComponent.url else {

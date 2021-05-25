@@ -100,6 +100,21 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         self.ampacheXmlServerApi.requestAlbumSongs(of: album, parserDelegate: songParser)
         libraryStorage.saveContext()
     }
+    
+    func getMusicFolders() -> [MusicFolder] {
+        ampacheXmlServerApi.eventLogger.info(message: "GetMusicFolders API function is not support by Ampache")
+        return [MusicFolder]()
+    }
+    
+    func getIndexes(musicFolder: MusicFolder, libraryStorage: LibraryStorage) -> MusicIndex {
+        ampacheXmlServerApi.eventLogger.info(message: "GetIndexes API function is not support by Ampache")
+        return MusicIndex(musicFolder: musicFolder, shortcuts: nil, directories: nil, songs: nil)
+    }
+    
+    func getMusicDirectoryContent(of musicDirectory: MusicDirectory, libraryStorage: LibraryStorage) -> MusicDirectory {
+        ampacheXmlServerApi.eventLogger.info(message: "GetMusicDirectory API function is not support by Ampache")
+        return musicDirectory
+    }
 
     func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage) {
         let playlistParser = PlaylistParserDelegate(libraryStorage: libraryStorage, parseNotifier: nil)
