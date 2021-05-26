@@ -13,12 +13,16 @@ extension UserStatisticsMO {
     @NSManaged public var activeRepeatSingleSongsCount: Int32
     @NSManaged public var activeShuffleOffSongsCount: Int32
     @NSManaged public var activeShuffleOnSongsCount: Int32
+    @NSManaged public var appSessionsStartedCount: Int32
     @NSManaged public var appVersion: String
     @NSManaged public var creationDate: Date
+    @NSManaged public var playedSongFromCacheCount: Int32
     @NSManaged public var playedSongsCount: Int32
+    @NSManaged public var playedSongViaStreamCount: Int32
     @NSManaged public var usedAirplayCount: Int32
     @NSManaged public var usedAlertGoToAlbumCount: Int32
     @NSManaged public var usedAlertGoToArtistCount: Int32
+    @NSManaged public var usedChangePlayerDisplayStyleCount: Int32
     @NSManaged public var usedPlayerOptionsCount: Int32
     @NSManaged public var usedPlayerSeekCount: Int32
     @NSManaged public var visitedAlbumDetailCount: Int32
@@ -42,9 +46,8 @@ extension UserStatisticsMO {
     @NSManaged public var visitedSettingsServerCount: Int32
     @NSManaged public var visitedSettingsSupportCount: Int32
     @NSManaged public var visitedSongsCount: Int32
-    @NSManaged public var playedSongFromCacheCount: Int32
-    @NSManaged public var playedSongViaStreamCount: Int32
-    @NSManaged public var appSessionsStartedCount: Int32
-    @NSManaged public var usedChangePlayerDisplayStyleCount: Int32
+    @NSManaged public var visitedMusicFoldersCount: Int32
+    @NSManaged public var visitedIndexesCount: Int32
+    @NSManaged public var visitedDirectoriesCount: Int32
 
 }

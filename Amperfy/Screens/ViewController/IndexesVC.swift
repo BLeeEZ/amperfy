@@ -10,6 +10,7 @@ class IndexesVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.userStatistics.visited(.indexes)
         navigationItem.title = musicFolder.name
         tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)

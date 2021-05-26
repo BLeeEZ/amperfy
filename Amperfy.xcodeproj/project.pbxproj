@@ -430,6 +430,7 @@
 		50DEEE06265E27070073FF20 /* DirectoryTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DirectoryTableCell.xib; sourceTree = "<group>"; };
 		50DEEE09265E392C0073FF20 /* IndexesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexesVC.swift; sourceTree = "<group>"; };
 		50DEEE0B265E3F9D0073FF20 /* DirectoriesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoriesVC.swift; sourceTree = "<group>"; };
+		50DEEE0D265E89590073FF20 /* Amperfy v8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v8.xcdatamodel"; sourceTree = "<group>"; };
 		50E15407261311590021F47D /* Amperfy v6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v6.xcdatamodel"; sourceTree = "<group>"; };
 		50E964A925E8E20E00E3210F /* SubsonicVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersion.swift; sourceTree = "<group>"; };
 		50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersionTest.swift; sourceTree = "<group>"; };
@@ -1616,6 +1617,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				50DEEE0D265E89590073FF20 /* Amperfy v8.xcdatamodel */,
 				505AD8712615B4D8001319B6 /* Amperfy v7.xcdatamodel */,
 				50E15407261311590021F47D /* Amperfy v6.xcdatamodel */,
 				5067016125E3ADA200A3EF89 /* Amperfy v5.xcdatamodel */,
@@ -1624,7 +1626,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 505AD8712615B4D8001319B6 /* Amperfy v7.xcdatamodel */;
+			currentVersion = 50DEEE0D265E89590073FF20 /* Amperfy v8.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

@@ -17,12 +17,15 @@ public enum ViewToVisit {
     albums,
     artistDetail,
     artists,
+    directories,
     downloads,
     eventLog,
     genreDetail,
     genres,
+    indexes,
     library,
     license,
+    musicFolders,
     playlistDetail,
     playlists,
     playlistSelector,
@@ -69,18 +72,24 @@ public class UserStatistics {
             self.managedObject.visitedArtistDetailCount += 1
         case .artists:
             self.managedObject.visitedArtistsCount += 1
+        case .directories:
+            self.managedObject.visitedDirectoriesCount += 1
         case .downloads:
             self.managedObject.visitedDownloadsCount += 1
         case .eventLog:
             self.managedObject.visitedEventLogCount += 1
         case .genreDetail:
             self.managedObject.visitedGenreDetailCount += 1
+        case .indexes:
+            self.managedObject.visitedIndexesCount += 1
         case .genres:
             self.managedObject.visitedGenresCount += 1
         case .library:
             self.managedObject.visitedLibraryCount += 1
         case .license:
             self.managedObject.visitedLicenseCount += 1
+        case .musicFolders:
+            self.managedObject.visitedMusicFoldersCount += 1
         case .playlistDetail:
             self.managedObject.visitedPlaylistDetailCount += 1
         case .playlists:
@@ -187,12 +196,15 @@ public class UserStatistics {
         viewsVisited.albums = managedObject.visitedAlbumsCount
         viewsVisited.artistDetail = managedObject.visitedArtistDetailCount
         viewsVisited.artists = managedObject.visitedArtistsCount
+        viewsVisited.directories = managedObject.visitedDirectoriesCount
         viewsVisited.downloads = managedObject.visitedDownloadsCount
         viewsVisited.eventLog = managedObject.visitedEventLogCount
         viewsVisited.genreDetail = managedObject.visitedGenreDetailCount
         viewsVisited.genres = managedObject.visitedGenresCount
+        viewsVisited.indexes = managedObject.visitedIndexesCount
         viewsVisited.library = managedObject.visitedLibraryCount
         viewsVisited.license = managedObject.visitedLicenseCount
+        viewsVisited.musicFolders = managedObject.visitedMusicFoldersCount
         viewsVisited.playlistDetail = managedObject.visitedPlaylistDetailCount
         viewsVisited.playlists = managedObject.visitedPlaylistsCount
         viewsVisited.playlistSelector = managedObject.visitedPlaylistSelectorCount
@@ -245,12 +257,15 @@ public struct ViewsVisitedCounts: Encodable {
     public var albums: Int32?
     public var artistDetail: Int32?
     public var artists: Int32?
+    public var directories: Int32?
     public var downloads: Int32?
     public var eventLog: Int32?
     public var genreDetail: Int32?
     public var genres: Int32?
+    public var indexes: Int32?
     public var library: Int32?
     public var license: Int32?
+    public var musicFolders: Int32?
     public var playlistDetail: Int32?
     public var playlists: Int32?
     public var playlistSelector: Int32?

@@ -9,6 +9,7 @@ class DirectoriesVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.userStatistics.visited(.directories)
         navigationItem.title = musicDirectory.name
         tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)

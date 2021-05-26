@@ -9,6 +9,7 @@ class MusicFoldersVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.userStatistics.visited(.musicFolders)
         tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.rowHeight = DirectoryTableCell.rowHeight
     }
