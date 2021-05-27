@@ -130,11 +130,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+extension AppDelegate {
+    static func topViewController(base: UIViewController? = (UIApplication.shared.delegate as! AppDelegate).window?.rootViewController) -> UIViewController? {
+        if base?.presentedViewController is UIAlertController {
+            return base
+        }
+        if let nav = base as? UINavigationController {
+            return topViewController(base: nav.visibleViewController)
+        }
+        if let tab = base as? UITabBarController, let selected = tab.selectedViewController {
+            return topViewController(base: selected)
+        }
+        if let presented = base?.presentedViewController {
+            return topViewController(base: presented)
+        }
+        return base
+    }
+}
+
 extension AppDelegate: AlertDisplayable {
     func display(alert: UIAlertController) {
-        guard let rootView = self.window?.rootViewController else { return }
+        guard let topView = Self.topViewController() else { return }
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
-        rootView.present(alert, animated: true, completion: nil)
+        alert.setOptionsForIPadToDisplayPopupCentricIn(view: topView.view)
+        topView.present(alert, animated: true, completion: nil)
     }
 }
