@@ -5,7 +5,7 @@ import os.log
 
 class SsSongParserDelegate: SsXmlLibParser {
     
-    private var subsonicUrlCreator: SubsonicUrlCreator
+    var subsonicUrlCreator: SubsonicUrlCreator
     var songBuffer: Song?
     var guessedArtist: Artist?
     var guessedAlbum: Album?

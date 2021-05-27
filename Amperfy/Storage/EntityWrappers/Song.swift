@@ -190,6 +190,16 @@ public class Song: AbstractLibraryEntity, Identifyable {
 
 }
 
+extension Song: Hashable, Equatable {
+    public static func == (lhs: Song, rhs: Song) -> Bool {
+        return lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(managedObject)
+    }
+}
+
 extension Array where Element: Song {
     
     func filterCached() -> [Element] {

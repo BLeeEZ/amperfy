@@ -8,8 +8,8 @@ extension ArtistMO {
         return NSFetchRequest<ArtistMO>(entityName: "Artist")
     }
 
-    @NSManaged public var name: String?
     @NSManaged public var albumCount: Int16
+    @NSManaged public var name: String?
     @NSManaged public var albums: NSOrderedSet?
     @NSManaged public var genre: GenreMO?
     @NSManaged public var songs: NSOrderedSet?

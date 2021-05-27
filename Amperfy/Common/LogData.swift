@@ -97,6 +97,8 @@ public struct LibraryInfo: Encodable {
     public var songCount: Int?
     public var cachedSongCount: Int?
     public var playlistCount: Int?
+    public var musicFolderCount: Int?
+    public var directoryCount: Int?
     public var syncWaveCount: Int?
     public var artworkCount: Int?
     public var cachedSongSize: String?

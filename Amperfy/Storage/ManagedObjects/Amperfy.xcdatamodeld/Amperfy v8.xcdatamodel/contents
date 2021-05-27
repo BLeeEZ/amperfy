@@ -27,6 +27,13 @@
         <attribute name="url" optional="YES" attributeType="String" elementID="urlMO"/>
         <relationship name="owners" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AbstractLibraryEntity" inverseName="artwork" inverseEntity="AbstractLibraryEntity"/>
     </entity>
+    <entity name="Directory" representedClassName="DirectoryMO" parentEntity="AbstractLibraryEntity" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="musicFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MusicFolder" inverseName="directories" inverseEntity="MusicFolder"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Directory" inverseName="subdirectories" inverseEntity="Directory"/>
+        <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="directory" inverseEntity="Song"/>
+        <relationship name="subdirectories" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Directory" inverseName="parent" inverseEntity="Directory"/>
+    </entity>
     <entity name="Genre" representedClassName="GenreMO" parentEntity="AbstractLibraryEntity" syncable="YES">
         <attribute name="name" attributeType="String" defaultValueString=""/>
         <relationship name="albums" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Album" inverseName="genre" inverseEntity="Album"/>
@@ -40,6 +47,11 @@
         <attribute name="statusCode" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="suppressionTimeInterval" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="type" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="MusicFolder" representedClassName="MusicFolderMO" syncable="YES">
+        <attribute name="id" attributeType="String" defaultValueString=""/>
+        <attribute name="name" attributeType="String" defaultValueString=""/>
+        <relationship name="directories" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Directory" inverseName="musicFolder" inverseEntity="Directory"/>
     </entity>
     <entity name="Player" representedClassName="PlayerMO" syncable="YES">
         <attribute name="currentSongIndex" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -73,6 +85,7 @@
         <attribute name="year" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songs" inverseEntity="Album"/>
         <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="songs" inverseEntity="Artist"/>
+        <relationship name="directory" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Directory" inverseName="songs" inverseEntity="Directory"/>
         <relationship name="file" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SongFile" inverseName="info" inverseEntity="SongFile" elementID="dataMO"/>
         <relationship name="genre" optional="YES" maxCount="1" deletionRule="Nullify" ordered="YES" destinationEntity="Genre" inverseName="songs" inverseEntity="Genre"/>
         <relationship name="playlistItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistItem" inverseName="song" inverseEntity="PlaylistItem" elementID="playlistElements"/>
@@ -144,12 +157,14 @@
         <element name="Album" positionX="-30672.00390625" positionY="-8275.76953125" width="128" height="134"/>
         <element name="Artist" positionX="-30559.515625" positionY="-8017.5703125" width="128" height="119"/>
         <element name="Artwork" positionX="-30271.51171875" positionY="-8396.6953125" width="128" height="103"/>
+        <element name="Directory" positionX="-30465" positionY="-8235" width="128" height="104"/>
         <element name="Genre" positionX="-30465" positionY="-8235" width="128" height="104"/>
         <element name="LogEntry" positionX="-30474" positionY="-8244" width="128" height="104"/>
+        <element name="MusicFolder" positionX="-30456" positionY="-8226" width="128" height="74"/>
         <element name="Player" positionX="-29890.359375" positionY="-8230.625" width="128" height="104"/>
         <element name="Playlist" positionX="-30080.7734375" positionY="-8216.7734375" width="128" height="119"/>
         <element name="PlaylistItem" positionX="-30254.0078125" positionY="-8216.28125" width="128" height="74"/>
-        <element name="Song" positionX="-30463.86328125" positionY="-8276.4765625" width="128" height="254"/>
+        <element name="Song" positionX="-30463.86328125" positionY="-8276.4765625" width="128" height="269"/>
         <element name="SongFile" positionX="-30352.42578125" positionY="-8090.62109375" width="128" height="59"/>
         <element name="SyncWave" positionX="-30465" positionY="-8244" width="128" height="209"/>
         <element name="UserStatistics" positionX="-30474" positionY="-8244" width="128" height="644"/>

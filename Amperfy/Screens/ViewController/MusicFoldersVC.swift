@@ -1,52 +1,41 @@
 import UIKit
 import CoreData
 
-class MusicFoldersVC: UITableViewController {
+class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     
-    var appDelegate: AppDelegate!
-    var musicFolders = [MusicFolder]()
+    private var fetchedResultsController: MusicFolderFetchedResultsController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.musicFolders)
+        
+        fetchedResultsController = MusicFolderFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        singleFetchedResultsController = fetchedResultsController
+        
+        configureSearchController(placeholder: "Search in \"Directories\"")
         tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.rowHeight = DirectoryTableCell.rowHeight
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        fetchedResultsController.fetch()
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            let library = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let folders = syncer.getMusicFolders()
-            DispatchQueue.main.async {
-                self.musicFolders = folders
-                self.tableView.reloadData()
-            }
+            syncer.syncMusicFolders(libraryStorage: library)
         }
-    }
-    
-    // MARK: - Table view data source
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0.0
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return musicFolders.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
-        cell.display(folder: musicFolders[indexPath.row])
+        let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
+        cell.display(folder: musicFolder)
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: Segues.toDirectories.rawValue, sender: musicFolders[indexPath.row])
+        let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
+        performSegue(withIdentifier: Segues.toDirectories.rawValue, sender: musicFolder)
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -55,6 +44,11 @@ class MusicFoldersVC: UITableViewController {
             let musicFolder = sender as? MusicFolder
             vc.musicFolder = musicFolder
         }
+    }
+    
+    override func updateSearchResults(for searchController: UISearchController) {
+        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "")
+        tableView.reloadData()
     }
 
 }

@@ -21,6 +21,13 @@
                 <rect key="frame" x="0.0" y="0.0" width="375" height="68"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="JCR-db-pze" userLabel="Artwork" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                        <rect key="frame" x="16" y="10" width="48" height="48"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="48" id="Be3-Pb-tdU"/>
+                            <constraint firstAttribute="width" secondItem="JCR-db-pze" secondAttribute="height" multiplier="1:1" id="HTp-fG-peP"/>
+                        </constraints>
+                    </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Directory" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZWe-re-U6e" userLabel="Genre Label">
                         <rect key="frame" x="72" y="23" width="287" height="22"/>
                         <constraints>
@@ -42,14 +49,19 @@
                     </label>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="JCR-db-pze" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="8BO-j3-Gi5"/>
                     <constraint firstAttribute="trailingMargin" secondItem="ZWe-re-U6e" secondAttribute="trailing" id="9tO-1D-PDW"/>
+                    <constraint firstItem="JCR-db-pze" firstAttribute="width" secondItem="JCR-db-pze" secondAttribute="height" multiplier="1:1" id="AFH-YX-4Oq"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="centerY" secondItem="4aT-Z7-2jl" secondAttribute="centerY" id="JpQ-DO-pPO"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="leading" secondItem="nZS-Wy-zFq" secondAttribute="trailing" constant="8" id="LuL-b5-m52"/>
                     <constraint firstItem="nZS-Wy-zFq" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="MgO-Ki-3tv"/>
                     <constraint firstItem="nZS-Wy-zFq" firstAttribute="centerY" secondItem="4aT-Z7-2jl" secondAttribute="centerY" id="Ntq-c4-Tz9"/>
+                    <constraint firstItem="JCR-db-pze" firstAttribute="centerY" secondItem="4aT-Z7-2jl" secondAttribute="centerY" id="f0K-Jf-Lzx"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="artworkImage" destination="JCR-db-pze" id="jty-ZF-zCN"/>
+                <outlet property="iconLabel" destination="nZS-Wy-zFq" id="Tqo-82-X9V"/>
                 <outlet property="infoLabel" destination="ZWe-re-U6e" id="cjB-i2-h1X"/>
             </connections>
             <point key="canvasLocation" x="53.600000000000001" y="-152.02398800599701"/>

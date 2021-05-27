@@ -18,26 +18,6 @@ protocol SyncCallbacks: ParsedObjectNotifiable {
     func notifySyncFinished()
 }
 
-public struct MusicFolder {
-    public var id: String
-    public var name: String
-}
-
-public struct MusicIndex {
-    public var musicFolder: MusicFolder
-    public var shortcuts: [MusicDirectory]?
-    public var directories: [MusicDirectory]?
-    public var songs: [Song]?
-}
-
-public struct MusicDirectory {
-    public var id: String
-    public var parent: String
-    public var name: String
-    public var directories: [MusicDirectory]?
-    public var songs: [Song]?
-}
-
 protocol LibrarySyncer {
     var artistCount: Int { get }
     var albumCount: Int { get }
@@ -54,9 +34,9 @@ protocol LibrarySyncer {
     func syncUpload(playlistToUpdateOrder playlist: Playlist, libraryStorage: LibraryStorage)
     func syncUpload(playlistToDelete playlist: Playlist)
     func searchSongs(searchText: String, libraryStorage: LibraryStorage)
-    func getMusicFolders() -> [MusicFolder]
-    func getIndexes(musicFolder: MusicFolder, libraryStorage: LibraryStorage) -> MusicIndex
-    func getMusicDirectoryContent(of musicDirectory: MusicDirectory, libraryStorage: LibraryStorage) -> MusicDirectory
+    func syncMusicFolders(libraryStorage: LibraryStorage)
+    func syncIndexes(musicFolder: MusicFolder, libraryStorage: LibraryStorage)
+    func sync(directory: Directory, libraryStorage: LibraryStorage)
 }
 
 protocol AbstractBackgroundLibrarySyncer {

@@ -310,3 +310,100 @@ class ErrorLogFetchedResultsController: BasicFetchedResultsController<LogEntryMO
     }
 
 }
+
+class MusicFolderFetchedResultsController: CachedFetchedResultsController<MusicFolderMO> {
+    
+    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        let fetchRequest = MusicFolderMO.idSortedFetchRequest
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+    
+    func search(searchText: String) {
+        if searchText.count > 0 {
+            search(predicate: MusicFolderMO.getSearchPredicate(searchText: searchText))
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
+class MusicFolderDirectoriesFetchedResultsController: BasicFetchedResultsController<DirectoryMO> {
+    
+    let musicFolder: MusicFolder
+    
+    init(for musicFolder: MusicFolder, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        self.musicFolder = musicFolder
+        let library = LibraryStorage(context: context)
+        let fetchRequest = DirectoryMO.identifierSortedFetchRequest
+        fetchRequest.predicate = library.getFetchPredicate(forMusicFolder: musicFolder)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+
+    func search(searchText: String) {
+        if searchText.count > 0 {
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicate(forMusicFolder: musicFolder),
+                DirectoryMO.getIdentifierBasedSearchPredicate(searchText: searchText)
+            ])
+            search(predicate: predicate)
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
+class DirectorySubdirectoriesFetchedResultsController: BasicFetchedResultsController<DirectoryMO> {
+    
+    let directory: Directory
+    
+    init(for directory: Directory, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        self.directory = directory
+        let library = LibraryStorage(context: context)
+        let fetchRequest = DirectoryMO.identifierSortedFetchRequest
+        fetchRequest.predicate = library.getDirectoryFetchPredicate(forDirectory: directory)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+
+    func search(searchText: String) {
+        if searchText.count > 0 {
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getDirectoryFetchPredicate(forDirectory: directory),
+                DirectoryMO.getIdentifierBasedSearchPredicate(searchText: searchText)
+            ])
+            search(predicate: predicate)
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
+
+class DirectorySongsFetchedResultsController: BasicFetchedResultsController<SongMO> {
+    
+    let directory: Directory
+    
+    init(for directory: Directory, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        self.directory = directory
+        let library = LibraryStorage(context: context)
+        let fetchRequest = SongMO.trackNumberSortedFetchRequest
+        fetchRequest.predicate = library.getSongFetchPredicate(forDirectory: directory)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+    
+    func search(searchText: String, onlyCachedSongs: Bool) {
+        if searchText.count > 0 || onlyCachedSongs {
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getSongFetchPredicate(forDirectory: directory),
+                SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+            ])
+            search(predicate: predicate)
+        } else {
+            showAllResults()
+        }
+    }
+
+}

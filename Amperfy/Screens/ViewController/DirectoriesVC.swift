@@ -1,30 +1,37 @@
 import UIKit
 import CoreData
 
-class DirectoriesVC: UITableViewController {
+class DirectoriesVC: BasicTableViewController {
     
-    var appDelegate: AppDelegate!
-    var musicDirectory: MusicDirectory!
+    var directory: Directory!
+    private var subdirectoriesFetchedResultsController: DirectorySubdirectoriesFetchedResultsController!
+    private var songsFetchedResultsController: DirectorySongsFetchedResultsController!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.directories)
-        navigationItem.title = musicDirectory.name
+        
+        subdirectoriesFetchedResultsController = DirectorySubdirectoriesFetchedResultsController(for: directory, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        subdirectoriesFetchedResultsController.delegate = self
+        songsFetchedResultsController = DirectorySongsFetchedResultsController(for: directory, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        songsFetchedResultsController.delegate = self
+        tableView.register(nibName: AlbumTableCell.typeName)
+        tableView.register(nibName: SongTableCell.typeName)
+        
+        configureSearchController(placeholder: "Directories and Songs", scopeButtonTitles: ["All", "Cached"])
+        navigationItem.title = directory.name
         tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        subdirectoriesFetchedResultsController.fetch()
+        songsFetchedResultsController.fetch()
         appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
+            let libraryStorage = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let musicDirectoryAsync = syncer.getMusicDirectoryContent(of: self.musicDirectory, libraryStorage: library)
-            DispatchQueue.main.async {
-                self.musicDirectory = musicDirectoryAsync
-                self.musicDirectory.songs = musicDirectoryAsync.songs?.compactMap{ Song(managedObject: self.appDelegate.storage.context.object(with: $0.objectID) as! SongMO) }
-                self.tableView.reloadData()
-            }
+            let directoryAsync = Directory(managedObject: context.object(with: self.directory.managedObject.objectID) as! DirectoryMO)
+            syncer.sync(directory: directoryAsync, libraryStorage: libraryStorage)
         }
     }
     
@@ -33,51 +40,85 @@ class DirectoriesVC: UITableViewController {
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
-    
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0.0
-    }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 {
-            return musicDirectory?.directories?.count ?? 0
-        } else {
-            return musicDirectory?.songs?.count ?? 0
+        switch section {
+        case 0:
+            return subdirectoriesFetchedResultsController.sections?[0].numberOfObjects ?? 0
+        case 1:
+            return songsFetchedResultsController.sections?[0].numberOfObjects ?? 0
+        default:
+            return 0
         }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.section == 0 {
+        switch indexPath.section {
+        case 0:
             let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
-            if let directory = musicDirectory?.directories?[indexPath.row] {
-                cell.display(directory: directory)
-            }
+            let cellDirectory = subdirectoriesFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            cell.display(directory: cellDirectory)
             return cell
-        } else {
+        case 1:
             let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
-            if let song = musicDirectory?.songs?[indexPath.row] {
-                cell.display(song: song, rootView: self)
-            }
+            let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            cell.display(song: song, rootView: self)
             return cell
-        }
-    }
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard indexPath.section == 0 else { return }
-        
-        if let navController = navigationController, let directory = musicDirectory?.directories?[indexPath.row] {
-            let directoriesVC = DirectoriesVC.instantiateFromAppStoryboard()
-            directoriesVC.musicDirectory = directory
-            navController.pushViewController(directoriesVC, animated: true)
+        default:
+            return UITableViewCell()
         }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 {
+        switch indexPath.section {
+        case 0:
             return DirectoryTableCell.rowHeight
-        } else {
+        case 1:
             return SongTableCell.rowHeight
+        default:
+            return 0.0
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard indexPath.section == 0, let navController = navigationController else { return }
+
+        let selectedDirectory = subdirectoriesFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+        let directoriesVC = DirectoriesVC.instantiateFromAppStoryboard()
+        directoriesVC.directory = selectedDirectory
+        navController.pushViewController(directoriesVC, animated: true)
+    }
+    
+    override func updateSearchResults(for searchController: UISearchController) {
+        guard let searchText = searchController.searchBar.text else { return }
+        if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
+            subdirectoriesFetchedResultsController.search(searchText: searchText)
+            songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
+        } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
+            subdirectoriesFetchedResultsController.clearResults()
+            songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
+        } else {
+            subdirectoriesFetchedResultsController.showAllResults()
+            songsFetchedResultsController.showAllResults()
+        }
+        tableView.reloadData()
+    }
+    
+    override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        var section: Int = 0
+        switch controller {
+        case subdirectoriesFetchedResultsController.fetchResultsController:
+            section = 0
+        case songsFetchedResultsController.fetchResultsController:
+            section = 1
+        default:
+            return
+        }
+        
+        super.applyChangesOfMultiRowType(determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
+    }
+    
+    override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
     }
 
 }

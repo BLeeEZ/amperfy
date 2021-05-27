@@ -53,7 +53,7 @@ class BackgroundSyncerManager {
             let backgroundLibrary = LibraryStorage(context: context)
             self.artworkSyncer.syncInBackground(libraryStorage: backgroundLibrary)
         }
-        if storage.librarySyncVersion.isNewestVersion {
+        if storage.librarySyncVersion > .v6 {
             storage.persistentContainer.performBackgroundTask() { (context) in
                 let backgroundLibrary = LibraryStorage(context: context)
                 self.libSyncer.syncInBackground(libraryStorage: backgroundLibrary)

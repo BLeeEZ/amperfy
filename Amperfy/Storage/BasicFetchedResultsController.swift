@@ -61,6 +61,24 @@ extension PlaylistMO {
     }
 }
 
+extension MusicFolderMO {
+    @objc public var section: String {
+        self.willAccessValue(forKey: "section")
+        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.name)
+        self.didAccessValue(forKey: "section")
+        return section
+    }
+}
+
+extension DirectoryMO {
+    @objc public var section: String {
+        self.willAccessValue(forKey: "section")
+        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.name)
+        self.didAccessValue(forKey: "section")
+        return section
+    }
+}
+
 extension NSFetchedResultsController {
     @objc func fetch() {
         do {
@@ -192,6 +210,20 @@ extension BasicFetchedResultsController where ResultType == LogEntryMO {
     func getWrappedEntity(at indexPath: IndexPath) -> LogEntry {
         let itemMO = fetchResultsController.object(at: indexPath)
         return LogEntry(managedObject: itemMO)
+    }
+}
+
+extension BasicFetchedResultsController where ResultType == MusicFolderMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> MusicFolder {
+        let musicFolderMO = fetchResultsController.object(at: indexPath)
+        return MusicFolder(managedObject: musicFolderMO)
+    }
+}
+
+extension BasicFetchedResultsController where ResultType == DirectoryMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> Directory {
+        let directoryMO = fetchResultsController.object(at: indexPath)
+        return Directory(managedObject: directoryMO)
     }
 }
 

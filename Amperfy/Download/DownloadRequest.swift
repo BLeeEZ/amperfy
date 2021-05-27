@@ -20,7 +20,7 @@ enum DownloadPhase {
     case finished
 }
 
-class DownloadRequest<Element: NSObject>: Equatable {
+class DownloadRequest<Element: Equatable>: Equatable {
     
     let priority: Priority
     let title: String

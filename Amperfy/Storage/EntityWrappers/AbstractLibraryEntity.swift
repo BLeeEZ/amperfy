@@ -1,9 +1,13 @@
 import Foundation
 import UIKit
 
-public class AbstractLibraryEntity: NSObject {
+public class AbstractLibraryEntity {
 
     private let managedObject: AbstractLibraryEntityMO
+    
+    static var typeName: String {
+        return String(describing: Self.self)
+    }
     
     init(managedObject: AbstractLibraryEntityMO) {
         self.managedObject = managedObject
@@ -31,7 +35,7 @@ public class AbstractLibraryEntity: NSObject {
         return img
     }
     
-    override public func isEqual(_ object: Any?) -> Bool {
+    public func isEqual(_ object: Any?) -> Bool {
         guard let object = object as? AbstractLibraryEntity else { return false }
         return managedObject == object.managedObject
     }

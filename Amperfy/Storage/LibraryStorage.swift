@@ -16,7 +16,7 @@ enum PlaylistSearchCategory: Int {
 
 class LibraryStorage: SongFileCachable {
     
-    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName]
+    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName]
 
     private let log = OSLog(subsystem: AppDelegate.name, category: "LibraryStorage")
     private var context: NSManagedObjectContext
@@ -36,6 +36,8 @@ class LibraryStorage: SongFileCachable {
         libraryInfo.genreCount = genreCount
         libraryInfo.syncWaveCount = syncWaveCount
         libraryInfo.artworkCount = artworkCount
+        libraryInfo.musicFolderCount = musicFolderCount
+        libraryInfo.directoryCount = directoryCount
         return libraryInfo
     }
     
@@ -61,6 +63,14 @@ class LibraryStorage: SongFileCachable {
     
     var artworkCount: Int {
         return (try? context.count(for: ArtworkMO.fetchRequest())) ?? 0
+    }
+    
+    var musicFolderCount: Int {
+        return (try? context.count(for: MusicFolderMO.fetchRequest())) ?? 0
+    }
+    
+    var directoryCount: Int {
+        return (try? context.count(for: DirectoryMO.fetchRequest())) ?? 0
     }
     
     var cachedSongCount: Int {
@@ -123,6 +133,25 @@ class LibraryStorage: SongFileCachable {
     func createSongFile() -> SongFile {
         let songFileMO = SongFileMO(context: context)
         return SongFile(managedObject: songFileMO)
+    }
+    
+    func createMusicFolder() -> MusicFolder {
+        let musicFolderMO = MusicFolderMO(context: context)
+        return MusicFolder(managedObject: musicFolderMO)
+    }
+    
+    func deleteMusicFolder(musicFolder: MusicFolder) {
+        context.delete(musicFolder.managedObject)
+    }
+    
+    func createDirectory() -> Directory {
+        let directoryMO = DirectoryMO(context: context)
+        directoryMO.artwork = createArtwork().managedObject
+        return Directory(managedObject: directoryMO)
+    }
+    
+    func deleteDirectory(directory: Directory) {
+        context.delete(directory.managedObject)
     }
     
     func createLogEntry() -> LogEntry {
@@ -243,6 +272,18 @@ class LibraryStorage: SongFileCachable {
     
     func getFetchPredicate(forPlaylist playlist: Playlist) -> NSPredicate {
         return NSPredicate(format: "%K == %@", #keyPath(PlaylistItemMO.playlist), playlist.managedObject.objectID)
+    }
+    
+    func getFetchPredicate(forMusicFolder musicFolder: MusicFolder) -> NSPredicate {
+        return NSPredicate(format: "musicFolder == %@", musicFolder.managedObject.objectID)
+    }
+    
+    func getSongFetchPredicate(forDirectory directory: Directory) -> NSPredicate {
+        return NSPredicate(format: "%K == %@", #keyPath(SongMO.directory), directory.managedObject.objectID)
+    }
+    
+    func getDirectoryFetchPredicate(forDirectory directory: Directory) -> NSPredicate {
+        return NSPredicate(format: "%K == %@", #keyPath(DirectoryMO.parent), directory.managedObject.objectID)
     }
     
     func getFetchPredicate(onlyCachedSongs: Bool) -> NSPredicate {
@@ -574,6 +615,45 @@ class LibraryStorage: SongFileCachable {
             userStatistics = foundUserStatistics.compactMap{ UserStatistics(managedObject: $0, libraryStorage: self) }
         } catch {}
         return userStatistics
+    }
+    
+    func getMusicFolders() -> [MusicFolder] {
+        let fetchRequest: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
+        let foundMusicFolders = try? context.fetch(fetchRequest)
+        let musicFolders = foundMusicFolders?.compactMap{ MusicFolder(managedObject: $0) }
+        return musicFolders ?? [MusicFolder]()
+    }
+    
+    func getMusicFolder(id: String) -> MusicFolder? {
+        var foundMF: MusicFolder? = nil
+        let fr: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(MusicFolderMO.id), NSString(string: id))
+        fr.fetchLimit = 1
+        do {
+            let result = try context.fetch(fr) as NSArray?
+            if let musicFolders = result, musicFolders.count > 0, let musicFolder = musicFolders[0] as? MusicFolderMO  {
+                foundMF = MusicFolder(managedObject: musicFolder)
+            }
+        } catch {
+            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
+        }
+        return foundMF
+    }
+    
+    func getDirectory(id: String) -> Directory? {
+        var foundDirectory: Directory? = nil
+        let fr: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
+        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(DirectoryMO.id), NSString(string: id))
+        fr.fetchLimit = 1
+        do {
+            let result = try context.fetch(fr) as NSArray?
+            if let directories = result, directories.count > 0, let directory = directories[0] as? DirectoryMO  {
+                foundDirectory = Directory(managedObject: directory)
+            }
+        } catch {
+            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
+        }
+        return foundDirectory
     }
     
     func cleanStorage() {

@@ -8,15 +8,16 @@ extension SongMO {
         return NSFetchRequest<SongMO>(entityName: "Song")
     }
 
+    @NSManaged public var bitrate: Int32
+    @NSManaged public var contentType: String?
+    @NSManaged public var directory: DirectoryMO?
+    @NSManaged public var disk: String?
     @NSManaged public var duration: Int16
+    @NSManaged public var size: Int32
     @NSManaged public var title: String?
     @NSManaged public var track: Int16
     @NSManaged public var url: String?
     @NSManaged public var year: Int16
-    @NSManaged public var size: Int32
-    @NSManaged public var bitrate: Int32
-    @NSManaged public var contentType: String?
-    @NSManaged public var disk: String?
     @NSManaged public var album: AlbumMO?
     @NSManaged public var artist: ArtistMO?
     @NSManaged public var file: SongFileMO?
