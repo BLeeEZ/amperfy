@@ -43,6 +43,7 @@ extension UserStatisticsMO {
     @NSManaged public var visitedSettingsCount: Int32
     @NSManaged public var visitedSettingsLibraryCount: Int32
     @NSManaged public var visitedSettingsPlayerCount: Int32
+    @NSManaged public var visitedSettingsPlayerSongTabCount: Int32
     @NSManaged public var visitedSettingsServerCount: Int32
     @NSManaged public var visitedSettingsSupportCount: Int32
     @NSManaged public var visitedSongsCount: Int32

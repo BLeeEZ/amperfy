@@ -15,7 +15,7 @@ class SettingsSongActionOnTabVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        appDelegate.userStatistics.visited(.settingsPlayer)
+        appDelegate.userStatistics.visited(.settingsPlayerSongTab)
 
         let settings = appDelegate.storage.getSettings()
 

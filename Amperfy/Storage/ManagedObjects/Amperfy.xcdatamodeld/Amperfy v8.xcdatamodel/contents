@@ -54,6 +54,7 @@
         <relationship name="directories" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Directory" inverseName="musicFolder" inverseEntity="Directory"/>
     </entity>
     <entity name="Player" representedClassName="PlayerMO" syncable="YES">
+        <attribute name="autoCachePlayedSongSetting" optional="YES" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES"/>
         <attribute name="currentSongIndex" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="repeatSetting" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="shuffleSetting" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" elementID="shuffelSetting"/>
@@ -148,6 +149,7 @@
         <attribute name="visitedSettingsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="visitedSettingsLibraryCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="visitedSettingsPlayerCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedSettingsPlayerSongTabCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="visitedSettingsServerCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="visitedSettingsSupportCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="visitedSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -161,12 +163,12 @@
         <element name="Genre" positionX="-30465" positionY="-8235" width="128" height="104"/>
         <element name="LogEntry" positionX="-30474" positionY="-8244" width="128" height="104"/>
         <element name="MusicFolder" positionX="-30456" positionY="-8226" width="128" height="74"/>
-        <element name="Player" positionX="-29890.359375" positionY="-8230.625" width="128" height="104"/>
+        <element name="Player" positionX="-29890.359375" positionY="-8230.625" width="128" height="119"/>
         <element name="Playlist" positionX="-30080.7734375" positionY="-8216.7734375" width="128" height="119"/>
         <element name="PlaylistItem" positionX="-30254.0078125" positionY="-8216.28125" width="128" height="74"/>
         <element name="Song" positionX="-30463.86328125" positionY="-8276.4765625" width="128" height="269"/>
         <element name="SongFile" positionX="-30352.42578125" positionY="-8090.62109375" width="128" height="59"/>
         <element name="SyncWave" positionX="-30465" positionY="-8244" width="128" height="209"/>
-        <element name="UserStatistics" positionX="-30474" positionY="-8244" width="128" height="644"/>
+        <element name="UserStatistics" positionX="-30474" positionY="-8244" width="128" height="659"/>
     </elements>
 </model>

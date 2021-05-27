@@ -57,7 +57,13 @@ public class PlayerData: NSObject {
             return playlist.items[currentSongIndex]
         }
     }
-    
+    var isAutoCachePlayedSong: Bool {
+        get { return managedObject.autoCachePlayedSongSetting == 1 }
+        set {
+            managedObject.autoCachePlayedSongSetting = newValue ? 1 : 0
+            storage.saveContext()
+        }
+    }
     var isShuffle: Bool {
         get {
             return managedObject.shuffleSetting == 1

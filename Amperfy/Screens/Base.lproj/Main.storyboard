@@ -1939,7 +1939,7 @@
         <!--Settings Player-->
         <scene sceneID="cK3-o0-336">
             <objects>
-                <tableViewController title="Player Settings" id="FAi-G9-LVC" userLabel="Settings Player" sceneMemberID="viewController">
+                <tableViewController title="Player Settings" id="FAi-G9-LVC" userLabel="Settings Player" customClass="SettingsPlayerVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="TVS-0o-sp2">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1947,8 +1947,44 @@
                         <sections>
                             <tableViewSection id="cG4-d4-eaO" userLabel="Player">
                                 <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="45" id="y7c-9j-Lxb">
+                                        <rect key="frame" x="0.0" y="18" width="414" height="45"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="y7c-9j-Lxb" id="yjd-JB-UXY">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="45"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Auto cache played songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p7L-Ac-hSc" userLabel="BackendApi Label">
+                                                    <rect key="frame" x="20" y="7.5" width="200" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="2S8-q7-Rhy"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BzB-qn-Vd8">
+                                                    <rect key="frame" x="345" y="7" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="triggeredAutoCachePlayedSongsSwitch:" destination="FAi-G9-LVC" eventType="primaryActionTriggered" id="GFf-cN-8Aa"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="p7L-Ac-hSc" firstAttribute="centerY" secondItem="yjd-JB-UXY" secondAttribute="centerY" id="66C-hq-bGv"/>
+                                                <constraint firstItem="p7L-Ac-hSc" firstAttribute="leading" secondItem="yjd-JB-UXY" secondAttribute="leadingMargin" id="7mg-km-OrO"/>
+                                                <constraint firstItem="BzB-qn-Vd8" firstAttribute="trailing" secondItem="yjd-JB-UXY" secondAttribute="trailingMargin" id="F75-lt-MPH"/>
+                                                <constraint firstAttribute="leadingMargin" secondItem="p7L-Ac-hSc" secondAttribute="trailing" constant="-200" id="MFn-7W-PKC"/>
+                                                <constraint firstItem="BzB-qn-Vd8" firstAttribute="centerY" secondItem="yjd-JB-UXY" secondAttribute="centerY" id="dDy-KQ-UG8"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection id="kLN-hI-8Fq" userLabel="Player">
+                                <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="40" id="7UN-zO-Pib">
-                                        <rect key="frame" x="0.0" y="18" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="99" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="7UN-zO-Pib" id="uBY-f0-6f2">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -1993,9 +2029,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Player Settings" largeTitleDisplayMode="never" id="fCh-Sx-ZOC"/>
                     <connections>
-                        <outlet property="backendApiLabel" destination="AbB-7I-y8n" id="8vE-L0-oJC"/>
-                        <outlet property="serverUrlTF" destination="8rc-5Q-zYT" id="V1W-BU-XUW"/>
-                        <outlet property="usernameTF" destination="UFp-En-Yxz" id="fxs-Tp-how"/>
+                        <outlet property="autoCachePlayedSongsSwitch" destination="BzB-qn-Vd8" id="GZt-hs-XtH"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tXt-zm-css" userLabel="First Responder" sceneMemberID="firstResponder"/>

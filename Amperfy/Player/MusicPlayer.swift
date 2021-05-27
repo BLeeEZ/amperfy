@@ -73,6 +73,13 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         get { return coreData.repeatMode }
         set { coreData.repeatMode = newValue }
     }
+    var isAutoCachePlayedSong: Bool {
+        get { return coreData.isAutoCachePlayedSong }
+        set {
+            coreData.isAutoCachePlayedSong = newValue
+            backendAudioPlayer.isAutoCachePlayedSong = newValue
+        }
+    }
 
     private var coreData: PlayerData
     private var downloadManager: SongDownloadable
@@ -85,6 +92,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         self.coreData = coreData
         self.downloadManager = downloadManager
         self.backendAudioPlayer = backendAudioPlayer
+        self.backendAudioPlayer.isAutoCachePlayedSong = coreData.isAutoCachePlayedSong
         self.userStatistics = userStatistics
         super.init()
         self.backendAudioPlayer.responder = self
@@ -144,6 +152,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
     
     private func preDownloadNextSongs(playlistIndex: Int) {
+        guard coreData.isAutoCachePlayedSong else { return }
         var nextSongsCount = (playlist.songs.count-1) - playlistIndex
         if nextSongsCount > Self.preDownloadCount {
             nextSongsCount = Self.preDownloadCount

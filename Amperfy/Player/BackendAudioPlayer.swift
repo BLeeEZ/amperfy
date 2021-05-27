@@ -37,6 +37,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     private var latestPlayRequest: PlayRequest?
     private let semaphore = DispatchSemaphore(value: 1)
     
+    public var isAutoCachePlayedSong: Bool = true
     public private(set) var isPlaying: Bool = false
     public private(set) var currentlyPlaying: PlaylistItem?
     
@@ -121,7 +122,9 @@ class BackendAudioPlayer: SongDownloadNotifiable {
                 insertCachedSong(playlistItem: playlistItem)
             } else {
                 insertStreamSong(playlistItem: playlistItem)
-                songDownloader.download(song: song, notifier: nil, priority: .high)
+                if isAutoCachePlayedSong {
+                    songDownloader.download(song: song, notifier: nil, priority: .high)
+                }
             }
         }
         self.continuePlay()
