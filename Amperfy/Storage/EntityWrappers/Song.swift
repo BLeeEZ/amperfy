@@ -182,11 +182,6 @@ public class Song: AbstractLibraryEntity, Identifyable {
         }
         return false
     }
-    
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? Song else { return false }
-        return managedObject == object.managedObject
-    }
 
 }
 

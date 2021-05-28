@@ -63,6 +63,7 @@ class MusicPlayerTest: XCTestCase {
     var storage: LibraryStorage!
     var mockAlertDisplayer: MOCK_AlertDisplayable!
     var eventLogger: EventLogger!
+    var userStatistics: UserStatistics!
     var songDownloader: MOCK_SongDownloader!
     var backendPlayer: BackendAudioPlayer!
     var playerData: PlayerData!
@@ -80,9 +81,10 @@ class MusicPlayerTest: XCTestCase {
         mockAVPlayer = MOCK_AVPlayer()
         mockAlertDisplayer = MOCK_AlertDisplayable()
         eventLogger = EventLogger(alertDisplayer: mockAlertDisplayer, persistentContainer: cdHelper.persistentContainer)
-        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, songDownloader: songDownloader, songCache: storage)
+        userStatistics = storage.getUserStatistics(appVersion: "")
+        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, songDownloader: songDownloader, songCache: storage, userStatistics: userStatistics)
         playerData = storage.getPlayerData()
-        testPlayer = MusicPlayer(coreData: playerData, downloadManager: songDownloader, backendAudioPlayer: backendPlayer)
+        testPlayer = MusicPlayer(coreData: playerData, downloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
         
         guard let songCachedFetched = storage.getSong(id: "36") else { XCTFail(); return }
         songCached = songCachedFetched

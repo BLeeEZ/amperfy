@@ -34,10 +34,5 @@ public class AbstractLibraryEntity {
         }
         return img
     }
-    
-    public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? AbstractLibraryEntity else { return false }
-        return managedObject == object.managedObject
-    }
 
 }

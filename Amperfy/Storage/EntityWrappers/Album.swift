@@ -84,10 +84,15 @@ public class Album: AbstractLibraryEntity, SongContainable {
         }
         return Artwork.defaultImage
     }
-    
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? Album else { return false }
-        return managedObject == object.managedObject
+
+}
+
+extension Album: Hashable, Equatable {
+    public static func == (lhs: Album, rhs: Album) -> Bool {
+        return lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(managedObject)
+    }
 }

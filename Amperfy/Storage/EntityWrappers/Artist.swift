@@ -64,10 +64,15 @@ public class Artist: AbstractLibraryEntity, SongContainable {
             if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
         }
     }
-    
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? Artist else { return false }
-        return managedObject == object.managedObject
+
+}
+
+extension Artist: Hashable, Equatable {
+    public static func == (lhs: Artist, rhs: Artist) -> Bool {
+        return lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(managedObject)
+    }
 }
