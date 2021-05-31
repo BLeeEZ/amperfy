@@ -54,6 +54,12 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="API" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v9a-mi-SHt" userLabel="Api">
+                                <rect key="frame" x="30" y="361" width="79" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Server url" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fDZ-Za-sK8">
                                 <rect key="frame" x="30" y="230" width="79" height="34"/>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
@@ -80,7 +86,7 @@
                                 </connections>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7aA-CY-fi1" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                <rect key="frame" x="167" y="408" width="80" height="30"/>
+                                <rect key="frame" x="167" y="430" width="80" height="30"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="fP5-0V-kT7"/>
@@ -100,6 +106,20 @@
                                     <action selector="loginPressed" destination="BYZ-38-t0r" eventType="touchUpInside" id="IZs-Yv-H0V"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="TKD-wA-Xnd" userLabel="ApiSelector" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                <rect key="frame" x="30" y="356" width="354" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="Y5U-L5-OQV"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="tintColor" systemColor="labelColor"/>
+                                <state key="normal" title="ApiType">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="apiSelectorPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="eXq-Bl-Gd8"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -113,19 +133,27 @@
                             <constraint firstItem="cJB-xi-h6o" firstAttribute="height" secondItem="fDZ-Za-sK8" secondAttribute="height" id="DPF-fx-sxS"/>
                             <constraint firstItem="fDZ-Za-sK8" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="30" id="Drx-hG-HUs"/>
                             <constraint firstItem="vfm-n3-YO9" firstAttribute="leading" secondItem="cJB-xi-h6o" secondAttribute="leading" id="GUC-sc-BoB"/>
+                            <constraint firstItem="TKD-wA-Xnd" firstAttribute="top" secondItem="vfm-n3-YO9" secondAttribute="bottom" constant="8" id="Lld-Sa-gVk"/>
                             <constraint firstItem="Hkb-KJ-f3A" firstAttribute="leading" secondItem="cJB-xi-h6o" secondAttribute="leading" id="M0R-J6-4zg"/>
                             <constraint firstItem="aKf-Oy-Mn4" firstAttribute="leading" secondItem="fDZ-Za-sK8" secondAttribute="leading" id="NI8-DU-Smj"/>
                             <constraint firstItem="0Dr-h8-7rI" firstAttribute="trailing" secondItem="fDZ-Za-sK8" secondAttribute="trailing" id="Ncx-zx-uTR"/>
                             <constraint firstItem="vfm-n3-YO9" firstAttribute="width" secondItem="cJB-xi-h6o" secondAttribute="width" id="OLv-WK-43r"/>
+                            <constraint firstItem="v9a-mi-SHt" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="30" id="P4s-q5-3pd"/>
                             <constraint firstItem="Hkb-KJ-f3A" firstAttribute="top" secondItem="cJB-xi-h6o" secondAttribute="bottom" constant="8" id="PQY-0l-1Os"/>
+                            <constraint firstItem="TKD-wA-Xnd" firstAttribute="trailing" secondItem="cJB-xi-h6o" secondAttribute="trailing" id="PZc-o6-CgT"/>
                             <constraint firstItem="0Dr-h8-7rI" firstAttribute="top" secondItem="aKf-Oy-Mn4" secondAttribute="bottom" constant="8" id="Qbj-KN-y8t"/>
+                            <constraint firstItem="v9a-mi-SHt" firstAttribute="centerY" secondItem="TKD-wA-Xnd" secondAttribute="centerY" id="Rle-CV-KaK"/>
                             <constraint firstItem="Hkb-KJ-f3A" firstAttribute="trailing" secondItem="cJB-xi-h6o" secondAttribute="trailing" id="WMY-fG-XMg"/>
                             <constraint firstItem="vfm-n3-YO9" firstAttribute="centerY" secondItem="0Dr-h8-7rI" secondAttribute="centerY" id="YHu-Y4-7w5"/>
                             <constraint firstItem="0Dr-h8-7rI" firstAttribute="width" secondItem="fDZ-Za-sK8" secondAttribute="width" id="YeK-Pf-Fvc"/>
                             <constraint firstItem="aKf-Oy-Mn4" firstAttribute="height" secondItem="fDZ-Za-sK8" secondAttribute="height" id="ZBc-kR-ffG"/>
                             <constraint firstItem="vfm-n3-YO9" firstAttribute="trailing" secondItem="cJB-xi-h6o" secondAttribute="trailing" id="aAs-X2-RQ8"/>
+                            <constraint firstItem="7aA-CY-fi1" firstAttribute="top" secondItem="TKD-wA-Xnd" secondAttribute="bottom" constant="44" id="bNC-nX-UJK"/>
                             <constraint firstItem="23L-Mn-QSO" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="e6A-vY-X0O"/>
+                            <constraint firstItem="v9a-mi-SHt" firstAttribute="width" secondItem="fDZ-Za-sK8" secondAttribute="width" id="eh7-LK-dDs"/>
+                            <constraint firstItem="TKD-wA-Xnd" firstAttribute="leading" secondItem="v9a-mi-SHt" secondAttribute="leading" id="hkc-6H-UfN"/>
                             <constraint firstItem="aKf-Oy-Mn4" firstAttribute="trailing" secondItem="fDZ-Za-sK8" secondAttribute="trailing" id="i4f-Ns-vMF"/>
+                            <constraint firstItem="v9a-mi-SHt" firstAttribute="trailing" secondItem="fDZ-Za-sK8" secondAttribute="trailing" id="jGy-Wt-nsa"/>
                             <constraint firstItem="0Dr-h8-7rI" firstAttribute="height" secondItem="fDZ-Za-sK8" secondAttribute="height" id="jHa-4Z-lb8"/>
                             <constraint firstItem="Hkb-KJ-f3A" firstAttribute="centerY" secondItem="aKf-Oy-Mn4" secondAttribute="centerY" id="jo1-QS-f3M"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="cJB-xi-h6o" secondAttribute="trailing" constant="30" id="mvC-gR-c3a"/>
@@ -135,10 +163,10 @@
                             <constraint firstItem="vfm-n3-YO9" firstAttribute="top" secondItem="Hkb-KJ-f3A" secondAttribute="bottom" constant="8" id="rT8-XR-RMg"/>
                             <constraint firstItem="cJB-xi-h6o" firstAttribute="top" secondItem="23L-Mn-QSO" secondAttribute="bottom" constant="56" id="ste-gC-7NE"/>
                             <constraint firstItem="0Dr-h8-7rI" firstAttribute="leading" secondItem="fDZ-Za-sK8" secondAttribute="leading" id="y1E-kI-fvv"/>
-                            <constraint firstItem="7aA-CY-fi1" firstAttribute="top" secondItem="vfm-n3-YO9" secondAttribute="bottom" constant="60" id="y35-V9-Ri9"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="apiSelectorButton" destination="TKD-wA-Xnd" id="1Ri-mL-bOC"/>
                         <outlet property="passwordTF" destination="vfm-n3-YO9" id="bfH-Hk-RYo"/>
                         <outlet property="serverUrlTF" destination="cJB-xi-h6o" id="vTq-48-JYD"/>
                         <outlet property="usernameTF" destination="Hkb-KJ-f3A" id="TMh-2q-bUV"/>
@@ -147,7 +175,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-546.39999999999998" y="154.27286356821591"/>
+            <point key="canvasLocation" x="-547.82608695652175" y="154.01785714285714"/>
         </scene>
         <!--Playlists-->
         <scene sceneID="Zt1-92-WKW">

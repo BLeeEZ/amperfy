@@ -5,10 +5,18 @@ enum BackenApiType: Int {
     case notDetected = 0
     case ampache = 1
     case subsonic = 2
-    
+
     var description : String {
         switch self {
         case .notDetected: return "NotDetected"
+        case .ampache: return "Ampache"
+        case .subsonic: return "Subsonic"
+        }
+    }
+    
+    var selectorDescription : String {
+        switch self {
+        case .notDetected: return "Auto-Detect"
         case .ampache: return "Ampache"
         case .subsonic: return "Subsonic"
         }
@@ -69,17 +77,21 @@ class BackendProxy {
         self.eventLogger = eventLogger
     }
 
-    func login(credentials: LoginCredentials) throws -> BackenApiType {
+    func login(apiType: BackenApiType, credentials: LoginCredentials) throws -> BackenApiType {
         try checkServerReachablity(credentials: credentials)
-        ampacheApi.authenticate(credentials: credentials)
-        if ampacheApi.isAuthenticated() {
-            selectedApi = .ampache
-            return .ampache
+        if apiType != .subsonic {
+            ampacheApi.authenticate(credentials: credentials)
+            if ampacheApi.isAuthenticated() {
+                selectedApi = .ampache
+                return .ampache
+            }
         }
-        subsonicApi.authenticate(credentials: credentials)
-        if subsonicApi.isAuthenticated() {
-            selectedApi = .subsonic
-            return .subsonic
+        if apiType != .ampache {
+            subsonicApi.authenticate(credentials: credentials)
+            if subsonicApi.isAuthenticated() {
+                selectedApi = .subsonic
+                return .subsonic
+            }
         }
         throw AuthenticationError(kind: .notAbleToLogin)
     }

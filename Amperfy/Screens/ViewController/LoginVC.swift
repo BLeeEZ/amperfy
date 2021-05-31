@@ -4,10 +4,12 @@ class LoginVC: UIViewController {
 
     var appDelegate: AppDelegate!
     var backendApi: BackendApi!
+    var selectedApiType: BackenApiType = .notDetected
     
     @IBOutlet weak var serverUrlTF: UITextField!
     @IBOutlet weak var usernameTF: UITextField!
     @IBOutlet weak var passwordTF: UITextField!
+    @IBOutlet weak var apiSelectorButton: BasicButton!
     
     @IBAction func serverUrlActionPressed() {
         serverUrlTF.resignFirstResponder()
@@ -26,6 +28,24 @@ class LoginVC: UIViewController {
         usernameTF.resignFirstResponder()
         passwordTF.resignFirstResponder()
         login()
+    }
+    @IBAction func apiSelectorPressed(_ sender: Any) {
+        let alert = UIAlertController(title: "Select API", message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: BackenApiType.notDetected.selectorDescription, style: .default, handler: { _ in
+            self.selectedApiType = .notDetected
+            self.updateApiSelectorText()
+        }))
+        alert.addAction(UIAlertAction(title: BackenApiType.ampache.selectorDescription, style: .default, handler: { _ in
+            self.selectedApiType = .ampache
+            self.updateApiSelectorText()
+        }))
+        alert.addAction(UIAlertAction(title: BackenApiType.subsonic.selectorDescription, style: .default, handler: { _ in
+            self.selectedApiType = .subsonic
+            self.updateApiSelectorText()
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        self.present(alert, animated: true, completion: nil)
     }
     
     func login() {
@@ -48,7 +68,7 @@ class LoginVC: UIViewController {
 
         let credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
         do {
-            let authenticatedApi = try appDelegate.backendProxy.login(credentials: credentials)
+            let authenticatedApi = try appDelegate.backendProxy.login(apiType: selectedApiType,credentials: credentials)
             credentials.backendApi = authenticatedApi
             appDelegate.storage.saveLoginCredentials(credentials: credentials)
             performSegue(withIdentifier: "toSync", sender: self)
@@ -79,6 +99,7 @@ class LoginVC: UIViewController {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         backendApi = appDelegate.backendApi
+        updateApiSelectorText()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -86,6 +107,23 @@ class LoginVC: UIViewController {
             serverUrlTF.text = credentials.serverUrl
             usernameTF.text = credentials.username
         }
+    }
+    
+    func updateApiSelectorText() {
+        let text = NSMutableAttributedString()
+        text.append( NSMutableAttributedString(string: "\(selectedApiType.selectorDescription) ",
+            attributes: [
+                NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0),
+                NSAttributedString.Key.foregroundColor: UIColor.white
+            ]
+        ) )
+        text.append( NSMutableAttributedString(string: FontAwesomeIcon.SortDown.asString,
+            attributes: [
+                NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName,size: 17)!,
+                NSAttributedString.Key.foregroundColor: UIColor.white
+            ]
+        ) )
+        apiSelectorButton.setAttributedTitle(text, for: .normal)
     }
 
 }

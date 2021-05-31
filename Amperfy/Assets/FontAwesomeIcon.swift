@@ -9,6 +9,7 @@ enum FontAwesomeIcon: Int {
     case Redo = 0xf01e
     case Check = 0xf00c
     case Bars = 0xf0c9
+    case SortDown = 0xf0dd
     case Exclamation = 0xf12a
     
     var asString: String {
