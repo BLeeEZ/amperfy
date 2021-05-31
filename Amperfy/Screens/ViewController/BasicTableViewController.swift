@@ -46,6 +46,7 @@ class BasicTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        self.tableView.keyboardDismissMode = .onDrag
     }
     
     func configureSearchController(placeholder: String?, scopeButtonTitles: [String]? = nil, showSearchBarAtEnter: Bool = false) {
