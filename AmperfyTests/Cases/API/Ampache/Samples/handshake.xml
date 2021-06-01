@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <auth><![CDATA[cfj3f237d563f479f5223k23189dbb34]]></auth>
+  <api><![CDATA[5.0.0]]></api>
+  <session_expire><![CDATA[2021-03-31T18:16:10+10:00]]></session_expire>
+  <update><![CDATA[2021-03-31T17:15:25+10:00]]></update>
+  <add><![CDATA[2021-03-31T13:32:27+10:00]]></add>
+  <clean><![CDATA[2021-03-31T17:15:18+10:00]]></clean>
+  <songs><![CDATA[55]]></songs>
+  <albums><![CDATA[8]]></albums>
+  <artists><![CDATA[16]]></artists>
+  <genres><![CDATA[6]]></genres>
+  <playlists><![CDATA[19]]></playlists>
+  <users><![CDATA[8]]></users>
+  <catalogs><![CDATA[4]]></catalogs>
+  <videos><![CDATA[2]]></videos>
+  <podcasts><![CDATA[3]]></podcasts>
+  <podcast_episodes><![CDATA[23]]></podcast_episodes>
+  <shares><![CDATA[2]]></shares>
+  <licenses><![CDATA[14]]></licenses>
+  <live_streams><![CDATA[3]]></live_streams>
+  <labels><![CDATA[3]]></labels>
+</root>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <total_count>19</total_count>
+  <playlist id="3">
+    <name><![CDATA[random - admin - private]]></name>
+    <owner><![CDATA[admin]]></owner>
+    <items>43</items>
+    <type>private</type>
+    <art><![CDATA[https://music.com.au/image.php?object_id=3&object_type=playlist&auth=eeb9f1b6056246a7d563f479f518bb34]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+  </playlist>
+  <playlist id="2">
+    <name><![CDATA[random - admin - public]]></name>
+    <owner><![CDATA[admin]]></owner>
+    <items>43</items>
+    <type>public</type>
+    <art><![CDATA[https://music.com.au/image.php?object_id=2&object_type=playlist&auth=eeb9f1b6056246a7d563f479f518bb34]]></art>
+    <flag>1</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+  </playlist>
+  <playlist id="smart_21">
+    <name><![CDATA[admin - 02/23/2021 14:36:44]]></name>
+    <owner><![CDATA[public]]></owner>
+    <items>5000</items>
+    <type>public</type>
+    <art><![CDATA[https://music.com.au/image.php?object_id=smart_21&object_type=search&auth=eeb9f1b6056246a7d563f479f518bb34]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+  </playlist>
+  <playlist id="smart_14">
+    <name><![CDATA[Album 1*]]></name>
+    <owner><![CDATA[public]]></owner>
+    <items>2</items>
+    <type>public</type>
+    <art><![CDATA[https://music.com.au/image.php?object_id=smart_14&object_type=search&auth=eeb9f1b6056246a7d563f479f518bb34]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+  </playlist>
+</root>

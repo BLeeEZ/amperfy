@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <total_count>55</total_count>
+  <song id="115">
+    <title><![CDATA[Are we going Crazy]]></title>
+    <name><![CDATA[Are we going Crazy]]></name>
+    <artist id="27"><![CDATA[Chi.Otic]]></artist>
+    <album id="12"><![CDATA[Buried in Nausea]]></album>
+    <albumartist id="19"><![CDATA[Various Artists]]></albumartist>
+    <disk><![CDATA[1]]></disk>
+    <track>7</track>
+    <filename><![CDATA[/mnt/files-music/ampache-test/music/Various Artists/Buried In Nausea/07Chi.otic-AreWeGoingCrazy.wma]]></filename>
+    <playlisttrack>1</playlisttrack>
+    <time>433</time>
+    <year>2012</year>
+    <bitrate>32582</bitrate>
+    <rate>44100</rate>
+    <mode><![CDATA[cbr]]></mode>
+    <mime><![CDATA[audio/x-ms-wma]]></mime>
+    <url><![CDATA[https://music.com.au/play/index.php?ssid=cfj3f237d563f479f5223k23189dbb34&type=song&oid=115&uid=4&player=api&name=Chi.Otic%20-%20Are%20we%20going%20Crazy.wma]]></url>
+    <size>1776580</size>
+    <mbid><![CDATA[]]></mbid>
+    <album_mbid><![CDATA[]]></album_mbid>
+    <artist_mbid><![CDATA[7]]></artist_mbid>
+    <albumartist_mbid><![CDATA[]]></albumartist_mbid>
+    <art><![CDATA[https://music.com.au/image.php?object_id=12&object_type=album&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.jpg]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+    <playcount>0</playcount>
+    <catalog>1</catalog>
+    <composer><![CDATA[]]></composer>
+    <channels/>
+    <comment><![CDATA[]]></comment>
+    <license><![CDATA[]]></license>
+    <publisher><![CDATA[]]></publisher>
+    <language/>
+    <replaygain_album_gain/>
+    <replaygain_album_peak/>
+    <replaygain_track_gain/>
+    <replaygain_track_peak/>
+    <r128_album_gain/>
+    <r128_track_gain/>
+  </song>
+  <song id="107">
+    <title><![CDATA[Arrest Me]]></title>
+    <name><![CDATA[Arrest Me]]></name>
+    <artist id="20"><![CDATA[R/B]]></artist>
+    <album id="12"><![CDATA[Buried in Nausea]]></album>
+    <albumartist id="19"><![CDATA[Various Artists]]></albumartist>
+    <disk><![CDATA[1]]></disk>
+    <track>9</track>
+    <genre id="7"><![CDATA[Punk]]></genre>
+    <filename><![CDATA[/mnt/files-music/ampache-test/music/Various Artists/Buried In Nausea/09R_b-ArrestMe.m4a]]></filename>
+    <playlisttrack>2</playlisttrack>
+    <time>96</time>
+    <year>2012</year>
+    <bitrate>252864</bitrate>
+    <rate>44100</rate>
+    <mode><![CDATA[vbr]]></mode>
+    <mime><![CDATA[audio/mp4]]></mime>
+    <url><![CDATA[https://music.com.au/play/index.php?ssid=cfj3f237d563f479f5223k23189dbb34&type=song&oid=107&uid=4&player=api&name=R-B%20-%20Arrest%20Me.m4a]]></url>
+    <size>3091727</size>
+    <mbid><![CDATA[]]></mbid>
+    <album_mbid><![CDATA[]]></album_mbid>
+    <artist_mbid><![CDATA[]]></artist_mbid>
+    <albumartist_mbid><![CDATA[]]></albumartist_mbid>
+    <art><![CDATA[https://music.com.au/image.php?object_id=12&object_type=album&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.jpg]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+    <playcount>0</playcount>
+    <catalog>1</catalog>
+    <composer><![CDATA[]]></composer>
+    <channels/>
+    <comment><![CDATA[]]></comment>
+    <license><![CDATA[]]></license>
+    <publisher><![CDATA[]]></publisher>
+    <language/>
+    <replaygain_album_gain/>
+    <replaygain_album_peak/>
+    <replaygain_track_gain>-1.350000</replaygain_track_gain>
+    <replaygain_track_peak>0.881000</replaygain_track_peak>
+    <r128_album_gain/>
+    <r128_track_gain/>
+  </song>
+  <song id="85">
+    <title><![CDATA[Beq Ultra Fat]]></title>
+    <name><![CDATA[Beq Ultra Fat]]></name>
+    <artist id="14"><![CDATA[Nofi/found.]]></artist>
+    <albumartist id="14"><![CDATA[Nofi/found.]]></albumartist>
+    <disk><![CDATA[1]]></disk>
+    <track>4</track>
+    <genre id="5"><![CDATA[Electronica]]></genre>
+    <genre id="6"><![CDATA[Dance]]></genre>
+    <filename><![CDATA[/mnt/files-music/ampache-test/music/Nofi_found/Nofi Devices LP/04_Beq_Ultra_Fat.mp3]]></filename>
+    <playlisttrack>3</playlisttrack>
+    <time>413</time>
+    <year>0</year>
+    <bitrate>192000</bitrate>
+    <rate>44100</rate>
+    <mode><![CDATA[cbr]]></mode>
+    <mime><![CDATA[audio/mpeg]]></mime>
+    <url><![CDATA[https://music.com.au/play/index.php?ssid=cfj3f237d563f479f5223k23189dbb34&type=song&oid=85&uid=4&player=api&name=Nofi-found.%20-%20Beq%20Ultra%20Fat.mp3]]></url>
+    <size>9935896</size>
+    <mbid><![CDATA[]]></mbid>
+    <album_mbid><![CDATA[]]></album_mbid>
+    <artist_mbid><![CDATA[]]></artist_mbid>
+    <albumartist_mbid><![CDATA[]]></albumartist_mbid>
+    <art><![CDATA[https://music.com.au/image.php?object_id=8&object_type=album&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.jpg]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+    <playcount>0</playcount>
+    <catalog>1</catalog>
+    <composer><![CDATA[Jeffrey Melton]]></composer>
+    <channels/>
+    <comment><![CDATA[8A114B0B+332232+11+150+3703+28283+76364+107382+132131+156082+177051+217892+239975+285087]]></comment>
+    <license><![CDATA[]]></license>
+    <publisher><![CDATA[archive.org]]></publisher>
+    <language/>
+    <replaygain_album_gain/>
+    <replaygain_album_peak/>
+    <replaygain_track_gain>0.940000</replaygain_track_gain>
+    <replaygain_track_peak>0.989000</replaygain_track_peak>
+    <r128_album_gain/>
+    <r128_track_gain/>
+  </song>
+  <song id="56">
+    <title><![CDATA[Black&BlueSmoke]]></title>
+    <name><![CDATA[Black&BlueSmoke]]></name>
+    <artist id="2"><![CDATA[Synthetic]]></artist>
+    <album id="2"><![CDATA[Colorsmoke EP]]></album>
+    <albumartist id="2"><![CDATA[Synthetic]]></albumartist>
+    <disk><![CDATA[1]]></disk>
+    <track>1</track>
+    <genre id="1"><![CDATA[Electronic]]></genre>
+    <filename><![CDATA[/mnt/files-music/ampache-test/music/Synthetic/Synthetic_-_Colorsmoke_EP-20k217-2007(1)/01-Synthetic_-_BlackBlueSmokeDM20k22kh_64kb.mp3]]></filename>
+    <playlisttrack>4</playlisttrack>
+    <time>500</time>
+    <year>2007</year>
+    <bitrate>64000</bitrate>
+    <rate>22050</rate>
+    <mode><![CDATA[cbr]]></mode>
+    <mime><![CDATA[audio/mpeg]]></mime>
+    <url><![CDATA[https://music.com.au/play/index.php?ssid=cfj3f237d563f479f5223k23189dbb34&type=song&oid=56&uid=4&player=api&name=Synthetic%20-%20Black-BlueSmoke.mp3]]></url>
+    <size>4010069</size>
+    <mbid><![CDATA[]]></mbid>
+    <album_mbid><![CDATA[]]></album_mbid>
+    <artist_mbid><![CDATA[1]]></artist_mbid>
+    <albumartist_mbid><![CDATA[1]]></albumartist_mbid>
+    <art><![CDATA[https://music.com.au/image.php?object_id=2&object_type=album&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.png]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+    <playcount>0</playcount>
+    <catalog>1</catalog>
+    <composer><![CDATA[]]></composer>
+    <channels/>
+    <comment><![CDATA[]]></comment>
+    <license><![CDATA[]]></license>
+    <publisher><![CDATA[20kbps rec.]]></publisher>
+    <language/>
+    <replaygain_album_gain/>
+    <replaygain_album_peak/>
+    <replaygain_track_gain>-5.110000</replaygain_track_gain>
+    <replaygain_track_peak>1.000000</replaygain_track_peak>
+    <r128_album_gain/>
+    <r128_track_gain/>
+  </song>
+</root>

@@ -31,7 +31,6 @@ class AuthentificationHandshake {
     var albumCount: Int = 0
     var genreCount: Int = 0
     var playlistCount: Int = 0
-    var tagCount: Int = 0
     var videoCount: Int = 0
 
 }

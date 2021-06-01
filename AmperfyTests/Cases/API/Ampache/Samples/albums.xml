@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <total_count>8</total_count>
+  <album id="12">
+    <name><![CDATA[Buried in Nausea]]></name>
+    <artist id="19"><![CDATA[Various Artists]]></artist>
+    <time>1879</time>
+    <year>2012</year>
+    <tracks/>
+    <songcount>9</songcount>
+    <diskcount>1</diskcount>
+    <type>compilation</type>
+    <genre id="7"><![CDATA[Punk]]></genre>
+    <art><![CDATA[https://music.com.au/image.php?object_id=12&object_type=album&auth=eeb9f1b6056246a7d563f479f518bb34]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+    <mbid><![CDATA[]]></mbid>
+  </album>
+  <album id="98">
+    <name><![CDATA[Blibb uu]]></name>
+    <artist id="12"><![CDATA[9958A]]></artist>
+    <time>4621</time>
+    <year>1974</year>
+    <tracks/>
+    <songcount>1</songcount>
+    <diskcount>1</diskcount>
+    <type>compilation</type>
+    <art><![CDATA[https://music.com.au/image.php?object_id=98&object_type=album&auth=eeb9f1b6056246a7d563f479f518bb34]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+    <mbid><![CDATA[]]></mbid>
+  </album>
+  <album id="99">
+    <name><![CDATA[123 GOo]]></name>
+    <artist id="91"><![CDATA[ZZZasdf]]></artist>
+    <time>2</time>
+    <year>2002</year>
+    <tracks/>
+    <songcount>105</songcount>
+    <diskcount>1</diskcount>
+    <type>compilation</type>
+    <genre id="1"><![CDATA[Blub]]></genre>
+    <art><![CDATA[https://music.com.au/image.php?object_id=99&object_type=album&auth=eeb9f1b6056246a7d563f479f518bb34]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+    <mbid><![CDATA[]]></mbid>
+  </album>
+</root>

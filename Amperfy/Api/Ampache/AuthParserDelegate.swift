@@ -34,8 +34,6 @@ class AuthParserDelegate: AmpacheXmlParser {
             authBuffer.genreCount = Int(buffer) ?? 0
         case "playlists":
             authBuffer.playlistCount = Int(buffer) ?? 0
-        case "tags":
-            authBuffer.tagCount = Int(buffer) ?? 0
         case "videos":
             authBuffer.videoCount = Int(buffer) ?? 0
         case "root":
