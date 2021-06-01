@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<subsonic-response xmlns="http://subsonic.org/restapi" status="ok" version="1.11.0">
+    <playlist id="15" name="kokos" comment="fan" owner="admin" public="true" songCount="6" duration="1391"
+              created="2012-04-17T19:53:44" coverArt="pl-15">
+        <allowedUser>sindre</allowedUser>
+        <allowedUser>john</allowedUser>
+        <entry id="657" parent="655" title="Making Me Nervous" album="I Don&apos;t Know What I&apos;m Doing"
+               artist="Brad Sucks" isDir="false" coverArt="655" created="2008-04-10T07:10:32" duration="159"
+               bitRate="202" track="1" year="2003" size="4060113" suffix="mp3" contentType="audio/mpeg" isVideo="false"
+               path="Brad Sucks/I Don&apos;t Know What I&apos;m Doing/01 - Making Me Nervous.mp3" albumId="58"
+               artistId="45" type="music"/>
+        <entry id="823" parent="784" title="Piano escena" album="BSO  Sebastian" artist="PeerGynt Lobogris"
+               isDir="false" coverArt="784" created="2009-01-14T22:26:29" duration="129" bitRate="170" track="8"
+               year="2008" genre="Blues" size="2799954" suffix="mp3" contentType="audio/mpeg" isVideo="false"
+               path="PeerGynt Lobogris/BSO Sebastian/08 - Piano escena.mp3" albumId="75" artistId="54" type="music"/>
+        <entry id="748" parent="746" title="Stories from Emona II" album="Between two worlds" artist="Maya Filipi&#269;"
+               isDir="false" coverArt="746" created="2008-07-30T22:05:40" duration="335" bitRate="176" track="2"
+               year="2008" genre="Classical" size="7458214" suffix="mp3" contentType="audio/mpeg" isVideo="false"
+               path="Maya Filipic/Between two worlds/02 - Stories from Emona II.mp3" albumId="68" artistId="51"
+               type="music"/>
+        <entry id="848" parent="827" title="Run enemy" album="Eve" artist="Shearer" isDir="false" coverArt="827"
+               created="2009-01-15T22:54:38" duration="331" bitRate="195" track="14" year="2008" genre="Rock"
+               size="8160185" suffix="mp3" contentType="audio/mpeg" isVideo="false"
+               path="Shearer/Eve/14 - Run enemy.mp3" albumId="77" artistId="55" type="music"/>
+        <entry id="884" parent="874" title="Isolation" album="Kosmonaut" artist="Ugress" isDir="false" coverArt="874"
+               created="2009-01-14T21:34:49" duration="320" bitRate="160" track="4" year="2006" genre="Electronic"
+               size="6412176" suffix="mp3" contentType="audio/mpeg" isVideo="false"
+               path="Ugress/Kosmonaut/Ugress-KosmonautEP-04-Isolation.mp3" albumId="81" artistId="57" type="music"/>
+        <entry id="805" parent="783" title="Bajo siete lunas (intro)" album="Broken Dreams" artist="PeerGynt Lobogris"
+               isDir="false" coverArt="783" created="2008-12-19T14:13:58" duration="117" bitRate="225" track="1"
+               year="2008" genre="Blues" size="3363271" suffix="mp3" contentType="audio/mpeg" isVideo="false"
+               path="PeerGynt Lobogris/Broken Dreams/01 - Bajo siete lunas (intro).mp3" albumId="74" artistId="54"
+               type="music"/>
+    </playlist>
+</subsonic-response>
+

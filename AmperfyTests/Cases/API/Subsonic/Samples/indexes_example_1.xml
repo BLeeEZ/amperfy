@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<subsonic-response xmlns="http://subsonic.org/restapi"
+                   status="ok" version="1.10.1">
+
+    <indexes lastModified="237462836472342" ignoredArticles="The El La Los Las Le Les">
+        <shortcut id="11" name="Audio books"/>
+        <shortcut id="10" name="Podcasts"/>
+        <index name="A">
+            <artist id="1" name="ABBA"/>
+            <artist id="2" name="Alanis Morisette"/>
+            <artist id="3" name="Alphaville" starred="2013-11-02T12:30:00"/>
+        </index>
+        <index name="B">
+            <artist name="Bob Dylan" id="4"/>
+        </index>
+
+        <child id="111" parent="11" title="Dancing Queen" isDir="false"
+               album="Arrival" artist="ABBA" track="7" year="1978" genre="Pop" coverArt="24"
+               size="8421341" contentType="audio/mpeg" suffix="mp3" duration="146" bitRate="128"
+               path="ABBA/Arrival/Dancing Queen.mp3"/>
+
+        <child id="112" parent="11" title="Money, Money, Money" isDir="false"
+               album="Arrival" artist="ABBA" track="7" year="1978" genre="Pop" coverArt="25"
+               size="4910028" contentType="audio/flac" suffix="flac"
+               transcodedContentType="audio/mpeg" transcodedSuffix="mp3"  duration="208" bitRate="128"
+               path="ABBA/Arrival/Money, Money, Money.mp3"/>
+    </indexes>
+
+</subsonic-response>

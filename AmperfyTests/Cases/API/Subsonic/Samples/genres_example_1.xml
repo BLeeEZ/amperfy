@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<subsonic-response xmlns="http://subsonic.org/restapi" status="ok" version="1.10.2">
+
+    <genres>
+        <genre songCount="28" albumCount="6">Electronic</genre>
+        <genre songCount="6" albumCount="2">Hard Rock</genre>
+        <genre songCount="8" albumCount="2">R&amp;B</genre>
+        <genre songCount="22" albumCount="2">Blues</genre>
+        <genre songCount="2" albumCount="2">Podcast</genre>
+        <genre songCount="11" albumCount="1">Brit Pop</genre>
+        <genre songCount="14" albumCount="1">Live</genre>
+    </genres>
+
+</subsonic-response>

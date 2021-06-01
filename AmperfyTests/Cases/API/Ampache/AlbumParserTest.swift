@@ -1,26 +1,17 @@
 import XCTest
 @testable import Amperfy
 
-class AlbumParserTest: XCTestCase {
+class AlbumParserTest: AbstractAmpacheTest {
     
-    var cdHelper: CoreDataHelper!
-    var library: LibraryStorage!
-    var xmlData: Data!
-    var ampacheUrlCreator: MOCK_AmpacheUrlCreator!
-    var syncWave: SyncWave!
-
     override func setUp() {
-        cdHelper = CoreDataHelper()
-        let context = cdHelper.createInMemoryManagedObjectContext()
-        cdHelper.clearContext(context: context)
-        library = LibraryStorage(context: context)
+        super.setUp()
         xmlData = getTestFileData(name: "albums")
-        ampacheUrlCreator = MOCK_AmpacheUrlCreator()
-        syncWave = library.createSyncWave()
+        recreateParserDelegate()
         createTestArtists()
     }
-
-    override func tearDown() {
+    
+    override func recreateParserDelegate() {
+        parserDelegate = AlbumParserDelegate(libraryStorage: library, syncWave: syncWave, parseNotifier: nil)
     }
     
     func createTestArtists() {
@@ -37,31 +28,7 @@ class AlbumParserTest: XCTestCase {
         artist.name = "ZZZasdf"
     }
     
-    func testParsing() {
-        let parserDelegate = AlbumParserDelegate(libraryStorage: library, syncWave: syncWave, parseNotifier: nil)
-        let parser = XMLParser(data: xmlData)
-        parser.delegate = parserDelegate
-        parser.parse()
-        XCTAssertNil(parserDelegate.error)
-        checkCorrectParsing()
-    }
-    
-    func testParsingTwice() {
-        syncWave = library.createSyncWave() // set isInitialWave to false
-        let parserDelegate1 = AlbumParserDelegate(libraryStorage: library, syncWave: syncWave, parseNotifier: nil)
-        let parser1 = XMLParser(data: xmlData)
-        parser1.delegate = parserDelegate1
-        parser1.parse()
-        checkCorrectParsing()
-        
-        let parserDelegate2 = AlbumParserDelegate(libraryStorage: library, syncWave: syncWave, parseNotifier: nil)
-        let parser2 = XMLParser(data: xmlData)
-        parser2.delegate = parserDelegate2
-        parser2.parse()
-        checkCorrectParsing()
-    }
-    
-    func checkCorrectParsing() {
+    override func checkCorrectParsing() {
         let albums = library.getAlbums().sorted(by: {$0.id < $1.id} )
         XCTAssertEqual(albums.count, 3)
         XCTAssertEqual(library.genreCount, 2)

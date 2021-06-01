@@ -1,52 +1,19 @@
 import XCTest
 @testable import Amperfy
 
-class PlaylistsParserTest: XCTestCase {
+class PlaylistsParserTest: AbstractAmpacheTest {
     
-    var cdHelper: CoreDataHelper!
-    var library: LibraryStorage!
-    var xmlData: Data!
-    var ampacheUrlCreator: MOCK_AmpacheUrlCreator!
-    var syncWave: SyncWave!
-
     override func setUp() {
-        cdHelper = CoreDataHelper()
-        let context = cdHelper.createInMemoryManagedObjectContext()
-        cdHelper.clearContext(context: context)
-        library = LibraryStorage(context: context)
+        super.setUp()
         xmlData = getTestFileData(name: "playlists")
-        ampacheUrlCreator = MOCK_AmpacheUrlCreator()
-        syncWave = library.createSyncWave()
-    }
-
-    override func tearDown() {
+        recreateParserDelegate()
     }
     
-    func testParsing() {
-        let parserDelegate = PlaylistParserDelegate(libraryStorage: library, parseNotifier: nil)
-        let parser = XMLParser(data: xmlData)
-        parser.delegate = parserDelegate
-        parser.parse()
-        XCTAssertNil(parserDelegate.error)
-        checkCorrectParsing()
+    override func recreateParserDelegate() {
+        parserDelegate = PlaylistParserDelegate(libraryStorage: library, parseNotifier: nil)
     }
     
-    func testParsingTwice() {
-        syncWave = library.createSyncWave() // set isInitialWave to false
-        let parserDelegate1 = PlaylistParserDelegate(libraryStorage: library, parseNotifier: nil)
-        let parser1 = XMLParser(data: xmlData)
-        parser1.delegate = parserDelegate1
-        parser1.parse()
-        checkCorrectParsing()
-        
-        let parserDelegate2 = PlaylistParserDelegate(libraryStorage: library, parseNotifier: nil)
-        let parser2 = XMLParser(data: xmlData)
-        parser2.delegate = parserDelegate2
-        parser2.parse()
-        checkCorrectParsing()
-    }
-    
-    func checkCorrectParsing() {
+    override func checkCorrectParsing() {
         let playlists = library.getPlaylists()
         XCTAssertEqual(playlists.count, 4)
         

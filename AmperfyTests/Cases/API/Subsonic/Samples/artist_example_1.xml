@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<subsonic-response xmlns="http://subsonic.org/restapi"
+                   status="ok" version="1.8.0">
+
+    <artist id="5432" name="AC/DC" coverArt="ar-5432" albumCount="15">
+        <album id="11047" name="Back In Black" coverArt="al-11047" songCount="10" created="2004-11-08T23:33:11" duration="2534" artist="AC/DC" artistId="5432"/>
+        <album id="11048" name="Black Ice" coverArt="al-11048" songCount="15" created="2008-10-30T09:20:52" duration="3332" artist="AC/DC" artistId="5432"/>
+        <album id="11049" name="Blow up your Video" coverArt="al-11049" songCount="10" created="2004-11-27T19:22:45" duration="2578" artist="AC/DC" artistId="5432"/>
+        <album id="11050" name="Flick Of The Switch" coverArt="al-11050" songCount="10" created="2004-11-27T19:22:51" duration="2222" artist="AC/DC" artistId="5432"/>
+        <album id="11051" name="Fly On The Wall" coverArt="al-11051" songCount="10" created="2004-11-27T19:22:57" duration="2405" artist="AC/DC" artistId="5432"/>
+        <album id="11052" name="For Those About To Rock" coverArt="al-11052" songCount="10" created="2004-11-08T23:35:02" duration="2403" artist="AC/DC" artistId="5432"/>
+        <album id="11053" name="High Voltage" coverArt="al-11053" songCount="8" created="2004-11-27T20:23:32" duration="2414" artist="AC/DC" artistId="5432"/>
+        <album id="10489" name="Highway To Hell" coverArt="al-10489" songCount="12" created="2009-06-15T09:41:54" duration="2745" artist="AC/DC" artistId="5432"/>
+        <album id="11054" name="If You Want Blood..." coverArt="al-11054" songCount="1" created="2004-11-27T20:23:32" duration="304" artist="AC/DC" artistId="5432"/>
+        <album id="11056" name="Let There Be Rock" coverArt="al-11056" songCount="8" created="2004-11-27T20:33:40" duration="2449" artist="AC/DC" artistId="5432"/>
+        <album id="11057" name="Live - Special Collector&apos;s Edition" coverArt="al-11057" songCount="22" created="2004-11-08T23:37:09" duration="6999" artist="AC/DC" artistId="5432"/>
+        <album id="11058" name="Powerage" coverArt="al-11058" songCount="9" created="2004-11-27T20:33:41" duration="2380" artist="AC/DC" artistId="5432"/>
+        <album id="11059" name="Stiff Upper Lip" coverArt="al-11059" songCount="11" created="2004-11-08T23:41:13" duration="2595" artist="AC/DC" artistId="5432"/>
+        <album id="11060" name="The Razors Edge" coverArt="al-11060" songCount="12" created="2004-11-27T20:33:42" duration="2787" artist="AC/DC" artistId="5432"/>
+        <album id="11061" name="Who Made Who" coverArt="al-11061" songCount="9" created="2004-11-08T23:43:18" duration="2291" artist="AC/DC" artistId="5432"/>
+    </artist>
+
+</subsonic-response>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<subsonic-response xmlns="http://subsonic.org/restapi" status="ok" version="1.11.0">
+    <playlists>
+        <playlist id="15" name="Some random songs" comment="Just something I tossed together" owner="admin" public="false" songCount="6" duration="1391" created="2012-04-17T19:53:44" coverArt="pl-15">
+            <allowedUser>sindre</allowedUser>
+            <allowedUser>john</allowedUser>
+        </playlist>
+        <playlist id="16" name="More random songs" comment="No comment" owner="admin" public="true" songCount="5" duration="1018" created="2012-04-17T19:55:49" coverArt="pl-16"/>
+    </playlists>
+</subsonic-response>
+

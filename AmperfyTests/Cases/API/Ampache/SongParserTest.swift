@@ -1,27 +1,18 @@
 import XCTest
 @testable import Amperfy
 
-class SongParserTest: XCTestCase {
+class SongParserTest: AbstractAmpacheTest {
     
-    var cdHelper: CoreDataHelper!
-    var library: LibraryStorage!
-    var xmlData: Data!
-    var ampacheUrlCreator: MOCK_AmpacheUrlCreator!
-    var syncWave: SyncWave!
-
     override func setUp() {
-        cdHelper = CoreDataHelper()
-        let context = cdHelper.createInMemoryManagedObjectContext()
-        cdHelper.clearContext(context: context)
-        library = LibraryStorage(context: context)
+        super.setUp()
         xmlData = getTestFileData(name: "songs")
-        ampacheUrlCreator = MOCK_AmpacheUrlCreator()
-        syncWave = library.createSyncWave()
+        recreateParserDelegate()
         createTestArtists()
         createTestAlbums()
     }
-
-    override func tearDown() {
+    
+    override func recreateParserDelegate() {
+        parserDelegate = SongParserDelegate(libraryStorage: library, syncWave: syncWave, parseNotifier: nil)
     }
     
     func createTestArtists() {
@@ -52,31 +43,7 @@ class SongParserTest: XCTestCase {
         album.name = "Colorsmoke EP"
     }
     
-    func testParsing() {
-        let parserDelegate = SongParserDelegate(libraryStorage: library, syncWave: syncWave, parseNotifier: nil)
-        let parser = XMLParser(data: xmlData)
-        parser.delegate = parserDelegate
-        parser.parse()
-        XCTAssertNil(parserDelegate.error)
-        Self.checkCorrectParsing(library: library)
-    }
-    
-    func testParsingTwice() {
-        syncWave = library.createSyncWave() // set isInitialWave to false
-        let parserDelegate1 = SongParserDelegate(libraryStorage: library, syncWave: syncWave, parseNotifier: nil)
-        let parser1 = XMLParser(data: xmlData)
-        parser1.delegate = parserDelegate1
-        parser1.parse()
-        Self.checkCorrectParsing(library: library)
-        
-        let parserDelegate2 = SongParserDelegate(libraryStorage: library, syncWave: syncWave, parseNotifier: nil)
-        let parser2 = XMLParser(data: xmlData)
-        parser2.delegate = parserDelegate2
-        parser2.parse()
-        Self.checkCorrectParsing(library: library)
-    }
-    
-    static func checkCorrectParsing(library: LibraryStorage) {
+    override func checkCorrectParsing() {
         let songs = library.getSongs()
         XCTAssertEqual(songs.count, 4)
         XCTAssertEqual(library.genreCount, 4)

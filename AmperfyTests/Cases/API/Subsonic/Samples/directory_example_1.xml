@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<subsonic-response xmlns="http://subsonic.org/restapi"
+                   status="ok" version="1.10.1">
+
+    <directory id="10" parent="9" name="ABBA" starred="2013-11-02T12:30:00">
+        <child id="11" parent="10" title="Arrival" artist="ABBA" isDir="true" coverArt="22"/>
+        <child id="12" parent="10" title="Super Trouper" artist="ABBA" isDir="true" coverArt="23"/>
+    </directory>
+
+</subsonic-response>

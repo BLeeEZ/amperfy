@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<subsonic-response xmlns="http://subsonic.org/restapi"
+                   status="ok" version="1.1.1">
+
+    <musicFolders>
+        <musicFolder id="1" name="Music"/>
+        <musicFolder id="2" name="Movies"/>
+        <musicFolder id="3" name="Incoming"/>
+    </musicFolders>
+
+</subsonic-response>

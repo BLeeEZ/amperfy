@@ -99,6 +99,7 @@ class SongParserDelegate: AmpacheXmlLibParser {
             if let song = songBuffer, let songArtwork = song.artwork, songArtwork.url.isEmpty, song.isOrphaned, let songArtworkUrlString = artworkUrlString {
                 songArtwork.url = songArtworkUrlString
             }
+            artworkUrlString = nil
             parsedCount += 1
             parseNotifier?.notifyParsedObject(ofType: .song)
             songBuffer = nil

@@ -7,6 +7,7 @@ class SsSongParserDelegate: SsXmlLibParser {
     
     var subsonicUrlCreator: SubsonicUrlCreator
     var songBuffer: Song?
+    var artworkUrlString: String?
     var guessedArtist: Artist?
     var guessedAlbum: Album?
     var guessedGenre: Genre?
@@ -55,8 +56,8 @@ class SsSongParserDelegate: SsXmlLibParser {
             if let disk = attributeDict["discNumber"] {
                 songBuffer?.disk = disk
             }
-            if let coverArtId = attributeDict["coverArt"], let song = songBuffer, let songArtwork = song.artwork, songArtwork.url.isEmpty, song.isOrphaned {
-                songArtwork.url = subsonicUrlCreator.getArtUrlString(forCoverArtId: coverArtId)
+            if let coverArtId = attributeDict["coverArt"] {
+                artworkUrlString = subsonicUrlCreator.getArtUrlString(forCoverArtId: coverArtId)
             }
 
             if songBuffer?.artist == nil, let artistId = attributeDict["artistId"] {
@@ -93,6 +94,10 @@ class SsSongParserDelegate: SsXmlLibParser {
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "song" || elementName == "entry" || elementName == "child", songBuffer != nil {
+            if let song = songBuffer, let songArtwork = song.artwork, songArtwork.url.isEmpty, song.isOrphaned, let songArtworkUrlString = artworkUrlString {
+                songArtwork.url = songArtworkUrlString
+            }
+            artworkUrlString = nil
             parsedCount += 1
             songBuffer = nil
         }
