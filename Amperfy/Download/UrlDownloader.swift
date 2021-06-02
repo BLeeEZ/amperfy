@@ -46,7 +46,7 @@ class UrlDownloader: NSObject, URLSessionDownloadDelegate {
             if data.count > 0 {
                 download.resumeData = data
             } else {
-                download.error = .fetchFailed
+                download.error = .emptyFile
             }
             
         } catch let error {

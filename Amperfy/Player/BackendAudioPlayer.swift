@@ -116,7 +116,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         if !song.isPlayableOniOS, let contentType = song.contentType {
             player.pause()
             player.replaceCurrentItem(with: nil)
-            eventLogger.info(message: "Content type \"\(contentType)\" of song \"\(song.displayString)\" is not playable via Amperfy.")
+            eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of song \"\(song.displayString)\" is not playable via Amperfy.")
         } else {
             if song.isCached {
                 insertCachedSong(playlistItem: playlistItem)

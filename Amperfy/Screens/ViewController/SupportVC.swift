@@ -36,7 +36,7 @@ class SupportVC: UITableViewController, MFMailComposeViewControllerDelegate {
             mailComposer.mailComposeDelegate = self
             self.present(mailComposer, animated: true, completion: nil)
         } else {
-            appDelegate.eventLogger.info(message: "Email is not configured in settings app or Amperfy is not able to send an email")
+            appDelegate.eventLogger.info(topic: "Email Info", statusCode: .emailError, message: "Email is not configured in settings app or Amperfy is not able to send an email")
         }
     }
     

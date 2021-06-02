@@ -7,7 +7,19 @@ enum DownloadError: Error {
     case noConnectivity
     case alreadyDownloaded
     case fetchFailed
+    case emptyFile
     case apiErrorResponse
+    
+    var description : String {
+        switch self {
+        case .urlInvalid: return "Invalid URL"
+        case .noConnectivity: return "No Connectivity"
+        case .alreadyDownloaded: return "Already Downloaded"
+        case .fetchFailed: return "Fetch Failed"
+        case .emptyFile: return "File is empty"
+        case .apiErrorResponse: return "API Error"
+        }
+    }
 }
 
 protocol SongDownloadable {
@@ -37,6 +49,7 @@ class DownloadManager: SongDownloadable {
     private let requestManager: RequestManager
     private let urlDownloader: UrlDownloader
     private let downloadDelegate: DownloadManagerDelegate
+    private let eventLogger: EventLogger
     
 
     private let downloadSlotCounter = DownloadSlotCounter(maximumActiveDownloads: 4)
@@ -49,11 +62,12 @@ class DownloadManager: SongDownloadable {
         return requestManager.requestQueues
     }
     
-    init(storage: PersistentStorage, requestManager: RequestManager, urlDownloader: UrlDownloader, downloadDelegate: DownloadManagerDelegate) {
+    init(storage: PersistentStorage, requestManager: RequestManager, urlDownloader: UrlDownloader, downloadDelegate: DownloadManagerDelegate, eventLogger: EventLogger) {
         self.storage = storage
         self.requestManager = requestManager
         self.urlDownloader = urlDownloader
         self.downloadDelegate = downloadDelegate
+        self.eventLogger = eventLogger
     }
     
     func download(song: Song, notifier: SongDownloadNotifiable? = nil, priority: Priority = .low) {
@@ -147,11 +161,13 @@ class DownloadManager: SongDownloadable {
             os_log("Fetching %s SUCCESS (%{iec-bytes}d)", log: self.log, type: .info, request.title, request.download?.resumeData?.count ?? 0)
             downloadDelegate.completedDownload(request: request, context: context)
         } catch let fetchError as DownloadError {
-            os_log("Fetching %s FAILED", log: self.log, type: .info, request.title)
             downloadError = fetchError
         } catch {
-            os_log("Fetching %s FAILED", log: self.log, type: .info, request.title)
             downloadError = DownloadError.fetchFailed
+        }
+        if let error = downloadError, error != .apiErrorResponse {
+            os_log("Fetching %s FAILED: %s", log: self.log, type: .info, request.title, error.description)
+            eventLogger.error(topic: "Download Error", statusCode: .downloadError, message: "Error \"\(error.description)\" occured while downloading song \"\(request.title)\".")
         }
         // remove data from request to free memory
         request.download?.resumeData = nil

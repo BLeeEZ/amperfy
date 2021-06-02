@@ -2,15 +2,15 @@ import Foundation
 import CoreData
 
 enum LogEntryType: Int16 {
-    case error = 0
-    case warning = 1
+    case apiError = 0
+    case error = 1
     case info = 2
     case debug = 3
     
     var description : String {
         switch self {
+        case .apiError: return "API Error"
         case .error: return "Error"
-        case .warning: return "Warning"
         case .info: return "Info"
         case .debug: return "Debug"
         }
