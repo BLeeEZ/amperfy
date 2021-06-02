@@ -27,6 +27,9 @@ public class MusicFolder {
     var directories: [Directory] {
         return managedObject.directories?.compactMap{ Directory(managedObject: $0 as! DirectoryMO) } ?? [Directory]()
     }
+    var songs: [Song] {
+        return managedObject.songs?.compactMap{ Song(managedObject: $0 as! SongMO) } ?? [Song]()
+    }
 
 }
 

@@ -22,6 +22,7 @@ extension SongMO {
     @NSManaged public var artist: ArtistMO?
     @NSManaged public var file: SongFileMO?
     @NSManaged public var genre: GenreMO?
+    @NSManaged public var musicFolder: MusicFolderMO?
     @NSManaged public var playlistItems: NSSet?
     @NSManaged public var syncInfo: SyncWaveMO?
 

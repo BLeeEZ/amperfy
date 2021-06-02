@@ -11,6 +11,7 @@ extension MusicFolderMO {
     @NSManaged public var id: String
     @NSManaged public var name: String
     @NSManaged public var directories: NSOrderedSet?
+    @NSManaged public var songs: NSOrderedSet?
 
 }
 
@@ -46,5 +47,40 @@ extension MusicFolderMO {
 
     @objc(removeDirectories:)
     @NSManaged public func removeFromDirectories(_ values: NSOrderedSet)
+
+}
+
+// MARK: Generated accessors for songs
+extension MusicFolderMO {
+
+    @objc(insertObject:inSongsAtIndex:)
+    @NSManaged public func insertIntoSongs(_ value: SongMO, at idx: Int)
+
+    @objc(removeObjectFromSongsAtIndex:)
+    @NSManaged public func removeFromSongs(at idx: Int)
+
+    @objc(insertSongs:atIndexes:)
+    @NSManaged public func insertIntoSongs(_ values: [SongMO], at indexes: NSIndexSet)
+
+    @objc(removeSongsAtIndexes:)
+    @NSManaged public func removeFromSongs(at indexes: NSIndexSet)
+
+    @objc(replaceObjectInSongsAtIndex:withObject:)
+    @NSManaged public func replaceSongs(at idx: Int, with value: SongMO)
+
+    @objc(replaceSongsAtIndexes:withSongs:)
+    @NSManaged public func replaceSongs(at indexes: NSIndexSet, with values: [SongMO])
+
+    @objc(addSongsObject:)
+    @NSManaged public func addToSongs(_ value: SongMO)
+
+    @objc(removeSongsObject:)
+    @NSManaged public func removeFromSongs(_ value: SongMO)
+
+    @objc(addSongs:)
+    @NSManaged public func addToSongs(_ values: NSOrderedSet)
+
+    @objc(removeSongs:)
+    @NSManaged public func removeFromSongs(_ values: NSOrderedSet)
 
 }

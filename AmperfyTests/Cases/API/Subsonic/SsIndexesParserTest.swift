@@ -24,6 +24,43 @@ class SsIndexesParserTest: AbstractSsParserTest {
         XCTAssertEqual(directories[2].name, "Alphaville")
         XCTAssertEqual(directories[3].id, "4")
         XCTAssertEqual(directories[3].name, "Bob Dylan")
+        
+        let songs = musicFolder.songs.sorted(by: {Int($0.id)! < Int($1.id)!} )
+        XCTAssertEqual(songs.count, 2)
+        
+        var song = songs[0]
+        XCTAssertEqual(song.id, "111")
+        XCTAssertEqual(song.title, "Dancing Queen")
+        XCTAssertNil(song.artist)
+        XCTAssertNil(song.album)
+        XCTAssertNil(song.disk)
+        XCTAssertEqual(song.track, 7)
+        XCTAssertEqual(song.genre?.id, "")
+        XCTAssertEqual(song.genre?.name, "Pop")
+        XCTAssertEqual(song.duration, 146)
+        XCTAssertEqual(song.year, 1978)
+        XCTAssertEqual(song.bitrate, 128000)
+        XCTAssertEqual(song.contentType, "audio/mpeg")
+        XCTAssertNil(song.url)
+        XCTAssertEqual(song.size, 8421341)
+        XCTAssertEqual(song.artwork?.url, "24")
+        
+        song = songs[1]
+        XCTAssertEqual(song.id, "112")
+        XCTAssertEqual(song.title, "Money, Money, Money")
+        XCTAssertNil(song.artist)
+        XCTAssertNil(song.album)
+        XCTAssertNil(song.disk)
+        XCTAssertEqual(song.track, 7)
+        XCTAssertEqual(song.genre?.id, "")
+        XCTAssertEqual(song.genre?.name, "Pop")
+        XCTAssertEqual(song.duration, 208)
+        XCTAssertEqual(song.year, 1978)
+        XCTAssertEqual(song.bitrate, 128000)
+        XCTAssertEqual(song.contentType, "audio/flac")
+        XCTAssertNil(song.url)
+        XCTAssertEqual(song.size, 4910028)
+        XCTAssertEqual(song.artwork?.url, "25")
     }
 
 }

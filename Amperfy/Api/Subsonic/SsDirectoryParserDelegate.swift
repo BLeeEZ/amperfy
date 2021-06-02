@@ -23,7 +23,7 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
         self.directory = nil
         self.musicFolder = musicFolder
         directoriesBeforeFetch = Set(musicFolder.directories)
-        songsBeforeFetch = Set()
+        songsBeforeFetch = Set(musicFolder.songs)
         super.init(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
     }
     
@@ -55,6 +55,9 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
             } else if let song = songBuffer {
                 if let directory = directory {
                     directory.managedObject.addToSongs(song.managedObject)
+                    songsParsed.insert(song)
+                } else if let musicFolder = musicFolder {
+                    musicFolder.managedObject.addToSongs(song.managedObject)
                     songsParsed.insert(song)
                 }
             }
@@ -88,6 +91,9 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
             if let directory = self.directory {
                 let removedSongs = songsBeforeFetch.subtracting(songsParsed)
                 removedSongs.forEach{ directory.managedObject.removeFromSongs($0.managedObject) }
+            } else if let musicFolder = musicFolder {
+                let removedSongs = songsBeforeFetch.subtracting(songsParsed)
+                removedSongs.forEach{ musicFolder.managedObject.removeFromSongs($0.managedObject) }
             }
         }
         
