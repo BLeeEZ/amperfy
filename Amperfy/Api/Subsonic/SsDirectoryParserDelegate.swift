@@ -40,8 +40,8 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
                         parsedDirectory = libraryStorage.createDirectory()
                         parsedDirectory.id = id
                         parsedDirectory.name = title
-                        if let coverArtId = attributeDict["coverArt"], let directoryArtwork = parsedDirectory.artwork, directoryArtwork.url.isEmpty {
-                            directoryArtwork.url = subsonicUrlCreator.getArtUrlString(forCoverArtId: coverArtId)
+                        if let coverArtId = attributeDict["coverArt"] {
+                            parsedDirectory.artwork = parseArtwork(id: coverArtId)
                         }
                     }
                         

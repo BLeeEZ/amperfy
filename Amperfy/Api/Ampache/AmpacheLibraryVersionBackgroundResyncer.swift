@@ -4,7 +4,6 @@ import os.log
 
 class AmpacheLibraryVersionBackgroundResyncer: GenericLibraryBackgroundSyncer, BackgroundLibraryVersionResyncer {
    
-    
     private let ampacheXmlServerApi: AmpacheXmlServerApi
 
     init(ampacheXmlServerApi: AmpacheXmlServerApi) {
@@ -39,7 +38,7 @@ class AmpacheLibraryVersionBackgroundResyncer: GenericLibraryBackgroundSyncer, B
             var allParsed = false
             repeat {
                 var syncIndex = Int(syncWave.syncIndexToContinue) ?? 0
-                let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, ampacheUrlCreator: ampacheXmlServerApi)
+                let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave)
                 ampacheXmlServerApi.requestArtists(parserDelegate: artistParser, startIndex: syncIndex)
                 syncIndex += artistParser.parsedCount
                 syncWave.syncIndexToContinue = String(syncIndex)

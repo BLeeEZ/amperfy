@@ -63,9 +63,7 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
         case "songcount":
             albumBuffer?.songCount = Int(buffer) ?? 0
         case "art":
-            if let albumArtwork = albumBuffer?.artwork, albumArtwork.url.isEmpty {
-                albumArtwork.url = buffer
-            }
+            albumBuffer?.artwork = parseArtwork(urlString: buffer)
         case "genre":
             if let genreId = genreIdToCreate {
                 os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)

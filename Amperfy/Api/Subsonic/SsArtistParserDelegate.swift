@@ -2,15 +2,9 @@ import Foundation
 import UIKit
 import CoreData
 
-class SsArtistParserDelegate: SsXmlLibParser {
+class SsArtistParserDelegate: SsXmlLibWithArtworkParser {
 
-    private var subsonicUrlCreator: SubsonicUrlCreator
     private var artistBuffer: Artist?
-
-    init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.subsonicUrlCreator = subsonicUrlCreator
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
-    }
 
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
@@ -32,8 +26,8 @@ class SsArtistParserDelegate: SsXmlLibParser {
             if let attributeArtistName = attributeDict["name"] {
                 artistBuffer?.name = attributeArtistName
             }
-            if let attributeCoverArtId = attributeDict["coverArt"], let artistArtwork = artistBuffer?.artwork, artistArtwork.url.isEmpty {
-                artistArtwork.url = subsonicUrlCreator.getArtUrlString(forCoverArtId: attributeCoverArtId)
+            if let attributeCoverArtId = attributeDict["coverArt"] {
+                artistBuffer?.artwork = parseArtwork(id: attributeCoverArtId)
             }
 		}    
     }

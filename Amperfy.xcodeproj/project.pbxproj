@@ -351,6 +351,7 @@
 		502C0040224C090100DA0D1E /* AmpacheLibraryBackgroundSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmpacheLibraryBackgroundSyncer.swift; sourceTree = "<group>"; };
 		502C0042224C091800DA0D1E /* SubsonicLibraryBackgroundSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubsonicLibraryBackgroundSyncer.swift; sourceTree = "<group>"; };
 		502C0044224C0B1400DA0D1E /* SubsonicArtworkBackgroundSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubsonicArtworkBackgroundSyncer.swift; sourceTree = "<group>"; };
+		50377A53266E130300F0C3F3 /* Amperfy v9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v9.xcdatamodel"; sourceTree = "<group>"; };
 		5041B7FF2212051A00603F02 /* ArtistDetailTableHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ArtistDetailTableHeader.xib; sourceTree = "<group>"; };
 		5041B8012212053300603F02 /* ArtistDetailTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistDetailTableHeader.swift; sourceTree = "<group>"; };
 		504C718E23BAC8F2001F82C7 /* PlaylistItemTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistItemTest.swift; sourceTree = "<group>"; };
@@ -1857,6 +1858,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				50377A53266E130300F0C3F3 /* Amperfy v9.xcdatamodel */,
 				50DEEE0D265E89590073FF20 /* Amperfy v8.xcdatamodel */,
 				505AD8712615B4D8001319B6 /* Amperfy v7.xcdatamodel */,
 				50E15407261311590021F47D /* Amperfy v6.xcdatamodel */,
@@ -1866,7 +1868,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 50DEEE0D265E89590073FF20 /* Amperfy v8.xcdatamodel */;
+			currentVersion = 50377A53266E130300F0C3F3 /* Amperfy v9.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

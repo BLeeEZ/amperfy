@@ -110,13 +110,11 @@ class LibraryStorage: SongFileCachable {
     
     func createArtist() -> Artist {
         let artistMO = ArtistMO(context: context)
-        artistMO.artwork = createArtwork().managedObject
         return Artist(managedObject: artistMO)
     }
     
     func createAlbum() -> Album {
         let albumMO = AlbumMO(context: context)
-        albumMO.artwork = createArtwork().managedObject
         return Album(managedObject: albumMO)
     }
     
@@ -126,7 +124,6 @@ class LibraryStorage: SongFileCachable {
     
     func createSong() -> Song {
         let songMO = SongMO(context: context)
-        songMO.artwork = createArtwork().managedObject
         return Song(managedObject: songMO)
     }
     
@@ -146,7 +143,6 @@ class LibraryStorage: SongFileCachable {
     
     func createDirectory() -> Directory {
         let directoryMO = DirectoryMO(context: context)
-        directoryMO.artwork = createArtwork().managedObject
         return Directory(managedObject: directoryMO)
     }
     
@@ -534,6 +530,24 @@ class LibraryStorage: SongFileCachable {
     func getPlaylist(viaPlaylistFromOtherContext: Playlist) -> Playlist? {
         guard let foundManagedPlaylist = context.object(with: viaPlaylistFromOtherContext.managedObject.objectID) as? PlaylistMO else { return nil }
         return Playlist(storage: self, managedObject: foundManagedPlaylist)
+    }
+    
+    func getArtworks() -> [Artwork] {
+        let fetchRequest: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
+        let foundMusicFolders = try? context.fetch(fetchRequest)
+        let artworks = foundMusicFolders?.compactMap{ Artwork(managedObject: $0) }
+        return artworks ?? [Artwork]()
+    }
+    
+    func getArtwork(remoteInfo: ArtworkRemoteInfo) -> Artwork? {
+        let fetchRequest: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.id), NSString(string: remoteInfo.id)),
+            NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.type), NSString(string: remoteInfo.type))
+        ])
+        fetchRequest.fetchLimit = 1
+        guard let foundArtwork = try? context.fetch(fetchRequest).first else { return nil }
+        return Artwork(managedObject: foundArtwork)
     }
     
     func getArtworksThatAreNotChecked(fetchCount: Int = 10) -> [Artwork] {

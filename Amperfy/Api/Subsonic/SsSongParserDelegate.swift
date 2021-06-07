@@ -3,19 +3,12 @@ import UIKit
 import CoreData
 import os.log
 
-class SsSongParserDelegate: SsXmlLibParser {
+class SsSongParserDelegate: SsXmlLibWithArtworkParser {
     
-    var subsonicUrlCreator: SubsonicUrlCreator
     var songBuffer: Song?
-    var artworkUrlString: String?
     var guessedArtist: Artist?
     var guessedAlbum: Album?
     var guessedGenre: Genre?
-    
-    init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.subsonicUrlCreator = subsonicUrlCreator
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
-    }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
@@ -57,7 +50,7 @@ class SsSongParserDelegate: SsXmlLibParser {
                 songBuffer?.disk = disk
             }
             if let coverArtId = attributeDict["coverArt"] {
-                artworkUrlString = subsonicUrlCreator.getArtUrlString(forCoverArtId: coverArtId)
+                songBuffer?.artwork = parseArtwork(id: coverArtId)
             }
 
             if songBuffer?.artist == nil, let artistId = attributeDict["artistId"] {
@@ -94,10 +87,6 @@ class SsSongParserDelegate: SsXmlLibParser {
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "song" || elementName == "entry" || elementName == "child", songBuffer != nil {
-            if let song = songBuffer, let songArtwork = song.artwork, songArtwork.url.isEmpty, song.isOrphaned, let songArtworkUrlString = artworkUrlString {
-                songArtwork.url = songArtworkUrlString
-            }
-            artworkUrlString = nil
             parsedCount += 1
             songBuffer = nil
         }

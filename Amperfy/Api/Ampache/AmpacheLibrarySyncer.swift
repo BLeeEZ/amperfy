@@ -51,7 +51,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 let libraryStorage = LibraryStorage(context: context)
                 let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
                 let syncWaveContext = SyncWave(managedObject: syncWaveMO)
-                let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, ampacheUrlCreator: self.ampacheXmlServerApi, parseNotifier: statusNotifyier)
+                let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWaveContext, parseNotifier: statusNotifyier)
                 self.ampacheXmlServerApi.requestArtists(parserDelegate: artistParser, startIndex: i*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                 libraryStorage.saveContext()
                 downloadSlotCounter.downloadFinished()

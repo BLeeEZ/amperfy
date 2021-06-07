@@ -42,7 +42,7 @@ class AmpacheLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Background
             var allParsed = false
             repeat {
                 var syncIndex = Int(syncWave.syncIndexToContinue) ?? 0
-                let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, ampacheUrlCreator: ampacheXmlServerApi)
+                let artistParser = ArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave)
                 ampacheXmlServerApi.requestArtists(parserDelegate: artistParser, addDate: addDate, startIndex: syncIndex, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                 syncIndex += artistParser.parsedCount
                 syncWave.syncIndexToContinue = String(syncIndex)

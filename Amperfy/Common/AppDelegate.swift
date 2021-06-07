@@ -88,6 +88,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.window?.makeKeyAndVisible()
             return true
         }
+        backgroundSyncerManager.performBlockingLibraryUpdatesIfNeeded()
         backgroundSyncerManager.start()
         downloadManager.start()
         userStatistics.sessionStarted()

@@ -9,6 +9,11 @@ enum ImageStatus: Int16 {
     case FetchError = 3
 }
 
+public struct ArtworkRemoteInfo {
+    public var id: String
+    public var type: String
+}
+
 public class Artwork: NSObject {
     
     let managedObject: ArtworkMO
@@ -21,6 +26,16 @@ public class Artwork: NSObject {
         return UIImage(named: "song") ?? UIImage()
     }()
 
+    var id: String {
+        get { return managedObject.id }
+        set { if managedObject.id != newValue { managedObject.id = newValue } }
+    }
+    
+    var type: String {
+        get { return managedObject.type }
+        set { if managedObject.type != newValue { managedObject.type = newValue } }
+    }
+    
     var status: ImageStatus {
         get { return ImageStatus(rawValue: managedObject.status) ?? .NotChecked }
         set { managedObject.status = newValue.rawValue }
@@ -29,8 +44,10 @@ public class Artwork: NSObject {
     var url: String {
         get { return managedObject.url ?? "" }
         set {
-            status = .NotChecked
-            managedObject.url = newValue
+            if managedObject.url != newValue {
+                status = .NotChecked
+                managedObject.url = newValue
+            }
         }
     }
 
@@ -59,6 +76,14 @@ public class Artwork: NSObject {
             returnOwners.append(AbstractLibraryEntity(managedObject: ownerMO))
         }
         return returnOwners
+    }
+    
+    var remoteInfo: ArtworkRemoteInfo {
+        get { return ArtworkRemoteInfo(id: managedObject.id, type: managedObject.type) }
+        set {
+            self.id = newValue.id
+            self.type = newValue.type
+        }
     }
     
     override public func isEqual(_ object: Any?) -> Bool {

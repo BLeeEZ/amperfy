@@ -47,18 +47,49 @@ class BackgroundSyncerManager {
         os_log("SyncInBackground stopped", log: log, type: .info)
     }
     
+    func performBlockingLibraryUpdatesIfNeeded() {
+        if storage.librarySyncVersion < .v9 {
+            os_log("Perform blocking library update (START): Artwork ids", log: log, type: .info)
+            updateArtworkIdStructure()
+            os_log("Perform blocking library update (DONE): Artwork ids", log: log, type: .info)
+        }
+    }
+    
+    private func updateArtworkIdStructure() {
+        // Extract artwork info from URL
+        let libraryStorage = LibraryStorage(context: storage.context)
+        var artworks = libraryStorage.getArtworks()
+        for artwork in artworks {
+            if let artworkUrlInfo = self.backendApi.extractArtworkInfoFromURL(urlString: artwork.url) {
+                artwork.type = artworkUrlInfo.type
+                artwork.id = artworkUrlInfo.id
+            } else {
+                libraryStorage.deleteArtwork(artwork: artwork)
+            }
+        }
+        libraryStorage.saveContext()
+
+        // Delete duplicate artworks
+        artworks = libraryStorage.getArtworks()
+        var uniqueArtworks: [String: Artwork] = [:]
+        for artwork in artworks {
+            if uniqueArtworks[artwork.id] != nil {
+                artwork.owners.forEach{ $0.artwork = uniqueArtworks[artwork.id] }
+                libraryStorage.deleteArtwork(artwork: artwork)
+            } else {
+                uniqueArtworks[artwork.id] = artwork
+            }
+        }
+        libraryStorage.saveContext()
+    }
+    
     private func syncInBackground() {
         os_log("SyncInBackground start", log: log, type: .info)
         storage.persistentContainer.performBackgroundTask() { (context) in
             let backgroundLibrary = LibraryStorage(context: context)
             self.artworkSyncer.syncInBackground(libraryStorage: backgroundLibrary)
         }
-        if storage.librarySyncVersion > .v6 {
-            storage.persistentContainer.performBackgroundTask() { (context) in
-                let backgroundLibrary = LibraryStorage(context: context)
-                self.libSyncer.syncInBackground(libraryStorage: backgroundLibrary)
-            }
-        } else {
+        if storage.librarySyncVersion <= .v6 {
             storage.persistentContainer.performBackgroundTask() { (context) in
                 let backgroundLibrary = LibraryStorage(context: context)
                 self.libVersionResyncer.resyncDueToNewLibraryVersionInBackground(libraryStorage: backgroundLibrary, libraryVersion: self.storage.librarySyncVersion)
@@ -67,6 +98,19 @@ class BackgroundSyncerManager {
                     self.storage.librarySyncVersion = .newestVersion
                 }
             }
+        } else if storage.librarySyncVersion < .v9 {
+            // Arwork ids library updates have been performed blocking before background sync started
+            self.storage.librarySyncVersion = .v9
+            syncLibrary()
+        } else {
+            syncLibrary()
+        }
+    }
+    
+    private func syncLibrary() {
+        storage.persistentContainer.performBackgroundTask() { (context) in
+            let backgroundLibrary = LibraryStorage(context: context)
+            self.libSyncer.syncInBackground(libraryStorage: backgroundLibrary)
         }
     }
     

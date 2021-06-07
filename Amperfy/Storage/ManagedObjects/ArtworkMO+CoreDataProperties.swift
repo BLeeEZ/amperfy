@@ -8,8 +8,10 @@ extension ArtworkMO {
         return NSFetchRequest<ArtworkMO>(entityName: "Artwork")
     }
 
+    @NSManaged public var id: String
     @NSManaged public var imageData: Data?
     @NSManaged public var status: Int16
+    @NSManaged public var type: String
     @NSManaged public var url: String?
     @NSManaged public var owners: NSSet?
 

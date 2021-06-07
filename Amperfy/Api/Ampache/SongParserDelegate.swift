@@ -6,7 +6,6 @@ import os.log
 class SongParserDelegate: AmpacheXmlLibParser {
 
     var songBuffer: Song?
-    var artworkUrlString: String?
     var genreIdToCreate: String?
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
@@ -76,7 +75,7 @@ class SongParserDelegate: AmpacheXmlLibParser {
         case "time":
             songBuffer?.duration = Int(buffer) ?? 0
         case "art":
-            artworkUrlString = buffer
+            songBuffer?.artwork = parseArtwork(urlString: buffer)
         case "size":
             songBuffer?.size = Int(buffer) ?? 0
         case "bitrate":
@@ -96,10 +95,6 @@ class SongParserDelegate: AmpacheXmlLibParser {
                 genreIdToCreate = nil
             }
         case "song":
-            if let song = songBuffer, let songArtwork = song.artwork, songArtwork.url.isEmpty, song.isOrphaned, let songArtworkUrlString = artworkUrlString {
-                songArtwork.url = songArtworkUrlString
-            }
-            artworkUrlString = nil
             parsedCount += 1
             parseNotifier?.notifyParsedObject(ofType: .song)
             songBuffer = nil

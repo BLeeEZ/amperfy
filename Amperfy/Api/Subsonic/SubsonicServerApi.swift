@@ -21,6 +21,14 @@ class SubsonicServerApi {
     init(eventLogger: EventLogger) {
         self.eventLogger = eventLogger
     }
+    
+    static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+        guard let url = URL(string: urlString),
+            let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
+            let id = urlComp.queryItems?.first(where: {$0.name == "id"})?.value
+        else { return nil }
+        return ArtworkRemoteInfo(id: id, type: "")
+    }
 
     private func generateAuthenticationToken(password: String, salt: String) -> String {
         // Calculate the authentication token as follows: token = md5(password + salt).

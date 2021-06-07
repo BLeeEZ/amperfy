@@ -3,16 +3,10 @@ import UIKit
 import CoreData
 import os.log
 
-class SsAlbumParserDelegate: SsXmlLibParser {
+class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
     
     var guessedArtist: Artist?
-    private var subsonicUrlCreator: SubsonicUrlCreator
     private var albumBuffer: Album?
-    
-    init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.subsonicUrlCreator = subsonicUrlCreator
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
-    }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
@@ -31,8 +25,8 @@ class SsAlbumParserDelegate: SsXmlLibParser {
             if let attributeAlbumtName = attributeDict["name"] {
                 albumBuffer?.name = attributeAlbumtName
             }
-            if let attributeCoverArt = attributeDict["coverArt"], let albumArtwork = albumBuffer?.artwork, albumArtwork.url.isEmpty {
-                albumArtwork.url = subsonicUrlCreator.getArtUrlString(forCoverArtId: attributeCoverArt)
+            if let attributeCoverArt = attributeDict["coverArt"] {
+                albumBuffer?.artwork = parseArtwork(id: attributeCoverArt)
             }
             
             if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {

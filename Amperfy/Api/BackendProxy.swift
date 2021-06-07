@@ -186,4 +186,8 @@ extension BackendProxy: BackendApi {
         return activeApi.createArtworkBackgroundSyncer()
     }
     
+    func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+        return activeApi.extractArtworkInfoFromURL(urlString: urlString)
+    }
+    
 }

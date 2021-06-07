@@ -60,5 +60,9 @@ class SubsonicApi: BackendApi {
     func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer {
         return SubsonicArtworkBackgroundSyncer(subsonicServerApi: subsonicServerApi)
     }
+    
+    func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+        return SubsonicServerApi.extractArtworkInfoFromURL(urlString: urlString)
+    }
 
 }

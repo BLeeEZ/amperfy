@@ -2,11 +2,6 @@ import Foundation
 import CoreData
 import os.log
 
-protocol AmpacheUrlCreationable {
-    func getArtUrlString(forArtistId: String) -> String
-}
-
-
 class AmpacheXmlServerApi {
     
     static let maxItemCountToPollAtOnce: Int = 500
@@ -59,6 +54,15 @@ class AmpacheXmlServerApi {
     
     init(eventLogger: EventLogger) {
         self.eventLogger = eventLogger
+    }
+    
+    static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+        guard let url = URL(string: urlString),
+            let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
+            let objectId = urlComp.queryItems?.first(where: {$0.name == "object_id"})?.value,
+            let objectType = urlComp.queryItems?.first(where: {$0.name == "object_type"})?.value
+        else { return nil }
+        return ArtworkRemoteInfo(id: objectId, type: objectType)
     }
 
     func isAuthenticated() -> Bool {
@@ -388,17 +392,4 @@ class AmpacheXmlServerApi {
         urlString = urlComp.string!
     }
     
-}
-
-extension AmpacheXmlServerApi: AmpacheUrlCreationable {
-    func getArtUrlString(forArtistId id: String) -> String {
-        guard let hostname = credentials?.serverUrl, var url = URL(string: hostname) else { return "" }
-        url.appendPathComponent("image.php")
-        guard var urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return "" }
-        let token = authHandshake?.token ?? "NA"
-        urlComp.addQueryItem(name: "auth", value: token)
-        urlComp.addQueryItem(name: "object_id", value: id)
-        urlComp.addQueryItem(name: "object_type", value: "artist")
-        return urlComp.string ?? ""
-    }
 }

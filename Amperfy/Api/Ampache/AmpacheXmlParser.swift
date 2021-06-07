@@ -53,4 +53,16 @@ class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
         super.init(parseNotifier: parseNotifier)
     }
     
+    func parseArtwork(urlString: String) -> Artwork? {
+        guard let artworkRemoteInfo = AmpacheXmlServerApi.extractArtworkInfoFromURL(urlString: urlString) else { return nil }
+        if let foundArtwork = libraryStorage.getArtwork(remoteInfo: artworkRemoteInfo) {
+            return foundArtwork
+        } else {
+            let createdArtwork = libraryStorage.createArtwork()
+            createdArtwork.remoteInfo = artworkRemoteInfo
+            createdArtwork.url = urlString
+            return createdArtwork
+        }
+    }
+    
 }

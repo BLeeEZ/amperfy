@@ -7,12 +7,6 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
 
     var artistBuffer: Artist?
     var genreIdToCreate: String?
-    var ampacheUrlCreator: AmpacheUrlCreationable
-
-    init(libraryStorage: LibraryStorage, syncWave: SyncWave, ampacheUrlCreator: AmpacheUrlCreationable, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.ampacheUrlCreator = ampacheUrlCreator
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
-    }
 
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
@@ -28,7 +22,6 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
                 artistBuffer = libraryStorage.createArtist()
                 artistBuffer?.syncInfo = syncWave
                 artistBuffer?.id = artistId
-                artistBuffer?.artwork?.url = ampacheUrlCreator.getArtUrlString(forArtistId: artistId)
             }
 		}
         if elementName == "genre", let artist = artistBuffer {
@@ -57,6 +50,8 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
                 artistBuffer?.genre = genre
                 genreIdToCreate = nil
             }
+        case "art":
+            artistBuffer?.artwork = parseArtwork(urlString: buffer)
 		case "artist":
             parsedCount += 1
             parseNotifier?.notifyParsedObject(ofType: .artist)
