@@ -191,7 +191,7 @@ class SongTableCell: BasicTableCell {
             }))
         } else {
             alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-                self.appDelegate.downloadManager.download(song: song)
+                self.appDelegate.downloadManager.download(object: song)
                 self.refresh()
             }))
         }

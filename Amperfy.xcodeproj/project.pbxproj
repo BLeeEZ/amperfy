@@ -15,7 +15,7 @@
 		50073BDD222EFF01000130D8 /* DownloadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50073BDC222EFF01000130D8 /* DownloadRequest.swift */; };
 		50073BDF22301D9A000130D8 /* RequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50073BDE22301D9A000130D8 /* RequestManager.swift */; };
 		50073BE12230245D000130D8 /* UrlDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50073BE02230245D000130D8 /* UrlDownloader.swift */; };
-		50073BE322319868000130D8 /* DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50073BE222319868000130D8 /* DownloadDelegate.swift */; };
+		50073BE322319868000130D8 /* SongDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50073BE222319868000130D8 /* SongDownloadDelegate.swift */; };
 		5007CE4121EF5F4300BC5CBA /* PlaylistsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5007CE4021EF5F4300BC5CBA /* PlaylistsVC.swift */; };
 		5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5007CE4221EF639200BC5CBA /* PlaylistTableCell.swift */; };
 		5007CE4521EF639200BC5CBA /* PlaylistTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5007CE4321EF639200BC5CBA /* PlaylistTableCell.xib */; };
@@ -309,7 +309,7 @@
 		50073BDC222EFF01000130D8 /* DownloadRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadRequest.swift; sourceTree = "<group>"; };
 		50073BDE22301D9A000130D8 /* RequestManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestManager.swift; sourceTree = "<group>"; };
 		50073BE02230245D000130D8 /* UrlDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlDownloader.swift; sourceTree = "<group>"; };
-		50073BE222319868000130D8 /* DownloadDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadDelegate.swift; sourceTree = "<group>"; };
+		50073BE222319868000130D8 /* SongDownloadDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongDownloadDelegate.swift; sourceTree = "<group>"; };
 		5007CE4021EF5F4300BC5CBA /* PlaylistsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsVC.swift; sourceTree = "<group>"; };
 		5007CE4221EF639200BC5CBA /* PlaylistTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTableCell.swift; sourceTree = "<group>"; };
 		5007CE4321EF639200BC5CBA /* PlaylistTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlaylistTableCell.xib; sourceTree = "<group>"; };
@@ -607,10 +607,10 @@
 				5077F937221F24C10099CA91 /* Download.swift */,
 				50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */,
 				5077F933221DAB5C0099CA91 /* DownloadManager.swift */,
-				50073BE222319868000130D8 /* DownloadDelegate.swift */,
 				50073BDC222EFF01000130D8 /* DownloadRequest.swift */,
 				50073BDE22301D9A000130D8 /* RequestManager.swift */,
 				50073BE02230245D000130D8 /* UrlDownloader.swift */,
+				50073BE222319868000130D8 /* SongDownloadDelegate.swift */,
 			);
 			path = Download;
 			sourceTree = "<group>";
@@ -1357,7 +1357,7 @@
 				50C16BF821E10E7500F086F0 /* Playlist.swift in Sources */,
 				5083861C21C828E200C4BB32 /* AmpacheXmlServerApi.swift in Sources */,
 				500B2B312249607B00D14EF4 /* BackendProxy.swift in Sources */,
-				50073BE322319868000130D8 /* DownloadDelegate.swift in Sources */,
+				50073BE322319868000130D8 /* SongDownloadDelegate.swift in Sources */,
 				50ADCD482660E70D007FE3BD /* SettingsPlayerVC.swift in Sources */,
 				50F81EEB23BF6B1E00EAAC3E /* PlaylistItemMO+CoreDataProperties.swift in Sources */,
 				50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */,

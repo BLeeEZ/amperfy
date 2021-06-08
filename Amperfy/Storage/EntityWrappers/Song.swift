@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Song: AbstractLibraryEntity, Identifyable {
+public class Song: AbstractLibraryEntity, Identifyable, Downloadable {
     /*
     Avoid direct access to the SongFile.
     Direct access will result in loading the file into memory and

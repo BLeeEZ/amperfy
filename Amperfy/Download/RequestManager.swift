@@ -1,19 +1,19 @@
 import Foundation
 
 struct DownloadRequestQueues {
-    var waitingRequests = [DownloadRequest<Song>]()
-    var activeRequests = [DownloadRequest<Song>]()
-    var completedRequests = [DownloadRequest<Song>]()
+    var waitingRequests = [DownloadRequest]()
+    var activeRequests = [DownloadRequest]()
+    var completedRequests = [DownloadRequest]()
 }
 
 class RequestManager {
 
     private let queuePushPopSemaphore = DispatchSemaphore(value: 1)
-    // song.id : DownloadRequestForThisSongId
-    private var requests = Dictionary<String, DownloadRequest<Song>>()
-    private var waitingRequests = [DownloadRequest<Song>]()
-    private var activeRequests = [DownloadRequest<Song>]()
-    private var completedRequests = [DownloadRequest<Song>]()
+    // object.id : DownloadRequestForThisObject
+    private var requests = Dictionary<String, DownloadRequest>()
+    private var waitingRequests = [DownloadRequest]()
+    private var activeRequests = [DownloadRequest]()
+    private var completedRequests = [DownloadRequest]()
     
     var requestQueues: DownloadRequestQueues {
         self.queuePushPopSemaphore.wait()
@@ -22,10 +22,10 @@ class RequestManager {
         return queues
     }
     
-    func add(request: DownloadRequest<Song>, completion: @escaping (_ addedRequest: DownloadRequest<Song>, _ removedRequest: DownloadRequest<Song>?) -> ()) {
+    func add(request: DownloadRequest, completion: @escaping (_ addedRequest: DownloadRequest, _ removedRequest: DownloadRequest?) -> ()) {
         self.queuePushPopSemaphore.wait()
         if request.priority == .low {
-            if !isAlreadyInQueue(song: request.element) {
+            if !isAlreadyInQueue(object: request.element) {
                 addLowPrio(request: request)
                 completion(request, nil)
             }
@@ -35,30 +35,30 @@ class RequestManager {
         self.queuePushPopSemaphore.signal()
     }
     
-    func add(requests: [DownloadRequest<Song>]) {
+    func add(requests: [DownloadRequest]) {
         self.queuePushPopSemaphore.wait()
         for request in requests {
-            if !isAlreadyInQueue(song: request.element) {
+            if !isAlreadyInQueue(object: request.element) {
                 addLowPrio(request: request)
             }
         }
         self.queuePushPopSemaphore.signal()
     }
 
-    private func addLowPrio(request: DownloadRequest<Song>) {
-        requests[request.element.id] = request
+    private func addLowPrio(request: DownloadRequest) {
+        requests[request.element.uniqueID] = request
         waitingRequests.insert(request, at: 0)
     }
 
-    private func addHighPrio(request: DownloadRequest<Song>, completion: (_ addedRequest: DownloadRequest<Song>, _ removedRequest: DownloadRequest<Song>?) -> ()) {
-        let sameRequest = requests[request.element.id]
+    private func addHighPrio(request: DownloadRequest, completion: (_ addedRequest: DownloadRequest, _ removedRequest: DownloadRequest?) -> ()) {
+        let sameRequest = requests[request.element.uniqueID]
         if sameRequest == nil {
-            requests[request.element.id] = request
+            requests[request.element.uniqueID] = request
             waitingRequests.append(request)
             completion(request, nil)
-        } else if !hasStartedToDownload(song: request.element) {
+        } else if !hasStartedToDownload(object: request.element) {
             let removedRequest = waitingRequests.lazy.enumerated().filter {
-                return $0.element.element == request.element
+                return $0.element.element.isEqualTo(request.element)
             }.first
             if let removedRequest = removedRequest {
                 waitingRequests.remove(at: removedRequest.offset)
@@ -71,19 +71,19 @@ class RequestManager {
         }
     }
 
-    private func isAlreadyInQueue(song: Song) -> Bool {
-        return requests[song.id] != nil
+    private func isAlreadyInQueue(object: Downloadable) -> Bool {
+        return requests[object.uniqueID] != nil
     }
 
-    private func hasStartedToDownload(song: Song) -> Bool {
+    private func hasStartedToDownload(object: Downloadable) -> Bool {
         var isStarted = false
-        if let request = requests[song.id] {
+        if let request = requests[object.uniqueID] {
             isStarted = request.phase == .activeDownloading || request.phase == .preparedToDownloading
         }
         return isStarted
     }
 
-    func getNextRequestToDownload() -> DownloadRequest<Song>? {
+    func getNextRequestToDownload() -> DownloadRequest? {
         self.queuePushPopSemaphore.wait()
         let nextRequest = waitingRequests.popLast()
         if let nextRequest = nextRequest {
@@ -94,7 +94,7 @@ class RequestManager {
         return nextRequest
     }
 
-    func getRequest(by url: URL) -> DownloadRequest<Song>? {
+    func getRequest(by url: URL) -> DownloadRequest? {
         self.queuePushPopSemaphore.wait()
         let foundRequest = activeRequests.lazy.filter {
             return $0.url == url
@@ -103,10 +103,10 @@ class RequestManager {
         return foundRequest
     }
     
-    func informDownloadCompleted(request: DownloadRequest<Song>) {
+    func informDownloadCompleted(request: DownloadRequest) {
         self.queuePushPopSemaphore.wait()
         let completedRequest = activeRequests.lazy.enumerated().filter {
-            return $0.element.element == request.element
+            return $0.element.element.isEqualTo(request.element)
         }.first
         if let completedRequest = completedRequest {
             activeRequests.remove(at: completedRequest.offset)
@@ -124,9 +124,9 @@ class RequestManager {
             request.cancelDownload()
         }
         completedRequests.append(contentsOf: activeRequests)
-        activeRequests = [DownloadRequest<Song>]()
+        activeRequests = [DownloadRequest]()
         completedRequests.append(contentsOf: waitingRequests)
-        waitingRequests = [DownloadRequest<Song>]()
+        waitingRequests = [DownloadRequest]()
         self.queuePushPopSemaphore.signal()
     }
 

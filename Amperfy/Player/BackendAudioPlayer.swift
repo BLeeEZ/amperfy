@@ -26,10 +26,11 @@ struct PlayRequest {
     let reactionToError: FetchErrorReaction
 }
 
-class BackendAudioPlayer: SongDownloadNotifiable {
+class BackendAudioPlayer {
 
-    private let songDownloader: SongDownloadable
+    private let songDownloader: DownloadManageable
     private let songCache: SongFileCachable
+    private let backendApi: BackendApi
     private let userStatistics: UserStatistics
     private let player: AVPlayer
     private let eventLogger: EventLogger
@@ -64,8 +65,9 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         return player.currentItem != nil
     }
     
-    init(mediaPlayer: AVPlayer, eventLogger: EventLogger, songDownloader: SongDownloadable, songCache: SongFileCachable, userStatistics: UserStatistics) {
+    init(mediaPlayer: AVPlayer, eventLogger: EventLogger, backendApi: BackendApi, songDownloader: DownloadManageable, songCache: SongFileCachable, userStatistics: UserStatistics) {
         self.player = mediaPlayer
+        self.backendApi = backendApi
         self.eventLogger = eventLogger
         self.songDownloader = songDownloader
         self.songCache = songCache
@@ -123,7 +125,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
             } else {
                 insertStreamSong(playlistItem: playlistItem)
                 if isAutoCachePlayedSong {
-                    songDownloader.download(song: song, notifier: nil, priority: .high)
+                    songDownloader.download(object: song, notifier: nil, priority: .high)
                 }
             }
         }
@@ -141,7 +143,7 @@ class BackendAudioPlayer: SongDownloadNotifiable {
     }
     
     private func insertStreamSong(playlistItem: PlaylistItem) {
-        guard let song = playlistItem.song, let streamUrl = songDownloader.updateStreamingUrl(forSong: song) else { return }
+        guard let song = playlistItem.song, let streamUrl = backendApi.generateUrl(forStreamingSong: song) else { return }
         os_log(.default, "Streaming song: %s", song.displayString)
         userStatistics.playedSong(isPlayedFromCache: false)
         insertSong(forSong: song, withUrl: streamUrl)
@@ -186,31 +188,6 @@ class BackendAudioPlayer: SongDownloadNotifiable {
         let url = tempDirectoryURL.appendingPathComponent("curSong.mp3")
         try! songData.write(to: url, options: Data.WritingOptions.atomic)
         return url
-    }
-    
-    func finished(downloading song: Song, error: DownloadError?) {
-        guard let playRequest = self.latestPlayRequest, song == playRequest.playlistItem.song else { return }
-        
-        if let fetchError = error {
-            if fetchError == .noConnectivity {
-                self.reactToInsertationFinish(playlistItem: playRequest.playlistItem)
-                switch playRequest.reactionToError {
-                case .playPrevious:
-                    self.reactToError(reaction: .playPreviousCached)
-                case .playNext:
-                    self.reactToError(reaction: .playNextCached)
-                default:
-                    self.reactToError(reaction: .stop)
-                }
-            } else {
-                self.reactToInsertationFinish(playlistItem: playRequest.playlistItem)
-                self.reactToError(reaction: playRequest.reactionToError)
-            }
-        } else {
-            self.insertCachedSong(playlistItem: playRequest.playlistItem)
-            self.continuePlay()
-            self.reactToInsertationFinish(playlistItem: playRequest.playlistItem)
-        }
     }
     
 }

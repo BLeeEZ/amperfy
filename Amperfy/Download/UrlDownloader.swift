@@ -2,7 +2,7 @@ import Foundation
 import os.log
 
 protocol UrlDownloadNotifiable {
-    func notifyDownloadProgressChange(request: DownloadRequest<Song>)
+    func notifyDownloadProgressChange(request: DownloadRequest)
 }
 
 class UrlDownloader: NSObject, URLSessionDownloadDelegate {
@@ -19,7 +19,7 @@ class UrlDownloader: NSObject, URLSessionDownloadDelegate {
         self.requestManager = requestManager
     }
     
-    func fetch(url: URL, request: DownloadRequest<Song>) throws {
+    func fetch(url: URL, request: DownloadRequest) throws {
         request.started()
         let download = Download(url: url)
         download.task = downloadsSession.downloadTask(with: url)

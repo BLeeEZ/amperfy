@@ -1,5 +1,6 @@
 import XCTest
 import AVFoundation
+import CoreData
 @testable import Amperfy
 
 class MOCK_AVPlayerItem: AVPlayerItem {
@@ -29,24 +30,20 @@ class MOCK_AVPlayer: AVPlayer {
     }
 }
 
-class MOCK_SongDownloader: SongDownloadable {
+class MOCK_SongDownloader: DownloadManageable {
     
     var downloadCount = 0
     var songArg = [Song]()
-    var notifierArg = [SongDownloadNotifiable?]()
+    var notifierArg = [DownloadNotifiable?]()
     var priorityArg = [Priority]()
     
-    func download(song: Song, notifier: SongDownloadNotifiable?, priority: Priority) {
+    func download(object: Downloadable, notifier: DownloadNotifiable?, priority: Priority) {
         downloadCount += 1
-        songArg.append(song)
+        songArg.append(object as! Song)
         notifierArg.append(notifier)
         priorityArg.append(priority)
     }
-    
-    func updateStreamingUrl(forSong song: Song) -> URL? {
-        return nil
-    }
-    
+
     func isNoDownloadRequested() -> Bool {
         return downloadCount == 0
     }
@@ -57,6 +54,59 @@ class MOCK_AlertDisplayable: AlertDisplayable {
     func display(alert: UIAlertController) {}
 }
 
+class MOCK_LibrarySyncer: LibrarySyncer {
+    var artistCount: Int = 0
+    var albumCount: Int = 0
+    var songCount: Int = 0
+    var genreCount: Int = 0
+    var playlistCount: Int = 0
+    func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?) {}
+    func sync(artist: Artist, libraryStorage: LibraryStorage) {}
+    func sync(album: Album, libraryStorage: LibraryStorage) {}
+    func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage) {}
+    func syncDown(playlist: Playlist, libraryStorage: LibraryStorage) {}
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], libraryStorage: LibraryStorage) {}
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, libraryStorage: LibraryStorage) {}
+    func syncUpload(playlistToUpdateOrder playlist: Playlist, libraryStorage: LibraryStorage) {}
+    func syncUpload(playlistToDelete playlist: Playlist) {}
+    func searchSongs(searchText: String, libraryStorage: LibraryStorage) {}
+    func syncMusicFolders(libraryStorage: LibraryStorage) {}
+    func syncIndexes(musicFolder: MusicFolder, libraryStorage: LibraryStorage) {}
+    func sync(directory: Directory, libraryStorage: LibraryStorage) {}
+}
+
+class MOCK_BackgroundLibrarySyncer: BackgroundLibrarySyncer {
+    func syncInBackground(libraryStorage: LibraryStorage) {}
+    var isActive: Bool = false
+    func stop() {}
+    func stopAndWait() {}
+}
+
+class MOCK_BackgroundLibraryVersionResyncer: BackgroundLibraryVersionResyncer {
+    func resyncDueToNewLibraryVersionInBackground(libraryStorage: LibraryStorage, libraryVersion: LibrarySyncVersion) {}
+    var isActive: Bool = false
+    func stop() {}
+    func stopAndWait() {}
+}
+
+class MOCK_BackendApi: BackendApi {
+    var clientApiVersion: String = ""
+    var serverApiVersion: String = ""
+    func provideCredentials(credentials: LoginCredentials) {}
+    func authenticate(credentials: LoginCredentials) {}
+    func isAuthenticated() -> Bool { return false }
+    func generateUrl(forDownloadingSong song: Song) -> URL? { return nil }
+    func generateUrl(forStreamingSong song: Song) -> URL? { return nil }
+    func generateUrl(forArtwork artwork: Artwork) -> URL? { return nil }
+    func checkForErrorResponse(inData data: Data) -> ResponseError? { return nil }
+    func createLibrarySyncer() -> LibrarySyncer { return MOCK_LibrarySyncer() }
+    func createLibraryBackgroundSyncer() -> BackgroundLibrarySyncer { return MOCK_BackgroundLibrarySyncer() }
+    func createLibraryVersionBackgroundResyncer() -> BackgroundLibraryVersionResyncer { return MOCK_BackgroundLibraryVersionResyncer() }
+    func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer { return MOCK_BackgroundLibrarySyncer() }
+    func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { return nil }
+}
+
+
 class MusicPlayerTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
@@ -65,6 +115,7 @@ class MusicPlayerTest: XCTestCase {
     var eventLogger: EventLogger!
     var userStatistics: UserStatistics!
     var songDownloader: MOCK_SongDownloader!
+    var backendApi: MOCK_BackendApi!
     var backendPlayer: BackendAudioPlayer!
     var playerData: PlayerData!
     var testPlayer: Amperfy.MusicPlayer!
@@ -82,7 +133,8 @@ class MusicPlayerTest: XCTestCase {
         mockAlertDisplayer = MOCK_AlertDisplayable()
         eventLogger = EventLogger(alertDisplayer: mockAlertDisplayer, persistentContainer: cdHelper.persistentContainer)
         userStatistics = storage.getUserStatistics(appVersion: "")
-        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, songDownloader: songDownloader, songCache: storage, userStatistics: userStatistics)
+        backendApi = MOCK_BackendApi()
+        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, songDownloader: songDownloader, songCache: storage, userStatistics: userStatistics)
         playerData = storage.getPlayerData()
         testPlayer = MusicPlayer(coreData: playerData, downloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
         

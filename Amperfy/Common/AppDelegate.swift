@@ -29,12 +29,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var backendApi: BackendApi = {
         return backendProxy
     }()
-    lazy var player = {
-        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), downloadManager: downloadManager, backendAudioPlayer: BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, songDownloader: downloadManager, songCache: persistentLibraryStorage, userStatistics: userStatistics), userStatistics: userStatistics)
+    lazy var player: MusicPlayer = {
+        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, songDownloader: downloadManager, songCache: persistentLibraryStorage, userStatistics: userStatistics)
+        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), downloadManager: downloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
     }()
     lazy var downloadManager: DownloadManager = {
         let requestManager = RequestManager()
-        let dlDelegate = DownloadDelegate(backendApi: backendApi)
+        let dlDelegate = SongDownloadDelegate(backendApi: backendApi)
         let urlDownloader = UrlDownloader(requestManager: requestManager)
         let dlManager = DownloadManager(storage: storage, requestManager: requestManager, urlDownloader: urlDownloader, downloadDelegate: dlDelegate, eventLogger: eventLogger)
         urlDownloader.urlDownloadNotifier = dlManager

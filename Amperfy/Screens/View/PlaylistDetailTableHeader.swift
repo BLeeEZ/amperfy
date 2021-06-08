@@ -101,7 +101,7 @@ class PlaylistDetailTableHeader: UIView {
         let alert = UIAlertController(title: playlist.name, message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Download all songs", style: .default, handler: { _ in
-            self.appDelegate.downloadManager.download(songs: playlist.songs)
+            self.appDelegate.downloadManager.download(objects: playlist.songs)
         }))
         if playlist.hasCachedSongs {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in

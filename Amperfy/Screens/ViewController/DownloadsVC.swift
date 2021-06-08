@@ -7,7 +7,7 @@ private enum Section: Int {
     case waitingRequests = 2
 }
 
-class DownloadsVC: UITableViewController, SongDownloadViewUpdatable {
+class DownloadsVC: UITableViewController, DownloadViewUpdatable {
     
     var actionButton: UIBarButtonItem!
     var appDelegate: AppDelegate!
@@ -34,9 +34,9 @@ class DownloadsVC: UITableViewController, SongDownloadViewUpdatable {
             self.appDelegate.downloadManager.cancelDownloads()
             
             self.requestQueues.completedRequests.append(contentsOf: self.requestQueues.activeRequests)
-            self.requestQueues.activeRequests = [DownloadRequest<Song>]()
+            self.requestQueues.activeRequests = [DownloadRequest]()
             self.requestQueues.completedRequests.append(contentsOf: self.requestQueues.waitingRequests)
-            self.requestQueues.waitingRequests = [DownloadRequest<Song>]()
+            self.requestQueues.waitingRequests = [DownloadRequest]()
             self.tableView.reloadData()
             
         }))
@@ -110,7 +110,7 @@ class DownloadsVC: UITableViewController, SongDownloadViewUpdatable {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
         
-        var request: DownloadRequest<Song>?
+        var request: DownloadRequest?
         switch indexPath.section {
         case Section.completedRequests.rawValue:
             request = requestQueues.completedRequests[indexPath.row]
@@ -122,21 +122,21 @@ class DownloadsVC: UITableViewController, SongDownloadViewUpdatable {
             break
         }
         
-        if let request = request {
-            cell.display(song: request.element, rootView: self, download: request.download)
+        if let request = request, let song = request.element as? Song {
+            cell.display(song: song, rootView: self, download: request.download)
         }
         cell.isUserTouchInteractionAllowed = false
 
         return cell
     }
 
-    func downloadManager(_ downloadManager: DownloadManager, updatedRequest: DownloadRequest<Song>, updateReason: SongDownloadRequestEvent) {
+    func downloadManager(_ downloadManager: DownloadManager, updatedRequest: DownloadRequest, updateReason: DownloadRequestEvent) {
         switch(updateReason) {
         case .updateProgress:
             let arrayIndices = requestQueues.activeRequests.allIndices(of: updatedRequest)
             for index in arrayIndices {
-                if let cell = self.tableView.cellForRow(at: IndexPath(row: index, section: Section.activeRequests.rawValue)) as? SongTableCell {
-                    cell.display(song: updatedRequest.element, rootView: self, download: updatedRequest.download)
+                if let cell = self.tableView.cellForRow(at: IndexPath(row: index, section: Section.activeRequests.rawValue)) as? SongTableCell, let song = updatedRequest.element as? Song {
+                    cell.display(song: song, rootView: self, download: updatedRequest.download)
                 }
             }
         case .added:

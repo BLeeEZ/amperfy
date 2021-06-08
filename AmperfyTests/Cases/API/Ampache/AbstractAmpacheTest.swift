@@ -1,19 +1,12 @@
 import XCTest
 @testable import Amperfy
 
-class MOCK_AmpacheUrlCreator: AmpacheUrlCreationable {
-    func getArtUrlString(forArtistId: String) -> String {
-        return forArtistId
-    }
-}
-
 class AbstractAmpacheTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
     var library: LibraryStorage!
     var xmlData: Data?
     var xmlErrorData: Data!
-    var ampacheUrlCreator: MOCK_AmpacheUrlCreator!
     var syncWave: SyncWave!
     var parserDelegate: AmpacheXmlParser?
 
@@ -23,7 +16,6 @@ class AbstractAmpacheTest: XCTestCase {
         cdHelper.clearContext(context: context)
         library = LibraryStorage(context: context)
         xmlErrorData = getTestFileData(name: "error-4700")
-        ampacheUrlCreator = MOCK_AmpacheUrlCreator()
         syncWave = library.createSyncWave()
     }
 

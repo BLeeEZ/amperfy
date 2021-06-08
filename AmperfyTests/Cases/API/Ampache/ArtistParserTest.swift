@@ -10,7 +10,7 @@ class ArtistParserTest: AbstractAmpacheTest {
     }
     
     override func recreateParserDelegate() {
-        parserDelegate = ArtistParserDelegate(libraryStorage: library, syncWave: syncWave, ampacheUrlCreator: ampacheUrlCreator, parseNotifier: nil)
+        parserDelegate = ArtistParserDelegate(libraryStorage: library, syncWave: syncWave, parseNotifier: nil)
     }
     
     override func checkCorrectParsing() {

@@ -309,15 +309,17 @@ extension PopupPlayerVC: MusicPlayable {
 
 }
 
-extension PopupPlayerVC: SongDownloadViewUpdatable {
+extension PopupPlayerVC: DownloadViewUpdatable {
     
-    func downloadManager(_ downloadManager: DownloadManager, updatedRequest: DownloadRequest<Song>, updateReason: SongDownloadRequestEvent) {
+    func downloadManager(_ downloadManager: DownloadManager, updatedRequest: DownloadRequest, updateReason: DownloadRequestEvent) {
         switch(updateReason) {
         case .finished:
-            let indicesOfDownloadedSong = player.playlist.songs.allIndices(of: updatedRequest.element)
-            for index in indicesOfDownloadedSong {
-                if let indexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: index), let cell = self.tableView.cellForRow(at: indexPath) as? SongTableCell {
-                    cell.refresh()
+            if let song = updatedRequest.element as? Song {
+                let indicesOfDownloadedSong = player.playlist.songs.allIndices(of: song)
+                for index in indicesOfDownloadedSong {
+                    if let indexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: index), let cell = self.tableView.cellForRow(at: indexPath) as? SongTableCell {
+                        cell.refresh()
+                    }
                 }
             }
         default:

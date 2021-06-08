@@ -2,6 +2,17 @@ import Foundation
 import UIKit
 import os.log
 
+protocol CustomEquatable {
+    func isEqualTo(_ other: CustomEquatable) -> Bool
+}
+
+extension CustomEquatable where Self: Equatable {
+    func isEqualTo(_ other: CustomEquatable) -> Bool {
+        if let other = other as? Self { return self == other }
+        return false
+    }
+}
+
 extension Bool {
     mutating func toggle() {
         self = !self

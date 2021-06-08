@@ -22,27 +22,25 @@ enum DownloadError: Error {
     }
 }
 
-protocol SongDownloadable {
-    func download(song: Song, notifier: SongDownloadNotifiable?, priority: Priority)
-    func updateStreamingUrl(forSong song: Song) -> URL?
+protocol DownloadManageable {
+    func download(object: Downloadable, notifier: DownloadNotifiable?, priority: Priority)
 }
 
-protocol SongDownloadNotifiable {
-    func finished(downloading: Song, error: DownloadError?)
+protocol DownloadNotifiable {
+    func finished(downloading: Downloadable, error: DownloadError?)
 }
 
-protocol SongDownloadViewUpdatable {
-    func downloadManager(_: DownloadManager, updatedRequest: DownloadRequest<Song>, updateReason: SongDownloadRequestEvent)
+protocol DownloadViewUpdatable {
+    func downloadManager(_: DownloadManager, updatedRequest: DownloadRequest, updateReason: DownloadRequestEvent)
 }
 
 protocol DownloadManagerDelegate {
-    func prepareDownload(forRequest request: DownloadRequest<Song>, context: NSManagedObjectContext) throws -> URL
-    func validateDownloadedData(request: DownloadRequest<Song>) -> ResponseError?
-    func completedDownload(request: DownloadRequest<Song>, context: NSManagedObjectContext)
-    func updateStreamingUrl(forSong song: Song) -> URL?
+    func prepareDownload(forRequest request: DownloadRequest, context: NSManagedObjectContext) throws -> URL
+    func validateDownloadedData(request: DownloadRequest) -> ResponseError?
+    func completedDownload(request: DownloadRequest, context: NSManagedObjectContext)
 }
 
-class DownloadManager: SongDownloadable {
+class DownloadManager: DownloadManageable {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "DownloadManager")
     private let storage: PersistentStorage
@@ -56,7 +54,7 @@ class DownloadManager: SongDownloadable {
     private let activeDispatchGroup = DispatchGroup()
     private var isRunning = false
     private var isActive = false
-    private var viewNotifiers = [SongDownloadViewUpdatable]()
+    private var viewNotifiers = [DownloadViewUpdatable]()
     
     var requestQueues: DownloadRequestQueues {
         return requestManager.requestQueues
@@ -70,9 +68,9 @@ class DownloadManager: SongDownloadable {
         self.eventLogger = eventLogger
     }
     
-    func download(song: Song, notifier: SongDownloadNotifiable? = nil, priority: Priority = .low) {
-        guard !song.isCached else { return }
-        let newRequest = DownloadRequest(priority: priority, element: song, title: song.displayString, notifier: notifier)
+    func download(object: Downloadable, notifier: DownloadNotifiable? = nil, priority: Priority = .low) {
+        guard !object.isCached else { return }
+        let newRequest = DownloadRequest(priority: priority, element: object, title: object.displayString, notifier: notifier)
         self.requestManager.add(request: newRequest) { addedRequest, removedRequest in
             if let removedRequest = removedRequest {
                 self.notifyViewRequestChange(removedRequest, updateReason: .removed)
@@ -81,19 +79,15 @@ class DownloadManager: SongDownloadable {
         }
     }
     
-    func download(songs: [Song]) {
-        var requests = [DownloadRequest<Song>]()
-        for song in songs {
-            guard !song.isCached else { continue }
-            requests.append(DownloadRequest(priority: .low, element: song, title: song.displayString, notifier: nil))
+    func download(objects: [Downloadable]) {
+        var requests = [DownloadRequest]()
+        for object in objects {
+            guard !object.isCached else { continue }
+            requests.append(DownloadRequest(priority: .low, element: object, title: object.displayString, notifier: nil))
         }
         if requests.count > 0 {
             self.requestManager.add(requests: requests)
         }
-    }
-    
-    func updateStreamingUrl(forSong song: Song) -> URL? {
-        return downloadDelegate.updateStreamingUrl(forSong: song)
     }
 
     func start() {
@@ -148,7 +142,7 @@ class DownloadManager: SongDownloadable {
         }
     }
     
-    private func manageDownload(request: DownloadRequest<Song>, context: NSManagedObjectContext) {
+    private func manageDownload(request: DownloadRequest, context: NSManagedObjectContext) {
         var downloadError: DownloadError?
         do {
             os_log("Fetching %s ...", log: self.log, type: .info, request.title)
@@ -167,7 +161,7 @@ class DownloadManager: SongDownloadable {
         }
         if let error = downloadError, error != .apiErrorResponse {
             os_log("Fetching %s FAILED: %s", log: self.log, type: .info, request.title, error.description)
-            eventLogger.error(topic: "Download Error", statusCode: .downloadError, message: "Error \"\(error.description)\" occured while downloading song \"\(request.title)\".")
+            eventLogger.error(topic: "Download Error", statusCode: .downloadError, message: "Error \"\(error.description)\" occured while downloading object \"\(request.title)\".")
         }
         // remove data from request to free memory
         request.download?.resumeData = nil
@@ -177,11 +171,11 @@ class DownloadManager: SongDownloadable {
         }
     }
 
-    func addNotifier(_ notifier: SongDownloadViewUpdatable) {
+    func addNotifier(_ notifier: DownloadViewUpdatable) {
         viewNotifiers.append(notifier)
     }  
 
-    func notifyViewRequestChange(_ request: DownloadRequest<Song>, updateReason: SongDownloadRequestEvent) {
+    func notifyViewRequestChange(_ request: DownloadRequest, updateReason: DownloadRequestEvent) {
         DispatchQueue.main.async {
             for notifier in self.viewNotifiers {
                 notifier.downloadManager(self, updatedRequest: request, updateReason: updateReason) 
@@ -193,7 +187,7 @@ class DownloadManager: SongDownloadable {
 
 extension DownloadManager: UrlDownloadNotifiable {
     
-    func notifyDownloadProgressChange(request: DownloadRequest<Song>) {
+    func notifyDownloadProgressChange(request: DownloadRequest) {
         notifyViewRequestChange(request, updateReason: .updateProgress)
     }
     
