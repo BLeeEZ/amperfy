@@ -3,7 +3,7 @@ import XCTest
 
 class MOCK_SubsonicUrlCreator: SubsonicUrlCreator {
     func getArtUrlString(forCoverArtId: String) -> String {
-        return forCoverArtId
+        return "www-" + forCoverArtId
     }
 }
 

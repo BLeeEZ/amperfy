@@ -31,10 +31,14 @@ class SsDirectoriesExample1ParserTest: AbstractSsParserTest {
         
         XCTAssertEqual(directories[0].id, "11")
         XCTAssertEqual(directories[0].name, "Arrival")
-        XCTAssertEqual(directories[0].artwork?.url, "22")
+        XCTAssertEqual(directories[0].artwork?.url, "www-22")
+        XCTAssertEqual(directories[0].artwork?.type, "")
+        XCTAssertEqual(directories[0].artwork?.id, "22")
         XCTAssertEqual(directories[1].id, "12")
         XCTAssertEqual(directories[1].name, "Super Trouper")
-        XCTAssertEqual(directories[1].artwork?.url, "23")
+        XCTAssertEqual(directories[1].artwork?.url, "www-23")
+        XCTAssertEqual(directories[1].artwork?.type, "")
+        XCTAssertEqual(directories[1].artwork?.id, "23")
     }
 
 }

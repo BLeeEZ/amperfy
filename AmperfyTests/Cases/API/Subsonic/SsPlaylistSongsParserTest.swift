@@ -103,7 +103,10 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 4060113)
-        XCTAssertEqual(song.artwork?.url, "")
+        XCTAssertEqual(song.artwork?.url, "www-655")
+        XCTAssertEqual(song.artwork?.type, "")
+        XCTAssertEqual(song.artwork?.id, "655")
+        
         
         song = playlist.songs[2]
         XCTAssertEqual(song.id, "748")
@@ -120,7 +123,9 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 7458214)
-        XCTAssertEqual(song.artwork?.url, "")
+        XCTAssertEqual(song.artwork?.url, "www-746")
+        XCTAssertEqual(song.artwork?.type, "")
+        XCTAssertEqual(song.artwork?.id, "746")
         
         song = playlist.songs[5]
         XCTAssertEqual(song.id, "805")
@@ -137,7 +142,9 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 3363271)
-        XCTAssertEqual(song.artwork?.url, "783")
+        XCTAssertEqual(song.artwork?.url, "www-783")
+        XCTAssertEqual(song.artwork?.type, "")
+        XCTAssertEqual(song.artwork?.id, "783")
     }
 
 }

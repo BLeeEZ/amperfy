@@ -21,7 +21,7 @@ class SongTest: XCTestCase {
     func testCreation() {
         let song = storage.createSong()
         XCTAssertEqual(song.id, "")
-        XCTAssertEqual(song.artwork?.image, Artwork.defaultImage)
+        XCTAssertNil(song.artwork)
         XCTAssertEqual(song.title, "Unknown Title")
         XCTAssertEqual(song.track, 0)
         XCTAssertEqual(song.url, nil)

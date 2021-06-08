@@ -28,7 +28,10 @@ class SsAlbumParserTest: AbstractSsParserTest {
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.songCount, 10)
         XCTAssertNil(album.genre)
-        XCTAssertEqual(album.artwork?.url, "al-11047")
+        XCTAssertEqual(album.artwork?.url, "www-al-11047")
+        XCTAssertEqual(album.artwork?.type, "")
+        XCTAssertEqual(album.artwork?.id, "al-11047")
+        
         
         album = albums[6]
         XCTAssertEqual(album.id, "11052")
@@ -38,7 +41,9 @@ class SsAlbumParserTest: AbstractSsParserTest {
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.songCount, 10)
         XCTAssertNil(album.genre)
-        XCTAssertEqual(album.artwork?.url, "al-11052")
+        XCTAssertEqual(album.artwork?.url, "www-al-11052")
+        XCTAssertEqual(album.artwork?.type, "")
+        XCTAssertEqual(album.artwork?.id, "al-11052")
         
         album = albums[7]
         XCTAssertEqual(album.id, "11053")
@@ -48,7 +53,9 @@ class SsAlbumParserTest: AbstractSsParserTest {
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.songCount, 8)
         XCTAssertNil(album.genre)
-        XCTAssertEqual(album.artwork?.url, "al-11053")
+        XCTAssertEqual(album.artwork?.url, "www-al-11053")
+        XCTAssertEqual(album.artwork?.type, "")
+        XCTAssertEqual(album.artwork?.id, "al-11053")
         
         album = albums[14]
         XCTAssertEqual(album.id, "11061")
@@ -58,7 +65,9 @@ class SsAlbumParserTest: AbstractSsParserTest {
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.songCount, 9)
         XCTAssertNil(album.genre)
-        XCTAssertEqual(album.artwork?.url, "al-11061")
+        XCTAssertEqual(album.artwork?.url, "www-al-11061")
+        XCTAssertEqual(album.artwork?.type, "")
+        XCTAssertEqual(album.artwork?.id, "al-11061")
     }
 
 }

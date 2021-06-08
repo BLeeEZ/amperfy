@@ -27,7 +27,7 @@ class ArtistTest: XCTestCase {
         XCTAssertFalse(artist.hasCachedSongs)
         XCTAssertEqual(artist.albums.count, 0)
         XCTAssertEqual(artist.syncInfo, nil)
-        XCTAssertEqual(artist.artwork?.image, Artwork.defaultImage)
+        XCTAssertNil(artist.artwork)
         XCTAssertEqual(artist.image, Artwork.defaultImage)
     }
     
