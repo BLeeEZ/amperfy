@@ -26,7 +26,7 @@ class SyncVC: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         self.appDelegate.eventLogger.supressAlerts = true
-        self.appDelegate.downloadManager.stopAndWait()
+        self.appDelegate.songDownloadManager.stopAndWait()
         self.appDelegate.backgroundSyncerManager.stopAndWait()
         self.appDelegate.storage.deleteLibraryIsSyncedFlag()
         self.appDelegate.persistentLibraryStorage.cleanStorage()
@@ -38,7 +38,7 @@ class SyncVC: UIViewController {
             self.appDelegate.storage.librarySyncVersion = .newestVersion
             self.appDelegate.storage.saveLibraryIsSyncedFlag()
             self.appDelegate.backgroundSyncerManager.start()
-            self.appDelegate.downloadManager.start()
+            self.appDelegate.songDownloadManager.start()
         }
     }
     

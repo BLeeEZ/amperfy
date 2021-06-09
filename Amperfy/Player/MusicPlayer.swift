@@ -82,15 +82,15 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
 
     private var coreData: PlayerData
-    private var downloadManager: DownloadManageable
+    private var songDownloadManager: DownloadManageable
     private let backendAudioPlayer: BackendAudioPlayer
     private let userStatistics: UserStatistics
     private var notifierList = [MusicPlayable]()
     private let currentSongReplayInsteadPlayPreviousTimeInSec = 5.0
     
-    init(coreData: PlayerData, downloadManager: DownloadManageable, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
+    init(coreData: PlayerData, songDownloadManager: DownloadManageable, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
         self.coreData = coreData
-        self.downloadManager = downloadManager
+        self.songDownloadManager = songDownloadManager
         self.backendAudioPlayer = backendAudioPlayer
         self.backendAudioPlayer.isAutoCachePlayedSong = coreData.isAutoCachePlayedSong
         self.userStatistics = userStatistics
@@ -161,7 +161,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
             for i in 1...nextSongsCount {
                 let nextSongIndex = playlistIndex + i
                 if let song = playlist.items[nextSongIndex].song, !song.isCached {
-                    downloadManager.download(object: song, notifier: nil, priority: .high)
+                    songDownloadManager.download(object: song, notifier: nil, priority: .high)
                 }
             }
         }

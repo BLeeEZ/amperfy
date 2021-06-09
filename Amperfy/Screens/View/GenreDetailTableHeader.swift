@@ -62,7 +62,7 @@ class GenreDetailTableHeader: UIView {
             }
         }))
         alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-            self.appDelegate.downloadManager.download(objects: genre.songs)
+            self.appDelegate.songDownloadManager.download(objects: genre.songs)
         }))
         if genre.hasCachedSongs {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in

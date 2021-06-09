@@ -26,7 +26,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         player = appDelegate.player
         player.addNotifier(notifier: self)
-        appDelegate.downloadManager.addNotifier(self)
+        appDelegate.songDownloadManager.addNotifier(self)
         groupedPlaylist = PopupPlaylistGrouper(player: player)
         backgroundColorGradient = PopupAnimatedGradientLayer(view: view)
         backgroundColorGradient.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)

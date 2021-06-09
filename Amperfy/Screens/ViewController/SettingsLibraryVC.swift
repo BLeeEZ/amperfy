@@ -68,10 +68,10 @@ class SettingsLibraryVC: UITableViewController {
         let alert = UIAlertController(title: "Delete song cache", message: "Are you sure to delete all downloaded songs from cache?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in
             self.appDelegate.player.stop()
-            self.appDelegate.downloadManager.stopAndWait()
+            self.appDelegate.songDownloadManager.stopAndWait()
             self.appDelegate.persistentLibraryStorage.deleteCompleteSongCache()
             self.appDelegate.persistentLibraryStorage.saveContext()
-            self.appDelegate.downloadManager.start()
+            self.appDelegate.songDownloadManager.start()
         }))
         alert.addAction(UIAlertAction(title: "No", style: .default , handler: nil))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()

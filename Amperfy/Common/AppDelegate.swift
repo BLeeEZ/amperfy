@@ -30,10 +30,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return backendProxy
     }()
     lazy var player: MusicPlayer = {
-        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, songDownloader: downloadManager, songCache: persistentLibraryStorage, userStatistics: userStatistics)
-        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), downloadManager: downloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, songDownloader: songDownloadManager, songCache: persistentLibraryStorage, userStatistics: userStatistics)
+        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), songDownloadManager: songDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
     }()
-    lazy var downloadManager: DownloadManager = {
+    lazy var songDownloadManager: DownloadManager = {
         let requestManager = RequestManager()
         let dlDelegate = SongDownloadDelegate(backendApi: backendApi)
         let urlDownloader = UrlDownloader(requestManager: requestManager)
@@ -91,7 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         backgroundSyncerManager.performBlockingLibraryUpdatesIfNeeded()
         backgroundSyncerManager.start()
-        downloadManager.start()
+        songDownloadManager.start()
         userStatistics.sessionStarted()
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()
         self.window?.rootViewController = initialViewController
@@ -125,7 +125,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         if storage.getLoginCredentials() != nil, storage.isLibrarySynced() {
-            downloadManager.stopAndWait()
+            songDownloadManager.stopAndWait()
         }
         persistentLibraryStorage.saveContext()
     }

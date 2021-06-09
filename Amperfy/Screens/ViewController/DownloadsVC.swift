@@ -18,12 +18,12 @@ class DownloadsVC: UITableViewController, DownloadViewUpdatable {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.downloads)
-        downloadManager = appDelegate.downloadManager
+        downloadManager = appDelegate.songDownloadManager
         requestQueues = downloadManager.requestQueues
         requestQueues.waitingRequests.reverse()
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
-        appDelegate.downloadManager.addNotifier(self)
+        appDelegate.songDownloadManager.addNotifier(self)
         actionButton = UIBarButtonItem(title: "...", style: .plain, target: self, action: #selector(performActionButtonOperation))
         navigationItem.rightBarButtonItem = actionButton
     }
@@ -31,7 +31,7 @@ class DownloadsVC: UITableViewController, DownloadViewUpdatable {
     @objc private func performActionButtonOperation() {
         let alert = UIAlertController(title: "Downloads", message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "Cancel all downloads", style: .default, handler: { _ in
-            self.appDelegate.downloadManager.cancelDownloads()
+            self.appDelegate.songDownloadManager.cancelDownloads()
             
             self.requestQueues.completedRequests.append(contentsOf: self.requestQueues.activeRequests)
             self.requestQueues.activeRequests = [DownloadRequest]()

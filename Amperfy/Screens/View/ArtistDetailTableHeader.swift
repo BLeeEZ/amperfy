@@ -62,7 +62,7 @@ class ArtistDetailTableHeader: UIView {
         alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
             for song in artist.songs {
                 if !song.isCached {
-                    self.appDelegate.downloadManager.download(object: song)
+                    self.appDelegate.songDownloadManager.download(object: song)
                 }
             }
         }))
