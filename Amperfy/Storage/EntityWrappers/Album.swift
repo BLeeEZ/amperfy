@@ -53,7 +53,10 @@ public class Album: AbstractLibraryEntity, SongContainable {
         }
     }
     var songCount: Int {
-        get { return Int(managedObject.songCount) }
+        get {
+            let moSongCount = Int(managedObject.songCount)
+            return moSongCount != 0 ? moSongCount : (managedObject.songs?.count ?? 0)
+        }
         set {
             guard Int16.isValid(value: newValue), managedObject.songCount != Int16(newValue) else { return }
             managedObject.songCount = Int16(newValue)
