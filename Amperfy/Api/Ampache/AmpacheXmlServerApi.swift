@@ -331,7 +331,7 @@ class AmpacheXmlServerApi {
         let parser = XMLParser(contentsOf: url)!
         parser.delegate = parserDelegate
         parser.parse()
-        if let error = parserDelegate.error {
+        if let error = parserDelegate.error, error.statusCode != 0 {
             eventLogger.report(error: error)
         }
     }
@@ -362,7 +362,7 @@ class AmpacheXmlServerApi {
         let parser = XMLParser(data: data)
         parser.delegate = errorParser
         parser.parse()
-        if let error = errorParser.error {
+        if let error = errorParser.error, error.statusCode != 0 {
             eventLogger.report(error: error)
         }
         return errorParser.error

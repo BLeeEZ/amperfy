@@ -25,6 +25,7 @@ class SyncVC: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        self.appDelegate.eventLogger.supressAlerts = true
         self.appDelegate.downloadManager.stopAndWait()
         self.appDelegate.backgroundSyncerManager.stopAndWait()
         self.appDelegate.storage.deleteLibraryIsSyncedFlag()
@@ -104,6 +105,7 @@ extension SyncVC: SyncCallbacks {
     func notifySyncFinished() {
         DispatchQueue.main.async { [weak self] in
             self?.appDelegate.isKeepScreenAlive = false
+            self?.appDelegate.eventLogger.supressAlerts = false
             self?.performSegue(withIdentifier: "toLibrary", sender: self)
         }
     }

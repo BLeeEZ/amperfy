@@ -18,6 +18,8 @@ class EventLogger {
     
     static private let errorReportOneDaySilentTimeInSec = 60*60*24
     
+    var supressAlerts = false
+    
     private let log = OSLog(subsystem: AppDelegate.name, category: "EventLogger")
     private let alertDisplayer: AlertDisplayable
     private let persistentContainer: NSPersistentContainer
@@ -48,6 +50,7 @@ class EventLogger {
     }
     
     private func displayAlert(topic: String, statusCode: AmperfyLogStatusCode, message: String, logType: LogEntryType) {
+        guard !supressAlerts else { return }
         DispatchQueue.main.async {
             var alertMessage = ""
             alertMessage += "\(message)"
@@ -76,6 +79,7 @@ class EventLogger {
     }
     
     private func displayAlert(error: ResponseError) {
+        guard !supressAlerts else { return }
         DispatchQueue.main.async {
             var alertMessage = ""
             alertMessage += "Status code: \(error.statusCode)"
