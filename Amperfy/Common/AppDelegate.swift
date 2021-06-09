@@ -41,6 +41,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         urlDownloader.urlDownloadNotifier = dlManager
         return dlManager
     }()
+    lazy var artworkDownloadManager: DownloadManager = {
+        let requestManager = RequestManager()
+        let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
+        let urlDownloader = UrlDownloader(requestManager: requestManager)
+        let dlManager = DownloadManager(storage: storage, requestManager: requestManager, urlDownloader: urlDownloader, downloadDelegate: dlDelegate, eventLogger: eventLogger)
+        urlDownloader.urlDownloadNotifier = dlManager
+        return dlManager
+    }()
     lazy var backgroundSyncerManager = {
         return BackgroundSyncerManager(storage: storage, backendApi: backendApi)
     }()
@@ -91,6 +99,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         backgroundSyncerManager.performBlockingLibraryUpdatesIfNeeded()
         backgroundSyncerManager.start()
+        artworkDownloadManager.start()
         songDownloadManager.start()
         userStatistics.sessionStarted()
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()
@@ -125,6 +134,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         if storage.getLoginCredentials() != nil, storage.isLibrarySynced() {
+            artworkDownloadManager.stopAndWait()
             songDownloadManager.stopAndWait()
         }
         persistentLibraryStorage.saveContext()

@@ -372,7 +372,7 @@ class AmpacheXmlServerApi {
         return errorParser.error
     }
     
-    private func updateUrlToken(urlString: inout String) {
+    func updateUrlToken(urlString: inout String) {
         reauthenticateIfNeccessary()
         guard 
         let auth = authHandshake,

@@ -202,7 +202,7 @@ extension Array where Element: Song {
     }
     
     func filterCustomArt() -> [Element] {
-        return self.filter{ $0.image != Artwork.defaultImage }
+        return self.filter{ $0.artwork != nil }
     }
     
     var hasCachedSongs: Bool {

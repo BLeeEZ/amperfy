@@ -9,9 +9,15 @@ class AlbumTableCell: BasicTableCell {
     
     static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
     
+    private var album: Album!
+    
     func display(album: Album) {
+        self.album = album
         albumLabel.text = album.name
         artistLabel.text = album.artist?.name
+        if let artwork = album.artwork {
+            appDelegate.artworkDownloadManager.download(object: artwork, notifier: self)
+        }
         artworkImage.image = album.image
         var infoText = ""
         if album.songCount == 1 {
@@ -22,4 +28,12 @@ class AlbumTableCell: BasicTableCell {
         infoLabel.text = infoText
     }
 
+}
+
+extension AlbumTableCell: DownloadNotifiable {
+    func finished(downloading: Downloadable, error: DownloadError?) {
+        if error == nil {
+            artworkImage.image = album.image
+        }
+    }
 }

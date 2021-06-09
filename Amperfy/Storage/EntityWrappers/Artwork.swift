@@ -64,7 +64,7 @@ public class Artwork: NSObject {
         return img
     }
     
-    func setImage(fromData: Data) {
+    func setImage(fromData: Data?) {
         managedObject.imageData = fromData
     }
     
@@ -91,4 +91,10 @@ public class Artwork: NSObject {
         return managedObject == object.managedObject
     }
 
+}
+
+extension Artwork: Downloadable {
+    var objectID: NSManagedObjectID { return managedObject.objectID }
+    var isCached: Bool { return false }
+    var displayString: String { return "Artwork id: \(id), type: \(type)" }
 }

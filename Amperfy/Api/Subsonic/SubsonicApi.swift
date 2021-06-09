@@ -56,9 +56,9 @@ class SubsonicApi: BackendApi {
     func createLibraryVersionBackgroundResyncer() -> BackgroundLibraryVersionResyncer {
         return SubsonicLibraryVersionBackgroundResyncer(subsonicServerApi: subsonicServerApi)
     }
-
-    func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer {
-        return SubsonicArtworkBackgroundSyncer(subsonicServerApi: subsonicServerApi)
+    
+    func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
+        return SubsonicArtworkDownloadDelegate(subsonicServerApi: subsonicServerApi)
     }
     
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {

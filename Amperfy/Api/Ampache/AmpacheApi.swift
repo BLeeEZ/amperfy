@@ -56,8 +56,8 @@ class AmpacheApi: BackendApi {
         return AmpacheLibraryVersionBackgroundResyncer(ampacheXmlServerApi: ampacheXmlServerApi)
     }
 
-    func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer {
-        return AmpacheArtworkSyncer(ampacheXmlServerApi: ampacheXmlServerApi)
+    func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
+        return AmpacheArtworkDownloadDelegate(ampacheXmlServerApi: ampacheXmlServerApi)
     }
     
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {

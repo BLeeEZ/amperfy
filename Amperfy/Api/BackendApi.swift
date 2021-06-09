@@ -66,6 +66,6 @@ protocol BackendApi {
     func createLibrarySyncer() -> LibrarySyncer
     func createLibraryBackgroundSyncer() -> BackgroundLibrarySyncer
     func createLibraryVersionBackgroundResyncer() -> BackgroundLibraryVersionResyncer
-    func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer
+    func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo?
 }

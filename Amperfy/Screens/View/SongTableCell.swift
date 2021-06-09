@@ -62,6 +62,9 @@ class SongTableCell: BasicTableCell {
         self.rootView = rootView
         self.displayMode = displayMode
         self.download = download
+        if let artwork = song.artwork {
+            appDelegate.artworkDownloadManager.download(object: artwork, notifier: self)
+        }
         refresh()
     }
     
@@ -238,4 +241,12 @@ class SongTableCell: BasicTableCell {
         }
     }
 
+}
+
+extension SongTableCell: DownloadNotifiable {
+    func finished(downloading: Downloadable, error: DownloadError?) {
+        if error == nil {
+            refresh()
+        }
+    }
 }

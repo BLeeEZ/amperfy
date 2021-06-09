@@ -6,19 +6,17 @@ class BackgroundSyncerManager {
     private let log = OSLog(subsystem: AppDelegate.name, category: "BackgroundSyncer")
     private let storage : PersistentStorage
     private let backendApi: BackendApi
-    private let artworkSyncer: BackgroundLibrarySyncer
     private let libSyncer: BackgroundLibrarySyncer
     private let libVersionResyncer: BackgroundLibraryVersionResyncer
     private let semaphore = DispatchSemaphore(value: 1)
     private var isRunning = false
     var isActive: Bool {
-        return artworkSyncer.isActive || libSyncer.isActive || libVersionResyncer.isActive
+        return libSyncer.isActive || libVersionResyncer.isActive
     }
 
     init(storage: PersistentStorage, backendApi: BackendApi) {
         self.storage = storage
         self.backendApi = backendApi
-        self.artworkSyncer = backendApi.createArtworkBackgroundSyncer()
         self.libSyncer = backendApi.createLibraryBackgroundSyncer()
         self.libVersionResyncer = backendApi.createLibraryVersionBackgroundResyncer()
     }
@@ -34,14 +32,12 @@ class BackgroundSyncerManager {
     
     func stop() {
         isRunning = false
-        artworkSyncer.stop()
         libSyncer.stop()
         libVersionResyncer.stop()
     }
     
     func stopAndWait() {
         isRunning = false
-        artworkSyncer.stopAndWait()
         libSyncer.stopAndWait()
         libVersionResyncer.stopAndWait()
         os_log("SyncInBackground stopped", log: log, type: .info)
@@ -85,10 +81,6 @@ class BackgroundSyncerManager {
     
     private func syncInBackground() {
         os_log("SyncInBackground start", log: log, type: .info)
-        storage.persistentContainer.performBackgroundTask() { (context) in
-            let backgroundLibrary = LibraryStorage(context: context)
-            self.artworkSyncer.syncInBackground(libraryStorage: backgroundLibrary)
-        }
         if storage.librarySyncVersion <= .v6 {
             storage.persistentContainer.performBackgroundTask() { (context) in
                 let backgroundLibrary = LibraryStorage(context: context)

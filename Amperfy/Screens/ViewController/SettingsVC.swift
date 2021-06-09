@@ -24,6 +24,7 @@ class SettingsVC: UITableViewController {
         let alert = UIAlertController(title: "Reset app data", message: "Are you sure to reset app data?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in
             self.appDelegate.player.stop()
+            self.appDelegate.artworkDownloadManager.stopAndWait()
             self.appDelegate.songDownloadManager.stopAndWait()
             self.appDelegate.backgroundSyncerManager.stopAndWait()
             self.appDelegate.storage.context.reset()
