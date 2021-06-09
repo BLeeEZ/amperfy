@@ -78,13 +78,15 @@ class AlbumDetailTableHeader: UIView {
                 }
             }))
         }
-        alert.addAction(UIAlertAction(title: "Show artist", style: .default, handler: { _ in
-            let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
-            artistDetailVC.artist = album.artist
-            if let navController = self.rootView?.navigationController {
-                navController.pushViewController(artistDetailVC, animated: true)
-            }
-        }))
+        if let artist = album.artist {
+            alert.addAction(UIAlertAction(title: "Show artist", style: .default, handler: { _ in
+                let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
+                artistDetailVC.artist = artist
+                if let navController = self.rootView?.navigationController {
+                    navController.pushViewController(artistDetailVC, animated: true)
+                }
+            }))
+        }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         return alert
