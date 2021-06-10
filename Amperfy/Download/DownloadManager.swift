@@ -71,12 +71,8 @@ class DownloadManager: DownloadManageable {
     func download(object: Downloadable, notifier: DownloadNotifiable? = nil, priority: Priority = .low) {
         guard !object.isCached else { return }
         let newRequest = DownloadRequest(priority: priority, element: object, title: object.displayString, notifier: notifier)
-        self.requestManager.add(request: newRequest) { addedRequest, removedRequest in
-            if let removedRequest = removedRequest {
-                self.notifyViewRequestChange(removedRequest, updateReason: .removed)
-            }
-            self.notifyViewRequestChange(addedRequest, updateReason: .added)
-        }
+        self.requestManager.add(request: newRequest)
+        notifyRequestQueueAddResult(request: newRequest)
     }
     
     func download(objects: [Downloadable]) {
@@ -87,6 +83,25 @@ class DownloadManager: DownloadManageable {
         }
         if requests.count > 0 {
             self.requestManager.add(requests: requests)
+            for request in requests {
+                notifyRequestQueueAddResult(request: request)
+            }
+        }
+    }
+    
+    func notifyRequestQueueAddResult(request: DownloadRequest) {
+        switch request.queueAddResult {
+        case .notSet:
+            break
+        case .added:
+            self.notifyViewRequestChange(request, updateReason: .added)
+        case .notifierAppendedToExistingRequest:
+            break
+        case .alreadyfinished:
+            request.notifyDownloadFinishedInMainQueue()
+        case .queuePlaceChanged:
+            self.notifyViewRequestChange(request, updateReason: .removed)
+            self.notifyViewRequestChange(request, updateReason: .added)
         }
     }
 
@@ -165,10 +180,9 @@ class DownloadManager: DownloadManageable {
         }
         // remove data from request to free memory
         request.download?.resumeData = nil
+        request.download?.error = downloadError
         self.requestManager.informDownloadCompleted(request: request)
-        DispatchQueue.main.async {
-            request.notifier?.finished(downloading: request.element, error: downloadError)
-        }
+        request.notifyDownloadFinishedInMainQueue()
     }
 
     func addNotifier(_ notifier: DownloadViewUpdatable) {

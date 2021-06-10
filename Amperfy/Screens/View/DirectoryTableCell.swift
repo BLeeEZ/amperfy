@@ -21,7 +21,7 @@ class DirectoryTableCell: BasicTableCell {
         self.folder = nil
         self.directory = directory
         if let artwork = directory.artwork {
-            appDelegate.artworkDownloadManager.download(object: artwork, notifier: self)
+            appDelegate.artworkDownloadManager.download(object: artwork, notifier: self, priority: .high)
         }
         refresh()
     }

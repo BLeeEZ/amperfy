@@ -21,6 +21,14 @@ enum DownloadPhase {
     case finished
 }
 
+enum DownloadRequestQueueAddResult {
+    case notSet
+    case added
+    case notifierAppendedToExistingRequest
+    case alreadyfinished
+    case queuePlaceChanged
+}
+
 protocol Downloadable: CustomEquatable {
     var objectID: NSManagedObjectID { get }
     var isCached: Bool { get }
@@ -36,9 +44,10 @@ class DownloadRequest: Equatable {
     let priority: Priority
     let title: String
     let element: Downloadable
-    let notifier: DownloadNotifiable?
     var url: URL?
     var download: Download?
+    var queueAddResult = DownloadRequestQueueAddResult.notSet
+    private(set) var notifiers = [DownloadNotifiable]()
     private(set) var phase = DownloadPhase.waitingToStart
     private let finishSync = DispatchGroup()
     private var queue = DispatchQueue(label: "DownloadRequest")
@@ -47,7 +56,7 @@ class DownloadRequest: Equatable {
         self.priority = priority
         self.title = title
         self.element = element
-        self.notifier = notifier
+        if let notifier = notifier { self.notifiers.append(notifier) }
     }
     
     static func == (lhs: DownloadRequest, rhs: DownloadRequest) -> Bool {
@@ -90,6 +99,16 @@ class DownloadRequest: Equatable {
                 finishSync.leave()
             }
             phase = .finished
+        }
+    }
+    
+    func addNotifiers(notifiers: [DownloadNotifiable]) {
+        self.notifiers.append(contentsOf: notifiers)
+    }
+    
+    func notifyDownloadFinishedInMainQueue() {
+        DispatchQueue.main.async {
+            self.notifiers.forEach{ $0.finished(downloading: self.element, error: self.download?.error) }
         }
     }
     

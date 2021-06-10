@@ -89,6 +89,12 @@ class MOCK_BackgroundLibraryVersionResyncer: BackgroundLibraryVersionResyncer {
     func stopAndWait() {}
 }
 
+class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
+    func prepareDownload(forRequest request: DownloadRequest, context: NSManagedObjectContext) throws -> URL { throw DownloadError.urlInvalid }
+    func validateDownloadedData(request: DownloadRequest) -> ResponseError? { return nil }
+    func completedDownload(request: DownloadRequest, context: NSManagedObjectContext) {}
+}
+
 class MOCK_BackendApi: BackendApi {
     var clientApiVersion: String = ""
     var serverApiVersion: String = ""
@@ -102,7 +108,7 @@ class MOCK_BackendApi: BackendApi {
     func createLibrarySyncer() -> LibrarySyncer { return MOCK_LibrarySyncer() }
     func createLibraryBackgroundSyncer() -> BackgroundLibrarySyncer { return MOCK_BackgroundLibrarySyncer() }
     func createLibraryVersionBackgroundResyncer() -> BackgroundLibraryVersionResyncer { return MOCK_BackgroundLibraryVersionResyncer() }
-    func createArtworkBackgroundSyncer() -> BackgroundLibrarySyncer { return MOCK_BackgroundLibrarySyncer() }
+    func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { return nil }
 }
 
