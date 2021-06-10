@@ -3,7 +3,7 @@ import UIKit
 class DirectoryTableCell: BasicTableCell {
     
     @IBOutlet weak var infoLabel: UILabel!
-    @IBOutlet weak var artworkImage: RoundedImage!
+    @IBOutlet weak var artworkImage: LibraryEntityImage!
     @IBOutlet weak var iconLabel: UILabel!
     
     static let rowHeight: CGFloat = 40.0 + margin.bottom + margin.top
@@ -32,8 +32,8 @@ class DirectoryTableCell: BasicTableCell {
         
         if let directory = directory {
             infoLabel.text = directory.name
+            artworkImage.display(entity: directory)
             if let artwork = directory.artwork, let directoryImage = artwork.image, directoryImage != Artwork.defaultImage {
-                artworkImage.image = directoryImage
                 artworkImage.isHidden = false
             } else {
                 iconLabel.isHidden = false

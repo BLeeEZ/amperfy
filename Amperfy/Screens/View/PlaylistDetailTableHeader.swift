@@ -5,12 +5,12 @@ class PlaylistDetailTableHeader: UIView {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var optionsButton: UIButton!
-    @IBOutlet weak var art1Image: UIImageView!
-    @IBOutlet weak var art2Image: UIImageView!
-    @IBOutlet weak var art3Image: UIImageView!
-    @IBOutlet weak var art4Image: UIImageView!
-    @IBOutlet weak var art5Image: UIImageView!
-    @IBOutlet weak var art6Image: UIImageView!
+    @IBOutlet weak var art1Image: LibraryEntityImage!
+    @IBOutlet weak var art2Image: LibraryEntityImage!
+    @IBOutlet weak var art3Image: LibraryEntityImage!
+    @IBOutlet weak var art4Image: LibraryEntityImage!
+    @IBOutlet weak var art5Image: LibraryEntityImage!
+    @IBOutlet weak var art6Image: LibraryEntityImage!
     @IBOutlet weak var smartPlaylistLabel: UILabel!
     @IBOutlet weak var songCountLabel: UILabel!
     
@@ -54,23 +54,14 @@ class PlaylistDetailTableHeader: UIView {
     }
     
     func refreshArtworks(playlist: Playlist?) {
-        var images = [UIImageView]()
-        images.append(art1Image)
-        images.append(art2Image)
-        images.append(art3Image)
-        images.append(art4Image)
-        images.append(art5Image)
-        images.append(art6Image)
-        
-        for artImage in images {
-            artImage.image = Artwork.defaultImage
-        }
+        let images: [LibraryEntityImage] = [art1Image, art2Image, art3Image, art4Image, art5Image, art6Image]
+        images.forEach{ $0.image = Artwork.defaultImage }
         
         guard let playlist = playlist else { return }
-        let customArtworkSongs = playlist.songs.filterCustomArt()
+        let songs = playlist.songs
         for (index, artImage) in images.enumerated() {
-            guard customArtworkSongs.count > index else { break }
-            artImage.image = customArtworkSongs[index].image
+            guard songs.count > index else { break }
+            artImage.displayAndUpdate(entity: songs[index], via: appDelegate.artworkDownloadManager)
         }
     }
     

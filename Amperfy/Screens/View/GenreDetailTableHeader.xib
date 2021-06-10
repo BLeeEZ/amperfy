@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -21,7 +21,7 @@
                     <color key="textColor" systemColor="secondaryLabelColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="j2g-G9-4Tx" userLabel="Genre Image" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="j2g-G9-4Tx" userLabel="Genre Image" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="16" y="0.0" width="125" height="125"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="j2g-G9-4Tx" secondAttribute="height" multiplier="1:1" id="Cqp-Xd-eh0"/>
@@ -63,7 +63,7 @@
                 <constraint firstItem="j2g-G9-4Tx" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="x2q-BN-MO2"/>
             </constraints>
             <connections>
-                <outlet property="albumImage" destination="j2g-G9-4Tx" id="qu0-cF-54N"/>
+                <outlet property="genreImage" destination="j2g-G9-4Tx" id="sB1-5e-bk1"/>
                 <outlet property="infoLabel" destination="iPX-Fa-tH3" id="j5K-fE-JvF"/>
                 <outlet property="nameLabel" destination="Arb-mj-xt4" id="LqP-ig-30T"/>
             </connections>

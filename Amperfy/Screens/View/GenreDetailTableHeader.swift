@@ -3,7 +3,7 @@ import UIKit
 class GenreDetailTableHeader: UIView {
     
     @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var albumImage: UIImageView!
+    @IBOutlet weak var genreImage: LibraryEntityImage!
     @IBOutlet weak var infoLabel: UILabel!
     
     static let frameHeight: CGFloat = 150.0 + margin.top + margin.bottom
@@ -25,7 +25,7 @@ class GenreDetailTableHeader: UIView {
         nameLabel.text = genre.name
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
-        albumImage.image = genre.image
+        genreImage.displayAndUpdate(entity: genre, via: appDelegate.artworkDownloadManager)
         var infoText = ""
         if appDelegate.backendProxy.selectedApi == .ampache {
             if genre.artists.count == 1 {

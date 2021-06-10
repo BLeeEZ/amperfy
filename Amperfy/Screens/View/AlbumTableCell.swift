@@ -4,7 +4,7 @@ class AlbumTableCell: BasicTableCell {
     
     @IBOutlet weak var albumLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
-    @IBOutlet weak var artworkImage: UIImageView!
+    @IBOutlet weak var artworkImage: LibraryEntityImage!
     @IBOutlet weak var infoLabel: UILabel!
     
     static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
@@ -15,10 +15,7 @@ class AlbumTableCell: BasicTableCell {
         self.album = album
         albumLabel.text = album.name
         artistLabel.text = album.artist?.name
-        if let artwork = album.artwork {
-            appDelegate.artworkDownloadManager.download(object: artwork, notifier: self)
-        }
-        artworkImage.image = album.image
+        artworkImage.displayAndUpdate(entity: album, via: appDelegate.artworkDownloadManager)
         var infoText = ""
         if album.songCount == 1 {
             infoText += "1 Song"
@@ -28,12 +25,4 @@ class AlbumTableCell: BasicTableCell {
         infoLabel.text = infoText
     }
 
-}
-
-extension AlbumTableCell: DownloadNotifiable {
-    func finished(downloading: Downloadable, error: DownloadError?) {
-        if error == nil {
-            artworkImage.image = album.image
-        }
-    }
 }

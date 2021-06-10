@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		43FBE27F250D4DFD00D5F9B3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */; };
 		5002565725E69DC800674CE1 /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5002565625E69DC700674CE1 /* SpinnerViewController.swift */; };
+		50048FFF2671EFBD00064433 /* LibraryEntityImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048FFE2671EFBD00064433 /* LibraryEntityImage.swift */; };
 		500631FF23A1747B000F75A3 /* PlayerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500631FE23A1747B000F75A3 /* PlayerView.xib */; };
 		5006320123A174C0000F75A3 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5006320023A174C0000F75A3 /* PlayerView.swift */; };
 		50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50065EB321F0584D0066FC32 /* PlaylistSelectorVC.swift */; };
@@ -303,6 +304,7 @@
 /* Begin PBXFileReference section */
 		43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5002565625E69DC700674CE1 /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
+		50048FFE2671EFBD00064433 /* LibraryEntityImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryEntityImage.swift; sourceTree = "<group>"; };
 		500631FE23A1747B000F75A3 /* PlayerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlayerView.xib; sourceTree = "<group>"; };
 		5006320023A174C0000F75A3 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		50065EB321F0584D0066FC32 /* PlaylistSelectorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSelectorVC.swift; sourceTree = "<group>"; };
@@ -623,6 +625,7 @@
 				5009863D2208CC1E0057A1A6 /* BasicButton.swift */,
 				5077F95022279DF40099CA91 /* PlaytimeSlider.swift */,
 				5077F95222283FED0099CA91 /* RoundedImage.swift */,
+				50048FFE2671EFBD00064433 /* LibraryEntityImage.swift */,
 				5029E0382235A8EC0027F96F /* CommonString.swift */,
 				5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */,
 				5002565625E69DC700674CE1 /* SpinnerViewController.swift */,
@@ -1421,6 +1424,7 @@
 				507361CC2632AB91005F151D /* Genre.swift in Sources */,
 				50C4FCC52639581B009B967B /* SubsonicLibraryVersionBackgroundResyncer.swift in Sources */,
 				50F81EEE23BF6B1E00EAAC3E /* SongMO+CoreDataClass.swift in Sources */,
+				50048FFF2671EFBD00064433 /* LibraryEntityImage.swift in Sources */,
 				50CDF20C264BC72800F83EF6 /* LogEntry.swift in Sources */,
 				5077F955222C58A10099CA91 /* GenericXmlParser.swift in Sources */,
 				5086F885223A1E4600546F5A /* SsPingParserDelegate.swift in Sources */,

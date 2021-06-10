@@ -35,7 +35,7 @@
                         <color key="textColor" systemColor="secondaryLabelColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Kb7-OT-MQ5" userLabel="Artwork" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Kb7-OT-MQ5" userLabel="Artwork" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
                         <rect key="frame" x="16" y="11" width="48" height="48"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="Kb7-OT-MQ5" secondAttribute="height" multiplier="1:1" id="fhb-YD-hTx"/>

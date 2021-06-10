@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -44,38 +44,38 @@
                         <action selector="optionsButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Bg7-ir-5hv"/>
                     </connections>
                 </button>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LsL-cQ-xls" userLabel="art1" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LsL-cQ-xls" userLabel="art1" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="16" y="44" width="40" height="40"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="LsL-cQ-xls" secondAttribute="height" multiplier="1:1" id="Yu3-ZR-JEV"/>
                         <constraint firstAttribute="height" constant="40" id="iR2-qz-Zqp"/>
                     </constraints>
                 </imageView>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="kFf-nA-SSC" userLabel="art2" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="kFf-nA-SSC" userLabel="art2" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="60" y="44" width="40" height="40"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="kFf-nA-SSC" secondAttribute="height" multiplier="1:1" id="Uwg-07-ggq"/>
                     </constraints>
                 </imageView>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jfz-h8-nia" userLabel="art3" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jfz-h8-nia" userLabel="art3" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="104" y="44" width="40" height="40"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="jfz-h8-nia" secondAttribute="height" multiplier="1:1" id="XEv-fn-eHH"/>
                     </constraints>
                 </imageView>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iyN-er-IBU" userLabel="art4" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iyN-er-IBU" userLabel="art4" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="148" y="44" width="40" height="40"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="iyN-er-IBU" secondAttribute="height" multiplier="1:1" id="wLJ-9o-5jv"/>
                     </constraints>
                 </imageView>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZCn-Dj-bYs" userLabel="art5" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZCn-Dj-bYs" userLabel="art5" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="192" y="44" width="40" height="40"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="ZCn-Dj-bYs" secondAttribute="height" multiplier="1:1" id="85E-kD-qWO"/>
                     </constraints>
                 </imageView>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="BC4-mi-UN1" userLabel="art6" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="BC4-mi-UN1" userLabel="art6" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="236" y="44" width="40" height="40"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="BC4-mi-UN1" secondAttribute="height" multiplier="1:1" id="mrt-MD-Zbh"/>

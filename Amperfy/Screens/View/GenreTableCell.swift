@@ -3,14 +3,14 @@ import UIKit
 class GenreTableCell: BasicTableCell {
     
     @IBOutlet weak var genreLabel: UILabel!
-    @IBOutlet weak var artworkImage: UIImageView!
+    @IBOutlet weak var artworkImage: LibraryEntityImage!
     @IBOutlet weak var infoLabel: UILabel!
     
     static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
     
     func display(genre: Genre) {
         genreLabel.text = genre.name
-        artworkImage.image = genre.image
+        artworkImage.displayAndUpdate(entity: genre, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
         var infoText = ""
         if appDelegate.backendProxy.selectedApi == .ampache {
             if genre.artists.count == 1 {

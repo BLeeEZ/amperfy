@@ -32,7 +32,7 @@ class SongTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
-    @IBOutlet weak var artworkImage: UIImageView!
+    @IBOutlet weak var artworkImage: LibraryEntityImage!
     @IBOutlet weak var downloadProgress: UIProgressView!
     @IBOutlet weak var reorderLabel: UILabel?
     
@@ -62,9 +62,6 @@ class SongTableCell: BasicTableCell {
         self.rootView = rootView
         self.displayMode = displayMode
         self.download = download
-        if let artwork = song.artwork {
-            appDelegate.artworkDownloadManager.download(object: artwork, notifier: self)
-        }
         refresh()
     }
     
@@ -72,7 +69,7 @@ class SongTableCell: BasicTableCell {
         guard let song = song else { return }
         titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         artistLabel.text = song.artist?.name
-        artworkImage.image = song.image
+        artworkImage.displayAndUpdate(entity: song, via: appDelegate.artworkDownloadManager)
         
         if displayMode == .playerCell {
             self.reorderLabel?.isHidden = false
@@ -241,12 +238,4 @@ class SongTableCell: BasicTableCell {
         }
     }
 
-}
-
-extension SongTableCell: DownloadNotifiable {
-    func finished(downloading: Downloadable, error: DownloadError?) {
-        if error == nil {
-            refresh()
-        }
-    }
 }

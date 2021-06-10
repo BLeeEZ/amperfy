@@ -3,7 +3,7 @@ import UIKit
 class AlbumDetailTableHeader: UIView {
     
     @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var albumImage: UIImageView!
+    @IBOutlet weak var albumImage: LibraryEntityImage!
     @IBOutlet weak var infoLabel: UILabel!
     
     static let frameHeight: CGFloat = 150.0 + margin.top + margin.bottom
@@ -30,7 +30,7 @@ class AlbumDetailTableHeader: UIView {
         nameLabel.text = album.name
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
-        albumImage.image = album.image
+        albumImage.displayAndUpdate(entity: album, via: appDelegate.artworkDownloadManager)
         var infoText = ""
         if album.songCount == 1 {
             infoText += "1 Song"
