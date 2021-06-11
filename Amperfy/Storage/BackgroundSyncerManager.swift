@@ -69,11 +69,11 @@ class BackgroundSyncerManager {
         artworks = libraryStorage.getArtworks()
         var uniqueArtworks: [String: Artwork] = [:]
         for artwork in artworks {
-            if uniqueArtworks[artwork.id] != nil {
-                artwork.owners.forEach{ $0.artwork = uniqueArtworks[artwork.id] }
+            if let existingArtwork = uniqueArtworks[artwork.uniqueID] {
+                artwork.owners.forEach{ $0.artwork = existingArtwork }
                 libraryStorage.deleteArtwork(artwork: artwork)
             } else {
-                uniqueArtworks[artwork.id] = artwork
+                uniqueArtworks[artwork.uniqueID] = artwork
             }
         }
         libraryStorage.saveContext()
