@@ -6,7 +6,7 @@ class SsGenreParserTest: AbstractSsParserTest {
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "genres_example_1")
-        ssParserDelegate = SsGenreParserDelegate(libraryStorage: library, syncWave: syncWave, parseNotifier: nil)
+        ssParserDelegate = SsGenreParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
     }
     
     override func checkCorrectParsing() {

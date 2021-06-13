@@ -44,21 +44,21 @@ class AmpacheNotifiableXmlParser: AmpacheXmlParser {
 
 class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
     
-    var libraryStorage: LibraryStorage
+    var library: LibraryStorage
     var syncWave: SyncWave
     
-    init(libraryStorage: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.libraryStorage = libraryStorage
+    init(library: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
+        self.library = library
         self.syncWave = syncWave
         super.init(parseNotifier: parseNotifier)
     }
     
     func parseArtwork(urlString: String) -> Artwork? {
         guard let artworkRemoteInfo = AmpacheXmlServerApi.extractArtworkInfoFromURL(urlString: urlString) else { return nil }
-        if let foundArtwork = libraryStorage.getArtwork(remoteInfo: artworkRemoteInfo) {
+        if let foundArtwork = library.getArtwork(remoteInfo: artworkRemoteInfo) {
             return foundArtwork
         } else {
-            let createdArtwork = libraryStorage.createArtwork()
+            let createdArtwork = library.createArtwork()
             createdArtwork.remoteInfo = artworkRemoteInfo
             createdArtwork.url = urlString
             return createdArtwork

@@ -25,18 +25,18 @@ protocol LibrarySyncer {
     var genreCount: Int { get }
     var playlistCount: Int { get }
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?)
-    func sync(artist: Artist, libraryStorage: LibraryStorage)
-    func sync(album: Album, libraryStorage: LibraryStorage)
-    func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage)
-    func syncDown(playlist: Playlist, libraryStorage: LibraryStorage)
-    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], libraryStorage: LibraryStorage)
-    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, libraryStorage: LibraryStorage)
-    func syncUpload(playlistToUpdateOrder playlist: Playlist, libraryStorage: LibraryStorage)
+    func sync(artist: Artist, library: LibraryStorage)
+    func sync(album: Album, library: LibraryStorage)
+    func syncDownPlaylistsWithoutSongs(library: LibraryStorage)
+    func syncDown(playlist: Playlist, library: LibraryStorage)
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], library: LibraryStorage)
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage)
+    func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage)
     func syncUpload(playlistToDelete playlist: Playlist)
-    func searchSongs(searchText: String, libraryStorage: LibraryStorage)
-    func syncMusicFolders(libraryStorage: LibraryStorage)
-    func syncIndexes(musicFolder: MusicFolder, libraryStorage: LibraryStorage)
-    func sync(directory: Directory, libraryStorage: LibraryStorage)
+    func searchSongs(searchText: String, library: LibraryStorage)
+    func syncMusicFolders(library: LibraryStorage)
+    func syncIndexes(musicFolder: MusicFolder, library: LibraryStorage)
+    func sync(directory: Directory, library: LibraryStorage)
 }
 
 protocol AbstractBackgroundLibrarySyncer {
@@ -46,11 +46,11 @@ protocol AbstractBackgroundLibrarySyncer {
 }
 
 protocol BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
-    func syncInBackground(libraryStorage: LibraryStorage)
+    func syncInBackground(library: LibraryStorage)
 }
 
 protocol BackgroundLibraryVersionResyncer: AbstractBackgroundLibrarySyncer {
-    func resyncDueToNewLibraryVersionInBackground(libraryStorage: LibraryStorage, libraryVersion: LibrarySyncVersion)
+    func resyncDueToNewLibraryVersionInBackground(library: LibraryStorage, libraryVersion: LibrarySyncVersion)
 }
 
 protocol BackendApi {

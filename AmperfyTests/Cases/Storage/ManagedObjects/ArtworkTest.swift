@@ -4,20 +4,20 @@ import XCTest
 class ArtworkTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
-    var storage: LibraryStorage!
+    var library: LibraryStorage!
     var testArtwork: Artwork!
 
     override func setUp() {
         cdHelper = CoreDataHelper()
-        storage = cdHelper.createSeededStorage()
-        testArtwork = storage.createArtwork()
+        library = cdHelper.createSeededStorage()
+        testArtwork = library.createArtwork()
     }
 
     override func tearDown() {
     }
     
     func testCreation() {
-        let artwork = storage.createArtwork()
+        let artwork = library.createArtwork()
         XCTAssertEqual(artwork.status.rawValue, ImageStatus.IsDefaultImage.rawValue)
         XCTAssertEqual(artwork.url, "")
         XCTAssertEqual(artwork.image, Artwork.defaultImage)
@@ -31,10 +31,10 @@ class ArtworkTest: XCTestCase {
     func testStatus() {
         testArtwork.status = ImageStatus.FetchError
         XCTAssertEqual(testArtwork.status, ImageStatus.FetchError)
-        guard let artist1 = storage.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
+        guard let artist1 = library.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
         artist1.managedObject.artwork = testArtwork.managedObject
-        storage.saveContext()
-        guard let artistFetched = storage.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
+        library.saveContext()
+        guard let artistFetched = library.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
         XCTAssertEqual(artistFetched.artwork?.status, ImageStatus.FetchError)
         
     }
@@ -43,10 +43,10 @@ class ArtworkTest: XCTestCase {
         let testUrl = "www.test.de"
         testArtwork.url = testUrl
         XCTAssertEqual(testArtwork.url, testUrl)
-        guard let artist1 = storage.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
+        guard let artist1 = library.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
         artist1.managedObject.artwork = testArtwork.managedObject
-        storage.saveContext()
-        guard let artistFetched = storage.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
+        library.saveContext()
+        guard let artistFetched = library.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
         XCTAssertEqual(artistFetched.artwork?.url, testUrl)
     }
     
@@ -70,8 +70,8 @@ class ArtworkTest: XCTestCase {
     }
     
     func testOwners() {
-        guard let artist1 = storage.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
-        guard let artist2 = storage.getArtist(id: cdHelper.seeder.artists[1].id) else { XCTFail(); return }
+        guard let artist1 = library.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
+        guard let artist2 = library.getArtist(id: cdHelper.seeder.artists[1].id) else { XCTFail(); return }
         XCTAssertEqual(testArtwork.owners.count, 0)
         artist1.managedObject.artwork = testArtwork.managedObject
         XCTAssertEqual(testArtwork.owners.count, 1)

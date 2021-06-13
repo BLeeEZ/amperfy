@@ -43,7 +43,7 @@ protocol DownloadManagerDelegate {
 class DownloadManager: DownloadManageable {
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "DownloadManager")
-    private let storage: PersistentStorage
+    private let persistentStorage: PersistentStorage
     private let requestManager: RequestManager
     private let urlDownloader: UrlDownloader
     private let downloadDelegate: DownloadManagerDelegate
@@ -60,8 +60,8 @@ class DownloadManager: DownloadManageable {
         return requestManager.requestQueues
     }
     
-    init(storage: PersistentStorage, requestManager: RequestManager, urlDownloader: UrlDownloader, downloadDelegate: DownloadManagerDelegate, eventLogger: EventLogger) {
-        self.storage = storage
+    init(persistentStorage: PersistentStorage, requestManager: RequestManager, urlDownloader: UrlDownloader, downloadDelegate: DownloadManagerDelegate, eventLogger: EventLogger) {
+        self.persistentStorage = persistentStorage
         self.requestManager = requestManager
         self.urlDownloader = urlDownloader
         self.downloadDelegate = downloadDelegate
@@ -143,7 +143,7 @@ class DownloadManager: DownloadManageable {
                 }
                 self.notifyViewRequestChange(request, updateReason: .started)
 
-                self.storage.persistentContainer.performBackgroundTask() { (context) in
+                self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                     self.manageDownload(request: request, context: context)
                     self.notifyViewRequestChange(request, updateReason: .finished)
                     self.downloadSlotCounter.downloadFinished()

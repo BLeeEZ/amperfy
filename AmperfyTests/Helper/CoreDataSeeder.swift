@@ -34,46 +34,46 @@ class CoreDataSeeder {
     ]
     
     func seed(context: NSManagedObjectContext) {
-        let storage = LibraryStorage(context: context)
+        let library = LibraryStorage(context: context)
         
         for artistSeed in artists {
-            let artist = storage.createArtist()
+            let artist = library.createArtist()
             artist.id = artistSeed.id
             artist.name = artistSeed.name
         }
         
         for albumSeed in albums {
-            let album = storage.createAlbum()
+            let album = library.createAlbum()
             album.id = albumSeed.id
             album.name = albumSeed.name
             album.year = albumSeed.year
-            let artist = storage.getArtist(id: albumSeed.artistId)
+            let artist = library.getArtist(id: albumSeed.artistId)
             album.artist = artist
         }
         
         for songSeed in songs {
-            let song = storage.createSong()
+            let song = library.createSong()
             song.id = songSeed.id
             song.title = songSeed.title
             song.track = songSeed.track
             song.url = songSeed.url
-            let artist = storage.getArtist(id: songSeed.artistId)
+            let artist = library.getArtist(id: songSeed.artistId)
             song.artist = artist
-            let album = storage.getAlbum(id: songSeed.albumId)
+            let album = library.getAlbum(id: songSeed.albumId)
             song.album = album
             if songSeed.isCached {
-                let songFile = storage.createSongFile()
+                let songFile = library.createSongFile()
                 songFile.info = song
                 songFile.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
             }
         }
         
         for playlistSeed in playlists {
-            let playlist = storage.createPlaylist()
+            let playlist = library.createPlaylist()
             playlist.id = playlistSeed.id
             playlist.name = playlistSeed.name
             for songId in playlistSeed.songIds {
-                if let song = storage.getSong(id: songId) {
+                if let song = library.getSong(id: songId) {
                     playlist.append(song: song)
                 } else {
                     let logMsg = "Song id <" + String(songId) + "> for playlist id <" + String(playlistSeed.id) + "> could not be found"
@@ -82,6 +82,6 @@ class CoreDataSeeder {
             }
         }
         
-        storage.saveContext()
+        library.saveContext()
     }
 }

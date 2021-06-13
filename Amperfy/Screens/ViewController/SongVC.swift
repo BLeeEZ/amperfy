@@ -9,7 +9,7 @@ class SongVC: SingleFetchedResultsTableViewController<SongMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.songs)
         
-        fetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Songs\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
@@ -32,10 +32,10 @@ class SongVC: SingleFetchedResultsTableViewController<SongMO> {
     override func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                 let backgroundLibrary = LibraryStorage(context: context)
                 let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.searchSongs(searchText: searchText, libraryStorage: backgroundLibrary)
+                syncer.searchSongs(searchText: searchText, library: backgroundLibrary)
             }
             fetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
             tableView.separatorStyle = .singleLine

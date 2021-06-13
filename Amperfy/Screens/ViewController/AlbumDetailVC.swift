@@ -9,7 +9,7 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.albumDetail)
-        fetchedResultsController = AlbumSongsFetchedResultsController(forAlbum: album, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        fetchedResultsController = AlbumSongsFetchedResultsController(forAlbum: album, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Album\"", scopeButtonTitles: ["All", "Cached"])
@@ -30,10 +30,10 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         fetchedResultsController.fetch()
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let libraryStorage = LibraryStorage(context: context)
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            let library = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.sync(album: self.album, libraryStorage: libraryStorage)
+            syncer.sync(album: self.album, library: library)
             DispatchQueue.main.async {
                 self.detailOperationsView?.refresh()
             }

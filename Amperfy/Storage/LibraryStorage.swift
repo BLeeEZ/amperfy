@@ -152,7 +152,7 @@ class LibraryStorage: SongFileCachable {
         let userStatistics = UserStatisticsMO(context: context)
         userStatistics.creationDate = Date()
         userStatistics.appVersion = appVersion
-        return UserStatistics(managedObject: userStatistics, libraryStorage: self)
+        return UserStatistics(managedObject: userStatistics, library: self)
     }
     
     func deleteSongFile(songFile: SongFile) {
@@ -215,7 +215,7 @@ class LibraryStorage: SongFileCachable {
     }
  
     func createPlaylist() -> Playlist {
-        return Playlist(storage: self, managedObject: PlaylistMO(context: context))
+        return Playlist(library: self, managedObject: PlaylistMO(context: context))
     }
     
     func deletePlaylist(_ playlist: Playlist) {
@@ -224,7 +224,7 @@ class LibraryStorage: SongFileCachable {
     
     func createPlaylistItem() -> PlaylistItem {
         let itemMO = PlaylistItemMO(context: context)
-        return PlaylistItem(storage: self, managedObject: itemMO)
+        return PlaylistItem(library: self, managedObject: itemMO)
     }
     
     func deletePlaylistItem(item: PlaylistItem) {
@@ -318,7 +318,7 @@ class LibraryStorage: SongFileCachable {
         let fetchRequest = PlaylistMO.identifierSortedFetchRequest
         fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
         let foundPlaylists = try? context.fetch(fetchRequest)
-        let playlists = foundPlaylists?.compactMap{ Playlist(storage: self, managedObject: $0) }
+        let playlists = foundPlaylists?.compactMap{ Playlist(library: self, managedObject: $0) }
         return playlists ?? [Playlist]()
     }
     
@@ -359,8 +359,8 @@ class LibraryStorage: SongFileCachable {
             saveContext()
         }
         
-        let normalPlaylist = Playlist(storage: self, managedObject: playerMO.normalPlaylist!)
-        let shuffledPlaylist = Playlist(storage: self, managedObject: playerMO.shuffledPlaylist!)
+        let normalPlaylist = Playlist(library: self, managedObject: playerMO.normalPlaylist!)
+        let shuffledPlaylist = Playlist(library: self, managedObject: playerMO.shuffledPlaylist!)
         
         if shuffledPlaylist.items.count != normalPlaylist.items.count {
             shuffledPlaylist.removeAllSongs()
@@ -368,7 +368,7 @@ class LibraryStorage: SongFileCachable {
             shuffledPlaylist.shuffle()
         }
         
-        playerData = PlayerData(storage: self, managedObject: playerMO, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
+        playerData = PlayerData(library: self, managedObject: playerMO, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
         
         return playerData
     }
@@ -427,12 +427,12 @@ class LibraryStorage: SongFileCachable {
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PlaylistMO.id), NSString(string: id))
         fetchRequest.fetchLimit = 1
         let playlists = try? context.fetch(fetchRequest)
-        return playlists?.lazy.compactMap{ Playlist(storage: self, managedObject: $0) }.first
+        return playlists?.lazy.compactMap{ Playlist(library: self, managedObject: $0) }.first
     }
     
     func getPlaylist(viaPlaylistFromOtherContext: Playlist) -> Playlist? {
         guard let foundManagedPlaylist = context.object(with: viaPlaylistFromOtherContext.managedObject.objectID) as? PlaylistMO else { return nil }
-        return Playlist(storage: self, managedObject: foundManagedPlaylist)
+        return Playlist(library: self, managedObject: foundManagedPlaylist)
     }
     
     func getArtworks() -> [Artwork] {
@@ -482,7 +482,7 @@ class LibraryStorage: SongFileCachable {
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(UserStatisticsMO.appVersion), appVersion)
         fetchRequest.fetchLimit = 1
         if let foundUserStatistics = try? context.fetch(fetchRequest).first {
-            return UserStatistics(managedObject: foundUserStatistics, libraryStorage: self)
+            return UserStatistics(managedObject: foundUserStatistics, library: self)
         } else {
             os_log("New UserStatistics for app version %s created", log: log, type: .info, appVersion)
             let createdUserStatistics = createUserStatistics(appVersion: appVersion)
@@ -494,7 +494,7 @@ class LibraryStorage: SongFileCachable {
     func getAllUserStatistics() -> [UserStatistics] {
         let fetchRequest: NSFetchRequest<UserStatisticsMO> = UserStatisticsMO.fetchRequest()
         let foundUserStatistics = try? context.fetch(fetchRequest)
-        let userStatistics = foundUserStatistics?.compactMap{ UserStatistics(managedObject: $0, libraryStorage: self) }
+        let userStatistics = foundUserStatistics?.compactMap{ UserStatistics(managedObject: $0, library: self) }
         return userStatistics ?? [UserStatistics]()
     }
     

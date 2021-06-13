@@ -10,7 +10,7 @@ class PlaylistsParserTest: AbstractAmpacheTest {
     }
     
     override func recreateParserDelegate() {
-        parserDelegate = PlaylistParserDelegate(libraryStorage: library, parseNotifier: nil)
+        parserDelegate = PlaylistParserDelegate(library: library, parseNotifier: nil)
     }
     
     override func checkCorrectParsing() {

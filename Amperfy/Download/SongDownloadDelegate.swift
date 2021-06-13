@@ -37,12 +37,12 @@ class SongDownloadDelegate: DownloadManagerDelegate {
 
     func completedDownload(request: DownloadRequest, context: NSManagedObjectContext) {
         guard let download = request.download, let data = download.resumeData else { return }
-		let libraryStorage = LibraryStorage(context: context)
+		let library = LibraryStorage(context: context)
         if let songMO = try? context.existingObject(with: request.element.objectID) as? SongMO {
-            let songFile = libraryStorage.createSongFile()
+            let songFile = library.createSongFile()
             songFile.info = Song(managedObject: songMO)
             songFile.data = data
-            libraryStorage.saveContext()
+            library.saveContext()
         }
     }
 

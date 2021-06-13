@@ -9,7 +9,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.albums)
         
-        fetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Albums\"")

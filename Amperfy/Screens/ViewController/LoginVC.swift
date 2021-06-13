@@ -70,7 +70,7 @@ class LoginVC: UIViewController {
         do {
             let authenticatedApi = try appDelegate.backendProxy.login(apiType: selectedApiType,credentials: credentials)
             credentials.backendApi = authenticatedApi
-            appDelegate.storage.saveLoginCredentials(credentials: credentials)
+            appDelegate.persistentStorage.saveLoginCredentials(credentials: credentials)
             performSegue(withIdentifier: "toSync", sender: self)
         } catch let e as AuthenticationError {
             switch e.kind {
@@ -103,7 +103,7 @@ class LoginVC: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if let credentials = appDelegate.storage.getLoginCredentials() {
+        if let credentials = appDelegate.persistentStorage.getLoginCredentials() {
             serverUrlTF.text = credentials.serverUrl
             usernameTF.text = credentials.username
         }

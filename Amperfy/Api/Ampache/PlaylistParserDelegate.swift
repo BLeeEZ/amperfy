@@ -6,10 +6,10 @@ import os.log
 class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
     
     var playlist: Playlist?
-    var libraryStorage: LibraryStorage
+    var library: LibraryStorage
     
-    init(libraryStorage: LibraryStorage, parseNotifier: ParsedObjectNotifiable?) {
-        self.libraryStorage = libraryStorage
+    init(library: LibraryStorage, parseNotifier: ParsedObjectNotifiable?) {
+        self.library = library
         super.init(parseNotifier: parseNotifier)
     }
     
@@ -35,10 +35,10 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
             if playlist != nil {
                 playlist?.id = playlistId
             } else if playlistId != "" {
-                if let fetchedPlaylist = libraryStorage.getPlaylist(id: playlistId)  {
+                if let fetchedPlaylist = library.getPlaylist(id: playlistId)  {
                     playlist = fetchedPlaylist
                 } else {
-                    playlist = libraryStorage.createPlaylist()
+                    playlist = library.createPlaylist()
                     playlist?.id = playlistId
                 }
             } else {

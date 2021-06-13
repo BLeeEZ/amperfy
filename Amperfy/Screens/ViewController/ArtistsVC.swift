@@ -9,7 +9,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.artists)
         
-        fetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Artists\"")

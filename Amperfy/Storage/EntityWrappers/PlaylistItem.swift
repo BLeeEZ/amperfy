@@ -4,10 +4,10 @@ import CoreData
 public class PlaylistItem: NSObject {
 
     let managedObject: PlaylistItemMO
-    private let storage: LibraryStorage
+    private let library: LibraryStorage
     
-    init(storage: LibraryStorage, managedObject: PlaylistItemMO) {
-        self.storage = storage
+    init(library: LibraryStorage, managedObject: PlaylistItemMO) {
+        self.library = library
         self.managedObject = managedObject
     }
     
@@ -40,7 +40,7 @@ public class PlaylistItem: NSObject {
             guard let playlistMO = managedObject.playlist else {
                 return nil
             }
-            return Playlist(storage: storage, managedObject: playlistMO)
+            return Playlist(library: library, managedObject: playlistMO)
         }
         set {
             guard let newPlaylist = newValue else {

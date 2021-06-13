@@ -11,7 +11,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.playlistSelector)
         
-        fetchedResultsController = PlaylistSelectorFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = PlaylistSelectorFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Playlists\"", showSearchBarAtEnter: true)
@@ -26,10 +26,10 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         fetchedResultsController.fetch()
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let backgroundLibrary = LibraryStorage(context: context)
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            let syncLibrary = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.syncDownPlaylistsWithoutSongs(libraryStorage: backgroundLibrary)
+            syncer.syncDownPlaylistsWithoutSongs(library: syncLibrary)
         }
     }
     
@@ -53,14 +53,14 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
         if let songs = songsToAdd {
             playlist.append(songs: songs)
-            appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-                let backgroundStorage = LibraryStorage(context: context)
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let syncLibrary = LibraryStorage(context: context)
                 let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let playlistAsync = playlist.getManagedObject(in: context, storage: backgroundStorage)
+                let playlistAsync = playlist.getManagedObject(in: context, library: syncLibrary)
                 let songsAsync = songs.compactMap {
                     Song(managedObject: context.object(with: $0.objectID) as! SongMO)
                 }
-                syncer.syncUpload(playlistToAddSongs: playlistAsync, songs: songsAsync, libraryStorage: backgroundStorage)
+                syncer.syncUpload(playlistToAddSongs: playlistAsync, songs: songsAsync, library: syncLibrary)
             }
         }
         dismiss()

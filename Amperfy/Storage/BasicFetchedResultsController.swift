@@ -195,14 +195,14 @@ extension BasicFetchedResultsController where ResultType == SongMO {
 extension BasicFetchedResultsController where ResultType == PlaylistMO {
     func getWrappedEntity(at indexPath: IndexPath) -> Playlist {
         let playlistMO = fetchResultsController.object(at: indexPath)
-        return Playlist(storage: LibraryStorage(context: self.managedObjectContext), managedObject: playlistMO)
+        return Playlist(library: LibraryStorage(context: self.managedObjectContext), managedObject: playlistMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == PlaylistItemMO {
     func getWrappedEntity(at indexPath: IndexPath) -> PlaylistItem {
         let itemMO = fetchResultsController.object(at: indexPath)
-        return PlaylistItem(storage: library, managedObject: itemMO)
+        return PlaylistItem(library: library, managedObject: itemMO)
     }
 }
 

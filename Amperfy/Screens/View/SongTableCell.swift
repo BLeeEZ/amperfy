@@ -107,7 +107,7 @@ class SongTableCell: BasicTableCell {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let song = song else { return }
         
-        let behaviourOnTab = isCellInPopupPlayer ? .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong :  appDelegate.storage.getSettings().songActionOnTab
+        let behaviourOnTab = isCellInPopupPlayer ? .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong :  appDelegate.persistentStorage.getSettings().songActionOnTab
         
         if isUserTouchInteractionAllowed, !isAlertPresented {
             hideSearchBarKeyboardInRootView()
@@ -185,8 +185,8 @@ class SongTableCell: BasicTableCell {
         }))
         if song.isCached {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
-                self.appDelegate.persistentLibraryStorage.deleteCache(ofSong: song)
-                self.appDelegate.persistentLibraryStorage.saveContext()
+                self.appDelegate.library.deleteCache(ofSong: song)
+                self.appDelegate.library.saveContext()
                 self.refresh()
             }))
         } else {

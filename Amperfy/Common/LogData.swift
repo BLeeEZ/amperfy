@@ -37,8 +37,8 @@ public struct LogData: Encodable {
         serverInfo.apiVersion = appDelegate.backendProxy.serverApiVersion
         logData.serverInfo = serverInfo
         
-        logData.libraryInfo = appDelegate.persistentLibraryStorage.getInfo()
-        logData.libraryInfo?.version = appDelegate.storage.librarySyncVersion.description
+        logData.libraryInfo = appDelegate.library.getInfo()
+        logData.libraryInfo?.version = appDelegate.persistentStorage.librarySyncVersion.description
         
         var playerInfo = PlayerInfo()
         playerInfo.playlistItemCount = appDelegate.player.playlist.items.count
@@ -50,16 +50,16 @@ public struct LogData: Encodable {
         logData.playerInfo = playerInfo
         
         var userSettings = UserSettings()
-        let settings = appDelegate.storage.getSettings()
+        let settings = appDelegate.persistentStorage.getSettings()
         userSettings.songActionOnTab = settings.songActionOnTab.description
         userSettings.playerDisplayStyle = settings.playerDisplayStyle.description
         logData.userSettings = userSettings
         
-        let allUserStatistics = appDelegate.persistentLibraryStorage.getAllUserStatistics()
+        let allUserStatistics = appDelegate.library.getAllUserStatistics()
         logData.userStatistics = allUserStatistics.compactMap{ $0.createLogInfo() }
         
         var eventInfo = EventInfo()
-        let eventLogs = appDelegate.persistentLibraryStorage.getLogEntries()
+        let eventLogs = appDelegate.library.getLogEntries()
         eventInfo.totalEventCount = eventLogs.count
         eventInfo.events = Array(eventLogs.prefix(Self.latestEventsCount))
         eventInfo.attachedEventCount = eventInfo.events?.count ?? 0

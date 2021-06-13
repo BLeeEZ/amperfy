@@ -11,20 +11,20 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
     let songsBeforeFetch: Set<Song>
     var songsParsed = Set<Song>()
     
-    init(directory: Directory, libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator) {
+    init(directory: Directory, library: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator) {
         self.directory = directory
         self.musicFolder = nil
         directoriesBeforeFetch = Set(directory.subdirectories)
         songsBeforeFetch = Set(directory.songs)
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
+        super.init(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
     }
     
-    init(musicFolder: MusicFolder, libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator) {
+    init(musicFolder: MusicFolder, library: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator) {
         self.directory = nil
         self.musicFolder = musicFolder
         directoriesBeforeFetch = Set(musicFolder.directories)
         songsBeforeFetch = Set(musicFolder.songs)
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
+        super.init(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
     }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
@@ -34,10 +34,10 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
             if let isDir = attributeDict["isDir"], let isDirBool = Bool(isDir), isDirBool {
                 if let id = attributeDict["id"], let title = attributeDict["title"] {
                     var parsedDirectory: Directory!
-                    if let fetchedDirectory = libraryStorage.getDirectory(id: id) {
+                    if let fetchedDirectory = library.getDirectory(id: id) {
                         parsedDirectory = fetchedDirectory
                     } else {
-                        parsedDirectory = libraryStorage.createDirectory()
+                        parsedDirectory = library.createDirectory()
                         parsedDirectory.id = id
                         parsedDirectory.name = title
                         if let coverArtId = attributeDict["coverArt"] {
@@ -65,10 +65,10 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
         if elementName == "artist" {
             if let id = attributeDict["id"], let name = attributeDict["name"] {
                 var parsedDirectory: Directory!
-                if let fetchedDirectory = libraryStorage.getDirectory(id: id) {
+                if let fetchedDirectory = library.getDirectory(id: id) {
                     parsedDirectory = fetchedDirectory
                 } else {
-                    parsedDirectory = libraryStorage.createDirectory()
+                    parsedDirectory = library.createDirectory()
                     parsedDirectory.id = id
                     parsedDirectory.name = name
                 }
@@ -86,7 +86,7 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "indexes" || elementName == "directory" {
             let removedDirectories = directoriesBeforeFetch.subtracting(directoriesParsed)
-            removedDirectories.forEach{ libraryStorage.deleteDirectory(directory: $0) }
+            removedDirectories.forEach{ library.deleteDirectory(directory: $0) }
             
             if let directory = self.directory {
                 let removedSongs = songsBeforeFetch.subtracting(songsParsed)

@@ -43,11 +43,11 @@ public enum ViewToVisit {
 public class UserStatistics {
     
     let managedObject: UserStatisticsMO
-    let libraryStorage: LibraryStorage
+    let library: LibraryStorage
     
-    init(managedObject: UserStatisticsMO, libraryStorage: LibraryStorage) {
+    init(managedObject: UserStatisticsMO, library: LibraryStorage) {
         self.managedObject = managedObject
-        self.libraryStorage = libraryStorage
+        self.library = library
     }
     
     var appVersion: String {
@@ -60,7 +60,7 @@ public class UserStatistics {
     
     func sessionStarted() {
         self.managedObject.appSessionsStartedCount += 1
-        libraryStorage.saveContext()
+        library.saveContext()
     }
     
     func visited(_ visitedView: ViewToVisit) {
@@ -117,7 +117,7 @@ public class UserStatistics {
             self.managedObject.visitedSongsCount += 1
         }
         
-        libraryStorage.saveContext()
+        library.saveContext()
     }
     
     func playedSong(repeatMode: RepeatMode, isShuffle: Bool) {
@@ -136,7 +136,7 @@ public class UserStatistics {
             self.managedObject.activeShuffleOffSongsCount += 1
         }
 
-        libraryStorage.saveContext()
+        library.saveContext()
     }
     
     func playedSong(isPlayedFromCache: Bool) {
@@ -146,7 +146,7 @@ public class UserStatistics {
             self.managedObject.playedSongViaStreamCount += 1
         }
         self.managedObject.playedSongsCount += 1
-        libraryStorage.saveContext()
+        library.saveContext()
     }
     
     func usedAction(_ actionUsed: UserActionUsed) {
@@ -165,7 +165,7 @@ public class UserStatistics {
             self.managedObject.usedPlayerSeekCount += 1
         }
         
-        libraryStorage.saveContext()
+        library.saveContext()
     }
     
     func createLogInfo() -> UserStatisticsOverview {

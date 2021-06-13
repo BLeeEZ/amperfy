@@ -17,10 +17,10 @@ class SsSongParserDelegate: SsXmlLibWithArtworkParser {
             guard let songId = attributeDict["id"] else { return }
             guard let isDir = attributeDict["isDir"], let isDirBool = Bool(isDir), isDirBool == false else { return }
             
-            if let fetchedSong = libraryStorage.getSong(id: songId)  {
+            if let fetchedSong = library.getSong(id: songId)  {
                 songBuffer = fetchedSong
             } else {
-                songBuffer = libraryStorage.createSong()
+                songBuffer = library.createSong()
                 songBuffer?.id = songId
                 songBuffer?.syncInfo = syncWave
             }
@@ -56,7 +56,7 @@ class SsSongParserDelegate: SsXmlLibWithArtworkParser {
             if songBuffer?.artist == nil, let artistId = attributeDict["artistId"] {
                 if let guessedArtist = guessedArtist, guessedArtist.id == artistId {
                     songBuffer?.artist = guessedArtist
-                } else if let artist = libraryStorage.getArtist(id: artistId) {
+                } else if let artist = library.getArtist(id: artistId) {
                     songBuffer?.artist = artist
                 }
             }
@@ -64,7 +64,7 @@ class SsSongParserDelegate: SsXmlLibWithArtworkParser {
             if songBuffer?.album == nil, let albumId = attributeDict["albumId"] {
                 if let guessedAlbum = guessedAlbum, guessedAlbum.id == albumId {
                     songBuffer?.album = guessedAlbum
-                } else if let album = libraryStorage.getAlbum(id: albumId) {
+                } else if let album = library.getAlbum(id: albumId) {
                     songBuffer?.album = album
                 }
             }
@@ -72,10 +72,10 @@ class SsSongParserDelegate: SsXmlLibWithArtworkParser {
             if songBuffer?.genre == nil, let genreName = attributeDict["genre"] {
                 if let guessedGenre = guessedGenre, guessedGenre.name == genreName {
                     songBuffer?.genre = guessedGenre
-                } else if let genre = libraryStorage.getGenre(name: genreName) {
+                } else if let genre = library.getGenre(name: genreName) {
                     songBuffer?.genre = genre
                 } else {
-                    let genre = libraryStorage.createGenre()
+                    let genre = library.createGenre()
                     genre.name = genreName
                     genre.syncInfo = syncWave
                     os_log("Genre <%s> has been created", log: log, type: .error, genreName)

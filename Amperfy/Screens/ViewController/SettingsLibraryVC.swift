@@ -21,41 +21,41 @@ class SettingsLibraryVC: UITableViewController {
         appDelegate.userStatistics.visited(.settingsLibrary)
         self.cachedSongsCountSpinner.style = UIActivityIndicatorView.defaultStyle
         
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let storage = LibraryStorage(context: context)
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            let library = LibraryStorage(context: context)
 
-            let playlistCount = storage.playlistCount
+            let playlistCount = library.playlistCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.playlistsCountLabel.text = String(playlistCount)
             }
 
-            let artistCount = storage.artistCount
+            let artistCount = library.artistCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.artistsCountLabel.text = String(artistCount)
             }
             
-            let albumCount = storage.albumCount
+            let albumCount = library.albumCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.albumsCountLabel.text = String(albumCount)
             }
             
-            let songCount = storage.songCount
+            let songCount = library.songCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.songsCountLabel.text = String(songCount)
             }
             
-            let cachedSongCount = storage.cachedSongCount
+            let cachedSongCount = library.cachedSongCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.cachedSongsCountSpinner.isHidden = true
                 self.cachedSongsCountLabel.text = String(cachedSongCount)
             }
             
-            let cachedSongSizeLabelText = storage.cachedSongSizeInByte.asByteString
+            let cachedSongSizeLabelText = library.cachedSongSizeInByte.asByteString
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.cachedSongsSizeSpinner.isHidden = true
@@ -69,8 +69,8 @@ class SettingsLibraryVC: UITableViewController {
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in
             self.appDelegate.player.stop()
             self.appDelegate.songDownloadManager.stopAndWait()
-            self.appDelegate.persistentLibraryStorage.deleteCompleteSongCache()
-            self.appDelegate.persistentLibraryStorage.saveContext()
+            self.appDelegate.library.deleteCompleteSongCache()
+            self.appDelegate.library.saveContext()
             self.appDelegate.songDownloadManager.start()
         }))
         alert.addAction(UIAlertAction(title: "No", style: .default , handler: nil))

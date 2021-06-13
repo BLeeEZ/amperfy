@@ -10,7 +10,7 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.indexes)
         
-        fetchedResultsController = MusicFolderDirectoriesFetchedResultsController(for: musicFolder, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        fetchedResultsController = MusicFolderDirectoriesFetchedResultsController(for: musicFolder, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         
         navigationItem.title = musicFolder.name
@@ -21,11 +21,11 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         fetchedResultsController.fetch()
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let library = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
             let musicFolderAsync = MusicFolder(managedObject: context.object(with: self.musicFolder.managedObject.objectID) as! MusicFolderMO)
-            syncer.syncIndexes(musicFolder: musicFolderAsync, libraryStorage: library)
+            syncer.syncIndexes(musicFolder: musicFolderAsync, library: library)
         }
     }
     

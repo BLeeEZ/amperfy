@@ -9,7 +9,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.playlists)
         
-        fetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
         var searchTiles: [String]? = nil
@@ -24,10 +24,10 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         fetchedResultsController.fetch()
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let backgroundLibrary = LibraryStorage(context: context)
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            let syncLibrary = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.syncDownPlaylistsWithoutSongs(libraryStorage: backgroundLibrary)
+            syncer.syncDownPlaylistsWithoutSongs(library: syncLibrary)
         }
     }
 
@@ -47,14 +47,14 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
-            appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-                let backgroundStorage = LibraryStorage(context: context)
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let syncLibrary = LibraryStorage(context: context)
                 let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let playlistAsync = playlist.getManagedObject(in: context, storage: backgroundStorage)
+                let playlistAsync = playlist.getManagedObject(in: context, library: syncLibrary)
                 syncer.syncUpload(playlistToDelete: playlistAsync)
             }
-            appDelegate.persistentLibraryStorage.deletePlaylist(playlist)
-            appDelegate.persistentLibraryStorage.saveContext()
+            appDelegate.library.deletePlaylist(playlist)
+            appDelegate.library.saveContext()
         }
     }
     
@@ -67,10 +67,10 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
 
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let backgroundLibrary = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.syncDownPlaylistsWithoutSongs(libraryStorage: backgroundLibrary)
+            syncer.syncDownPlaylistsWithoutSongs(library: backgroundLibrary)
             DispatchQueue.main.async {
                 self.refreshControl?.endRefreshing()
             }

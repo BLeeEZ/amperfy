@@ -25,10 +25,10 @@ class NewPlaylistTableHeader: UIView {
         guard let playlistName = nameTextField.text, !playlistName.isEmpty else {
             return
         }
-        let playlist = appDelegate.persistentLibraryStorage.createPlaylist()
+        let playlist = appDelegate.library.createPlaylist()
         playlist.name = playlistName
         nameTextField.text = ""
-        appDelegate.persistentLibraryStorage.saveContext()
+        appDelegate.library.saveContext()
     }
 
 }

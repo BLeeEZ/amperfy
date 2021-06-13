@@ -17,10 +17,10 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
                 os_log("Found album with no id", log: log, type: .error)
                 return
             }
-            if let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
+            if let fetchedAlbum = library.getAlbum(id: albumId)  {
                 albumBuffer = fetchedAlbum
             } else {
-                albumBuffer = libraryStorage.createAlbum()
+                albumBuffer = library.createAlbum()
                 albumBuffer?.syncInfo = syncWave
                 albumBuffer?.id = albumId
             }
@@ -30,7 +30,7 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
                     os_log("Found album id %s with no artist id. Album name: %s", log: log, type: .error, album.id, album.name)
                     return
                 }
-                if let artist = libraryStorage.getArtist(id: artistId) {
+                if let artist = library.getArtist(id: artistId) {
                     album.artist = artist
                 } else {
                     os_log("Found album id %s with unknown artist %s. Album name: %s", log: log, type: .error, album.id, artistId, album.name)
@@ -39,7 +39,7 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
         case "genre":
             if let album = albumBuffer {
                 guard let genreId = attributeDict["id"] else { return }
-                if let genre = libraryStorage.getGenre(id: genreId) {
+                if let genre = library.getGenre(id: genreId) {
                     album.genre = genre
                 } else {
                     genreIdToCreate = genreId
@@ -67,7 +67,7 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
         case "genre":
             if let genreId = genreIdToCreate {
                 os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
-                let genre = libraryStorage.createGenre()
+                let genre = library.createGenre()
                 genre.id = genreId
                 genre.name = buffer
                 genre.syncInfo = syncWave

@@ -4,14 +4,14 @@ import XCTest
 class SongTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
-    var storage: LibraryStorage!
+    var library: LibraryStorage!
     var testSong: Song!
     let testId = "2345"
 
     override func setUp() {
         cdHelper = CoreDataHelper()
-        storage = cdHelper.createSeededStorage()
-        testSong = storage.createSong()
+        library = cdHelper.createSeededStorage()
+        testSong = library.createSong()
         testSong.id = testId
     }
 
@@ -19,7 +19,7 @@ class SongTest: XCTestCase {
     }
     
     func testCreation() {
-        let song = storage.createSong()
+        let song = library.createSong()
         XCTAssertEqual(song.id, "")
         XCTAssertNil(song.artwork)
         XCTAssertEqual(song.title, "Unknown Title")
@@ -35,20 +35,20 @@ class SongTest: XCTestCase {
     }
     
     func testArtist() {
-        guard let artist = storage.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
+        guard let artist = library.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
         testSong.artist = artist
         XCTAssertEqual(testSong.artist!.id, artist.id)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.artist!.id, artist.id)
     }
     
     func testAlbum() {
-        guard let album = storage.getAlbum(id: cdHelper.seeder.albums[0].id) else { XCTFail(); return }
+        guard let album = library.getAlbum(id: cdHelper.seeder.albums[0].id) else { XCTFail(); return }
         testSong.album = album
         XCTAssertEqual(testSong.album!.id, album.id)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.album!.id, album.id)
     }
     
@@ -58,8 +58,8 @@ class SongTest: XCTestCase {
         XCTAssertEqual(testSong.title, testTitle)
         XCTAssertEqual(testSong.displayString, "Unknown Artist - " + testTitle)
         XCTAssertEqual(testSong.identifier, testTitle)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.title, testTitle)
         XCTAssertEqual(songFetched.displayString, "Unknown Artist - " + testTitle)
         XCTAssertEqual(songFetched.identifier, testTitle)
@@ -69,8 +69,8 @@ class SongTest: XCTestCase {
         let testTrack = 13
         testSong.track = testTrack
         XCTAssertEqual(testSong.track, testTrack)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.track, testTrack)
     }
     
@@ -78,45 +78,45 @@ class SongTest: XCTestCase {
         let testUrl = "www.blub.de"
         testSong.url = testUrl
         XCTAssertEqual(testSong.url, testUrl)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.url, testUrl)
     }
     
     func testCachedSong() {
         let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
-        let songFile = storage.createSongFile()
+        let songFile = library.createSongFile()
         songFile.info = testSong
         songFile.data = testData
         XCTAssertTrue(testSong.isCached)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertTrue(songFetched.isCached)
-        guard let songFileFetched = storage.getSongFile(forSong: testSong) else { XCTFail(); return }
+        guard let songFileFetched = library.getSongFile(forSong: testSong) else { XCTFail(); return }
         XCTAssertEqual(songFileFetched.data, testData)
     }
     
     func testArtworkAndImage() {
         let testData = Artwork.defaultImage.pngData()!
         let testImg = Artwork.defaultImage
-        testSong.artwork = storage.createArtwork()
+        testSong.artwork = library.createArtwork()
         testSong.artwork?.setImage(fromData: testData)
         XCTAssertEqual(testSong.artwork?.image, testImg)
         XCTAssertEqual(testSong.image, testImg)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.artwork?.image, testImg)
         XCTAssertEqual(songFetched.image, testImg)
     }
     
     func testSyncWave() {
         let testWaveId: Int = 987
-        let testWave = storage.createSyncWave()
+        let testWave = library.createSyncWave()
         testWave.id = testWaveId
         testSong.syncInfo = testWave
         XCTAssertEqual(testSong.syncInfo?.id, testWaveId)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.syncInfo?.id, testWaveId)
     }
 

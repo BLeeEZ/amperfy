@@ -6,7 +6,7 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "playlists_example_1")
-        ssParserDelegate = SsPlaylistParserDelegate(libraryStorage: library)
+        ssParserDelegate = SsPlaylistParserDelegate(library: library)
     }
     
     override func checkCorrectParsing() {

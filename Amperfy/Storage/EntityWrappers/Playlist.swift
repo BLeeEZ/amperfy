@@ -7,10 +7,10 @@ public class Playlist: NSObject, SongContainable, Identifyable {
     static let smartPlaylistIdPrefix = "smart_"
     
     let managedObject: PlaylistMO
-    private let storage: LibraryStorage
+    private let library: LibraryStorage
     
-    init(storage: LibraryStorage, managedObject: PlaylistMO) {
-        self.storage = storage
+    init(library: LibraryStorage, managedObject: PlaylistMO) {
+        self.library = library
         self.managedObject = managedObject
     }
     
@@ -18,9 +18,9 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         return name
     }
     
-    func getManagedObject(in context: NSManagedObjectContext, storage libraryStorage: LibraryStorage) -> Playlist {
+    func getManagedObject(in context: NSManagedObjectContext, library: LibraryStorage) -> Playlist {
         let playlistMO = context.object(with: managedObject.objectID) as! PlaylistMO
-        return Playlist(storage: libraryStorage, managedObject: playlistMO)
+        return Playlist(library: library, managedObject: playlistMO)
     }
     
     private var sortedPlaylistItems: [PlaylistItem] {
@@ -30,7 +30,7 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         }
         sortedItems = itemsMO.lazy
             .sorted(by: { $0.order < $1.order })
-            .compactMap{ PlaylistItem(storage: storage, managedObject: $0) }
+            .compactMap{ PlaylistItem(library: library, managedObject: $0) }
         return sortedItems
     }
     
@@ -42,7 +42,7 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         sortedCachedItems = itemsMO.lazy
             .filter{ return $0.song?.file != nil }
             .sorted(by: { $0.order < $1.order })
-            .compactMap{ PlaylistItem(storage: storage, managedObject: $0) }
+            .compactMap{ PlaylistItem(library: library, managedObject: $0) }
         return sortedCachedItems
     }
     
@@ -73,7 +73,7 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         }
         set {
             managedObject.id = newValue
-            storage.saveContext()
+            library.saveContext()
         }
     }
     var name: String {
@@ -83,7 +83,7 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         set {
             if managedObject.name != newValue {
                 managedObject.name = newValue
-                storage.saveContext()
+                library.saveContext()
             }
         }
     }
@@ -158,7 +158,7 @@ public class Playlist: NSObject, SongContainable, Identifyable {
     func append(song: Song) {
         createPlaylistItem(forSong: song)
         songCount += 1
-        storage.saveContext()
+        library.saveContext()
     }
 
     func append(songs songsToAppend: [Song]) {
@@ -166,11 +166,11 @@ public class Playlist: NSObject, SongContainable, Identifyable {
             createPlaylistItem(forSong: song)
         }
         songCount += songsToAppend.count
-        storage.saveContext()
+        library.saveContext()
     }
     
     private func createPlaylistItem(forSong song: Song) {
-        let playlistItem = storage.createPlaylistItem()
+        let playlistItem = library.createPlaylistItem()
         playlistItem.order = managedObject.items!.count
         playlistItem.playlist = self
         playlistItem.song = song
@@ -197,7 +197,7 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         }
         localSortedPlaylistItems[fromIndex].order = targetOrder
         
-        storage.saveContext()
+        library.saveContext()
     }
     
     func remove(at index: Int) {
@@ -208,9 +208,9 @@ public class Playlist: NSObject, SongContainable, Identifyable {
                     item.order = item.order - 1
                 }
             }
-            storage.deletePlaylistItem(item: itemToBeRemoved)
+            library.deletePlaylistItem(item: itemToBeRemoved)
             songCount -= 1
-            storage.saveContext()
+            library.saveContext()
         }
     }
     
@@ -235,10 +235,10 @@ public class Playlist: NSObject, SongContainable, Identifyable {
     
     func removeAllSongs() {
         for item in sortedPlaylistItems {
-            storage.deletePlaylistItem(item: item)
+            library.deletePlaylistItem(item: item)
         }
         songCount = 0
-        storage.saveContext()
+        library.saveContext()
     }
     
     func shuffle() {
@@ -253,7 +253,7 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         for i in 0..<songCount {
             localSortedPlaylistItems[i].order = shuffeldIndexes[i]
         }
-        storage.saveContext()
+        library.saveContext()
     }
 
     func ensureConsistentItemOrder() {
@@ -266,7 +266,7 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         }
         if hasInconsistencyDetected {
             os_log(.debug, "Playlist inconsistency detected and fixed!")
-            storage.saveContext()
+            library.saveContext()
         }
     }
     

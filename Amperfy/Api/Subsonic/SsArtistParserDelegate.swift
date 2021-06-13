@@ -12,10 +12,10 @@ class SsArtistParserDelegate: SsXmlLibWithArtworkParser {
         if elementName == "artist" {
             guard let artistId = attributeDict["id"] else { return }
             
-            if let fetchedArtist = libraryStorage.getArtist(id: artistId)  {
+            if let fetchedArtist = library.getArtist(id: artistId)  {
                 artistBuffer = fetchedArtist
             } else {
-                artistBuffer = libraryStorage.createArtist()
+                artistBuffer = library.createArtist()
                 artistBuffer?.id = artistId
                 artistBuffer?.syncInfo = syncWave
             }

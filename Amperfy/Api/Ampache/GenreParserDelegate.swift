@@ -15,10 +15,10 @@ class GenreParserDelegate: AmpacheXmlLibParser {
                 os_log("Found genre with no id", log: log, type: .error)
                 return
             }
-            if !syncWave.isInitialWave, let fetchedGenre = libraryStorage.getGenre(id: genreId)  {
+            if !syncWave.isInitialWave, let fetchedGenre = library.getGenre(id: genreId)  {
                 genreBuffer = fetchedGenre
             } else {
-                genreBuffer = libraryStorage.createGenre()
+                genreBuffer = library.createGenre()
                 genreBuffer?.id = genreId
                 genreBuffer?.syncInfo = syncWave
             }

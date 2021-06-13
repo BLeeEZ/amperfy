@@ -9,7 +9,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.genres)
         
-        fetchedResultsController = GenreFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = GenreFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Genres\"")

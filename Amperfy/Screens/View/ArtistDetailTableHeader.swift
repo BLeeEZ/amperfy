@@ -68,8 +68,8 @@ class ArtistDetailTableHeader: UIView {
         }))
         if artist.hasCachedSongs {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
-                self.appDelegate.persistentLibraryStorage.deleteCache(ofArtist: artist)
-                self.appDelegate.persistentLibraryStorage.saveContext()
+                self.appDelegate.library.deleteCache(ofArtist: artist)
+                self.appDelegate.library.saveContext()
                 if let rootView = self.rootView {
                     rootView.tableView.reloadData()
                 }

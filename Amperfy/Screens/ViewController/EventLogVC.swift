@@ -9,7 +9,7 @@ class EventLogVC: SingleFetchedResultsTableViewController<LogEntryMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.eventLog)
         
-        fetchedResultsController = ErrorLogFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        fetchedResultsController = ErrorLogFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         
         tableView.register(nibName: LogEntryTableCell.typeName)

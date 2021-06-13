@@ -10,40 +10,40 @@ class SubsonicLibraryVersionBackgroundResyncer: GenericLibraryBackgroundSyncer, 
         self.subsonicServerApi = subsonicServerApi
     }
 
-    func resyncDueToNewLibraryVersionInBackground(libraryStorage: LibraryStorage, libraryVersion: LibrarySyncVersion) {
+    func resyncDueToNewLibraryVersionInBackground(library: LibraryStorage, libraryVersion: LibrarySyncVersion) {
         isRunning = true
         semaphoreGroup.enter()
         isActive = true
 
-        if let latestSyncWave = libraryStorage.getLatestSyncWave(), latestSyncWave.syncType == .versionResync, latestSyncWave.version == libraryVersion , !latestSyncWave.isDone {
+        if let latestSyncWave = library.getLatestSyncWave(), latestSyncWave.syncType == .versionResync, latestSyncWave.version == libraryVersion , !latestSyncWave.isDone {
             os_log("Lib version resync: Continue update library version %s -> %s", log: log, type: .info, latestSyncWave.version.description, LibrarySyncVersion.newestVersion.description)
-            resync(libraryStorage: libraryStorage, syncWave: latestSyncWave)
+            resync(library: library, syncWave: latestSyncWave)
         } else {
             os_log("Lib version resync: Start update library version %s -> %s", log: log, type: .info, libraryVersion.description, LibrarySyncVersion.newestVersion.description)
-            let syncWave = libraryStorage.createSyncWave()
+            let syncWave = library.createSyncWave()
             syncWave.setMetaData(fromLibraryChangeDates: LibraryChangeDates())
             syncWave.version = libraryVersion
             syncWave.syncType = .versionResync
-            libraryStorage.saveContext()
-            resync(libraryStorage: libraryStorage, syncWave: syncWave)
+            library.saveContext()
+            resync(library: library, syncWave: syncWave)
         } 
         
         isActive = false
         semaphoreGroup.leave()
     }   
     
-    private func resync(libraryStorage: LibraryStorage, syncWave: SyncWave) {
+    private func resync(library: LibraryStorage, syncWave: SyncWave) {
         if syncWave.syncState == .Artists, isRunning {
             os_log("Lib version resync: Artist parsing start", log: log, type: .info)
-            let artistDelegate = SsArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+            let artistDelegate = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
             subsonicServerApi.requestArtists(parserDelegate: artistDelegate)
 
             os_log("Lib version resync: Artist parsing done", log: log, type: .info)
             syncWave.syncState = .Albums
-            libraryStorage.saveContext()
+            library.saveContext()
         }
         if syncWave.syncState == .Albums, isRunning {
-            let allArtists = libraryStorage.getArtists()
+            let allArtists = library.getArtists()
             let artistsLeftUnsorted = allArtists.filter {
                 return $0.id.localizedStandardCompare(syncWave.syncIndexToContinue) == ComparisonResult.orderedDescending
             }
@@ -52,7 +52,7 @@ class SubsonicLibraryVersionBackgroundResyncer: GenericLibraryBackgroundSyncer, 
             }
             os_log("Lib version resync: Albums parsing start", log: log, type: .info)
             for artist in artistsLeftSorted {
-                let albumDelegate = SsAlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+                let albumDelegate = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
                 albumDelegate.guessedArtist = artist
                 subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artist.id)
                 syncWave.syncIndexToContinue = artist.id
@@ -63,7 +63,7 @@ class SubsonicLibraryVersionBackgroundResyncer: GenericLibraryBackgroundSyncer, 
                 os_log("Lib version resync: Albums parsing done", log: log, type: .info)
                 syncWave.syncState = .Done
             }
-            libraryStorage.saveContext()
+            library.saveContext()
         }
     }
     

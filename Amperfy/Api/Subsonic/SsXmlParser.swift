@@ -28,11 +28,11 @@ class SsNotifiableXmlParser: SsXmlParser {
 
 class SsXmlLibParser: SsNotifiableXmlParser {
     
-    var libraryStorage: LibraryStorage
+    var library: LibraryStorage
     var syncWave: SyncWave
     
-    init(libraryStorage: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.libraryStorage = libraryStorage
+    init(library: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
+        self.library = library
         self.syncWave = syncWave
         super.init(parseNotifier: parseNotifier)
     }
@@ -43,17 +43,17 @@ class SsXmlLibWithArtworkParser: SsXmlLibParser {
     
     var subsonicUrlCreator: SubsonicUrlCreator
     
-    init(libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(library: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.subsonicUrlCreator = subsonicUrlCreator
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: parseNotifier)
+        super.init(library: library, syncWave: syncWave, parseNotifier: parseNotifier)
     }
 
     func parseArtwork(id: String) -> Artwork? {
         let remoteInfo = ArtworkRemoteInfo(id: id, type: "")
-        if let foundArtwork = libraryStorage.getArtwork(remoteInfo: remoteInfo) {
+        if let foundArtwork = library.getArtwork(remoteInfo: remoteInfo) {
             return foundArtwork
         } else {
-            let createdArtwork = libraryStorage.createArtwork()
+            let createdArtwork = library.createArtwork()
             createdArtwork.remoteInfo = remoteInfo
             createdArtwork.url = subsonicUrlCreator.getArtUrlString(forCoverArtId: id)
             return createdArtwork

@@ -4,14 +4,14 @@ import XCTest
 class SyncWaveTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
-    var storage: LibraryStorage!
+    var library: LibraryStorage!
     var testSyncWave: SyncWave!
     let nowDate = Date()
 
     override func setUp() {
         cdHelper = CoreDataHelper()
-        storage = cdHelper.createSeededStorage()
-        testSyncWave = storage.createSyncWave()
+        library = cdHelper.createSeededStorage()
+        testSyncWave = library.createSyncWave()
         checkCreation()
     }
 
@@ -32,7 +32,7 @@ class SyncWaveTest: XCTestCase {
     }
     
     func testSecondCreation() {
-        let syncWave = storage.createSyncWave()
+        let syncWave = library.createSyncWave()
         XCTAssertEqual(syncWave.id, 1)
         XCTAssertEqual(syncWave.syncState, SyncState.Artists)
         XCTAssertEqual(syncWave.syncIndexToContinue, "")
@@ -48,20 +48,20 @@ class SyncWaveTest: XCTestCase {
     func testIdAndSongsAnd() {
         let testId = 456
         let testSongId = cdHelper.seeder.songs[0].id
-        guard let song = storage.getSong(id: testSongId) else { XCTFail(); return }
+        guard let song = library.getSong(id: testSongId) else { XCTFail(); return }
         testSyncWave.id = testId
         XCTAssertEqual(testSyncWave.id, testId)
         song.syncInfo = testSyncWave
         XCTAssertEqual(testSyncWave.songs.count, 1)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testSongId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testSongId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.syncInfo?.id, testId)
         XCTAssertEqual(songFetched.syncInfo?.songs.count, 1)
     }
     
     func testSyncStateAndIsDone() {
         let testSongId = cdHelper.seeder.songs[0].id
-        guard let song = storage.getSong(id: testSongId) else { XCTFail(); return }
+        guard let song = library.getSong(id: testSongId) else { XCTFail(); return }
         song.syncInfo = testSyncWave
         
         testSyncWave.syncState = .Albums
@@ -70,27 +70,27 @@ class SyncWaveTest: XCTestCase {
         testSyncWave.syncState = .Done
         XCTAssertEqual(testSyncWave.syncState, SyncState.Done)
         XCTAssertTrue(testSyncWave.isDone)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testSongId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testSongId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.syncInfo?.syncState, SyncState.Done)
         XCTAssertTrue(testSyncWave.isDone)
     }
     
     func testSyncIndexToContinue() {
         let testSongId = cdHelper.seeder.songs[0].id
-        guard let song = storage.getSong(id: testSongId) else { XCTFail(); return }
+        guard let song = library.getSong(id: testSongId) else { XCTFail(); return }
         song.syncInfo = testSyncWave
         
         testSyncWave.syncIndexToContinue = "20"
         XCTAssertEqual(testSyncWave.syncIndexToContinue, "20")
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testSongId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testSongId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.syncInfo?.syncIndexToContinue, "20")
     }
     
     func testLibraryChangeDatesAndSetMetaData() {
         let testSongId = cdHelper.seeder.songs[0].id
-        guard let song = storage.getSong(id: testSongId) else { XCTFail(); return }
+        guard let song = library.getSong(id: testSongId) else { XCTFail(); return }
         song.syncInfo = testSyncWave
         
         let addDate = Date(timeIntervalSince1970: TimeInterval(integerLiteral: 2000))
@@ -106,8 +106,8 @@ class SyncWaveTest: XCTestCase {
         XCTAssertEqual(testSyncWave.libraryChangeDates.dateOfLastAdd.compare(addDate), ComparisonResult.orderedSame)
         XCTAssertEqual(testSyncWave.libraryChangeDates.dateOfLastClean.compare(cleanDate), ComparisonResult.orderedSame)
         XCTAssertEqual(testSyncWave.libraryChangeDates.dateOfLastUpdate.compare(updateDate), ComparisonResult.orderedSame)
-        storage.saveContext()
-        guard let songFetched = storage.getSong(id: testSongId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched = library.getSong(id: testSongId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.syncInfo?.libraryChangeDates.dateOfLastAdd.compare(addDate), ComparisonResult.orderedSame)
         XCTAssertEqual(songFetched.syncInfo?.libraryChangeDates.dateOfLastClean.compare(cleanDate), ComparisonResult.orderedSame)
         XCTAssertEqual(songFetched.syncInfo?.libraryChangeDates.dateOfLastUpdate.compare(updateDate), ComparisonResult.orderedSame)
@@ -116,19 +116,19 @@ class SyncWaveTest: XCTestCase {
     func testHasCachedSongs() {
         let testSongNotCachedId = cdHelper.seeder.songs[0].id
         let testSongCachedId = cdHelper.seeder.songs[4].id
-        guard let songNotCached = storage.getSong(id: testSongNotCachedId) else { XCTFail(); return }
-        guard let songCached = storage.getSong(id: testSongCachedId) else { XCTFail(); return }
+        guard let songNotCached = library.getSong(id: testSongNotCachedId) else { XCTFail(); return }
+        guard let songCached = library.getSong(id: testSongCachedId) else { XCTFail(); return }
         
         songNotCached.syncInfo = testSyncWave
         XCTAssertFalse(testSyncWave.hasCachedSongs)
-        storage.saveContext()
-        guard let songFetched1 = storage.getSong(id: testSongNotCachedId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched1 = library.getSong(id: testSongNotCachedId) else { XCTFail(); return }
         XCTAssertFalse(songFetched1.syncInfo!.hasCachedSongs)
         
         songCached.syncInfo = testSyncWave
         XCTAssertTrue(testSyncWave.hasCachedSongs)
-        storage.saveContext()
-        guard let songFetched2 = storage.getSong(id: testSongNotCachedId) else { XCTFail(); return }
+        library.saveContext()
+        guard let songFetched2 = library.getSong(id: testSongNotCachedId) else { XCTFail(); return }
         XCTAssertTrue(songFetched2.syncInfo!.hasCachedSongs)
     }
     

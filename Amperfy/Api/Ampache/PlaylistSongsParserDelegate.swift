@@ -7,10 +7,10 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
     let playlist: Playlist
     var items: [PlaylistItem]
 
-    init(playlist: Playlist, libraryStorage: LibraryStorage, syncWave: SyncWave) {
+    init(playlist: Playlist, library: LibraryStorage, syncWave: SyncWave) {
         self.playlist = playlist
         self.items = playlist.items
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, parseNotifier: nil)
+        super.init(library: library, syncWave: syncWave, parseNotifier: nil)
     }
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
@@ -25,7 +25,7 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
             if order < items.count {
                 item = items[order]
             } else {
-                item = libraryStorage.createPlaylistItem()
+                item = library.createPlaylistItem()
                 item?.order = order
                 playlist.add(item: item!)
             }
@@ -33,7 +33,7 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
         case "root":
             if items.count > parsedCount {
                 for i in Array(parsedCount...items.count-1) {
-                    libraryStorage.deletePlaylistItem(item: items[i])
+                    library.deletePlaylistItem(item: items[i])
                 }
             }
         default:

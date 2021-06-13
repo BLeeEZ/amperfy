@@ -12,9 +12,9 @@ class ArtistDetailVC: BasicTableViewController {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.artistDetail)
         
-        albumsFetchedResultsController = ArtistAlbumsItemsFetchedResultsController(for: artist, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        albumsFetchedResultsController = ArtistAlbumsItemsFetchedResultsController(for: artist, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         albumsFetchedResultsController.delegate = self
-        songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(for: artist, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(for: artist, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         songsFetchedResultsController.delegate = self
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
@@ -35,10 +35,10 @@ class ArtistDetailVC: BasicTableViewController {
     override func viewWillAppear(_ animated: Bool) {
         albumsFetchedResultsController.fetch()
         songsFetchedResultsController.fetch()
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let libraryStorage = LibraryStorage(context: context)
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            let library = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.sync(artist: self.artist, libraryStorage: libraryStorage)
+            syncer.sync(artist: self.artist, library: library)
             DispatchQueue.main.async {
                 self.detailOperationsView?.refresh()
             }

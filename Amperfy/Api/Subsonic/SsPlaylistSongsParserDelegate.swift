@@ -9,10 +9,10 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
     var items: [PlaylistItem]
     public private(set) var playlistHasBeenDetected = false
     
-    init(playlist: Playlist, libraryStorage: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator) {
+    init(playlist: Playlist, library: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator) {
         self.playlist = playlist
         self.items = playlist.items
-        super.init(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
+        super.init(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
     }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
@@ -39,7 +39,7 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
             if order < items.count {
                 item = items[order]
             } else {
-                item = libraryStorage.createPlaylistItem()
+                item = library.createPlaylistItem()
                 item?.order = order
                 playlist.add(item: item!)
             }
@@ -52,7 +52,7 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
         case "playlist":
             if items.count > parsedCount {
                 for i in Array(parsedCount...items.count-1) {
-                    libraryStorage.deletePlaylistItem(item: items[i])
+                    library.deletePlaylistItem(item: items[i])
                 }
             }
         default:

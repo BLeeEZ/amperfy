@@ -9,7 +9,7 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.musicFolders)
         
-        fetchedResultsController = MusicFolderFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        fetchedResultsController = MusicFolderFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Directories\"")
@@ -19,10 +19,10 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         fetchedResultsController.fetch()
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let library = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.syncMusicFolders(libraryStorage: library)
+            syncer.syncMusicFolders(library: library)
         }
     }
     

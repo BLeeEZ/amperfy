@@ -4,7 +4,7 @@ import XCTest
 class PlaylistTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
-    var storage: LibraryStorage!
+    var library: LibraryStorage!
     var testPlaylist: Playlist!
     var defaultPlaylist: Playlist!
     var playlistThreeCached: Playlist!
@@ -12,14 +12,14 @@ class PlaylistTest: XCTestCase {
 
     override func setUp() {
         cdHelper = CoreDataHelper()
-        storage = cdHelper.createSeededStorage()
-        guard let playlist = storage.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }
+        library = cdHelper.createSeededStorage()
+        guard let playlist = library.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }
         defaultPlaylist = playlist
-        guard let playlistCached = storage.getPlaylist(id: cdHelper.seeder.playlists[1].id) else { XCTFail(); return }
+        guard let playlistCached = library.getPlaylist(id: cdHelper.seeder.playlists[1].id) else { XCTFail(); return }
         playlistThreeCached = playlistCached
-        guard let playlistZeroCached = storage.getPlaylist(id: cdHelper.seeder.playlists[2].id) else { XCTFail(); return }
+        guard let playlistZeroCached = library.getPlaylist(id: cdHelper.seeder.playlists[2].id) else { XCTFail(); return }
         playlistNoCached = playlistZeroCached
-        testPlaylist = storage.createPlaylist()
+        testPlaylist = library.createPlaylist()
         resetTestPlaylist()
     }
 
@@ -29,7 +29,7 @@ class PlaylistTest: XCTestCase {
     func resetTestPlaylist() {
         testPlaylist.removeAllSongs()
         for i in 0...4 {
-            guard let song = storage.getSong(id: cdHelper.seeder.songs[i].id) else { XCTFail(); return }
+            guard let song = library.getSong(id: cdHelper.seeder.songs[i].id) else { XCTFail(); return }
             testPlaylist.append(song: song)
         }
     }
@@ -41,12 +41,12 @@ class PlaylistTest: XCTestCase {
     }
     
     func checkPlaylistIndexEqualSeedIndex(playlistIndex: Int, seedIndex: Int) {
-        guard let song = storage.getSong(id: cdHelper.seeder.songs[seedIndex].id) else { XCTFail(); return }
+        guard let song = library.getSong(id: cdHelper.seeder.songs[seedIndex].id) else { XCTFail(); return }
         XCTAssertEqual(testPlaylist.songs[playlistIndex].id, song.id)
     }
     
     func testCreation() {
-        let playlist = storage.createPlaylist()
+        let playlist = library.createPlaylist()
         XCTAssertEqual(playlist.items.count, 0)
         XCTAssertEqual(playlist.id, "")
         XCTAssertEqual(playlist.lastSongIndex, 0)
@@ -62,26 +62,26 @@ class PlaylistTest: XCTestCase {
     }
     
     func testFetch() {
-        let playlist = storage.createPlaylist()
+        let playlist = library.createPlaylist()
         let id = "12345"
         let name = "Test 234"
         playlist.name = name
         playlist.id = id
-        guard let playlistFetched = storage.getPlaylist(id: id) else { XCTFail(); return }
+        guard let playlistFetched = library.getPlaylist(id: id) else { XCTFail(); return }
         XCTAssertEqual(playlistFetched.name, name)
         XCTAssertEqual(playlistFetched.id, id)
     }
 
     func testSongAppend() {
-        let playlist = storage.createPlaylist()
+        let playlist = library.createPlaylist()
         XCTAssertEqual(playlist.items.count, 0)
-        guard let song1 = storage.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
         playlist.append(song: song1)
         XCTAssertEqual(playlist.items.count, 1)
-        guard let song2 = storage.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         playlist.append(song: song2)
         XCTAssertEqual(playlist.items.count, 2)
-        guard let song3 = storage.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
+        guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
         playlist.append(song: song3)
         XCTAssertEqual(playlist.items.count, 3)
         
@@ -144,7 +144,7 @@ class PlaylistTest: XCTestCase {
     }
     
     func testRemoveFirstOccurrenceOfSong_Success() {
-        guard let song1 = storage.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        guard let song1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         defaultPlaylist.append(song: song1)
         defaultPlaylist.remove(firstOccurrenceOfSong: song1)
         XCTAssertEqual(defaultPlaylist.items.count, cdHelper.seeder.playlists[0].songIds.count)
@@ -165,7 +165,7 @@ class PlaylistTest: XCTestCase {
     }
     
     func testRemoveFirstOccurrenceOfSong_NoChange() {
-        guard let song6 = storage.getSong(id: cdHelper.seeder.songs[6].id) else { XCTFail(); return }
+        guard let song6 = library.getSong(id: cdHelper.seeder.songs[6].id) else { XCTFail(); return }
         defaultPlaylist.remove(firstOccurrenceOfSong: song6)
         testDefaultPlaylist()
     }
@@ -176,7 +176,7 @@ class PlaylistTest: XCTestCase {
     }
     
     func testGetFirstIndex() {
-        guard let song0 = storage.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        guard let song0 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         guard let foundSongIndex0 = defaultPlaylist.getFirstIndex(song: song0) else { XCTFail(); return }
         XCTAssertEqual(foundSongIndex0, 1)
         XCTAssertEqual(defaultPlaylist.items[foundSongIndex0].song!.id, song0.id)

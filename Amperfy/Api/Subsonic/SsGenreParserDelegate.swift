@@ -8,10 +8,10 @@ class SsGenreParserDelegate: SsXmlLibParser {
 		switch(elementName) {
 		case "genre":
             let genreName = buffer
-            if let _ = libraryStorage.getGenre(name: genreName) {
+            if let _ = library.getGenre(name: genreName) {
                 // info already synced -> skip
             } else {
-                let genre = libraryStorage.createGenre()
+                let genre = library.createGenre()
                 genre.name = buffer
                 genre.syncInfo = syncWave
             }

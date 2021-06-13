@@ -14,10 +14,10 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
         if elementName == "album" {
             guard let albumId = attributeDict["id"] else { return }
             
-            if let fetchedAlbum = libraryStorage.getAlbum(id: albumId)  {
+            if let fetchedAlbum = library.getAlbum(id: albumId)  {
                 albumBuffer = fetchedAlbum
             } else {
-                albumBuffer = libraryStorage.createAlbum()
+                albumBuffer = library.createAlbum()
                 albumBuffer?.id = albumId
                 albumBuffer?.syncInfo = syncWave
             }
@@ -36,7 +36,7 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
             if albumBuffer?.artist == nil, let artistId = attributeDict["artistId"] {
                 if let guessedArtist = guessedArtist, guessedArtist.id == artistId {
                     albumBuffer?.artist = guessedArtist
-                } else if let artist = libraryStorage.getArtist(id: artistId) {
+                } else if let artist = library.getArtist(id: artistId) {
                     albumBuffer?.artist = artist
                 }
             }
@@ -45,10 +45,10 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
             }
             
             if albumBuffer?.genre == nil, let genreName = attributeDict["genre"] {
-                if let genre = libraryStorage.getGenre(name: genreName) {
+                if let genre = library.getGenre(name: genreName) {
                     albumBuffer?.genre = genre
                 } else {
-                    let genre = libraryStorage.createGenre()
+                    let genre = library.createGenre()
                     genre.name = genreName
                     genre.syncInfo = syncWave
                     os_log("Genre <%s> has been created", log: log, type: .error, genreName)

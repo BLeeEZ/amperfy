@@ -10,38 +10,38 @@ class SubsonicLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Backgroun
         self.subsonicServerApi = subsonicServerApi
     }
 
-    func syncInBackground(libraryStorage: LibraryStorage) {
+    func syncInBackground(library: LibraryStorage) {
         isRunning = true
         semaphoreGroup.enter()
         isActive = true
 
-        if let latestSyncWave = libraryStorage.getLatestSyncWave(), !latestSyncWave.isDone {
+        if let latestSyncWave = library.getLatestSyncWave(), !latestSyncWave.isDone {
             os_log("Lib resync: Continue last resync", log: log, type: .info)
-            resync(libraryStorage: libraryStorage, syncWave: latestSyncWave)
+            resync(library: library, syncWave: latestSyncWave)
         } else {
             os_log("Lib resync: Start resync again", log: log, type: .info)
-            let syncWave = libraryStorage.createSyncWave()
+            let syncWave = library.createSyncWave()
             syncWave.setMetaData(fromLibraryChangeDates: LibraryChangeDates())
-            libraryStorage.saveContext()
-            resync(libraryStorage: libraryStorage, syncWave: syncWave)
+            library.saveContext()
+            resync(library: library, syncWave: syncWave)
         } 
         
         isActive = false
         semaphoreGroup.leave()
     }   
     
-    private func resync(libraryStorage: LibraryStorage, syncWave: SyncWave) {
+    private func resync(library: LibraryStorage, syncWave: SyncWave) {
         if syncWave.syncState == .Artists, isRunning {
             os_log("Lib resync: Artist parsing start", log: log, type: .info)
-            let artistParser = SsArtistParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+            let artistParser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
             subsonicServerApi.requestArtists(parserDelegate: artistParser)
 
             os_log("Lib resync: Artist parsing done", log: log, type: .info)
             syncWave.syncState = .Albums
-            libraryStorage.saveContext()
+            library.saveContext()
         }
         if syncWave.syncState == .Albums, isRunning {
-            let allArtists = libraryStorage.getArtists()
+            let allArtists = library.getArtists()
             let artistsLeftUnsorted = allArtists.filter {
                 return $0.id.localizedStandardCompare(syncWave.syncIndexToContinue) == ComparisonResult.orderedDescending
             }
@@ -50,7 +50,7 @@ class SubsonicLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Backgroun
             }
             os_log("Lib resync: Albums parsing start", log: log, type: .info)
             for artist in artistsLeftSorted {
-                let albumDelegate = SsAlbumParserDelegate(libraryStorage: libraryStorage, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+                let albumDelegate = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
                 albumDelegate.guessedArtist = artist
                 subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artist.id)
                 syncWave.syncIndexToContinue = artist.id
@@ -61,11 +61,11 @@ class SubsonicLibraryBackgroundSyncer: GenericLibraryBackgroundSyncer, Backgroun
                 os_log("Lib resync: Albums parsing done", log: log, type: .info)
                 syncWave.syncState = .Done
             }
-            libraryStorage.saveContext()
+            library.saveContext()
         }
         if syncWave.syncState == .Songs, isRunning {
             syncWave.syncState = .Done
-            libraryStorage.saveContext()
+            library.saveContext()
         }
     }
     

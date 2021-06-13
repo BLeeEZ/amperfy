@@ -20,7 +20,7 @@ class LibraryVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
-        if cell == genreTableViewCell, appDelegate.storage.librarySyncVersion < .v7 {
+        if cell == genreTableViewCell, appDelegate.persistentStorage.librarySyncVersion < .v7 {
             return 0
         } else if cell == directoriesTableViewCell, appDelegate.backendProxy.selectedApi == .ampache {
             return 0

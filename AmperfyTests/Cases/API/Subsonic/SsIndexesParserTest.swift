@@ -9,7 +9,7 @@ class SsIndexesParserTest: AbstractSsParserTest {
         super.setUp()
         xmlData = getTestFileData(name: "indexes_example_1")
         musicFolder = library.createMusicFolder()
-        ssParserDelegate = SsDirectoryParserDelegate(musicFolder: musicFolder, libraryStorage: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
+        ssParserDelegate = SsDirectoryParserDelegate(musicFolder: musicFolder, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
     }
     
     override func checkCorrectParsing() {

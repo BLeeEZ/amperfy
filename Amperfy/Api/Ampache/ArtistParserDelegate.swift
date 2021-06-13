@@ -16,17 +16,17 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
                 os_log("Found artist with no id", log: log, type: .error)
                 return
             }
-            if !syncWave.isInitialWave, let fetchedArtist = libraryStorage.getArtist(id: artistId)  {
+            if !syncWave.isInitialWave, let fetchedArtist = library.getArtist(id: artistId)  {
                 artistBuffer = fetchedArtist
             } else {
-                artistBuffer = libraryStorage.createArtist()
+                artistBuffer = library.createArtist()
                 artistBuffer?.syncInfo = syncWave
                 artistBuffer?.id = artistId
             }
 		}
         if elementName == "genre", let artist = artistBuffer {
             guard let genreId = attributeDict["id"] else { return }
-            if let genre = libraryStorage.getGenre(id: genreId) {
+            if let genre = library.getGenre(id: genreId) {
                 artist.genre = genre
             } else {
                 genreIdToCreate = genreId
@@ -43,7 +43,7 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
         case "genre":
             if let genreId = genreIdToCreate {
                 os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
-                let genre = libraryStorage.createGenre()
+                let genre = library.createGenre()
                 genre.id = genreId
                 genre.name = buffer
                 genre.syncInfo = syncWave

@@ -6,7 +6,7 @@ class SsMusicFolderParserTest: AbstractSsParserTest {
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "musicFolders_example_1")
-        ssParserDelegate = SsMusicFolderParserDelegate(libraryStorage: library, syncWave: syncWave)
+        ssParserDelegate = SsMusicFolderParserDelegate(library: library, syncWave: syncWave)
     }
     
     override func checkCorrectParsing() {

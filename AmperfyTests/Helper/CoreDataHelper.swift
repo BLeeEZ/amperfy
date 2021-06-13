@@ -45,9 +45,9 @@ class CoreDataHelper {
     func createSeededStorage() -> LibraryStorage {
         let context = createInMemoryManagedObjectContext()
         clearContext(context: context)
-        let storage = LibraryStorage(context: context)
+        let library = LibraryStorage(context: context)
         seeder.seed(context: context)
-        return storage
+        return library
     }
 
 }

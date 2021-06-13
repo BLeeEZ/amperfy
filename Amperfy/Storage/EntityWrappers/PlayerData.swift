@@ -3,15 +3,15 @@ import CoreData
 
 public class PlayerData: NSObject {
     
-    private let storage: LibraryStorage
+    private let library: LibraryStorage
     private let managedObject: PlayerMO
     private let normalPlaylist: Playlist
     private let shuffledPlaylist: Playlist
     
     static let entityName: String = { return "Player" }()
     
-    init(storage: LibraryStorage, managedObject: PlayerMO, normalPlaylist: Playlist, shuffledPlaylist: Playlist) {
-        self.storage = storage
+    init(library: LibraryStorage, managedObject: PlayerMO, normalPlaylist: Playlist, shuffledPlaylist: Playlist) {
+        self.library = library
         self.managedObject = managedObject
         self.normalPlaylist = normalPlaylist
         self.shuffledPlaylist = shuffledPlaylist
@@ -61,7 +61,7 @@ public class PlayerData: NSObject {
         get { return managedObject.autoCachePlayedSongSetting == 1 }
         set {
             managedObject.autoCachePlayedSongSetting = newValue ? 1 : 0
-            storage.saveContext()
+            library.saveContext()
         }
     }
     var isShuffle: Bool {
@@ -81,7 +81,7 @@ public class PlayerData: NSObject {
                 }
             }
             managedObject.shuffleSetting = newValue ? 1 : 0
-            storage.saveContext()
+            library.saveContext()
         }
     }
     var repeatMode: RepeatMode {
@@ -90,7 +90,7 @@ public class PlayerData: NSObject {
         }
         set {
             managedObject.repeatSetting = newValue.rawValue
-            storage.saveContext()
+            library.saveContext()
         }
     }
     
@@ -98,7 +98,7 @@ public class PlayerData: NSObject {
         get {
             if managedObject.currentSongIndex >= playlist.songs.count, managedObject.currentSongIndex < 0 {
                 managedObject.currentSongIndex = 0
-                storage.saveContext()
+                library.saveContext()
             }
             return Int(managedObject.currentSongIndex)
         }
@@ -108,7 +108,7 @@ public class PlayerData: NSObject {
             } else {
                 managedObject.currentSongIndex = 0
             }
-            storage.saveContext()
+            library.saveContext()
         }
     }
 

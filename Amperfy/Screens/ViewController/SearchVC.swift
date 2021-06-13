@@ -11,13 +11,13 @@ class SearchVC: BasicTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        playlistFetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        playlistFetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         playlistFetchedResultsController.delegate = self
-        artistFetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        artistFetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         artistFetchedResultsController.delegate = self
-        albumFetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        albumFetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         albumFetchedResultsController.delegate = self
-        songFetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        songFetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         songFetchedResultsController.delegate = self
         
         configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"])
@@ -163,10 +163,10 @@ class SearchVC: BasicTableViewController {
     override func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-                let backgroundLibrary = LibraryStorage(context: context)
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let syncLibrary = LibraryStorage(context: context)
                 let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.searchSongs(searchText: searchText, libraryStorage: backgroundLibrary)
+                syncer.searchSongs(searchText: searchText, library: syncLibrary)
             }
             playlistFetchedResultsController.search(searchText: searchText, playlistSearchCategory: .all)
             artistFetchedResultsController.search(searchText: searchText)

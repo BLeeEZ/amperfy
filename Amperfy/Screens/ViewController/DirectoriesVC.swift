@@ -11,9 +11,9 @@ class DirectoriesVC: BasicTableViewController {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.directories)
         
-        subdirectoriesFetchedResultsController = DirectorySubdirectoriesFetchedResultsController(for: directory, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        subdirectoriesFetchedResultsController = DirectorySubdirectoriesFetchedResultsController(for: directory, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         subdirectoriesFetchedResultsController.delegate = self
-        songsFetchedResultsController = DirectorySongsFetchedResultsController(for: directory, managedObjectContext: appDelegate.storage.context, isGroupedInAlphabeticSections: false)
+        songsFetchedResultsController = DirectorySongsFetchedResultsController(for: directory, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         songsFetchedResultsController.delegate = self
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
@@ -27,11 +27,11 @@ class DirectoriesVC: BasicTableViewController {
     override func viewWillAppear(_ animated: Bool) {
         subdirectoriesFetchedResultsController.fetch()
         songsFetchedResultsController.fetch()
-        appDelegate.storage.persistentContainer.performBackgroundTask() { (context) in
-            let libraryStorage = LibraryStorage(context: context)
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            let library = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()
             let directoryAsync = Directory(managedObject: context.object(with: self.directory.managedObject.objectID) as! DirectoryMO)
-            syncer.sync(directory: directoryAsync, libraryStorage: libraryStorage)
+            syncer.sync(directory: directoryAsync, library: library)
         }
     }
     

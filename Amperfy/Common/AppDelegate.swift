@@ -14,14 +14,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
 
-    lazy var storage = {
+    lazy var persistentStorage = {
         return PersistentStorage()
     }()
-    lazy var persistentLibraryStorage = {
-        return LibraryStorage(context: storage.context)
+    lazy var library = {
+        return LibraryStorage(context: persistentStorage.context)
     }()
     lazy var eventLogger = {
-        return EventLogger(alertDisplayer: self, persistentContainer: storage.persistentContainer)
+        return EventLogger(alertDisplayer: self, persistentContainer: persistentStorage.persistentContainer)
     }()
     lazy var backendProxy: BackendProxy = {
         return BackendProxy(eventLogger: eventLogger)
@@ -30,14 +30,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return backendProxy
     }()
     lazy var player: MusicPlayer = {
-        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, songDownloader: songDownloadManager, songCache: persistentLibraryStorage, userStatistics: userStatistics)
-        return MusicPlayer(coreData: persistentLibraryStorage.getPlayerData(), songDownloadManager: songDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, songDownloader: songDownloadManager, songCache: library, userStatistics: userStatistics)
+        return MusicPlayer(coreData: library.getPlayerData(), songDownloadManager: songDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
     }()
     lazy var songDownloadManager: DownloadManager = {
         let requestManager = RequestManager()
         let dlDelegate = SongDownloadDelegate(backendApi: backendApi)
         let urlDownloader = UrlDownloader(requestManager: requestManager)
-        let dlManager = DownloadManager(storage: storage, requestManager: requestManager, urlDownloader: urlDownloader, downloadDelegate: dlDelegate, eventLogger: eventLogger)
+        let dlManager = DownloadManager(persistentStorage: persistentStorage, requestManager: requestManager, urlDownloader: urlDownloader, downloadDelegate: dlDelegate, eventLogger: eventLogger)
         urlDownloader.urlDownloadNotifier = dlManager
         return dlManager
     }()
@@ -45,19 +45,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let requestManager = RequestManager()
         let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
         let urlDownloader = UrlDownloader(requestManager: requestManager)
-        let dlManager = DownloadManager(storage: storage, requestManager: requestManager, urlDownloader: urlDownloader, downloadDelegate: dlDelegate, eventLogger: eventLogger)
+        let dlManager = DownloadManager(persistentStorage: persistentStorage, requestManager: requestManager, urlDownloader: urlDownloader, downloadDelegate: dlDelegate, eventLogger: eventLogger)
         urlDownloader.urlDownloadNotifier = dlManager
         return dlManager
     }()
     lazy var backgroundSyncerManager = {
-        return BackgroundSyncerManager(storage: storage, backendApi: backendApi)
+        return BackgroundSyncerManager(persistentStorage: persistentStorage, backendApi: backendApi)
     }()
     lazy var userStatistics = {
-        return persistentLibraryStorage.getUserStatistics(appVersion: Self.version)
+        return library.getUserStatistics(appVersion: Self.version)
     }()
 
     func reinit() {
-        player.reinit(coreData: persistentLibraryStorage.getPlayerData())
+        player.reinit(coreData: library.getPlayerData())
     }
 
     func configureAudioSessionInterruptionAndRemoteControl() {
@@ -82,7 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         configureDefaultNavigationBarStyle()
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
-        guard let credentials = storage.getLoginCredentials() else {
+        guard let credentials = persistentStorage.getLoginCredentials() else {
             let initialViewController = LoginVC.instantiateFromAppStoryboard()
             self.window?.rootViewController = initialViewController
             self.window?.makeKeyAndVisible()
@@ -91,7 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         backendProxy.selectedApi = credentials.backendApi
         backendApi.provideCredentials(credentials: credentials)
         
-        guard storage.isLibrarySynced() else {
+        guard persistentStorage.isLibrarySynced() else {
             let initialViewController = SyncVC.instantiateFromAppStoryboard()
             self.window?.rootViewController = initialViewController
             self.window?.makeKeyAndVisible()
@@ -116,7 +116,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-        guard storage.getLoginCredentials() != nil, storage.isLibrarySynced() else { return }
+        guard persistentStorage.getLoginCredentials() != nil, persistentStorage.isLibrarySynced() else { return }
         backgroundSyncerManager.stop()
     }
 
@@ -126,18 +126,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        if storage.isLibrarySynced() {
+        if persistentStorage.isLibrarySynced() {
             backgroundSyncerManager.start()
         }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-        if storage.getLoginCredentials() != nil, storage.isLibrarySynced() {
+        if persistentStorage.getLoginCredentials() != nil, persistentStorage.isLibrarySynced() {
             artworkDownloadManager.stopAndWait()
             songDownloadManager.stopAndWait()
         }
-        persistentLibraryStorage.saveContext()
+        library.saveContext()
     }
 
 }

@@ -61,29 +61,29 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     var genreCount: Int = 0
     var playlistCount: Int = 0
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?) {}
-    func sync(artist: Artist, libraryStorage: LibraryStorage) {}
-    func sync(album: Album, libraryStorage: LibraryStorage) {}
-    func syncDownPlaylistsWithoutSongs(libraryStorage: LibraryStorage) {}
-    func syncDown(playlist: Playlist, libraryStorage: LibraryStorage) {}
-    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], libraryStorage: LibraryStorage) {}
-    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, libraryStorage: LibraryStorage) {}
-    func syncUpload(playlistToUpdateOrder playlist: Playlist, libraryStorage: LibraryStorage) {}
+    func sync(artist: Artist, library: LibraryStorage) {}
+    func sync(album: Album, library: LibraryStorage) {}
+    func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {}
+    func syncDown(playlist: Playlist, library: LibraryStorage) {}
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], library: LibraryStorage) {}
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage) {}
+    func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage) {}
     func syncUpload(playlistToDelete playlist: Playlist) {}
-    func searchSongs(searchText: String, libraryStorage: LibraryStorage) {}
-    func syncMusicFolders(libraryStorage: LibraryStorage) {}
-    func syncIndexes(musicFolder: MusicFolder, libraryStorage: LibraryStorage) {}
-    func sync(directory: Directory, libraryStorage: LibraryStorage) {}
+    func searchSongs(searchText: String, library: LibraryStorage) {}
+    func syncMusicFolders(library: LibraryStorage) {}
+    func syncIndexes(musicFolder: MusicFolder, library: LibraryStorage) {}
+    func sync(directory: Directory, library: LibraryStorage) {}
 }
 
 class MOCK_BackgroundLibrarySyncer: BackgroundLibrarySyncer {
-    func syncInBackground(libraryStorage: LibraryStorage) {}
+    func syncInBackground(library: LibraryStorage) {}
     var isActive: Bool = false
     func stop() {}
     func stopAndWait() {}
 }
 
 class MOCK_BackgroundLibraryVersionResyncer: BackgroundLibraryVersionResyncer {
-    func resyncDueToNewLibraryVersionInBackground(libraryStorage: LibraryStorage, libraryVersion: LibrarySyncVersion) {}
+    func resyncDueToNewLibraryVersionInBackground(library: LibraryStorage, libraryVersion: LibrarySyncVersion) {}
     var isActive: Bool = false
     func stop() {}
     func stopAndWait() {}
@@ -116,7 +116,7 @@ class MOCK_BackendApi: BackendApi {
 class MusicPlayerTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
-    var storage: LibraryStorage!
+    var library: LibraryStorage!
     var mockAlertDisplayer: MOCK_AlertDisplayable!
     var eventLogger: EventLogger!
     var userStatistics: UserStatistics!
@@ -133,22 +133,22 @@ class MusicPlayerTest: XCTestCase {
 
     override func setUp() {
         cdHelper = CoreDataHelper()
-        storage = cdHelper.createSeededStorage()
+        library = cdHelper.createSeededStorage()
         songDownloader = MOCK_SongDownloader()
         mockAVPlayer = MOCK_AVPlayer()
         mockAlertDisplayer = MOCK_AlertDisplayable()
         eventLogger = EventLogger(alertDisplayer: mockAlertDisplayer, persistentContainer: cdHelper.persistentContainer)
-        userStatistics = storage.getUserStatistics(appVersion: "")
+        userStatistics = library.getUserStatistics(appVersion: "")
         backendApi = MOCK_BackendApi()
-        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, songDownloader: songDownloader, songCache: storage, userStatistics: userStatistics)
-        playerData = storage.getPlayerData()
+        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, songDownloader: songDownloader, songCache: library, userStatistics: userStatistics)
+        playerData = library.getPlayerData()
         testPlayer = MusicPlayer(coreData: playerData, songDownloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
         
-        guard let songCachedFetched = storage.getSong(id: "36") else { XCTFail(); return }
+        guard let songCachedFetched = library.getSong(id: "36") else { XCTFail(); return }
         songCached = songCachedFetched
-        guard let songToDownloadFetched = storage.getSong(id: "3") else { XCTFail(); return }
+        guard let songToDownloadFetched = library.getSong(id: "3") else { XCTFail(); return }
         songToDownload = songToDownloadFetched
-        guard let playlistCached = storage.getPlaylist(id: cdHelper.seeder.playlists[1].id) else { XCTFail(); return }
+        guard let playlistCached = library.getPlaylist(id: cdHelper.seeder.playlists[1].id) else { XCTFail(); return }
         playlistThreeCached = playlistCached
     }
 
@@ -162,7 +162,7 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func markAsCached(song: Song) {
-        let songFile = storage.createSongFile()
+        let songFile = library.createSongFile()
         songFile.info = song
         songFile.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
     }

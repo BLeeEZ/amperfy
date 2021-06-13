@@ -6,10 +6,10 @@ import os.log
 class SsPlaylistParserDelegate: SsXmlParser {
     
     private var playlist: Playlist?
-    private let libraryStorage: LibraryStorage
+    private let library: LibraryStorage
     
-    init(libraryStorage: LibraryStorage) {
-        self.libraryStorage = libraryStorage
+    init(library: LibraryStorage) {
+        self.library = library
         super.init()
     }
 
@@ -25,10 +25,10 @@ class SsPlaylistParserDelegate: SsXmlParser {
             if playlist != nil {
                 playlist?.id = playlistId
             } else if playlistId != "" {
-                if let fetchedPlaylist = libraryStorage.getPlaylist(id: playlistId)  {
+                if let fetchedPlaylist = library.getPlaylist(id: playlistId)  {
                     playlist = fetchedPlaylist
                 } else {
-                    playlist = libraryStorage.createPlaylist()
+                    playlist = library.createPlaylist()
                     playlist?.id = playlistId
                 }
             } else {

@@ -28,12 +28,12 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     
     func completedDownload(request: DownloadRequest, context: NSManagedObjectContext) {
         guard let download = request.download, let data = download.resumeData else { return }
-        let libraryStorage = LibraryStorage(context: context)
+        let library = LibraryStorage(context: context)
         if let artworkMO = try? context.existingObject(with: request.element.objectID) as? ArtworkMO {
             let artwork = Artwork(managedObject: artworkMO)
             artwork.status = .CustomImage
             artwork.setImage(fromData: data)
-            libraryStorage.saveContext()
+            library.saveContext()
         }
     }
 
