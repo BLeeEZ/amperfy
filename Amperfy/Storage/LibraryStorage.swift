@@ -86,20 +86,12 @@ class LibraryStorage: SongFileCachable {
     }
     
     var cachedSongSizeInByte: Int64 {
-        var foundSongFiles = [NSDictionary]()
         let fetchRequest = NSFetchRequest<NSDictionary>(entityName: SongFile.typeName)
         fetchRequest.propertiesToFetch = [#keyPath(SongFileMO.data)]
         fetchRequest.resultType = .dictionaryResultType
-        do {
-            foundSongFiles = try context.fetch(fetchRequest)
-        } catch {}
-        
-        var cachedSongSizeInByte: Int64 = 0
-        for songFile in foundSongFiles {
-            if let fileData = songFile[#keyPath(SongFileMO.data)] as? NSData {
-                cachedSongSizeInByte += fileData.sizeInByte
-            }
-        }
+        let foundSongFiles = (try? context.fetch(fetchRequest)) ?? [NSDictionary]()
+        let files = foundSongFiles.compactMap{ $0[#keyPath(SongFileMO.data)] as? NSData }
+        let cachedSongSizeInByte: Int64 = files.reduce(0, { $0 + $1.sizeInByte})
         return cachedSongSizeInByte
     }
     
@@ -301,81 +293,48 @@ class LibraryStorage: SongFileCachable {
         }
     }
 
-    func getArtists() -> Array<Artist> {
-        var artists = Array<Artist>()
-        var foundArtists = Array<ArtistMO>()
+    func getArtists() -> [Artist] {
         let fetchRequest = ArtistMO.identifierSortedFetchRequest
-        do {
-            foundArtists = try context.fetch(fetchRequest)
-            for artistMO in foundArtists {
-                artists.append(Artist(managedObject: artistMO))
-            }
-        } catch {}
-        
-        return artists
+        let foundArtists = try? context.fetch(fetchRequest)
+        let artists = foundArtists?.compactMap{ Artist(managedObject: $0) }
+        return artists ?? [Artist]()
     }
     
-    func getAlbums() -> Array<Album> {
-        var albums = Array<Album>()
-        var foundAlbums = Array<AlbumMO>()
+    func getAlbums() -> [Album] {
         let fetchRequest = AlbumMO.identifierSortedFetchRequest
-        do {
-            foundAlbums = try context.fetch(fetchRequest)
-            for albumMO in foundAlbums {
-                albums.append(Album(managedObject: albumMO))
-            }
-        } catch {}
-        
-        return albums
+        let foundAlbums = try? context.fetch(fetchRequest)
+        let albums = foundAlbums?.compactMap{ Album(managedObject: $0) }
+        return albums ?? [Album]()
     }
 
-    func getSongs() -> Array<Song> {
-        var songs = Array<Song>()
-        var foundSongs = Array<SongMO>()
+    func getSongs() -> [Song] {
         let fetchRequest = SongMO.identifierSortedFetchRequest
-        do {
-            foundSongs = try context.fetch(fetchRequest)
-            for songMO in foundSongs {
-                songs.append(Song(managedObject: songMO))
-            }
-        } catch {}
-        
-        return songs
+        let foundSongs = try? context.fetch(fetchRequest)
+        let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
+        return songs ?? [Song]()
     }
     
-    func getPlaylists() -> Array<Playlist> {
-        var playlists = Array<Playlist>()
-        var foundPlaylists = Array<PlaylistMO>()
+    func getPlaylists() -> [Playlist] {
         let fetchRequest = PlaylistMO.identifierSortedFetchRequest
         fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
-        do {
-            foundPlaylists = try context.fetch(fetchRequest)
-            for playlist in foundPlaylists {
-                let wrappedPlaylist = Playlist(storage: self, managedObject: playlist)
-                playlists.append(wrappedPlaylist)
-            }
-        } catch {}
-        
-        return playlists
+        let foundPlaylists = try? context.fetch(fetchRequest)
+        let playlists = foundPlaylists?.compactMap{ Playlist(storage: self, managedObject: $0) }
+        return playlists ?? [Playlist]()
     }
     
-    func getLogEntries() -> Array<LogEntry> {
-        var entries = Array<LogEntry>()
-        var foundEntries = Array<LogEntryMO>()
+    func getLogEntries() -> [LogEntry] {
         let fetchRequest: NSFetchRequest<LogEntryMO> = LogEntryMO.creationDateSortedFetchRequest
-        do {
-            foundEntries = try context.fetch(fetchRequest)
-            entries = foundEntries.compactMap{ LogEntry(managedObject: $0) }
-        } catch {}
-        return entries
+        let foundEntries = try? context.fetch(fetchRequest)
+        let entries = foundEntries?.compactMap{ LogEntry(managedObject: $0) }
+        return entries ?? [LogEntry]()
     }
     
     func getPlayerData() -> PlayerData {
+        let fetchRequest: NSFetchRequest<PlayerMO> = PlayerMO.fetchRequest()
         var playerData: PlayerData
         var playerMO: PlayerMO
-        let fetchRequest: NSFetchRequest<PlayerMO> = PlayerMO.fetchRequest()
-        do {
-            let fetchResults: Array<PlayerMO> = try context.fetch(fetchRequest)
+
+        if let fetchResults: [PlayerMO] = try? context.fetch(fetchRequest) {
             if fetchResults.count == 1 {
                 playerMO = fetchResults[0]
             } else if (fetchResults.count == 0) {
@@ -386,145 +345,89 @@ class LibraryStorage: SongFileCachable {
                 playerMO = PlayerMO(context: context)
                 saveContext()
             }
-            
-            if playerMO.normalPlaylist == nil {
-                playerMO.normalPlaylist = PlaylistMO(context: context)
-                saveContext()
-            }
-            if playerMO.shuffledPlaylist == nil {
-                playerMO.shuffledPlaylist = PlaylistMO(context: context)
-                saveContext()
-            }
-            
-            let normalPlaylist = Playlist(storage: self, managedObject: playerMO.normalPlaylist!)
-            let shuffledPlaylist = Playlist(storage: self, managedObject: playerMO.shuffledPlaylist!)
-            
-            if shuffledPlaylist.items.count != normalPlaylist.items.count {
-                shuffledPlaylist.removeAllSongs()
-                shuffledPlaylist.append(songs: normalPlaylist.songs)
-                shuffledPlaylist.shuffle()
-            }
-            
-            playerData = PlayerData(storage: self, managedObject: playerMO, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
-            
-        } catch {
-            fatalError("Not able to get/create " + PlayerData.entityName)
+        } else {
+            playerMO = PlayerMO(context: context)
+            saveContext()
         }
+        
+        if playerMO.normalPlaylist == nil {
+            playerMO.normalPlaylist = PlaylistMO(context: context)
+            saveContext()
+        }
+        if playerMO.shuffledPlaylist == nil {
+            playerMO.shuffledPlaylist = PlaylistMO(context: context)
+            saveContext()
+        }
+        
+        let normalPlaylist = Playlist(storage: self, managedObject: playerMO.normalPlaylist!)
+        let shuffledPlaylist = Playlist(storage: self, managedObject: playerMO.shuffledPlaylist!)
+        
+        if shuffledPlaylist.items.count != normalPlaylist.items.count {
+            shuffledPlaylist.removeAllSongs()
+            shuffledPlaylist.append(songs: normalPlaylist.songs)
+            shuffledPlaylist.shuffle()
+        }
+        
+        playerData = PlayerData(storage: self, managedObject: playerMO, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
         
         return playerData
     }
-    
+
     func getGenre(id: String) -> Genre? {
-        var foundGenre: Genre? = nil
-        let fr: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(GenreMO.id), NSString(string: id))
-        fr.fetchLimit = 1
-        do {
-            let result = try context.fetch(fr) as NSArray?
-            if let genres = result, genres.count > 0, let genre = genres[0] as? GenreMO {
-                foundGenre = Genre(managedObject: genre)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return foundGenre
+        let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(GenreMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let genres = try? context.fetch(fetchRequest)
+        return genres?.lazy.compactMap{ Genre(managedObject: $0) }.first
     }
     
     func getGenre(name: String) -> Genre? {
-        var foundGenre: Genre? = nil
-        let fr: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(GenreMO.name), NSString(string: name))
-        fr.fetchLimit = 1
-        do {
-            let result = try context.fetch(fr) as NSArray?
-            if let genres = result, genres.count > 0, let genre = genres[0] as? GenreMO {
-                foundGenre = Genre(managedObject: genre)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return foundGenre
+        let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(GenreMO.name), NSString(string: name))
+        fetchRequest.fetchLimit = 1
+        let genres = try? context.fetch(fetchRequest)
+        return genres?.lazy.compactMap{ Genre(managedObject: $0) }.first
     }
     
     func getArtist(id: String) -> Artist? {
-        var foundArtist: Artist? = nil
-        let fr: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(ArtistMO.id), NSString(string: id))
-        fr.fetchLimit = 1
-        do {
-            let result = try context.fetch(fr) as NSArray?
-            if let artists = result, artists.count > 0, let artist = artists[0] as? ArtistMO {
-                foundArtist = Artist(managedObject: artist)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return foundArtist
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(ArtistMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let artists = try? context.fetch(fetchRequest)
+        return artists?.lazy.compactMap{ Artist(managedObject: $0) }.first
     }
     
     func getAlbum(id: String) -> Album? {
-        var foundAlbum: Album? = nil
-        let fr: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(AlbumMO.id), NSString(string: id))
-        fr.fetchLimit = 1
-        do {
-            let result = try context.fetch(fr) as NSArray?
-            if let albums = result, albums.count > 0, let album = albums[0] as? AlbumMO  {
-                foundAlbum = Album(managedObject: album)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return foundAlbum
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(AlbumMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let albums = try? context.fetch(fetchRequest)
+        return albums?.lazy.compactMap{ Album(managedObject: $0) }.first
     }
     
     func getSong(id: String) -> Song? {
-        var foundSong: Song? = nil
-        let fr: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(SongMO.id), NSString(string: id))
-        fr.fetchLimit = 1
-        do {
-            let result = try context.fetch(fr) as NSArray?
-            if let songs = result, songs.count > 0, let song = songs[0] as? SongMO  {
-                foundSong = Song(managedObject: song)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return foundSong
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(SongMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let songs = try? context.fetch(fetchRequest)
+        return songs?.lazy.compactMap{ Song(managedObject: $0) }.first
     }
     
     func getSongFile(forSong song: Song) -> SongFile? {
         guard song.isCached else { return nil }
-        var foundSongFile: SongFile? = nil
-        let fr: NSFetchRequest<SongFileMO> = SongFileMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(SongFileMO.info.id), NSString(string: song.id))
-        fr.fetchLimit = 1
-        do {
-            let result = try context.fetch(fr) as NSArray?
-            if let songFiles = result, songFiles.count > 0, let songFile = songFiles[0] as? SongFileMO  {
-                foundSongFile = SongFile(managedObject: songFile)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return foundSongFile
+        let fetchRequest: NSFetchRequest<SongFileMO> = SongFileMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(SongFileMO.info.id), NSString(string: song.id))
+        fetchRequest.fetchLimit = 1
+        let songFiles = try? context.fetch(fetchRequest)
+        return songFiles?.lazy.compactMap{ SongFile(managedObject: $0) }.first
     }
 
     func getPlaylist(id: String) -> Playlist? {
-        var foundPlaylist: Playlist? = nil
-        let fr: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(PlaylistMO.id), NSString(string: id))
-        fr.fetchLimit = 1
-        do {
-            let result = try context.fetch(fr) as NSArray?
-            if let playlists = result, playlists.count > 0, let playlist = playlists[0] as? PlaylistMO  {
-                foundPlaylist = Playlist(storage: self, managedObject: playlist)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return foundPlaylist
+        let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PlaylistMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let playlists = try? context.fetch(fetchRequest)
+        return playlists?.lazy.compactMap{ Playlist(storage: self, managedObject: $0) }.first
     }
     
     func getPlaylist(viaPlaylistFromOtherContext: Playlist) -> Playlist? {
@@ -546,71 +449,39 @@ class LibraryStorage: SongFileCachable {
             NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.type), NSString(string: remoteInfo.type))
         ])
         fetchRequest.fetchLimit = 1
-        guard let foundArtwork = try? context.fetch(fetchRequest).first else { return nil }
-        return Artwork(managedObject: foundArtwork)
+        let artworks = try? context.fetch(fetchRequest)
+        return artworks?.lazy.compactMap{ Artwork(managedObject: $0) }.first
     }
     
     func getArtworksThatAreNotChecked(fetchCount: Int = 10) -> [Artwork] {
-        var foundArtworks = [Artwork]()
-        
-        let fr: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.status), NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue)))
-        fr.fetchLimit = fetchCount
-        do {
-            let result = try context.fetch(fr) as NSArray?
-            if let results = result, let artworksMO = results as? [ArtworkMO] {
-                for artworkMO in artworksMO {
-                    foundArtworks.append(Artwork(managedObject: artworkMO))
-                }
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return foundArtworks
+        let fetchRequest: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.status), NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue)))
+        fetchRequest.fetchLimit = fetchCount
+        let foundArtworks = try? context.fetch(fetchRequest)
+        let artworks = foundArtworks?.compactMap{ Artwork(managedObject: $0) }
+        return artworks ?? [Artwork]()
     }
 
-    func getSyncWaves() -> Array<SyncWave> {
-        var foundSyncWaves = Array<SyncWave>()
+    func getSyncWaves() -> [SyncWave] {
         let fetchRequest: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
-        do {
-            let foundSyncWavesMO = try context.fetch(fetchRequest)
-            for syncWave in foundSyncWavesMO {
-                foundSyncWaves.append(SyncWave(managedObject: syncWave))
-            }
-        }
-        catch {}
-        
-        return foundSyncWaves
+        let foundSyncWaves = try? context.fetch(fetchRequest)
+        let syncWaves = foundSyncWaves?.compactMap{ SyncWave(managedObject: $0) }
+        return syncWaves ?? [SyncWave]()
     }
 
     func getLatestSyncWave() -> SyncWave? {
-        var latestSyncWave: SyncWave? = nil
-        let fr: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == max(%K)", #keyPath(SyncWaveMO.id), #keyPath(SyncWaveMO.id))
-        fr.fetchLimit = 1
-        do {
-            let result = try self.context.fetch(fr).first
-            if let latestSyncWaveMO = result {
-                latestSyncWave = SyncWave(managedObject: latestSyncWaveMO)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return latestSyncWave
+        let fetchRequest: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == max(%K)", #keyPath(SyncWaveMO.id), #keyPath(SyncWaveMO.id))
+        fetchRequest.fetchLimit = 1
+        let syncWaves = try? context.fetch(fetchRequest)
+        return syncWaves?.lazy.compactMap{ SyncWave(managedObject: $0) }.first
     }
     
     func getUserStatistics(appVersion: String) -> UserStatistics {
-        var foundUserStatistics: UserStatisticsMO? = nil
-        let fr: NSFetchRequest<UserStatisticsMO> = UserStatisticsMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(UserStatisticsMO.appVersion), appVersion)
-        fr.fetchLimit = 1
-        do {
-            foundUserStatistics = try self.context.fetch(fr).first
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        
-        if let foundUserStatistics = foundUserStatistics {
+        let fetchRequest: NSFetchRequest<UserStatisticsMO> = UserStatisticsMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(UserStatisticsMO.appVersion), appVersion)
+        fetchRequest.fetchLimit = 1
+        if let foundUserStatistics = try? context.fetch(fetchRequest).first {
             return UserStatistics(managedObject: foundUserStatistics, libraryStorage: self)
         } else {
             os_log("New UserStatistics for app version %s created", log: log, type: .info, appVersion)
@@ -620,15 +491,11 @@ class LibraryStorage: SongFileCachable {
         }
     }
     
-    func getAllUserStatistics() -> Array<UserStatistics> {
-        var userStatistics = Array<UserStatistics>()
-        var foundUserStatistics = Array<UserStatisticsMO>()
+    func getAllUserStatistics() -> [UserStatistics] {
         let fetchRequest: NSFetchRequest<UserStatisticsMO> = UserStatisticsMO.fetchRequest()
-        do {
-            foundUserStatistics = try context.fetch(fetchRequest)
-            userStatistics = foundUserStatistics.compactMap{ UserStatistics(managedObject: $0, libraryStorage: self) }
-        } catch {}
-        return userStatistics
+        let foundUserStatistics = try? context.fetch(fetchRequest)
+        let userStatistics = foundUserStatistics?.compactMap{ UserStatistics(managedObject: $0, libraryStorage: self) }
+        return userStatistics ?? [UserStatistics]()
     }
     
     func getMusicFolders() -> [MusicFolder] {
@@ -639,35 +506,19 @@ class LibraryStorage: SongFileCachable {
     }
     
     func getMusicFolder(id: String) -> MusicFolder? {
-        var foundMF: MusicFolder? = nil
-        let fr: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(MusicFolderMO.id), NSString(string: id))
-        fr.fetchLimit = 1
-        do {
-            let result = try context.fetch(fr) as NSArray?
-            if let musicFolders = result, musicFolders.count > 0, let musicFolder = musicFolders[0] as? MusicFolderMO  {
-                foundMF = MusicFolder(managedObject: musicFolder)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return foundMF
+        let fetchRequest: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(MusicFolderMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let musicFolders = try? context.fetch(fetchRequest)
+        return musicFolders?.lazy.compactMap{ MusicFolder(managedObject: $0) }.first
     }
     
     func getDirectory(id: String) -> Directory? {
-        var foundDirectory: Directory? = nil
-        let fr: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
-        fr.predicate = NSPredicate(format: "%K == %@", #keyPath(DirectoryMO.id), NSString(string: id))
-        fr.fetchLimit = 1
-        do {
-            let result = try context.fetch(fr) as NSArray?
-            if let directories = result, directories.count > 0, let directory = directories[0] as? DirectoryMO  {
-                foundDirectory = Directory(managedObject: directory)
-            }
-        } catch {
-            os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
-        }
-        return foundDirectory
+        let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(DirectoryMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let directories = try? context.fetch(fetchRequest)
+        return directories?.lazy.compactMap{ Directory(managedObject: $0) }.first
     }
     
     func cleanStorage() {
