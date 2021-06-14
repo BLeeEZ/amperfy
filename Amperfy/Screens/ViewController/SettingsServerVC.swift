@@ -16,7 +16,7 @@ class SettingsServerVC: UITableViewController {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.settingsServer)
         
-        if let loginCredentials = self.appDelegate.persistentStorage.getLoginCredentials() {
+        if let loginCredentials = self.appDelegate.persistentStorage.loginCredentials {
             serverUrlTF.text = loginCredentials.serverUrl
             usernameTF.text = loginCredentials.username
             backendApiLabel.text = loginCredentials.backendApi.description

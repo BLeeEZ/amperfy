@@ -17,29 +17,30 @@ class PersistentStorage {
         case SongsSyncInfoReadByUser = "SongsSyncInfoReadByUser"
     }
 
-    func saveLoginCredentials(credentials: LoginCredentials) {
-        UserDefaults.standard.set(credentials.serverUrl, forKey: UserDefaultsKey.ServerUrl.rawValue)
-        UserDefaults.standard.set(credentials.username, forKey: UserDefaultsKey.Username.rawValue)
-        UserDefaults.standard.set(credentials.password, forKey: UserDefaultsKey.Password.rawValue)
-        UserDefaults.standard.set(credentials.backendApi.rawValue, forKey: UserDefaultsKey.BackendApi.rawValue)
-    }
-    
-    func deleteLoginCredentials() {
-        UserDefaults.standard.removeObject(forKey: UserDefaultsKey.ServerUrl.rawValue)
-        UserDefaults.standard.removeObject(forKey: UserDefaultsKey.Username.rawValue)
-        UserDefaults.standard.removeObject(forKey: UserDefaultsKey.Password.rawValue)
-        UserDefaults.standard.removeObject(forKey: UserDefaultsKey.BackendApi.rawValue)
-    }
-
-    func getLoginCredentials() -> LoginCredentials? {
-        if  let serverUrl = UserDefaults.standard.object(forKey: UserDefaultsKey.ServerUrl.rawValue) as? String,
-            let username = UserDefaults.standard.object(forKey: UserDefaultsKey.Username.rawValue) as? String,
-            let passwordHash = UserDefaults.standard.object(forKey: UserDefaultsKey.Password.rawValue) as? String,
-            let backendApiRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.BackendApi.rawValue) as? Int,
-            let backendApi = BackenApiType(rawValue: backendApiRaw) {
-                return LoginCredentials(serverUrl: serverUrl, username: username, password: passwordHash, backendApi: backendApi)
-        } 
-        return nil
+    var loginCredentials: LoginCredentials? {
+        get {
+            if  let serverUrl = UserDefaults.standard.object(forKey: UserDefaultsKey.ServerUrl.rawValue) as? String,
+                let username = UserDefaults.standard.object(forKey: UserDefaultsKey.Username.rawValue) as? String,
+                let passwordHash = UserDefaults.standard.object(forKey: UserDefaultsKey.Password.rawValue) as? String,
+                let backendApiRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.BackendApi.rawValue) as? Int,
+                let backendApi = BackenApiType(rawValue: backendApiRaw) {
+                    return LoginCredentials(serverUrl: serverUrl, username: username, password: passwordHash, backendApi: backendApi)
+            }
+            return nil
+        }
+        set {
+            if let newCredentials = newValue {
+                UserDefaults.standard.set(newCredentials.serverUrl, forKey: UserDefaultsKey.ServerUrl.rawValue)
+                UserDefaults.standard.set(newCredentials.username, forKey: UserDefaultsKey.Username.rawValue)
+                UserDefaults.standard.set(newCredentials.password, forKey: UserDefaultsKey.Password.rawValue)
+                UserDefaults.standard.set(newCredentials.backendApi.rawValue, forKey: UserDefaultsKey.BackendApi.rawValue)
+            } else {
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKey.ServerUrl.rawValue)
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKey.Username.rawValue)
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKey.Password.rawValue)
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKey.BackendApi.rawValue)
+            }
+        }
     }
     
     var isSongsSyncInfoReadByUser: Bool {
@@ -47,34 +48,23 @@ class PersistentStorage {
         set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.SongsSyncInfoReadByUser.rawValue) }
     }
 
-    func saveLibraryIsSyncedFlag() {
-        UserDefaults.standard.set(true, forKey: UserDefaultsKey.LibraryIsSynced.rawValue)
+    var isLibrarySynced: Bool {
+        get { return UserDefaults.standard.object(forKey: UserDefaultsKey.LibraryIsSynced.rawValue) as? Bool ?? false }
+        set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.LibraryIsSynced.rawValue) }
     }
     
-    func deleteLibraryIsSyncedFlag() {
-        UserDefaults.standard.set(false, forKey: UserDefaultsKey.LibraryIsSynced.rawValue)
-    }
-    
-    func saveSettings(settings: Settings) {
-        UserDefaults.standard.set(settings.songActionOnTab.rawValue, forKey: UserDefaultsKey.SongActionOnTab.rawValue)
-        UserDefaults.standard.set(settings.playerDisplayStyle.rawValue, forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue)
-    }
-    
-    func getSettings() -> Settings {
-        let songActionOnTabRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongActionOnTab.rawValue) as? Int ?? SongActionOnTab.defaultValue.rawValue
-        let songActionOnTab = SongActionOnTab(rawValue: songActionOnTabRaw) ?? SongActionOnTab.defaultValue
-        
-        let playerDisplayStyleRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue) as? Int ?? PlayerDisplayStyle.defaultValue.rawValue
-        let playerDisplayStyle = PlayerDisplayStyle(rawValue: playerDisplayStyleRaw) ?? PlayerDisplayStyle.defaultValue
-        
-        return Settings(songActionOnTab: songActionOnTab, playerDisplayStyle: playerDisplayStyle)
-    }
-    
-    func isLibrarySynced() -> Bool {
-        guard let isLibrarySynced = UserDefaults.standard.object(forKey: UserDefaultsKey.LibraryIsSynced.rawValue) as? Bool else {
-            return false
+    var settings: Settings {
+        get {
+            let songActionOnTabRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongActionOnTab.rawValue) as? Int ?? SongActionOnTab.defaultValue.rawValue
+            let songActionOnTab = SongActionOnTab(rawValue: songActionOnTabRaw) ?? SongActionOnTab.defaultValue
+            let playerDisplayStyleRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue) as? Int ?? PlayerDisplayStyle.defaultValue.rawValue
+            let playerDisplayStyle = PlayerDisplayStyle(rawValue: playerDisplayStyleRaw) ?? PlayerDisplayStyle.defaultValue
+            return Settings(songActionOnTab: songActionOnTab, playerDisplayStyle: playerDisplayStyle)
         }
-        return isLibrarySynced
+        set {
+            UserDefaults.standard.set(newValue.songActionOnTab.rawValue, forKey: UserDefaultsKey.SongActionOnTab.rawValue)
+            UserDefaults.standard.set(newValue.playerDisplayStyle.rawValue, forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue)
+        }
     }
     
     var librarySyncVersion: LibrarySyncVersion {

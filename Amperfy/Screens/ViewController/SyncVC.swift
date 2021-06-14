@@ -29,7 +29,7 @@ class SyncVC: UIViewController {
         self.appDelegate.artworkDownloadManager.stopAndWait()
         self.appDelegate.songDownloadManager.stopAndWait()
         self.appDelegate.backgroundSyncerManager.stopAndWait()
-        self.appDelegate.persistentStorage.deleteLibraryIsSyncedFlag()
+        self.appDelegate.persistentStorage.isLibrarySynced = false
         self.appDelegate.library.cleanStorage()
         self.appDelegate.reinit()
         
@@ -37,7 +37,7 @@ class SyncVC: UIViewController {
             self.syncer = self.appDelegate.backendApi.createLibrarySyncer()
             self.syncer?.sync(currentContext: context, persistentContainer: self.appDelegate.persistentStorage.persistentContainer, statusNotifyier: self)
             self.appDelegate.persistentStorage.librarySyncVersion = .newestVersion
-            self.appDelegate.persistentStorage.saveLibraryIsSyncedFlag()
+            self.appDelegate.persistentStorage.isLibrarySynced = true
             self.appDelegate.backgroundSyncerManager.start()
             self.appDelegate.songDownloadManager.start()
             self.appDelegate.artworkDownloadManager.start()

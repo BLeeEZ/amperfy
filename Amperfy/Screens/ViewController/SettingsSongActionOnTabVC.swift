@@ -17,7 +17,7 @@ class SettingsSongActionOnTabVC: UITableViewController {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.settingsPlayerSongTab)
 
-        let settings = appDelegate.persistentStorage.getSettings()
+        let settings = appDelegate.persistentStorage.settings
 
         playAndErasePlaylistButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.playAndErasePlaylist.displayText, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]),  for: .normal)
         addToPlaylistAndPlayButton.setAttributedTitle(NSMutableAttributedString(string: SongActionOnTab.addToPlaylistAndPlay.displayText, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]), for: .normal)
@@ -40,23 +40,23 @@ class SettingsSongActionOnTabVC: UITableViewController {
     }
     
     @IBAction func playAndErasePlaylistPressed(_ sender: Any) {
-        let settings = appDelegate.persistentStorage.getSettings()
+        let settings = appDelegate.persistentStorage.settings
         settings.songActionOnTab = .playAndErasePlaylist
-        appDelegate.persistentStorage.saveSettings(settings: settings)
+        appDelegate.persistentStorage.settings = settings
         navigationController?.popToRootViewController(animated: true)
     }
     
     @IBAction func addToPlaylistAndPlayPressed(_ sender: Any) {
-        let settings = appDelegate.persistentStorage.getSettings()
+        let settings = appDelegate.persistentStorage.settings
         settings.songActionOnTab = .addToPlaylistAndPlay
-        appDelegate.persistentStorage.saveSettings(settings: settings)
+        appDelegate.persistentStorage.settings = settings
         navigationController?.popToRootViewController(animated: true)
     }
     
     @IBAction func insertAsNextSongNoPlayPressed(_ sender: Any) {
-        let settings = appDelegate.persistentStorage.getSettings()
+        let settings = appDelegate.persistentStorage.settings
         settings.songActionOnTab = .insertAsNextSongNoPlay
-        appDelegate.persistentStorage.saveSettings(settings: settings)
+        appDelegate.persistentStorage.settings = settings
         navigationController?.popToRootViewController(animated: true)
     }
 

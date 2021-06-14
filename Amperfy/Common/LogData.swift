@@ -50,7 +50,7 @@ public struct LogData: Encodable {
         logData.playerInfo = playerInfo
         
         var userSettings = UserSettings()
-        let settings = appDelegate.persistentStorage.getSettings()
+        let settings = appDelegate.persistentStorage.settings
         userSettings.songActionOnTab = settings.songActionOnTab.description
         userSettings.playerDisplayStyle = settings.playerDisplayStyle.description
         logData.userSettings = userSettings

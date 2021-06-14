@@ -28,10 +28,10 @@ class SettingsVC: UITableViewController {
             self.appDelegate.songDownloadManager.stopAndWait()
             self.appDelegate.backgroundSyncerManager.stopAndWait()
             self.appDelegate.persistentStorage.context.reset()
-            self.appDelegate.persistentStorage.deleteLoginCredentials()
+            self.appDelegate.persistentStorage.loginCredentials = nil
             self.appDelegate.library.cleanStorage()
             self.appDelegate.persistentStorage.isSongsSyncInfoReadByUser = false
-            self.appDelegate.persistentStorage.deleteLibraryIsSyncedFlag()
+            self.appDelegate.persistentStorage.isLibrarySynced = false
             self.deleteViewControllerCaches()
             self.appDelegate.reinit()
             self.performSegue(withIdentifier: Segues.toLogin.rawValue, sender: nil)

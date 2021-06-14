@@ -107,7 +107,7 @@ class SongTableCell: BasicTableCell {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let song = song else { return }
         
-        let behaviourOnTab = isCellInPopupPlayer ? .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong :  appDelegate.persistentStorage.getSettings().songActionOnTab
+        let behaviourOnTab = isCellInPopupPlayer ? .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong :  appDelegate.persistentStorage.settings.songActionOnTab
         
         if isUserTouchInteractionAllowed, !isAlertPresented {
             hideSearchBarKeyboardInRootView()

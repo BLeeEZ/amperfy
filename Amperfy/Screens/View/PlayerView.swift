@@ -66,7 +66,7 @@ class PlayerView: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        self.displayStyle = appDelegate.persistentStorage.getSettings().playerDisplayStyle
+        self.displayStyle = appDelegate.persistentStorage.settings.playerDisplayStyle
         self.layoutMargins = PlayerView.margin
         player = appDelegate.player
         player.addNotifier(notifier: self)
@@ -129,9 +129,9 @@ class PlayerView: UIView {
     @IBAction private func displayPlaylistPressed() {
         appDelegate.userStatistics.usedAction(.changePlayerDisplayStyle)
         displayStyle.switchToNextStyle()
-        let settings = appDelegate.persistentStorage.getSettings()
+        let settings = appDelegate.persistentStorage.settings
         settings.playerDisplayStyle = displayStyle
-        appDelegate.persistentStorage.saveSettings(settings: settings)
+        appDelegate.persistentStorage.settings = settings
         refreshDisplayPlaylistButton()
         renderAnimation()
     }
