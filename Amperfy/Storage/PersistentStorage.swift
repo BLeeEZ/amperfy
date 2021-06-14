@@ -13,9 +13,8 @@ class PersistentStorage {
         case SongActionOnTab = "songActionOnTab"
         case PlayerDisplayStyle = "playerDisplayStyle"
         case LibrarySyncVersion = "librarySyncVersion"
-    }
-
-    init() {
+        
+        case SongsSyncInfoReadByUser = "SongsSyncInfoReadByUser"
     }
 
     func saveLoginCredentials(credentials: LoginCredentials) {
@@ -41,6 +40,11 @@ class PersistentStorage {
                 return LoginCredentials(serverUrl: serverUrl, username: username, password: passwordHash, backendApi: backendApi)
         } 
         return nil
+    }
+    
+    var isSongsSyncInfoReadByUser: Bool {
+        get { return UserDefaults.standard.object(forKey: UserDefaultsKey.SongsSyncInfoReadByUser.rawValue) as? Bool ?? false }
+        set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.SongsSyncInfoReadByUser.rawValue) }
     }
 
     func saveLibraryIsSyncedFlag() {

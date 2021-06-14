@@ -30,6 +30,7 @@ class SettingsVC: UITableViewController {
             self.appDelegate.persistentStorage.context.reset()
             self.appDelegate.persistentStorage.deleteLoginCredentials()
             self.appDelegate.library.cleanStorage()
+            self.appDelegate.persistentStorage.isSongsSyncInfoReadByUser = false
             self.appDelegate.persistentStorage.deleteLibraryIsSyncedFlag()
             self.deleteViewControllerCaches()
             self.appDelegate.reinit()
@@ -47,6 +48,7 @@ class SettingsVC: UITableViewController {
         PlaylistFetchedResultsController.deleteCache()
         GenreFetchedResultsController.deleteCache()
         PlaylistSelectorFetchedResultsController.deleteCache()
+        MusicFolderFetchedResultsController.deleteCache()
     }
     
 }

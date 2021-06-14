@@ -12,14 +12,23 @@ class SongVC: SingleFetchedResultsTableViewController<SongMO> {
         fetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController(placeholder: "Search in \"Songs\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
+        configureSearchController(placeholder: "Search in \"Songs\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
-        tableView.separatorStyle = .none
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        // Only search performes fetches in this view
+        fetchedResultsController.fetch()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        if !appDelegate.persistentStorage.isSongsSyncInfoReadByUser {
+            let alert = UIAlertController(title: "Info", message: "Only already synced songs are displayed.\nPlease use the search bar to find and update your song collection.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default , handler: { _ in
+                self.appDelegate.persistentStorage.isSongsSyncInfoReadByUser = true
+            }))
+            present(alert, animated: true, completion: nil)
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -38,13 +47,10 @@ class SongVC: SingleFetchedResultsTableViewController<SongMO> {
                 syncer.searchSongs(searchText: searchText, library: backgroundLibrary)
             }
             fetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
-            tableView.separatorStyle = .singleLine
         } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
             fetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
-            tableView.separatorStyle = .singleLine
         } else {
-            fetchedResultsController.clearResults()
-            tableView.separatorStyle = .none
+            fetchedResultsController.showAllResults()
         }
         tableView.reloadData()
     }
