@@ -14,8 +14,28 @@ class PersistentStorage {
         case PlayerDisplayStyle = "playerDisplayStyle"
         case LibrarySyncVersion = "librarySyncVersion"
         
-        case SongsSyncInfoReadByUser = "SongsSyncInfoReadByUser"
+        case SongsSyncInfoReadByUser = "songsSyncInfoReadByUser"
     }
+    
+    class Settings {
+        var songActionOnTab: SongActionOnTab {
+            get {
+                let songActionOnTabRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongActionOnTab.rawValue) as? Int ?? SongActionOnTab.defaultValue.rawValue
+                return SongActionOnTab(rawValue: songActionOnTabRaw) ?? SongActionOnTab.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.SongActionOnTab.rawValue) }
+        }
+        
+        var playerDisplayStyle: PlayerDisplayStyle {
+            get {
+                let playerDisplayStyleRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue) as? Int ?? PlayerDisplayStyle.defaultValue.rawValue
+                return PlayerDisplayStyle(rawValue: playerDisplayStyleRaw) ?? PlayerDisplayStyle.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue) }
+        }
+    }
+    
+    var settings = Settings()
 
     var loginCredentials: LoginCredentials? {
         get {
@@ -51,20 +71,6 @@ class PersistentStorage {
     var isLibrarySynced: Bool {
         get { return UserDefaults.standard.object(forKey: UserDefaultsKey.LibraryIsSynced.rawValue) as? Bool ?? false }
         set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.LibraryIsSynced.rawValue) }
-    }
-    
-    var settings: Settings {
-        get {
-            let songActionOnTabRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongActionOnTab.rawValue) as? Int ?? SongActionOnTab.defaultValue.rawValue
-            let songActionOnTab = SongActionOnTab(rawValue: songActionOnTabRaw) ?? SongActionOnTab.defaultValue
-            let playerDisplayStyleRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue) as? Int ?? PlayerDisplayStyle.defaultValue.rawValue
-            let playerDisplayStyle = PlayerDisplayStyle(rawValue: playerDisplayStyleRaw) ?? PlayerDisplayStyle.defaultValue
-            return Settings(songActionOnTab: songActionOnTab, playerDisplayStyle: playerDisplayStyle)
-        }
-        set {
-            UserDefaults.standard.set(newValue.songActionOnTab.rawValue, forKey: UserDefaultsKey.SongActionOnTab.rawValue)
-            UserDefaults.standard.set(newValue.playerDisplayStyle.rawValue, forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue)
-        }
     }
     
     var librarySyncVersion: LibrarySyncVersion {

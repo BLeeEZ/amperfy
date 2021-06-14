@@ -40,23 +40,17 @@ class SettingsSongActionOnTabVC: UITableViewController {
     }
     
     @IBAction func playAndErasePlaylistPressed(_ sender: Any) {
-        let settings = appDelegate.persistentStorage.settings
-        settings.songActionOnTab = .playAndErasePlaylist
-        appDelegate.persistentStorage.settings = settings
+        appDelegate.persistentStorage.settings.songActionOnTab = .playAndErasePlaylist
         navigationController?.popToRootViewController(animated: true)
     }
     
     @IBAction func addToPlaylistAndPlayPressed(_ sender: Any) {
-        let settings = appDelegate.persistentStorage.settings
-        settings.songActionOnTab = .addToPlaylistAndPlay
-        appDelegate.persistentStorage.settings = settings
+        appDelegate.persistentStorage.settings.songActionOnTab = .addToPlaylistAndPlay
         navigationController?.popToRootViewController(animated: true)
     }
     
     @IBAction func insertAsNextSongNoPlayPressed(_ sender: Any) {
-        let settings = appDelegate.persistentStorage.settings
-        settings.songActionOnTab = .insertAsNextSongNoPlay
-        appDelegate.persistentStorage.settings = settings
+        appDelegate.persistentStorage.settings.songActionOnTab = .insertAsNextSongNoPlay
         navigationController?.popToRootViewController(animated: true)
     }
 

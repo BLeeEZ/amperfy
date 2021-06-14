@@ -129,9 +129,7 @@ class PlayerView: UIView {
     @IBAction private func displayPlaylistPressed() {
         appDelegate.userStatistics.usedAction(.changePlayerDisplayStyle)
         displayStyle.switchToNextStyle()
-        let settings = appDelegate.persistentStorage.settings
-        settings.playerDisplayStyle = displayStyle
-        appDelegate.persistentStorage.settings = settings
+        appDelegate.persistentStorage.settings.playerDisplayStyle = displayStyle
         refreshDisplayPlaylistButton()
         renderAnimation()
     }
