@@ -1653,6 +1653,46 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection id="pqk-wi-PXE">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="40" id="VEB-Zz-QUm">
+                                        <rect key="frame" x="0.0" y="304" width="414" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="VEB-Zz-QUm" id="cLz-Cc-qOE">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v1N-2v-U0b">
+                                                    <rect key="frame" x="20" y="5" width="394" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="hGD-JA-KPm"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Update password">
+                                                        <color key="titleColor" systemColor="labelColor"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="updatePasswordPressed:" destination="3j9-EZ-8oG" eventType="touchUpInside" id="i1b-eh-akc"/>
+                                                    </connections>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&gt;" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SSQ-Pw-jiq" userLabel="Select Label">
+                                                    <rect key="frame" x="314" y="10" width="84" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="SSQ-Pw-jiq" firstAttribute="centerY" secondItem="cLz-Cc-qOE" secondAttribute="centerY" id="BPS-2q-hwL"/>
+                                                <constraint firstAttribute="trailing" secondItem="v1N-2v-U0b" secondAttribute="trailing" id="DNg-qA-De9"/>
+                                                <constraint firstItem="v1N-2v-U0b" firstAttribute="leading" secondItem="cLz-Cc-qOE" secondAttribute="leadingMargin" id="DqY-38-G9E"/>
+                                                <constraint firstItem="v1N-2v-U0b" firstAttribute="centerY" secondItem="cLz-Cc-qOE" secondAttribute="centerY" id="GLC-hr-eT7"/>
+                                                <constraint firstAttribute="trailing" secondItem="SSQ-Pw-jiq" secondAttribute="trailing" constant="16" id="Oxt-z3-aMq"/>
+                                                <constraint firstItem="SSQ-Pw-jiq" firstAttribute="leading" secondItem="cLz-Cc-qOE" secondAttribute="trailing" constant="-100" id="kJp-2e-WOJ"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="3j9-EZ-8oG" id="zWq-32-tb0"/>

@@ -59,6 +59,7 @@ protocol BackendApi {
     func provideCredentials(credentials: LoginCredentials)
     func authenticate(credentials: LoginCredentials) 
     func isAuthenticated() -> Bool
+    func isAuthenticationValid(credentials: LoginCredentials) -> Bool
     func generateUrl(forDownloadingSong song: Song) -> URL?
     func generateUrl(forStreamingSong song: Song) -> URL?
     func generateUrl(forArtwork artwork: Artwork) -> URL?

@@ -25,4 +25,34 @@ class SettingsServerVC: UITableViewController {
         }
     }
     
+    @IBAction func updatePasswordPressed(_ sender: Any) {
+        let alert = UIAlertController(title: "Update Password", message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addTextField(configurationHandler: { passwordTextField in
+            passwordTextField.placeholder = "Changed account password..."
+            passwordTextField.isSecureTextEntry = true
+        })
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+            if let newPassword = alert.textFields?.first?.text,
+               let loginCredentials = self.appDelegate.persistentStorage.loginCredentials {
+                loginCredentials.changePasswordAndHash(password: newPassword)
+                if self.appDelegate.backendProxy.isAuthenticationValid(credentials: loginCredentials) {
+                    self.appDelegate.persistentStorage.loginCredentials = loginCredentials
+                    self.appDelegate.backendProxy.authenticate(credentials: loginCredentials)
+                    let alert = UIAlertController(title: "Successful", message: "Password updated!", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+                    self.present(alert, animated: true)
+                } else {
+                    let alert = UIAlertController(title: "Failed", message: "Not able to login!", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+                    self.present(alert, animated: true)
+                }
+            }
+        }))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        self.present(alert, animated: true)
+    }
+    
 }

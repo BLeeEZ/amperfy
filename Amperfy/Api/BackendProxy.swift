@@ -154,6 +154,10 @@ extension BackendProxy: BackendApi {
         return activeApi.isAuthenticated()
     }
     
+    func isAuthenticationValid(credentials: LoginCredentials) -> Bool {
+        return activeApi.isAuthenticationValid(credentials: credentials)
+    }
+    
     func generateUrl(forDownloadingSong song: Song) -> URL? {
         return activeApi.generateUrl(forDownloadingSong: song)
     }

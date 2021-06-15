@@ -57,8 +57,9 @@ class SubsonicServerApi {
         }
     }
     
-    private func createBasicApiUrlComponent(forAction: String) -> URLComponents? {
-        guard let hostname = credentials?.serverUrl,
+    private func createBasicApiUrlComponent(forAction: String, providedCredentials: LoginCredentials? = nil) -> URLComponents? {
+        let localCredentials = providedCredentials != nil ? providedCredentials : self.credentials
+        guard let hostname = localCredentials?.serverUrl,
               var apiUrl = URL(string: hostname)
         else { return nil }
         
@@ -68,10 +69,11 @@ class SubsonicServerApi {
         return URLComponents(url: apiUrl, resolvingAgainstBaseURL: false)
     }
     
-    private func createAuthenticatedApiUrlComponent(forAction: String) -> URLComponents? {
-        guard let username = credentials?.username,
-              let password = credentials?.password,
-              var urlComp = createBasicApiUrlComponent(forAction: forAction)
+    private func createAuthenticatedApiUrlComponent(forAction: String, credentials providedCredentials: LoginCredentials? = nil) -> URLComponents? {
+        let localCredentials = providedCredentials != nil ? providedCredentials : self.credentials
+        guard let username = localCredentials?.username,
+              let password = localCredentials?.password,
+              var urlComp = createBasicApiUrlComponent(forAction: forAction, providedCredentials: localCredentials)
         else { return nil }
         
         determeClientApiVersionToUse()
@@ -103,17 +105,22 @@ class SubsonicServerApi {
     }
     
     func authenticate(credentials: LoginCredentials) {
-        self.credentials = credentials
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "ping"),
+        isValidCredentials = isAuthenticationValid(credentials: credentials)
+        if isValidCredentials {
+            self.credentials = credentials
+        }
+    }
+    
+    func isAuthenticationValid(credentials: LoginCredentials) -> Bool {
+        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "ping", credentials: credentials),
               let url = urlComp.url else {
             os_log("Subsonic server url invalid", log: log, type: .error)
-            return
+            return false
         }
 
         guard let parser = XMLParser(contentsOf: url) else {
             os_log("Couldn't load the ping response.", log: log, type: .error)
-            isValidCredentials = false
-            return
+            return false
         }
         
         let curDelegate = SsPingParserDelegate()
@@ -125,15 +132,14 @@ class SubsonicServerApi {
         }
         
         if let error = parser.parserError {
-            isValidCredentials = false
             os_log("Error during login parsing: %s", log: log, type: .error, error.localizedDescription)
-            return
+            return false
         }
         if success, curDelegate.isAuthValid {
-            isValidCredentials = true
+            return true
         } else {
-            isValidCredentials = false
             os_log("Couldn't login.", log: log, type: .error)
+            return false
         }
     }
     

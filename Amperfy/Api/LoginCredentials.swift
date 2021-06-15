@@ -6,7 +6,7 @@ class LoginCredentials {
     var username: String
     var password: String
     var passwordHash: String
-    var backendApi: BackenApiType 
+    var backendApi: BackenApiType
 
     init() {
         self.serverUrl = ""
@@ -28,5 +28,11 @@ class LoginCredentials {
         self.init(serverUrl: serverUrl, username: username, password: password)
         self.backendApi = backendApi
     }
+    
+    func changePasswordAndHash(password newPassword: String) {
+        self.password = newPassword
+        self.passwordHash = StringHasher.sha256(dataString: newPassword)
+    }
+    
 }
 

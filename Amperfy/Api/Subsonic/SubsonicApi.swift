@@ -28,6 +28,10 @@ class SubsonicApi: BackendApi {
     func isAuthenticated() -> Bool {
         return subsonicServerApi.isAuthenticated()
     }
+    
+    func isAuthenticationValid(credentials: LoginCredentials) -> Bool {
+        return subsonicServerApi.isAuthenticationValid(credentials: credentials)
+    }
 
     func generateUrl(forDownloadingSong song: Song) -> URL? {
         return subsonicServerApi.generateUrl(forDownloadingSong: song)

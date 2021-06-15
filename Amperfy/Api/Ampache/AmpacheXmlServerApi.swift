@@ -79,8 +79,9 @@ class AmpacheXmlServerApi {
         return passphrase
     }
 
-    private func createApiUrl() -> URL? {
-        guard let hostname = credentials?.serverUrl else { return nil }
+    private func createApiUrl(providedCredentials: LoginCredentials? = nil) -> URL? {
+        let localCredentials = providedCredentials != nil ? providedCredentials : self.credentials
+        guard let hostname = localCredentials?.serverUrl else { return nil }
         var apiUrl = URL(string: hostname)
         apiUrl?.appendPathComponent("server")
         apiUrl?.appendPathComponent("xml.server.php")
@@ -102,11 +103,24 @@ class AmpacheXmlServerApi {
     }
     
     func authenticate(credentials: LoginCredentials) {
-        self.credentials = credentials
+        if let handshake = requestHandshake(credentials: credentials) {
+            self.authHandshake = handshake
+            self.credentials = credentials
+        } else {
+            self.authHandshake = nil
+            self.credentials = nil
+        }
+    }
+    
+    func isAuthenticationValid(credentials: LoginCredentials) -> Bool {
+        return requestHandshake(credentials: credentials) != nil
+    }
+    
+    private func requestHandshake(credentials: LoginCredentials) -> AuthentificationHandshake? {
         let timestamp = Int(NSDate().timeIntervalSince1970)
         let passphrase = generatePassphrase(passwordHash: credentials.passwordHash, timestamp: timestamp)
 
-        guard let apiUrl = createApiUrl(), var urlComp = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false) else { return }
+        guard let apiUrl = createApiUrl(providedCredentials: credentials), var urlComp = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false) else { return nil }
         urlComp.addQueryItem(name: "action", value: "handshake")
         urlComp.addQueryItem(name: "auth", value: passphrase)
         urlComp.addQueryItem(name: "timestamp", value: timestamp)
@@ -114,7 +128,7 @@ class AmpacheXmlServerApi {
         urlComp.addQueryItem(name: "user", value: credentials.username)
         guard let url = urlComp.url else {
             os_log("Ampache authentication url is invalid: %s", log: log, type: .error, urlComp.description)
-            return
+            return nil
         }
         let parser = XMLParser(contentsOf: url)!
         let curDelegate = AuthParserDelegate()
@@ -124,18 +138,18 @@ class AmpacheXmlServerApi {
             self.serverApiVersion = serverApiVersion
         }
         if let error = parser.parserError {
-            authHandshake = nil
             os_log("Error during AuthPars: %s", log: log, type: .error, error.localizedDescription)
-            return
+            return nil
         }
         if success && curDelegate.authHandshake != nil {
-            authHandshake = curDelegate.authHandshake
+            return curDelegate.authHandshake
         } else {
             authHandshake = nil
             os_log("Couldn't get a login token.", log: log, type: .error)
             if let apiError = curDelegate.error {
                 eventLogger.report(error: apiError)
             }
+            return nil
         }
     }
     

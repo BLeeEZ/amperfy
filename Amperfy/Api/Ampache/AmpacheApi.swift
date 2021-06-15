@@ -27,6 +27,10 @@ class AmpacheApi: BackendApi {
     func isAuthenticated() -> Bool {
         return ampacheXmlServerApi.isAuthenticated()
     }
+    
+    func isAuthenticationValid(credentials: LoginCredentials) -> Bool {
+        return ampacheXmlServerApi.isAuthenticationValid(credentials: credentials)
+    }
 
     func generateUrl(forDownloadingSong song: Song) -> URL? {
         return ampacheXmlServerApi.generateUrl(forDownloadingSong: song)
