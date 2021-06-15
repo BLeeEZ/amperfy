@@ -20,10 +20,6 @@ class AlbumParserTest: AbstractAmpacheTest {
         artist.name = "Various Artists"
         
         artist = library.createArtist()
-        artist.id = "12"
-        artist.name = "9958A"
-        
-        artist = library.createArtist()
         artist.id = "91"
         artist.name = "ZZZasdf"
     }
@@ -47,7 +43,7 @@ class AlbumParserTest: AbstractAmpacheTest {
         album = albums[1]
         XCTAssertEqual(album.id, "98")
         XCTAssertEqual(album.name, "Blibb uu")
-        XCTAssertEqual(album.artist?.id, "12")
+        XCTAssertEqual(album.artist?.id, "12") // Artist not pre created
         XCTAssertEqual(album.artist?.name, "9958A")
         XCTAssertEqual(album.year, 1974)
         XCTAssertEqual(album.songCount, 1)

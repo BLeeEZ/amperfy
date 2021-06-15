@@ -111,7 +111,8 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         song = playlist.songs[2]
         XCTAssertEqual(song.id, "748")
         XCTAssertEqual(song.title, "Stories from Emona II")
-        XCTAssertNil(song.artist) // artist not pre created
+        XCTAssertEqual(song.artist?.id, "51") // Artist not pre created
+        XCTAssertEqual(song.artist?.name, "Maya Filipič")
         XCTAssertEqual(song.album?.id, "68")
         XCTAssertEqual(song.album?.name, "Between two worlds")
         XCTAssertEqual(song.track, 2)
@@ -132,7 +133,8 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.title, "Bajo siete lunas (intro)")
         XCTAssertEqual(song.artist?.id, "54")
         XCTAssertEqual(song.artist?.name, "PeerGynt Lobogris")
-        XCTAssertNil(song.album) // Album not pre created
+        XCTAssertEqual(song.album?.id, "74") // Album not pre created
+        XCTAssertEqual(song.album?.name, "Broken Dreams")
         XCTAssertEqual(song.track, 1)
         XCTAssertEqual(song.genre?.id, "")
         XCTAssertEqual(song.genre?.name, "Blues")

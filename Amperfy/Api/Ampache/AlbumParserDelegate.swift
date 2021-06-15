@@ -6,6 +6,7 @@ import os.log
 class AlbumParserDelegate: AmpacheXmlLibParser {
     
     var albumBuffer: Album?
+    var artistIdToCreate: String?
     var genreIdToCreate: String?
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
@@ -25,16 +26,11 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
                 albumBuffer?.id = albumId
             }
 		case "artist":
-            if let album = albumBuffer {
-                guard let artistId = attributeDict["id"] else {
-                    os_log("Found album id %s with no artist id. Album name: %s", log: log, type: .error, album.id, album.name)
-                    return
-                }
-                if let artist = library.getArtist(id: artistId) {
-                    album.artist = artist
-                } else {
-                    os_log("Found album id %s with unknown artist %s. Album name: %s", log: log, type: .error, album.id, artistId, album.name)
-                }
+            guard let album = albumBuffer, let artistId = attributeDict["id"] else { return }
+            if let artist = library.getArtist(id: artistId) {
+                album.artist = artist
+            } else {
+                artistIdToCreate = artistId
             }
         case "genre":
             if let album = albumBuffer {
@@ -52,6 +48,16 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
 		switch(elementName) {
+        case "artist":
+            if let artistId = artistIdToCreate {
+                os_log("Artist <%s> with id %s has been created", log: log, type: .error, buffer, artistId)
+                let artist = library.createArtist()
+                artist.id = artistId
+                artist.name = buffer
+                artist.syncInfo = syncWave
+                albumBuffer?.artist = artist
+                artistIdToCreate = nil
+            }
 		case "name":
             albumBuffer?.name = buffer
 		case "album":

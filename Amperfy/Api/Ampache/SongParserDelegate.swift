@@ -6,6 +6,8 @@ import os.log
 class SongParserDelegate: AmpacheXmlLibParser {
 
     var songBuffer: Song?
+    var artistIdToCreate: String?
+    var albumIdToCreate: String?
     var genreIdToCreate: String?
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
@@ -25,37 +27,25 @@ class SongParserDelegate: AmpacheXmlLibParser {
                 songBuffer?.id = songId
             }
         case "artist":
-            if let song = songBuffer {
-                guard let artistId = attributeDict["id"] else {
-                    os_log("Found song id %s with no artist id. Title: %s", log: log, type: .error, song.id, song.title)
-                    return
-                }
-                if let artist = library.getArtist(id: artistId) {
-                    song.artist = artist
-                } else {
-                    os_log("Found song id %s with unknown artist id %s. Title: %s", log: log, type: .error, song.id, artistId, song.title)
-                }
+            guard let song = songBuffer, let artistId = attributeDict["id"] else { return }
+            if let artist = library.getArtist(id: artistId) {
+                song.artist = artist
+            } else {
+                artistIdToCreate = artistId
             }
         case "album":
-            if let song = songBuffer {
-                guard let albumId = attributeDict["id"] else {
-                    os_log("Found song id %s with no album id. Title: %s", log: log, type: .error, song.id, song.title)
-                    return
-                }
-                if let album = library.getAlbum(id: albumId)  {
-                    song.album = album
-                } else {
-                    os_log("Found song id %s with unknown album id %s. Title: %s", log: log, type: .error, song.id, albumId, song.title)
-                }
+            guard let song = songBuffer, let albumId = attributeDict["id"] else { return }
+            if let album = library.getAlbum(id: albumId)  {
+                song.album = album
+            } else {
+                albumIdToCreate = albumId
             }
         case "genre":
-            if let song = songBuffer {
-                guard let genreId = attributeDict["id"] else { return }
-                if let genre = library.getGenre(id: genreId) {
-                    song.genre = genre
-                } else {
-                    genreIdToCreate = genreId
-                }
+            guard let song = songBuffer, let genreId = attributeDict["id"] else { return }
+            if let genre = library.getGenre(id: genreId) {
+                song.genre = genre
+            } else {
+                genreIdToCreate = genreId
             }
         default:
             break
@@ -64,6 +54,36 @@ class SongParserDelegate: AmpacheXmlLibParser {
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
+        case "artist":
+            if let artistId = artistIdToCreate {
+                os_log("Artist <%s> with id %s has been created", log: log, type: .error, buffer, artistId)
+                let artist = library.createArtist()
+                artist.id = artistId
+                artist.name = buffer
+                artist.syncInfo = syncWave
+                songBuffer?.artist = artist
+                artistIdToCreate = nil
+            }
+        case "album":
+            if let albumId = albumIdToCreate {
+                os_log("Album <%s> with id %s has been created", log: log, type: .error, buffer, albumId)
+                let album = library.createAlbum()
+                album.id = albumId
+                album.name = buffer
+                album.syncInfo = syncWave
+                songBuffer?.album = album
+                albumIdToCreate = nil
+            }
+        case "genre":
+            if let genreId = genreIdToCreate {
+                os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
+                let genre = library.createGenre()
+                genre.id = genreId
+                genre.name = buffer
+                genre.syncInfo = syncWave
+                songBuffer?.genre = genre
+                genreIdToCreate = nil
+            }
         case "title":
             songBuffer?.title = buffer
         case "track":
@@ -84,16 +104,6 @@ class SongParserDelegate: AmpacheXmlLibParser {
             songBuffer?.contentType = buffer
         case "disk":
             songBuffer?.disk = buffer
-        case "genre":
-            if let genreId = genreIdToCreate {
-                os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
-                let genre = library.createGenre()
-                genre.id = genreId
-                genre.name = buffer
-                genre.syncInfo = syncWave
-                songBuffer?.genre = genre
-                genreIdToCreate = nil
-            }
         case "song":
             parsedCount += 1
             parseNotifier?.notifyParsedObject(ofType: .song)

@@ -27,18 +27,10 @@ class SongParserTest: AbstractAmpacheTest {
         artist = library.createArtist()
         artist.id = "14"
         artist.name = "Nofi/found."
-        
-        artist = library.createArtist()
-        artist.id = "2"
-        artist.name = "Synthetic"
     }
     
     func createTestAlbums() {
-        var album = library.createAlbum()
-        album.id = "12"
-        album.name = "Buried in Nausea"
-        
-        album = library.createAlbum()
+        let album = library.createAlbum()
         album.id = "2"
         album.name = "Colorsmoke EP"
     }
@@ -53,7 +45,7 @@ class SongParserTest: AbstractAmpacheTest {
         XCTAssertEqual(song.title, "Are we going Crazy")
         XCTAssertEqual(song.artist?.id, "27")
         XCTAssertEqual(song.artist?.name, "Chi.Otic")
-        XCTAssertEqual(song.album?.id, "12")
+        XCTAssertEqual(song.album?.id, "12") // Album not pre created
         XCTAssertEqual(song.album?.name, "Buried in Nausea")
         XCTAssertEqual(song.disk, "1")
         XCTAssertEqual(song.track, 7)
@@ -114,7 +106,7 @@ class SongParserTest: AbstractAmpacheTest {
         song = songs[3]
         XCTAssertEqual(song.id, "56")
         XCTAssertEqual(song.title, "Black&BlueSmoke")
-        XCTAssertEqual(song.artist?.id, "2")
+        XCTAssertEqual(song.artist?.id, "2") // Artist not pre created
         XCTAssertEqual(song.artist?.name, "Synthetic")
         XCTAssertEqual(song.album?.id, "2")
         XCTAssertEqual(song.album?.name, "Colorsmoke EP")

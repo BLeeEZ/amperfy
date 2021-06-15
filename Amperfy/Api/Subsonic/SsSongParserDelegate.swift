@@ -53,23 +53,37 @@ class SsSongParserDelegate: SsXmlLibWithArtworkParser {
                 songBuffer?.artwork = parseArtwork(id: coverArtId)
             }
 
-            if songBuffer?.artist == nil, let artistId = attributeDict["artistId"] {
+            if let artistId = attributeDict["artistId"] {
                 if let guessedArtist = guessedArtist, guessedArtist.id == artistId {
                     songBuffer?.artist = guessedArtist
                 } else if let artist = library.getArtist(id: artistId) {
                     songBuffer?.artist = artist
+                } else if let artistName = attributeDict["artist"] {
+                    let artist = library.createArtist()
+                    artist.id = artistId
+                    artist.name = artistName
+                    artist.syncInfo = syncWave
+                    os_log("Artist <%s> with id %s has been created", log: log, type: .error, artistName, artistId)
+                    songBuffer?.artist = artist
                 }
             }
 
-            if songBuffer?.album == nil, let albumId = attributeDict["albumId"] {
+            if let albumId = attributeDict["albumId"] {
                 if let guessedAlbum = guessedAlbum, guessedAlbum.id == albumId {
                     songBuffer?.album = guessedAlbum
                 } else if let album = library.getAlbum(id: albumId) {
                     songBuffer?.album = album
+                } else if let albumName = attributeDict["album"] {
+                    let album = library.createAlbum()
+                    album.id = albumId
+                    album.name = albumName
+                    album.syncInfo = syncWave
+                    os_log("Album <%s> with id %s has been created", log: log, type: .error, albumName, albumId)
+                    songBuffer?.album = album
                 }
             }
             
-            if songBuffer?.genre == nil, let genreName = attributeDict["genre"] {
+            if let genreName = attributeDict["genre"] {
                 if let guessedGenre = guessedGenre, guessedGenre.name == genreName {
                     songBuffer?.genre = guessedGenre
                 } else if let genre = library.getGenre(name: genreName) {

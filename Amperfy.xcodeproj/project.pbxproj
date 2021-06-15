@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		43FBE27F250D4DFD00D5F9B3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */; };
 		5002565725E69DC800674CE1 /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5002565625E69DC700674CE1 /* SpinnerViewController.swift */; };
+		5003D8F72678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */; };
 		50048FFF2671EFBD00064433 /* LibraryEntityImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048FFE2671EFBD00064433 /* LibraryEntityImage.swift */; };
 		500631FF23A1747B000F75A3 /* PlayerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500631FE23A1747B000F75A3 /* PlayerView.xib */; };
 		5006320123A174C0000F75A3 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5006320023A174C0000F75A3 /* PlayerView.swift */; };
@@ -303,6 +304,7 @@
 /* Begin PBXFileReference section */
 		43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5002565625E69DC700674CE1 /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
+		5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserPreCreatedArtistsTest.swift; sourceTree = "<group>"; };
 		50048FFE2671EFBD00064433 /* LibraryEntityImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryEntityImage.swift; sourceTree = "<group>"; };
 		500631FE23A1747B000F75A3 /* PlayerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlayerView.xib; sourceTree = "<group>"; };
 		5006320023A174C0000F75A3 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
@@ -1046,6 +1048,7 @@
 				50DB11A9266536290033BFFA /* SsXmlParserTest.swift */,
 				50DB11B626653B3A0033BFFA /* SsGenreParserTest.swift */,
 				50AB92BD26660FE000DCE45C /* SsArtistParserTest.swift */,
+				5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */,
 				50AB92C326661F2600DCE45C /* SsAlbumParserTest.swift */,
 				50AB92C12666127100DCE45C /* SsSongExample1ParserTest.swift */,
 				50AB92E126675B7000DCE45C /* SsSongExample2ParserTest.swift */,
@@ -1521,6 +1524,7 @@
 				50B798AF23B7ED6200551E62 /* CoreDataSeeder.swift in Sources */,
 				5090963826496A9500DD9826 /* UtilitiesTest.swift in Sources */,
 				50E964AF25E8E25E00E3210F /* SubsonicVersionTest.swift in Sources */,
+				5003D8F72678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift in Sources */,
 				50AB92D42666C1A000DCE45C /* SsDirectoriesExample1ParserTest.swift in Sources */,
 				50B798B423B8664700551E62 /* HelperTest.swift in Sources */,
 				50F81E9B23BE531900EAAC3E /* SyncWaveTest.swift in Sources */,

@@ -28,22 +28,28 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
             if let attributeCoverArt = attributeDict["coverArt"] {
                 albumBuffer?.artwork = parseArtwork(id: attributeCoverArt)
             }
-            
             if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
                 albumBuffer?.year = year
-            }
-            
-            if albumBuffer?.artist == nil, let artistId = attributeDict["artistId"] {
-                if let guessedArtist = guessedArtist, guessedArtist.id == artistId {
-                    albumBuffer?.artist = guessedArtist
-                } else if let artist = library.getArtist(id: artistId) {
-                    albumBuffer?.artist = artist
-                }
             }
             if let attributeSongCount = attributeDict["songCount"], let songCount = Int(attributeSongCount) {
                 albumBuffer?.songCount = songCount
             }
             
+            if let artistId = attributeDict["artistId"] {
+                if let guessedArtist = guessedArtist, guessedArtist.id == artistId {
+                    albumBuffer?.artist = guessedArtist
+                } else if let artist = library.getArtist(id: artistId) {
+                    albumBuffer?.artist = artist
+                } else if let artistName = attributeDict["artist"] {
+                    let artist = library.createArtist()
+                    artist.id = artistId
+                    artist.name = artistName
+                    artist.syncInfo = syncWave
+                    os_log("Artist <%s> with id %s has been created", log: log, type: .error, artistName, artistId)
+                    albumBuffer?.artist = artist
+                }
+            }
+
             if albumBuffer?.genre == nil, let genreName = attributeDict["genre"] {
                 if let genre = library.getGenre(name: genreName) {
                     albumBuffer?.genre = genre

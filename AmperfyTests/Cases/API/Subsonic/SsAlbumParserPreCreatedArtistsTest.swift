@@ -1,12 +1,19 @@
 import XCTest
 @testable import Amperfy
 
-class SsAlbumParserTest: AbstractSsParserTest {
+class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
     
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "artist_example_1")
         ssParserDelegate = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        createTestPartner()
+    }
+    
+    func createTestPartner() {
+        let artist = library.createArtist()
+        artist.id = "5432"
+        artist.name = "AC/DC"
     }
     
     override func checkCorrectParsing() {
@@ -16,7 +23,7 @@ class SsAlbumParserTest: AbstractSsParserTest {
         var album = albums[1]
         XCTAssertEqual(album.id, "11047")
         XCTAssertEqual(album.name, "Back In Black")
-        XCTAssertEqual(album.artist?.id, "5432") // Artist not pre created
+        XCTAssertEqual(album.artist?.id, "5432")
         XCTAssertEqual(album.artist?.name, "AC/DC")
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.songCount, 10)
