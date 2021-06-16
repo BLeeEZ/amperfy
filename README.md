@@ -14,11 +14,9 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 
 - Offline support
 - Syncing the database after first login
-- Background sync to keep database up to date
+- Update library via search API
 - Player interaction from lock screen
 - Remote controlable
-- Artwork sync from database
-- Playlist download and upload
 - Dark mode support
 
 ## Requirements

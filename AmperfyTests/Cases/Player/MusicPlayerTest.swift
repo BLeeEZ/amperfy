@@ -69,6 +69,8 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage) {}
     func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage) {}
     func syncUpload(playlistToDelete playlist: Playlist) {}
+    func searchArtists(searchText: String, library: LibraryStorage) {}
+    func searchAlbums(searchText: String, library: LibraryStorage) {}
     func searchSongs(searchText: String, library: LibraryStorage) {}
     func syncMusicFolders(library: LibraryStorage) {}
     func syncIndexes(musicFolder: MusicFolder, library: LibraryStorage) {}
@@ -101,13 +103,12 @@ class MOCK_BackendApi: BackendApi {
     func provideCredentials(credentials: LoginCredentials) {}
     func authenticate(credentials: LoginCredentials) {}
     func isAuthenticated() -> Bool { return false }
+    func isAuthenticationValid(credentials: LoginCredentials) -> Bool { return false }
     func generateUrl(forDownloadingSong song: Song) -> URL? { return nil }
     func generateUrl(forStreamingSong song: Song) -> URL? { return nil }
     func generateUrl(forArtwork artwork: Artwork) -> URL? { return nil }
     func checkForErrorResponse(inData data: Data) -> ResponseError? { return nil }
     func createLibrarySyncer() -> LibrarySyncer { return MOCK_LibrarySyncer() }
-    func createLibraryBackgroundSyncer() -> BackgroundLibrarySyncer { return MOCK_BackgroundLibrarySyncer() }
-    func createLibraryVersionBackgroundResyncer() -> BackgroundLibraryVersionResyncer { return MOCK_BackgroundLibraryVersionResyncer() }
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { return nil }
 }

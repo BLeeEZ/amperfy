@@ -178,14 +178,6 @@ extension BackendProxy: BackendApi {
         return activeApi.createLibrarySyncer()
     }
 
-    func createLibraryBackgroundSyncer() -> BackgroundLibrarySyncer {
-        return activeApi.createLibraryBackgroundSyncer()
-    }
-
-    func createLibraryVersionBackgroundResyncer() -> BackgroundLibraryVersionResyncer {
-        return activeApi.createLibraryVersionBackgroundResyncer()
-    }
-
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
         return activeApi.createArtworkArtworkDownloadDelegate()
     }

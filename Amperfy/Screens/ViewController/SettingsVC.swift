@@ -26,7 +26,6 @@ class SettingsVC: UITableViewController {
             self.appDelegate.player.stop()
             self.appDelegate.artworkDownloadManager.stopAndWait()
             self.appDelegate.songDownloadManager.stopAndWait()
-            self.appDelegate.backgroundSyncerManager.stopAndWait()
             self.appDelegate.persistentStorage.context.reset()
             self.appDelegate.persistentStorage.loginCredentials = nil
             self.appDelegate.library.cleanStorage()
