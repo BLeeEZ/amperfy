@@ -11,6 +11,7 @@ enum FontAwesomeIcon: Int {
     case Bars = 0xf0c9
     case SortDown = 0xf0dd
     case Exclamation = 0xf12a
+    case Sync = 0xf021
     
     var asString: String {
         return String(format: "%C", self.rawValue)

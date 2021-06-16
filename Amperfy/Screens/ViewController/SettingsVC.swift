@@ -29,7 +29,7 @@ class SettingsVC: UITableViewController {
             self.appDelegate.persistentStorage.context.reset()
             self.appDelegate.persistentStorage.loginCredentials = nil
             self.appDelegate.library.cleanStorage()
-            self.appDelegate.persistentStorage.isSongsSyncInfoReadByUser = false
+            self.appDelegate.persistentStorage.isLibrarySyncInfoReadByUser = false
             self.appDelegate.persistentStorage.isLibrarySynced = false
             self.deleteViewControllerCaches()
             self.appDelegate.reinit()

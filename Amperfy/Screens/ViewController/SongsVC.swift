@@ -1,7 +1,7 @@
 import UIKit
 import CoreData
 
-class SongVC: SingleFetchedResultsTableViewController<SongMO> {
+class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
     private var fetchedResultsController: SongFetchedResultsController!
     
@@ -19,16 +19,6 @@ class SongVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         fetchedResultsController.fetch()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        if !appDelegate.persistentStorage.isSongsSyncInfoReadByUser {
-            let alert = UIAlertController(title: "Info", message: "Only already synced songs are displayed.\nPlease use the search bar to find and update your song collection.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default , handler: { _ in
-                self.appDelegate.persistentStorage.isSongsSyncInfoReadByUser = true
-            }))
-            present(alert, animated: true, completion: nil)
-        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

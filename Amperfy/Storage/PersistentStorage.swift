@@ -14,7 +14,7 @@ class PersistentStorage {
         case PlayerDisplayStyle = "playerDisplayStyle"
         case LibrarySyncVersion = "librarySyncVersion"
         
-        case SongsSyncInfoReadByUser = "songsSyncInfoReadByUser"
+        case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
     }
     
     class Settings {
@@ -63,9 +63,9 @@ class PersistentStorage {
         }
     }
     
-    var isSongsSyncInfoReadByUser: Bool {
-        get { return UserDefaults.standard.object(forKey: UserDefaultsKey.SongsSyncInfoReadByUser.rawValue) as? Bool ?? false }
-        set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.SongsSyncInfoReadByUser.rawValue) }
+    var isLibrarySyncInfoReadByUser: Bool {
+        get { return UserDefaults.standard.object(forKey: UserDefaultsKey.LibrarySyncInfoReadByUser.rawValue) as? Bool ?? false }
+        set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.LibrarySyncInfoReadByUser.rawValue) }
     }
 
     var isLibrarySynced: Bool {
