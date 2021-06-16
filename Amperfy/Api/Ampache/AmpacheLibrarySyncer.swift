@@ -37,7 +37,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         let syncWave = syncLibrary.createSyncWave()
         syncWave.setMetaData(fromLibraryChangeDates: libMetaData.libraryChangeDates)
         syncLibrary.saveContext()
-        
+
         statusNotifyier?.notifySyncStarted(ofType: .genre)
         let genreParser = GenreParserDelegate(library: syncLibrary, syncWave: syncWave, parseNotifier: statusNotifyier)
         self.ampacheXmlServerApi.requestGenres(parserDelegate: genreParser)
@@ -79,7 +79,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         let playlistParser = PlaylistParserDelegate(library: syncLibrary, parseNotifier: statusNotifyier)
         ampacheXmlServerApi.requestPlaylists(parserDelegate: playlistParser)
         syncLibrary.saveContext()
-                
+
         syncWave.syncState = .Done
         syncLibrary.saveContext()
         statusNotifyier?.notifySyncFinished()
@@ -166,6 +166,22 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             playlistParser.playlist = playlist
             ampacheXmlServerApi.requestPlaylistCreate(parserDelegate: playlistParser, playlist: playlist)
         }
+    }
+    
+    func searchArtists(searchText: String, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+        os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
+        let parser = ArtistParserDelegate(library: library, syncWave: syncWave)
+        ampacheXmlServerApi.requestSearchArtists(parserDelegate: parser, searchText: searchText)
+        library.saveContext()
+    }
+    
+    func searchAlbums(searchText: String, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+        os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
+        let parser = AlbumParserDelegate(library: library, syncWave: syncWave)
+        ampacheXmlServerApi.requestSearchAlbums(parserDelegate: parser, searchText: searchText)
+        library.saveContext()
     }
     
     func searchSongs(searchText: String, library: LibraryStorage) {

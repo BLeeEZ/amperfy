@@ -33,6 +33,8 @@ protocol LibrarySyncer {
     func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage)
     func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage)
     func syncUpload(playlistToDelete playlist: Playlist)
+    func searchArtists(searchText: String, library: LibraryStorage)
+    func searchAlbums(searchText: String, library: LibraryStorage)
     func searchSongs(searchText: String, library: LibraryStorage)
     func syncMusicFolders(library: LibraryStorage)
     func syncIndexes(musicFolder: MusicFolder, library: LibraryStorage)

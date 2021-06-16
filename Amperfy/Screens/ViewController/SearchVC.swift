@@ -164,6 +164,16 @@ class SearchVC: BasicTableViewController {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
             appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let backgroundLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.searchArtists(searchText: searchText, library: backgroundLibrary)
+            }
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let backgroundLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.searchAlbums(searchText: searchText, library: backgroundLibrary)
+            }
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                 let syncLibrary = LibraryStorage(context: context)
                 let syncer = self.appDelegate.backendApi.createLibrarySyncer()
                 syncer.searchSongs(searchText: searchText, library: syncLibrary)

@@ -24,7 +24,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         let syncWave = syncLibrary.createSyncWave()
         syncWave.setMetaData(fromLibraryChangeDates: LibraryChangeDates())
         syncLibrary.saveContext()
-        
+
         statusNotifyier?.notifySyncStarted(ofType: .genre)
         let genreParser = SsGenreParserDelegate(library: syncLibrary, syncWave: syncWave, parseNotifier: statusNotifyier)
         subsonicServerApi.requestGenres(parserDelegate: genreParser)
@@ -169,6 +169,22 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         os_log("Upload Delete playlist \"%s\"", log: log, type: .info, playlist.name)
         let updateResponseParser = SsPingParserDelegate()
         subsonicServerApi.requestPlaylistDelete(parserDelegate: updateResponseParser, playlist: playlist)
+    }
+    
+    func searchArtists(searchText: String, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+        os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
+        let parser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestSearchArtists(parserDelegate: parser, searchText: searchText)
+        library.saveContext()
+    }
+    
+    func searchAlbums(searchText: String, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+        os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
+        let parser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestSearchAlbums(parserDelegate: parser, searchText: searchText)
+        library.saveContext()
     }
     
     func searchSongs(searchText: String, library: LibraryStorage) {

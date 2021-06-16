@@ -4,6 +4,23 @@ import os.log
 
 class AmpacheXmlServerApi {
     
+    enum AmpacheError: Int {
+        case accessControlNotEnabled = 4700 // The API is disabled. Enable 'access_control' in your config
+        case receivedInvalidHandshake = 4701 //This is a temporary error, this means no valid session was passed or the handshake failed
+        case accessDenied = 4703 // The requested method is not available
+                                 // You can check the error message for details about which feature is disabled
+        case notFound = 4704 // The API could not find the requested object
+        case missing = 4705 // This is a fatal error, the service requested a method that the API does not implement
+        case depreciated = 4706 // This is a fatal error, the method requested is no longer available
+        case badRequest = 4710  // Used when you have specified a valid method but something about the input is incorrect, invalid or missing
+                                // You can check the error message for details, but do not re-attempt the exact same request
+        case failedAccessCheck = 4742 // Access denied to the requested object or function for this user
+        
+        static func shouldErrorBeDisplayedToUser(statusCode: Int) -> Bool {
+            return statusCode != 0 && statusCode != AmpacheError.notFound.rawValue
+        }
+    }
+    
     static let maxItemCountToPollAtOnce: Int = 500
     
     var serverApiVersion: String?
@@ -333,6 +350,22 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
     }
     
+    func requestSearchArtists(parserDelegate: AmpacheXmlParser, searchText: String) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "artists")
+        apiUrlComponent.addQueryItem(name: "filter", value: searchText)
+        apiUrlComponent.addQueryItem(name: "limit", value: 40)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
+    func requestSearchAlbums(parserDelegate: AmpacheXmlParser, searchText: String) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "albums")
+        apiUrlComponent.addQueryItem(name: "filter", value: searchText)
+        apiUrlComponent.addQueryItem(name: "limit", value: 40)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
     func requestSearchSongs(parserDelegate: AmpacheXmlParser, searchText: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "search_songs")
@@ -349,7 +382,7 @@ class AmpacheXmlServerApi {
         let parser = XMLParser(contentsOf: url)!
         parser.delegate = parserDelegate
         parser.parse()
-        if let error = parserDelegate.error, error.statusCode != 0 {
+        if let error = parserDelegate.error, AmpacheError.shouldErrorBeDisplayedToUser(statusCode: error.statusCode) {
             eventLogger.report(error: error)
         }
     }
@@ -380,7 +413,7 @@ class AmpacheXmlServerApi {
         let parser = XMLParser(data: data)
         parser.delegate = errorParser
         parser.parse()
-        if let error = errorParser.error, error.statusCode != 0 {
+        if let error = errorParser.error, AmpacheError.shouldErrorBeDisplayedToUser(statusCode: error.statusCode) {
             eventLogger.report(error: error)
         }
         return errorParser.error

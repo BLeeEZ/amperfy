@@ -195,6 +195,30 @@ class SubsonicServerApi {
         guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getAlbum", id: id) else { return }
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
+    
+    func requestSearchArtists(parserDelegate: SsXmlParser, searchText: String) {
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "search3") else { return }
+        urlComp.addQueryItem(name: "query", value: searchText)
+        urlComp.addQueryItem(name: "artistCount", value: 40)
+        urlComp.addQueryItem(name: "artistOffset", value: 0)
+        urlComp.addQueryItem(name: "albumCount", value: 0)
+        urlComp.addQueryItem(name: "albumOffset", value: 0)
+        urlComp.addQueryItem(name: "songCount", value: 0)
+        urlComp.addQueryItem(name: "songOffset", value: 0)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
+    func requestSearchAlbums(parserDelegate: SsXmlParser, searchText: String) {
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "search3") else { return }
+        urlComp.addQueryItem(name: "query", value: searchText)
+        urlComp.addQueryItem(name: "artistCount", value: 0)
+        urlComp.addQueryItem(name: "artistOffset", value: 0)
+        urlComp.addQueryItem(name: "albumCount", value: 40)
+        urlComp.addQueryItem(name: "albumOffset", value: 0)
+        urlComp.addQueryItem(name: "songCount", value: 0)
+        urlComp.addQueryItem(name: "songOffset", value: 0)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
 
     func requestSearchSongs(parserDelegate: SsXmlParser, searchText: String) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "search3") else { return }
@@ -203,7 +227,7 @@ class SubsonicServerApi {
         urlComp.addQueryItem(name: "artistOffset", value: 0)
         urlComp.addQueryItem(name: "albumCount", value: 0)
         urlComp.addQueryItem(name: "albumOffset", value: 0)
-        urlComp.addQueryItem(name: "songCount", value: 200)
+        urlComp.addQueryItem(name: "songCount", value: 40)
         urlComp.addQueryItem(name: "songOffset", value: 0)
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }

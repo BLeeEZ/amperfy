@@ -42,7 +42,15 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     }
     
     override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "")
+        let searchText = searchController.searchBar.text ?? ""
+        if searchText.count > 0 {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let backgroundLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.searchAlbums(searchText: searchText, library: backgroundLibrary)
+            }
+        }
+        fetchedResultsController.search(searchText: searchText)
         tableView.reloadData()
     }
     

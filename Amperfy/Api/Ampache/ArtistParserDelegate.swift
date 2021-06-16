@@ -16,7 +16,7 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
                 os_log("Found artist with no id", log: log, type: .error)
                 return
             }
-            if !syncWave.isInitialWave, let fetchedArtist = library.getArtist(id: artistId)  {
+            if let fetchedArtist = library.getArtist(id: artistId)  {
                 artistBuffer = fetchedArtist
             } else {
                 artistBuffer = library.createArtist()
