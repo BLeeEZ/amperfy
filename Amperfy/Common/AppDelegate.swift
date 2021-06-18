@@ -155,10 +155,11 @@ extension AppDelegate {
 }
 
 extension AppDelegate: AlertDisplayable {
-    func display(alert: UIAlertController) {
-        guard let topView = Self.topViewController() else { return }
+    func display(alert: UIAlertController) -> Bool {
+        guard let topView = Self.topViewController(), topView.presentedViewController == nil else { return false }
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         alert.setOptionsForIPadToDisplayPopupCentricIn(view: topView.view)
         topView.present(alert, animated: true, completion: nil)
+        return true
     }
 }
