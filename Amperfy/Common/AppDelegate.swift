@@ -55,6 +55,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var userStatistics = {
         return library.getUserStatistics(appVersion: Self.version)
     }()
+    private lazy var popupDisplaySemaphore = {
+        return DispatchSemaphore(value: 1)
+    }()
 
     func reinit() {
         player.reinit(coreData: library.getPlayerData())
@@ -144,8 +147,8 @@ extension AppDelegate {
         if let nav = base as? UINavigationController {
             return topViewController(base: nav.visibleViewController)
         }
-        if let tab = base as? UITabBarController, let selected = tab.selectedViewController {
-            return topViewController(base: selected)
+        if let tab = base as? UITabBarController {
+            return tab
         }
         if let presented = base?.presentedViewController {
             return topViewController(base: presented)
@@ -155,11 +158,16 @@ extension AppDelegate {
 }
 
 extension AppDelegate: AlertDisplayable {
-    func display(alert: UIAlertController) -> Bool {
-        guard let topView = Self.topViewController(), topView.presentedViewController == nil else { return false }
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        alert.setOptionsForIPadToDisplayPopupCentricIn(view: topView.view)
-        topView.present(alert, animated: true, completion: nil)
-        return true
+    func display(popupVC: LibrarySyncPopupVC) {
+        guard let topView = Self.topViewController(),
+              topView.presentedViewController == nil,
+              self.popupDisplaySemaphore.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success
+              else { return }
+
+        popupVC.display(on: topView, onClose: { _ in
+            self.popupDisplaySemaphore.signal()
+        })
+        UIApplication.shared.keyWindow!.addSubview(popupVC.view)
+        UIApplication.shared.keyWindow!.bringSubviewToFront(popupVC.view)
     }
 }

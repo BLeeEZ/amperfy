@@ -491,14 +491,26 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="a7T-Uc-nlO">
-                                <rect key="frame" x="42" y="198" width="330" height="380"/>
+                                <rect key="frame" x="42" y="208" width="330" height="360"/>
                                 <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jwb-Ck-Kjx" userLabel="Optional Button" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                        <rect key="frame" x="58" y="262" width="214" height="30"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="30" id="HAw-ey-9J9"/>
+                                        </constraints>
+                                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <state key="normal" title="Optional"/>
+                                        <connections>
+                                            <action selector="closeButtonPressed:" destination="4fV-g4-CJz" eventType="touchUpInside" id="BgN-Fs-wio"/>
+                                            <action selector="optionalButtonPressed:" destination="4fV-g4-CJz" eventType="touchUpInside" id="zna-d1-9Zh"/>
+                                        </connections>
+                                    </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oJc-Ob-FSO" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                        <rect key="frame" x="125" y="322" width="80" height="30"/>
+                                        <rect key="frame" x="58" y="302" width="214" height="30"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="6UK-3l-Lo3"/>
-                                            <constraint firstAttribute="width" constant="80" id="SOj-FI-Emo"/>
                                         </constraints>
                                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <state key="normal" title="Close"/>
@@ -507,25 +519,37 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="20" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RpK-J6-8f1" userLabel="Content Label">
-                                        <rect key="frame" x="18" y="124" width="302" height="188"/>
+                                        <rect key="frame" x="18" y="94" width="302" height="158"/>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <string key="text">Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
                                         <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ycx-rF-ag8" userLabel="Sync Icon">
-                                        <rect key="frame" x="135" y="20" width="60" height="60"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3k1-vq-TUe" userLabel="Icon Background Label">
+                                        <rect key="frame" x="115" y="-30" width="100" height="100"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="60" id="M75-dZ-Hrf"/>
-                                            <constraint firstAttribute="height" constant="60" id="ZwS-fP-UEt"/>
+                                            <constraint firstAttribute="width" secondItem="3k1-vq-TUe" secondAttribute="height" multiplier="1:1" id="WGU-mK-IIK"/>
+                                            <constraint firstAttribute="height" constant="100" id="c3O-6Q-w1o"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ycx-rF-ag8" userLabel="Icon Label">
+                                        <rect key="frame" x="115" y="-30" width="100" height="100"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="100" id="M75-dZ-Hrf"/>
+                                            <constraint firstAttribute="height" constant="100" id="ZwS-fP-UEt"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bih-od-ZMX" userLabel="Title Label">
-                                        <rect key="frame" x="144.5" y="90" width="41" height="30"/>
+                                        <rect key="frame" x="144.5" y="60" width="41" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="gn9-tm-cXi"/>
                                         </constraints>
@@ -536,17 +560,24 @@
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBlueColor"/>
                                 <constraints>
+                                    <constraint firstItem="oJc-Ob-FSO" firstAttribute="width" secondItem="Jwb-Ck-Kjx" secondAttribute="width" id="5GC-L8-xy8"/>
+                                    <constraint firstItem="oJc-Ob-FSO" firstAttribute="top" relation="greaterThanOrEqual" secondItem="RpK-J6-8f1" secondAttribute="bottom" constant="10" id="6CK-Vf-qvT"/>
                                     <constraint firstItem="RpK-J6-8f1" firstAttribute="leading" secondItem="a7T-Uc-nlO" secondAttribute="leadingMargin" constant="10" id="7o4-9D-ob8"/>
+                                    <constraint firstItem="oJc-Ob-FSO" firstAttribute="leading" secondItem="a7T-Uc-nlO" secondAttribute="leadingMargin" constant="50" id="9yC-iD-YCw"/>
                                     <constraint firstAttribute="bottomMargin" secondItem="oJc-Ob-FSO" secondAttribute="bottom" constant="20" id="Ggp-WE-v77"/>
-                                    <constraint firstAttribute="height" constant="380" id="IUC-UO-cZW"/>
+                                    <constraint firstItem="Jwb-Ck-Kjx" firstAttribute="centerX" secondItem="a7T-Uc-nlO" secondAttribute="centerX" id="I1v-ZT-Xyj"/>
+                                    <constraint firstAttribute="height" constant="360" id="IUC-UO-cZW"/>
+                                    <constraint firstItem="3k1-vq-TUe" firstAttribute="centerY" secondItem="Ycx-rF-ag8" secondAttribute="centerY" id="JZw-uQ-58i"/>
                                     <constraint firstItem="RpK-J6-8f1" firstAttribute="topMargin" secondItem="bih-od-ZMX" secondAttribute="bottomMargin" constant="20" id="VjD-SV-cP4"/>
                                     <constraint firstAttribute="width" constant="330" id="ZSr-Sn-Zqg"/>
+                                    <constraint firstItem="3k1-vq-TUe" firstAttribute="centerX" secondItem="Ycx-rF-ag8" secondAttribute="centerX" id="c2s-gx-8NX"/>
                                     <constraint firstAttribute="trailingMargin" secondItem="RpK-J6-8f1" secondAttribute="trailingMargin" constant="10" id="gHO-TN-izc"/>
                                     <constraint firstItem="Ycx-rF-ag8" firstAttribute="centerX" secondItem="a7T-Uc-nlO" secondAttribute="centerX" id="ghe-J7-mg2"/>
-                                    <constraint firstItem="oJc-Ob-FSO" firstAttribute="top" secondItem="RpK-J6-8f1" secondAttribute="bottom" constant="10" id="hQB-Jm-ThM"/>
+                                    <constraint firstItem="Jwb-Ck-Kjx" firstAttribute="top" secondItem="RpK-J6-8f1" secondAttribute="bottom" constant="10" id="hQB-Jm-ThM"/>
                                     <constraint firstItem="oJc-Ob-FSO" firstAttribute="centerX" secondItem="a7T-Uc-nlO" secondAttribute="centerX" id="iCZ-NN-jkw"/>
-                                    <constraint firstItem="bih-od-ZMX" firstAttribute="top" secondItem="Ycx-rF-ag8" secondAttribute="bottom" constant="10" id="ioI-qP-1Zd"/>
-                                    <constraint firstItem="Ycx-rF-ag8" firstAttribute="top" secondItem="a7T-Uc-nlO" secondAttribute="top" constant="20" id="qlA-mQ-WxM"/>
+                                    <constraint firstItem="bih-od-ZMX" firstAttribute="top" secondItem="Ycx-rF-ag8" secondAttribute="bottom" constant="-10" id="ioI-qP-1Zd"/>
+                                    <constraint firstItem="oJc-Ob-FSO" firstAttribute="top" secondItem="Jwb-Ck-Kjx" secondAttribute="bottom" constant="10" id="qGb-jI-VCn"/>
+                                    <constraint firstItem="Ycx-rF-ag8" firstAttribute="top" secondItem="a7T-Uc-nlO" secondAttribute="top" constant="-30" id="qlA-mQ-WxM"/>
                                     <constraint firstItem="bih-od-ZMX" firstAttribute="centerX" secondItem="a7T-Uc-nlO" secondAttribute="centerX" id="rSc-iB-Gys"/>
                                 </constraints>
                             </view>
@@ -560,8 +591,10 @@
                     </view>
                     <connections>
                         <outlet property="contentView" destination="a7T-Uc-nlO" id="2cL-fE-b6Q"/>
+                        <outlet property="iconBackgroundLabel" destination="3k1-vq-TUe" id="ASH-QP-SiO"/>
+                        <outlet property="iconLabel" destination="Ycx-rF-ag8" id="aAS-6r-g5c"/>
                         <outlet property="infoLabel" destination="RpK-J6-8f1" id="gLZ-ks-2pz"/>
-                        <outlet property="syncIcon" destination="Ycx-rF-ag8" id="aAS-6r-g5c"/>
+                        <outlet property="optionalButton" destination="Jwb-Ck-Kjx" id="iyn-by-SNQ"/>
                         <outlet property="titelLabel" destination="bih-od-ZMX" id="Th8-2y-rmp"/>
                     </connections>
                 </viewController>

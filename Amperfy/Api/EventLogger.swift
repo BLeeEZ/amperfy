@@ -4,7 +4,7 @@ import CoreData
 import os.log
 
 protocol AlertDisplayable {
-    func display(alert: UIAlertController) -> Bool // Must be called from main thread
+    func display(popupVC: LibrarySyncPopupVC) // Must be called from main thread
 }
 
 enum AmperfyLogStatusCode: Int {
@@ -23,7 +23,6 @@ class EventLogger {
     private let log = OSLog(subsystem: AppDelegate.name, category: "EventLogger")
     private let alertDisplayer: AlertDisplayable
     private let persistentContainer: NSPersistentContainer
-    private let displaySemaphore = DispatchSemaphore(value: 1)
     
     init(alertDisplayer: AlertDisplayable, persistentContainer: NSPersistentContainer) {
         self.alertDisplayer = alertDisplayer
@@ -82,22 +81,15 @@ class EventLogger {
     }
     
     private func displayAlert(topic: String, message: String, logEntry: LogEntry) {
+        let logType = logEntry.type
         DispatchQueue.main.async {
             guard !self.supressAlerts else { return }
-            if self.displaySemaphore.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success {
-                let alert = UIAlertController(title: topic, message: message, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Suppress for \(Self.errorReportOneDaySilentTimeInSec.asDayString)", style: .destructive, handler: { _ in
-                    self.updateSuppressionTimeInterval(logEntry: logEntry, suppressionTimeInterval: Self.errorReportOneDaySilentTimeInSec)
-                    self.displaySemaphore.signal()
-                }))
-                alert.addAction(UIAlertAction(title: "OK", style: .default,  handler: { _ in
-                    self.displaySemaphore.signal()
-                }))
-                let isDisplayed = self.alertDisplayer.display(alert: alert)
-                if !isDisplayed {
-                    self.displaySemaphore.signal()
-                }
-            }
+            let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
+            popupVC.setContent(topic: topic, message: message, type: logType)
+            popupVC.useOptionalButton(text: "Suppress for \(Self.errorReportOneDaySilentTimeInSec.asDayString)", onPressed: { _ in
+                self.updateSuppressionTimeInterval(logEntry: logEntry, suppressionTimeInterval: Self.errorReportOneDaySilentTimeInSec)
+            })
+            self.alertDisplayer.display(popupVC: popupVC)
         }
     }
     

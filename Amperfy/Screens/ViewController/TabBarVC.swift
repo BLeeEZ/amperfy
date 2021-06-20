@@ -23,11 +23,18 @@ class TabBarVC: UITabBarController {
         self.popupInteractionStyle = .snap
         
         if !appDelegate.persistentStorage.isLibrarySyncInfoReadByUser {
-            let popOverVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
-            self.addChild(popOverVC)
-            popOverVC.view.frame = self.view.frame
-            self.view.addSubview(popOverVC.view)
-            popOverVC.didMove(toParent: self)
+            let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
+            popupVC.setContent(
+                topic: "Synchronisation",
+                message: "Your music collection is constantly updating. Already synced libray items are offline available. If library items (artists/albums/songs) are not shown in your  collection please use the various search functionalities to synchronise with the server.",
+                type: .info,
+                customIcon: .Sync,
+                customAnimation: .rotate,
+                onClosePressed: { _ in
+                    self.appDelegate.persistentStorage.isLibrarySyncInfoReadByUser = true
+                }
+            )
+            appDelegate.display(popupVC: popupVC)
         }
     }
 
