@@ -3,10 +3,6 @@ import UIKit
 import CoreData
 import os.log
 
-protocol AlertDisplayable {
-    func display(popupVC: LibrarySyncPopupVC) // Must be called from main thread
-}
-
 enum AmperfyLogStatusCode: Int {
     case downloadError = 1
     case playerError = 2
@@ -89,7 +85,7 @@ class EventLogger {
             popupVC.useOptionalButton(text: "Suppress for \(Self.errorReportOneDaySilentTimeInSec.asDayString)", onPressed: { _ in
                 self.updateSuppressionTimeInterval(logEntry: logEntry, suppressionTimeInterval: Self.errorReportOneDaySilentTimeInSec)
             })
-            self.alertDisplayer.display(popupVC: popupVC)
+            self.alertDisplayer.display(notificationBanner: popupVC)
         }
     }
     

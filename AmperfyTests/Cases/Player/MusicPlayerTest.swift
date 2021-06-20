@@ -51,7 +51,8 @@ class MOCK_SongDownloader: DownloadManageable {
 }
 
 class MOCK_AlertDisplayable: AlertDisplayable {
-    func display(alert: UIAlertController) {}
+    func display(notificationBanner popupVC: LibrarySyncPopupVC) {}
+    func display(popup popupVC: LibrarySyncPopupVC) {}
 }
 
 class MOCK_LibrarySyncer: LibrarySyncer {

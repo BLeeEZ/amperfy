@@ -16,8 +16,9 @@ class LibrarySyncPopupVC: UIViewController {
     @IBOutlet weak var contentView: UIView!
     
     var appDelegate: AppDelegate!
-    private var topic = ""
-    private var message = ""
+    var topic = ""
+    var message = ""
+    var logType = LogEntryType.info
     private var popupColor = UIColor.systemBlue
     private var icon = FontAwesomeIcon.Sync
     private var iconAnimation = PopupIconAnimation.zoomInZoomOut
@@ -71,6 +72,7 @@ class LibrarySyncPopupVC: UIViewController {
     func setContent(topic: String, message: String, type: LogEntryType, customIcon: FontAwesomeIcon? = nil, customAnimation: PopupIconAnimation? = nil, onClosePressed: ((Bool) -> Void)? = nil) {
         self.topic = topic
         self.message = message
+        self.logType = type
         self.closeButtonOnPressed = onClosePressed
         
         self.iconAnimation = customAnimation != nil ? customAnimation! : .zoomInZoomOut

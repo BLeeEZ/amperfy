@@ -1,2 +1,3 @@
 github "LeoNatan/LNPopupController" ~> 2.8.5
 github "cbpowell/MarqueeLabel" ~> 4.0.1
+github "Daltron/NotificationBanner" "master"

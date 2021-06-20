@@ -1,5 +1,6 @@
 import UIKit
 import MediaPlayer
+import NotificationBanner
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -157,13 +158,35 @@ extension AppDelegate {
     }
 }
 
+/// Must be called from main thread
+protocol AlertDisplayable {
+    func display(notificationBanner popupVC: LibrarySyncPopupVC)
+    func display(popup popupVC: LibrarySyncPopupVC)
+}
+
 extension AppDelegate: AlertDisplayable {
-    func display(popupVC: LibrarySyncPopupVC) {
+    func display(notificationBanner popupVC: LibrarySyncPopupVC) {
+        guard let topView = Self.topViewController(),
+              topView.presentedViewController == nil
+              else { return }
+
+        let banner = FloatingNotificationBanner(title: popupVC.topic, subtitle: popupVC.message, style: BannerStyle.from(logType: popupVC.logType), colors: AmperfyBannerColors())
+        
+        banner.onTap = {
+            self.display(popup: popupVC)
+        }
+        
+        banner.show(queuePosition: .back, bannerPosition: .top, on: topView, cornerRadius: 20, shadowBlurRadius: 10)
+        UIApplication.shared.keyWindow!.addSubview(banner)
+        UIApplication.shared.keyWindow!.bringSubviewToFront(banner)
+    }
+    
+    func display(popup popupVC: LibrarySyncPopupVC) {
         guard let topView = Self.topViewController(),
               topView.presentedViewController == nil,
               self.popupDisplaySemaphore.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success
               else { return }
-
+        
         popupVC.display(on: topView, onClose: { _ in
             self.popupDisplaySemaphore.signal()
         })

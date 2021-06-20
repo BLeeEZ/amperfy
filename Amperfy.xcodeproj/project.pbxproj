@@ -43,6 +43,7 @@
 		501267B7264C058500E13F08 /* SsXmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501267B6264C058500E13F08 /* SsXmlParser.swift */; };
 		501267B9264C187600E13F08 /* AmpacheXmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501267B8264C187600E13F08 /* AmpacheXmlParser.swift */; };
 		501858F8265F779C00F2E13A /* Directory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501858F7265F779B00F2E13A /* Directory.swift */; };
+		501999DC26806B8600F72D37 /* NotificationBannerCustomization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */; };
 		501DBE9B2632C31400B31128 /* GenreTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507361E62632BAFB005F151D /* GenreTableCell.xib */; };
 		501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501DBE9E2632D2CF00B31128 /* GenreDetailVC.swift */; };
 		502040302202341500ED48A3 /* PlaylistParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020402F2202341500ED48A3 /* PlaylistParserDelegate.swift */; };
@@ -231,6 +232,8 @@
 		50DEEE1B265ED65B0073FF20 /* MusicFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE1A265ED65B0073FF20 /* MusicFolder.swift */; };
 		50E964AA25E8E20E00E3210F /* SubsonicVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E964A925E8E20E00E3210F /* SubsonicVersion.swift */; };
 		50E964AF25E8E25E00E3210F /* SubsonicVersionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */; };
+		50EF2CB2267F658B0011C42F /* SnapKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50EF2CB1267F658B0011C42F /* SnapKit.xcframework */; };
+		50EF2CB4267F65960011C42F /* NotificationBanner.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50EF2CB3267F65960011C42F /* NotificationBanner.xcframework */; };
 		50F81E8623BAF25900EAAC3E /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E8523BAF25900EAAC3E /* Album.swift */; };
 		50F81E8823BB29CD00EAAC3E /* AlbumTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E8723BB29CD00EAAC3E /* AlbumTest.swift */; };
 		50F81E8A23BB5FC500EAAC3E /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E8923BB5FC500EAAC3E /* Artist.swift */; };
@@ -335,6 +338,7 @@
 		501267B6264C058500E13F08 /* SsXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsXmlParser.swift; sourceTree = "<group>"; };
 		501267B8264C187600E13F08 /* AmpacheXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheXmlParser.swift; sourceTree = "<group>"; };
 		501858F7265F779B00F2E13A /* Directory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Directory.swift; sourceTree = "<group>"; };
+		501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationBannerCustomization.swift; sourceTree = "<group>"; };
 		501DBE9E2632D2CF00B31128 /* GenreDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreDetailVC.swift; sourceTree = "<group>"; };
 		5020402F2202341500ED48A3 /* PlaylistParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistParserDelegate.swift; sourceTree = "<group>"; };
 		502040332203865400ED48A3 /* PlaylistSongsParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistSongsParserDelegate.swift; sourceTree = "<group>"; };
@@ -535,6 +539,8 @@
 		50E15407261311590021F47D /* Amperfy v6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v6.xcdatamodel"; sourceTree = "<group>"; };
 		50E964A925E8E20E00E3210F /* SubsonicVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersion.swift; sourceTree = "<group>"; };
 		50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersionTest.swift; sourceTree = "<group>"; };
+		50EF2CB1267F658B0011C42F /* SnapKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SnapKit.xcframework; path = Carthage/Build/SnapKit.xcframework; sourceTree = "<group>"; };
+		50EF2CB3267F65960011C42F /* NotificationBanner.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = NotificationBanner.xcframework; path = Carthage/Build/NotificationBanner.xcframework; sourceTree = "<group>"; };
 		50F81E8523BAF25900EAAC3E /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		50F81E8723BB29CD00EAAC3E /* AlbumTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumTest.swift; sourceTree = "<group>"; };
 		50F81E8923BB5FC500EAAC3E /* Artist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
@@ -576,6 +582,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5054689C2625CD95008005EC /* LNPopupController.xcframework in Frameworks */,
+				50EF2CB2267F658B0011C42F /* SnapKit.xcframework in Frameworks */,
+				50EF2CB4267F65960011C42F /* NotificationBanner.xcframework in Frameworks */,
 				506007232625E8BD00F9891D /* MarqueeLabel.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -626,6 +634,7 @@
 				50675E6C25F61163005737FD /* BasicTableCell.swift */,
 				500EB36725F8B3EB00B4B998 /* Corners.swift */,
 				500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */,
+				501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */,
 			);
 			path = Basics;
 			sourceTree = "<group>";
@@ -791,6 +800,8 @@
 			children = (
 				505468712625C47D008005EC /* MarqueeLabel.xcframework */,
 				5054686C2625C457008005EC /* LNPopupController.xcframework */,
+				50EF2CB3267F65960011C42F /* NotificationBanner.xcframework */,
+				50EF2CB1267F658B0011C42F /* SnapKit.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1423,6 +1434,7 @@
 				5086F87F22399D1900546F5A /* SubsonicServerApi.swift in Sources */,
 				5086F887223BD68C00546F5A /* SsArtistParserDelegate.swift in Sources */,
 				50F81EDE23BF6B1E00EAAC3E /* PlaylistMO+CoreDataClass.swift in Sources */,
+				501999DC26806B8600F72D37 /* NotificationBannerCustomization.swift in Sources */,
 				50BA930421D10F0000E5901D /* SyncVC.swift in Sources */,
 				50B798A923B6E5FF00551E62 /* PlaylistItem.swift in Sources */,
 				50B798A123B6CA5400551E62 /* Song.swift in Sources */,

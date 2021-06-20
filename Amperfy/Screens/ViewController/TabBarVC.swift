@@ -34,7 +34,7 @@ class TabBarVC: UITabBarController {
                     self.appDelegate.persistentStorage.isLibrarySyncInfoReadByUser = true
                 }
             )
-            appDelegate.display(popupVC: popupVC)
+            appDelegate.display(popup: popupVC)
         }
     }
 
