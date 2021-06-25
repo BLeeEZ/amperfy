@@ -19,13 +19,13 @@ class LibrarySyncPopupVC: UIViewController {
     var topic = ""
     var message = ""
     var logType = LogEntryType.info
+    var onClose: (() -> Void)?
     private var popupColor = UIColor.systemBlue
     private var icon = FontAwesomeIcon.Sync
     private var iconAnimation = PopupIconAnimation.zoomInZoomOut
     private var closeButtonOnPressed: ((Bool) -> Void)?
     private var optionalButtonText: String?
     private var optionalButtonOnPressed: ((Bool) -> Void)?
-    private var onClosedHandler: ((Bool) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,24 +49,51 @@ class LibrarySyncPopupVC: UIViewController {
         self.iconBackgroundLabel.backgroundColor = popupColor
         
         iconLabel.text = icon.asString
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        showAsAnimatedPopup()
+        
         switch iconAnimation {
         case .rotate:
             animateIconRotation()
         case .zoomInZoomOut:
             animateIconZoomInZoomOut()
         }
-        
-        showAsAnimatedPopup()
+    }
+    
+    private func showAsAnimatedPopup() {
+        self.view.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+        self.view.alpha = 0.0;
+        UIView.animate(withDuration: 0.25, animations: {
+            self.view.alpha = 1.0
+            self.view.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+        });
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        removeAsAnimatedPopup()
+    }
+    
+    private func removeAsAnimatedPopup() {
+        UIView.animate(withDuration: 0.25, animations: {
+            self.view.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+            self.view.alpha = 0.0;
+            }, completion: { (finished : Bool) in
+                if (finished) {
+                    self.onClose?()
+                }
+        });
     }
     
     @IBAction func closeButtonPressed(_ sender: Any) {
         self.closeButtonOnPressed?(true)
-        removeAsAnimatedPopup()
+        self.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func optionalButtonPressed(_ sender: Any) {
         self.optionalButtonOnPressed?(true)
-        removeAsAnimatedPopup()
+        self.dismiss(animated: true, completion: nil)
     }
     
     func setContent(topic: String, message: String, type: LogEntryType, customIcon: FontAwesomeIcon? = nil, customAnimation: PopupIconAnimation? = nil, onClosePressed: ((Bool) -> Void)? = nil) {
@@ -97,14 +124,6 @@ class LibrarySyncPopupVC: UIViewController {
         self.optionalButtonOnPressed = onPressed
     }
     
-    func display(on hostVC: UIViewController, onClose: ((Bool) -> Void)? = nil) {
-        onClosedHandler = onClose
-        hostVC.addChild(self)
-        self.view.frame = hostVC.view.frame
-        hostVC.view.addSubview(self.view)
-        self.didMove(toParent: hostVC)
-    }
-    
     private func animateIconRotation() {
         UIView.animate(withDuration: 5, delay: 0, options: .repeat, animations: ({
             self.iconLabel.transform = CGAffineTransform(rotationAngle: CGFloat.pi)
@@ -118,27 +137,6 @@ class LibrarySyncPopupVC: UIViewController {
         UIView.animate(withDuration: 3, delay: 3, options: [.repeat, .autoreverse], animations: ({
             self.iconLabel.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
         }), completion: nil)
-    }
-    
-    private func showAsAnimatedPopup() {
-        self.view.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        self.view.alpha = 0.0;
-        UIView.animate(withDuration: 0.25, animations: {
-            self.view.alpha = 1.0
-            self.view.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
-        });
-    }
-    
-    private func removeAsAnimatedPopup() {
-        UIView.animate(withDuration: 0.25, animations: {
-            self.view.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-            self.view.alpha = 0.0;
-            }, completion: { (finished : Bool) in
-                if (finished) {
-                    self.view.removeFromSuperview()
-                    self.onClosedHandler?(true)
-                }
-        });
     }
     
 }

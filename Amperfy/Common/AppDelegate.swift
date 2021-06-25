@@ -186,11 +186,11 @@ extension AppDelegate: AlertDisplayable {
               topView.presentedViewController == nil,
               self.popupDisplaySemaphore.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success
               else { return }
-        
-        popupVC.display(on: topView, onClose: { _ in
+        popupVC.onClose = {
             self.popupDisplaySemaphore.signal()
-        })
-        UIApplication.shared.keyWindow!.addSubview(popupVC.view)
-        UIApplication.shared.keyWindow!.bringSubviewToFront(popupVC.view)
+        }
+        popupVC.modalPresentationStyle = .overCurrentContext
+        popupVC.modalTransitionStyle = .crossDissolve
+        topView.present(popupVC, animated: true, completion: nil)
     }
 }
