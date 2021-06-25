@@ -31,6 +31,15 @@ class AmpacheXmlServerApi {
     private var credentials: LoginCredentials?
     private var authHandshake: AuthentificationHandshake?
     
+    var isPodcastSupported: Bool {
+        reauthenticateIfNeccessary()
+        if let serverApi = serverApiVersion, let serverApiInt = Int(serverApi) {
+            return serverApiInt >= 420000
+        } else {
+            return false
+        }
+    }
+    
     var artistCount: Int {
         reauthenticateIfNeccessary()
         return authHandshake?.artistCount ?? 0
@@ -50,6 +59,10 @@ class AmpacheXmlServerApi {
     var playlistCount: Int {
         reauthenticateIfNeccessary()
         return authHandshake?.playlistCount ?? 0
+    }
+    var podcastCount: Int {
+        reauthenticateIfNeccessary()
+        return authHandshake?.podcastCount ?? 0
     }
 
     var defaultArtworkUrl: String {
@@ -348,6 +361,19 @@ class AmpacheXmlServerApi {
         }
         let errorParser = AmpacheXmlParser()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
+    }
+    
+    func requestPodcasts(parserDelegate: AmpacheXmlParser) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "podcasts")
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
+    func requestPodcastEpisodes(of podcast: Podcast, parserDelegate: AmpacheXmlParser) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "podcast_episodes")
+        apiUrlComponent.addQueryItem(name: "filter", value: podcast.id)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
     func requestSearchArtists(parserDelegate: AmpacheXmlParser, searchText: String) {

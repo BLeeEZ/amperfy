@@ -13,16 +13,18 @@ class SsSongParserDelegate: SsXmlLibWithArtworkParser {
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
         
-        if elementName == "song" || elementName == "entry" || elementName == "child" {
+        if elementName == "song" || elementName == "entry" || elementName == "child" || elementName == "episode" {
             guard let songId = attributeDict["id"] else { return }
             guard let isDir = attributeDict["isDir"], let isDirBool = Bool(isDir), isDirBool == false else { return }
             
-            if let fetchedSong = library.getSong(id: songId)  {
-                songBuffer = fetchedSong
-            } else {
-                songBuffer = library.createSong()
-                songBuffer?.id = songId
-                songBuffer?.syncInfo = syncWave
+            if elementName != "episode" {
+                if let fetchedSong = library.getSong(id: songId)  {
+                    songBuffer = fetchedSong
+                } else {
+                    songBuffer = library.createSong()
+                    songBuffer?.id = songId
+                    songBuffer?.syncInfo = syncWave
+                }
             }
             
             if let attributeTitle = attributeDict["title"] {
@@ -100,7 +102,7 @@ class SsSongParserDelegate: SsXmlLibWithArtworkParser {
     }
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        if elementName == "song" || elementName == "entry" || elementName == "child", songBuffer != nil {
+        if elementName == "song" || elementName == "entry" || elementName == "child" || elementName == "episode", songBuffer != nil {
             parsedCount += 1
             songBuffer = nil
         }

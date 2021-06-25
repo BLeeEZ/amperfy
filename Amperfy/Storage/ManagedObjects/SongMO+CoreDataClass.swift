@@ -4,11 +4,17 @@ import CoreData
 @objc(SongMO)
 public final class SongMO: AbstractLibraryEntityMO {
 
+    static var excludePodcastEpisodesFetchPredicate: NSPredicate {
+        return NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == nil", #keyPath(SongMO.podcastEpisodeInfo))
+        ])
+    }
+    
 }
 
 extension SongMO: CoreDataIdentifyable {
     
-    static var identifierKey: WritableKeyPath<SongMO, String?> {
+    static var identifierKey: KeyPath<SongMO, String?> {
         return \SongMO.title
     }
     

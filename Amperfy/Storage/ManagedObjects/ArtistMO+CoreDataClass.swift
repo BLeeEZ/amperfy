@@ -8,7 +8,7 @@ public final class ArtistMO: AbstractLibraryEntityMO {
 
 extension ArtistMO: CoreDataIdentifyable {   
     
-    static var identifierKey: WritableKeyPath<ArtistMO, String?> {
+    static var identifierKey: KeyPath<ArtistMO, String?> {
         return \ArtistMO.name
     }
     

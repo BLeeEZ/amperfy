@@ -68,7 +68,8 @@ class SongTableCell: BasicTableCell {
     func refresh() {
         guard let song = song else { return }
         titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
-        artistLabel.text = song.artist?.name
+        artistLabel.text = song.creatorName
+        
         artworkImage.displayAndUpdate(entity: song, via: appDelegate.artworkDownloadManager)
         
         if displayMode == .playerCell {
@@ -177,12 +178,14 @@ class SongTableCell: BasicTableCell {
                 self.appDelegate.player.addToPlaylist(song: song)
             }))
         }
-        alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
-            let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.songsToAdd = [song]
-            let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-            rootView.present(selectPlaylistNav, animated: true, completion: nil)
-        }))
+        if !song.isPodcastEpisode {
+            alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
+                let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
+                selectPlaylistVC.songsToAdd = [song]
+                let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+                rootView.present(selectPlaylistNav, animated: true, completion: nil)
+            }))
+        }
         if song.isCached {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.library.deleteCache(ofSong: song)
@@ -216,6 +219,18 @@ class SongTableCell: BasicTableCell {
                     navController.pushViewController(albumDetailVC, animated: true)
                 } else {
                     self.closePopupPlayerAndDisplayInLibraryTab(view: albumDetailVC)
+                }
+            }))
+        }
+        if let podcast = song.podcastEpisodeInfo?.podcast {
+            alert.addAction(UIAlertAction(title: "Show podcast", style: .default, handler: { _ in
+                self.appDelegate.userStatistics.usedAction(.alertGoToPodcast)
+                let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
+                podcastDetailVC.podcast = podcast
+                if let navController = self.rootView?.navigationController {
+                    navController.pushViewController(podcastDetailVC, animated: true)
+                } else {
+                    self.closePopupPlayerAndDisplayInLibraryTab(view: podcastDetailVC)
                 }
             }))
         }

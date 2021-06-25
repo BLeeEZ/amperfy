@@ -142,6 +142,10 @@ extension BackendProxy: BackendApi {
         return activeApi.serverApiVersion
     }
     
+    public var isPodcastSupported: Bool {
+        return activeApi.isPodcastSupported
+    }
+    
     func provideCredentials(credentials: LoginCredentials) {
         activeApi.provideCredentials(credentials: credentials)
     }

@@ -22,6 +22,7 @@ extension UserStatisticsMO {
     @NSManaged public var usedAirplayCount: Int32
     @NSManaged public var usedAlertGoToAlbumCount: Int32
     @NSManaged public var usedAlertGoToArtistCount: Int32
+    @NSManaged public var usedAlertGoToPodcastCount: Int32
     @NSManaged public var usedChangePlayerDisplayStyleCount: Int32
     @NSManaged public var usedPlayerOptionsCount: Int32
     @NSManaged public var usedPlayerSeekCount: Int32
@@ -38,6 +39,8 @@ extension UserStatisticsMO {
     @NSManaged public var visitedPlaylistDetailCount: Int32
     @NSManaged public var visitedPlaylistsCount: Int32
     @NSManaged public var visitedPlaylistSelectorCount: Int32
+    @NSManaged public var visitedPodcastDetailCount: Int32
+    @NSManaged public var visitedPodcastsCount: Int32
     @NSManaged public var visitedPopupPlayerCount: Int32
     @NSManaged public var visitedSearchCount: Int32
     @NSManaged public var visitedSettingsCount: Int32

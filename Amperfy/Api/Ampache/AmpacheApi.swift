@@ -15,6 +15,10 @@ class AmpacheApi: BackendApi {
     public var serverApiVersion: String {
         return ampacheXmlServerApi.serverApiVersion ?? "-"
     }
+    
+    public var isPodcastSupported: Bool {
+        return ampacheXmlServerApi.isPodcastSupported
+    }
 
     func provideCredentials(credentials: LoginCredentials) {
         ampacheXmlServerApi.provideCredentials(credentials: credentials)

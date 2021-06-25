@@ -8,7 +8,7 @@ public final class GenreMO: AbstractLibraryEntityMO {
 
 extension GenreMO: CoreDataIdentifyable {
     
-    static var identifierKey: WritableKeyPath<GenreMO, String?> {
+    static var identifierKey: KeyPath<GenreMO, String?> {
         return \GenreMO.name
     }
     

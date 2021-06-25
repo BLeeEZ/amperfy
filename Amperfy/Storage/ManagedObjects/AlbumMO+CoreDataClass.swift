@@ -21,7 +21,7 @@ public final class AlbumMO: AbstractLibraryEntityMO {
 
 extension AlbumMO: CoreDataIdentifyable {
     
-    static var identifierKey: WritableKeyPath<AlbumMO, String?> {
+    static var identifierKey: KeyPath<AlbumMO, String?> {
         return \AlbumMO.name
     }
     

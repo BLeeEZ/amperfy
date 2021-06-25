@@ -8,7 +8,7 @@ protocol Identifyable {
 }
 
 protocol CoreDataIdentifyable where Self: NSFetchRequestResult {
-    static var identifierKey: WritableKeyPath<Self, String?> { get }
+    static var identifierKey: KeyPath<Self, String?> { get }
     static var identifierKeyString: String { get }
     static var identifierSortedFetchRequest: NSFetchRequest<Self> { get }
     static func getIdentifierBasedSearchPredicate(searchText: String) -> NSPredicate

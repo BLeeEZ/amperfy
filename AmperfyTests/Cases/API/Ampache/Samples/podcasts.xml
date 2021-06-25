@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <total_count>3</total_count>
+  <podcast id="1">
+    <name><![CDATA[60-Second Science]]></name>
+    <description><![CDATA[Tune in every weekday for quick reports and commentaries on the world of science—it'll just take a minute]]></description>
+    <language><![CDATA[en-us]]></language>
+    <copyright><![CDATA[False]]></copyright>
+    <feed_url><![CDATA[http://rss.sciam.com/sciam/60secsciencepodcast]]></feed_url>
+    <generator><![CDATA[]]></generator>
+    <website><![CDATA[https://www.scientificamerican.com/podcast/60-second-science/]]></website>
+    <build_date><![CDATA[1/1/70, 10:00 AM]]></build_date>
+    <sync_date><![CDATA[3/31/21, 5:17 PM]]></sync_date>
+    <public_url><![CDATA[https://music.com.au/podcast.php?action=show&podcast=1]]></public_url>
+    <art><![CDATA[https://music.com.au/image.php?object_id=1&object_type=podcast&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.jpg]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+  </podcast>
+  <podcast id="2">
+    <name><![CDATA[Plays Well with Others]]></name>
+    <description><![CDATA[From Creative Commons, a podcast about the art and science of collaboration. With a focus on the tools, techniques, and mechanics of collaboration, we explore how today's most interesting collaborators are making new things, solving old problems, and getting things done — together. Hosted by Creative Commons CEO Ryan Merkley. ]]></description>
+    <language><![CDATA[en]]></language>
+    <copyright><![CDATA[Creative Commons]]></copyright>
+    <feed_url><![CDATA[https://anchor.fm/s/90932e8/podcast/rss]]></feed_url>
+    <generator><![CDATA[Anchor Podcasts]]></generator>
+    <website><![CDATA[playswellwithothers.org]]></website>
+    <build_date><![CDATA[2/23/21, 2:18 PM]]></build_date>
+    <sync_date><![CDATA[2/23/21, 2:31 PM]]></sync_date>
+    <public_url><![CDATA[https://music.com.au/podcast.php?action=show&podcast=2]]></public_url>
+    <art><![CDATA[https://music.com.au/image.php?object_id=2&object_type=podcast&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.jpg]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+  </podcast>
+  <podcast id="5">
+    <name><![CDATA[Trace]]></name>
+    <description><![CDATA[Lawyer Nicola Gobbo represented some of Australia’s most dangerous criminals, all the while secretly working as a police informer. Why did she do it, and how was it allowed to happen? For the first time, she tells the full story behind why she became an informer, and what happened when her double life was exposed to the world.]]></description>
+    <language><![CDATA[en-AU]]></language>
+    <copyright><![CDATA[Copyright 2021, Australian Broadcasting Corporation. All Rights Reserved.]]></copyright>
+    <feed_url><![CDATA[https://www.abc.net.au/radio/programs/trace/feed/8597522/podcast.xml]]></feed_url>
+    <generator><![CDATA[]]></generator>
+    <website><![CDATA[https://www.abc.net.au/radio/programs/trace/]]></website>
+    <build_date><![CDATA[12/17/20, 12:01 AM]]></build_date>
+    <sync_date><![CDATA[3/31/21, 5:17 PM]]></sync_date>
+    <public_url><![CDATA[https://music.com.au/podcast.php?action=show&podcast=5]]></public_url>
+    <art><![CDATA[https://music.com.au/image.php?object_id=5&object_type=podcast&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.jpg?v=2]]></art>
+    <flag>0</flag>
+    <preciserating/>
+    <rating/>
+    <averagerating/>
+  </podcast>
+</root>

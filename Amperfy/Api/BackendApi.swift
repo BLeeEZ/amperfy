@@ -7,6 +7,7 @@ enum ParsedObjectType {
     case song
     case playlist
     case genre
+    case podcast
 }
 
 protocol ParsedObjectNotifiable {
@@ -24,6 +25,7 @@ protocol LibrarySyncer {
     var songCount: Int { get }
     var genreCount: Int { get }
     var playlistCount: Int { get }
+    var podcastCount: Int { get }
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?)
     func sync(artist: Artist, library: LibraryStorage)
     func sync(album: Album, library: LibraryStorage)
@@ -33,6 +35,8 @@ protocol LibrarySyncer {
     func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage)
     func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage)
     func syncUpload(playlistToDelete playlist: Playlist)
+    func syncDownPodcastsWithoutEpisodes(library: LibraryStorage)
+    func sync(podcast: Podcast, library: LibraryStorage)
     func searchArtists(searchText: String, library: LibraryStorage)
     func searchAlbums(searchText: String, library: LibraryStorage)
     func searchSongs(searchText: String, library: LibraryStorage)
@@ -58,6 +62,7 @@ protocol BackgroundLibraryVersionResyncer: AbstractBackgroundLibrarySyncer {
 protocol BackendApi {
     var clientApiVersion: String { get }
     var serverApiVersion: String { get }
+    var isPodcastSupported: Bool { get }
     func provideCredentials(credentials: LoginCredentials)
     func authenticate(credentials: LoginCredentials) 
     func isAuthenticated() -> Bool

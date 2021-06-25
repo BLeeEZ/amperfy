@@ -16,6 +16,10 @@ class SubsonicApi: BackendApi {
     public var serverApiVersion: String {
         return subsonicServerApi.serverApiVersion?.description ?? "-"
     }
+    
+    public var isPodcastSupported: Bool {
+        return subsonicServerApi.isPodcastSupported
+    }
 
     func provideCredentials(credentials: LoginCredentials) {
         subsonicServerApi.provideCredentials(credentials: credentials)

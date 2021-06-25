@@ -15,7 +15,7 @@ public final class PlaylistMO: NSManagedObject {
 
 extension PlaylistMO: CoreDataIdentifyable {
     
-    static var identifierKey: WritableKeyPath<PlaylistMO, String?> {
+    static var identifierKey: KeyPath<PlaylistMO, String?> {
         return \PlaylistMO.name
     }
     

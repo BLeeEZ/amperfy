@@ -24,7 +24,7 @@ public final class DirectoryMO: AbstractLibraryEntityMO {
 
 extension DirectoryMO: CoreDataIdentifyable {
     
-    static var identifierKey: WritableKeyPath<DirectoryMO, String?> {
+    static var identifierKey: KeyPath<DirectoryMO, String?> {
         return \DirectoryMO.name
     }
     

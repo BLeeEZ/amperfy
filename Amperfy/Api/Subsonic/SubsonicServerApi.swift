@@ -148,11 +148,13 @@ class SubsonicServerApi {
     }
     
     func generateUrl(forDownloadingSong song: Song) -> URL? {
-        return createAuthenticatedApiUrlComponent(forAction: "download", id: song.id)?.url
+        let requestId = song.podcastEpisodeInfo?.streamId ?? song.id
+        return createAuthenticatedApiUrlComponent(forAction: "download", id: requestId)?.url
     }
     
     func generateUrl(forStreamingSong song: Song) -> URL? {
-        return createAuthenticatedApiUrlComponent(forAction: "stream", id: song.id)?.url
+        let requestId = song.podcastEpisodeInfo?.streamId ?? song.id
+        return createAuthenticatedApiUrlComponent(forAction: "stream", id: requestId)?.url
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {
@@ -174,6 +176,15 @@ class SubsonicServerApi {
             return nil
         }
         return serverApiVersion
+    }
+    
+    public var isPodcastSupported: Bool {
+        determeClientApiVersionToUse()
+        if let serverApi = serverApiVersion {
+            return serverApi >= SubsonicVersion(major: 1, minor: 9, patch: 0)
+        } else {
+            return false
+        }
     }
 
     func requestGenres(parserDelegate: SsXmlParser) {
@@ -275,6 +286,18 @@ class SubsonicServerApi {
         for songId in songIdsToAdd {
             urlComp.addQueryItem(name: "songIdToAdd", value: songId)
         }
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
+    func requestPodcasts(parserDelegate: SsXmlParser) {
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getPodcasts") else { return }
+        urlComp.addQueryItem(name: "includeEpisodes", value: "false")
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
+    func requestPodcastEpisodes(parserDelegate: SsXmlParser, id: String) {
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getPodcasts", id: id) else { return }
+        urlComp.addQueryItem(name: "includeEpisodes", value: "true")
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     

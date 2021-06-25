@@ -28,6 +28,7 @@ class AuthParserTest: XCTestCase {
         XCTAssertEqual(handshake.albumCount, 8)
         XCTAssertEqual(handshake.genreCount, 6)
         XCTAssertEqual(handshake.playlistCount, 19)
+        XCTAssertEqual(handshake.podcastCount, 3)
         XCTAssertEqual(handshake.videoCount, 2)
     }
 

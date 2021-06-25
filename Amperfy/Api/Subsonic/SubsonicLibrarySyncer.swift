@@ -12,6 +12,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     public private(set) var songCount: Int = 1
     public private(set) var genreCount: Int = 1
     public private(set) var playlistCount: Int = 1
+    public private(set) var podcastCount: Int = 1
     
     init(subsonicServerApi: SubsonicServerApi) {
         self.subsonicServerApi = subsonicServerApi
@@ -73,6 +74,13 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         let playlistParser = SsPlaylistParserDelegate(library: syncLibrary)
         subsonicServerApi.requestPlaylists(parserDelegate: playlistParser)
         syncLibrary.saveContext()
+        
+        if subsonicServerApi.isPodcastSupported {
+            statusNotifyier?.notifySyncStarted(ofType: .podcast)
+            let podcastParser = SsPodcastParserDelegate(library: syncLibrary, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
+            subsonicServerApi.requestPodcasts(parserDelegate: podcastParser)
+            syncLibrary.saveContext()
+        }
 
         syncWave.syncState = .Done
         syncLibrary.saveContext()
@@ -169,6 +177,20 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         os_log("Upload Delete playlist \"%s\"", log: log, type: .info, playlist.name)
         let updateResponseParser = SsPingParserDelegate()
         subsonicServerApi.requestPlaylistDelete(parserDelegate: updateResponseParser, playlist: playlist)
+    }
+    
+    func syncDownPodcastsWithoutEpisodes(library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        let podcastParser = SsPodcastParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestPodcasts(parserDelegate: podcastParser)
+        library.saveContext()
+    }
+    
+    func sync(podcast: Podcast, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        let podcastEpisodeParser = SsPodcastEpisodeParserDelegate(podcast: podcast, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestPodcastEpisodes(parserDelegate: podcastEpisodeParser, id: podcast.id)
+        library.saveContext()
     }
     
     func searchArtists(searchText: String, library: LibraryStorage) {

@@ -23,6 +23,9 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     var playlistCount: Int {
         return ampacheXmlServerApi.playlistCount
     }
+    var podcastCount: Int {
+        return ampacheXmlServerApi.podcastCount
+    }
     
     init(ampacheXmlServerApi: AmpacheXmlServerApi) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
@@ -79,7 +82,14 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         let playlistParser = PlaylistParserDelegate(library: syncLibrary, parseNotifier: statusNotifyier)
         ampacheXmlServerApi.requestPlaylists(parserDelegate: playlistParser)
         syncLibrary.saveContext()
-
+        
+        if ampacheXmlServerApi.isPodcastSupported {
+            statusNotifyier?.notifySyncStarted(ofType: .podcast)
+            let podcastParser = PodcastParserDelegate(library: syncLibrary, syncWave: syncWave, parseNotifier: statusNotifyier)
+            ampacheXmlServerApi.requestPodcasts(parserDelegate: podcastParser)
+            syncLibrary.saveContext()
+        }
+        
         syncWave.syncState = .Done
         syncLibrary.saveContext()
         statusNotifyier?.notifySyncFinished()
@@ -166,6 +176,20 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             playlistParser.playlist = playlist
             ampacheXmlServerApi.requestPlaylistCreate(parserDelegate: playlistParser, playlist: playlist)
         }
+    }
+    
+    func syncDownPodcastsWithoutEpisodes(library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        let podcastParser = PodcastParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+        ampacheXmlServerApi.requestPodcasts(parserDelegate: podcastParser)
+        library.saveContext()
+    }
+    
+    func sync(podcast: Podcast, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        let podcastEpisodeParser = PodcastEpisodeParserDelegate(podcast: podcast, library: library, syncWave: syncWave)
+        self.ampacheXmlServerApi.requestPodcastEpisodes(of: podcast, parserDelegate: podcastEpisodeParser)
+        library.saveContext()
     }
     
     func searchArtists(searchText: String, library: LibraryStorage) {

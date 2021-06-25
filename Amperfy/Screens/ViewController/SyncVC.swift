@@ -98,6 +98,9 @@ extension SyncVC: SyncCallbacks {
         case .genre:
             self.libObjectsToParseCount = self.syncer?.genreCount ?? 1
             self.updateSyncInfo(infoText: "Syncing genres ...", percentParsed: 0.0)
+        case .podcast:
+            self.libObjectsToParseCount = self.syncer?.podcastCount ?? 1
+            self.updateSyncInfo(infoText: "Syncing podcasts ...", percentParsed: 0.0)
         }
         syncSemaphore.signal()
     }

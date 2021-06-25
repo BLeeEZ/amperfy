@@ -329,11 +329,11 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         }
     }
 
-    func updateNowPlayingInfo(song: Song) {
+    func updateNowPlayingInfo(song: Song) {       
         nowPlayingInfoCenter?.nowPlayingInfo = [
             MPMediaItemPropertyTitle: song.title,
             MPMediaItemPropertyAlbumTitle: song.album?.name ?? "",
-            MPMediaItemPropertyArtist: song.artist?.name ?? "",
+            MPMediaItemPropertyArtist: song.creatorName,
             MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
             MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: song.image.size, requestHandler: { (size) -> UIImage in

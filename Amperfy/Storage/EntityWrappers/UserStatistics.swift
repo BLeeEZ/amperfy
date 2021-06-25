@@ -6,6 +6,7 @@ public enum UserActionUsed {
     airplay,
     alertGoToAlbum,
     alertGoToArtist,
+    alertGoToPodcast,
     changePlayerDisplayStyle,
     playerOptions,
     playerSeek
@@ -29,6 +30,8 @@ public enum ViewToVisit {
     playlistDetail,
     playlists,
     playlistSelector,
+    podcasts,
+    podcastDetail,
     popupPlayer,
     search,
     settings,
@@ -97,6 +100,10 @@ public class UserStatistics {
             self.managedObject.visitedPlaylistsCount += 1
         case .playlistSelector:
             self.managedObject.visitedPlaylistSelectorCount += 1
+        case .podcasts:
+            self.managedObject.visitedPodcastsCount += 1
+        case .podcastDetail:
+            self.managedObject.visitedPodcastDetailCount += 1
         case .popupPlayer:
             self.managedObject.visitedPopupPlayerCount += 1
         case .search:
@@ -157,6 +164,8 @@ public class UserStatistics {
             self.managedObject.usedAlertGoToAlbumCount += 1
         case .alertGoToArtist:
             self.managedObject.usedAlertGoToArtistCount += 1
+        case .alertGoToPodcast:
+            self.managedObject.usedAlertGoToPodcastCount += 1
         case .changePlayerDisplayStyle:
             self.managedObject.usedChangePlayerDisplayStyleCount += 1
         case .playerOptions:
@@ -178,6 +187,7 @@ public class UserStatistics {
         actionUsed.airplay = managedObject.usedAirplayCount
         actionUsed.alertGoToAlbum = managedObject.usedAlertGoToAlbumCount
         actionUsed.alertGoToArtist = managedObject.usedAlertGoToArtistCount
+        actionUsed.alertGoToPodcast = managedObject.usedAlertGoToPodcastCount
         actionUsed.changePlayerDisplayStyle = managedObject.usedChangePlayerDisplayStyleCount
         actionUsed.playerOptions = managedObject.usedPlayerOptionsCount
         actionUsed.playerSeek = managedObject.usedPlayerSeekCount
@@ -211,6 +221,8 @@ public class UserStatistics {
         viewsVisited.playlistDetail = managedObject.visitedPlaylistDetailCount
         viewsVisited.playlists = managedObject.visitedPlaylistsCount
         viewsVisited.playlistSelector = managedObject.visitedPlaylistSelectorCount
+        viewsVisited.podcastDetail = managedObject.visitedPodcastDetailCount
+        viewsVisited.podcasts = managedObject.visitedPodcastsCount
         viewsVisited.popupPlayer = managedObject.visitedPopupPlayerCount
         viewsVisited.search = managedObject.visitedSearchCount
         viewsVisited.settings = managedObject.visitedSettingsCount
@@ -240,6 +252,7 @@ public struct ActionUsedCounts: Encodable {
     public var airplay: Int32?
     public var alertGoToAlbum: Int32?
     public var alertGoToArtist: Int32?
+    public var alertGoToPodcast: Int32?
     public var changePlayerDisplayStyle: Int32?
     public var playerOptions: Int32?
     public var playerSeek: Int32?
@@ -273,6 +286,8 @@ public struct ViewsVisitedCounts: Encodable {
     public var playlistDetail: Int32?
     public var playlists: Int32?
     public var playlistSelector: Int32?
+    public var podcastDetail: Int32?
+    public var podcasts: Int32?
     public var popupPlayer: Int32?
     public var search: Int32?
     public var settings: Int32?

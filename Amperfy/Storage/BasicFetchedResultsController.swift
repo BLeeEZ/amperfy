@@ -79,6 +79,24 @@ extension DirectoryMO {
     }
 }
 
+extension PodcastMO {
+    @objc public var section: String {
+        self.willAccessValue(forKey: "section")
+        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.title)
+        self.didAccessValue(forKey: "section")
+        return section
+    }
+}
+
+extension PodcastEpisodeMO {
+    @objc public var section: String {
+        self.willAccessValue(forKey: "section")
+        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.playInfo?.title)
+        self.didAccessValue(forKey: "section")
+        return section
+    }
+}
+
 extension NSFetchedResultsController {
     @objc func fetch() {
         do {
@@ -226,6 +244,21 @@ extension BasicFetchedResultsController where ResultType == DirectoryMO {
         return Directory(managedObject: directoryMO)
     }
 }
+
+extension BasicFetchedResultsController where ResultType == PodcastMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> Podcast {
+        let podcastMO = fetchResultsController.object(at: indexPath)
+        return Podcast(managedObject: podcastMO)
+    }
+}
+
+extension BasicFetchedResultsController where ResultType == PodcastEpisodeMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> PodcastEpisode {
+        let podcastEpisodeMO = fetchResultsController.object(at: indexPath)
+        return PodcastEpisode(managedObject: podcastEpisodeMO)
+    }
+}
+
 
 class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<ResultType> where ResultType : NSFetchRequestResult  {
     

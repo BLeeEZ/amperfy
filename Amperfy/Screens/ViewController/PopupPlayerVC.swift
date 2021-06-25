@@ -274,7 +274,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }))
         alert.addAction(UIAlertAction(title: "Add all songs to playlist", style: .default, handler: { _ in
             let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.songsToAdd = self.appDelegate.player.playlist.songs
+            selectPlaylistVC.songsToAdd = self.appDelegate.player.playlist.songs.filterMusicSongs()
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
             self.present(selectPlaylistNav, animated: true, completion: nil)
         }))

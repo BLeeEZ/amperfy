@@ -16,7 +16,7 @@ class SongActionSheetView: UIView {
     
     func display(song: Song) {
         titleLabel.text = song.title
-        artistLabel.text = song.artist?.name
+        artistLabel.text = song.creatorName
         artworkImage.displayAndUpdate(entity: song, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
     }
 

@@ -106,7 +106,7 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         for playlistItem in sortedPlaylistItems {
             infoText += String(playlistItem.order) + ": "
             if let song = playlistItem.song {
-                infoText += song.artist?.name ?? "NO ARTIST"
+                infoText += song.creatorName
                 infoText += " - "
                 infoText += song.title
             } else {

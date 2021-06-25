@@ -110,6 +110,13 @@ public class Song: AbstractLibraryEntity, Identifyable, Downloadable {
             if managedObject.artist != newValue?.managedObject { managedObject.artist = newValue?.managedObject }
         }
     }
+    var creatorName: String {
+        if let podcast = podcastEpisodeInfo?.podcast {
+            return podcast.title
+        } else {
+            return artist?.name ?? "Unknown Artist"
+        }
+    }
     var genre: Genre? {
         get {
             guard let genreMO = managedObject.genre else { return nil }
@@ -126,13 +133,24 @@ public class Song: AbstractLibraryEntity, Identifyable, Downloadable {
             if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
         }
     }
+    var isPodcastEpisode: Bool {
+        return podcastEpisodeInfo != nil
+    }
+    var podcastEpisodeInfo: PodcastEpisode? {
+        get {
+            guard let podcastEpisodeInfoMO = managedObject.podcastEpisodeInfo else { return nil }
+            return PodcastEpisode(managedObject: podcastEpisodeInfoMO) }
+        set {
+            if managedObject.podcastEpisodeInfo != newValue?.managedObject { managedObject.podcastEpisodeInfo = newValue?.managedObject }
+        }
+    }
     var isOrphaned: Bool {
         guard let album = album else { return true }
         return album.isOrphaned
     }
 
     var displayString: String {
-        return "\(managedObject.artist?.name ?? "Unknown Artist") - \(title)"
+        return "\(creatorName) - \(title)"
     }
     
     var detailInfo: String {
@@ -152,7 +170,19 @@ public class Song: AbstractLibraryEntity, Identifyable, Downloadable {
         info += " size: \(size),"
         let contentTypeInfo = contentType ?? "-"
         info += " contentType: \(contentTypeInfo),"
-        info += " bitrate: \(bitrate)"
+        info += " bitrate: \(bitrate),"
+        if let podcastEpisodeInfo = podcastEpisodeInfo {
+            info += "podcastEpisodeInfo: {"
+            info += " description: \(podcastEpisodeInfo.depiction ?? "-")"
+            let publishDateInfo = podcastEpisodeInfo.publishDate.asIso8601String
+            info += " publishDate: \(publishDateInfo),"
+            info += " remoteStatus: \(podcastEpisodeInfo.remoteStatus)"
+            info += "}"
+        } else {
+            info += "podcastEpisodeInfo: -"
+        }
+        
+        
 
         
         info += ")"
@@ -211,6 +241,10 @@ extension Array where Element: Song {
     
     func sortByTrackNumber() -> [Element] {
         return self.sorted{ $0.track < $1.track }
+    }
+    
+    func filterMusicSongs() -> [Element] {
+        return self.filter{ $0.podcastEpisodeInfo == nil }
     }
     
 }

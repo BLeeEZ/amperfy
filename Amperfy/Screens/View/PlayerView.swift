@@ -311,11 +311,11 @@ class PlayerView: UIView {
             let songInfo = player.playlist.songs[songIndex]
             songTitleCompactLabel.text = songInfo.title
             songTitleLargeLabel.text = songInfo.title
-            artistNameCompactLabel.text = songInfo.artist?.name
-            artistNameLargeLabel.text = songInfo.artist?.name
+            artistNameCompactLabel.text = songInfo.creatorName
+            artistNameLargeLabel.text = songInfo.creatorName
             artworkImage.image = songInfo.image
             rootView?.popupItem.title = songInfo.title
-            rootView?.popupItem.subtitle = songInfo.artist?.name
+            rootView?.popupItem.subtitle = songInfo.creatorName
             rootView?.popupItem.image = songInfo.image
             rootView?.changeBackgroundGradient(forSong: songInfo)
             lastDisplayedSong = songInfo

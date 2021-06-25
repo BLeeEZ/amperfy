@@ -61,6 +61,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     var songCount: Int = 0
     var genreCount: Int = 0
     var playlistCount: Int = 0
+    var podcastCount: Int = 0
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?) {}
     func sync(artist: Artist, library: LibraryStorage) {}
     func sync(album: Album, library: LibraryStorage) {}
@@ -70,6 +71,8 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage) {}
     func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage) {}
     func syncUpload(playlistToDelete playlist: Playlist) {}
+    func syncDownPodcastsWithoutEpisodes(library: LibraryStorage) {}
+    func sync(podcast: Podcast, library: LibraryStorage) {}
     func searchArtists(searchText: String, library: LibraryStorage) {}
     func searchAlbums(searchText: String, library: LibraryStorage) {}
     func searchSongs(searchText: String, library: LibraryStorage) {}
@@ -101,6 +104,7 @@ class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
 class MOCK_BackendApi: BackendApi {
     var clientApiVersion: String = ""
     var serverApiVersion: String = ""
+    var isPodcastSupported: Bool = false
     func provideCredentials(credentials: LoginCredentials) {}
     func authenticate(credentials: LoginCredentials) {}
     func isAuthenticated() -> Bool { return false }

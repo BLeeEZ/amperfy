@@ -82,6 +82,35 @@ extension String {
         return dateFormatter.date(from: self)
     }
     
+    var asByteCount: Int? {
+        guard !self.isEmpty else { return nil }
+        if self.hasSuffix(" GB") {
+            let stringSize = self[..<self.index(self.endIndex, offsetBy: -3)]
+            guard let stringFloat = Float(stringSize) else { return nil }
+            return Int(stringFloat * 1000 * 1000 * 1000)
+        } else if self.hasSuffix(" MB") {
+            let stringSize = self[..<self.index(self.endIndex, offsetBy: -3)]
+            guard let stringFloat = Float(stringSize) else { return nil }
+            return Int(stringFloat * 1000 * 1000)
+        } else if self.hasSuffix(" KB") {
+            let stringSize = self[..<self.index(self.endIndex, offsetBy: -3)]
+            guard let stringFloat = Float(stringSize) else { return nil }
+            return Int(stringFloat * 1000)
+        } else if self.hasSuffix(" B") {
+            let stringSize = self[..<self.index(self.endIndex, offsetBy: -2)]
+            guard let stringFloat = Float(stringSize) else { return nil }
+            return Int(stringFloat)
+        } else {
+            return nil
+        }
+    }
+    
+    var asDurationInSeconds: Int? {
+        let components = self.split{ $0 == ":" }.compactMap{ Int($0) }
+        guard components.count == 3 else { return nil }
+        return (components[0] * 60 * 24) + (components[1] * 60) + components[2]
+    }
+    
     static func generateRandomString(ofLength length: Int) -> String {
         let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return String((0..<length).map{ _ in letters.randomElement()! })
@@ -215,6 +244,13 @@ extension Data {
 extension Date {
     var asIso8601String: String {
         let dateFormatter = ISO8601DateFormatter()
+        return dateFormatter.string(from: self)
+    }
+    
+    var asShortDayMonthString: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d. MMMM"
+        dateFormatter.timeZone = NSTimeZone(name: "UTC")! as TimeZone
         return dateFormatter.string(from: self)
     }
 }

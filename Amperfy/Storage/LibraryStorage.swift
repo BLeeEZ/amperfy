@@ -16,7 +16,7 @@ enum PlaylistSearchCategory: Int {
 
 class LibraryStorage: SongFileCachable {
     
-    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName]
+    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, SongFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName]
 
     private let log = OSLog(subsystem: AppDelegate.name, category: "LibraryStorage")
     private var context: NSManagedObjectContext
@@ -38,6 +38,8 @@ class LibraryStorage: SongFileCachable {
         libraryInfo.artworkCount = artworkCount
         libraryInfo.musicFolderCount = musicFolderCount
         libraryInfo.directoryCount = directoryCount
+        libraryInfo.podcastCount = podcastCount
+        libraryInfo.podcastEpisodeCount = podcastEpisodeCount
         return libraryInfo
     }
     
@@ -54,7 +56,9 @@ class LibraryStorage: SongFileCachable {
     }
     
     var songCount: Int {
-        return (try? context.count(for: SongMO.fetchRequest())) ?? 0
+        let request: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        request.predicate = SongMO.excludePodcastEpisodesFetchPredicate
+        return (try? context.count(for: request)) ?? 0
     }
     
     var syncWaveCount: Int {
@@ -75,7 +79,10 @@ class LibraryStorage: SongFileCachable {
     
     var cachedSongCount: Int {
         let request: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        request.predicate = NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            SongMO.excludePodcastEpisodesFetchPredicate,
+            NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
+        ])
         return (try? context.count(for: request)) ?? 0
     }
     
@@ -83,6 +90,14 @@ class LibraryStorage: SongFileCachable {
         let request: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         request.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
         return (try? context.count(for: request)) ?? 0
+    }
+    
+    var podcastCount: Int {
+        return (try? context.count(for: PodcastMO.fetchRequest())) ?? 0
+    }
+    
+    var podcastEpisodeCount: Int {
+        return (try? context.count(for: PodcastEpisodeMO.fetchRequest())) ?? 0
     }
     
     var cachedSongSizeInByte: Int64 {
@@ -112,6 +127,16 @@ class LibraryStorage: SongFileCachable {
     
     func deleteAlbum(album: Album) {
         context.delete(album.managedObject)
+    }
+    
+    func createPodcast() -> Podcast {
+        let podcastMO = PodcastMO(context: context)
+        return Podcast(managedObject: podcastMO)
+    }
+    
+    func createPodcastEpisode() -> PodcastEpisode {
+        let podcastEpisodeMO = PodcastEpisodeMO(context: context)
+        return PodcastEpisode(managedObject: podcastEpisodeMO)
     }
     
     func createSong() -> Song {
@@ -165,36 +190,9 @@ class LibraryStorage: SongFileCachable {
             song.managedObject.file = nil
         }
     }
-
-    func deleteCache(ofPlaylist playlist: Playlist) {
-        for song in playlist.songs {
-            if let songFile = getSongFile(forSong: song) {
-                deleteSongFile(songFile: songFile)
-                song.managedObject.file = nil
-            }
-        }
-    }
     
-    func deleteCache(ofGenre genre: Genre) {
-        for song in genre.songs {
-            if let songFile = getSongFile(forSong: song) {
-                deleteSongFile(songFile: songFile)
-                song.managedObject.file = nil
-            }
-        }
-    }
-    
-    func deleteCache(ofArtist artist: Artist) {
-        for song in artist.songs {
-            if let songFile = getSongFile(forSong: song) {
-                deleteSongFile(songFile: songFile)
-                song.managedObject.file = nil
-            }
-        }
-    }
-    
-    func deleteCache(ofAlbum album: Album) {
-        for song in album.songs {
+    func deleteCache(of songContainable: SongContainable) {
+        for song in songContainable.songs {
             if let songFile = getSongFile(forSong: song) {
                 deleteSongFile(songFile: songFile)
                 song.managedObject.file = nil
@@ -262,6 +260,10 @@ class LibraryStorage: SongFileCachable {
         return NSPredicate(format: "%K == %@", #keyPath(PlaylistItemMO.playlist), playlist.managedObject.objectID)
     }
     
+    func getFetchPredicate(forPodcast podcast: Podcast) -> NSPredicate {
+        return NSPredicate(format: "%K == %@", #keyPath(PodcastEpisodeMO.podcast), podcast.managedObject.objectID)
+    }
+    
     func getFetchPredicate(forMusicFolder musicFolder: MusicFolder) -> NSPredicate {
         return NSPredicate(format: "musicFolder == %@", musicFolder.managedObject.objectID)
     }
@@ -277,6 +279,14 @@ class LibraryStorage: SongFileCachable {
     func getFetchPredicate(onlyCachedSongs: Bool) -> NSPredicate {
         if onlyCachedSongs {
             return NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
+        } else {
+            return NSPredicate.alwaysTrue
+        }
+    }
+    
+    func getFetchPredicate(onlyCachedPodcastEpisodes: Bool) -> NSPredicate {
+        if onlyCachedPodcastEpisodes {
+            return NSPredicate(format: "%K != nil", #keyPath(PodcastEpisodeMO.playInfo.file))
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -305,6 +315,13 @@ class LibraryStorage: SongFileCachable {
         let foundAlbums = try? context.fetch(fetchRequest)
         let albums = foundAlbums?.compactMap{ Album(managedObject: $0) }
         return albums ?? [Album]()
+    }
+    
+    func getPodcasts() -> [Podcast] {
+        let fetchRequest = PodcastMO.identifierSortedFetchRequest
+        let foundAlbums = try? context.fetch(fetchRequest)
+        let podcasts = foundAlbums?.compactMap{ Podcast(managedObject: $0) }
+        return podcasts ?? [Podcast]()
     }
 
     func getSongs() -> [Song] {
@@ -403,6 +420,22 @@ class LibraryStorage: SongFileCachable {
         fetchRequest.fetchLimit = 1
         let albums = try? context.fetch(fetchRequest)
         return albums?.lazy.compactMap{ Album(managedObject: $0) }.first
+    }
+    
+    func getPodcast(id: String) -> Podcast? {
+        let fetchRequest: NSFetchRequest<PodcastMO> = PodcastMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PodcastMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let albums = try? context.fetch(fetchRequest)
+        return albums?.lazy.compactMap{ Podcast(managedObject: $0) }.first
+    }
+    
+    func getPodcastEpisode(id: String) -> PodcastEpisode? {
+        let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PodcastEpisodeMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let songs = try? context.fetch(fetchRequest)
+        return songs?.lazy.compactMap{ PodcastEpisode(managedObject: $0) }.first
     }
     
     func getSong(id: String) -> Song? {
