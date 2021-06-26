@@ -180,14 +180,14 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func syncDownPodcastsWithoutEpisodes(library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard subsonicServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
         let podcastParser = SsPodcastParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestPodcasts(parserDelegate: podcastParser)
         library.saveContext()
     }
     
     func sync(podcast: Podcast, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard subsonicServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
         let podcastEpisodeParser = SsPodcastEpisodeParserDelegate(podcast: podcast, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestPodcastEpisodes(parserDelegate: podcastEpisodeParser, id: podcast.id)
         library.saveContext()

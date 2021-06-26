@@ -179,14 +179,14 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func syncDownPodcastsWithoutEpisodes(library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard ampacheXmlServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
         let podcastParser = PodcastParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
         ampacheXmlServerApi.requestPodcasts(parserDelegate: podcastParser)
         library.saveContext()
     }
     
     func sync(podcast: Podcast, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard ampacheXmlServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
         let podcastEpisodeParser = PodcastEpisodeParserDelegate(podcast: podcast, library: library, syncWave: syncWave)
         self.ampacheXmlServerApi.requestPodcastEpisodes(of: podcast, parserDelegate: podcastEpisodeParser)
         library.saveContext()
