@@ -87,6 +87,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     private let userStatistics: UserStatistics
     private var notifierList = [MusicPlayable]()
     private let replayInsteadPlayPreviousTimeInSec = 5.0
+    private var remoteCommandCenter: MPRemoteCommandCenter?
     
     init(coreData: PlayerData, playableDownloadManager: DownloadManageable, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
         self.coreData = coreData
@@ -299,6 +300,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         for notifier in notifierList {
             notifier.didStartPlaying(playlistItem: playlistItem)
         }
+        changeRemoteCommandCenterControlsBasedOnCurrentPlayableType()
     }
     
     func notifyItemPaused() {
@@ -315,6 +317,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     func didElapsedTimeChange() {
         notifyElapsedTimeChanged()
+        if let currentItem = currentlyPlaying?.playable { updateNowPlayingInfo(playable: currentItem) }
     }
     
     func notifyElapsedTimeChanged() {
@@ -386,31 +389,69 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         }
     }
     
-    func configureRemoteCommands(commandCenter: MPRemoteCommandCenter) {
-        commandCenter.playCommand.isEnabled = true;
-        commandCenter.playCommand.addTarget(handler: { (event) in
+    func configureRemoteCommands(remoteCommandCenter: MPRemoteCommandCenter) {
+        self.remoteCommandCenter = remoteCommandCenter
+        remoteCommandCenter.playCommand.isEnabled = true
+        remoteCommandCenter.playCommand.addTarget(handler: { (event) in
             self.play()
             return .success})
         
-        commandCenter.pauseCommand.isEnabled = true;
-        commandCenter.pauseCommand.addTarget(handler: { (event) in
+        remoteCommandCenter.pauseCommand.isEnabled = true
+        remoteCommandCenter.pauseCommand.addTarget(handler: { (event) in
             self.pause()
             return .success})
         
-        commandCenter.togglePlayPauseCommand.isEnabled = true;
-        commandCenter.togglePlayPauseCommand.addTarget(handler: { (event) in
+        remoteCommandCenter.togglePlayPauseCommand.isEnabled = true
+        remoteCommandCenter.togglePlayPauseCommand.addTarget(handler: { (event) in
             self.togglePlay()
             return .success})
         
-        commandCenter.previousTrackCommand.isEnabled = true;
-        commandCenter.previousTrackCommand.addTarget(handler: { (event) in
+        remoteCommandCenter.previousTrackCommand.isEnabled = true
+        remoteCommandCenter.previousTrackCommand.addTarget(handler: { (event) in
             self.playPreviousOrReplay()
             return .success})
 
-        commandCenter.nextTrackCommand.isEnabled = true;
-        commandCenter.nextTrackCommand.addTarget(handler: { (event) in
+        remoteCommandCenter.nextTrackCommand.isEnabled = true
+        remoteCommandCenter.nextTrackCommand.addTarget(handler: { (event) in
             self.playNext()
             return .success})
+        
+        remoteCommandCenter.changePlaybackPositionCommand.isEnabled = true
+        remoteCommandCenter.changePlaybackPositionCommand.addTarget(handler: { (event) in
+            guard let command = event as? MPChangePlaybackPositionCommandEvent else { return .noSuchContent}
+            self.seek(toSecond: command.positionTime)
+            return .success})
+        
+        remoteCommandCenter.skipBackwardCommand.isEnabled = true
+        remoteCommandCenter.skipBackwardCommand.preferredIntervals = [15]
+        remoteCommandCenter.skipBackwardCommand.addTarget(handler: { (event) in
+            guard let command = event.command as? MPSkipIntervalCommand else { return .noSuchContent }
+            let interval = Double(truncating: command.preferredIntervals[0])
+            self.seek(toSecond: self.elapsedTime - interval)
+            return .success})
+        
+        remoteCommandCenter.skipForwardCommand.isEnabled = true
+        remoteCommandCenter.skipForwardCommand.preferredIntervals = [30]
+        remoteCommandCenter.skipForwardCommand.addTarget(handler: { (event) in
+            guard let command = event.command as? MPSkipIntervalCommand else { return .noSuchContent }
+            let interval = Double(truncating: command.preferredIntervals[0])
+            self.seek(toSecond: self.elapsedTime + interval)
+            return .success})
+    }
+    
+    private func changeRemoteCommandCenterControlsBasedOnCurrentPlayableType() {
+        guard let currentItem = currentlyPlaying?.playable, let remoteCommandCenter = remoteCommandCenter else { return }
+        if currentItem.isSong {
+            remoteCommandCenter.previousTrackCommand.isEnabled = true
+            remoteCommandCenter.nextTrackCommand.isEnabled = true
+            remoteCommandCenter.skipBackwardCommand.isEnabled = false
+            remoteCommandCenter.skipForwardCommand.isEnabled = false
+        } else if currentItem.isPodcastEpisode {
+            remoteCommandCenter.previousTrackCommand.isEnabled = false
+            remoteCommandCenter.nextTrackCommand.isEnabled = false
+            remoteCommandCenter.skipBackwardCommand.isEnabled = true
+            remoteCommandCenter.skipForwardCommand.isEnabled = true
+        }
     }
 
 }

@@ -69,7 +69,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.player.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
         UIApplication.shared.beginReceivingRemoteControlEvents()
         self.player.nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
-        self.player.configureRemoteCommands(commandCenter: MPRemoteCommandCenter.shared())
+        self.player.configureRemoteCommands(remoteCommandCenter: MPRemoteCommandCenter.shared())
     }
     
     var isKeepScreenAlive: Bool {
