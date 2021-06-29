@@ -20,8 +20,8 @@ class PodcastEpisodeTableCell: BasicTableCell {
     }
 
     func refresh() {
-        guard let episode = self.episode, let playInfo = episode.playInfo else { return }
-        podcastEpisodeLabel.text = playInfo.title
+        guard let episode = self.episode else { return }
+        podcastEpisodeLabel.text = episode.title
         podcastEpisodeImage.displayAndUpdate(entity: episode, via: appDelegate.artworkDownloadManager)
         
         optionsButton.setTitle(CommonString.threeMiddleDots, for: .normal)
@@ -36,52 +36,52 @@ class PodcastEpisodeTableCell: BasicTableCell {
         var infoText = ""
         infoText += "\(episode.publishDate.asShortDayMonthString) \(CommonString.oneMiddleDot)"
         infoText += " \(episode.userStatus.description) \(CommonString.oneMiddleDot)"
-        infoText += " \(playInfo.duration.asDurationString)"
+        infoText += " \(episode.duration.asDurationString)"
         infoLabel.text = infoText
     }
 
     @IBAction func playEpisodeButtonPressed(_ sender: Any) {
-        guard let episode = self.episode, let playInfo = episode.playInfo else { return }
-        appDelegate.player.addToPlaylist(song: playInfo)
-        let indexInPlayerPlaylist = appDelegate.player.playlist.songs.count-1
-        appDelegate.player.play(songInPlaylistAt: indexInPlayerPlaylist)
+        guard let episode = self.episode else { return }
+        appDelegate.player.addToPlaylist(playable: episode)
+        let indexInPlayerPlaylist = appDelegate.player.playlist.playables.count-1
+        appDelegate.player.play(elementInPlaylistAt: indexInPlayerPlaylist)
     }
     
     @IBAction func optionsButtonPressed(_ sender: Any) {
-        guard let episode = self.episode, let playInfo = episode.playInfo, let rootView = rootView else { return }
+        guard let episode = self.episode, let rootView = rootView else { return }
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        let alert = createAlert(forSong: playInfo, rootView: rootView)
+        let alert = createAlert(forEpisode: episode, rootView: rootView)
         alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
         rootView.present(alert, animated: true, completion: nil)
     }
     
-    func createAlert(forSong song: Song, rootView: UIViewController) -> UIAlertController {
+    func createAlert(forEpisode episode: PodcastEpisode, rootView: UIViewController) -> UIAlertController {
         let alert = UIAlertController(title: "\n\n\n", message: nil, preferredStyle: .actionSheet)
     
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: alert.view.bounds.size.width, height: SongActionSheetView.frameHeight))
         if let songActionSheetView = ViewBuilder<SongActionSheetView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: alert.view.bounds.size.width, height: SongActionSheetView.frameHeight)) {
-            songActionSheetView.display(song: song)
+            songActionSheetView.display(playable: episode)
             headerView.addSubview(songActionSheetView)
             alert.view.addSubview(headerView)
         }
     
         if episode.userStatus != .syncingOnServer {
             alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
-                self.appDelegate.player.play(song: song)
+                self.appDelegate.player.play(playable: episode)
             }))
             alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
-                self.appDelegate.player.addToPlaylist(song: song)
+                self.appDelegate.player.addToPlaylist(playable: episode)
             }))
-            if song.isCached {
+            if episode.isCached {
                 alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
-                    self.appDelegate.library.deleteCache(ofSong: song)
+                    self.appDelegate.library.deleteCache(ofPlayable: episode)
                     self.appDelegate.library.saveContext()
                     self.refresh()
                 }))
             } else {
                 alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-                    self.appDelegate.songDownloadManager.download(object: song)
+                    self.appDelegate.playableDownloadManager.download(object: episode)
                     self.refresh()
                 }))
             }

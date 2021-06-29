@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Podcast: AbstractLibraryEntity, SongContainable {
+public class Podcast: AbstractLibraryEntity, PlayableContainable {
     
     let managedObject: PodcastMO
     
@@ -26,12 +26,7 @@ public class Podcast: AbstractLibraryEntity, SongContainable {
         guard let episodesSet = managedObject.episodes, let episodesMO = episodesSet.array as? [PodcastEpisodeMO] else { return [PodcastEpisode]() }
         return episodesMO.compactMap{ PodcastEpisode(managedObject: $0) }.sortByPublishDate()
     }
-    var songs: [Song] {
-        return episodes.compactMap{ $0.playInfo }
-    }
-    var hasCachedSongs: Bool {
-        return songs.hasCachedSongs
-    }
+    var playables: [AbstractPlayable] { return episodes }
     
     override var image: UIImage {
         if super.image != Artwork.defaultImage {

@@ -43,7 +43,7 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
                 item?.order = order
                 playlist.add(item: item!)
             }
-            item?.song = songBuffer
+            item?.playable = songBuffer
         }
     }
     

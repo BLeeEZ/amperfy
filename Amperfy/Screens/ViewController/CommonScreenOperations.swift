@@ -1,11 +1,6 @@
 import Foundation
 import UIKit
 
-enum SongOperationDisplayModes {
-    case libraryCell
-    case playerCell
-}
-
 extension UIView {
     static let defaultMarginX: CGFloat = 16
     static let defaultMarginY: CGFloat = 11

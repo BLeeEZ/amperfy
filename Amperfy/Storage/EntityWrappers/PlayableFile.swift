@@ -1,25 +1,25 @@
 import Foundation
 import CoreData
 
-public class SongFile: NSObject {
+public class PlayableFile: NSObject {
     
-    let managedObject: SongFileMO
+    let managedObject: PlayableFileMO
 
-    init(managedObject: SongFileMO) {
+    init(managedObject: PlayableFileMO) {
         self.managedObject = managedObject
     }
 
-    var info: Song? {
+    var info: AbstractPlayable? {
         get {
             guard let songMO = managedObject.info else { return nil }
-            return Song(managedObject: songMO)
+            return AbstractPlayable(managedObject: songMO)
         }
         set {
-            guard let song = newValue else {
+            guard let playable = newValue else {
                 managedObject.info = nil
                 return
             }
-            managedObject.info = song.managedObject
+            managedObject.info = playable.playableManagedObject
         }
     }
     
@@ -33,7 +33,7 @@ public class SongFile: NSObject {
     }
     
     override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? SongFile else { return false }
+        guard let object = object as? PlayableFile else { return false }
         return managedObject == object.managedObject
     }
 

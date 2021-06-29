@@ -8,7 +8,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     static let frameHeight: CGFloat = 30.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginMiddleElement
     
-    private var songContainer: SongContainable?
+    private var playableContainer: PlayableContainable?
     private var player: MusicPlayer?
     
     required init?(coder aDecoder: NSCoder) {
@@ -17,19 +17,19 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     @IBAction func playAllButtonPressed(_ sender: Any) {
-        guard let songContainer = songContainer, let player = player else { return }
+        guard let playableContainer = playableContainer, let player = player else { return }
         player.cleanPlaylist()
-        player.addToPlaylist(songs: songContainer.songs)
+        player.addToPlaylist(playables: playableContainer.playables)
         player.play()
     }
     
     @IBAction func addAllToPlayNextButtonPressed(_ sender: Any) {
-        guard let songContainer = songContainer, let player = player else { return }
-        player.addToPlaylist(songs: songContainer.songs)
+        guard let playableContainer = playableContainer, let player = player else { return }
+        player.addToPlaylist(playables: playableContainer.playables)
     }
     
-    func prepare(songContainer: SongContainable?, with player: MusicPlayer) {
-        self.songContainer = songContainer
+    func prepare(playableContainer: PlayableContainable?, with player: MusicPlayer) {
+        self.playableContainer = playableContainer
         self.player = player
     }
     

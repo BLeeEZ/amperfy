@@ -162,12 +162,12 @@ extension BackendProxy: BackendApi {
         return activeApi.isAuthenticationValid(credentials: credentials)
     }
     
-    func generateUrl(forDownloadingSong song: Song) -> URL? {
-        return activeApi.generateUrl(forDownloadingSong: song)
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL? {
+        return activeApi.generateUrl(forDownloadingPlayable: playable)
     }
     
-    func generateUrl(forStreamingSong song: Song) -> URL? {
-        return activeApi.generateUrl(forStreamingSong: song)
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL? {
+        return activeApi.generateUrl(forStreamingPlayable: playable)
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {

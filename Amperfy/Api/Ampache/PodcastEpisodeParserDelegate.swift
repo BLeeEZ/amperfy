@@ -3,7 +3,7 @@ import UIKit
 import CoreData
 import os.log
 
-class PodcastEpisodeParserDelegate: SongParserDelegate {
+class PodcastEpisodeParserDelegate: PlayableParserDelegate {
 
     var podcast: Podcast
     var episodeBuffer: PodcastEpisode?
@@ -27,10 +27,8 @@ class PodcastEpisodeParserDelegate: SongParserDelegate {
             } else {
                 episodeBuffer = library.createPodcastEpisode()
                 episodeBuffer?.id = episodeId
-                songBuffer = library.createSong()
-                songBuffer?.syncInfo = syncWave
-                episodeBuffer?.playInfo = songBuffer
             }
+            playableBuffer = episodeBuffer
             episodeBuffer?.podcast = podcast
         default:
             break
@@ -50,14 +48,14 @@ class PodcastEpisodeParserDelegate: SongParserDelegate {
         case "state":
             episodeBuffer?.remoteStatus = PodcastEpisodeRemoteStatus.create(from: buffer)
         case "filelength":
-            songBuffer?.duration = buffer.asDurationInSeconds ?? 0
+            episodeBuffer?.duration = buffer.asDurationInSeconds ?? 0
         case "filesize":
-            songBuffer?.size = buffer.asByteCount ?? 0
+            episodeBuffer?.size = buffer.asByteCount ?? 0
         case "art":
             episodeBuffer?.artwork = parseArtwork(urlString: buffer)
         case "podcast_episode":
             parsedCount += 1
-            songBuffer = nil
+            playableBuffer = nil
             episodeBuffer = nil
         default:
             break

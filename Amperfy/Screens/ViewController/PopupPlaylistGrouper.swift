@@ -3,20 +3,20 @@ import Foundation
 class PopupPlaylistGrouper {
     
     let sectionNames = ["Previous", "Next"]
-    var sections: [[Song]]
+    var sections: [[AbstractPlayable]]
     private var playIndex: Int
     
     init(player: MusicPlayer) {
         playIndex = player.currentlyPlaying?.index ?? 0
         
         let playlist = player.playlist
-        var played = [Song]()
+        var played = [AbstractPlayable]()
         if playIndex > 0 {
-            played = Array(playlist.songs[0...playIndex-1])
+            played = Array(playlist.playables[0...playIndex-1])
         }
-        var next = [Song]()
-        if playlist.songs.count > 0, playIndex < playlist.songs.count-1 {
-            next = Array(playlist.songs[(playIndex+1)...])
+        var next = [AbstractPlayable]()
+        if playlist.playables.count > 0, playIndex < playlist.playables.count-1 {
+            next = Array(playlist.playables[(playIndex+1)...])
         }
         sections = [played, next]
     }

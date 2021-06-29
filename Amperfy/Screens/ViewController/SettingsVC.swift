@@ -25,7 +25,7 @@ class SettingsVC: UITableViewController {
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in
             self.appDelegate.player.stop()
             self.appDelegate.artworkDownloadManager.stopAndWait()
-            self.appDelegate.songDownloadManager.stopAndWait()
+            self.appDelegate.playableDownloadManager.stopAndWait()
             self.appDelegate.persistentStorage.context.reset()
             self.appDelegate.persistentStorage.loginCredentials = nil
             self.appDelegate.library.cleanStorage()

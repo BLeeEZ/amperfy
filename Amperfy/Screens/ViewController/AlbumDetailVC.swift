@@ -23,7 +23,7 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
             detailOperationsView = albumDetailTableHeaderView
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: AlbumDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(songContainer: album, with: appDelegate.player)
+            libraryElementDetailTableHeaderView.prepare(playableContainer: album, with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
     }

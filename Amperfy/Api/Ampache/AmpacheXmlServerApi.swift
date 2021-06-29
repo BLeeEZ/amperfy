@@ -354,10 +354,10 @@ class AmpacheXmlServerApi {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_edit")
         apiUrlComponent.addQueryItem(name: "filter", value: playlist.id)
-        let playlistSongs = playlist.songs
+        let playlistSongs = playlist.playables
         if playlistSongs.count > 0 {
-            apiUrlComponent.addQueryItem(name: "items", value: playlist.songs.compactMap{ $0.id }.joined(separator: ","))
-            apiUrlComponent.addQueryItem(name: "tracks", value: Array(1...playlist.songs.count).compactMap{"\($0)"}.joined(separator: ","))
+            apiUrlComponent.addQueryItem(name: "items", value: playlist.playables.compactMap{ $0.id }.joined(separator: ","))
+            apiUrlComponent.addQueryItem(name: "tracks", value: Array(1...playlist.playables.count).compactMap{"\($0)"}.joined(separator: ","))
         }
         let errorParser = AmpacheXmlParser()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
@@ -418,14 +418,14 @@ class AmpacheXmlServerApi {
         return authHandshake
     }
     
-    func generateUrl(forDownloadingSong song: Song) -> URL? {
-        guard var urlString = song.url else { return nil }
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL? {
+        guard var urlString = playable.url else { return nil }
         updateUrlToken(urlString: &urlString)
         return URL(string: urlString)
     }
     
-    func generateUrl(forStreamingSong song: Song) -> URL? {
-        return generateUrl(forDownloadingSong: song)
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL? {
+        return generateUrl(forDownloadingPlayable: playable)
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {

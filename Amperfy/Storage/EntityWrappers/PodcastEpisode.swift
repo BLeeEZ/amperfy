@@ -58,7 +58,7 @@ enum PodcastEpisodeUserStatus {
     }
 }
 
-public class PodcastEpisode: AbstractLibraryEntity {
+public class PodcastEpisode: AbstractPlayable {
 
     let managedObject: PodcastEpisodeMO
 
@@ -66,10 +66,11 @@ public class PodcastEpisode: AbstractLibraryEntity {
         self.managedObject = managedObject
         super.init(managedObject: managedObject)
     }
-
-    var objectID: NSManagedObjectID {
-        return managedObject.objectID
+    
+    override var creatorName: String {
+        return podcast?.title ?? "Unknown Podcast"
     }
+
     var depiction: String? {
         get { return managedObject.depiction }
         set {
@@ -85,7 +86,7 @@ public class PodcastEpisode: AbstractLibraryEntity {
         set { if managedObject.status != newValue.rawValue { managedObject.status = Int16(newValue.rawValue) } }
     }
     var userStatus: PodcastEpisodeUserStatus {
-        if playInfo?.isCached ?? false {
+        if isCached {
             return .cached
         } else if remoteStatus == .completed {
             return .availableOnServer
@@ -104,12 +105,28 @@ public class PodcastEpisode: AbstractLibraryEntity {
         }
         set { if managedObject.podcast != newValue?.managedObject { managedObject.podcast = newValue?.managedObject } }
     }
-    var playInfo: Song? {
-        get {
-            guard let episodeMO = managedObject.playInfo else { return nil }
-            return Song(managedObject: episodeMO)
-        }
-        set { if managedObject.playInfo != newValue?.managedObject { managedObject.playInfo = newValue?.managedObject } }
+    var detailInfo: String {
+        var info = title
+        info += " ("
+        let podcastName = podcast?.title ?? "-"
+        info += "album: \(podcastName),"
+        
+        info += " id: \(id),"
+        info += " track: \(track),"
+        info += " year: \(year),"
+        info += " duration: \(duration),"
+        let diskInfo =  disk ?? "-"
+        info += " disk: \(diskInfo),"
+        info += " size: \(size),"
+        let contentTypeInfo = contentType ?? "-"
+        info += " contentType: \(contentTypeInfo),"
+        info += " bitrate: \(bitrate),"
+
+        info += " description: \(depiction ?? "-")"
+        info += " publishDate: \(publishDate.asIso8601String),"
+        info += " remoteStatus: \(remoteStatus)"
+        info += ")"
+        return info
     }
 
 }

@@ -26,7 +26,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         player = appDelegate.player
         player.addNotifier(notifier: self)
-        appDelegate.songDownloadManager.addNotifier(self)
+        appDelegate.playableDownloadManager.addNotifier(self)
         groupedPlaylist = PopupPlaylistGrouper(player: player)
         backgroundColorGradient = PopupAnimatedGradientLayer(view: view)
         backgroundColorGradient.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
@@ -37,8 +37,8 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             playerPlaceholderView.addSubview(playerView)
         }
 
-        tableView.register(nibName: SongTableCell.typeName)
-        tableView.rowHeight = SongTableCell.rowHeight
+        tableView.register(nibName: PlayableTableCell.typeName)
+        tableView.rowHeight = PlayableTableCell.rowHeight
         tableView.backgroundColor = UIColor.clear
     }
     
@@ -55,18 +55,18 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tableView.reloadData()
     }
     
-    func changeBackgroundGradient(forSong song: Song) {
+    func changeBackgroundGradient(forPlayable playable: AbstractPlayable) {
         var customColor: UIColor?
-        let songArtwork = song.image
+        let artwork = playable.image
 
-        if playerView.lastDisplayedSong != song {
+        if playerView.lastDisplayedPlayable != playable {
             DispatchQueue.global().async {
-                if songArtwork != Artwork.defaultImage {
-                    customColor = songArtwork.averageColor()
+                if artwork != Artwork.defaultImage {
+                    customColor = artwork.averageColor()
                 }
                 sleep(self.backgroundGradientDelayTime)
                 DispatchQueue.main.async {
-                    if self.playerView.lastDisplayedSong == song {
+                    if self.playerView.lastDisplayedPlayable == playable {
                         if let customColor = customColor {
                             self.backgroundColorGradient.changeBackground(style: self.traitCollection.userInterfaceStyle, customColor: customColor)
                         } else {
@@ -168,12 +168,12 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: SongTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
-        let song = groupedPlaylist.sections[indexPath.section][indexPath.row]
-        cell.display(song: song, rootView: self, displayMode: .playerCell)
+        let cell: PlayableTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
+        let playable = groupedPlaylist.sections[indexPath.section][indexPath.row]
         let playlistIndex = groupedPlaylist.convertIndexPathToPlaylistIndex(indexPath: indexPath)
-        cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: playlistIndex)
+        cell.playerIndex = playlistIndex
         cell.backgroundColor = UIColor.clear
+        cell.display(playable: playable, rootView: self)
         return cell
     }
     
@@ -181,12 +181,11 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let deletedPlaylistIndex = groupedPlaylist.convertIndexPathToPlaylistIndex(indexPath: indexPath)
-            for i in deletedPlaylistIndex+1...player.playlist.songs.count {
+            for i in deletedPlaylistIndex+1...player.playlist.playables.count {
                 if let targetIndexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: i),
-                   let cell =  tableView.cellForRow(at: targetIndexPath) as? SongTableCell,
-                   var newIndex = cell.indexInPlaylist {
-                    newIndex -= 1
-                    cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: newIndex)
+                   let cell = tableView.cellForRow(at: targetIndexPath) as? PlayableTableCell,
+                   let index = cell.playerIndex {
+                    cell.playerIndex = index - 1
                 }
             }
             player.removeFromPlaylist(at: groupedPlaylist.convertIndexPathToPlaylistIndex(indexPath: indexPath))
@@ -209,28 +208,25 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         if fromPlaylistIndex < toPlaylistIndex {
             for i in fromPlaylistIndex+1...toPlaylistIndex {
                 if let targetIndexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: i),
-                   let cell =  tableView.cellForRow(at: targetIndexPath) as? SongTableCell,
-                   var newIndex = cell.indexInPlaylist {
-                    newIndex -= 1
-                    cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: newIndex)
+                   let cell =  tableView.cellForRow(at: targetIndexPath) as? PlayableTableCell,
+                   let index = cell.playerIndex {
+                    cell.playerIndex = index - 1
                 }
             }
         } else {
             for i in toPlaylistIndex...fromPlaylistIndex-1 {
                 if let targetIndexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: i),
-                   let cell =  tableView.cellForRow(at: targetIndexPath) as? SongTableCell,
-                   var newIndex = cell.indexInPlaylist {
-                        newIndex += 1
-                        cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: newIndex)
+                   let cell =  tableView.cellForRow(at: targetIndexPath) as? PlayableTableCell,
+                   let index = cell.playerIndex {
+                    cell.playerIndex = index + 1
                 }
             }
         }
-        if let cell =  tableView.cellForRow(at: fromIndexPath) as? SongTableCell {
-            let newIndex = toPlaylistIndex
-            cell.confToPlayPlaylistIndexOnTab(indexInPlaylist: newIndex)
+        if let cell = tableView.cellForRow(at: fromIndexPath) as? PlayableTableCell {
+            cell.playerIndex = toPlaylistIndex
         }
 
-        player.movePlaylistSong(fromIndex: fromPlaylistIndex, to: toPlaylistIndex)
+        player.movePlaylistItem(fromIndex: fromPlaylistIndex, to: toPlaylistIndex)
         groupedPlaylist = PopupPlaylistGrouper(player: player)
     }
 
@@ -274,7 +270,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }))
         alert.addAction(UIAlertAction(title: "Add all songs to playlist", style: .default, handler: { _ in
             let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.songsToAdd = self.appDelegate.player.playlist.songs.filterMusicSongs()
+            selectPlaylistVC.itemsToAdd = self.appDelegate.player.playlist.playables.filterSongs()
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
             self.present(selectPlaylistNav, animated: true, completion: nil)
         }))
@@ -314,10 +310,10 @@ extension PopupPlayerVC: DownloadViewUpdatable {
     func downloadManager(_ downloadManager: DownloadManager, updatedRequest: DownloadRequest, updateReason: DownloadRequestEvent) {
         switch(updateReason) {
         case .finished:
-            if let song = updatedRequest.element as? Song {
-                let indicesOfDownloadedSong = player.playlist.songs.allIndices(of: song)
-                for index in indicesOfDownloadedSong {
-                    if let indexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: index), let cell = self.tableView.cellForRow(at: indexPath) as? SongTableCell {
+            if let playable = updatedRequest.element as? AbstractPlayable {
+                let indicesOfDownloadedItems = player.playlist.playables.allIndices(of: playable)
+                for index in indicesOfDownloadedItems {
+                    if let indexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: index), let cell = self.tableView.cellForRow(at: indexPath) as? PlayableTableCell {
                         cell.refresh()
                     }
                 }

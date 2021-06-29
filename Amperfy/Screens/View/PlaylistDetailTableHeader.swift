@@ -58,10 +58,10 @@ class PlaylistDetailTableHeader: UIView {
         images.forEach{ $0.image = Artwork.defaultImage }
         
         guard let playlist = playlist else { return }
-        let songs = playlist.songs
+        let playables = playlist.playables
         for (index, artImage) in images.enumerated() {
-            guard songs.count > index else { break }
-            artImage.displayAndUpdate(entity: songs[index], via: appDelegate.artworkDownloadManager)
+            guard playables.count > index else { break }
+            artImage.displayAndUpdate(entity: playables[index], via: appDelegate.artworkDownloadManager)
         }
     }
     
@@ -92,9 +92,9 @@ class PlaylistDetailTableHeader: UIView {
         let alert = UIAlertController(title: playlist.name, message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Download all songs", style: .default, handler: { _ in
-            self.appDelegate.songDownloadManager.download(objects: playlist.songs)
+            self.appDelegate.playableDownloadManager.download(objects: playlist.playables)
         }))
-        if playlist.hasCachedSongs {
+        if playlist.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.library.deleteCache(of: playlist)
                 self.appDelegate.library.saveContext()

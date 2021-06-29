@@ -1,7 +1,7 @@
 import Foundation
 import CoreData
 
-class SongDownloadDelegate: DownloadManagerDelegate {
+class PlayableDownloadDelegate: DownloadManagerDelegate {
 
     private let backendApi: BackendApi
 
@@ -10,19 +10,19 @@ class SongDownloadDelegate: DownloadManagerDelegate {
     }
 
     func prepareDownload(forRequest request: DownloadRequest, context: NSManagedObjectContext) throws -> URL {
-        let songMO = try context.existingObject(with: request.element.objectID) as! SongMO
-        let song = Song(managedObject: songMO)
-        guard !song.isCached else {
+        let playableMO = try context.existingObject(with: request.element.objectID) as! AbstractPlayableMO
+        let playable = AbstractPlayable(managedObject: playableMO)
+        guard !playable.isCached else {
             throw DownloadError.alreadyDownloaded 
         }
-        return try updateDownloadUrl(forSong: song)
+        return try updateDownloadUrl(forPlayable: playable)
     }
 
-    private func updateDownloadUrl(forSong song: Downloadable) throws -> URL {
+    private func updateDownloadUrl(forPlayable playable: AbstractPlayable) throws -> URL {
         guard Reachability.isConnectedToNetwork() else {
             throw DownloadError.noConnectivity
         }
-        guard let url = backendApi.generateUrl(forDownloadingSong: song as! Song) else {
+        guard let url = backendApi.generateUrl(forDownloadingPlayable: playable) else {
             throw DownloadError.urlInvalid
         }
         return url
@@ -38,10 +38,10 @@ class SongDownloadDelegate: DownloadManagerDelegate {
     func completedDownload(request: DownloadRequest, context: NSManagedObjectContext) {
         guard let download = request.download, let data = download.resumeData else { return }
 		let library = LibraryStorage(context: context)
-        if let songMO = try? context.existingObject(with: request.element.objectID) as? SongMO {
-            let songFile = library.createSongFile()
-            songFile.info = Song(managedObject: songMO)
-            songFile.data = data
+        if let playableMO = try? context.existingObject(with: request.element.objectID) as? AbstractPlayableMO {
+            let playableFile = library.createPlayableFile()
+            playableFile.info = AbstractPlayable(managedObject: playableMO)
+            playableFile.data = data
             library.saveContext()
         }
     }

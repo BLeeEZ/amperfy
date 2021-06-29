@@ -18,12 +18,12 @@ class DownloadsVC: UITableViewController, DownloadViewUpdatable {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.downloads)
-        downloadManager = appDelegate.songDownloadManager
+        downloadManager = appDelegate.playableDownloadManager
         requestQueues = downloadManager.requestQueues
         requestQueues.waitingRequests.reverse()
-        tableView.register(nibName: SongTableCell.typeName)
-        tableView.rowHeight = SongTableCell.rowHeight
-        appDelegate.songDownloadManager.addNotifier(self)
+        tableView.register(nibName: PlayableTableCell.typeName)
+        tableView.rowHeight = PlayableTableCell.rowHeight
+        appDelegate.playableDownloadManager.addNotifier(self)
         actionButton = UIBarButtonItem(title: "...", style: .plain, target: self, action: #selector(performActionButtonOperation))
         navigationItem.rightBarButtonItem = actionButton
     }
@@ -31,7 +31,7 @@ class DownloadsVC: UITableViewController, DownloadViewUpdatable {
     @objc private func performActionButtonOperation() {
         let alert = UIAlertController(title: "Downloads", message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "Cancel all downloads", style: .default, handler: { _ in
-            self.appDelegate.songDownloadManager.cancelDownloads()
+            self.downloadManager.cancelDownloads()
             
             self.requestQueues.completedRequests.append(contentsOf: self.requestQueues.activeRequests)
             self.requestQueues.activeRequests = [DownloadRequest]()
@@ -108,7 +108,7 @@ class DownloadsVC: UITableViewController, DownloadViewUpdatable {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
+        let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
         
         var request: DownloadRequest?
         switch indexPath.section {
@@ -122,10 +122,9 @@ class DownloadsVC: UITableViewController, DownloadViewUpdatable {
             break
         }
         
-        if let request = request, let song = request.element as? Song {
-            cell.display(song: song, rootView: self, download: request.download)
+        if let request = request, let playable = request.element as? AbstractPlayable {
+            cell.display(playable: playable, rootView: self, download: request.download)
         }
-        cell.isUserTouchInteractionAllowed = false
 
         return cell
     }
@@ -135,8 +134,8 @@ class DownloadsVC: UITableViewController, DownloadViewUpdatable {
         case .updateProgress:
             let arrayIndices = requestQueues.activeRequests.allIndices(of: updatedRequest)
             for index in arrayIndices {
-                if let cell = self.tableView.cellForRow(at: IndexPath(row: index, section: Section.activeRequests.rawValue)) as? SongTableCell, let song = updatedRequest.element as? Song {
-                    cell.display(song: song, rootView: self, download: updatedRequest.download)
+                if let cell = self.tableView.cellForRow(at: IndexPath(row: index, section: Section.activeRequests.rawValue)) as? PlayableTableCell, let playable = updatedRequest.element as? AbstractPlayable {
+                    cell.display(playable: playable, rootView: self, download: updatedRequest.download)
                 }
             }
         case .added:

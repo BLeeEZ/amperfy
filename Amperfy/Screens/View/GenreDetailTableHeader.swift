@@ -55,16 +55,16 @@ class GenreDetailTableHeader: UIView {
         let alert = UIAlertController(title: genre.name, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
             let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.songsToAdd = genre.songs
+            selectPlaylistVC.itemsToAdd = genre.songs
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
             if let rootView = self.rootView {
                 rootView.present(selectPlaylistNav, animated: true, completion: nil)
             }
         }))
         alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-            self.appDelegate.songDownloadManager.download(objects: genre.songs)
+            self.appDelegate.playableDownloadManager.download(objects: genre.songs)
         }))
-        if genre.hasCachedSongs {
+        if genre.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.library.deleteCache(of: genre)
                 self.appDelegate.library.saveContext()

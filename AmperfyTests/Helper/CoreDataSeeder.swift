@@ -62,7 +62,7 @@ class CoreDataSeeder {
             let album = library.getAlbum(id: songSeed.albumId)
             song.album = album
             if songSeed.isCached {
-                let songFile = library.createSongFile()
+                let songFile = library.createPlayableFile()
                 songFile.info = song
                 songFile.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
             }
@@ -74,7 +74,7 @@ class CoreDataSeeder {
             playlist.name = playlistSeed.name
             for songId in playlistSeed.songIds {
                 if let song = library.getSong(id: songId) {
-                    playlist.append(song: song)
+                    playlist.append(playable: song)
                 } else {
                     let logMsg = "Song id <" + String(songId) + "> for playlist id <" + String(playlistSeed.id) + "> could not be found"
                     print(logMsg)

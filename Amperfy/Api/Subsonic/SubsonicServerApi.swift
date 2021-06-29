@@ -147,14 +147,20 @@ class SubsonicServerApi {
         return isValidCredentials
     }
     
-    func generateUrl(forDownloadingSong song: Song) -> URL? {
-        let requestId = song.podcastEpisodeInfo?.streamId ?? song.id
-        return createAuthenticatedApiUrlComponent(forAction: "download", id: requestId)?.url
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL? {
+        if let podcastEpisode = playable.asPodcastEpisode, let streamId = podcastEpisode.streamId {
+            return createAuthenticatedApiUrlComponent(forAction: "download", id: streamId)?.url
+        } else {
+            return createAuthenticatedApiUrlComponent(forAction: "download", id: playable.id)?.url
+        }
     }
     
-    func generateUrl(forStreamingSong song: Song) -> URL? {
-        let requestId = song.podcastEpisodeInfo?.streamId ?? song.id
-        return createAuthenticatedApiUrlComponent(forAction: "stream", id: requestId)?.url
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL? {
+        if let podcastEpisode = playable.asPodcastEpisode, let streamId = podcastEpisode.streamId {
+            return createAuthenticatedApiUrlComponent(forAction: "stream", id: streamId)?.url
+        } else {
+            return createAuthenticatedApiUrlComponent(forAction: "stream", id: playable.id)?.url
+        }
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {

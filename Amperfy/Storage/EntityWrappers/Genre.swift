@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Genre: AbstractLibraryEntity, SongContainable {
+public class Genre: AbstractLibraryEntity, PlayableContainable {
     
     let managedObject: GenreMO
     
@@ -38,9 +38,7 @@ public class Genre: AbstractLibraryEntity, SongContainable {
             Song(managedObject: $0)
         }
     }
-    var hasCachedSongs: Bool {
-        return songs.hasCachedSongs
-    }
+    var playables: [AbstractPlayable] { return songs }
     var syncInfo: SyncWave? {
         get {
             guard let syncInfoMO = managedObject.syncInfo else { return nil }

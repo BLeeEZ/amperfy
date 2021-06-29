@@ -29,7 +29,7 @@ class GenreDetailVC: BasicTableViewController {
             tableView.tableHeaderView?.addSubview(genreDetailTableHeaderView)
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenreDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(songContainer: genre, with: appDelegate.player)
+            libraryElementDetailTableHeaderView.prepare(playableContainer: genre, with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
     }

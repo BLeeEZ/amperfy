@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -45,7 +45,7 @@
                         <constraint firstAttribute="height" constant="30" id="KQ1-7I-Fbo"/>
                     </constraints>
                     <connections>
-                        <action selector="currentSongTimeSliderChanged:" destination="iN0-l3-epB" eventType="valueChanged" id="adh-M6-kZp"/>
+                        <action selector="timeSliderChanged:" destination="iN0-l3-epB" eventType="valueChanged" id="adh-M6-kZp"/>
                     </connections>
                 </slider>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0:15" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="okd-ac-nGY" userLabel="Elapsed time">
@@ -250,29 +250,29 @@
             <connections>
                 <outlet property="artistNameCompactLabel" destination="8F1-fg-8m2" id="sbT-Gf-h9b"/>
                 <outlet property="artistNameLargeLabel" destination="GST-UH-ejT" id="YB9-pD-Vtf"/>
-                <outlet property="artistToSongLargeDistanceConstraint" destination="aHN-mb-PDa" id="kTF-0C-55b"/>
+                <outlet property="artistToTitleLargeDistanceConstraint" destination="aHN-mb-PDa" id="kTF-0C-55b"/>
                 <outlet property="artworkImage" destination="zQR-aF-4SD" id="nmJ-ZY-4Yy"/>
                 <outlet property="artworkWidthConstraint" destination="mqC-xb-C7r" id="oRa-22-hhi"/>
                 <outlet property="bottomControlToProgressDistanceConstraint" destination="Qty-8v-U1B" id="7Ai-8O-KT5"/>
-                <outlet property="currentSongTimeSlider" destination="42q-l9-IXM" id="Uit-8D-ekQ"/>
                 <outlet property="displayPlaylistButton" destination="ZVN-JG-VAA" id="2Rh-6V-CMd"/>
                 <outlet property="elapsedTimeLabel" destination="okd-ac-nGY" id="MFD-Qa-B7r"/>
+                <outlet property="infoLargeToProgressDistanceConstraint" destination="Qu9-nI-cVh" id="iph-Qw-oog"/>
                 <outlet property="playButton" destination="Byk-rx-3Lv" id="03r-73-6Na"/>
                 <outlet property="playerOptionsControlGroupToPlayDistanceConstraint" destination="Msk-f3-yHP" id="wvO-AW-NHd"/>
                 <outlet property="remainingTimeLabel" destination="t1c-hF-UMw" id="hPl-lK-efe"/>
                 <outlet property="repeatButton" destination="zaZ-s9-erE" id="GdF-O9-5q9"/>
                 <outlet property="shuffleButton" destination="mhL-mu-zks" id="GGU-BH-0MG"/>
-                <outlet property="songInfoLargeToProgressDistanceConstraint" destination="Qu9-nI-cVh" id="iph-Qw-oog"/>
-                <outlet property="songSliderToArtworkDistanceConstraint" destination="guh-i3-Npn" id="kpa-DZ-5bm"/>
-                <outlet property="songTitleCompactLabel" destination="pOR-k2-6Vf" id="cbC-Pn-Q2g"/>
-                <outlet property="songTitleLargeLabel" destination="6NT-8n-tg9" id="99n-87-eTl"/>
+                <outlet property="timeSlider" destination="42q-l9-IXM" id="Uit-8D-ekQ"/>
+                <outlet property="timeSliderToArtworkDistanceConstraint" destination="guh-i3-Npn" id="kpa-DZ-5bm"/>
+                <outlet property="titleCompactLabel" destination="pOR-k2-6Vf" id="cbC-Pn-Q2g"/>
+                <outlet property="titleLargeLabel" destination="6NT-8n-tg9" id="99n-87-eTl"/>
             </connections>
             <point key="canvasLocation" x="138.40000000000001" y="99.400299850074973"/>
         </view>
     </objects>
     <designables>
         <designable name="6NT-8n-tg9">
-            <size key="intrinsicContentSize" width="105.5" height="25.5"/>
+            <size key="intrinsicContentSize" width="105" height="25.5"/>
         </designable>
         <designable name="8F1-fg-8m2">
             <size key="intrinsicContentSize" width="97.5" height="23"/>
@@ -281,7 +281,7 @@
             <size key="intrinsicContentSize" width="97.5" height="23"/>
         </designable>
         <designable name="pOR-k2-6Vf">
-            <size key="intrinsicContentSize" width="105.5" height="25.5"/>
+            <size key="intrinsicContentSize" width="105" height="25.5"/>
         </designable>
     </designables>
     <resources>

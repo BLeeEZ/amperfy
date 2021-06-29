@@ -85,14 +85,14 @@ class SongTest: XCTestCase {
     
     func testCachedSong() {
         let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
-        let songFile = library.createSongFile()
-        songFile.info = testSong
-        songFile.data = testData
+        let playableFile = library.createPlayableFile()
+        playableFile.info = testSong
+        playableFile.data = testData
         XCTAssertTrue(testSong.isCached)
         library.saveContext()
         guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertTrue(songFetched.isCached)
-        guard let songFileFetched = library.getSongFile(forSong: testSong) else { XCTFail(); return }
+        guard let songFileFetched = library.getFile(forPlayable: testSong) else { XCTFail(); return }
         XCTAssertEqual(songFileFetched.data, testData)
     }
     

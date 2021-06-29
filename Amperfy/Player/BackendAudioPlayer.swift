@@ -17,8 +17,8 @@ protocol BackendAudioPlayerNotifiable {
     func playPreviousCached()
     func playNext()
     func playNextCached()
-    func didSongFinishedPlaying()
-    func notifySongPreparationFinished()
+    func didItemFinishedPlaying()
+    func notifyItemPreparationFinished()
 }
 
 struct PlayRequest {
@@ -28,8 +28,8 @@ struct PlayRequest {
 
 class BackendAudioPlayer {
 
-    private let songDownloader: DownloadManageable
-    private let songCache: SongFileCachable
+    private let playableDownloader: DownloadManageable
+    private let cacheProxy: PlayableFileCachable
     private let backendApi: BackendApi
     private let userStatistics: UserStatistics
     private let player: AVPlayer
@@ -38,7 +38,7 @@ class BackendAudioPlayer {
     private var latestPlayRequest: PlayRequest?
     private let semaphore = DispatchSemaphore(value: 1)
     
-    public var isAutoCachePlayedSong: Bool = true
+    public var isAutoCachePlayedItems: Bool = true
     public private(set) var isPlaying: Bool = false
     public private(set) var currentlyPlaying: PlaylistItem?
     
@@ -65,12 +65,12 @@ class BackendAudioPlayer {
         return player.currentItem != nil
     }
     
-    init(mediaPlayer: AVPlayer, eventLogger: EventLogger, backendApi: BackendApi, songDownloader: DownloadManageable, songCache: SongFileCachable, userStatistics: UserStatistics) {
+    init(mediaPlayer: AVPlayer, eventLogger: EventLogger, backendApi: BackendApi, playableDownloader: DownloadManageable, cacheProxy: PlayableFileCachable, userStatistics: UserStatistics) {
         self.player = mediaPlayer
         self.backendApi = backendApi
         self.eventLogger = eventLogger
-        self.songDownloader = songDownloader
-        self.songCache = songCache
+        self.playableDownloader = playableDownloader
+        self.cacheProxy = cacheProxy
         self.userStatistics = userStatistics
         
         player.addPeriodicTimeObserver(forInterval: updateElapsedTimeInterval, queue: DispatchQueue.main) { [weak self] time in
@@ -80,8 +80,8 @@ class BackendAudioPlayer {
         }
     }
     
-    @objc private func songFinishedPlaying() {
-        responder?.didSongFinishedPlaying()
+    @objc private func itemFinishedPlaying() {
+        responder?.didItemFinishedPlaying()
     }
     
     func continuePlay() {
@@ -106,7 +106,7 @@ class BackendAudioPlayer {
     }
     
     func updateCurrentlyPlayingReference(playlistItem: PlaylistItem) {
-        if currentlyPlaying?.song?.id == playlistItem.song?.id {
+        if currentlyPlaying?.playable?.id == playlistItem.playable?.id {
             currentlyPlaying = playlistItem
         }
     }
@@ -114,18 +114,18 @@ class BackendAudioPlayer {
     func requestToPlay(playlistItem: PlaylistItem, reactionToError: FetchErrorReaction) {
         semaphore.wait()
         latestPlayRequest = PlayRequest(playlistItem: playlistItem, reactionToError: reactionToError)
-        guard let song = playlistItem.song else { return }
-        if !song.isPlayableOniOS, let contentType = song.contentType {
+        guard let playable = playlistItem.playable else { return }
+        if !playable.isPlayableOniOS, let contentType = playable.contentType {
             player.pause()
             player.replaceCurrentItem(with: nil)
-            eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of song \"\(song.displayString)\" is not playable via Amperfy.")
+            eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playable.displayString)\" is not playable via Amperfy.")
         } else {
-            if song.isCached {
-                insertCachedSong(playlistItem: playlistItem)
+            if playable.isCached {
+                insertCachedPlayable(playlistItem: playlistItem)
             } else {
-                insertStreamSong(playlistItem: playlistItem)
-                if isAutoCachePlayedSong {
-                    songDownloader.download(object: song, notifier: nil, priority: .high)
+                insertStreamPlayable(playlistItem: playlistItem)
+                if isAutoCachePlayedItems {
+                    playableDownloader.download(object: playable, notifier: nil, priority: .high)
                 }
             }
         }
@@ -134,38 +134,38 @@ class BackendAudioPlayer {
         semaphore.signal()
     }
     
-    private func insertCachedSong(playlistItem: PlaylistItem) {
-        guard let song = playlistItem.song, let songData = songCache.getSongFile(forSong: song)?.data else { return }
-        os_log(.default, "Play song: %s", song.displayString)
-        userStatistics.playedSong(isPlayedFromCache: true)
-        let url = createLocalUrl(songData: songData)
-        insertSong(forSong: song, withUrl: url)
+    private func insertCachedPlayable(playlistItem: PlaylistItem) {
+        guard let playable = playlistItem.playable, let playableData = cacheProxy.getFile(forPlayable: playable)?.data else { return }
+        os_log(.default, "Play item: %s", playable.displayString)
+        if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
+        let url = createLocalUrl(forFileData: playableData)
+        insert(playable: playable, withUrl: url)
     }
     
-    private func insertStreamSong(playlistItem: PlaylistItem) {
-        guard let song = playlistItem.song, let streamUrl = backendApi.generateUrl(forStreamingSong: song) else { return }
-        os_log(.default, "Streaming song: %s", song.displayString)
-        userStatistics.playedSong(isPlayedFromCache: false)
-        insertSong(forSong: song, withUrl: streamUrl)
+    private func insertStreamPlayable(playlistItem: PlaylistItem) {
+        guard let playable = playlistItem.playable, let streamUrl = backendApi.generateUrl(forStreamingPlayable: playable) else { return }
+        os_log(.default, "Stream item: %s", playable.displayString)
+        if playable.isSong { userStatistics.playedSong(isPlayedFromCache: false) }
+        insert(playable: playable, withUrl: streamUrl)
     }
 
-    private func insertSong(forSong song: Song, withUrl url: URL) {
+    private func insert(playable: AbstractPlayable, withUrl url: URL) {
         player.pause()
         player.replaceCurrentItem(with: nil)
         var item: AVPlayerItem?
-        if let mimeType = song.iOsCompatibleContentType {
+        if let mimeType = playable.iOsCompatibleContentType {
             let asset: AVURLAsset = AVURLAsset(url: url, options: ["AVURLAssetOutOfBandMIMETypeKey" : mimeType])
             item = AVPlayerItem(asset: asset)
         } else {
             item = AVPlayerItem(url: url)
         }
         player.replaceCurrentItem(with: item)
-        NotificationCenter.default.addObserver(self, selector: #selector(songFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(itemFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
     }
     
     private func reactToInsertationFinish(playlistItem: PlaylistItem) {
         currentlyPlaying = playlistItem
-        self.responder?.notifySongPreparationFinished()
+        self.responder?.notifyItemPreparationFinished()
     }
     
     private func reactToError(reaction: FetchErrorReaction) {
@@ -183,10 +183,10 @@ class BackendAudioPlayer {
         }
     }
     
-    private func createLocalUrl(songData: Data) -> URL {
+    private func createLocalUrl(forFileData fileData: Data) -> URL {
         let tempDirectoryURL = NSURL.fileURL(withPath: NSTemporaryDirectory(), isDirectory: true)
-        let url = tempDirectoryURL.appendingPathComponent("curSong.mp3")
-        try! songData.write(to: url, options: Data.WritingOptions.atomic)
+        let url = tempDirectoryURL.appendingPathComponent("curPlayItem.mp3")
+        try! fileData.write(to: url, options: Data.WritingOptions.atomic)
         return url
     }
     

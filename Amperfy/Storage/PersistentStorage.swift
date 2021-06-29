@@ -90,7 +90,7 @@ class PersistentStorage {
     // MARK: - Core Data stack
     
     static var managedObjectModel: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
-    
+
     lazy var persistentContainer: NSPersistentContainer = {
         /*
          The persistent container for the application. This implementation
@@ -99,6 +99,20 @@ class PersistentStorage {
          error conditions that could cause the creation of the store to fail.
          */
         let container = NSPersistentContainer(name: "Amperfy", managedObjectModel: PersistentStorage.managedObjectModel)
+        let description = container.persistentStoreDescriptions.first
+        description?.shouldInferMappingModelAutomatically = false
+        description?.shouldMigrateStoreAutomatically = false
+        description?.type = NSSQLiteStoreType
+        
+        guard let storeURL = container.persistentStoreDescriptions.first?.url else {
+            fatalError("persistentContainer was not set up properly")
+        }
+        
+        let migrator = CoreDataMigrator()
+        if migrator.requiresMigration(at: storeURL, toVersion: CoreDataMigrationVersion.current) {
+            migrator.migrateStore(at: storeURL, toVersion: CoreDataMigrationVersion.current)
+        }
+        
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.
@@ -115,6 +129,7 @@ class PersistentStorage {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+
         return container
     }()
     

@@ -168,7 +168,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage) {
         os_log("Upload OrderChange on playlist \"%s\"", log: log, type: .info, playlist.name)
         let songIndicesToRemove = Array(0...playlist.songCount-1)
-        let songIdsToAdd = playlist.songs.compactMap{ $0.id }
+        let songIdsToAdd = playlist.playables.compactMap{ $0.id }
         let updateResponseParser = SsPingParserDelegate()
         subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: songIndicesToRemove, songIdsToAdd: songIdsToAdd)
     }

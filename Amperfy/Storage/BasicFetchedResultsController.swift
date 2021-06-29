@@ -91,7 +91,7 @@ extension PodcastMO {
 extension PodcastEpisodeMO {
     @objc public var section: String {
         self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.playInfo?.title)
+        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.title)
         self.didAccessValue(forKey: "section")
         return section
     }

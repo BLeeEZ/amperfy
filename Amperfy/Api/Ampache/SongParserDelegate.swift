@@ -3,7 +3,7 @@ import UIKit
 import CoreData
 import os.log
 
-class SongParserDelegate: AmpacheXmlLibParser {
+class SongParserDelegate: PlayableParserDelegate {
 
     var songBuffer: Song?
     var artistIdToCreate: String?
@@ -26,6 +26,7 @@ class SongParserDelegate: AmpacheXmlLibParser {
                 songBuffer?.syncInfo = syncWave
                 songBuffer?.id = songId
             }
+            playableBuffer = songBuffer
         case "artist":
             guard let song = songBuffer, let artistId = attributeDict["id"] else { return }
             if let artist = library.getArtist(id: artistId) {
@@ -84,29 +85,10 @@ class SongParserDelegate: AmpacheXmlLibParser {
                 songBuffer?.genre = genre
                 genreIdToCreate = nil
             }
-        case "title":
-            songBuffer?.title = buffer
-        case "track":
-            songBuffer?.track = Int(buffer) ?? 0
-        case "url":
-            songBuffer?.url = buffer
-        case "year":
-            songBuffer?.year = Int(buffer) ?? 0
-        case "time":
-            songBuffer?.duration = Int(buffer) ?? 0
-        case "art":
-            songBuffer?.artwork = parseArtwork(urlString: buffer)
-        case "size":
-            songBuffer?.size = Int(buffer) ?? 0
-        case "bitrate":
-            songBuffer?.bitrate = Int(buffer) ?? 0
-        case "mime":
-            songBuffer?.contentType = buffer
-        case "disk":
-            songBuffer?.disk = buffer
         case "song":
             parsedCount += 1
             parseNotifier?.notifyParsedObject(ofType: .song)
+            playableBuffer = nil
             songBuffer = nil
         default:
             break

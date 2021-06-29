@@ -67,8 +67,8 @@ protocol BackendApi {
     func authenticate(credentials: LoginCredentials) 
     func isAuthenticated() -> Bool
     func isAuthenticationValid(credentials: LoginCredentials) -> Bool
-    func generateUrl(forDownloadingSong song: Song) -> URL?
-    func generateUrl(forStreamingSong song: Song) -> URL?
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL?
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL?
     func generateUrl(forArtwork artwork: Artwork) -> URL?
     func checkForErrorResponse(inData data: Data) -> ResponseError?
     func createLibrarySyncer() -> LibrarySyncer

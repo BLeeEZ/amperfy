@@ -29,7 +29,7 @@ class AlbumTest: XCTestCase {
         XCTAssertEqual(album.songs.count, 0)
         XCTAssertNil(album.artwork)
         XCTAssertEqual(album.image, Artwork.defaultImage)
-        XCTAssertFalse(album.hasCachedSongs)
+        XCTAssertFalse(album.hasCachedPlayables)
         XCTAssertFalse(album.isOrphaned)
     }
     
@@ -96,9 +96,9 @@ class AlbumTest: XCTestCase {
     
     func testHasCachedSongs() {
         guard let albumNoCached = library.getAlbum(id: cdHelper.seeder.albums[0].id) else { XCTFail(); return }
-        XCTAssertFalse(albumNoCached.hasCachedSongs)
+        XCTAssertFalse(albumNoCached.hasCachedPlayables)
         guard let albumTwoCached = library.getAlbum(id: cdHelper.seeder.albums[2].id) else { XCTFail(); return }
-        XCTAssertTrue(albumTwoCached.hasCachedSongs)
+        XCTAssertTrue(albumTwoCached.hasCachedPlayables)
     }
     
     func testIsOrphaned() {

@@ -52,7 +52,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
             let song = library.createSong()
             song.id = i.description
             song.title = i.description
-            playlist.append(song: song)
+            playlist.append(playable: song)
         }
         createdSongCount = 3
         recreateParserDelegate()
@@ -64,7 +64,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
             let song = library.createSong()
             song.id = i.description
             song.title = i.description
-            playlist.append(song: song)
+            playlist.append(playable: song)
         }
         createdSongCount = 6
         recreateParserDelegate()
@@ -76,7 +76,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
             let song = library.createSong()
             song.id = i.description
             song.title = i.description
-            playlist.append(song: song)
+            playlist.append(playable: song)
         }
         createdSongCount = 20
         recreateParserDelegate()
@@ -87,9 +87,9 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         library.saveContext()
         XCTAssertEqual(library.songCount, 4+createdSongCount)
         
-        XCTAssertEqual(playlist.songs.count, 4)
+        XCTAssertEqual(playlist.playables.count, 4)
                
-        var song = playlist.songs[0]
+        var song = playlist.playables[0].asSong!
         XCTAssertEqual(song.id, "56")
         XCTAssertEqual(song.title, "Black&BlueSmoke")
         XCTAssertEqual(song.artist?.id, "2")
@@ -110,7 +110,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         XCTAssertEqual(song.artwork?.type, "album")
         XCTAssertEqual(song.artwork?.id, "2")
         
-        song = playlist.songs[1]
+        song = playlist.playables[1].asSong!
         XCTAssertEqual(song.id, "107")
         XCTAssertEqual(song.title, "Arrest Me")
         XCTAssertEqual(song.artist?.id, "20")
@@ -131,7 +131,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         XCTAssertEqual(song.artwork?.type, "album")
         XCTAssertEqual(song.artwork?.id, "12")
         
-        song = playlist.songs[2]
+        song = playlist.playables[2].asSong!
         XCTAssertEqual(song.id, "115")
         XCTAssertEqual(song.title, "Are we going Crazy")
         XCTAssertEqual(song.artist?.id, "27")
@@ -151,7 +151,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         XCTAssertEqual(song.artwork?.type, "album")
         XCTAssertEqual(song.artwork?.id, "12")
         
-        song = playlist.songs[3]
+        song = playlist.playables[3].asSong!
         XCTAssertEqual(song.id, "85")
         XCTAssertEqual(song.title, "Beq Ultra Fat")
         XCTAssertEqual(song.artist?.id, "14")

@@ -2,13 +2,8 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Song: AbstractLibraryEntity, Identifyable, Downloadable {
-    /*
-    Avoid direct access to the SongFile.
-    Direct access will result in loading the file into memory and
-    it sticks there till the song is removed from memory.
-    This will result in memory overflow for an array of songs.
-    */
+public class Song: AbstractPlayable, Identifyable {
+
     let managedObject: SongMO
 
     init(managedObject: SongMO) {
@@ -16,82 +11,6 @@ public class Song: AbstractLibraryEntity, Identifyable, Downloadable {
         super.init(managedObject: managedObject)
     }
 
-    var objectID: NSManagedObjectID {
-        return managedObject.objectID
-    }
-    var title: String {
-        get { return managedObject.title ?? "Unknown Title" }
-        set {
-            if managedObject.title != newValue { managedObject.title = newValue }
-        }
-    }
-    var track: Int {
-        get { return Int(managedObject.track) }
-        set {
-            guard Int16.isValid(value: newValue), managedObject.track != Int16(newValue) else { return }
-            managedObject.track = Int16(newValue)
-        }
-    }
-    var year: Int {
-        get { return Int(managedObject.year) }
-        set {
-            guard Int16.isValid(value: newValue), managedObject.year != Int16(newValue) else { return }
-            managedObject.year = Int16(newValue)
-        }
-    }
-    var duration: Int {
-        get { return Int(managedObject.duration) }
-        set {
-            guard Int16.isValid(value: newValue), managedObject.duration != Int16(newValue) else { return }
-            managedObject.duration = Int16(newValue)
-        }
-    }
-    var size: Int {
-        get { return Int(managedObject.size) }
-        set {
-            guard Int32.isValid(value: newValue), managedObject.size != Int32(newValue) else { return }
-            managedObject.size = Int32(newValue)
-        }
-    }
-    var bitrate: Int { // byte per second
-        get { return Int(managedObject.bitrate) }
-        set {
-            guard Int32.isValid(value: newValue), managedObject.bitrate != Int32(newValue) else { return }
-            managedObject.bitrate = Int32(newValue)
-        }
-    }
-    var contentType: String? {
-        get { return managedObject.contentType }
-        set {
-            if managedObject.contentType != newValue { managedObject.contentType = newValue }
-        }
-    }
-    var iOsCompatibleContentType: String? {
-        guard isPlayableOniOS, let originalContenType = contentType else { return nil }
-        if originalContenType == "audio/x-flac" {
-            return "audio/flac"
-        }
-        return originalContenType
-    }
-    var isPlayableOniOS: Bool {
-        guard let originalContenType = contentType else { return true }
-        if originalContenType == "audio/x-ms-wma" {
-            return false
-        }
-        return true
-    }
-    var disk: String? {
-        get { return managedObject.disk }
-        set {
-            if managedObject.disk != newValue { managedObject.disk = newValue }
-        }
-    }
-    var url: String? {
-        get { return managedObject.url }
-        set {
-            if managedObject.url != newValue { managedObject.url = newValue }
-        }
-    }
     var album: Album? {
         get {
             guard let albumMO = managedObject.album else { return nil }
@@ -110,13 +29,6 @@ public class Song: AbstractLibraryEntity, Identifyable, Downloadable {
             if managedObject.artist != newValue?.managedObject { managedObject.artist = newValue?.managedObject }
         }
     }
-    var creatorName: String {
-        if let podcast = podcastEpisodeInfo?.podcast {
-            return podcast.title
-        } else {
-            return artist?.name ?? "Unknown Artist"
-        }
-    }
     var genre: Genre? {
         get {
             guard let genreMO = managedObject.genre else { return nil }
@@ -133,24 +45,13 @@ public class Song: AbstractLibraryEntity, Identifyable, Downloadable {
             if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
         }
     }
-    var isPodcastEpisode: Bool {
-        return podcastEpisodeInfo != nil
-    }
-    var podcastEpisodeInfo: PodcastEpisode? {
-        get {
-            guard let podcastEpisodeInfoMO = managedObject.podcastEpisodeInfo else { return nil }
-            return PodcastEpisode(managedObject: podcastEpisodeInfoMO) }
-        set {
-            if managedObject.podcastEpisodeInfo != newValue?.managedObject { managedObject.podcastEpisodeInfo = newValue?.managedObject }
-        }
-    }
     var isOrphaned: Bool {
         guard let album = album else { return true }
         return album.isOrphaned
     }
 
-    var displayString: String {
-        return "\(creatorName) - \(title)"
+    override var creatorName: String {
+        return artist?.name ?? "Unknown Artist"
     }
     
     var detailInfo: String {
@@ -170,21 +71,7 @@ public class Song: AbstractLibraryEntity, Identifyable, Downloadable {
         info += " size: \(size),"
         let contentTypeInfo = contentType ?? "-"
         info += " contentType: \(contentTypeInfo),"
-        info += " bitrate: \(bitrate),"
-        if let podcastEpisodeInfo = podcastEpisodeInfo {
-            info += "podcastEpisodeInfo: {"
-            info += " description: \(podcastEpisodeInfo.depiction ?? "-")"
-            let publishDateInfo = podcastEpisodeInfo.publishDate.asIso8601String
-            info += " publishDate: \(publishDateInfo),"
-            info += " remoteStatus: \(podcastEpisodeInfo.remoteStatus)"
-            info += "}"
-        } else {
-            info += "podcastEpisodeInfo: -"
-        }
-        
-        
-
-        
+        info += " bitrate: \(bitrate)"
         info += ")"
         return info
     }
@@ -206,23 +93,6 @@ public class Song: AbstractLibraryEntity, Identifyable, Downloadable {
         return Artwork.defaultImage
     }
 
-    var isCached: Bool {
-        if managedObject.file != nil {
-            return true
-        }
-        return false
-    }
-
-}
-
-extension Song: Hashable, Equatable {
-    public static func == (lhs: Song, rhs: Song) -> Bool {
-        return lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(managedObject)
-    }
 }
 
 extension Array where Element: Song {
@@ -242,9 +112,5 @@ extension Array where Element: Song {
     func sortByTrackNumber() -> [Element] {
         return self.sorted{ $0.track < $1.track }
     }
-    
-    func filterMusicSongs() -> [Element] {
-        return self.filter{ $0.podcastEpisodeInfo == nil }
-    }
-    
+
 }

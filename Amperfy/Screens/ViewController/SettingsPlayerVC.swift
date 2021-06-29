@@ -12,10 +12,10 @@ class SettingsPlayerVC: UITableViewController {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.settingsPlayer)
         
-        autoCachePlayedSongsSwitch.isOn = appDelegate.player.isAutoCachePlayedSong
+        autoCachePlayedSongsSwitch.isOn = appDelegate.player.isAutoCachePlayedItems
     }
 
     @IBAction func triggeredAutoCachePlayedSongsSwitch(_ sender: Any) {
-        appDelegate.player.isAutoCachePlayedSong = autoCachePlayedSongsSwitch.isOn
+        appDelegate.player.isAutoCachePlayedItems = autoCachePlayedSongsSwitch.isOn
     }
 }

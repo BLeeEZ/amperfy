@@ -127,7 +127,7 @@ public class UserStatistics {
         library.saveContext()
     }
     
-    func playedSong(repeatMode: RepeatMode, isShuffle: Bool) {
+    func playedItem(repeatMode: RepeatMode, isShuffle: Bool) {
         switch repeatMode {
         case .off:
             self.managedObject.activeRepeatOffSongsCount += 1

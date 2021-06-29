@@ -2,13 +2,7 @@ import Foundation
 import CoreData
 
 @objc(SongMO)
-public final class SongMO: AbstractLibraryEntityMO {
-
-    static var excludePodcastEpisodesFetchPredicate: NSPredicate {
-        return NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K == nil", #keyPath(SongMO.podcastEpisodeInfo))
-        ])
-    }
+public final class SongMO: AbstractPlayableMO {
     
 }
 

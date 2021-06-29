@@ -238,14 +238,12 @@ class SongFetchedResultsController: CachedFetchedResultsController<SongMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest = SongMO.identifierSortedFetchRequest
-        fetchRequest.predicate = SongMO.excludePodcastEpisodesFetchPredicate
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                SongMO.excludePodcastEpisodesFetchPredicate,
                 SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
                 library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
             ])

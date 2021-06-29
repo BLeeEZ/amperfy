@@ -30,8 +30,6 @@ class SettingsSongActionOnTabVC: UITableViewController {
         switch settings.songActionOnTab {
         case .playAndErasePlaylist:
             playAndErasePlaylistCheckLabel.attributedText = checkIconText
-        case .hiddenOptionPlayInPopupPlayerPlaylistSelectedSong:
-            break
         case .addToPlaylistAndPlay:
             addToPlaylistAndPlayCheckLabel.attributedText = checkIconText
         case .insertAsNextSongNoPlay:

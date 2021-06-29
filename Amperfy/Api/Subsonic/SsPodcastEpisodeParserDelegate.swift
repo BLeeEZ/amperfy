@@ -3,7 +3,7 @@ import UIKit
 import CoreData
 import os.log
 
-class SsPodcastEpisodeParserDelegate: SsSongParserDelegate {
+class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
     
     var podcast: Podcast
     var episodeBuffer: PodcastEpisode?
@@ -24,10 +24,8 @@ class SsPodcastEpisodeParserDelegate: SsSongParserDelegate {
             } else {
                 episodeBuffer = library.createPodcastEpisode()
                 episodeBuffer?.id = episodeId
-                songBuffer = library.createSong()
-                songBuffer?.syncInfo = syncWave
-                episodeBuffer?.playInfo = songBuffer
             }
+            playableBuffer = episodeBuffer
             episodeBuffer?.podcast = podcast
 
             if let description = attributeDict["description"] {
@@ -59,6 +57,7 @@ class SsPodcastEpisodeParserDelegate: SsSongParserDelegate {
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
         
         if elementName == "episode", episodeBuffer != nil {
+            playableBuffer = nil
             episodeBuffer = nil
         }
     }

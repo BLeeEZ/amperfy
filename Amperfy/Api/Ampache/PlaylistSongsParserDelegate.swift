@@ -29,7 +29,7 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
                 item?.order = order
                 playlist.add(item: item!)
             }
-            item?.song = songBuffer
+            item?.playable = songBuffer
         case "root":
             if items.count > parsedCount {
                 for i in Array(parsedCount...items.count-1) {

@@ -1,0 +1,196 @@
+import UIKit
+import AudioToolbox
+
+class PlayableTableCell: BasicTableCell {
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var artistLabel: UILabel!
+    @IBOutlet weak var artworkImage: LibraryEntityImage!
+    @IBOutlet weak var downloadProgress: UIProgressView!
+    @IBOutlet weak var reorderLabel: UILabel?
+    
+    static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
+    
+    var playerIndex: Int?
+    private var playable: AbstractPlayable?
+    private var download: Download?
+    private var rootView: UIViewController?
+    private var isAlertPresented = false
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        playerIndex = nil
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
+        self.addGestureRecognizer(longPressGesture)
+    }
+    
+    func display(playable: AbstractPlayable, rootView: UIViewController, download: Download? = nil) {
+        self.playable = playable
+        self.rootView = rootView
+        self.download = download
+        refresh()
+    }
+    
+    func refresh() {
+        guard let playable = playable else { return }
+        titleLabel.attributedText = NSMutableAttributedString(string: playable.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
+        
+        artistLabel.text = playable.creatorName
+        artworkImage.displayAndUpdate(entity: playable, via: appDelegate.artworkDownloadManager)
+        
+        if playerIndex != nil {
+            self.reorderLabel?.isHidden = false
+            self.reorderLabel?.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Bars.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
+        } else if download?.error != nil {
+            self.reorderLabel?.isHidden = false
+            self.reorderLabel?.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Exclamation.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 25)!])
+        } else {
+            self.reorderLabel?.isHidden = true
+        }
+        
+        if download?.error != nil {
+            artistLabel.textColor = .systemRed
+        } else if playable.isCached {
+            artistLabel.textColor = UIColor.defaultBlue
+        } else if playerIndex != nil {
+            artistLabel.textColor = UIColor.labelColor
+        } else {
+            artistLabel.textColor = UIColor.secondaryLabelColor
+        }
+        
+        if let download = download, download.isDownloading {
+            downloadProgress.isHidden = false
+            downloadProgress.progress = download.progress
+        } else {
+            downloadProgress.isHidden = true
+        }
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let index = playerIndex, !isAlertPresented {
+            appDelegate.player.play(elementInPlaylistAt: index)
+        }
+        isAlertPresented = false
+    }
+    
+    private func hideSearchBarKeyboardInRootView() {
+        if let basicRootView = rootView as? BasicTableViewController {
+            basicRootView.searchController.searchBar.endEditing(true)
+        }
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        isAlertPresented = false
+    }
+    
+    @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {
+        if gesture.state == .began {
+            displayMenu()
+        }
+    }
+    
+    func displayMenu() {
+        if let playable = playable, let rootView = rootView, rootView.presentingViewController == nil {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            isAlertPresented = true
+            let alert = createAlert(forPlayable: playable, rootView: rootView)
+            alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
+            rootView.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func createAlert(forPlayable playable: AbstractPlayable, rootView: UIViewController) -> UIAlertController {
+        let alert = UIAlertController(title: "\n\n\n", message: nil, preferredStyle: .actionSheet)
+    
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: alert.view.bounds.size.width, height: SongActionSheetView.frameHeight))
+        if let songActionSheetView = ViewBuilder<SongActionSheetView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: alert.view.bounds.size.width, height: SongActionSheetView.frameHeight)) {
+            songActionSheetView.display(playable: playable)
+            headerView.addSubview(songActionSheetView)
+            alert.view.addSubview(headerView)
+        }
+    
+        if playerIndex == nil {
+            alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
+                self.appDelegate.player.play(playable: playable)
+                }))
+                alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
+                self.appDelegate.player.addToPlaylist(playable: playable)
+            }))
+        }
+        if playable.isSong {
+            alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
+                let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
+                selectPlaylistVC.itemsToAdd = [playable]
+                let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+                rootView.present(selectPlaylistNav, animated: true, completion: nil)
+            }))
+        }
+        if playable.isCached {
+            alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
+                self.appDelegate.library.deleteCache(ofPlayable: playable)
+                self.appDelegate.library.saveContext()
+                self.refresh()
+            }))
+        } else {
+            alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
+                self.appDelegate.playableDownloadManager.download(object: playable)
+                self.refresh()
+            }))
+        }
+        if let song = playable.asSong, let artist = song.artist {
+            alert.addAction(UIAlertAction(title: "Show artist", style: .default, handler: { _ in
+                self.appDelegate.userStatistics.usedAction(.alertGoToArtist)
+                let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
+                artistDetailVC.artist = artist
+                if let navController = self.rootView?.navigationController {
+                    navController.pushViewController(artistDetailVC, animated: true)
+                } else {
+                    self.closePopupPlayerAndDisplayInLibraryTab(view: artistDetailVC)
+                }
+            }))
+        }
+        if let song = playable.asSong, let album = song.album {
+            alert.addAction(UIAlertAction(title: "Show album", style: .default, handler: { _ in
+                self.appDelegate.userStatistics.usedAction(.alertGoToAlbum)
+                let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
+                albumDetailVC.album = album
+                if let navController = self.rootView?.navigationController {
+                    navController.pushViewController(albumDetailVC, animated: true)
+                } else {
+                    self.closePopupPlayerAndDisplayInLibraryTab(view: albumDetailVC)
+                }
+            }))
+        }
+        if let podcastEpisode = playable.asPodcastEpisode, let podcast = podcastEpisode.podcast {
+            alert.addAction(UIAlertAction(title: "Show podcast", style: .default, handler: { _ in
+                self.appDelegate.userStatistics.usedAction(.alertGoToPodcast)
+                let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
+                podcastDetailVC.podcast = podcast
+                if let navController = self.rootView?.navigationController {
+                    navController.pushViewController(podcastDetailVC, animated: true)
+                } else {
+                    self.closePopupPlayerAndDisplayInLibraryTab(view: podcastDetailVC)
+                }
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        return alert
+    }
+    
+    private func closePopupPlayerAndDisplayInLibraryTab(view: UIViewController) {
+        if let popupPlayerVC = rootView as? PopupPlayerVC,
+           let hostingTabBarVC = popupPlayerVC.hostingTabBarVC {
+            hostingTabBarVC.closePopup(animated: true, completion: { () in
+                if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
+                   hostingTabViewControllers.count > 0,
+                   let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
+                    libraryTabNavVC.pushViewController(view, animated: false)
+                    hostingTabBarVC.selectedIndex = 0
+                }
+            })
+        }
+    }
+
+}

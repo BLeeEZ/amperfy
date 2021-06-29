@@ -24,7 +24,7 @@ class PlaylistTableCell: BasicTableCell {
         }
         
         if playlist.songCount < 500 {
-            let customArtworkSongs = playlist.songs.filterCustomArt()
+            let customArtworkSongs = playlist.playables.filterCustomArt()
             for (index, artImage) in images.enumerated() {
                 guard customArtworkSongs.count > index else { break }
                 artImage.image = customArtworkSongs[index].image

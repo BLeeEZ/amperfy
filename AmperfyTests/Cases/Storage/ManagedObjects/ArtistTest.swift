@@ -24,7 +24,7 @@ class ArtistTest: XCTestCase {
         XCTAssertEqual(artist.identifier, "Unknown Artist")
         XCTAssertEqual(artist.name, "Unknown Artist")
         XCTAssertEqual(artist.songs.count, 0)
-        XCTAssertFalse(artist.hasCachedSongs)
+        XCTAssertFalse(artist.hasCachedPlayables)
         XCTAssertEqual(artist.albums.count, 0)
         XCTAssertEqual(artist.syncInfo, nil)
         XCTAssertNil(artist.artwork)
@@ -51,9 +51,9 @@ class ArtistTest: XCTestCase {
     
     func testHasCachedSongs() {
         guard let artistNoCached = library.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
-        XCTAssertFalse(artistNoCached.hasCachedSongs)
+        XCTAssertFalse(artistNoCached.hasCachedPlayables)
         guard let artistTwoCached = library.getArtist(id: cdHelper.seeder.artists[2].id) else { XCTFail(); return }
-        XCTAssertTrue(artistTwoCached.hasCachedSongs)
+        XCTAssertTrue(artistTwoCached.hasCachedPlayables)
     }
 
     func testAlbums() {

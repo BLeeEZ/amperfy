@@ -35,7 +35,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
             playlistOperationsView = playlistDetailTableHeaderView
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: playlistTableHeaderFrameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(songContainer: playlist, with: appDelegate.player)
+            libraryElementDetailTableHeaderView.prepare(playableContainer: playlist, with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
@@ -69,7 +69,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
         let playlistItem = fetchedResultsController.getWrappedEntity(at: indexPath)
-        if let song = playlistItem.song {
+        if let playable = playlistItem.playable, let song = playable.asSong {
             cell.display(song: song, rootView: self)
         }
         return cell
@@ -99,7 +99,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         noAnimationAtNextDataChange = true
-        playlist.movePlaylistSong(fromIndex: fromIndexPath.row, to: to.row)
+        playlist.movePlaylistItem(fromIndex: fromIndexPath.row, to: to.row)
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let syncLibrary = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendApi.createLibrarySyncer()

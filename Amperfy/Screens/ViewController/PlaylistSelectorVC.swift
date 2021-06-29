@@ -3,7 +3,7 @@ import CoreData
 
 class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
-    var songsToAdd: [Song]?
+    var itemsToAdd: [AbstractPlayable]?
     
     private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
     
@@ -51,15 +51,13 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
-        if let songs = songsToAdd {
-            playlist.append(songs: songs)
+        if let items = itemsToAdd {
+            playlist.append(playables: items)
             appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                 let syncLibrary = LibraryStorage(context: context)
                 let syncer = self.appDelegate.backendApi.createLibrarySyncer()
                 let playlistAsync = playlist.getManagedObject(in: context, library: syncLibrary)
-                let songsAsync = songs.compactMap {
-                    Song(managedObject: context.object(with: $0.objectID) as! SongMO)
-                }
+                let songsAsync = items.compactMap{ context.object(with: $0.objectID) as? SongMO }.compactMap{ Song(managedObject: $0) }
                 syncer.syncUpload(playlistToAddSongs: playlistAsync, songs: songsAsync, library: syncLibrary)
             }
         }

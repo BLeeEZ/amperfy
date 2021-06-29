@@ -53,7 +53,7 @@ class ArtistDetailTableHeader: UIView {
         let alert = UIAlertController(title: artist.name, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
             let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.songsToAdd = artist.songs
+            selectPlaylistVC.itemsToAdd = artist.songs
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
             if let rootView = self.rootView {
                 rootView.present(selectPlaylistNav, animated: true, completion: nil)
@@ -62,11 +62,11 @@ class ArtistDetailTableHeader: UIView {
         alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
             for song in artist.songs {
                 if !song.isCached {
-                    self.appDelegate.songDownloadManager.download(object: song)
+                    self.appDelegate.playableDownloadManager.download(object: song)
                 }
             }
         }))
-        if artist.hasCachedSongs {
+        if artist.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.library.deleteCache(of: artist)
                 self.appDelegate.library.saveContext()

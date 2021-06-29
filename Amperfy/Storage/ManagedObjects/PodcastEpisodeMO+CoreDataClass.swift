@@ -2,14 +2,14 @@ import Foundation
 import CoreData
 
 @objc(PodcastEpisodeMO)
-public final class PodcastEpisodeMO: AbstractLibraryEntityMO {
+public final class PodcastEpisodeMO: AbstractPlayableMO {
 
 }
 
 extension PodcastEpisodeMO: CoreDataIdentifyable {
    
     static var identifierKey: KeyPath<PodcastEpisodeMO, String?> {
-        return \PodcastEpisodeMO.playInfo?.title
+        return \PodcastEpisodeMO.title
     }
     
     static var publishedDateSortedFetchRequest: NSFetchRequest<PodcastEpisodeMO> {

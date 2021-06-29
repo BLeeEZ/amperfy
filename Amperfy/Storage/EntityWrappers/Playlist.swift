@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import os.log
 
-public class Playlist: NSObject, SongContainable, Identifyable {
+public class Playlist: NSObject, PlayableContainable, Identifyable {
     
     static let smartPlaylistIdPrefix = "smart_"
     
@@ -40,7 +40,7 @@ public class Playlist: NSObject, SongContainable, Identifyable {
             return sortedCachedItems
         }
         sortedCachedItems = itemsMO.lazy
-            .filter{ return $0.song?.file != nil }
+            .filter{ return $0.playable?.file != nil }
             .sorted(by: { $0.order < $1.order })
             .compactMap{ PlaylistItem(library: library, managedObject: $0) }
         return sortedCachedItems
@@ -53,16 +53,16 @@ public class Playlist: NSObject, SongContainable, Identifyable {
             managedObject.songCount = Int16(newValue)
         }
     }
-    var songs: [Song] {
-        var sortedSongs = [Song]()
+    var playables: [AbstractPlayable] {
+        var sortedPlayables = [AbstractPlayable]()
         guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else {
-            return sortedSongs
+            return sortedPlayables
         }
-        sortedSongs = itemsMO.lazy
+        sortedPlayables = itemsMO.lazy
             .sorted(by: { $0.order < $1.order })
-            .compactMap{ $0.song }
-            .compactMap{ Song(managedObject: $0) }
-        return sortedSongs
+            .compactMap{ $0.playable }
+            .compactMap{ AbstractPlayable(managedObject: $0) }
+        return sortedPlayables
     }
     var items: [PlaylistItem] {
         return sortedPlaylistItems
@@ -90,25 +90,21 @@ public class Playlist: NSObject, SongContainable, Identifyable {
     var isSmartPlaylist: Bool {
         return id.hasPrefix(Self.smartPlaylistIdPrefix)
     }
-    var lastSongIndex: Int {
-        guard songs.count > 0 else { return 0 }
-        return songs.count-1
+    var lastPlayableIndex: Int {
+        guard playables.count > 0 else { return 0 }
+        return playables.count-1
     }
-    
-    var hasCachedSongs: Bool {
-        return songs.hasCachedSongs
-    }
-    
+
     var info: String {
         var infoText = "Name: " + name + "\n"
         infoText += "Count: " + String(sortedPlaylistItems.count) + "\n"
-        infoText += "Songs:\n"
+        infoText += "Playables:\n"
         for playlistItem in sortedPlaylistItems {
             infoText += String(playlistItem.order) + ": "
-            if let song = playlistItem.song {
-                infoText += song.creatorName
+            if let playable = playlistItem.playable {
+                infoText += playable.creatorName
                 infoText += " - "
-                infoText += song.title
+                infoText += playable.title
             } else {
                 infoText += "NOT AVAILABLE"
             }
@@ -117,9 +113,9 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         return infoText
     }
     
-    func previousCachedSongIndex(downwardsFrom: Int) -> Int? {
+    func previousCachedItemIndex(downwardsFrom: Int) -> Int? {
         let cachedPlaylistItems = sortedCachedPlaylistItems
-        guard downwardsFrom <= songs.count, !cachedPlaylistItems.isEmpty else {
+        guard downwardsFrom <= playables.count, !cachedPlaylistItems.isEmpty else {
             return nil
         }
         var previousIndex: Int? = nil
@@ -132,13 +128,13 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         return previousIndex
     }
     
-    func previousCachedSongIndex(beginningAt: Int) -> Int? {
-        return previousCachedSongIndex(downwardsFrom: beginningAt+1)
+    func previousCachedItemIndex(beginningAt: Int) -> Int? {
+        return previousCachedItemIndex(downwardsFrom: beginningAt+1)
     }
     
-    func nextCachedSongIndex(upwardsFrom: Int) -> Int? {
+    func nextCachedItemIndex(upwardsFrom: Int) -> Int? {
         let cachedPlaylistItems = sortedCachedPlaylistItems
-        guard upwardsFrom < songs.count, !cachedPlaylistItems.isEmpty else {
+        guard upwardsFrom < playables.count, !cachedPlaylistItems.isEmpty else {
             return nil
         }
         var nextIndex: Int? = nil
@@ -151,29 +147,29 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         return nextIndex
     }
     
-    func nextCachedSongIndex(beginningAt: Int) -> Int? {
-        return nextCachedSongIndex(upwardsFrom: beginningAt-1)
+    func nextCachedItemIndex(beginningAt: Int) -> Int? {
+        return nextCachedItemIndex(upwardsFrom: beginningAt-1)
     }
     
-    func append(song: Song) {
-        createPlaylistItem(forSong: song)
+    func append(playable: AbstractPlayable) {
+        createPlaylistItem(for: playable)
         songCount += 1
         library.saveContext()
     }
 
-    func append(songs songsToAppend: [Song]) {
-        for song in songsToAppend {
-            createPlaylistItem(forSong: song)
+    func append(playables playablesToAppend: [AbstractPlayable]) {
+        for playable in playablesToAppend {
+            createPlaylistItem(for: playable)
         }
-        songCount += songsToAppend.count
+        songCount += playablesToAppend.count
         library.saveContext()
     }
     
-    private func createPlaylistItem(forSong song: Song) {
+    private func createPlaylistItem(for playable: AbstractPlayable) {
         let playlistItem = library.createPlaylistItem()
         playlistItem.order = managedObject.items!.count
         playlistItem.playlist = self
-        playlistItem.song = song
+        playlistItem.playable = playable
     }
 
     func add(item: PlaylistItem) {
@@ -181,8 +177,8 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         managedObject.addToItems(item.managedObject)
     }
     
-    func movePlaylistSong(fromIndex: Int, to: Int) {
-        guard fromIndex >= 0, fromIndex < songs.count, to >= 0, to < songs.count, fromIndex != to else { return }
+    func movePlaylistItem(fromIndex: Int, to: Int) {
+        guard fromIndex >= 0, fromIndex < playables.count, to >= 0, to < playables.count, fromIndex != to else { return }
         
         let localSortedPlaylistItems = sortedPlaylistItems
         let targetOrder = localSortedPlaylistItems[to].order
@@ -214,9 +210,9 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         }
     }
     
-    func remove(firstOccurrenceOfSong song: Song) {
+    func remove(firstOccurrenceOfPlayable playable: AbstractPlayable) {
         for item in items {
-            if item.song?.id == song.id {
+            if item.playable?.id == playable.id {
                 remove(at: Int(item.order))
                 songCount -= 1
                 break
@@ -224,16 +220,16 @@ public class Playlist: NSObject, SongContainable, Identifyable {
         }
     }
     
-    func getFirstIndex(song: Song) -> Int? {
+    func getFirstIndex(playable: AbstractPlayable) -> Int? {
         for item in items {
-            if item.song?.id == song.id {
+            if item.playable?.id == playable.id {
                 return Int(item.order)
             }
         }
         return nil
     }
     
-    func removeAllSongs() {
+    func removeAllItems() {
         for item in sortedPlaylistItems {
             library.deletePlaylistItem(item: item)
         }

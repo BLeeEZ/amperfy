@@ -31,12 +31,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return backendProxy
     }()
     lazy var player: MusicPlayer = {
-        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, songDownloader: songDownloadManager, songCache: library, userStatistics: userStatistics)
-        return MusicPlayer(coreData: library.getPlayerData(), songDownloadManager: songDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
+        return MusicPlayer(coreData: library.getPlayerData(), playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
     }()
-    lazy var songDownloadManager: DownloadManager = {
+    lazy var playableDownloadManager: DownloadManager = {
         let requestManager = RequestManager()
-        let dlDelegate = SongDownloadDelegate(backendApi: backendApi)
+        let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi)
         let urlDownloader = UrlDownloader(requestManager: requestManager)
         let dlManager = DownloadManager(persistentStorage: persistentStorage, requestManager: requestManager, urlDownloader: urlDownloader, downloadDelegate: dlDelegate, eventLogger: eventLogger)
         urlDownloader.urlDownloadNotifier = dlManager
@@ -103,7 +103,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         libraryUpdater.performBlockingLibraryUpdatesIfNeeded()
         artworkDownloadManager.start()
-        songDownloadManager.start()
+        playableDownloadManager.start()
         userStatistics.sessionStarted()
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()
         self.window?.rootViewController = initialViewController
@@ -133,7 +133,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         if persistentStorage.loginCredentials != nil, persistentStorage.isLibrarySynced {
             artworkDownloadManager.stopAndWait()
-            songDownloadManager.stopAndWait()
+            playableDownloadManager.stopAndWait()
         }
         library.saveContext()
     }

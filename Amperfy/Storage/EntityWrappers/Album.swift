@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Album: AbstractLibraryEntity, SongContainable {
+public class Album: AbstractLibraryEntity, PlayableContainable {
     
     let managedObject: AlbumMO
     
@@ -62,7 +62,7 @@ public class Album: AbstractLibraryEntity, SongContainable {
             managedObject.songCount = Int16(newValue)
         }
     }
-    var songs: [Song] {
+    var songs: [AbstractPlayable] {
         guard let songsSet = managedObject.songs, let songsMO = songsSet.array as? [SongMO] else { return [Song]() }
         var returnSongs = [Song]()
         for songMO in songsMO {
@@ -70,9 +70,7 @@ public class Album: AbstractLibraryEntity, SongContainable {
         }
         return returnSongs.sortByTrackNumber()
     }
-    var hasCachedSongs: Bool {
-        return songs.hasCachedSongs
-    }
+    var playables: [AbstractPlayable] { return songs }
     
     var isOrphaned: Bool {
         return identifier == "Unknown (Orphaned)"

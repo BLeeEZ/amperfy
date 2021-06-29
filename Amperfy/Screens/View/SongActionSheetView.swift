@@ -14,10 +14,10 @@ class SongActionSheetView: UIView {
         self.layoutMargins = SongActionSheetView.margin
     }
     
-    func display(song: Song) {
-        titleLabel.text = song.title
-        artistLabel.text = song.creatorName
-        artworkImage.displayAndUpdate(entity: song, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
+    func display(playable: AbstractPlayable) {
+        titleLabel.text = playable.title
+        artistLabel.text = playable.creatorName
+        artworkImage.displayAndUpdate(entity: playable, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
     }
 
 }

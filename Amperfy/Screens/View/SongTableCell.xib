@@ -18,7 +18,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hPr-VQ-rTt">
-                        <rect key="frame" x="72" y="14" width="352" height="22"/>
+                        <rect key="frame" x="72" y="14" width="372" height="22"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="XXp-uK-dh5"/>
                         </constraints>
@@ -27,7 +27,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nJe-7h-3tU">
-                        <rect key="frame" x="72" y="38" width="352" height="16"/>
+                        <rect key="frame" x="72" y="38" width="372" height="16"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="16" id="Lp3-VV-zM5"/>
                         </constraints>
@@ -42,43 +42,22 @@
                             <constraint firstAttribute="width" constant="48" id="iSI-nj-yJY"/>
                         </constraints>
                     </imageView>
-                    <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="moK-d1-lj1">
-                        <rect key="frame" x="72" y="55" width="380" height="4"/>
-                    </progressView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="=" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4OZ-v0-bY2" userLabel="Reorder Label">
-                        <rect key="frame" x="432" y="20" width="20" height="30"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="20" id="jYs-KG-jTv"/>
-                            <constraint firstAttribute="height" constant="30" id="mc6-Iq-tQ8"/>
-                        </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="4OZ-v0-bY2" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="trailing" constant="8" id="AUO-iE-pDI"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="hPr-VQ-rTt" secondAttribute="trailing" constant="8" id="AUO-iE-pDI"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="top" secondItem="hPr-VQ-rTt" secondAttribute="bottom" constant="2" id="E4f-kL-YK1"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="4OZ-v0-bY2" secondAttribute="trailing" id="GoY-7G-GF0"/>
-                    <constraint firstAttribute="bottomMargin" secondItem="moK-d1-lj1" secondAttribute="bottom" id="Ldd-iy-NFu"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" constant="3" id="PbZ-KR-6Uu"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="Pwh-zQ-8MT"/>
                     <constraint firstItem="Kb7-OT-MQ5" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="RGP-0j-GXj"/>
                     <constraint firstItem="Kb7-OT-MQ5" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leadingMargin" id="Uld-ix-WQV"/>
-                    <constraint firstItem="moK-d1-lj1" firstAttribute="leading" secondItem="nJe-7h-3tU" secondAttribute="leading" id="Yix-AI-aoZ"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="leading" secondItem="Kb7-OT-MQ5" secondAttribute="trailing" constant="8" id="YjP-mp-fEC"/>
                     <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="hPr-VQ-rTt" secondAttribute="trailing" id="hho-eL-Cqq"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="moK-d1-lj1" secondAttribute="trailing" id="huL-V9-Zmu"/>
-                    <constraint firstItem="4OZ-v0-bY2" firstAttribute="leading" secondItem="nJe-7h-3tU" secondAttribute="trailing" constant="8" id="mcC-ks-bMI"/>
-                    <constraint firstItem="4OZ-v0-bY2" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="uVM-f4-TFi"/>
-                    <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="nJe-7h-3tU" secondAttribute="trailing" id="ybP-eq-wcE"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="nJe-7h-3tU" secondAttribute="trailing" constant="8" id="ybP-eq-wcE"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="artistLabel" destination="nJe-7h-3tU" id="SlX-ew-mVM"/>
                 <outlet property="artworkImage" destination="Kb7-OT-MQ5" id="tFa-Ih-i2W"/>
-                <outlet property="downloadProgress" destination="moK-d1-lj1" id="Jof-Zl-a7H"/>
-                <outlet property="reorderLabel" destination="4OZ-v0-bY2" id="5zb-zm-AcA"/>
                 <outlet property="titleLabel" destination="hPr-VQ-rTt" id="Gwv-hx-ZdG"/>
             </connections>
             <point key="canvasLocation" x="217.59999999999999" y="-203.29835082458771"/>

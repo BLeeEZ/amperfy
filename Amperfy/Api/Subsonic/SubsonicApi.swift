@@ -37,12 +37,12 @@ class SubsonicApi: BackendApi {
         return subsonicServerApi.isAuthenticationValid(credentials: credentials)
     }
 
-    func generateUrl(forDownloadingSong song: Song) -> URL? {
-        return subsonicServerApi.generateUrl(forDownloadingSong: song)
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL? {
+        return subsonicServerApi.generateUrl(forDownloadingPlayable: playable)
     }
 
-    func generateUrl(forStreamingSong song: Song) -> URL? {
-        return subsonicServerApi.generateUrl(forStreamingSong: song)
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL? {
+        return subsonicServerApi.generateUrl(forStreamingPlayable: playable)
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> URL? {

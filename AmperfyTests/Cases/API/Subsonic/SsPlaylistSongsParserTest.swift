@@ -44,7 +44,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
             let song = library.createSong()
             song.id = i.description
             song.title = i.description
-            playlist.append(song: song)
+            playlist.append(playable: song)
         }
         createdSongCount = 3
         recreateParserDelegate()
@@ -56,7 +56,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
             let song = library.createSong()
             song.id = i.description
             song.title = i.description
-            playlist.append(song: song)
+            playlist.append(playable: song)
         }
         createdSongCount = 6
         recreateParserDelegate()
@@ -68,7 +68,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
             let song = library.createSong()
             song.id = i.description
             song.title = i.description
-            playlist.append(song: song)
+            playlist.append(playable: song)
         }
         createdSongCount = 20
         recreateParserDelegate()
@@ -77,17 +77,17 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     
     override func checkCorrectParsing() {
         library.saveContext()
-        XCTAssertEqual(playlist.songs.count, 6)
-        XCTAssertEqual(playlist.songs[0].id, "657")
-        XCTAssertEqual(playlist.songs[1].id, "823")
-        XCTAssertEqual(playlist.songs[2].id, "748")
-        XCTAssertEqual(playlist.songs[3].id, "848")
-        XCTAssertEqual(playlist.songs[4].id, "884")
-        XCTAssertEqual(playlist.songs[5].id, "805")
+        XCTAssertEqual(playlist.playables.count, 6)
+        XCTAssertEqual(playlist.playables[0].id, "657")
+        XCTAssertEqual(playlist.playables[1].id, "823")
+        XCTAssertEqual(playlist.playables[2].id, "748")
+        XCTAssertEqual(playlist.playables[3].id, "848")
+        XCTAssertEqual(playlist.playables[4].id, "884")
+        XCTAssertEqual(playlist.playables[5].id, "805")
         
         XCTAssertEqual(library.songCount, 6+createdSongCount)
         
-        var song = playlist.songs[0]
+        var song = playlist.playables[0].asSong!
         XCTAssertEqual(song.id, "657")
         XCTAssertEqual(song.title, "Making Me Nervous")
         XCTAssertEqual(song.artist?.id, "45")
@@ -108,7 +108,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.artwork?.id, "655")
         
         
-        song = playlist.songs[2]
+        song = playlist.playables[2].asSong!
         XCTAssertEqual(song.id, "748")
         XCTAssertEqual(song.title, "Stories from Emona II")
         XCTAssertEqual(song.artist?.id, "51") // Artist not pre created
@@ -128,7 +128,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.artwork?.type, "")
         XCTAssertEqual(song.artwork?.id, "746")
         
-        song = playlist.songs[5]
+        song = playlist.playables[5].asSong!
         XCTAssertEqual(song.id, "805")
         XCTAssertEqual(song.title, "Bajo siete lunas (intro)")
         XCTAssertEqual(song.artist?.id, "54")

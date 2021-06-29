@@ -31,15 +31,15 @@ class PlayerView: UIView {
     static private let margin = UIEdgeInsets(top: 0, left: UIView.defaultMarginX, bottom: 20, right: UIView.defaultMarginX)
     static private let defaultAnimationDuration = TimeInterval(0.50)
     
-    var lastDisplayedSong: Song?
+    var lastDisplayedPlayable: AbstractPlayable?
     
     private var appDelegate: AppDelegate!
     private var player: MusicPlayer!
     private var rootView: PopupPlayerVC?
     private var displayStyle: PlayerDisplayStyle!
     
-    @IBOutlet weak var songTitleCompactLabel: MarqueeLabel!
-    @IBOutlet weak var songTitleLargeLabel: MarqueeLabel!
+    @IBOutlet weak var titleCompactLabel: MarqueeLabel!
+    @IBOutlet weak var titleLargeLabel: MarqueeLabel!
     
     @IBOutlet weak var artistNameCompactLabel: MarqueeLabel!
     @IBOutlet weak var artistNameLargeLabel: MarqueeLabel!
@@ -48,20 +48,20 @@ class PlayerView: UIView {
     @IBOutlet weak var repeatButton: UIButton!
     @IBOutlet weak var shuffleButton: UIButton!
     @IBOutlet weak var displayPlaylistButton: UIButton!
-    @IBOutlet weak var currentSongTimeSlider: UISlider!
+    @IBOutlet weak var timeSlider: UISlider!
     @IBOutlet weak var elapsedTimeLabel: UILabel!
     @IBOutlet weak var remainingTimeLabel: UILabel!
     @IBOutlet weak var artworkImage: UIImageView!
     
     // Animation constraints
-    @IBOutlet weak var artistToSongLargeDistanceConstraint: NSLayoutConstraint!
+    @IBOutlet weak var artistToTitleLargeDistanceConstraint: NSLayoutConstraint!
     @IBOutlet weak var bottomControlToProgressDistanceConstraint: NSLayoutConstraint!
     @IBOutlet weak var playerOptionsControlGroupToPlayDistanceConstraint: NSLayoutConstraint!
     @IBOutlet weak var artworkWidthConstraint: NSLayoutConstraint!
-    private var songInfoCompactToArtworkDistanceConstraint: NSLayoutConstraint?
-    @IBOutlet weak var songInfoLargeToProgressDistanceConstraint: NSLayoutConstraint!
+    private var infoCompactToArtworkDistanceConstraint: NSLayoutConstraint?
+    @IBOutlet weak var infoLargeToProgressDistanceConstraint: NSLayoutConstraint!
     private var artworkXPositionConstraint: NSLayoutConstraint?
-    @IBOutlet weak var songSliderToArtworkDistanceConstraint: NSLayoutConstraint!
+    @IBOutlet weak var timeSliderToArtworkDistanceConstraint: NSLayoutConstraint!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -101,8 +101,8 @@ class PlayerView: UIView {
         rootView?.scrollToNextPlayingRow()
     }
     
-    @IBAction func currentSongTimeSliderChanged(_ sender: Any) {
-        if let timeSliderValue = currentSongTimeSlider?.value {
+    @IBAction func timeSliderChanged(_ sender: Any) {
+        if let timeSliderValue = timeSlider?.value {
             player.seek(toSecond: Double(timeSliderValue))
         }
     }
@@ -146,19 +146,19 @@ class PlayerView: UIView {
     private func renderAnimationSwitchToCompact(animationDuration: TimeInterval = defaultAnimationDuration) {
         guard let rootView = self.rootView else { return }
         artworkWidthConstraint.constant = 100
-        songInfoLargeToProgressDistanceConstraint.constant = -30
+        infoLargeToProgressDistanceConstraint.constant = -30
         bottomControlToProgressDistanceConstraint.constant = -20
         playerOptionsControlGroupToPlayDistanceConstraint.constant = -2
         
-        self.songInfoCompactToArtworkDistanceConstraint?.isActive = false
-        self.songInfoCompactToArtworkDistanceConstraint = NSLayoutConstraint(item: self.songTitleCompactLabel!,
+        self.infoCompactToArtworkDistanceConstraint?.isActive = false
+        self.infoCompactToArtworkDistanceConstraint = NSLayoutConstraint(item: self.titleCompactLabel!,
                            attribute: .leading,
                            relatedBy: .equal,
                            toItem: self.artworkImage,
                            attribute: .trailing,
                            multiplier: 1.0,
                            constant: UIView.defaultMarginX)
-        self.songInfoCompactToArtworkDistanceConstraint?.isActive = true
+        self.infoCompactToArtworkDistanceConstraint?.isActive = true
         
         self.artworkXPositionConstraint?.isActive = false
         self.artworkXPositionConstraint = NSLayoutConstraint(item: artworkImage!,
@@ -171,8 +171,8 @@ class PlayerView: UIView {
         self.artworkXPositionConstraint?.isActive = true
     
         UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut, animations: ({
-            self.songTitleCompactLabel.alpha = 1
-            self.songTitleLargeLabel.alpha = 0
+            self.titleCompactLabel.alpha = 1
+            self.titleLargeLabel.alpha = 0
             self.artistNameCompactLabel.alpha = 1
             self.artistNameLargeLabel.alpha = 0
         }), completion: nil)
@@ -186,18 +186,18 @@ class PlayerView: UIView {
     
     private func renderAnimationSwitchToLarge(animationDuration: TimeInterval = defaultAnimationDuration) {
         guard let rootView = self.rootView else { return }
-        songInfoLargeToProgressDistanceConstraint.constant = CGFloat(30.0)
-        bottomControlToProgressDistanceConstraint.constant = songTitleLargeLabel.frame.height + artistNameLargeLabel.frame.height + artistToSongLargeDistanceConstraint.constant + songInfoLargeToProgressDistanceConstraint.constant
+        infoLargeToProgressDistanceConstraint.constant = CGFloat(30.0)
+        bottomControlToProgressDistanceConstraint.constant = titleLargeLabel.frame.height + artistNameLargeLabel.frame.height + artistToTitleLargeDistanceConstraint.constant + infoLargeToProgressDistanceConstraint.constant
         playerOptionsControlGroupToPlayDistanceConstraint.constant = CGFloat(0.0)
         
         let availableRootWidth = rootView.view.frame.size.width - PlayerView.margin.left -  PlayerView.margin.right
         let availableRootHeight = rootView.availableFrameHeightForLargePlayer
         
-        var elementsBelowArtworkHeight = songSliderToArtworkDistanceConstraint.constant
-        elementsBelowArtworkHeight += currentSongTimeSlider.frame.size.height
-        elementsBelowArtworkHeight += songInfoLargeToProgressDistanceConstraint.constant
-        elementsBelowArtworkHeight += songTitleLargeLabel.frame.size.height
-        elementsBelowArtworkHeight += artistToSongLargeDistanceConstraint.constant
+        var elementsBelowArtworkHeight = timeSliderToArtworkDistanceConstraint.constant
+        elementsBelowArtworkHeight += timeSlider.frame.size.height
+        elementsBelowArtworkHeight += infoLargeToProgressDistanceConstraint.constant
+        elementsBelowArtworkHeight += titleLargeLabel.frame.size.height
+        elementsBelowArtworkHeight += artistToTitleLargeDistanceConstraint.constant
         elementsBelowArtworkHeight += artistNameLargeLabel.frame.size.height
         elementsBelowArtworkHeight += playButton.frame.size.height
         elementsBelowArtworkHeight += displayPlaylistButton.frame.size.height
@@ -212,15 +212,15 @@ class PlayerView: UIView {
             artworkWidthConstraint.constant = availableRootWidth
         }
         
-        self.songInfoCompactToArtworkDistanceConstraint?.isActive = false
-        self.songInfoCompactToArtworkDistanceConstraint = NSLayoutConstraint(item: songTitleCompactLabel!,
+        self.infoCompactToArtworkDistanceConstraint?.isActive = false
+        self.infoCompactToArtworkDistanceConstraint = NSLayoutConstraint(item: titleCompactLabel!,
                            attribute: .leading,
                            relatedBy: .lessThanOrEqual,
                            toItem: artworkImage,
                            attribute: .trailing,
                            multiplier: 1.0,
                            constant: 0)
-        self.songInfoCompactToArtworkDistanceConstraint?.isActive = true
+        self.infoCompactToArtworkDistanceConstraint?.isActive = true
         
         self.artworkXPositionConstraint?.isActive = false
         self.artworkXPositionConstraint = NSLayoutConstraint(item: artworkImage!,
@@ -233,8 +233,8 @@ class PlayerView: UIView {
         self.artworkXPositionConstraint?.isActive = true
 
         UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseIn, animations: ({
-            self.songTitleCompactLabel.alpha = 0
-            self.songTitleLargeLabel.alpha = 1
+            self.titleCompactLabel.alpha = 0
+            self.titleLargeLabel.alpha = 1
             self.artistNameCompactLabel.alpha = 0
             self.artistNameLargeLabel.alpha = 1
         }), completion: nil)
@@ -250,19 +250,19 @@ class PlayerView: UIView {
         refreshPlayer()
         renderAnimation(animationDuration: TimeInterval(0.0))
         
-        songTitleCompactLabel.leadingBuffer = 0.0
-        songTitleCompactLabel.trailingBuffer = 30.0
-        songTitleCompactLabel.animationDelay = 2.0
-        songTitleCompactLabel.type = .continuous
-        songTitleCompactLabel.speed = .rate(20.0)
-        songTitleCompactLabel.fadeLength = 10.0
+        titleCompactLabel.leadingBuffer = 0.0
+        titleCompactLabel.trailingBuffer = 30.0
+        titleCompactLabel.animationDelay = 2.0
+        titleCompactLabel.type = .continuous
+        titleCompactLabel.speed = .rate(20.0)
+        titleCompactLabel.fadeLength = 10.0
         
-        songTitleLargeLabel.leadingBuffer = 0.0
-        songTitleLargeLabel.trailingBuffer = 30.0
-        songTitleLargeLabel.animationDelay = 2.0
-        songTitleLargeLabel.type = .continuous
-        songTitleLargeLabel.speed = .rate(20.0)
-        songTitleLargeLabel.fadeLength = 10.0
+        titleLargeLabel.leadingBuffer = 0.0
+        titleLargeLabel.trailingBuffer = 30.0
+        titleLargeLabel.animationDelay = 2.0
+        titleLargeLabel.type = .continuous
+        titleLargeLabel.speed = .rate(20.0)
+        titleLargeLabel.fadeLength = 10.0
         
         artistNameCompactLabel.leadingBuffer = 0.0
         artistNameCompactLabel.trailingBuffer = 30.0
@@ -278,15 +278,15 @@ class PlayerView: UIView {
         artistNameLargeLabel.speed = .rate(20.0)
         artistNameLargeLabel.fadeLength = 10.0
         
-        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
-        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
+        timeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
+        timeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
     }
     
     // handle dark/light mode change
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
-        currentSongTimeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
+        timeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
+        timeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
     }
     
     func refreshPlayButtonTitle() {
@@ -305,59 +305,59 @@ class PlayerView: UIView {
         rootView?.popupItem.trailingBarButtonItems = [ barButtonItem ]
     }
     
-    func refreshSongInfo() {
-        if player.playlist.songs.count > 0 {
-            let songIndex = player.currentlyPlaying?.index ?? 0
-            let songInfo = player.playlist.songs[songIndex]
-            songTitleCompactLabel.text = songInfo.title
-            songTitleLargeLabel.text = songInfo.title
-            artistNameCompactLabel.text = songInfo.creatorName
-            artistNameLargeLabel.text = songInfo.creatorName
-            artworkImage.image = songInfo.image
-            rootView?.popupItem.title = songInfo.title
-            rootView?.popupItem.subtitle = songInfo.creatorName
-            rootView?.popupItem.image = songInfo.image
-            rootView?.changeBackgroundGradient(forSong: songInfo)
-            lastDisplayedSong = songInfo
+    func refreshCurrentlyPlayingInfo() {
+        if player.playlist.playables.count > 0 {
+            let playableIndex = player.currentlyPlaying?.index ?? 0
+            let playableInfo = player.playlist.playables[playableIndex]
+            titleCompactLabel.text = playableInfo.title
+            titleLargeLabel.text = playableInfo.title
+            artistNameCompactLabel.text = playableInfo.creatorName
+            artistNameLargeLabel.text = playableInfo.creatorName
+            artworkImage.image = playableInfo.image
+            rootView?.popupItem.title = playableInfo.title
+            rootView?.popupItem.subtitle = playableInfo.creatorName
+            rootView?.popupItem.image = playableInfo.image
+            rootView?.changeBackgroundGradient(forPlayable: playableInfo)
+            lastDisplayedPlayable = playableInfo
         } else {
-            songTitleCompactLabel.text = "No song playing"
-            songTitleLargeLabel.text = "No song playing"
+            titleCompactLabel.text = "Not playing"
+            titleLargeLabel.text = "Not playing"
             artistNameCompactLabel.text = ""
             artistNameLargeLabel.text = ""
             artworkImage.image = Artwork.defaultImage
-            rootView?.popupItem.title = "No song playing"
+            rootView?.popupItem.title = "Not playing"
             rootView?.popupItem.subtitle = ""
             rootView?.popupItem.image = Artwork.defaultImage
-            lastDisplayedSong = nil
+            lastDisplayedPlayable = nil
         }
     }
 
-    func refreshSongTime() {
+    func refreshTimeInfo() {
         if player.currentlyPlaying != nil {
             let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
             elapsedTimeLabel.text = elapsedClockTime.asShortString()
             let remainingTime = ClockTime(timeInSeconds: Int(player.elapsedTime - ceil(player.duration)))
             remainingTimeLabel.text = remainingTime.asShortString()
-            currentSongTimeSlider.minimumValue = 0.0
-            currentSongTimeSlider.maximumValue = Float(player.duration)
-            if !currentSongTimeSlider.isTouchInside {
-                currentSongTimeSlider.value = Float(player.elapsedTime)
+            timeSlider.minimumValue = 0.0
+            timeSlider.maximumValue = Float(player.duration)
+            if !timeSlider.isTouchInside {
+                timeSlider.value = Float(player.elapsedTime)
             }
             rootView?.popupItem.progress = Float(player.elapsedTime / player.duration)
         } else {
             elapsedTimeLabel.text = "--:--"
             remainingTimeLabel.text = "--:--"
-            currentSongTimeSlider.minimumValue = 0.0
-            currentSongTimeSlider.maximumValue = 1.0
-            currentSongTimeSlider.value = 0.0
+            timeSlider.minimumValue = 0.0
+            timeSlider.maximumValue = 1.0
+            timeSlider.value = 0.0
             rootView?.popupItem.progress = 0.0
         }
     }
     
     func refreshPlayer() {
-        refreshSongInfo()
+        refreshCurrentlyPlayingInfo()
         refreshPlayButtonTitle()
-        refreshSongTime()
+        refreshTimeInfo()
         refreshRepeatButton()
         refreshShuffleButton()
         refreshDisplayPlaylistButton()
@@ -407,11 +407,11 @@ extension PlayerView: MusicPlayable {
     
     func didStopPlaying(playlistItem: PlaylistItem?) {
         refreshPlayer()
-        refreshSongInfo()
+        refreshCurrentlyPlayingInfo()
     }
 
     func didElapsedTimeChange() {
-        refreshSongTime()
+        refreshTimeInfo()
     }
     
     func didPlaylistChange() {

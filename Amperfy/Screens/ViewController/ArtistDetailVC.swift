@@ -27,7 +27,7 @@ class ArtistDetailVC: BasicTableViewController {
             detailOperationsView = artistDetailTableHeaderView
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: ArtistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(songContainer: artist, with: appDelegate.player)
+            libraryElementDetailTableHeaderView.prepare(playableContainer: artist, with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
     }

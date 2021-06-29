@@ -69,7 +69,7 @@ class SettingsLibraryVC: UITableViewController {
                 self.cachedSongsCountLabel.text = String(cachedSongCount)
             }
             
-            let cachedSongSizeLabelText = library.cachedSongSizeInByte.asByteString
+            let cachedSongSizeLabelText = library.cachedPlayableSizeInByte.asByteString
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.cachedSongsSizeSpinner.isHidden = true
@@ -82,10 +82,10 @@ class SettingsLibraryVC: UITableViewController {
         let alert = UIAlertController(title: "Delete song cache", message: "Are you sure to delete all downloaded songs from cache?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in
             self.appDelegate.player.stop()
-            self.appDelegate.songDownloadManager.stopAndWait()
+            self.appDelegate.playableDownloadManager.stopAndWait()
             self.appDelegate.library.deleteCompleteSongCache()
             self.appDelegate.library.saveContext()
-            self.appDelegate.songDownloadManager.start()
+            self.appDelegate.playableDownloadManager.start()
         }))
         alert.addAction(UIAlertAction(title: "No", style: .default , handler: nil))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()

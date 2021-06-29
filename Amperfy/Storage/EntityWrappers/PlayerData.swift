@@ -40,27 +40,27 @@ public class PlayerData: NSObject {
     public var playlist: Playlist {
         get { return activePlaylist }
     }
-    public var currentSong: Song? {
+    public var currentItem: AbstractPlayable? {
         get {
-            guard currentSongIndex < playlist.songs.count else {
+            guard currentIndex < playlist.playables.count else {
                 return nil
             }
-            return playlist.songs[currentSongIndex]
+            return playlist.playables[currentIndex]
         }
     }
     
     public var currentPlaylistItem: PlaylistItem? {
         get {
-            guard currentSongIndex < playlist.songs.count else {
+            guard currentIndex < playlist.playables.count else {
                 return nil
             }
-            return playlist.items[currentSongIndex]
+            return playlist.items[currentIndex]
         }
     }
-    var isAutoCachePlayedSong: Bool {
-        get { return managedObject.autoCachePlayedSongSetting == 1 }
+    var isAutoCachePlayedItems: Bool {
+        get { return managedObject.autoCachePlayedItemSetting == 1 }
         set {
-            managedObject.autoCachePlayedSongSetting = newValue ? 1 : 0
+            managedObject.autoCachePlayedItemSetting = newValue ? 1 : 0
             library.saveContext()
         }
     }
@@ -71,13 +71,13 @@ public class PlayerData: NSObject {
         set {
             if newValue {
                 shuffledPlaylist.shuffle()
-                if let curSong = currentSong, let indexOfCurrentSongInShuffledPlaylist = shuffledPlaylist.getFirstIndex(song: curSong) {
-                    shuffledPlaylist.movePlaylistSong(fromIndex: indexOfCurrentSongInShuffledPlaylist, to: 0)
-                    currentSongIndex = 0
+                if let curPlayable = currentItem, let indexOfCurrentItemInShuffledPlaylist = shuffledPlaylist.getFirstIndex(playable: curPlayable) {
+                    shuffledPlaylist.movePlaylistItem(fromIndex: indexOfCurrentItemInShuffledPlaylist, to: 0)
+                    currentIndex = 0
                 }
             } else {
-                if let curSong = currentSong, let indexOfCurrentSongInNormalPlaylist = normalPlaylist.getFirstIndex(song: curSong) {
-                    currentSongIndex = indexOfCurrentSongInNormalPlaylist
+                if let curPlayable = currentItem, let indexOfCurrentItemInNormalPlaylist = normalPlaylist.getFirstIndex(playable: curPlayable) {
+                    currentIndex = indexOfCurrentItemInNormalPlaylist
                 }
             }
             managedObject.shuffleSetting = newValue ? 1 : 0
@@ -94,81 +94,81 @@ public class PlayerData: NSObject {
         }
     }
     
-    var currentSongIndex: Int {
+    var currentIndex: Int {
         get {
-            if managedObject.currentSongIndex >= playlist.songs.count, managedObject.currentSongIndex < 0 {
-                managedObject.currentSongIndex = 0
+            if managedObject.currentIndex >= playlist.playables.count, managedObject.currentIndex < 0 {
+                managedObject.currentIndex = 0
                 library.saveContext()
             }
-            return Int(managedObject.currentSongIndex)
+            return Int(managedObject.currentIndex)
         }
         set {
-            if newValue >= 0, newValue < playlist.songs.count {
-                managedObject.currentSongIndex = Int32(newValue)
+            if newValue >= 0, newValue < playlist.playables.count {
+                managedObject.currentIndex = Int32(newValue)
             } else {
-                managedObject.currentSongIndex = 0
+                managedObject.currentIndex = 0
             }
             library.saveContext()
         }
     }
 
-    var previousSongIndex: Int? {
-        let prevSongIndex = currentSongIndex - 1
-        guard prevSongIndex >= 0 else { return nil }
-        if prevSongIndex >= playlist.songs.count {
+    var previousIndex: Int? {
+        let prevIndex = currentIndex - 1
+        guard prevIndex >= 0 else { return nil }
+        if prevIndex >= playlist.playables.count {
             return nil
-        } else if playlist.songs.count == 0 {
+        } else if playlist.playables.count == 0 {
             return nil
         } else {
-            return prevSongIndex
+            return prevIndex
         }
     }
     
-    var nextSongIndex: Int? {
-        let nextSongIndex = currentSongIndex + 1
-        if nextSongIndex >= playlist.songs.count {
+    var nextIndex: Int? {
+        let nxtIndex = currentIndex + 1
+        if nxtIndex >= playlist.playables.count {
             return nil
         } else {
-            return nextSongIndex
+            return nxtIndex
         }
     }
     
-    func addToPlaylist(song: Song) {
-        normalPlaylist.append(song: song)
-        shuffledPlaylist.append(song: song)
+    func addToPlaylist(playable: AbstractPlayable) {
+        normalPlaylist.append(playable: playable)
+        shuffledPlaylist.append(playable: playable)
     }
     
-    func addToPlaylist(songs: [Song]) {
-        normalPlaylist.append(songs: songs)
-        shuffledPlaylist.append(songs: songs)
+    func addToPlaylist(playables: [AbstractPlayable]) {
+        normalPlaylist.append(playables: playables)
+        shuffledPlaylist.append(playables: playables)
     }
     
-    func removeAllSongs() {
-        currentSongIndex = 0
-        normalPlaylist.removeAllSongs()
-        shuffledPlaylist.removeAllSongs()
+    func removeAllItems() {
+        currentIndex = 0
+        normalPlaylist.removeAllItems()
+        shuffledPlaylist.removeAllItems()
     }
     
-    func removeSongFromPlaylist(at index: Int) {
-        if index < playlist.songs.count {
-            let songToRemove = playlist.songs[index]
+    func removeItemFromPlaylist(at index: Int) {
+        if index < playlist.playables.count {
+            let playableToRemove = playlist.playables[index]
             activePlaylist.remove(at: index)
-            inactivePlaylist.remove(firstOccurrenceOfSong: songToRemove)
-            if index < currentSongIndex {
-                currentSongIndex = currentSongIndex - 1
+            inactivePlaylist.remove(firstOccurrenceOfPlayable: playableToRemove)
+            if index < currentIndex {
+                currentIndex = currentIndex - 1
             }
         }
     }
     
-    func movePlaylistSong(fromIndex: Int, to: Int) {
-        if fromIndex < playlist.songs.count, to < playlist.songs.count, fromIndex != to {
-            playlist.movePlaylistSong(fromIndex: fromIndex, to: to)
-            if currentSongIndex == fromIndex {
-                currentSongIndex = to
-            } else if fromIndex < currentSongIndex, currentSongIndex <= to {
-                currentSongIndex = currentSongIndex - 1
-            } else if to <= currentSongIndex, currentSongIndex < fromIndex {
-                currentSongIndex = currentSongIndex + 1
+    func movePlaylistItem(fromIndex: Int, to: Int) {
+        if fromIndex < playlist.playables.count, to < playlist.playables.count, fromIndex != to {
+            playlist.movePlaylistItem(fromIndex: fromIndex, to: to)
+            if currentIndex == fromIndex {
+                currentIndex = to
+            } else if fromIndex < currentIndex, currentIndex <= to {
+                currentIndex = currentIndex - 1
+            } else if to <= currentIndex, currentIndex < fromIndex {
+                currentIndex = currentIndex + 1
             }
         }
     }

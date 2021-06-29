@@ -39,7 +39,7 @@ class PodcastDetailTableHeader: UIView {
         } else {
             infoText += "\(episodeCount) Episodes"
         }
-        infoText += " \(CommonString.oneMiddleDot) \(podcast.songs.reduce(0, {$0 + $1.duration}).asDurationString)"
+        infoText += " \(CommonString.oneMiddleDot) \(podcast.episodes.reduce(0, {$0 + $1.duration}).asDurationString)"
         infoLabel.text = infoText
         descriptionLabel.text = podcast.depiction
     }
@@ -55,13 +55,9 @@ class PodcastDetailTableHeader: UIView {
     func createAlert(forPodcast podcast: Podcast) -> UIAlertController {
         let alert = UIAlertController(title: podcast.title, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-            for song in podcast.songs {
-                if !song.isCached {
-                    self.appDelegate.songDownloadManager.download(object: song)
-                }
-            }
+            podcast.cachePlayables(downloadManager: self.appDelegate.playableDownloadManager)
         }))
-        if podcast.hasCachedSongs {
+        if podcast.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.library.deleteCache(of: podcast)
                 self.appDelegate.library.saveContext()

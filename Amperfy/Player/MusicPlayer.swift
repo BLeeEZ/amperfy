@@ -47,8 +47,8 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         return backendAudioPlayer.isPlaying
     }
     var currentlyPlaying: PlaylistItem? {
-        if let playingSong = backendAudioPlayer.currentlyPlaying {
-            return playingSong
+        if let playingItem = backendAudioPlayer.currentlyPlaying {
+            return playingItem
         }
         return coreData.currentPlaylistItem
     }
@@ -73,26 +73,26 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         get { return coreData.repeatMode }
         set { coreData.repeatMode = newValue }
     }
-    var isAutoCachePlayedSong: Bool {
-        get { return coreData.isAutoCachePlayedSong }
+    var isAutoCachePlayedItems: Bool {
+        get { return coreData.isAutoCachePlayedItems }
         set {
-            coreData.isAutoCachePlayedSong = newValue
-            backendAudioPlayer.isAutoCachePlayedSong = newValue
+            coreData.isAutoCachePlayedItems = newValue
+            backendAudioPlayer.isAutoCachePlayedItems = newValue
         }
     }
 
     private var coreData: PlayerData
-    private var songDownloadManager: DownloadManageable
+    private var playableDownloadManager: DownloadManageable
     private let backendAudioPlayer: BackendAudioPlayer
     private let userStatistics: UserStatistics
     private var notifierList = [MusicPlayable]()
-    private let currentSongReplayInsteadPlayPreviousTimeInSec = 5.0
+    private let replayInsteadPlayPreviousTimeInSec = 5.0
     
-    init(coreData: PlayerData, songDownloadManager: DownloadManageable, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
+    init(coreData: PlayerData, playableDownloadManager: DownloadManageable, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
         self.coreData = coreData
-        self.songDownloadManager = songDownloadManager
+        self.playableDownloadManager = playableDownloadManager
         self.backendAudioPlayer = backendAudioPlayer
-        self.backendAudioPlayer.isAutoCachePlayedSong = coreData.isAutoCachePlayedSong
+        self.backendAudioPlayer.isAutoCachePlayedItems = coreData.isAutoCachePlayedItems
         self.userStatistics = userStatistics
         super.init()
         self.backendAudioPlayer.responder = self
@@ -102,15 +102,15 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         self.coreData = coreData
     }
 
-    private func shouldCurrentSongReplayInsteadPlayPrevious() -> Bool {
+    private func shouldCurrentItemReplayedInsteadOfPrevious() -> Bool {
         if !backendAudioPlayer.canBeContinued {
             return false
         }
-        return backendAudioPlayer.elapsedTime >= currentSongReplayInsteadPlayPreviousTimeInSec
+        return backendAudioPlayer.elapsedTime >= replayInsteadPlayPreviousTimeInSec
     }
 
-    private func replayCurrenSong() {
-        os_log(.debug, "Replay song")
+    private func replayCurrentItem() {
+        os_log(.debug, "Replay")
         seek(toSecond: 0)
         play()
     }
@@ -120,65 +120,65 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         backendAudioPlayer.seek(toSecond: toSecond)
     }
     
-    func addToPlaylist(song: Song) {
-        coreData.addToPlaylist(song: song)
+    func addToPlaylist(playable: AbstractPlayable) {
+        coreData.addToPlaylist(playable: playable)
     }
     
-    func addToPlaylist(songs: [Song]) {
-        coreData.addToPlaylist(songs: songs)
+    func addToPlaylist(playables: [AbstractPlayable]) {
+        coreData.addToPlaylist(playables: playables)
     }
     
-    func movePlaylistSong(fromIndex: Int, to: Int) {
-        coreData.movePlaylistSong(fromIndex: fromIndex, to: to)
+    func movePlaylistItem(fromIndex: Int, to: Int) {
+        coreData.movePlaylistItem(fromIndex: fromIndex, to: to)
     }
     
     func removeFromPlaylist(at index: Int) {
-        guard index < playlist.songs.count else { return }
-        if playlist.songs.count <= 1 {
+        guard index < playlist.playables.count else { return }
+        if playlist.playables.count <= 1 {
             stop()
-        } else if index == coreData.currentSongIndex {
+        } else if index == coreData.currentIndex {
             playNext()
         }
-        coreData.removeSongFromPlaylist(at: index)
+        coreData.removeItemFromPlaylist(at: index)
     }
     
-    private func prepareSongAndInsertToPlayer(playlistIndex: Int, reactionToError: FetchErrorReaction) {
-        guard playlistIndex < playlist.songs.count else { return }
+    private func prepareItemAndInsertIntoPlayer(playlistIndex: Int, reactionToError: FetchErrorReaction) {
+        guard playlistIndex < playlist.playables.count else { return }
         let playlistItem = playlist.items[playlistIndex]
-        userStatistics.playedSong(repeatMode: repeatMode, isShuffle: isShuffle)
+        userStatistics.playedItem(repeatMode: repeatMode, isShuffle: isShuffle)
         backendAudioPlayer.requestToPlay(playlistItem: playlistItem, reactionToError: reactionToError)
-        coreData.currentSongIndex = playlistIndex
-        preDownloadNextSongs(playlistIndex: playlistIndex)
+        coreData.currentIndex = playlistIndex
+        preDownloadNextItems(playlistIndex: playlistIndex)
     }
     
-    private func preDownloadNextSongs(playlistIndex: Int) {
-        guard coreData.isAutoCachePlayedSong else { return }
-        var nextSongsCount = (playlist.songs.count-1) - playlistIndex
-        if nextSongsCount > Self.preDownloadCount {
-            nextSongsCount = Self.preDownloadCount
+    private func preDownloadNextItems(playlistIndex: Int) {
+        guard coreData.isAutoCachePlayedItems else { return }
+        var upcomingItemsCount = (playlist.playables.count-1) - playlistIndex
+        if upcomingItemsCount > Self.preDownloadCount {
+            upcomingItemsCount = Self.preDownloadCount
         }
-        if nextSongsCount > 0 {
-            for i in 1...nextSongsCount {
-                let nextSongIndex = playlistIndex + i
-                if let song = playlist.items[nextSongIndex].song, !song.isCached {
-                    songDownloadManager.download(object: song, notifier: nil, priority: .high)
+        if upcomingItemsCount > 0 {
+            for i in 1...upcomingItemsCount {
+                let nextItemIndex = playlistIndex + i
+                if let playable = playlist.items[nextItemIndex].playable, !playable.isCached {
+                    playableDownloadManager.download(object: playable, notifier: nil, priority: .high)
                 }
             }
         }
     }
     
-    func notifySongPreparationFinished() {
+    func notifyItemPreparationFinished() {
         if let curPlaylistItem = backendAudioPlayer.currentlyPlaying {
-            notifySongStartedPlaying(playlistItem: curPlaylistItem)
-            if let song = curPlaylistItem.song {
-                updateNowPlayingInfo(song: song)
+            notifyItemStartedPlaying(playlistItem: curPlaylistItem)
+            if let playable = curPlaylistItem.playable {
+                updateNowPlayingInfo(playable: playable)
             }
         }
     }
     
-    func didSongFinishedPlaying() {
+    func didItemFinishedPlaying() {
         if repeatMode == .single {
-            replayCurrenSong()
+            replayCurrentItem()
         } else {
             playNext()
         }
@@ -186,74 +186,74 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     func play() {
         if !backendAudioPlayer.canBeContinued {
-            play(songInPlaylistAt: coreData.currentSongIndex)
+            play(elementInPlaylistAt: coreData.currentIndex)
         } else {
             backendAudioPlayer.continuePlay()
             if let curPlaylistItem = backendAudioPlayer.currentlyPlaying {
-                notifySongStartedPlaying(playlistItem: curPlaylistItem)
+                notifyItemStartedPlaying(playlistItem: curPlaylistItem)
             }
         }
     }
     
-    func play(song: Song) {
+    func play(playable: AbstractPlayable) {
         cleanPlaylist()
-        addToPlaylist(song: song)
-        play(songInPlaylistAt: coreData.currentSongIndex)
+        addToPlaylist(playable: playable)
+        play(elementInPlaylistAt: coreData.currentIndex)
     }
     
-    func play(songInPlaylistAt: Int, reactionToError: FetchErrorReaction = .playNext) {
-        if songInPlaylistAt >= 0, songInPlaylistAt <= playlist.songs.count {
-            prepareSongAndInsertToPlayer(playlistIndex: songInPlaylistAt, reactionToError: reactionToError)
+    func play(elementInPlaylistAt: Int, reactionToError: FetchErrorReaction = .playNext) {
+        if elementInPlaylistAt >= 0, elementInPlaylistAt <= playlist.playables.count {
+            prepareItemAndInsertIntoPlayer(playlistIndex: elementInPlaylistAt, reactionToError: reactionToError)
         } else {
             stop()
         }
     }
     
     func playPreviousOrReplay() {
-        if shouldCurrentSongReplayInsteadPlayPrevious() {
-            replayCurrenSong()
+        if shouldCurrentItemReplayedInsteadOfPrevious() {
+            replayCurrentItem()
         } else {
             playPrevious()
         }
     }
 
     func playPrevious() {
-        if let prevSongIndex = coreData.previousSongIndex {
-            play(songInPlaylistAt: prevSongIndex, reactionToError: .playPrevious) 
-        } else if repeatMode == .all, !playlist.songs.isEmpty {
-            play(songInPlaylistAt: playlist.lastSongIndex, reactionToError: .playPrevious)
-        } else if !playlist.songs.isEmpty {
-            play(songInPlaylistAt: 0, reactionToError: .playPrevious)
+        if let prevElementIndex = coreData.previousIndex {
+            play(elementInPlaylistAt: prevElementIndex, reactionToError: .playPrevious)
+        } else if repeatMode == .all, !playlist.playables.isEmpty {
+            play(elementInPlaylistAt: playlist.lastPlayableIndex, reactionToError: .playPrevious)
+        } else if !playlist.playables.isEmpty {
+            play(elementInPlaylistAt: 0, reactionToError: .playPrevious)
         } else {
             stop()
         }
     }
 
     func playPreviousCached() {
-        if let prevSongIndex = playlist.previousCachedSongIndex(downwardsFrom: coreData.currentSongIndex) {
-            play(songInPlaylistAt: prevSongIndex, reactionToError: .playPrevious)
-        } else if repeatMode == .all, let prevSongIndex = playlist.previousCachedSongIndex(beginningAt: playlist.lastSongIndex) {
-            play(songInPlaylistAt: prevSongIndex, reactionToError: .playPrevious)
+        if let prevItemIndex = playlist.previousCachedItemIndex(downwardsFrom: coreData.currentIndex) {
+            play(elementInPlaylistAt: prevItemIndex, reactionToError: .playPrevious)
+        } else if repeatMode == .all, let prevItemIndex = playlist.previousCachedItemIndex(beginningAt: playlist.lastPlayableIndex) {
+            play(elementInPlaylistAt: prevItemIndex, reactionToError: .playPrevious)
         } else {
             stop()
         }
     }
     
     func playNext() {
-        if let nextSongIndex = coreData.nextSongIndex {
-            play(songInPlaylistAt: nextSongIndex)
-        } else if repeatMode == .all, !playlist.songs.isEmpty {
-            play(songInPlaylistAt: 0)
+        if let nextItemIndex = coreData.nextIndex {
+            play(elementInPlaylistAt: nextItemIndex)
+        } else if repeatMode == .all, !playlist.playables.isEmpty {
+            play(elementInPlaylistAt: 0)
         } else {
             stop()
         }
     }
     
     func playNextCached() {
-        if let nextSongIndex = playlist.nextCachedSongIndex(upwardsFrom: coreData.currentSongIndex) {
-            play(songInPlaylistAt: nextSongIndex)
-        } else if repeatMode == .all, let nextSongIndex = playlist.nextCachedSongIndex(beginningAt: 0) {
-            play(songInPlaylistAt: nextSongIndex)
+        if let nextItemIndex = playlist.nextCachedItemIndex(upwardsFrom: coreData.currentIndex) {
+            play(elementInPlaylistAt: nextItemIndex)
+        } else if repeatMode == .all, let nextItemIndex = playlist.nextCachedItemIndex(beginningAt: 0) {
+            play(elementInPlaylistAt: nextItemIndex)
         } else {
             stop()
         }
@@ -261,16 +261,16 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     func pause() {
         backendAudioPlayer.pause()
-        notifySongPaused()
-        if let song = coreData.currentSong {
-            updateNowPlayingInfo(song: song)
+        notifyItemPaused()
+        if let playable = coreData.currentItem {
+            updateNowPlayingInfo(playable: playable)
         }
     }
     
     func stop() {
         let stoppedPlaylistItem = currentlyPlaying
         backendAudioPlayer.stop()
-        coreData.currentSongIndex = 0
+        coreData.currentIndex = 0
         notifyPlayerStopped(playlistItem: stoppedPlaylistItem)
     }
     
@@ -284,7 +284,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     func cleanPlaylist() {
         stop()
-        coreData.removeAllSongs()
+        coreData.removeAllItems()
     }
     
     func addNotifier(notifier: MusicPlayable) {
@@ -295,13 +295,13 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         notifierList.removeAll()
     }
     
-    func notifySongStartedPlaying(playlistItem: PlaylistItem) {
+    func notifyItemStartedPlaying(playlistItem: PlaylistItem) {
         for notifier in notifierList {
             notifier.didStartPlaying(playlistItem: playlistItem)
         }
     }
     
-    func notifySongPaused() {
+    func notifyItemPaused() {
         for notifier in notifierList {
             notifier.didPause()
         }
@@ -329,15 +329,16 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         }
     }
 
-    func updateNowPlayingInfo(song: Song) {       
+    func updateNowPlayingInfo(playable: AbstractPlayable) {
+        let albumTitle = playable.asSong?.album?.name ?? ""
         nowPlayingInfoCenter?.nowPlayingInfo = [
-            MPMediaItemPropertyTitle: song.title,
-            MPMediaItemPropertyAlbumTitle: song.album?.name ?? "",
-            MPMediaItemPropertyArtist: song.creatorName,
+            MPMediaItemPropertyTitle: playable.title,
+            MPMediaItemPropertyAlbumTitle: albumTitle,
+            MPMediaItemPropertyArtist: playable.creatorName,
             MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
-            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: song.image.size, requestHandler: { (size) -> UIImage in
-                return song.image
+            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: playable.image.size, requestHandler: { (size) -> UIImage in
+                return playable.image
             })
         ]
     }

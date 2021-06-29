@@ -33,13 +33,13 @@ class MOCK_AVPlayer: AVPlayer {
 class MOCK_SongDownloader: DownloadManageable {
     
     var downloadCount = 0
-    var songArg = [Song]()
+    var songArg = [AbstractPlayable]()
     var notifierArg = [DownloadNotifiable?]()
     var priorityArg = [Priority]()
     
     func download(object: Downloadable, notifier: DownloadNotifiable?, priority: Priority) {
         downloadCount += 1
-        songArg.append(object as! Song)
+        songArg.append(object as! AbstractPlayable)
         notifierArg.append(notifier)
         priorityArg.append(priority)
     }
@@ -109,15 +109,14 @@ class MOCK_BackendApi: BackendApi {
     func authenticate(credentials: LoginCredentials) {}
     func isAuthenticated() -> Bool { return false }
     func isAuthenticationValid(credentials: LoginCredentials) -> Bool { return false }
-    func generateUrl(forDownloadingSong song: Song) -> URL? { return nil }
-    func generateUrl(forStreamingSong song: Song) -> URL? { return nil }
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL? { return nil }
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL? { return nil }
     func generateUrl(forArtwork artwork: Artwork) -> URL? { return nil }
     func checkForErrorResponse(inData data: Data) -> ResponseError? { return nil }
     func createLibrarySyncer() -> LibrarySyncer { return MOCK_LibrarySyncer() }
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { return nil }
 }
-
 
 class MusicPlayerTest: XCTestCase {
     
@@ -146,9 +145,9 @@ class MusicPlayerTest: XCTestCase {
         eventLogger = EventLogger(alertDisplayer: mockAlertDisplayer, persistentContainer: cdHelper.persistentContainer)
         userStatistics = library.getUserStatistics(appVersion: "")
         backendApi = MOCK_BackendApi()
-        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, songDownloader: songDownloader, songCache: library, userStatistics: userStatistics)
+        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)
         playerData = library.getPlayerData()
-        testPlayer = MusicPlayer(coreData: playerData, songDownloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
+        testPlayer = MusicPlayer(coreData: playerData, playableDownloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
         
         guard let songCachedFetched = library.getSong(id: "36") else { XCTFail(); return }
         songCached = songCachedFetched
@@ -162,15 +161,15 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func prepareWithCachedPlaylist() {
-        for song in playlistThreeCached.songs {
-            testPlayer.addToPlaylist(song: song)
+        for song in playlistThreeCached.playables {
+            testPlayer.addToPlaylist(playable: song)
         }
     }
     
-    func markAsCached(song: Song) {
-        let songFile = library.createSongFile()
-        songFile.info = song
-        songFile.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
+    func markAsCached(playable: AbstractPlayable) {
+        let playableFile = library.createPlayableFile()
+        playableFile.info = playable
+        playableFile.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
     }
     
     func testCreation() {
@@ -191,66 +190,66 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testPlay_OneCachedSongInPlayer_IsPlayingTrue() {
-        testPlayer.addToPlaylist(song: songCached)
+        testPlayer.addToPlaylist(playable: songCached)
         testPlayer.play()
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.song, songCached)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.playable, songCached)
     }
     
     func testPlay_OneCachedSongInPlayer_NoDownloadRequest() {
-        testPlayer.addToPlaylist(song: songCached)
+        testPlayer.addToPlaylist(playable: songCached)
         testPlayer.play()
         XCTAssertTrue(songDownloader.isNoDownloadRequested())
     }
     
     func testPlay_OneSongToDownload_IsPlayingTrue_AfterSuccessfulDownload() {
-        testPlayer.addToPlaylist(song: songToDownload)
+        testPlayer.addToPlaylist(playable: songToDownload)
         testPlayer.play()
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.song, songToDownload)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.playable, songToDownload)
     }
     
     func testPlay_OneSongToDownload_CheckDownloadRequest() {
-        testPlayer.addToPlaylist(song: songToDownload)
+        testPlayer.addToPlaylist(playable: songToDownload)
         testPlayer.play()
         XCTAssertEqual(songDownloader.downloadCount, 1)
         XCTAssertEqual(songDownloader.songArg.first, songToDownload)
     }
     
     func testPlaySong_Cached() {
-        testPlayer.play(song: songCached)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.song, songCached)
+        testPlayer.play(playable: songCached)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.playable, songCached)
     }
     
     func testPlaySong_CheckPlaylistClear() {
         prepareWithCachedPlaylist()
-        testPlayer.play(song: songCached)
-        XCTAssertEqual(testPlayer.playlist.songs.count, 1)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.song, songCached)
+        testPlayer.play(playable: songCached)
+        XCTAssertEqual(testPlayer.playlist.playables.count, 1)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.playable, songCached)
     }
     
     func testPlaySongInPlaylistAt_EmptyPlaylist() {
-        testPlayer.play(songInPlaylistAt: 0)
+        testPlayer.play(elementInPlaylistAt: 0)
         XCTAssertFalse(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying, nil)
-        testPlayer.play(songInPlaylistAt: 5)
+        testPlayer.play(elementInPlaylistAt: 5)
         XCTAssertFalse(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying, nil)
-        testPlayer.play(songInPlaylistAt: -1)
+        testPlayer.play(elementInPlaylistAt: -1)
         XCTAssertFalse(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying, nil)
     }
     
     func testPlaySongInPlaylistAt_Cached_FullPlaylist() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 3)
     }
     
     func testPlaySongInPlaylistAt_FetchSuccess_FullPlaylist() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 2)
+        testPlayer.play(elementInPlaylistAt: 2)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
     }
@@ -262,21 +261,21 @@ class MusicPlayerTest: XCTestCase {
     }
 
     func testPause_CurrentlyPlaying() {
-        testPlayer.addToPlaylist(song: songCached)
+        testPlayer.addToPlaylist(playable: songCached)
         testPlayer.play()
         testPlayer.pause()
         XCTAssertFalse(testPlayer.isPlaying)
     }
     
     func testPause_CurrentlyPaused() {
-        testPlayer.addToPlaylist(song: songCached)
+        testPlayer.addToPlaylist(playable: songCached)
         testPlayer.pause()
         XCTAssertFalse(testPlayer.isPlaying)
     }
     
     func testPause_SongInMiddleOfPlaylist() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 3)
         testPlayer.pause()
@@ -288,27 +287,27 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testAddToPlaylist() {
-        XCTAssertEqual(testPlayer.playlist.songs.count, 0)
-        testPlayer.addToPlaylist(song: songCached)
-        XCTAssertEqual(testPlayer.playlist.songs.count, 1)
-        testPlayer.addToPlaylist(song: songToDownload)
-        XCTAssertEqual(testPlayer.playlist.songs.count, 2)
-        testPlayer.addToPlaylist(song: songCached)
-        XCTAssertEqual(testPlayer.playlist.songs.count, 3)
-        testPlayer.addToPlaylist(song: songToDownload)
-        XCTAssertEqual(testPlayer.playlist.songs.count, 4)
+        XCTAssertEqual(testPlayer.playlist.playables.count, 0)
+        testPlayer.addToPlaylist(playable: songCached)
+        XCTAssertEqual(testPlayer.playlist.playables.count, 1)
+        testPlayer.addToPlaylist(playable: songToDownload)
+        XCTAssertEqual(testPlayer.playlist.playables.count, 2)
+        testPlayer.addToPlaylist(playable: songCached)
+        XCTAssertEqual(testPlayer.playlist.playables.count, 3)
+        testPlayer.addToPlaylist(playable: songToDownload)
+        XCTAssertEqual(testPlayer.playlist.playables.count, 4)
     }
   
     func testPlaylistClear_EmptyPlaylist() {
         testPlayer.cleanPlaylist()
-        XCTAssertEqual(testPlayer.playlist.songs.count, 0)
+        XCTAssertEqual(testPlayer.playlist.playables.count, 0)
         XCTAssertEqual(testPlayer.currentlyPlaying, nil)
     }
     
     func testPlaylistClear_FilledPlaylist() {
         prepareWithCachedPlaylist()
         testPlayer.cleanPlaylist()
-        XCTAssertEqual(testPlayer.playlist.songs.count, 0)
+        XCTAssertEqual(testPlayer.playlist.playables.count, 0)
         XCTAssertEqual(testPlayer.currentlyPlaying, nil)
     }
     
@@ -318,7 +317,7 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testSeek_FilledPlaylist() {
-        testPlayer.play(song: songCached)
+        testPlayer.play(playable: songCached)
         testPlayer.seek(toSecond: 3.0)
         mockAVPlayer.useMockCurrentItem = true
         XCTAssertEqual(testPlayer.elapsedTime, 3.0)
@@ -332,7 +331,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayPreviousOrReplay_Previous() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         testPlayer.playPreviousOrReplay()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
         XCTAssertEqual(testPlayer.elapsedTime, 0.0)
@@ -340,7 +339,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayPreviousOrReplay_Replay() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         testPlayer.seek(toSecond: 10.0)
         mockAVPlayer.useMockCurrentItem = true
         testPlayer.playPreviousOrReplay()
@@ -356,7 +355,7 @@ class MusicPlayerTest: XCTestCase {
 
     func testPlayPrevious_Normal() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         testPlayer.playPrevious()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 2)
         testPlayer.playPrevious()
@@ -365,7 +364,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayPrevious_AtStart() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 0)
+        testPlayer.play(elementInPlaylistAt: 0)
         testPlayer.playPrevious()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 0)
         testPlayer.playPrevious()
@@ -375,14 +374,14 @@ class MusicPlayerTest: XCTestCase {
     func testPlayPrevious_RepeatAll() {
         prepareWithCachedPlaylist()
         testPlayer.repeatMode = .all
-        testPlayer.play(songInPlaylistAt: 1)
+        testPlayer.play(elementInPlaylistAt: 1)
         testPlayer.playPrevious()
         testPlayer.playPrevious()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 8)
     }
     
     func testPlayPrevious_RepeatAll_OnlyOneSong() {
-        testPlayer.play(song: songCached)
+        testPlayer.play(playable: songCached)
         testPlayer.repeatMode = .all
         testPlayer.playPrevious()
         testPlayer.playPrevious()
@@ -391,7 +390,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayPrevious_StartPlayIfPaused() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         testPlayer.pause()
         testPlayer.playPrevious()
         XCTAssertTrue(testPlayer.isPlaying)
@@ -399,7 +398,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayPrevious_IsPlayingStaysTrue() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         testPlayer.playPrevious()
         XCTAssertTrue(testPlayer.isPlaying)
     }
@@ -411,7 +410,7 @@ class MusicPlayerTest: XCTestCase {
 
     func testPlayPreviousCached_Normal_FromCached() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 6)
+        testPlayer.play(elementInPlaylistAt: 6)
         testPlayer.playPreviousCached()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 3)
         testPlayer.playPreviousCached()
@@ -420,14 +419,14 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayPreviousCached_Normal_FromDownload() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 8)
+        testPlayer.play(elementInPlaylistAt: 8)
         testPlayer.playPreviousCached()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 6)
     }
     
     func testPlayPreviousCached_AtStart() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 0)
+        testPlayer.play(elementInPlaylistAt: 0)
         testPlayer.playPreviousCached()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 0)
         testPlayer.playPreviousCached()
@@ -437,14 +436,14 @@ class MusicPlayerTest: XCTestCase {
     func testPlayPreviousCached_RepeatAll() {
         prepareWithCachedPlaylist()
         testPlayer.repeatMode = .all
-        testPlayer.play(songInPlaylistAt: 1)
+        testPlayer.play(elementInPlaylistAt: 1)
         testPlayer.playPreviousCached()
         testPlayer.playPreviousCached()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 6)
     }
     
     func testPlayPreviousCached_RepeatAll_OnlyOneSong() {
-        testPlayer.play(song: songCached)
+        testPlayer.play(playable: songCached)
         testPlayer.repeatMode = .all
         testPlayer.playPreviousCached()
         testPlayer.playPreviousCached()
@@ -453,7 +452,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayPreviousCached_StartPlayIfPaused() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 6)
+        testPlayer.play(elementInPlaylistAt: 6)
         testPlayer.pause()
         testPlayer.playPreviousCached()
         XCTAssertTrue(testPlayer.isPlaying)
@@ -461,7 +460,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayPreviousCached_IsPlayingStaysTrue() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 6)
+        testPlayer.play(elementInPlaylistAt: 6)
         testPlayer.playPreviousCached()
         XCTAssertTrue(testPlayer.isPlaying)
     }
@@ -473,7 +472,7 @@ class MusicPlayerTest: XCTestCase {
 
     func testPlayNext_Normal() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         testPlayer.playNext()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 4)
         testPlayer.playNext()
@@ -482,7 +481,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayNext_AtStart() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 0)
+        testPlayer.play(elementInPlaylistAt: 0)
         testPlayer.playNext()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 1)
         testPlayer.playNext()
@@ -492,14 +491,14 @@ class MusicPlayerTest: XCTestCase {
     func testPlayNext_RepeatAll() {
         prepareWithCachedPlaylist()
         testPlayer.repeatMode = .all
-        testPlayer.play(songInPlaylistAt: 8)
+        testPlayer.play(elementInPlaylistAt: 8)
         testPlayer.playNext()
         testPlayer.playNext()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 1)
     }
     
     func testPlayNext_RepeatAll_OnlyOneSong() {
-        testPlayer.play(song: songCached)
+        testPlayer.play(playable: songCached)
         testPlayer.repeatMode = .all
         testPlayer.playNext()
         testPlayer.playNext()
@@ -508,7 +507,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayNext_StartPlayIfPaused() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         testPlayer.pause()
         testPlayer.playNext()
         XCTAssertTrue(testPlayer.isPlaying)
@@ -516,7 +515,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayNext_IsPlayingStaysTrue() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         testPlayer.playNext()
         XCTAssertTrue(testPlayer.isPlaying)
     }
@@ -528,7 +527,7 @@ class MusicPlayerTest: XCTestCase {
 
     func testPlayNextCached_Normal_FromCached() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 3)
+        testPlayer.play(elementInPlaylistAt: 3)
         testPlayer.playNextCached()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 6)
         testPlayer.playNextCached()
@@ -537,14 +536,14 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayNextCached_Normal_FromDownload() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 4)
+        testPlayer.play(elementInPlaylistAt: 4)
         testPlayer.playNextCached()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 6)
     }
     
     func testPlayNextCached_AtStart() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 8)
+        testPlayer.play(elementInPlaylistAt: 8)
         testPlayer.playNextCached()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 0)
         testPlayer.playNextCached()
@@ -554,14 +553,14 @@ class MusicPlayerTest: XCTestCase {
     func testPlayNextCached_RepeatAll() {
         prepareWithCachedPlaylist()
         testPlayer.repeatMode = .all
-        testPlayer.play(songInPlaylistAt: 1)
+        testPlayer.play(elementInPlaylistAt: 1)
         testPlayer.playNextCached()
         testPlayer.playNextCached()
         XCTAssertEqual(testPlayer.currentlyPlaying?.index, 6)
     }
     
     func testPlayNextCached_RepeatAll_OnlyOneSong() {
-        testPlayer.play(song: songCached)
+        testPlayer.play(playable: songCached)
         testPlayer.repeatMode = .all
         testPlayer.playNextCached()
         testPlayer.playNextCached()
@@ -570,7 +569,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayNextCached_StartPlayIfPaused() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 6)
+        testPlayer.play(elementInPlaylistAt: 6)
         testPlayer.pause()
         testPlayer.playNextCached()
         XCTAssertTrue(testPlayer.isPlaying)
@@ -578,7 +577,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayNextCached_IsPlayingStaysTrue() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 6)
+        testPlayer.play(elementInPlaylistAt: 6)
         testPlayer.playNextCached()
         XCTAssertTrue(testPlayer.isPlaying)
     }
@@ -591,7 +590,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testStop_Playing() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 6)
+        testPlayer.play(elementInPlaylistAt: 6)
         testPlayer.stop()
         XCTAssertFalse(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying?.order, 0)
@@ -599,7 +598,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testStop_AlreadyStopped() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 6)
+        testPlayer.play(elementInPlaylistAt: 6)
         testPlayer.stop()
         testPlayer.stop()
         XCTAssertFalse(testPlayer.isPlaying)
@@ -617,7 +616,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testTogglePlay_AfterPlay() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 6)
+        testPlayer.play(elementInPlaylistAt: 6)
         testPlayer.togglePlay()
         XCTAssertFalse(testPlayer.isPlaying)
         testPlayer.togglePlay()
@@ -630,7 +629,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testRemoveFromPlaylist_RemoveNotCurrentSong() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 4)
+        testPlayer.play(elementInPlaylistAt: 4)
         testPlayer.removeFromPlaylist(at: 2)
         XCTAssertEqual(testPlayer.currentlyPlaying?.order, 3)
         testPlayer.removeFromPlaylist(at: 6)
@@ -643,16 +642,16 @@ class MusicPlayerTest: XCTestCase {
     
     func testRemoveFromPlaylist_RemoveCurrentSong() {
         prepareWithCachedPlaylist()
-        testPlayer.play(songInPlaylistAt: 4)
-        let nextSong1 = testPlayer.playlist.songs[5]
+        testPlayer.play(elementInPlaylistAt: 4)
+        let nextSong1 = testPlayer.playlist.playables[5]
         testPlayer.removeFromPlaylist(at: 4)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.song, nextSong1)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.playable, nextSong1)
         XCTAssertEqual(testPlayer.currentlyPlaying?.order, 4)
         
-        testPlayer.play(songInPlaylistAt: 1)
-        let nextSong2 = testPlayer.playlist.songs[2]
+        testPlayer.play(elementInPlaylistAt: 1)
+        let nextSong2 = testPlayer.playlist.playables[2]
         testPlayer.removeFromPlaylist(at: 1)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.song, nextSong2)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.playable, nextSong2)
         XCTAssertEqual(testPlayer.currentlyPlaying?.order, 1)
     }
     

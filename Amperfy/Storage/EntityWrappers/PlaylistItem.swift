@@ -29,11 +29,11 @@ public class PlaylistItem: NSObject {
             managedObject.order = Int32(newValue)
         }
      }
-    var song: Song? {
+    var playable: AbstractPlayable? {
         get {
-            guard let songMO = managedObject.song else { return nil }
-            return Song(managedObject: songMO) }
-        set { managedObject.song = newValue?.managedObject }
+            guard let playableMO = managedObject.playable else { return nil }
+            return AbstractPlayable(managedObject: playableMO) }
+        set { managedObject.playable = newValue?.playableManagedObject }
     }
     var playlist: Playlist? {
         get {

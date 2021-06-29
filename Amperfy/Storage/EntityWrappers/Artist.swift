@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Artist: AbstractLibraryEntity, SongContainable {
+public class Artist: AbstractLibraryEntity, PlayableContainable {
     
     let managedObject: ArtistMO
     
@@ -15,7 +15,7 @@ public class Artist: AbstractLibraryEntity, SongContainable {
         return name
     }
     
-    var songs: [Song] {
+    var songs: [AbstractPlayable] {
         guard let songsSet = managedObject.songs, let songsMO = songsSet.array as? [SongMO] else { return [Song]() }
         var returnSongs = [Song]()
         for songMO in songsMO {
@@ -23,9 +23,7 @@ public class Artist: AbstractLibraryEntity, SongContainable {
         }
         return returnSongs
     }
-    var hasCachedSongs: Bool {
-        return songs.hasCachedSongs
-    }
+    var playables: [AbstractPlayable] { return songs }
     
     var name: String {
         get { return managedObject.name ?? "Unknown Artist" }
