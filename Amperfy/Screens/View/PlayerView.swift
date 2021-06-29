@@ -39,10 +39,14 @@ class PlayerView: UIView {
     private var displayStyle: PlayerDisplayStyle!
     
     @IBOutlet weak var titleCompactLabel: MarqueeLabel!
+    @IBOutlet weak var titleCompactButton: UIButton!
     @IBOutlet weak var titleLargeLabel: MarqueeLabel!
+    @IBOutlet weak var titleLargeButton: UIButton!
     
     @IBOutlet weak var artistNameCompactLabel: MarqueeLabel!
+    @IBOutlet weak var artistNameCompactButton: UIButton!
     @IBOutlet weak var artistNameLargeLabel: MarqueeLabel!
+    @IBOutlet weak var artistNameLargeButton: UIButton!
     
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var repeatButton: UIButton!
@@ -133,7 +137,61 @@ class PlayerView: UIView {
         refreshDisplayPlaylistButton()
         renderAnimation()
     }
-        
+    
+    @IBAction func titleCompactPressed(_ sender: Any) {
+        displayAlbumDetail()
+        displayPodcastDetail()
+    }
+    @IBAction func titleLargePressed(_ sender: Any) {
+        displayAlbumDetail()
+        displayPodcastDetail()
+    }
+    @IBAction func artistNameCompactPressed(_ sender: Any) {
+        displayArtistDetail()
+        displayPodcastDetail()
+    }
+    @IBAction func artistNameLargePressed(_ sender: Any) {
+        displayArtistDetail()
+        displayPodcastDetail()
+    }
+    
+    private func displayArtistDetail() {
+        if let song = lastDisplayedPlayable?.asSong, let artist = song.artist {
+            let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
+            artistDetailVC.artist = artist
+            self.closePopupPlayerAndDisplayInLibraryTab(view: artistDetailVC)
+        }
+    }
+    
+    private func displayAlbumDetail() {
+        if let song = lastDisplayedPlayable?.asSong, let album = song.album {
+            let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
+            albumDetailVC.album = album
+            self.closePopupPlayerAndDisplayInLibraryTab(view: albumDetailVC)
+        }
+    }
+    
+    private func displayPodcastDetail() {
+        if let podcastEpisode = lastDisplayedPlayable?.asPodcastEpisode, let podcast = podcastEpisode.podcast {
+            let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
+            podcastDetailVC.podcast = podcast
+            self.closePopupPlayerAndDisplayInLibraryTab(view: podcastDetailVC)
+        }
+    }
+    
+    private func closePopupPlayerAndDisplayInLibraryTab(view: UIViewController) {
+        if let popupPlayerVC = rootView, let hostingTabBarVC = popupPlayerVC.hostingTabBarVC {
+            hostingTabBarVC.closePopup(animated: true, completion: { () in
+                if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
+                   hostingTabViewControllers.count > 0,
+                   let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
+                    libraryTabNavVC.pushViewController(view, animated: false)
+                    hostingTabBarVC.selectedIndex = 0
+                }
+            })
+        }
+    }
+    
     private func renderAnimation(animationDuration: TimeInterval = defaultAnimationDuration) {
         if displayStyle == .compact {
             rootView?.scrollToNextPlayingRow()
@@ -172,9 +230,13 @@ class PlayerView: UIView {
     
         UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut, animations: ({
             self.titleCompactLabel.alpha = 1
+            self.titleCompactButton.isHidden = false
             self.titleLargeLabel.alpha = 0
+            self.titleLargeButton.isHidden = true
             self.artistNameCompactLabel.alpha = 1
+            self.artistNameCompactButton.isHidden = false
             self.artistNameLargeLabel.alpha = 0
+            self.artistNameLargeButton.isHidden = true
         }), completion: nil)
         
         rootView.renderAnimationForCompactPlayer(ofHight: PlayerView.frameHeightCompact, animationDuration: animationDuration)
@@ -234,9 +296,13 @@ class PlayerView: UIView {
 
         UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseIn, animations: ({
             self.titleCompactLabel.alpha = 0
+            self.titleCompactButton.isHidden = true
             self.titleLargeLabel.alpha = 1
+            self.titleLargeButton.isHidden = false
             self.artistNameCompactLabel.alpha = 0
+            self.artistNameCompactButton.isHidden = true
             self.artistNameLargeLabel.alpha = 1
+            self.artistNameLargeButton.isHidden = false
         }), completion: nil)
         
         rootView.renderAnimationForLargePlayer(animationDuration: animationDuration)
