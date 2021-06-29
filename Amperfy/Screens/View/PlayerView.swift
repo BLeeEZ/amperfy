@@ -110,7 +110,16 @@ class PlayerView: UIView {
             player.seek(toSecond: Double(timeSliderValue))
         }
     }
-
+    
+    @IBAction func timeSliderIsChanging(_ sender: Any) {
+        if let timeSliderValue = timeSlider?.value {
+            let elapsedClockTime = ClockTime(timeInSeconds: Int(timeSliderValue))
+            elapsedTimeLabel.text = elapsedClockTime.asShortString()
+            let remainingTime = ClockTime(timeInSeconds: Int(Double(timeSliderValue) - ceil(player.duration)))
+            remainingTimeLabel.text = remainingTime.asShortString()
+        }
+    }
+    
     @IBAction func airplayButtonPushed(_ sender: Any) {
         appDelegate.userStatistics.usedAction(.airplay)
         let rect = CGRect(x: -100, y: 0, width: 0, height: 0)
@@ -400,13 +409,13 @@ class PlayerView: UIView {
 
     func refreshTimeInfo() {
         if player.currentlyPlaying != nil {
-            let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
-            elapsedTimeLabel.text = elapsedClockTime.asShortString()
-            let remainingTime = ClockTime(timeInSeconds: Int(player.elapsedTime - ceil(player.duration)))
-            remainingTimeLabel.text = remainingTime.asShortString()
             timeSlider.minimumValue = 0.0
             timeSlider.maximumValue = Float(player.duration)
-            if !timeSlider.isTouchInside {
+            if !timeSlider.isTracking {
+                let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
+                elapsedTimeLabel.text = elapsedClockTime.asShortString()
+                let remainingTime = ClockTime(timeInSeconds: Int(player.elapsedTime - ceil(player.duration)))
+                remainingTimeLabel.text = remainingTime.asShortString()
                 timeSlider.value = Float(player.elapsedTime)
             }
             rootView?.popupItem.progress = Float(player.elapsedTime / player.duration)

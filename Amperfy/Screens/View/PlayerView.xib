@@ -58,6 +58,8 @@
                     </constraints>
                     <connections>
                         <action selector="timeSliderChanged:" destination="iN0-l3-epB" eventType="valueChanged" id="adh-M6-kZp"/>
+                        <action selector="timeSliderIsChanging:" destination="iN0-l3-epB" eventType="touchDragOutside" id="azr-FZ-dLl"/>
+                        <action selector="timeSliderIsChanging:" destination="iN0-l3-epB" eventType="touchDragInside" id="nz0-Yy-zFt"/>
                     </connections>
                 </slider>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0:15" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="okd-ac-nGY" userLabel="Elapsed time">
