@@ -6,10 +6,14 @@ import os.log
 class SsPlaylistParserDelegate: SsXmlParser {
     
     private var playlist: Playlist?
+    private let oldPlaylists: Set<Playlist>
+    private var parsedPlaylists: Set<Playlist>
     private let library: LibraryStorage
     
     init(library: LibraryStorage) {
         self.library = library
+        oldPlaylists = Set(library.getPlaylists())
+        parsedPlaylists = Set<Playlist>()
         super.init()
     }
 
@@ -48,7 +52,17 @@ class SsPlaylistParserDelegate: SsXmlParser {
         switch(elementName) {
         case "playlist":
             parsedCount += 1
+            if let parsedPlaylist = playlist {
+                parsedPlaylists.insert(parsedPlaylist)
+            }
             playlist = nil
+        case "playlists":
+            let outdatedPlaylists = oldPlaylists.subtracting(parsedPlaylists)
+            outdatedPlaylists.forEach{
+                if $0.id != "" {
+                    library.deletePlaylist($0)
+                }
+            }
         default:
             break
         }

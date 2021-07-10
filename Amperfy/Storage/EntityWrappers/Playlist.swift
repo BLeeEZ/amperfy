@@ -2,9 +2,12 @@ import Foundation
 import CoreData
 import os.log
 
-public class Playlist: NSObject, PlayableContainable, Identifyable {
+public class Playlist: PlayableContainable, Identifyable {
     
     static let smartPlaylistIdPrefix = "smart_"
+    static var typeName: String {
+        return String(describing: Self.self)
+    }
     
     let managedObject: PlaylistMO
     private let library: LibraryStorage
@@ -265,12 +268,17 @@ public class Playlist: NSObject, PlayableContainable, Identifyable {
             library.saveContext()
         }
     }
-    
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? Playlist else { return false }
-        return managedObject == object.managedObject
+
+}
+
+extension Playlist: Hashable, Equatable {
+    public static func == (lhs: Playlist, rhs: Playlist) -> Bool {
+        return lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(managedObject)
+    }
 }
 
 extension Array where Element: Playlist {

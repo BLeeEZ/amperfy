@@ -13,6 +13,16 @@ class PodcastsParserTest: AbstractAmpacheTest {
         parserDelegate = PodcastParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
     }
     
+    func testLibraryContainsBeforeMorePodcastsThenAfter() {
+        for i in 10...20 {
+            let podcast = library.createPodcast()
+            podcast.id = i.description
+            podcast.title = i.description
+        }
+        recreateParserDelegate()
+        testParsing()
+    }
+    
     override func checkCorrectParsing() {
         let podcasts = library.getPodcasts()
         XCTAssertEqual(podcasts.count, 3)

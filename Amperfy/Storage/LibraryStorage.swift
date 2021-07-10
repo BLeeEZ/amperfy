@@ -131,6 +131,10 @@ class LibraryStorage: PlayableFileCachable {
         return Podcast(managedObject: podcastMO)
     }
     
+    func deletePodcast(_ podcast: Podcast) {
+        context.delete(podcast.managedObject)
+    }
+    
     func createPodcastEpisode() -> PodcastEpisode {
         let podcastEpisodeMO = PodcastEpisodeMO(context: context)
         return PodcastEpisode(managedObject: podcastEpisodeMO)
@@ -313,8 +317,8 @@ class LibraryStorage: PlayableFileCachable {
     
     func getPodcasts() -> [Podcast] {
         let fetchRequest = PodcastMO.identifierSortedFetchRequest
-        let foundAlbums = try? context.fetch(fetchRequest)
-        let podcasts = foundAlbums?.compactMap{ Podcast(managedObject: $0) }
+        let foundPodcasts = try? context.fetch(fetchRequest)
+        let podcasts = foundPodcasts?.compactMap{ Podcast(managedObject: $0) }
         return podcasts ?? [Podcast]()
     }
 

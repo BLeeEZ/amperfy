@@ -13,6 +13,16 @@ class PlaylistsParserTest: AbstractAmpacheTest {
         parserDelegate = PlaylistParserDelegate(library: library, parseNotifier: nil)
     }
     
+    func testLibraryContainsBeforeMorePlaylistsThenAfter() {
+        for i in 10...20 {
+            let playlist = library.createPlaylist()
+            playlist.id = i.description
+            playlist.name = i.description
+        }
+        recreateParserDelegate()
+        testParsing()
+    }
+    
     override func checkCorrectParsing() {
         let playlists = library.getPlaylists()
         XCTAssertEqual(playlists.count, 4)

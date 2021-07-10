@@ -5,11 +5,18 @@ import os.log
 
 class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
     
-    var playlist: Playlist?
-    var library: LibraryStorage
+    private var playlist: Playlist?
+    private var playlistToValidate: Playlist?
+    private let oldPlaylists: Set<Playlist>
+    private var parsedPlaylists: Set<Playlist>
+    private var library: LibraryStorage
     
-    init(library: LibraryStorage, parseNotifier: ParsedObjectNotifiable?) {
+    init(library: LibraryStorage, parseNotifier: ParsedObjectNotifiable?, playlistToValidate: Playlist? = nil) {
         self.library = library
+        self.playlist = playlistToValidate
+        self.playlistToValidate = playlistToValidate
+        oldPlaylists = Set(library.getPlaylists())
+        parsedPlaylists = Set<Playlist>()
         super.init(parseNotifier: parseNotifier)
     }
     
@@ -56,8 +63,20 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
         case "items":
             playlist?.songCount = Int(buffer) ?? 0
         case "playlist":
+            if let parsedPlaylist = playlist {
+                parsedPlaylists.insert(parsedPlaylist)
+            }
             playlist = nil
             parseNotifier?.notifyParsedObject(ofType: .playlist)
+        case "root":
+            if playlistToValidate == nil {
+                let outdatedPlaylists = oldPlaylists.subtracting(parsedPlaylists)
+                outdatedPlaylists.forEach{
+                    if $0.id != "" {
+                        library.deletePlaylist($0)
+                    }
+                }
+            }
         default:
             break
         }

@@ -9,6 +9,20 @@ class SsPodcastParserTest: AbstractSsParserTest {
         ssParserDelegate = SsPodcastParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
     }
     
+    override func recreateParserDelegate() {
+        ssParserDelegate = SsPodcastParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+    }
+    
+    func testLibraryContainsBeforeMorePodcastsThenAfter() {
+        for i in 10...20 {
+            let podcast = library.createPodcast()
+            podcast.id = i.description
+            podcast.title = i.description
+        }
+        recreateParserDelegate()
+        testParsing()
+    }
+    
     override func checkCorrectParsing() {
         let podcasts = library.getPodcasts().sorted(by: {Int($0.id)! < Int($1.id)!} )
         XCTAssertEqual(podcasts.count, 2)

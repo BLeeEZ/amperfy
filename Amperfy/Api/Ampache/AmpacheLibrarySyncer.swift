@@ -167,13 +167,11 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     private func validatePlaylistId(playlist: Playlist, library: LibraryStorage) {
-        let playlistParser = PlaylistParserDelegate(library: library, parseNotifier: nil)
-        playlistParser.playlist = playlist
+        let playlistParser = PlaylistParserDelegate(library: library, parseNotifier: nil, playlistToValidate: playlist)
         ampacheXmlServerApi.requestPlaylist(parserDelegate: playlistParser, id: playlist.id)
         if playlist.id == "" {
             os_log("Create playlist on server", log: log, type: .info)
-            let playlistParser = PlaylistParserDelegate(library: library, parseNotifier: nil)
-            playlistParser.playlist = playlist
+            let playlistParser = PlaylistParserDelegate(library: library, parseNotifier: nil, playlistToValidate: playlist)
             ampacheXmlServerApi.requestPlaylistCreate(parserDelegate: playlistParser, playlist: playlist)
         }
     }
