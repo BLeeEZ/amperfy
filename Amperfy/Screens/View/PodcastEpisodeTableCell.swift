@@ -5,10 +5,14 @@ class PodcastEpisodeTableCell: BasicTableCell {
     @IBOutlet weak var podcastEpisodeLabel: UILabel!
     @IBOutlet weak var podcastEpisodeImage: LibraryEntityImage!
     @IBOutlet weak var infoLabel: UILabel!
+    @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var playEpisodeButton: UIButton!
     @IBOutlet weak var optionsButton: UIButton!
+    @IBOutlet weak var playProgressBar: UIProgressView!
+    @IBOutlet weak var playProgressLabel: UILabel!
+    @IBOutlet weak var playProgressLabelPlayButtonDistance: NSLayoutConstraint!
     
-    static let rowHeight: CGFloat = 70.0 + margin.bottom + margin.top
+    static let rowHeight: CGFloat = 143.0 + margin.bottom + margin.top
     
     private var episode: PodcastEpisode!
     private var rootView: UIViewController?
@@ -32,12 +36,32 @@ class PodcastEpisodeTableCell: BasicTableCell {
             playEpisodeButton.setTitle(FontAwesomeIcon.Play.asString, for: .normal)
             playEpisodeButton.isEnabled = true
         }
+        infoLabel.text = "\(episode.publishDate.asShortDayMonthString)"
+        descriptionLabel.text = episode.depiction ?? ""
         
-        var infoText = ""
-        infoText += "\(episode.publishDate.asShortDayMonthString) \(CommonString.oneMiddleDot)"
-        infoText += " \(episode.userStatus.description) \(CommonString.oneMiddleDot)"
-        infoText += " \(episode.duration.asDurationString)"
-        infoLabel.text = infoText
+        let playDuration = episode.playDuration
+        let playProgress = episode.playProgress
+        var progressText = ""
+        if playDuration > 0, playProgress > 0 {
+            let remainingTime = playDuration - playProgress
+            progressText = "\(remainingTime.asDurationString) left"
+            playProgressBar.isHidden = false
+            playProgressLabelPlayButtonDistance.constant = (2 * 8.0) + playProgressBar.frame.width
+            playProgressBar.progress = Float(playProgress) / Float(playDuration)
+        } else {
+            progressText = "\(episode.duration.asDurationString)"
+            playProgressBar.isHidden = true
+            playProgressLabelPlayButtonDistance.constant = 8.0
+        }
+        if episode.userStatus == .syncingOnServer {
+            progressText += "\(CommonString.oneMiddleDot) \(episode.userStatus.description)"
+        }
+        playProgressLabel.text = progressText
+        if episode.isCached {
+            playProgressLabel.textColor = .defaultBlue
+        } else {
+            playProgressLabel.textColor = .secondaryLabelColor
+        }
     }
 
     @IBAction func playEpisodeButtonPressed(_ sender: Any) {

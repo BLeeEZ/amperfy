@@ -48,7 +48,7 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
         case "state":
             episodeBuffer?.remoteStatus = PodcastEpisodeRemoteStatus.create(from: buffer)
         case "filelength":
-            episodeBuffer?.duration = buffer.asDurationInSeconds ?? 0
+            episodeBuffer?.remoteDuration = buffer.asDurationInSeconds ?? 0
         case "filesize":
             episodeBuffer?.size = buffer.asByteCount ?? 0
         case "art":

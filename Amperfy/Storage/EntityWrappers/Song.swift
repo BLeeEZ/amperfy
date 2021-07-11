@@ -65,7 +65,7 @@ public class Song: AbstractPlayable, Identifyable {
         info += " id: \(id),"
         info += " track: \(track),"
         info += " year: \(year),"
-        info += " duration: \(duration),"
+        info += " remote duration: \(remoteDuration),"
         let diskInfo =  disk ?? "-"
         info += " disk: \(diskInfo),"
         info += " size: \(size),"

@@ -11,7 +11,7 @@ extension AbstractPlayableMO {
     @NSManaged public var bitrate: Int32
     @NSManaged public var contentType: String?
     @NSManaged public var disk: String?
-    @NSManaged public var duration: Int16
+    @NSManaged public var remoteDuration: Int16
     @NSManaged public var size: Int32
     @NSManaged public var title: String?
     @NSManaged public var track: Int16
@@ -19,6 +19,8 @@ extension AbstractPlayableMO {
     @NSManaged public var year: Int16
     @NSManaged public var file: PlayableFileMO?
     @NSManaged public var playlistItems: NSOrderedSet?
+    @NSManaged public var playDuration: Int16
+    @NSManaged public var playProgress: Int16
 
 }
 

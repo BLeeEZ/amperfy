@@ -23,7 +23,7 @@ class SsPlayableParserDelegate: SsXmlLibWithArtworkParser {
                 playableBuffer?.year = year
             }
             if let attributeDuration = attributeDict["duration"], let duration = Int(attributeDuration) {
-                playableBuffer?.duration = duration
+                playableBuffer?.remoteDuration = duration
             }
             if let attributeSize = attributeDict["size"], let size = Int(attributeSize) {
                 playableBuffer?.size = size

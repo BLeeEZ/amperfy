@@ -46,10 +46,29 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         }
     }
     var duration: Int {
-        get { return Int(playableManagedObject.duration) }
+        get { return playDuration > 0 ? playDuration : remoteDuration }
+    }
+    /// duration based on the data from the xml parser
+    var remoteDuration: Int {
+        get { return Int(playableManagedObject.remoteDuration) }
         set {
-            guard Int16.isValid(value: newValue), playableManagedObject.duration != Int16(newValue) else { return }
-            playableManagedObject.duration = Int16(newValue)
+            guard Int16.isValid(value: newValue), playableManagedObject.remoteDuration != Int16(newValue) else { return }
+            playableManagedObject.remoteDuration = Int16(newValue)
+        }
+    }
+    /// duration based on the downloaded/streamed file reported by the player
+    var playDuration: Int {
+        get { return Int(playableManagedObject.playDuration) }
+        set {
+            guard Int16.isValid(value: newValue), playableManagedObject.playDuration != Int16(newValue) else { return }
+            playableManagedObject.playDuration = Int16(newValue)
+        }
+    }
+    var playProgress: Int {
+        get { return Int(playableManagedObject.playProgress) }
+        set {
+            guard Int16.isValid(value: newValue), playableManagedObject.playProgress != Int16(newValue) else { return }
+            playableManagedObject.playProgress = Int16(newValue)
         }
     }
     var size: Int {

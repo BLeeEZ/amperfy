@@ -22,7 +22,7 @@ class PlayableParserDelegate: AmpacheXmlLibParser {
         case "year":
             playableBuffer?.year = Int(buffer) ?? 0
         case "time":
-            playableBuffer?.duration = Int(buffer) ?? 0
+            playableBuffer?.remoteDuration = Int(buffer) ?? 0
         case "art":
             playableBuffer?.artwork = parseArtwork(urlString: buffer)
         case "size":

@@ -39,6 +39,8 @@ enum RepeatMode: Int16 {
 class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     static let preDownloadCount = 3
+    static let progressTimeStartThreshold: Double = 15.0
+    static let progressTimeEndThreshold: Double = 15.0
     
     var playlist: Playlist { 
         return coreData.playlist
@@ -300,7 +302,14 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         for notifier in notifierList {
             notifier.didStartPlaying(playlistItem: playlistItem)
         }
+        seekToLastStoppedPlayTime(playlistItem: playlistItem)
         changeRemoteCommandCenterControlsBasedOnCurrentPlayableType()
+    }
+    
+    private func seekToLastStoppedPlayTime(playlistItem: PlaylistItem) {
+        if let playable = playlistItem.playable, playable.isPodcastEpisode, playable.playProgress > 0 {
+            seek(toSecond: Double(playable.playProgress))
+        }
     }
     
     func notifyItemPaused() {
@@ -317,7 +326,23 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     func didElapsedTimeChange() {
         notifyElapsedTimeChanged()
-        if let currentItem = currentlyPlaying?.playable { updateNowPlayingInfo(playable: currentItem) }
+        if let currentItem = currentlyPlaying?.playable {
+            savePlayInformation(of: currentItem)
+            updateNowPlayingInfo(playable: currentItem)
+        }
+    }
+    
+    private func savePlayInformation(of playable: AbstractPlayable) {
+        let playDuration = backendAudioPlayer.duration
+        let playProgress = backendAudioPlayer.elapsedTime
+        if playDuration != 0.0, playProgress != 0.0, playable == currentlyPlaying?.playable {
+            playable.playDuration = Int(playDuration)
+            if playProgress > Self.progressTimeStartThreshold, playProgress < (playDuration - Self.progressTimeEndThreshold) {
+                playable.playProgress = Int(playProgress)
+            } else {
+                playable.playProgress = 0
+            }
+        }
     }
     
     func notifyElapsedTimeChanged() {
