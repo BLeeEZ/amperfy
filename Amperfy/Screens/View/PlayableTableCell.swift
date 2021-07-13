@@ -145,8 +145,8 @@ class PlayableTableCell: BasicTableCell {
                 artistDetailVC.artist = artist
                 if let navController = self.rootView?.navigationController {
                     navController.pushViewController(artistDetailVC, animated: true)
-                } else {
-                    self.closePopupPlayerAndDisplayInLibraryTab(view: artistDetailVC)
+                } else if let popupPlayerVC = rootView as? PopupPlayerVC {
+                    popupPlayerVC.closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
                 }
             }))
         }
@@ -157,8 +157,8 @@ class PlayableTableCell: BasicTableCell {
                 albumDetailVC.album = album
                 if let navController = self.rootView?.navigationController {
                     navController.pushViewController(albumDetailVC, animated: true)
-                } else {
-                    self.closePopupPlayerAndDisplayInLibraryTab(view: albumDetailVC)
+                } else if let popupPlayerVC = rootView as? PopupPlayerVC {
+                    popupPlayerVC.closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
                 }
             }))
         }
@@ -169,28 +169,14 @@ class PlayableTableCell: BasicTableCell {
                 podcastDetailVC.podcast = podcast
                 if let navController = self.rootView?.navigationController {
                     navController.pushViewController(podcastDetailVC, animated: true)
-                } else {
-                    self.closePopupPlayerAndDisplayInLibraryTab(view: podcastDetailVC)
+                } else if let popupPlayerVC = rootView as? PopupPlayerVC {
+                    popupPlayerVC.closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
                 }
             }))
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         return alert
-    }
-    
-    private func closePopupPlayerAndDisplayInLibraryTab(view: UIViewController) {
-        if let popupPlayerVC = rootView as? PopupPlayerVC,
-           let hostingTabBarVC = popupPlayerVC.hostingTabBarVC {
-            hostingTabBarVC.closePopup(animated: true, completion: { () in
-                if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
-                   hostingTabViewControllers.count > 0,
-                   let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
-                    libraryTabNavVC.pushViewController(view, animated: false)
-                    hostingTabBarVC.selectedIndex = 0
-                }
-            })
-        }
     }
 
 }

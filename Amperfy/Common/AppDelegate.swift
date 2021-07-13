@@ -56,6 +56,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var userStatistics = {
         return library.getUserStatistics(appVersion: Self.version)
     }()
+    lazy var localNotificationManager = {
+        return LocalNotificationManager(userStatistics: userStatistics)
+    }()
+    lazy var backgroundFetchTriggeredSyncer = {
+        return BackgroundFetchTriggeredSyncer(library: library, backendApi: backendApi, notificationManager: localNotificationManager)
+    }()
     private lazy var popupDisplaySemaphore = {
         return DispatchSemaphore(value: 1)
     }()
@@ -80,10 +86,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func configureDefaultNavigationBarStyle() {
         UINavigationBar.appearance().shadowImage = UIImage()
     }
+    
+    func configureBackgroundFetch() {
+        UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
+    }
+    
+    func configureNotificationHandling() {
+        UNUserNotificationCenter.current().delegate = self
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         configureAudioSessionInterruptionAndRemoteControl()
         configureDefaultNavigationBarStyle()
+        configureBackgroundFetch()
+        configureNotificationHandling()
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
         guard let credentials = persistentStorage.loginCredentials else {
@@ -107,7 +123,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         userStatistics.sessionStarted()
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()
         self.window?.rootViewController = initialViewController
-        self.window?.makeKeyAndVisible()
+        self.window?.makeKeyAndVisible()        
         return true
     }
 
@@ -137,7 +153,54 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         library.saveContext()
     }
+    
+    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        let fetchResult = backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
+        userStatistics.backgroundFetchPerformed(result: fetchResult)
+        completionHandler(fetchResult)
+    }
 
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate
+{
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler(.alert)
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        userStatistics.appStartedViaNotification()
+        let userInfo = response.notification.request.content.userInfo
+        guard let contentTypeRaw = userInfo[NotificationUserInfo.type] as? NSString, let contentType = NotificationContentType(rawValue: contentTypeRaw), let id = userInfo[NotificationUserInfo.id] as? String else { completionHandler(); return }
+
+        switch contentType {
+        case .podcastEpisode:
+            let episode = library.getPodcastEpisode(id: id)
+            if let podcast = episode?.podcast {
+                let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
+                podcastDetailVC.podcast = podcast
+                displayInLibraryTab(vc: podcastDetailVC)
+            }
+        }
+        completionHandler()
+    }
+    
+    private func displayInLibraryTab(vc: UIViewController) {
+        guard let topView = Self.topViewController(),
+              topView.presentedViewController == nil,
+              let hostingTabBarVC = topView as? UITabBarController
+        else { return }
+        
+        if hostingTabBarVC.popupPresentationState == .open,
+           let popupPlayerVC = hostingTabBarVC.popupContent as? PopupPlayerVC {
+            popupPlayerVC.closePopupPlayerAndDisplayInLibraryTab(vc: vc)
+        } else if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
+           hostingTabViewControllers.count > 0,
+           let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
+            libraryTabNavVC.pushViewController(vc, animated: false)
+            hostingTabBarVC.selectedIndex = 0
+        }
+    }
 }
 
 extension AppDelegate {

@@ -14,8 +14,13 @@ extension UserStatisticsMO {
     @NSManaged public var activeShuffleOffSongsCount: Int32
     @NSManaged public var activeShuffleOnSongsCount: Int32
     @NSManaged public var appSessionsStartedCount: Int32
+    @NSManaged public var appStartedViaNotificationCount: Int32
     @NSManaged public var appVersion: String
+    @NSManaged public var backgroundFetchFailedCount: Int32
+    @NSManaged public var backgroundFetchNewDataCount: Int32
+    @NSManaged public var backgroundFetchNoDataCount: Int32
     @NSManaged public var creationDate: Date
+    @NSManaged public var localNotificationCreationCount: Int32
     @NSManaged public var playedSongFromCacheCount: Int32
     @NSManaged public var playedSongsCount: Int32
     @NSManaged public var playedSongViaStreamCount: Int32

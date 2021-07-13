@@ -15,6 +15,7 @@ enum FontAwesomeIcon: Int {
     case Info = 0xf129
     case Podcast = 0xf2ce
     case Ban = 0xf05e
+    case Bell = 0xf0f3
     
     var asString: String {
         return String(format: "%C", self.rawValue)

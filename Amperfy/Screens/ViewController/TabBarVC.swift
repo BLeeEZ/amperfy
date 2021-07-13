@@ -23,18 +23,44 @@ class TabBarVC: UITabBarController {
         self.popupInteractionStyle = .snap
         
         if !appDelegate.persistentStorage.isLibrarySyncInfoReadByUser {
-            let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
-            popupVC.setContent(
-                topic: "Synchronisation",
-                message: "Your music collection is constantly updating. Already synced libray items are offline available. If library items (artists/albums/songs) are not shown in your  collection please use the various search functionalities to synchronise with the server.",
-                type: .info,
-                customIcon: .Sync,
-                customAnimation: .rotate,
-                onClosePressed: { _ in
-                    self.appDelegate.persistentStorage.isLibrarySyncInfoReadByUser = true
-                }
-            )
-            appDelegate.display(popup: popupVC)
+            displaySyncInfo()
+        } else {
+            displayNotificationAuthorization()
+        }
+    }
+    
+    private func displaySyncInfo() {
+        let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
+        popupVC.setContent(
+            topic: "Synchronization",
+            message: "Your music collection is constantly updating. Already synced libray items are offline available. If library items (artists/albums/songs) are not shown in your  collection please use the various search functionalities to synchronize with the server.",
+            type: .info,
+            customIcon: .Sync,
+            customAnimation: .rotate,
+            onClosePressed: { _ in
+                self.appDelegate.persistentStorage.isLibrarySyncInfoReadByUser = true
+                self.displayNotificationAuthorization()
+            }
+        )
+        appDelegate.display(popup: popupVC)
+    }
+    
+    private func displayNotificationAuthorization() {
+        self.appDelegate.localNotificationManager.executeIfAuthorizationHasNotBeenAskedYet {
+            DispatchQueue.main.async {
+                let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
+                popupVC.setContent(
+                    topic: "Notification",
+                    message: "Amperfy can inform you about the latest podcast episodes. If you want to, please authorize Amperfy to send you notifications.",
+                    type: .info,
+                    customIcon: .Bell,
+                    customAnimation: .swing,
+                    onClosePressed: { _ in
+                        self.appDelegate.localNotificationManager.requestAuthorization()
+                    }
+                )
+                self.appDelegate.display(popup: popupVC)
+            }
         }
     }
 

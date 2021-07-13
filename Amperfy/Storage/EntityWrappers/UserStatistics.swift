@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 import CoreData
 
 public enum UserActionUsed {
@@ -63,6 +64,30 @@ public class UserStatistics {
     
     func sessionStarted() {
         self.managedObject.appSessionsStartedCount += 1
+        library.saveContext()
+    }
+    
+    func appStartedViaNotification() {
+        self.managedObject.appStartedViaNotificationCount += 1
+        library.saveContext()
+    }
+    
+    func localNotificationCreated() {
+        self.managedObject.localNotificationCreationCount += 1
+        library.saveContext()
+    }
+    
+    func backgroundFetchPerformed(result: UIBackgroundFetchResult) {
+        switch result {
+        case .newData:
+            self.managedObject.backgroundFetchNewDataCount += 1
+        case .noData:
+            self.managedObject.backgroundFetchNoDataCount += 1
+        case .failed:
+            self.managedObject.backgroundFetchFailedCount += 1
+        @unknown default:
+            break
+        }
         library.saveContext()
     }
     
@@ -182,6 +207,11 @@ public class UserStatistics {
         overview.appVersion = managedObject.appVersion
         overview.creationDate = managedObject.creationDate
         overview.appSessionsStartedCount = managedObject.appSessionsStartedCount
+        overview.appStartedViaNotificationCount = managedObject.appStartedViaNotificationCount
+        overview.localNotificationCreationCount = managedObject.localNotificationCreationCount
+        overview.backgroundFetchFailedCount = managedObject.backgroundFetchFailedCount
+        overview.backgroundFetchNewDataCount = managedObject.backgroundFetchNewDataCount
+        overview.backgroundFetchNoDataCount = managedObject.backgroundFetchNoDataCount
         
         var actionUsed = ActionUsedCounts()
         actionUsed.airplay = managedObject.usedAirplayCount
@@ -243,6 +273,11 @@ public struct UserStatisticsOverview: Encodable {
     public var appVersion: String?
     public var creationDate: Date?
     public var appSessionsStartedCount: Int32?
+    public var appStartedViaNotificationCount: Int32?
+    public var localNotificationCreationCount: Int32?
+    public var backgroundFetchFailedCount: Int32?
+    public var backgroundFetchNewDataCount: Int32?
+    public var backgroundFetchNoDataCount: Int32?
     public var actionsUsedCounts: ActionUsedCounts?
     public var songPlayedConfigCounts: SongPlayedConfigCounts?
     public var viewsVisitedCounts: ViewsVisitedCounts?

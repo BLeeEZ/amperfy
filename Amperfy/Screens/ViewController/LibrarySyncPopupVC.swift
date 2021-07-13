@@ -4,6 +4,7 @@ import UIKit
 enum PopupIconAnimation {
     case rotate
     case zoomInZoomOut
+    case swing
 }
 
 class LibrarySyncPopupVC: UIViewController {
@@ -59,6 +60,8 @@ class LibrarySyncPopupVC: UIViewController {
             animateIconRotation()
         case .zoomInZoomOut:
             animateIconZoomInZoomOut()
+        case .swing:
+            animateSwing()
         }
     }
     
@@ -87,13 +90,15 @@ class LibrarySyncPopupVC: UIViewController {
     }
     
     @IBAction func closeButtonPressed(_ sender: Any) {
-        self.closeButtonOnPressed?(true)
-        self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true) {
+            self.closeButtonOnPressed?(true)
+        }
     }
     
     @IBAction func optionalButtonPressed(_ sender: Any) {
-        self.optionalButtonOnPressed?(true)
-        self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true) {
+            self.optionalButtonOnPressed?(true)
+        }
     }
     
     func setContent(topic: String, message: String, type: LogEntryType, customIcon: FontAwesomeIcon? = nil, customAnimation: PopupIconAnimation? = nil, onClosePressed: ((Bool) -> Void)? = nil) {
@@ -136,6 +141,16 @@ class LibrarySyncPopupVC: UIViewController {
         }), completion: nil)
         UIView.animate(withDuration: 3, delay: 3, options: [.repeat, .autoreverse], animations: ({
             self.iconLabel.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        }), completion: nil)
+    }
+    
+    private func animateSwing() {
+        let rotationAngle = 0.18*CGFloat.pi
+        UIView.animate(withDuration: 1.5, delay: 0, options: [], animations: ({
+            self.iconLabel.transform = CGAffineTransform(rotationAngle: rotationAngle)
+        }), completion: nil)
+        UIView.animate(withDuration: 3, delay: 1.5, options: [.repeat, .autoreverse], animations: ({
+            self.iconLabel.transform = CGAffineTransform(rotationAngle: -rotationAngle)
         }), completion: nil)
     }
     

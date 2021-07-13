@@ -168,7 +168,7 @@ class PlayerView: UIView {
         if let song = lastDisplayedPlayable?.asSong, let artist = song.artist {
             let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
             artistDetailVC.artist = artist
-            self.closePopupPlayerAndDisplayInLibraryTab(view: artistDetailVC)
+            rootView?.closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
         }
     }
     
@@ -176,7 +176,7 @@ class PlayerView: UIView {
         if let song = lastDisplayedPlayable?.asSong, let album = song.album {
             let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
             albumDetailVC.album = album
-            self.closePopupPlayerAndDisplayInLibraryTab(view: albumDetailVC)
+            rootView?.closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
         }
     }
     
@@ -184,20 +184,7 @@ class PlayerView: UIView {
         if let podcastEpisode = lastDisplayedPlayable?.asPodcastEpisode, let podcast = podcastEpisode.podcast {
             let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
             podcastDetailVC.podcast = podcast
-            self.closePopupPlayerAndDisplayInLibraryTab(view: podcastDetailVC)
-        }
-    }
-    
-    private func closePopupPlayerAndDisplayInLibraryTab(view: UIViewController) {
-        if let popupPlayerVC = rootView, let hostingTabBarVC = popupPlayerVC.hostingTabBarVC {
-            hostingTabBarVC.closePopup(animated: true, completion: { () in
-                if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
-                   hostingTabViewControllers.count > 0,
-                   let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
-                    libraryTabNavVC.pushViewController(view, animated: false)
-                    hostingTabBarVC.selectedIndex = 0
-                }
-            })
+            rootView?.closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
         }
     }
     

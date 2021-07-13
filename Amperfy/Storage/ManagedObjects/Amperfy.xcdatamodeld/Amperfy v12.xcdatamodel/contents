@@ -137,8 +137,13 @@
         <attribute name="activeShuffleOffSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="activeShuffleOnSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="appSessionsStartedCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="appStartedViaNotificationCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="appVersion" attributeType="String" defaultValueString=""/>
+        <attribute name="backgroundFetchFailedCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="backgroundFetchNewDataCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="backgroundFetchNoDataCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="creationDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="localNotificationCreationCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="playedSongFromCacheCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="playedSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="playedSongViaStreamCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -195,6 +200,6 @@
         <element name="PodcastEpisode" positionX="-30447" positionY="-8217" width="128" height="104"/>
         <element name="Song" positionX="-30463.86328125" positionY="-8276.4765625" width="128" height="119"/>
         <element name="SyncWave" positionX="-30465" positionY="-8244" width="128" height="209"/>
-        <element name="UserStatistics" positionX="-30474" positionY="-8244" width="128" height="704"/>
+        <element name="UserStatistics" positionX="-30474" positionY="-8244" width="128" height="779"/>
     </elements>
 </model>
