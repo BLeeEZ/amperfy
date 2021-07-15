@@ -13,15 +13,13 @@ class SettingsLibraryVC: UITableViewController {
     @IBOutlet weak var podcastEpisodesCountLabel: UILabel!
     
     @IBOutlet weak var cachedSongsCountLabel: UILabel!
-    @IBOutlet weak var cachedSongsCountSpinner: UIActivityIndicatorView!
-    @IBOutlet weak var cachedSongsSizeLabel: UILabel!
-    @IBOutlet weak var cachedSongsSizeSpinner: UIActivityIndicatorView!
+    @IBOutlet weak var cachedPodcastEpisodesCountLabel: UILabel!
+    @IBOutlet weak var cachedCompleteSizeLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.settingsLibrary)
-        self.cachedSongsCountSpinner.style = UIActivityIndicatorView.defaultStyle
         
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let library = LibraryStorage(context: context)
@@ -65,21 +63,25 @@ class SettingsLibraryVC: UITableViewController {
             let cachedSongCount = library.cachedSongCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.cachedSongsCountSpinner.isHidden = true
                 self.cachedSongsCountLabel.text = String(cachedSongCount)
             }
             
-            let cachedSongSizeLabelText = library.cachedPlayableSizeInByte.asByteString
+            let cachedPodcastEpisodesCount = library.cachedPodcastEpisodeCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.cachedSongsSizeSpinner.isHidden = true
-                self.cachedSongsSizeLabel.text = cachedSongSizeLabelText
+                self.cachedPodcastEpisodesCountLabel.text = String(cachedPodcastEpisodesCount)
+            }
+            
+            let completeCacheSize = library.cachedPlayableSizeInByte
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.cachedCompleteSizeLabel.text = completeCacheSize.asByteString
             }
         }
     }
     
     @IBAction func deleteSongCachePressed(_ sender: Any) {
-        let alert = UIAlertController(title: "Delete song cache", message: "Are you sure to delete all downloaded songs from cache?", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Delete Cache", message: "Are you sure to delete all downloaded files from cache?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in
             self.appDelegate.player.stop()
             self.appDelegate.playableDownloadManager.stopAndWait()

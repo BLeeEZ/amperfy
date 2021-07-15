@@ -2021,7 +2021,7 @@
                                                     <color key="textColor" systemColor="secondaryLabelColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Fetched songs meta info" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HQg-5q-OlT" userLabel="Description">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HQg-5q-OlT" userLabel="Description">
                                                     <rect key="frame" x="20" y="5" width="200" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="ACk-0j-Rv5"/>
@@ -2093,7 +2093,7 @@
                                                     <color key="textColor" systemColor="secondaryLabelColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast episodes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hjg-DH-qec" userLabel="Description">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Episodes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hjg-DH-qec" userLabel="Description">
                                                     <rect key="frame" x="20" y="5" width="200" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="Lel-pm-Qtt"/>
@@ -2115,7 +2115,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Cache" id="7Cg-br-dJ6" userLabel="Delete Cache">
+                            <tableViewSection headerTitle="Cache" id="7Cg-br-dJ6">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="WSS-2H-GMy">
                                         <rect key="frame" x="0.0" y="339.5" width="414" height="40"/>
@@ -2124,7 +2124,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IDq-Rn-c12" userLabel="Value">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IDq-Rn-c12" userLabel="Value">
                                                     <rect key="frame" x="294" y="5" width="100" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="dux-KY-Ocg"/>
@@ -2133,7 +2133,7 @@
                                                     <color key="textColor" systemColor="secondaryLabelColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cached songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6EB-Ym-qzl" userLabel="Description">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cached Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6EB-Ym-qzl" userLabel="Description">
                                                     <rect key="frame" x="20" y="5" width="150" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="Ae1-ch-305"/>
@@ -2142,65 +2142,91 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="5Wy-ux-O8s" userLabel="Spinner">
-                                                    <rect key="frame" x="374" y="10" width="20" height="20"/>
-                                                </activityIndicatorView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="leadingMargin" secondItem="6EB-Ym-qzl" secondAttribute="trailing" constant="-150" id="24H-Ht-XcY"/>
                                                 <constraint firstItem="IDq-Rn-c12" firstAttribute="leading" secondItem="jLI-pw-RIZ" secondAttribute="trailingMargin" constant="-100" id="CBF-6g-vHo"/>
-                                                <constraint firstItem="5Wy-ux-O8s" firstAttribute="centerY" secondItem="jLI-pw-RIZ" secondAttribute="centerY" id="HYT-U8-Gpv"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="IDq-Rn-c12" secondAttribute="trailing" id="ZXH-k3-isq"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="5Wy-ux-O8s" secondAttribute="trailing" id="jia-cz-Gi4"/>
                                                 <constraint firstItem="6EB-Ym-qzl" firstAttribute="centerY" secondItem="jLI-pw-RIZ" secondAttribute="centerY" id="nBn-YP-zib"/>
                                                 <constraint firstItem="6EB-Ym-qzl" firstAttribute="leading" secondItem="jLI-pw-RIZ" secondAttribute="leadingMargin" id="om2-YV-Ead"/>
                                                 <constraint firstItem="IDq-Rn-c12" firstAttribute="centerY" secondItem="jLI-pw-RIZ" secondAttribute="centerY" id="spu-Xb-vLh"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="hgT-1X-Nqi">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="H7V-mm-ELS">
                                         <rect key="frame" x="0.0" y="379.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hgT-1X-Nqi" id="YE3-CN-PQH">
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="H7V-mm-ELS" id="FLz-6G-irq">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OaM-sv-EGG" userLabel="Value">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eHJ-I2-UdY" userLabel="Value">
                                                     <rect key="frame" x="294" y="5" width="100" height="30"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="dgI-Jg-VyS"/>
+                                                        <constraint firstAttribute="height" constant="30" id="dmh-ez-g40"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                     <color key="textColor" systemColor="secondaryLabelColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Song Cache Size" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Beu-87-Tgo" userLabel="Description">
-                                                    <rect key="frame" x="20" y="5" width="150" height="30"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cached Podcast Episodes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bed-1J-nM0" userLabel="Description">
+                                                    <rect key="frame" x="20" y="5" width="200" height="30"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="2D5-Fw-O8d"/>
+                                                        <constraint firstAttribute="height" constant="30" id="oVq-Xi-tAe"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="b1P-EU-cSS" userLabel="Spinner">
-                                                    <rect key="frame" x="374" y="10" width="20" height="20"/>
-                                                </activityIndicatorView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="OaM-sv-EGG" firstAttribute="centerY" secondItem="YE3-CN-PQH" secondAttribute="centerY" id="0kT-LN-M3L"/>
-                                                <constraint firstItem="Beu-87-Tgo" firstAttribute="centerY" secondItem="YE3-CN-PQH" secondAttribute="centerY" id="8L2-7D-ReJ"/>
-                                                <constraint firstAttribute="leadingMargin" secondItem="Beu-87-Tgo" secondAttribute="trailing" constant="-150" id="CeK-rC-sdP"/>
-                                                <constraint firstItem="b1P-EU-cSS" firstAttribute="centerY" secondItem="YE3-CN-PQH" secondAttribute="centerY" id="QzO-Bq-qRe"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="b1P-EU-cSS" secondAttribute="trailing" id="UVp-2q-z9m"/>
-                                                <constraint firstItem="OaM-sv-EGG" firstAttribute="leading" secondItem="YE3-CN-PQH" secondAttribute="trailingMargin" constant="-100" id="cqD-D5-IRD"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="OaM-sv-EGG" secondAttribute="trailing" id="oyX-df-6Ll"/>
-                                                <constraint firstItem="Beu-87-Tgo" firstAttribute="leading" secondItem="YE3-CN-PQH" secondAttribute="leadingMargin" id="xY9-s5-mrU"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="eHJ-I2-UdY" secondAttribute="trailing" id="HHB-Zx-ec6"/>
+                                                <constraint firstItem="eHJ-I2-UdY" firstAttribute="centerY" secondItem="FLz-6G-irq" secondAttribute="centerY" id="RQ3-RD-khD"/>
+                                                <constraint firstItem="bed-1J-nM0" firstAttribute="leading" secondItem="FLz-6G-irq" secondAttribute="leadingMargin" id="eW7-zf-3zk"/>
+                                                <constraint firstAttribute="leadingMargin" secondItem="bed-1J-nM0" secondAttribute="trailing" constant="-200" id="mhQ-c9-6Bb"/>
+                                                <constraint firstItem="eHJ-I2-UdY" firstAttribute="leading" secondItem="FLz-6G-irq" secondAttribute="trailingMargin" constant="-100" id="o1k-7c-Dda"/>
+                                                <constraint firstItem="bed-1J-nM0" firstAttribute="centerY" secondItem="FLz-6G-irq" secondAttribute="centerY" id="xkg-Qb-SjI"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="e7f-bw-r1R">
+                                        <rect key="frame" x="0.0" y="419.5" width="414" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="e7f-bw-r1R" id="gVd-JC-B0X">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bFo-lf-Dyt" userLabel="Value">
+                                                    <rect key="frame" x="294" y="5" width="100" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="Wag-Ei-ZgN"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Complete Cache Size" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w4f-2H-Jk8" userLabel="Description">
+                                                    <rect key="frame" x="20" y="5" width="200" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="YUL-6c-PvR"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="w4f-2H-Jk8" firstAttribute="centerY" secondItem="gVd-JC-B0X" secondAttribute="centerY" id="BWn-B2-1i7"/>
+                                                <constraint firstItem="bFo-lf-Dyt" firstAttribute="centerY" secondItem="gVd-JC-B0X" secondAttribute="centerY" id="Eih-c7-1fk"/>
+                                                <constraint firstItem="w4f-2H-Jk8" firstAttribute="leading" secondItem="gVd-JC-B0X" secondAttribute="leadingMargin" id="ZDp-Vj-0ad"/>
+                                                <constraint firstItem="bFo-lf-Dyt" firstAttribute="leading" secondItem="gVd-JC-B0X" secondAttribute="trailingMargin" constant="-100" id="Zho-Og-KwM"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="bFo-lf-Dyt" secondAttribute="trailing" id="rWu-n5-WKw"/>
+                                                <constraint firstAttribute="leadingMargin" secondItem="w4f-2H-Jk8" secondAttribute="trailing" constant="-200" id="wrR-ha-FLs"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="zbD-fA-ds8">
-                                        <rect key="frame" x="0.0" y="419.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="459.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zbD-fA-ds8" id="sYm-ek-akd">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -2211,7 +2237,7 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="kTu-Mb-rSx"/>
                                                     </constraints>
-                                                    <state key="normal" title="Delete cached songs">
+                                                    <state key="normal" title="Delete Cache">
                                                         <color key="titleColor" systemColor="systemRedColor"/>
                                                     </state>
                                                     <connections>
@@ -2238,10 +2264,9 @@
                     <connections>
                         <outlet property="albumsCountLabel" destination="KgV-m6-5E6" id="bRO-2g-ob0"/>
                         <outlet property="artistsCountLabel" destination="Thx-6G-fSC" id="HSr-Ci-J1L"/>
+                        <outlet property="cachedCompleteSizeLabel" destination="bFo-lf-Dyt" id="ak2-Wa-Oro"/>
+                        <outlet property="cachedPodcastEpisodesCountLabel" destination="eHJ-I2-UdY" id="YT6-ca-fnk"/>
                         <outlet property="cachedSongsCountLabel" destination="IDq-Rn-c12" id="Era-EP-6wg"/>
-                        <outlet property="cachedSongsCountSpinner" destination="5Wy-ux-O8s" id="OuR-sQ-3dh"/>
-                        <outlet property="cachedSongsSizeLabel" destination="OaM-sv-EGG" id="foo-YG-xn3"/>
-                        <outlet property="cachedSongsSizeSpinner" destination="b1P-EU-cSS" id="5fI-gv-Ztd"/>
                         <outlet property="playlistsCountLabel" destination="c9v-4o-ykS" id="y6d-Qf-35a"/>
                         <outlet property="podcastEpisodesCountLabel" destination="gYg-yF-w8Y" id="LkQ-6m-NY3"/>
                         <outlet property="podcastsCountLabel" destination="AnN-gF-yha" id="uP4-eT-8Vx"/>

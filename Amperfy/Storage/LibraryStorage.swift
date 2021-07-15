@@ -97,6 +97,14 @@ class LibraryStorage: PlayableFileCachable {
         return (try? context.count(for: PodcastEpisodeMO.fetchRequest())) ?? 0
     }
     
+    var cachedPodcastEpisodeCount: Int {
+        let request: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K != nil", #keyPath(PodcastEpisodeMO.file))
+        ])
+        return (try? context.count(for: request)) ?? 0
+    }
+    
     var cachedPlayableSizeInByte: Int64 {
         let fetchRequest = NSFetchRequest<NSDictionary>(entityName: PlayableFile.typeName)
         fetchRequest.propertiesToFetch = [#keyPath(PlayableFileMO.data)]

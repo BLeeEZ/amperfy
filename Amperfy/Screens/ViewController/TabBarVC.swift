@@ -50,7 +50,7 @@ class TabBarVC: UITabBarController {
             DispatchQueue.main.async {
                 let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
                 popupVC.setContent(
-                    topic: "Notification",
+                    topic: "Notifications",
                     message: "Amperfy can inform you about the latest podcast episodes. If you want to, please authorize Amperfy to send you notifications.",
                     type: .info,
                     customIcon: .Bell,
