@@ -451,3 +451,14 @@ class DirectorySongsFetchedResultsController: BasicFetchedResultsController<Song
     }
 
 }
+
+
+class DownloadsFetchedResultsController: BasicFetchedResultsController<DownloadMO> {
+    
+    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+        fetchRequest.predicate = DownloadMO.onlyPlayablesPredicate
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+
+}

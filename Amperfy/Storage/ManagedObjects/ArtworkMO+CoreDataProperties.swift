@@ -13,6 +13,7 @@ extension ArtworkMO {
     @NSManaged public var status: Int16
     @NSManaged public var type: String
     @NSManaged public var url: String?
+    @NSManaged public var download: DownloadMO?
     @NSManaged public var owners: NSSet?
 
 }

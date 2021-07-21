@@ -145,11 +145,11 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         coreData.removeItemFromPlaylist(at: index)
     }
     
-    private func prepareItemAndInsertIntoPlayer(playlistIndex: Int, reactionToError: FetchErrorReaction) {
+    private func prepareItemAndInsertIntoPlayer(playlistIndex: Int) {
         guard playlistIndex < playlist.playables.count else { return }
         let playlistItem = playlist.items[playlistIndex]
         userStatistics.playedItem(repeatMode: repeatMode, isShuffle: isShuffle)
-        backendAudioPlayer.requestToPlay(playlistItem: playlistItem, reactionToError: reactionToError)
+        backendAudioPlayer.requestToPlay(playlistItem: playlistItem)
         coreData.currentIndex = playlistIndex
         preDownloadNextItems(playlistIndex: playlistIndex)
     }
@@ -164,7 +164,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
             for i in 1...upcomingItemsCount {
                 let nextItemIndex = playlistIndex + i
                 if let playable = playlist.items[nextItemIndex].playable, !playable.isCached {
-                    playableDownloadManager.download(object: playable, notifier: nil, priority: .high)
+                    playableDownloadManager.download(object: playable)
                 }
             }
         }
@@ -204,9 +204,9 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         play(elementInPlaylistAt: coreData.currentIndex)
     }
     
-    func play(elementInPlaylistAt: Int, reactionToError: FetchErrorReaction = .playNext) {
+    func play(elementInPlaylistAt: Int) {
         if elementInPlaylistAt >= 0, elementInPlaylistAt <= playlist.playables.count {
-            prepareItemAndInsertIntoPlayer(playlistIndex: elementInPlaylistAt, reactionToError: reactionToError)
+            prepareItemAndInsertIntoPlayer(playlistIndex: elementInPlaylistAt)
         } else {
             stop()
         }
@@ -222,11 +222,11 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
 
     func playPrevious() {
         if let prevElementIndex = coreData.previousIndex {
-            play(elementInPlaylistAt: prevElementIndex, reactionToError: .playPrevious)
+            play(elementInPlaylistAt: prevElementIndex)
         } else if repeatMode == .all, !playlist.playables.isEmpty {
-            play(elementInPlaylistAt: playlist.lastPlayableIndex, reactionToError: .playPrevious)
+            play(elementInPlaylistAt: playlist.lastPlayableIndex)
         } else if !playlist.playables.isEmpty {
-            play(elementInPlaylistAt: 0, reactionToError: .playPrevious)
+            play(elementInPlaylistAt: 0)
         } else {
             stop()
         }
@@ -234,9 +234,9 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
 
     func playPreviousCached() {
         if let prevItemIndex = playlist.previousCachedItemIndex(downwardsFrom: coreData.currentIndex) {
-            play(elementInPlaylistAt: prevItemIndex, reactionToError: .playPrevious)
+            play(elementInPlaylistAt: prevItemIndex)
         } else if repeatMode == .all, let prevItemIndex = playlist.previousCachedItemIndex(beginningAt: playlist.lastPlayableIndex) {
-            play(elementInPlaylistAt: prevItemIndex, reactionToError: .playPrevious)
+            play(elementInPlaylistAt: prevItemIndex)
         } else {
             stop()
         }

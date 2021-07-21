@@ -2,14 +2,6 @@ import Foundation
 import AVFoundation
 import os.log
 
-enum FetchErrorReaction {
-    case playPrevious
-    case playPreviousCached
-    case playNext
-    case playNextCached
-    case stop
-}
-
 protocol BackendAudioPlayerNotifiable {
     func didElapsedTimeChange()
     func stop()
@@ -21,11 +13,6 @@ protocol BackendAudioPlayerNotifiable {
     func notifyItemPreparationFinished()
 }
 
-struct PlayRequest {
-    let playlistItem: PlaylistItem
-    let reactionToError: FetchErrorReaction
-}
-
 class BackendAudioPlayer {
 
     private let playableDownloader: DownloadManageable
@@ -35,7 +22,6 @@ class BackendAudioPlayer {
     private let player: AVPlayer
     private let eventLogger: EventLogger
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
-    private var latestPlayRequest: PlayRequest?
     private let semaphore = DispatchSemaphore(value: 1)
     
     public var isAutoCachePlayedItems: Bool = true
@@ -111,9 +97,8 @@ class BackendAudioPlayer {
         }
     }
     
-    func requestToPlay(playlistItem: PlaylistItem, reactionToError: FetchErrorReaction) {
+    func requestToPlay(playlistItem: PlaylistItem) {
         semaphore.wait()
-        latestPlayRequest = PlayRequest(playlistItem: playlistItem, reactionToError: reactionToError)
         guard let playable = playlistItem.playable else { return }
         if !playable.isPlayableOniOS, let contentType = playable.contentType {
             player.pause()
@@ -125,7 +110,7 @@ class BackendAudioPlayer {
             } else {
                 insertStreamPlayable(playlistItem: playlistItem)
                 if isAutoCachePlayedItems {
-                    playableDownloader.download(object: playable, notifier: nil, priority: .high)
+                    playableDownloader.download(object: playable)
                 }
             }
         }
@@ -166,21 +151,6 @@ class BackendAudioPlayer {
     private func reactToInsertationFinish(playlistItem: PlaylistItem) {
         currentlyPlaying = playlistItem
         self.responder?.notifyItemPreparationFinished()
-    }
-    
-    private func reactToError(reaction: FetchErrorReaction) {
-        switch reaction {
-        case .playPrevious:
-            self.responder?.playPrevious()
-        case .playPreviousCached:
-            self.responder?.playPreviousCached()
-        case .playNext:
-            self.responder?.playNext()
-        case .playNextCached:
-            self.responder?.playNextCached()
-        case .stop:
-            self.responder?.stop()
-        }
     }
     
     private func createLocalUrl(forFileData fileData: Data) -> URL {

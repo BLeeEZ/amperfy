@@ -16,7 +16,7 @@ enum PlaylistSearchCategory: Int {
 
 class LibraryStorage: PlayableFileCachable {
     
-    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName]
+    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName]
 
     private let log = OSLog(subsystem: AppDelegate.name, category: "LibraryStorage")
     private var context: NSManagedObjectContext
@@ -244,6 +244,30 @@ class LibraryStorage: PlayableFileCachable {
         let syncWaveMO = SyncWaveMO(context: context)
         syncWaveMO.id = syncWaveCount
         return SyncWave(managedObject: syncWaveMO)
+    }
+    
+    func createDownload() -> Download {
+        return Download(managedObject: DownloadMO(context: context))
+    }
+    
+    func getDownload(id: String) -> Download? {
+        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(DownloadMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let downloads = try? context.fetch(fetchRequest)
+        return downloads?.lazy.compactMap{ Download(managedObject: $0) }.first
+    }
+    
+    func getDownload(url: String) -> Download? {
+        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(DownloadMO.urlString), NSString(string: url))
+        fetchRequest.fetchLimit = 1
+        let downloads = try? context.fetch(fetchRequest)
+        return downloads?.lazy.compactMap{ Download(managedObject: $0) }.first
+    }
+    
+    func deleteDownload(_ download: Download) {
+        context.delete(download.managedObject)
     }
     
     func getFetchPredicate(forSyncWave syncWave: SyncWave) -> NSPredicate {
@@ -586,7 +610,7 @@ class LibraryStorage: PlayableFileCachable {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+                fatalError("Unresolved error \(nserror), \(nserror.localizedDescription)")
             }
         }
     }

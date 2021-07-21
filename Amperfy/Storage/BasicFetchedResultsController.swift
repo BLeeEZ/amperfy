@@ -97,6 +97,15 @@ extension PodcastEpisodeMO {
     }
 }
 
+extension DownloadMO {
+    @objc public var section: String {
+        self.willAccessValue(forKey: "section")
+        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.urlString)
+        self.didAccessValue(forKey: "section")
+        return section
+    }
+}
+
 extension NSFetchedResultsController {
     @objc func fetch() {
         do {
@@ -256,6 +265,13 @@ extension BasicFetchedResultsController where ResultType == PodcastEpisodeMO {
     func getWrappedEntity(at indexPath: IndexPath) -> PodcastEpisode {
         let podcastEpisodeMO = fetchResultsController.object(at: indexPath)
         return PodcastEpisode(managedObject: podcastEpisodeMO)
+    }
+}
+
+extension BasicFetchedResultsController where ResultType == DownloadMO {
+    func getWrappedEntity(at indexPath: IndexPath) -> Download {
+        let downloadMO = fetchResultsController.object(at: indexPath)
+        return Download(managedObject: downloadMO)
     }
 }
 

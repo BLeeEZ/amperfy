@@ -1,4 +1,5 @@
 import UIKit
+import CoreData
 
 class DirectoryTableCell: BasicTableCell {
     
@@ -11,6 +12,29 @@ class DirectoryTableCell: BasicTableCell {
     private var folder: MusicFolder?
     private var directory: Directory?
     
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        NotificationCenter.default.addObserver(self, selector: #selector(contextDidSave(_:)), name: Notification.Name.NSManagedObjectContextObjectsDidChange, object: appDelegate.persistentStorage.context)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc func contextDidSave(_ notification: Notification) {
+        if let refreshedObjects = notification.userInfo?[NSRefreshedObjectsKey] as? Set<NSManagedObject>, !refreshedObjects.isEmpty, let directory = directory {
+            for obj in refreshedObjects {
+                if let artMO = obj as? ArtworkMO {
+                    let artw = Artwork(managedObject: artMO)
+                    if artw.owners.contains(where: {$0.isEqual(directory)}) {
+                        refresh()
+                    }
+                }
+            }
+        }
+    }
+    
     func display(folder: MusicFolder) {
         self.folder = folder
         self.directory = nil
@@ -21,7 +45,7 @@ class DirectoryTableCell: BasicTableCell {
         self.folder = nil
         self.directory = directory
         if let artwork = directory.artwork {
-            appDelegate.artworkDownloadManager.download(object: artwork, notifier: self, priority: .high)
+            appDelegate.artworkDownloadManager.download(object: artwork)
         }
         refresh()
     }
@@ -44,12 +68,4 @@ class DirectoryTableCell: BasicTableCell {
         }
     }
 
-}
-
-extension DirectoryTableCell: DownloadNotifiable {
-    func finished(downloading: Downloadable, error: DownloadError?) {
-        if error == nil {
-            refresh()
-        }
-    }
 }

@@ -44,13 +44,16 @@ class PlayableTableCell: BasicTableCell {
         } else if download?.error != nil {
             self.reorderLabel?.isHidden = false
             self.reorderLabel?.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Exclamation.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 25)!])
+        } else if download?.isFinishedSuccessfully ?? false {
+            self.reorderLabel?.isHidden = false
+            self.reorderLabel?.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Check.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
         } else {
             self.reorderLabel?.isHidden = true
         }
         
         if download?.error != nil {
             artistLabel.textColor = .systemRed
-        } else if playable.isCached {
+        } else if playable.isCached || download?.isFinishedSuccessfully ?? false {
             artistLabel.textColor = UIColor.defaultBlue
         } else if playerIndex != nil {
             artistLabel.textColor = UIColor.labelColor

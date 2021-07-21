@@ -34,5 +34,8 @@ public class AbstractLibraryEntity {
         }
         return img
     }
+    func isEqual(_ other: AbstractLibraryEntity) -> Bool {
+        return managedObject == other.managedObject
+    }
 
 }

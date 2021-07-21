@@ -34,20 +34,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
         return MusicPlayer(coreData: library.getPlayerData(), playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
     }()
-    lazy var playableDownloadManager: DownloadManager = {
-        let requestManager = RequestManager()
+    lazy var playableDownloadManager: DownloadManageable = {
         let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi)
-        let urlDownloader = UrlDownloader(requestManager: requestManager)
-        let dlManager = DownloadManager(persistentStorage: persistentStorage, requestManager: requestManager, urlDownloader: urlDownloader, downloadDelegate: dlDelegate, eventLogger: eventLogger)
-        urlDownloader.urlDownloadNotifier = dlManager
+        let requestManager = DownloadRequestManager(persistentStorage: persistentStorage, downloadDelegate: dlDelegate)
+        requestManager.resetStartedDownloads()
+        let dlManager = DownloadManager(name: "PlayableDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, eventLogger: eventLogger)
+        
+        let configuration = URLSessionConfiguration.default
+        var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
+        dlManager.urlSession = urlSession
+        
         return dlManager
     }()
-    lazy var artworkDownloadManager: DownloadManager = {
-        let requestManager = RequestManager()
+    lazy var artworkDownloadManager: DownloadManageable = {
         let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
-        let urlDownloader = UrlDownloader(requestManager: requestManager)
-        let dlManager = DownloadManager(persistentStorage: persistentStorage, requestManager: requestManager, urlDownloader: urlDownloader, downloadDelegate: dlDelegate, eventLogger: eventLogger)
-        urlDownloader.urlDownloadNotifier = dlManager
+        let requestManager = DownloadRequestManager(persistentStorage: persistentStorage, downloadDelegate: dlDelegate)
+        requestManager.clearAllDownloads()
+        let dlManager = DownloadManager(name: "ArtworkDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, eventLogger: eventLogger)
+        
+        let configuration = URLSessionConfiguration.default
+        var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
+        dlManager.urlSession = urlSession
+        
         return dlManager
     }()
     lazy var libraryUpdater = {
@@ -147,10 +155,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-        if persistentStorage.loginCredentials != nil, persistentStorage.isLibrarySynced {
-            artworkDownloadManager.stopAndWait()
-            playableDownloadManager.stopAndWait()
-        }
         library.saveContext()
     }
     

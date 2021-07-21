@@ -26,7 +26,6 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         player = appDelegate.player
         player.addNotifier(notifier: self)
-        appDelegate.playableDownloadManager.addNotifier(self)
         groupedPlaylist = PopupPlaylistGrouper(player: player)
         backgroundColorGradient = PopupAnimatedGradientLayer(view: view)
         backgroundColorGradient.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
@@ -315,24 +314,4 @@ extension PopupPlayerVC: MusicPlayable {
         })
     }
 
-}
-
-extension PopupPlayerVC: DownloadViewUpdatable {
-    
-    func downloadManager(_ downloadManager: DownloadManager, updatedRequest: DownloadRequest, updateReason: DownloadRequestEvent) {
-        switch(updateReason) {
-        case .finished:
-            if let playable = updatedRequest.element as? AbstractPlayable {
-                let indicesOfDownloadedItems = player.playlist.playables.allIndices(of: playable)
-                for index in indicesOfDownloadedItems {
-                    if let indexPath = groupedPlaylist.convertPlaylistIndexToIndexPath(playlistIndex: index), let cell = self.tableView.cellForRow(at: indexPath) as? PlayableTableCell {
-                        cell.refresh()
-                    }
-                }
-            }
-        default:
-            break
-        }
-    }
-    
 }

@@ -8,9 +8,13 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     init(backendApi: BackendApi) {
         self.backendApi = backendApi
     }
+    
+    var requestPredicate: NSPredicate {
+        return DownloadMO.onlyPlayablesPredicate
+    }
 
-    func prepareDownload(forRequest request: DownloadRequest, context: NSManagedObjectContext) throws -> URL {
-        let playableMO = try context.existingObject(with: request.element.objectID) as! AbstractPlayableMO
+    func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL {
+        let playableMO = try context.existingObject(with: download.element.objectID) as! AbstractPlayableMO
         let playable = AbstractPlayable(managedObject: playableMO)
         guard !playable.isCached else {
             throw DownloadError.alreadyDownloaded 
@@ -28,17 +32,17 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
         return url
     }
     
-    func validateDownloadedData(request: DownloadRequest) -> ResponseError? {
-        guard let download = request.download, let data = download.resumeData else {
+    func validateDownloadedData(download: Download) -> ResponseError? {
+        guard let data = download.resumeData else {
             return ResponseError(statusCode: 0, message: "Invalid download")
         }
         return backendApi.checkForErrorResponse(inData: data)
     }
 
-    func completedDownload(request: DownloadRequest, context: NSManagedObjectContext) {
-        guard let download = request.download, let data = download.resumeData else { return }
+    func completedDownload(download: Download, context: NSManagedObjectContext) {
+        guard let data = download.resumeData else { return }
 		let library = LibraryStorage(context: context)
-        if let playableMO = try? context.existingObject(with: request.element.objectID) as? AbstractPlayableMO {
+        if let playableMO = try? context.existingObject(with: download.element.objectID) as? AbstractPlayableMO {
             let playableFile = library.createPlayableFile()
             playableFile.info = AbstractPlayable(managedObject: playableMO)
             playableFile.data = data
