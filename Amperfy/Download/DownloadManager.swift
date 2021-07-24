@@ -72,6 +72,10 @@ class DownloadManager: NSObject, DownloadManageable {
         requestManager.clearFinishedDownloads()
     }
     
+    func resetFailedDownloads() {
+        requestManager.resetFailedDownloads()
+    }
+    
     func isDownloadSlotAvailable() -> Bool {
         var isAvailable = false
         let sync = DispatchGroup()

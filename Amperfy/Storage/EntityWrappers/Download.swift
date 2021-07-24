@@ -30,6 +30,15 @@ class Download: NSObject {
         }
         set { if newValue { error = .canceled } }
     }
+    
+    func reset() {
+        startDate = nil
+        finishDate = nil
+        error = nil
+        errorDate = nil
+        progress = 0.0
+        totalSize = ""
+    }
 
     var id: String {
         get { return managedObject.id }
@@ -71,9 +80,12 @@ class Download: NSObject {
             return DownloadError.create(rawValue: errorType)
         }
         set {
-            if newValue != nil {
+            if let newError = newValue {
                 errorDate = Date()
-                errorType = newValue?.rawValue
+                errorType = newError.rawValue
+            } else {
+                errorDate = nil
+                errorType = 0
             }
         }
     }

@@ -8,6 +8,7 @@ protocol DownloadManageable {
     func download(object: Downloadable)
     func download(objects: [Downloadable])
     func clearFinishedDownloads()
+    func resetFailedDownloads()
     func cancelDownloads()
     func start()
     func stopAndWait()

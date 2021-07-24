@@ -96,7 +96,7 @@ class DownloadRequestManager {
             self.downloadDelegate.requestPredicate
         ])
         let results = try? persistentStorage.context.fetch(fetchRequest)
-        let downloads = results?.compactMap{ Download(managedObject: $0)}
+        let downloads = results?.compactMap{ Download(managedObject: $0) }
         downloads?.forEach{ $0.startDate = nil }
         library.saveContext()
     }
@@ -110,8 +110,21 @@ class DownloadRequestManager {
             self.downloadDelegate.requestPredicate
         ])
         let results = try? persistentStorage.context.fetch(fetchRequest)
-        let downloads = results?.compactMap{ Download(managedObject: $0)}
+        let downloads = results?.compactMap{ Download(managedObject: $0) }
         downloads?.forEach{ $0.isCanceled = true }
+        library.saveContext()
+    }
+    
+    func resetFailedDownloads() {
+        let library = LibraryStorage(context: persistentStorage.context)
+        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K != nil", #keyPath(DownloadMO.errorDate)),
+            self.downloadDelegate.requestPredicate
+        ])
+        let results = try? persistentStorage.context.fetch(fetchRequest)
+        let downloads = results?.compactMap{ Download(managedObject: $0) }
+        downloads?.forEach{ $0.reset() }
         library.saveContext()
     }
 

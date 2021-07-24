@@ -34,6 +34,9 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
         alert.addAction(UIAlertAction(title: "Clear finished downloads", style: .default, handler: { _ in
             self.downloadManager.clearFinishedDownloads()
         }))
+        alert.addAction(UIAlertAction(title: "Retry failed downloads", style: .default, handler: { _ in
+            self.downloadManager.resetFailedDownloads()
+        }))
         alert.addAction(UIAlertAction(title: "Cancel all downloads", style: .default, handler: { _ in
             self.downloadManager.cancelDownloads()
         }))
