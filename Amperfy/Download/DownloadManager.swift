@@ -8,11 +8,14 @@ class DownloadManager: NSObject, DownloadManageable {
     let requestManager: DownloadRequestManager
     let downloadDelegate: DownloadManagerDelegate
     var urlSession: URLSession!
+    var backgroundFetchCompletionHandler: CompleteHandlerBlock?
     let log: OSLog
     
+    
     private let eventLogger: EventLogger
-    private let downloadSlotCounter = DownloadSlotCounter(maximumActiveDownloads: 4)
+    private let downloadSlotCount = 4
     private let activeDispatchGroup = DispatchGroup()
+    private let downloadPreperationSemaphore = DispatchSemaphore(value: 1)
     private var isRunning = false
     private var isActive = false
     
@@ -24,13 +27,11 @@ class DownloadManager: NSObject, DownloadManageable {
         self.eventLogger = eventLogger
     }
     
-    /// call only from main threat
     func download(object: Downloadable) {
         guard !object.isCached else { return }
         self.requestManager.add(object: object)
     }
     
-    /// call only from main threat
     func download(objects: [Downloadable]) {
         let downloadObjects = objects.filter{ !$0.isCached }
         if downloadObjects.count > 0 {
@@ -57,14 +58,30 @@ class DownloadManager: NSObject, DownloadManageable {
     }
     
     func cancelDownloads() {
+        let sync = DispatchGroup()
+        sync.enter()
         requestManager.cancelDownloads()
         urlSession.getAllTasks { tasks in
             tasks.forEach{ $0.cancel() }
+            sync.leave()
         }
+        sync.wait()
     }
     
     func clearFinishedDownloads() {
         requestManager.clearFinishedDownloads()
+    }
+    
+    func isDownloadSlotAvailable() -> Bool {
+        var isAvailable = false
+        let sync = DispatchGroup()
+        sync.enter()
+        self.urlSession.getAllTasks { tasks in
+            isAvailable = tasks.count < self.downloadSlotCount
+            sync.leave()
+        }
+        sync.wait()
+        return isAvailable
     }
     
     private func downloadInBackground() {
@@ -73,22 +90,22 @@ class DownloadManager: NSObject, DownloadManageable {
             os_log("DownloadManager start", log: self.log, type: .info)
             
             while self.isRunning {
-                self.downloadSlotCounter.waitForDownloadSlot()
-                
-                guard let nextDownload = self.requestManager.getNextRequestToDownload() else {
-                    self.downloadSlotCounter.downloadFinished()
-                    // wait some time and poll for new requests
+                self.downloadPreperationSemaphore.wait()
+                guard self.isDownloadSlotAvailable(),
+                      let nextDownload = self.requestManager.getNextRequestToDownload()
+                else {
+                    // wait some time, check if a download slot is available and poll for new requests
                     sleep(1)
+                    self.downloadPreperationSemaphore.signal()
                     continue
                 }
 
                 self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                     let download = Download(managedObject: context.object(with: nextDownload.managedObject.objectID) as! DownloadMO)
                     self.manageDownload(download: download, context: context)
+                    self.downloadPreperationSemaphore.signal()
                 }
             }
-            os_log("DownloadManager wait till all active downloads finished", log: self.log, type: .info)
-            self.downloadSlotCounter.waitTillAllDownloadsFinished()
             os_log("DownloadManager stopped", log: self.log, type: .info)
             self.isActive = false
             self.activeDispatchGroup.leave()
@@ -119,7 +136,6 @@ class DownloadManager: NSObject, DownloadManageable {
         }
         download.isDownloading = false
         library.saveContext()
-        self.downloadSlotCounter.downloadFinished()
     }
     
     func finishDownload(download: Download, context: NSManagedObjectContext, data: Data) {
@@ -135,7 +151,6 @@ class DownloadManager: NSObject, DownloadManageable {
         download.resumeData = nil
         download.isDownloading = false
         library.saveContext()
-        self.downloadSlotCounter.downloadFinished()
     }
     
 }

@@ -1,6 +1,7 @@
 import UIKit
 import MediaPlayer
 import NotificationBanner
+import os.log
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,6 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
 
+    lazy var log = {
+        return OSLog(subsystem: AppDelegate.name, category: "AppDelegate")
+    }()
     lazy var persistentStorage = {
         return PersistentStorage()
     }()
@@ -37,10 +41,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var playableDownloadManager: DownloadManageable = {
         let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi)
         let requestManager = DownloadRequestManager(persistentStorage: persistentStorage, downloadDelegate: dlDelegate)
-        requestManager.resetStartedDownloads()
         let dlManager = DownloadManager(name: "PlayableDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, eventLogger: eventLogger)
         
-        let configuration = URLSessionConfiguration.default
+        let configuration = URLSessionConfiguration.background(withIdentifier: "\(Bundle.main.bundleIdentifier!).PlayableDownloader.background")
         var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
         dlManager.urlSession = urlSession
         
@@ -104,6 +107,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        if let options = launchOptions {
+            os_log("application launch with options:", log: self.log, type: .info)
+            options.forEach{ os_log("- key: %s", log: self.log, type: .info, $0.key.rawValue.description) }
+        } else {
+            os_log("application launch", log: self.log, type: .info)
+        }
+
         configureAudioSessionInterruptionAndRemoteControl()
         configureDefaultNavigationBarStyle()
         configureBackgroundFetch()
@@ -138,30 +148,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+        os_log("applicationWillResignActive", log: self.log, type: .info)
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        os_log("applicationDidEnterBackground", log: self.log, type: .info)
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        os_log("applicationWillEnterForeground", log: self.log, type: .info)
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        os_log("applicationDidBecomeActive", log: self.log, type: .info)
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        os_log("applicationWillTerminate", log: self.log, type: .info)
         library.saveContext()
     }
     
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        os_log("performFetchWithCompletionHandler", log: self.log, type: .info)
         let fetchResult = backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
         userStatistics.backgroundFetchPerformed(result: fetchResult)
         completionHandler(fetchResult)
+    }
+    
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+        os_log("handleEventsForBackgroundURLSession: %s", log: self.log, type: .info, identifier)
+        playableDownloadManager.backgroundFetchCompletionHandler = completionHandler
     }
 
 }

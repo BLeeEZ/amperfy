@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import os.log
 
-extension DownloadManager: URLSessionDownloadDelegate {
+extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
         
     func fetch(url: URL, download: Download, context: NSManagedObjectContext) {
         let library = LibraryStorage(context: context)
@@ -29,26 +29,25 @@ extension DownloadManager: URLSessionDownloadDelegate {
             os_log("Could not get downloaded file from disk: %s", log: self.log, type: .error, error.localizedDescription)
         }
         
-        self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
+        self.persistentStorage.context.performAndWait {
+            let library = LibraryStorage(context: self.persistentStorage.context)
             guard let download = library.getDownload(url: requestUrl) else { return }
             if let activeError = downloadError {
-                self.finishDownload(download: download, context: context, error: activeError)
+                self.finishDownload(download: download, context: self.persistentStorage.context, error: activeError)
             } else if let data = downloadedData {
-                self.finishDownload(download: download, context: context, data: data)
+                self.finishDownload(download: download, context: self.persistentStorage.context, data: data)
             } else {
-                self.finishDownload(download: download, context: context, error: .emptyFile)
+                self.finishDownload(download: download, context: self.persistentStorage.context, error: .emptyFile)
             }
         }
     }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard error != nil, let requestUrl = task.originalRequest?.url?.absoluteString else { return }
-        
-        self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
+        self.persistentStorage.context.performAndWait {
+            let library = LibraryStorage(context: self.persistentStorage.context)
             guard let download = library.getDownload(url: requestUrl) else { return }
-            self.finishDownload(download: download, context: context, error: .fetchFailed)
+            self.finishDownload(download: download, context: self.persistentStorage.context, error: .fetchFailed)
         }
     }
     
@@ -57,12 +56,22 @@ extension DownloadManager: URLSessionDownloadDelegate {
                     didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
                     totalBytesExpectedToWrite: Int64) {
         guard let requestUrl = downloadTask.originalRequest?.url?.absoluteString else { return }
-        self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
+        
+        self.persistentStorage.context.performAndWait {
+            let library = LibraryStorage(context: self.persistentStorage.context)
             guard let download = library.getDownload(url: requestUrl) else { return }
             download.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
             download.totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
             library.saveContext()
+        }
+    }
+    
+    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+        os_log("URLSession urlSessionDidFinishEvents", log: self.log, type: .info)
+        if let completionHandler = backgroundFetchCompletionHandler {
+            os_log("Calling application backgroundFetchCompletionHandler", log: self.log, type: .info)
+            completionHandler()
+            backgroundFetchCompletionHandler = nil
         }
     }
     

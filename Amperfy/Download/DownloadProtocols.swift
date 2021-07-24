@@ -1,7 +1,10 @@
 import Foundation
 import CoreData
 
+typealias CompleteHandlerBlock = () -> ()
+
 protocol DownloadManageable {
+    var backgroundFetchCompletionHandler: CompleteHandlerBlock? { get set }
     func download(object: Downloadable)
     func download(objects: [Downloadable])
     func clearFinishedDownloads()

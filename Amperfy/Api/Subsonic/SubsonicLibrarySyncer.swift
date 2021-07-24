@@ -19,7 +19,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?) {
-        let downloadSlotCounter = DownloadSlotCounter(maximumActiveDownloads: 5)
+        let taskGroup = ConcurrentTaskGroup(taskSlotsCount: 5)
         let syncLibrary = LibraryStorage(context: currentContext)
 
         let syncWave = syncLibrary.createSyncWave()
@@ -39,9 +39,9 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         let artists = syncLibrary.getArtists()
         albumCount = artists.count
         statusNotifyier?.notifySyncStarted(ofType: .album)
-        let artistBatches = artists.chunked(intoSubarrayCount: downloadSlotCounter.maxActiveDownloads)
+        let artistBatches = artists.chunked(intoSubarrayCount: taskGroup.maxTaskSlots)
         for artistBatch in artistBatches {
-            downloadSlotCounter.waitForDownloadSlot()
+            taskGroup.waitForSlot()
             persistentContainer.performBackgroundTask() { (context) in
                 let batchLibrary = LibraryStorage(context: context)
                 for artist in artistBatch {
@@ -55,10 +55,10 @@ class SubsonicLibrarySyncer: LibrarySyncer {
                     statusNotifyier?.notifyParsedObject(ofType: .album)
                 }
                 batchLibrary.saveContext()
-                downloadSlotCounter.downloadFinished()
+                taskGroup.taskFinished()
             }
         }
-        downloadSlotCounter.waitTillAllDownloadsFinished()
+        taskGroup.waitTillAllTasksFinished()
         // Delete duplicated albums due to concurrence
         let albums = syncLibrary.getAlbums()
         var uniqueAlbums: [String: Album] = [:]

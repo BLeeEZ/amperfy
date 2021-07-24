@@ -229,7 +229,7 @@
 		50C16C3221EA77C700F086F0 /* AmpacheArtworkDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C3121EA77C700F086F0 /* AmpacheArtworkDownloadDelegate.swift */; };
 		50C16C3421EB454100F086F0 /* LibraryUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C3321EB454100F086F0 /* LibraryUpdater.swift */; };
 		50C80F2826831DB40022F710 /* SsPodcastEpisodeParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C80F2726831DB40022F710 /* SsPodcastEpisodeParserDelegate.swift */; };
-		50CA8E972601E06500C90791 /* DownloadSlotCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */; };
+		50CA8E972601E06500C90791 /* ConcurrentTaskGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */; };
 		50CDF202264BB1C000F83EF6 /* EventLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF201264BB1C000F83EF6 /* EventLogger.swift */; };
 		50CDF209264BC6BB00F83EF6 /* LogEntryMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF207264BC6BB00F83EF6 /* LogEntryMO+CoreDataClass.swift */; };
 		50CDF20A264BC6BB00F83EF6 /* LogEntryMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF208264BC6BB00F83EF6 /* LogEntryMO+CoreDataProperties.swift */; };
@@ -578,7 +578,7 @@
 		50C16C3121EA77C700F086F0 /* AmpacheArtworkDownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheArtworkDownloadDelegate.swift; sourceTree = "<group>"; };
 		50C16C3321EB454100F086F0 /* LibraryUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryUpdater.swift; sourceTree = "<group>"; };
 		50C80F2726831DB40022F710 /* SsPodcastEpisodeParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPodcastEpisodeParserDelegate.swift; sourceTree = "<group>"; };
-		50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSlotCounter.swift; sourceTree = "<group>"; };
+		50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentTaskGroup.swift; sourceTree = "<group>"; };
 		50CDF201264BB1C000F83EF6 /* EventLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventLogger.swift; sourceTree = "<group>"; };
 		50CDF207264BC6BB00F83EF6 /* LogEntryMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogEntryMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50CDF208264BC6BB00F83EF6 /* LogEntryMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogEntryMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -701,7 +701,6 @@
 			isa = PBXGroup;
 			children = (
 				5088A8A426A955AD00B4C8C6 /* DownloadProtocols.swift */,
-				50CA8E962601E06500C90791 /* DownloadSlotCounter.swift */,
 				5077F933221DAB5C0099CA91 /* DownloadManager.swift */,
 				50073BE02230245D000130D8 /* DownloadManagerSessionExtension.swift */,
 				5068D37F26A85C2D0006710D /* DownloadError.swift */,
@@ -790,6 +789,7 @@
 				5077F939221F40130099CA91 /* SynchronizedArray.swift */,
 				5029288626564C6800DA3A8F /* LogData.swift */,
 				5040B2C3269CD19600911451 /* LocalNotificationManager.swift */,
+				50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1505,7 +1505,7 @@
 				501A7D472681C11C0055A51B /* PodcastEpisodeMO+CoreDataProperties.swift in Sources */,
 				5029E03B2235ABB80027F96F /* OptionsBarButtonItem.swift in Sources */,
 				500B7D4721EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift in Sources */,
-				50CA8E972601E06500C90791 /* DownloadSlotCounter.swift in Sources */,
+				50CA8E972601E06500C90791 /* ConcurrentTaskGroup.swift in Sources */,
 				5029288B26579DA900DA3A8F /* UserStatistics.swift in Sources */,
 				50C16C2421E7A3AC00F086F0 /* ClockTime.swift in Sources */,
 				50BA92FC21CD841B00E5901D /* MusicPlayer.swift in Sources */,

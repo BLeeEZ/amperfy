@@ -34,7 +34,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks? = nil) {
         guard let libMetaData = ampacheXmlServerApi.requesetLibraryMetaData() else { return }
         
-        let downloadSlotCounter = DownloadSlotCounter(maximumActiveDownloads: 5)
+        let taskGroup = ConcurrentTaskGroup(taskSlotsCount: 5)
         let syncLibrary = LibraryStorage(context: currentContext)
 
         let syncWave = syncLibrary.createSyncWave()
@@ -49,7 +49,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         statusNotifyier?.notifySyncStarted(ofType: .artist)
         let pollCountArtist = (ampacheXmlServerApi.artistCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
         for i in 0...pollCountArtist {
-            downloadSlotCounter.waitForDownloadSlot()
+            taskGroup.waitForSlot()
             persistentContainer.performBackgroundTask() { (context) in
                 let batchLibrary = LibraryStorage(context: context)
                 let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
@@ -57,15 +57,15 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 let artistParser = ArtistParserDelegate(library: batchLibrary, syncWave: syncWaveContext, parseNotifier: statusNotifyier)
                 self.ampacheXmlServerApi.requestArtists(parserDelegate: artistParser, startIndex: i*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                 batchLibrary.saveContext()
-                downloadSlotCounter.downloadFinished()
+                taskGroup.taskFinished()
             }
         }
-        downloadSlotCounter.waitTillAllDownloadsFinished()
+        taskGroup.waitTillAllTasksFinished()
 
         statusNotifyier?.notifySyncStarted(ofType: .album)
         let pollCountAlbum = (ampacheXmlServerApi.albumCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce)
         for i in 0...pollCountAlbum {
-            downloadSlotCounter.waitForDownloadSlot()
+            taskGroup.waitForSlot()
             persistentContainer.performBackgroundTask() { (context) in
                 let batchLibrary = LibraryStorage(context: context)
                 let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
@@ -73,10 +73,10 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 let albumDelegate = AlbumParserDelegate(library: batchLibrary, syncWave: syncWaveContext, parseNotifier: statusNotifyier)
                 self.ampacheXmlServerApi.requestAlbums(parserDelegate: albumDelegate, startIndex: i*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                 batchLibrary.saveContext()
-                downloadSlotCounter.downloadFinished()
+                taskGroup.taskFinished()
             }
         }
-        downloadSlotCounter.waitTillAllDownloadsFinished()
+        taskGroup.waitTillAllTasksFinished()
         
         statusNotifyier?.notifySyncStarted(ofType: .playlist)
         let playlistParser = PlaylistParserDelegate(library: syncLibrary, parseNotifier: statusNotifyier)

@@ -38,10 +38,9 @@ class DownloadRequestManager {
     }
 
     func getNextRequestToDownload() -> Download? {
-        let sync = DispatchGroup()
         var nextDownload: Download?
-        sync.enter()
-        self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+        let context = self.persistentStorage.context
+        context.performAndWait {
             let library = LibraryStorage(context: context)
             let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
             fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -55,9 +54,7 @@ class DownloadRequestManager {
             nextDownload = downloads?.lazy.compactMap{ Download(managedObject: $0) }.first
             nextDownload?.isDownloading = true
             library.saveContext()
-            sync.leave()
         }
-        sync.wait()
         return nextDownload
     }
     
