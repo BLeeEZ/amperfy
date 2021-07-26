@@ -31,23 +31,19 @@ class MOCK_AVPlayer: AVPlayer {
 }
 
 class MOCK_SongDownloader: DownloadManageable {
-    
-    var downloadCount = 0
-    var songArg = [AbstractPlayable]()
-    var notifierArg = [DownloadNotifiable?]()
-    var priorityArg = [Priority]()
-    
-    func download(object: Downloadable, notifier: DownloadNotifiable?, priority: Priority) {
-        downloadCount += 1
-        songArg.append(object as! AbstractPlayable)
-        notifierArg.append(notifier)
-        priorityArg.append(priority)
+    var downloadables = [Downloadable]()
+    func isNoDownloadRequested() -> Bool {
+        return downloadables.count == 0
     }
 
-    func isNoDownloadRequested() -> Bool {
-        return downloadCount == 0
-    }
-    
+    var backgroundFetchCompletionHandler: CompleteHandlerBlock? { get {return nil} set {} }
+    func download(object: Downloadable) { downloadables.append(object) }
+    func download(objects: [Downloadable]) { downloadables.append(contentsOf: objects) }
+    func clearFinishedDownloads() {}
+    func resetFailedDownloads() {}
+    func cancelDownloads() {}
+    func start() {}
+    func stopAndWait() {}
 }
 
 class MOCK_AlertDisplayable: AlertDisplayable {
@@ -96,9 +92,10 @@ class MOCK_BackgroundLibraryVersionResyncer: BackgroundLibraryVersionResyncer {
 }
 
 class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
-    func prepareDownload(forRequest request: DownloadRequest, context: NSManagedObjectContext) throws -> URL { throw DownloadError.urlInvalid }
-    func validateDownloadedData(request: DownloadRequest) -> ResponseError? { return nil }
-    func completedDownload(request: DownloadRequest, context: NSManagedObjectContext) {}
+    var requestPredicate: NSPredicate { return NSPredicate.alwaysTrue }
+    func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL { throw DownloadError.urlInvalid }
+    func validateDownloadedData(download: Download) -> ResponseError? { return nil }
+    func completedDownload(download: Download, context: NSManagedObjectContext) {}
 }
 
 class MOCK_BackendApi: BackendApi {
@@ -212,8 +209,8 @@ class MusicPlayerTest: XCTestCase {
     func testPlay_OneSongToDownload_CheckDownloadRequest() {
         testPlayer.addToPlaylist(playable: songToDownload)
         testPlayer.play()
-        XCTAssertEqual(songDownloader.downloadCount, 1)
-        XCTAssertEqual(songDownloader.songArg.first, songToDownload)
+        XCTAssertEqual(songDownloader.downloadables.count, 1)
+        XCTAssertEqual((songDownloader.downloadables.first! as! AbstractPlayable).asSong!, songToDownload)
     }
     
     func testPlaySong_Cached() {
