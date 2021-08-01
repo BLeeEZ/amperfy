@@ -24,10 +24,10 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     }
     
     func validateDownloadedData(download: Download) -> ResponseError? {
-        guard download.resumeData != nil else {
+        guard let data = download.resumeData else {
             return ResponseError(statusCode: 0, message: "Invalid download")
         }
-        return nil
+        return subsonicServerApi.checkForErrorResponse(inData: data)
     }
     
     func completedDownload(download: Download, context: NSManagedObjectContext) {

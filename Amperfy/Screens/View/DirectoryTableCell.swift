@@ -23,14 +23,9 @@ class DirectoryTableCell: BasicTableCell {
     }
     
     @objc func contextDidSave(_ notification: Notification) {
-        if let refreshedObjects = notification.userInfo?[NSRefreshedObjectsKey] as? Set<NSManagedObject>, !refreshedObjects.isEmpty, let directory = directory {
-            for obj in refreshedObjects {
-                if let artMO = obj as? ArtworkMO {
-                    let artw = Artwork(managedObject: artMO)
-                    if artw.owners.contains(where: {$0.isEqual(directory)}) {
-                        refresh()
-                    }
-                }
+        if let directory = directory {
+            Artwork.executeIf(entity: directory, hasBeenUpdatedIn: notification) {
+                refresh()
             }
         }
     }

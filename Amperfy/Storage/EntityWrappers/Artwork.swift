@@ -90,6 +90,17 @@ public class Artwork: NSObject {
         guard let object = object as? Artwork else { return false }
         return managedObject == object.managedObject
     }
+    
+    static func executeIf(entity: AbstractLibraryEntity, hasBeenUpdatedIn notification: Notification, completionHandler: ()->()) {
+        let objKeys = [NSUpdatedObjectsKey, NSRefreshedObjectsKey]
+        
+        for objKey in objKeys {
+            if let refreshedObjects = notification.userInfo?[objKey] as? Set<NSManagedObject>, !refreshedObjects.isEmpty {
+                let foundReference = refreshedObjects.lazy.compactMap{ $0 as? ArtworkMO }.compactMap{ Artwork(managedObject: $0) }.filter{ $0.owners.contains(where: {$0.isEqual(entity)}) }.first
+                if foundReference != nil { completionHandler(); return }
+            }
+        }
+    }
 
 }
 
