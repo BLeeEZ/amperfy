@@ -122,6 +122,14 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     func sync(directory: Directory, library: LibraryStorage) {
         ampacheXmlServerApi.eventLogger.error(topic: "Internal Error", statusCode: .internalError, message: "GetMusicDirectory API function is not support by Ampache")
     }
+    
+    func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        let parser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+        ampacheXmlServerApi.requestRandomSongs(parserDelegate: parser, count: count)
+        playlist.append(playables: parser.parsedSongs)
+        library.saveContext()
+    }
 
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {
         let playlistParser = PlaylistParserDelegate(library: library, parseNotifier: nil)

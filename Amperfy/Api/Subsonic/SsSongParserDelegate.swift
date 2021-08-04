@@ -6,6 +6,7 @@ import os.log
 class SsSongParserDelegate: SsPlayableParserDelegate {
     
     var songBuffer: Song?
+    var parsedSongs = [Song]()
     var guessedArtist: Artist?
     var guessedAlbum: Album?
     var guessedGenre: Genre?
@@ -76,6 +77,9 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         if elementName == "song" || elementName == "entry" || elementName == "child" || elementName == "episode", songBuffer != nil {
             parsedCount += 1
             playableBuffer = nil
+            if let song = songBuffer {
+                parsedSongs.append(song)
+            }
             songBuffer = nil
         }
         

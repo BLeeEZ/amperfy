@@ -76,7 +76,7 @@ class AmpacheXmlServerApi {
         url.appendPathComponent("image.php")
         guard var urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return "" }
         urlComp.addQueryItem(name: "object_id", value: "0")
-        urlComp.addQueryItem(name: "object_type", value: "album")
+        urlComp.addQueryItem(name: "object_type", value: "artist")
         urlComp.addQueryItem(name: "auth", value: auth.token)
         guard let urlString = urlComp.string else { return ""}
         return urlString
@@ -293,6 +293,15 @@ class AmpacheXmlServerApi {
         apiUrlComponent.addQueryItem(name: "add", value: addDate.asIso8601String)
         apiUrlComponent.addQueryItem(name: "offset", value: startIndex)
         apiUrlComponent.addQueryItem(name: "limit", value: pollCount)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
+    func requestRandomSongs(parserDelegate: AmpacheXmlParser, count: Int) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "playlist_generate")
+        apiUrlComponent.addQueryItem(name: "mode", value: "random")
+        apiUrlComponent.addQueryItem(name: "format", value: "song")
+        apiUrlComponent.addQueryItem(name: "limit", value: count)
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     

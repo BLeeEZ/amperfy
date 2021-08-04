@@ -18,7 +18,7 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
         
-        actionButton = UIBarButtonItem(title: "...", style: .plain, target: self, action: #selector(performActionButtonOperation))
+        actionButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(performActionButtonOperation))
         navigationItem.rightBarButtonItem = actionButton
     }
     

@@ -6,6 +6,7 @@ import os.log
 class SongParserDelegate: PlayableParserDelegate {
 
     var songBuffer: Song?
+    var parsedSongs = [Song]()
     var artistIdToCreate: String?
     var albumIdToCreate: String?
     var genreIdToCreate: String?
@@ -89,6 +90,9 @@ class SongParserDelegate: PlayableParserDelegate {
             parsedCount += 1
             parseNotifier?.notifyParsedObject(ofType: .song)
             playableBuffer = nil
+            if let song = songBuffer {
+                parsedSongs.append(song)
+            }
             songBuffer = nil
         default:
             break

@@ -126,6 +126,14 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         library.saveContext()
     }
     
+    func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestRandomSongs(parserDelegate: songParser, count: count)
+        playlist.append(playables: songParser.parsedSongs)
+        library.saveContext()
+    }
+    
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {
         let playlistParser = SsPlaylistParserDelegate(library: library)
         subsonicServerApi.requestPlaylists(parserDelegate: playlistParser)
