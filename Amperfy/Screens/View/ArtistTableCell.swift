@@ -20,6 +20,11 @@ class ArtistTableCell: BasicTableCell {
         } else {
             infoText += "\(artist.albumCount) Albums"
         }
+        if artist.songCount == 1 {
+            infoText += " \(CommonString.oneMiddleDot) 1 Song"
+        } else if artist.songCount > 1 {
+            infoText += " \(CommonString.oneMiddleDot) \(artist.songCount) Songs"
+        }
         infoLabel.text = infoText
     }
 

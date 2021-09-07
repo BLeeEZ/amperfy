@@ -15,6 +15,9 @@ public class Artist: AbstractLibraryEntity, PlayableContainable {
         return name
     }
     
+    var songCount: Int {
+        return managedObject.songs?.count ?? 0
+    }
     var songs: [AbstractPlayable] {
         guard let songsSet = managedObject.songs, let songsMO = songsSet.array as? [SongMO] else { return [Song]() }
         var returnSongs = [Song]()
