@@ -14,8 +14,10 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         
         var searchTiles: [String]? = nil
         if appDelegate.backendProxy.selectedApi == .ampache {
-            searchTiles = ["All", "User Playlists", "Smart Playlists"]
-         }
+            searchTiles = ["All", "Cached", "User", "Smart"]
+        } else if appDelegate.backendProxy.selectedApi == .subsonic {
+            searchTiles = ["All", "Cached"]
+        }
         configureSearchController(placeholder: "Search in \"Playlists\"", scopeButtonTitles: searchTiles)
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight

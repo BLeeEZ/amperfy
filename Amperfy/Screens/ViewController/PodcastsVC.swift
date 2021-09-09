@@ -12,7 +12,7 @@ class PodcastsVC: SingleFetchedResultsTableViewController<PodcastMO> {
         fetchedResultsController = PodcastFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController(placeholder: "Search in \"Podcasts\"")
+        configureSearchController(placeholder: "Search in \"Podcasts\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: PodcastTableCell.typeName)
         tableView.rowHeight = PodcastTableCell.rowHeight
     }
@@ -47,7 +47,8 @@ class PodcastsVC: SingleFetchedResultsTableViewController<PodcastMO> {
     }
     
     override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "")
+        let searchText = searchController.searchBar.text ?? ""
+        fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1)
         tableView.reloadData()
     }
 

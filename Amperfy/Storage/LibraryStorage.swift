@@ -8,8 +8,9 @@ protocol PlayableFileCachable {
 
 enum PlaylistSearchCategory: Int {
     case all = 0
-    case userOnly = 1
-    case smartOnly = 2
+    case cached = 1
+    case userOnly = 2
+    case smartOnly = 3
 
     static let defaultValue: PlaylistSearchCategory = .all
 }
@@ -306,9 +307,33 @@ class LibraryStorage: PlayableFileCachable {
         return NSPredicate(format: "%K == %@", #keyPath(DirectoryMO.parent), directory.managedObject.objectID)
     }
     
+    func getFetchPredicate(onlyCachedArtists: Bool) -> NSPredicate {
+        if onlyCachedArtists {
+            return NSPredicate(format: "SUBQUERY(songs, $song, $song.file != nil) .@count > 0")
+        } else {
+            return NSPredicate.alwaysTrue
+        }
+    }
+    
+    func getFetchPredicate(onlyCachedAlbums: Bool) -> NSPredicate {
+        if onlyCachedAlbums {
+            return NSPredicate(format: "SUBQUERY(songs, $song, $song.file != nil) .@count > 0")
+        } else {
+            return NSPredicate.alwaysTrue
+        }
+    }
+    
     func getFetchPredicate(onlyCachedSongs: Bool) -> NSPredicate {
         if onlyCachedSongs {
             return NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
+        } else {
+            return NSPredicate.alwaysTrue
+        }
+    }
+    
+    func getFetchPredicate(onlyCachedPodcasts: Bool) -> NSPredicate {
+        if onlyCachedPodcasts {
+            return NSPredicate(format: "SUBQUERY(episodes, $episode, $episode.file != nil) .@count > 0")
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -326,6 +351,8 @@ class LibraryStorage: PlayableFileCachable {
         switch playlistSearchCategory {
         case .all:
             return NSPredicate.alwaysTrue
+        case .cached:
+            return NSPredicate(format: "SUBQUERY(items, $item, $item.playable.file != nil) .@count > 0")
         case .userOnly:
             return NSPredicate(format: "NOT (%K BEGINSWITH %@)", #keyPath(PlaylistMO.id), Playlist.smartPlaylistIdPrefix)
         case .smartOnly:

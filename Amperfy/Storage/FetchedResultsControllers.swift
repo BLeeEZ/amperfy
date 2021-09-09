@@ -8,9 +8,13 @@ class PodcastFetchedResultsController: CachedFetchedResultsController<PodcastMO>
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
         
-    func search(searchText: String) {
-        if searchText.count > 0 {
-            search(predicate: PodcastMO.getIdentifierBasedSearchPredicate(searchText: searchText))
+    func search(searchText: String, onlyCached: Bool) {
+        if searchText.count > 0 || onlyCached {
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                PodcastMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(onlyCachedPodcasts: onlyCached)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -148,9 +152,13 @@ class ArtistFetchedResultsController: CachedFetchedResultsController<ArtistMO> {
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
-    func search(searchText: String) {
-        if searchText.count > 0 {
-            search(predicate: ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText))
+    func search(searchText: String, onlyCached: Bool) {
+        if searchText.count > 0 || onlyCached {
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(onlyCachedArtists: onlyCached)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -173,13 +181,14 @@ class ArtistAlbumsItemsFetchedResultsController: BasicFetchedResultsController<A
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
-    func search(searchText: String) {
-        if searchText.count > 0 {
+    func search(searchText: String, onlyCached: Bool) {
+        if searchText.count > 0 || onlyCached {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
                     library.getFetchPredicate(forArtist: artist),
                     AlbumMO.getFetchPredicateForAlbumsWhoseSongsHave(artist: artist)
                 ]),
+                library.getFetchPredicate(onlyCachedAlbums: onlyCached),
                 ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText)
             ])
             search(predicate: predicate)
@@ -224,9 +233,13 @@ class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
-    func search(searchText: String) {
-        if searchText.count > 0 {
-            search(predicate: AlbumMO.getIdentifierBasedSearchPredicate(searchText: searchText))
+    func search(searchText: String, onlyCached: Bool) {
+        if searchText.count > 0 || onlyCached {
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                AlbumMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(onlyCachedAlbums: onlyCached)
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }

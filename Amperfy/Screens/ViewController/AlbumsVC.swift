@@ -12,7 +12,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         fetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController(placeholder: "Search in \"Albums\"")
+        configureSearchController(placeholder: "Search in \"Albums\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.rowHeight = AlbumTableCell.rowHeight
     }
@@ -43,14 +43,14 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     
     override func updateSearchResults(for searchController: UISearchController) {
         let searchText = searchController.searchBar.text ?? ""
-        if searchText.count > 0 {
+        if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
             appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                 let backgroundLibrary = LibraryStorage(context: context)
                 let syncer = self.appDelegate.backendApi.createLibrarySyncer()
                 syncer.searchAlbums(searchText: searchText, library: backgroundLibrary)
             }
         }
-        fetchedResultsController.search(searchText: searchText)
+        fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1)
         tableView.reloadData()
     }
     

@@ -133,10 +133,10 @@ class ArtistDetailVC: BasicTableViewController {
     override func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            albumsFetchedResultsController.search(searchText: searchText)
+            albumsFetchedResultsController.search(searchText: searchText, onlyCached: false)
             songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
         } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
-            albumsFetchedResultsController.clearResults()
+            albumsFetchedResultsController.search(searchText: searchText, onlyCached: true)
             songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
         } else {
             albumsFetchedResultsController.showAllResults()

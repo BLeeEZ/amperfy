@@ -12,7 +12,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         fetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController(placeholder: "Search in \"Artists\"")
+        configureSearchController(placeholder: "Search in \"Artists\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.rowHeight = ArtistTableCell.rowHeight
     }
@@ -43,14 +43,14 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     
     override func updateSearchResults(for searchController: UISearchController) {
         let searchText = searchController.searchBar.text ?? ""
-        if searchText.count > 0 {
+        if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
             appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                 let backgroundLibrary = LibraryStorage(context: context)
                 let syncer = self.appDelegate.backendApi.createLibrarySyncer()
                 syncer.searchArtists(searchText: searchText, library: backgroundLibrary)
             }
         }
-        fetchedResultsController.search(searchText: searchText)
+        fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1)
         tableView.reloadData()
     }
 
