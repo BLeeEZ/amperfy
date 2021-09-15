@@ -25,11 +25,13 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.syncDownPlaylistsWithoutSongs(library: syncLibrary)
+        super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let syncLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.syncDownPlaylistsWithoutSongs(library: syncLibrary)
+            }
         }
     }
 

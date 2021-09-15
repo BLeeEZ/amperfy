@@ -54,9 +54,11 @@ class PodcastDetailTableHeader: UIView {
     
     func createAlert(forPodcast podcast: Podcast) -> UIAlertController {
         let alert = UIAlertController(title: podcast.title, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-            podcast.cachePlayables(downloadManager: self.appDelegate.playableDownloadManager)
-        }))
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
+                podcast.cachePlayables(downloadManager: self.appDelegate.playableDownloadManager)
+            }))
+        }
         if podcast.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.library.deleteCache(of: podcast)

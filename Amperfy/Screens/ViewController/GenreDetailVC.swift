@@ -33,12 +33,6 @@ class GenreDetailVC: BasicTableViewController {
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        artistsFetchedResultsController.fetch()
-        albumsFetchedResultsController.fetch()
-        songsFetchedResultsController.fetch()
-    }
 
     // MARK: - Table view data source
 
@@ -149,12 +143,12 @@ class GenreDetailVC: BasicTableViewController {
     override func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            artistsFetchedResultsController.search(searchText: searchText)
-            albumsFetchedResultsController.search(searchText: searchText)
+            artistsFetchedResultsController.search(searchText: searchText, onlyCached: false)
+            albumsFetchedResultsController.search(searchText: searchText, onlyCached: false)
             songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
         } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
-            artistsFetchedResultsController.clearResults()
-            albumsFetchedResultsController.clearResults()
+            artistsFetchedResultsController.search(searchText: searchText, onlyCached: true)
+            albumsFetchedResultsController.search(searchText: searchText, onlyCached: true)
             songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
         } else {
             artistsFetchedResultsController.showAllResults()

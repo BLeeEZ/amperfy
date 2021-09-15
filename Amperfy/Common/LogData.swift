@@ -53,6 +53,7 @@ public struct LogData: Encodable {
         let settings = appDelegate.persistentStorage.settings
         userSettings.songActionOnTab = settings.songActionOnTab.description
         userSettings.playerDisplayStyle = settings.playerDisplayStyle.description
+        userSettings.isOfflineMode = settings.isOfflineMode
         logData.userSettings = userSettings
         
         let allUserStatistics = appDelegate.library.getAllUserStatistics()
@@ -118,6 +119,7 @@ public struct PlayerInfo: Encodable {
 public struct UserSettings: Encodable {
     public var songActionOnTab: String?
     public var playerDisplayStyle: String?
+    public var isOfflineMode: Bool?
 }
 
 public struct EventInfo: Encodable {

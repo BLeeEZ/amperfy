@@ -29,8 +29,8 @@ class SearchVC: BasicTableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         appDelegate.userStatistics.visited(.search)
-        // Only search performes fetches in this view
     }
 
     // MARK: - Table view data source

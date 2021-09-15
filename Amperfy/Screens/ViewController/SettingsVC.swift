@@ -7,6 +7,7 @@ class SettingsVC: UITableViewController {
     
     @IBOutlet weak var versionLabel: UILabel!
     @IBOutlet weak var buildNumberLabel: UILabel!
+    @IBOutlet weak var offlineModeSwitch: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -14,10 +15,16 @@ class SettingsVC: UITableViewController {
         
         versionLabel.text = AppDelegate.version
         buildNumberLabel.text = AppDelegate.buildNumber
+        offlineModeSwitch.isOn = appDelegate.persistentStorage.settings.isOfflineMode
     }
     
     override func viewWillAppear(_ animated: Bool) {
         appDelegate.userStatistics.visited(.settings)
+    }
+    
+    @IBAction func triggeredOfflineModeSwitch(_ sender: Any) {
+        appDelegate.persistentStorage.settings.isOfflineMode = offlineModeSwitch.isOn
+        appDelegate.player.isOfflineMode = offlineModeSwitch.isOn
     }
     
     @IBAction func resetAppPressed(_ sender: Any) {

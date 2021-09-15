@@ -113,7 +113,7 @@ class PlayableTableCell: BasicTableCell {
             alert.view.addSubview(headerView)
         }
     
-        if playerIndex == nil {
+        if playerIndex == nil && (playable.isCached || appDelegate.persistentStorage.settings.isOnlineMode) {
             alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
                 self.appDelegate.player.play(playable: playable)
                 }))
@@ -121,7 +121,7 @@ class PlayableTableCell: BasicTableCell {
                 self.appDelegate.player.addToPlaylist(playable: playable)
             }))
         }
-        if playable.isSong {
+        if playable.isSong && appDelegate.persistentStorage.settings.isOnlineMode {
             alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
                 let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
                 selectPlaylistVC.itemsToAdd = [playable]
@@ -135,7 +135,7 @@ class PlayableTableCell: BasicTableCell {
                 self.appDelegate.library.saveContext()
                 self.refresh()
             }))
-        } else {
+        } else if appDelegate.persistentStorage.settings.isOnlineMode {
             alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
                 self.appDelegate.playableDownloadManager.download(object: playable)
                 self.refresh()

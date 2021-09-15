@@ -53,17 +53,19 @@ class GenreDetailTableHeader: UIView {
     
     func createAlert(for genre: Genre) -> UIAlertController {
         let alert = UIAlertController(title: genre.name, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
-            let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.itemsToAdd = genre.songs
-            let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-            if let rootView = self.rootView {
-                rootView.present(selectPlaylistNav, animated: true, completion: nil)
-            }
-        }))
-        alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-            self.appDelegate.playableDownloadManager.download(objects: genre.songs)
-        }))
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
+                let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
+                selectPlaylistVC.itemsToAdd = genre.songs
+                let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+                if let rootView = self.rootView {
+                    rootView.present(selectPlaylistNav, animated: true, completion: nil)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
+                self.appDelegate.playableDownloadManager.download(objects: genre.songs)
+            }))
+        }
         if genre.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.library.deleteCache(of: genre)

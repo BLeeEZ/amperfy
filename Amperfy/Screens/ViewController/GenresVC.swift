@@ -12,13 +12,9 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         fetchedResultsController = GenreFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController(placeholder: "Search in \"Genres\"")
+        configureSearchController(placeholder: "Search in \"Genres\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: GenreTableCell.typeName)
         tableView.rowHeight = GenreTableCell.rowHeight
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -42,7 +38,8 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     }
     
     override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "")
+        let searchText = searchController.searchBar.text ?? ""
+        fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1)
         tableView.reloadData()
     }
 

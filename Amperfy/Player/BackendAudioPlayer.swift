@@ -24,6 +24,7 @@ class BackendAudioPlayer {
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     private let semaphore = DispatchSemaphore(value: 1)
     
+    public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
     public private(set) var isPlaying: Bool = false
     public private(set) var currentlyPlaying: PlaylistItem?
@@ -104,15 +105,16 @@ class BackendAudioPlayer {
             player.pause()
             player.replaceCurrentItem(with: nil)
             eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playable.displayString)\" is not playable via Amperfy.")
-        } else {
-            if playable.isCached {
-                insertCachedPlayable(playlistItem: playlistItem)
-            } else {
-                insertStreamPlayable(playlistItem: playlistItem)
-                if isAutoCachePlayedItems {
-                    playableDownloader.download(object: playable)
-                }
+        } else if playable.isCached {
+            insertCachedPlayable(playlistItem: playlistItem)
+        } else if !isOfflineMode{
+            insertStreamPlayable(playlistItem: playlistItem)
+            if isAutoCachePlayedItems {
+                playableDownloader.download(object: playable)
             }
+        } else {
+            player.pause()
+            player.replaceCurrentItem(with: nil)
         }
         self.continuePlay()
         self.reactToInsertationFinish(playlistItem: playlistItem)

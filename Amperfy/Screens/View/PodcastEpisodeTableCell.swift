@@ -91,19 +91,21 @@ class PodcastEpisodeTableCell: BasicTableCell {
         }
     
         if episode.userStatus != .syncingOnServer {
-            alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
-                self.appDelegate.player.play(playable: episode)
-            }))
-            alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
-                self.appDelegate.player.addToPlaylist(playable: episode)
-            }))
+            if episode.isCached || appDelegate.persistentStorage.settings.isOnlineMode {
+                alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
+                    self.appDelegate.player.play(playable: episode)
+                }))
+                alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
+                    self.appDelegate.player.addToPlaylist(playable: episode)
+                }))
+            }
             if episode.isCached {
                 alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                     self.appDelegate.library.deleteCache(ofPlayable: episode)
                     self.appDelegate.library.saveContext()
                     self.refresh()
                 }))
-            } else {
+            } else if appDelegate.persistentStorage.settings.isOnlineMode {
                 alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
                     self.appDelegate.playableDownloadManager.download(object: episode)
                     self.refresh()

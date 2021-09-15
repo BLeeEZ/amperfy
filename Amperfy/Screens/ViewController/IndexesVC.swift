@@ -20,12 +20,14 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let musicFolderAsync = MusicFolder(managedObject: context.object(with: self.musicFolder.managedObject.objectID) as! MusicFolderMO)
-            syncer.syncIndexes(musicFolder: musicFolderAsync, library: library)
+        super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let library = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                let musicFolderAsync = MusicFolder(managedObject: context.object(with: self.musicFolder.managedObject.objectID) as! MusicFolderMO)
+                syncer.syncIndexes(musicFolder: musicFolderAsync, library: library)
+            }
         }
     }
     

@@ -16,10 +16,6 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.rowHeight = ArtistTableCell.rowHeight
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
-    }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: ArtistTableCell = dequeueCell(for: tableView, at: indexPath)

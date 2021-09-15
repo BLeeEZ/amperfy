@@ -18,11 +18,13 @@ class PodcastsVC: SingleFetchedResultsTableViewController<PodcastMO> {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.syncDownPodcastsWithoutEpisodes(library: syncLibrary)
+        super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let syncLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.syncDownPodcastsWithoutEpisodes(library: syncLibrary)
+            }
         }
     }
 

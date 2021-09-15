@@ -18,11 +18,13 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.syncMusicFolders(library: library)
+        super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let library = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.syncMusicFolders(library: library)
+            }
         }
     }
     
@@ -47,7 +49,8 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     }
     
     override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "")
+        let searchText = searchController.searchBar.text ?? ""
+        fetchedResultsController.search(searchText: searchText)
         tableView.reloadData()
     }
 

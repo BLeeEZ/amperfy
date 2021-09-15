@@ -42,14 +42,16 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let playlistAsync = self.playlist.getManagedObject(in: context, library: syncLibrary)
-            syncer.syncDown(playlist: playlistAsync, library: syncLibrary)
-            DispatchQueue.main.async {
-                self.playlistOperationsView?.refresh()
+        super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let syncLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                let playlistAsync = self.playlist.getManagedObject(in: context, library: syncLibrary)
+                syncer.syncDown(playlist: playlistAsync, library: syncLibrary)
+                DispatchQueue.main.async {
+                    self.playlistOperationsView?.refresh()
+                }
             }
         }
     }
@@ -87,11 +89,13 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         if editingStyle == .delete {
             playlist.remove(at: indexPath.row)
             self.playlistOperationsView?.refresh()
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let playlistAsync = self.playlist.getManagedObject(in: context, library: syncLibrary)
-                syncer.syncUpload(playlistToDeleteSong: playlistAsync, index: indexPath.row, library: syncLibrary)
+            if appDelegate.persistentStorage.settings.isOnlineMode {
+                appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                    let syncLibrary = LibraryStorage(context: context)
+                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                    let playlistAsync = self.playlist.getManagedObject(in: context, library: syncLibrary)
+                    syncer.syncUpload(playlistToDeleteSong: playlistAsync, index: indexPath.row, library: syncLibrary)
+                }
             }
         }
     }
@@ -100,11 +104,13 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         noAnimationAtNextDataChange = true
         playlist.movePlaylistItem(fromIndex: fromIndexPath.row, to: to.row)
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let playlistAsync = self.playlist.getManagedObject(in: context, library: syncLibrary)
-            syncer.syncUpload(playlistToUpdateOrder: playlistAsync, library: syncLibrary)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let syncLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                let playlistAsync = self.playlist.getManagedObject(in: context, library: syncLibrary)
+                syncer.syncUpload(playlistToUpdateOrder: playlistAsync, library: syncLibrary)
+            }
         }
     }
     
@@ -125,6 +131,11 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
                 self.refreshControl?.endRefreshing()
             }
         }
+    }
+    
+    override func updateSearchResults(for searchController: UISearchController) {
+        fetchedResultsController.fetch()
+        tableView.reloadData()
     }
     
 }

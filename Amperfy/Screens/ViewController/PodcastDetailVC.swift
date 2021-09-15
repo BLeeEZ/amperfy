@@ -26,14 +26,16 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let podcastAsync = Podcast(managedObject: context.object(with: self.podcast.managedObject.objectID) as! PodcastMO)
-            syncer.sync(podcast: podcastAsync, library: library)
-            DispatchQueue.main.async {
-                self.detailOperationsView?.refresh()
+        super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let library = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                let podcastAsync = Podcast(managedObject: context.object(with: self.podcast.managedObject.objectID) as! PodcastMO)
+                syncer.sync(podcast: podcastAsync, library: library)
+                DispatchQueue.main.async {
+                    self.detailOperationsView?.refresh()
+                }
             }
         }
     }

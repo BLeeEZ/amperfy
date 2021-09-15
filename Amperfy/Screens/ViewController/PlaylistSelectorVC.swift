@@ -25,11 +25,13 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.syncDownPlaylistsWithoutSongs(library: syncLibrary)
+        super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let syncLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.syncDownPlaylistsWithoutSongs(library: syncLibrary)
+            }
         }
     }
     
@@ -53,12 +55,14 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
         if let items = itemsToAdd {
             playlist.append(playables: items)
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let playlistAsync = playlist.getManagedObject(in: context, library: syncLibrary)
-                let songsAsync = items.compactMap{ context.object(with: $0.objectID) as? SongMO }.compactMap{ Song(managedObject: $0) }
-                syncer.syncUpload(playlistToAddSongs: playlistAsync, songs: songsAsync, library: syncLibrary)
+            if appDelegate.persistentStorage.settings.isOnlineMode {
+                appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                    let syncLibrary = LibraryStorage(context: context)
+                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                    let playlistAsync = playlist.getManagedObject(in: context, library: syncLibrary)
+                    let songsAsync = items.compactMap{ context.object(with: $0.objectID) as? SongMO }.compactMap{ Song(managedObject: $0) }
+                    syncer.syncUpload(playlistToAddSongs: playlistAsync, songs: songsAsync, library: syncLibrary)
+                }
             }
         }
         dismiss()

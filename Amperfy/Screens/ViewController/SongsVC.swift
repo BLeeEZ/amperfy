@@ -18,11 +18,16 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.rowHeight = SongTableCell.rowHeight
         
         optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
-        navigationItem.rightBarButtonItem = optionsButton
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
+        super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            navigationItem.rightBarButtonItem = optionsButton
+        } else {
+            navigationItem.rightBarButtonItem = nil
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

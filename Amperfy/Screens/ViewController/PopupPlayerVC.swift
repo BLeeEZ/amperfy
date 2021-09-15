@@ -267,12 +267,14 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             self.reloadData()
             self.playerView.refreshPlayer()
         }))
-        alert.addAction(UIAlertAction(title: "Add all songs to playlist", style: .default, handler: { _ in
-            let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.itemsToAdd = self.appDelegate.player.playlist.playables.filterSongs()
-            let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-            self.present(selectPlaylistNav, animated: true, completion: nil)
-        }))
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            alert.addAction(UIAlertAction(title: "Add all songs to playlist", style: .default, handler: { _ in
+                let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
+                selectPlaylistVC.itemsToAdd = self.appDelegate.player.playlist.playables.filterSongs()
+                let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+                self.present(selectPlaylistNav, animated: true, completion: nil)
+            }))
+        }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)

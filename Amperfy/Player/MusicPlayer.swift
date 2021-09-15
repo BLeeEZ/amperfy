@@ -75,6 +75,10 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         get { return coreData.repeatMode }
         set { coreData.repeatMode = newValue }
     }
+    var isOfflineMode: Bool {
+        get { return backendAudioPlayer.isOfflineMode }
+        set { backendAudioPlayer.isOfflineMode = newValue }
+    }
     var isAutoCachePlayedItems: Bool {
         get { return coreData.isAutoCachePlayedItems }
         set {

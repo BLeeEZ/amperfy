@@ -56,9 +56,17 @@ class GenreFetchedResultsController: CachedFetchedResultsController<GenreMO> {
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
         
-    func search(searchText: String) {
-        if searchText.count > 0 {
-            search(predicate: GenreMO.getIdentifierBasedSearchPredicate(searchText: searchText))
+    func search(searchText: String, onlyCached: Bool) {
+        if searchText.count > 0 || onlyCached {
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                GenreMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                NSCompoundPredicate(orPredicateWithSubpredicates: [
+                    library.getFetchPredicate(onlyCachedGenreArtists: onlyCached),
+                    library.getFetchPredicate(onlyCachedGenreAlbums: onlyCached),
+                    library.getFetchPredicate(onlyCachedGenreSongs: onlyCached)
+                ])
+            ])
+            search(predicate: predicate)
         } else {
             showAllResults()
         }
@@ -78,10 +86,11 @@ class GenreArtistsFetchedResultsController: BasicFetchedResultsController<Artist
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
-    func search(searchText: String) {
-        if searchText.count > 0 {
+    func search(searchText: String, onlyCached: Bool) {
+        if searchText.count > 0 || onlyCached {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 library.getFetchPredicate(forGenre: genre),
+                library.getFetchPredicate(onlyCachedArtists: onlyCached),
                 ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText)
             ])
             search(predicate: predicate)
@@ -104,10 +113,11 @@ class GenreAlbumsFetchedResultsController: BasicFetchedResultsController<AlbumMO
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
-    func search(searchText: String) {
-        if searchText.count > 0 {
+    func search(searchText: String, onlyCached: Bool) {
+        if searchText.count > 0 || onlyCached {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 library.getFetchPredicate(forGenre: genre),
+                library.getFetchPredicate(onlyCachedAlbums: onlyCached),
                 ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText)
             ])
             search(predicate: predicate)

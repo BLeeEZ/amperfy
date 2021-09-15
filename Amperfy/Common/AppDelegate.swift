@@ -36,7 +36,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }()
     lazy var player: MusicPlayer = {
         let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
-        return MusicPlayer(coreData: library.getPlayerData(), playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        let curPlayer = MusicPlayer(coreData: library.getPlayerData(), playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        curPlayer.isOfflineMode = persistentStorage.settings.isOfflineMode
+        return curPlayer
     }()
     lazy var playableDownloadManager: DownloadManageable = {
         let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi)

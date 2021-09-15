@@ -28,11 +28,12 @@ class DownloadManager: NSObject, DownloadManageable {
     }
     
     func download(object: Downloadable) {
-        guard !object.isCached else { return }
+        guard !object.isCached, persistentStorage.settings.isOnlineMode else { return }
         self.requestManager.add(object: object)
     }
     
     func download(objects: [Downloadable]) {
+        guard persistentStorage.settings.isOnlineMode else { return }
         let downloadObjects = objects.filter{ !$0.isCached }
         if downloadObjects.count > 0 {
             self.requestManager.add(objects: downloadObjects)

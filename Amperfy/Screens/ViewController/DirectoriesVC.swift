@@ -25,13 +25,14 @@ class DirectoriesVC: BasicTableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        subdirectoriesFetchedResultsController.fetch()
-        songsFetchedResultsController.fetch()
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let directoryAsync = Directory(managedObject: context.object(with: self.directory.managedObject.objectID) as! DirectoryMO)
-            syncer.sync(directory: directoryAsync, library: library)
+        super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let library = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                let directoryAsync = Directory(managedObject: context.object(with: self.directory.managedObject.objectID) as! DirectoryMO)
+                syncer.sync(directory: directoryAsync, library: library)
+            }
         }
     }
     
@@ -95,7 +96,7 @@ class DirectoriesVC: BasicTableViewController {
             subdirectoriesFetchedResultsController.search(searchText: searchText)
             songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
         } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
-            subdirectoriesFetchedResultsController.clearResults()
+            subdirectoriesFetchedResultsController.search(searchText: searchText)
             songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
         } else {
             subdirectoriesFetchedResultsController.showAllResults()

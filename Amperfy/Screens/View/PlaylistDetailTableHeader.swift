@@ -91,9 +91,11 @@ class PlaylistDetailTableHeader: UIView {
     func createAlert(forPlaylist playlist: Playlist) -> UIAlertController {
         let alert = UIAlertController(title: playlist.name, message: nil, preferredStyle: .actionSheet)
         
-        alert.addAction(UIAlertAction(title: "Download all songs", style: .default, handler: { _ in
-            self.appDelegate.playableDownloadManager.download(objects: playlist.playables)
-        }))
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            alert.addAction(UIAlertAction(title: "Download all songs", style: .default, handler: { _ in
+                self.appDelegate.playableDownloadManager.download(objects: playlist.playables)
+            }))
+        }
         if playlist.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.library.deleteCache(of: playlist)

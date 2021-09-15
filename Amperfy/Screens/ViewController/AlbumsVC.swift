@@ -16,10 +16,6 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.rowHeight = AlbumTableCell.rowHeight
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        fetchedResultsController.fetch()
-    }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: AlbumTableCell = dequeueCell(for: tableView, at: indexPath)

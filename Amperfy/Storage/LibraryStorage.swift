@@ -347,6 +347,30 @@ class LibraryStorage: PlayableFileCachable {
         }
     }
     
+    func getFetchPredicate(onlyCachedGenreArtists: Bool) -> NSPredicate {
+        if onlyCachedGenreArtists {
+            return NSPredicate(format: "SUBQUERY(artists, $artist, ANY $artist.songs.file != nil) .@count > 0")
+        } else {
+            return NSPredicate.alwaysTrue
+        }
+    }
+    
+    func getFetchPredicate(onlyCachedGenreAlbums: Bool) -> NSPredicate {
+        if onlyCachedGenreAlbums {
+            return NSPredicate(format: "SUBQUERY(albums, $album, ANY $album.songs.file != nil) .@count > 0")
+        } else {
+            return NSPredicate.alwaysTrue
+        }
+    }
+    
+    func getFetchPredicate(onlyCachedGenreSongs: Bool) -> NSPredicate {
+        if onlyCachedGenreSongs {
+            return NSPredicate(format: "SUBQUERY(songs, $song, $song.file != nil) .@count > 0")
+        } else {
+            return NSPredicate.alwaysTrue
+        }
+    }
+    
     func getFetchPredicate(forPlaylistSearchCategory playlistSearchCategory: PlaylistSearchCategory) -> NSPredicate {
         switch playlistSearchCategory {
         case .all:

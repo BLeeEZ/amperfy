@@ -12,6 +12,7 @@ class PersistentStorage {
         
         case SongActionOnTab = "songActionOnTab"
         case PlayerDisplayStyle = "playerDisplayStyle"
+        case IsOfflineMode = "isOfflineMode"
         case LibrarySyncVersion = "librarySyncVersion"
         
         case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
@@ -32,6 +33,14 @@ class PersistentStorage {
                 return PlayerDisplayStyle(rawValue: playerDisplayStyleRaw) ?? PlayerDisplayStyle.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue) }
+        }
+        
+        var isOfflineMode: Bool {
+            get { return UserDefaults.standard.object(forKey: UserDefaultsKey.IsOfflineMode.rawValue) as? Bool ?? false }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsOfflineMode.rawValue) }
+        }
+        var isOnlineMode: Bool {
+            return !isOfflineMode
         }
     }
     

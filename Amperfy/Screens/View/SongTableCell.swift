@@ -66,7 +66,7 @@ class SongTableCell: BasicTableCell {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let song = song else { return }
 
-        if !isAlertPresented {
+        if !isAlertPresented && (song.isCached || appDelegate.persistentStorage.settings.isOnlineMode) {
             hideSearchBarKeyboardInRootView()
             switch appDelegate.persistentStorage.settings.songActionOnTab {
             case .playAndErasePlaylist:
@@ -122,26 +122,29 @@ class SongTableCell: BasicTableCell {
             headerView.addSubview(songActionSheetView)
             alert.view.addSubview(headerView)
         }
-    
-        alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
-            self.appDelegate.player.play(playable: song)
+        if song.isCached || appDelegate.persistentStorage.settings.isOnlineMode {
+            alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
+                self.appDelegate.player.play(playable: song)
+                }))
+                alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
+                self.appDelegate.player.addToPlaylist(playable: song)
             }))
-            alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
-            self.appDelegate.player.addToPlaylist(playable: song)
-        }))
-        alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
-            let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.itemsToAdd = [song]
-            let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-            rootView.present(selectPlaylistNav, animated: true, completion: nil)
-        }))
+        }
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
+                let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
+                selectPlaylistVC.itemsToAdd = [song]
+                let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+                rootView.present(selectPlaylistNav, animated: true, completion: nil)
+            }))
+        }
         if song.isCached {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                 self.appDelegate.library.deleteCache(ofPlayable: song)
                 self.appDelegate.library.saveContext()
                 self.refresh()
             }))
-        } else {
+        } else if appDelegate.persistentStorage.settings.isOnlineMode {
             alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
                 self.appDelegate.playableDownloadManager.download(object: song)
                 self.refresh()
