@@ -18,7 +18,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.rowHeight = SongTableCell.rowHeight
         
         optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {

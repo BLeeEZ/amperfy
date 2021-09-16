@@ -20,13 +20,8 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(startEditing))
         doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(endEditing))
-        navigationItem.rightBarButtonItem = editButton
-        if playlist?.isSmartPlaylist ?? false {
-            navigationItem.rightBarButtonItem?.isEnabled = false
-        }
         
         let playlistTableHeaderFrameHeight = PlaylistDetailTableHeader.frameHeight
-        
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: playlistTableHeaderFrameHeight + LibraryElementDetailTableHeaderView.frameHeight))
 
         if let playlistDetailTableHeaderView = ViewBuilder<PlaylistDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: playlistTableHeaderFrameHeight)) {
@@ -43,6 +38,14 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            navigationItem.rightBarButtonItem = editButton
+            if playlist?.isSmartPlaylist ?? false {
+                navigationItem.rightBarButtonItem?.isEnabled = false
+            }
+        } else {
+            navigationItem.rightBarButtonItem = nil
+        }
         if appDelegate.persistentStorage.settings.isOnlineMode {
             appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                 let syncLibrary = LibraryStorage(context: context)
