@@ -213,6 +213,13 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
+    func requestLatestAlbums(parserDelegate: SsXmlParser) {
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getAlbumList2") else { return }
+        urlComp.addQueryItem(name: "type", value: "newest")
+        urlComp.addQueryItem(name: "size", value: 50)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
     func requestRandomSongs(parserDelegate: SsXmlParser, count: Int) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getRandomSongs") else { return }
         urlComp.addQueryItem(name: "size", value: count)

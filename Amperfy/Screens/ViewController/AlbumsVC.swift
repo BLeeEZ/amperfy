@@ -15,6 +15,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         configureSearchController(placeholder: "Search in \"Albums\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.rowHeight = AlbumTableCell.rowHeight
+        self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -48,6 +49,24 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         }
         fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1)
         tableView.reloadData()
+    }
+    
+    @objc func handleRefresh(refreshControl: UIRefreshControl) {
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            if self.appDelegate.persistentStorage.settings.isOnlineMode {
+                let syncLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.syncLatestLibraryElements(library: syncLibrary)
+                DispatchQueue.main.async {
+                    self.refreshControl?.endRefreshing()
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.refreshControl?.endRefreshing()
+                }
+            }
+
+        }
     }
     
 }

@@ -105,6 +105,21 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         library.saveContext()
     }
     
+    func syncLatestLibraryElements(library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        os_log("Sync newest albums", log: log, type: .info)
+        let albumDelegate = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestLatestAlbums(parserDelegate: albumDelegate)
+        library.saveContext()
+        os_log("Sync songs of newest albums", log: log, type: .info)
+        for album in albumDelegate.parsedAlbums {
+            let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+            subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+        }
+        os_log("%i newest Albums synced", log: log, type: .info, albumDelegate.parsedAlbums.count)
+        library.saveContext()
+    }
+    
     func syncMusicFolders(library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
         let musicFolderParser = SsMusicFolderParserDelegate(library: library, syncWave: syncWave)

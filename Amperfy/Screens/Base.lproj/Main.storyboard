@@ -266,6 +266,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Artists" id="r1Y-hi-fd7"/>
+                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="OLQ-2i-rN9">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </refreshControl>
                     <connections>
                         <segue destination="CbP-zj-PDn" kind="show" identifier="toArtistDetail" id="PtL-O3-n85"/>
                     </connections>
@@ -310,6 +313,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Albums" id="tB5-PS-t7P"/>
+                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="hYm-lD-F5a">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </refreshControl>
                     <connections>
                         <segue destination="CiG-al-lkI" kind="show" identifier="toAlbumDetail" id="sdx-Gn-m0J"/>
                     </connections>
@@ -352,6 +358,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Songs" id="bi8-mc-CgH"/>
+                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="bF0-OW-Sag">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </refreshControl>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8cX-Lc-IQ2" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -2429,6 +2438,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Genres" id="QuU-c2-iBn"/>
+                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="g8Q-Jo-DTW">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </refreshControl>
                     <connections>
                         <segue destination="noZ-Ok-RcV" kind="show" identifier="toGenreDetail" id="gUH-lh-jqe"/>
                     </connections>
@@ -2730,9 +2742,9 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="kw4-13-m0t"/>
-        <segue reference="JPy-r0-4uB"/>
-        <segue reference="whh-XI-a5P"/>
+        <segue reference="sdx-Gn-m0J"/>
+        <segue reference="PtL-O3-n85"/>
+        <segue reference="qYo-eV-9nj"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="music_library" width="30" height="30"/>

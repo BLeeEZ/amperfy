@@ -6,6 +6,7 @@ import os.log
 class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
     
     var guessedArtist: Artist?
+    var parsedAlbums = [Album]()
     private var albumBuffer: Album?
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
@@ -68,6 +69,9 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
         switch(elementName) {
         case "album":
             parsedCount += 1
+            if let album = albumBuffer {
+                parsedAlbums.append(album)
+            }
             albumBuffer = nil
         default:
             break

@@ -29,6 +29,7 @@ protocol LibrarySyncer {
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?)
     func sync(artist: Artist, library: LibraryStorage)
     func sync(album: Album, library: LibraryStorage)
+    func syncLatestLibraryElements(library: LibraryStorage)
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage)
     func syncDown(playlist: Playlist, library: LibraryStorage)
     func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], library: LibraryStorage)

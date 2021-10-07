@@ -18,6 +18,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.rowHeight = SongTableCell.rowHeight
         
         optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
+        self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -76,6 +77,24 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
         present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func handleRefresh(refreshControl: UIRefreshControl) {
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            if self.appDelegate.persistentStorage.settings.isOnlineMode {
+                let syncLibrary = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.syncLatestLibraryElements(library: syncLibrary)
+                DispatchQueue.main.async {
+                    self.refreshControl?.endRefreshing()
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.refreshControl?.endRefreshing()
+                }
+            }
+
+        }
     }
     
 }

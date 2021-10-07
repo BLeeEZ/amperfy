@@ -123,6 +123,54 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         ampacheXmlServerApi.eventLogger.error(topic: "Internal Error", statusCode: .internalError, message: "GetMusicDirectory API function is not support by Ampache")
     }
     
+    func syncLatestLibraryElements(library: LibraryStorage) {
+        guard var syncWave = library.getLatestSyncWave() else { return }
+        guard let ampacheMetaData = ampacheXmlServerApi.requesetLibraryMetaData() else { return }
+        guard syncWave.libraryChangeDates.dateOfLastAdd != ampacheMetaData.libraryChangeDates.dateOfLastAdd else {
+            os_log("No new library elements available", log: log, type: .info)
+            return
+        }
+        let lastStr = "\(syncWave.libraryChangeDates.dateOfLastAdd)"
+        let newStr = "\(ampacheMetaData.libraryChangeDates.dateOfLastAdd)"
+        os_log("New library elements available (last: %s, new: %s)", log: log, type: .info, lastStr, newStr)
+        
+        let addDate = Date(timeInterval: 1, since: syncWave.libraryChangeDates.dateOfLastAdd)
+        syncWave = library.createSyncWave()
+        syncWave.setMetaData(fromLibraryChangeDates: ampacheMetaData.libraryChangeDates)
+        library.saveContext()
+        
+        var allParsed = false
+        var syncIndex = 0
+        repeat {
+            let artistParser = ArtistParserDelegate(library: library, syncWave: syncWave)
+            ampacheXmlServerApi.requestArtists(parserDelegate: artistParser, addDate: addDate, startIndex: syncIndex, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+            syncIndex += artistParser.parsedCount
+            allParsed = artistParser.parsedCount == 0
+        } while(!allParsed)
+        os_log("%i new Artists synced", log: log, type: .info, syncIndex)
+        library.saveContext()
+        
+        syncIndex = 0
+        repeat {
+            let albumParser = AlbumParserDelegate(library: library, syncWave: syncWave)
+            ampacheXmlServerApi.requestAlbums(parserDelegate: albumParser, addDate: addDate, startIndex: syncIndex, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+            syncIndex += albumParser.parsedCount
+            allParsed = albumParser.parsedCount == 0
+        } while(!allParsed)
+        os_log("%i new Albums synced", log: log, type: .info, syncIndex)
+        library.saveContext()
+        
+        syncIndex = 0
+        repeat {
+            let songParser = SongParserDelegate(library: library, syncWave: syncWave)
+            ampacheXmlServerApi.requestSongs(parserDelegate: songParser, addDate: addDate, startIndex: syncIndex, pollCount: AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+            syncIndex += songParser.parsedCount
+            allParsed = songParser.parsedCount == 0
+        } while(!allParsed)
+        os_log("%i new Songs synced", log: log, type: .info, syncIndex)
+        library.saveContext()
+    }
+    
     func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
         let parser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
