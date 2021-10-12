@@ -111,6 +111,18 @@ class BackendProxy {
         let task = session.downloadTask(with: request) { (tempLocalUrl, response, error) in
             if let error = error {
                 downloadError = AuthenticationError(message: error.localizedDescription, kind: .downloadError)
+            } else {
+                if let statusCode = (response as? HTTPURLResponse)?.statusCode {
+                    if statusCode >= 400,
+                       // ignore 401 Unauthorized (RFC 7235) status code
+                       // -> Can occure if root website requires http basic authentication,
+                       //    but the REST API endpoints are reachable without http basic authentication
+                       statusCode != 401 {
+                        downloadError = AuthenticationError(message: "\(statusCode)", kind: .requestStatusError)
+                    } else {
+                        os_log("Server url is reachable. Status code: %d", log: self.log, type: .info, statusCode)
+                    }
+                }
             }
             group.leave()
         }
