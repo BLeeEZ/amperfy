@@ -267,8 +267,10 @@ extension AppDelegate: AlertDisplayable {
         }
         
         banner.show(queuePosition: .back, bannerPosition: .top, on: topView, cornerRadius: 20, shadowBlurRadius: 10)
-        UIApplication.shared.keyWindow!.addSubview(banner)
-        UIApplication.shared.keyWindow!.bringSubviewToFront(banner)
+        if let keyWindow = UIApplication.shared.keyWindow {
+            keyWindow.addSubview(banner)
+            keyWindow.bringSubviewToFront(banner)
+        }
     }
     
     func display(popup popupVC: LibrarySyncPopupVC) {
