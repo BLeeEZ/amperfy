@@ -371,6 +371,24 @@ class LibraryStorage: PlayableFileCachable {
         }
     }
     
+    func getFetchPredicate(songsDisplayFilter: DisplayCategoryFilter) -> NSPredicate {
+        switch songsDisplayFilter {
+        case .recentlyAdded:
+            return NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isRecentlyAdded))
+        case .all:
+            return NSPredicate.alwaysTrue
+        }
+    }
+    
+    func getFetchPredicate(albumsDisplayFilter: DisplayCategoryFilter) -> NSPredicate {
+        switch albumsDisplayFilter {
+        case .recentlyAdded:
+            return NSPredicate(format: "SUBQUERY(songs, $song, $song.isRecentlyAdded == TRUE) .@count > 0")
+        case .all:
+            return NSPredicate.alwaysTrue
+        }
+    }
+    
     func getFetchPredicate(forPlaylistSearchCategory playlistSearchCategory: PlaylistSearchCategory) -> NSPredicate {
         switch playlistSearchCategory {
         case .all:
@@ -407,6 +425,14 @@ class LibraryStorage: PlayableFileCachable {
 
     func getSongs() -> [Song] {
         let fetchRequest = SongMO.identifierSortedFetchRequest
+        let foundSongs = try? context.fetch(fetchRequest)
+        let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
+        return songs ?? [Song]()
+    }
+    
+    func getRecentSongs() -> [Song] {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isRecentlyAdded))
         let foundSongs = try? context.fetch(fetchRequest)
         let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
         return songs ?? [Song]()

@@ -305,6 +305,16 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
+    func requestRecentSongs(parserDelegate: AmpacheXmlParser, count: Int) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "advanced_search")
+        apiUrlComponent.addQueryItem(name: "rule_1", value: "recent_added")
+        apiUrlComponent.addQueryItem(name: "rule_1_operator", value: 0)
+        apiUrlComponent.addQueryItem(name: "rule_1_input", value: count)
+        apiUrlComponent.addQueryItem(name: "type", value: "song")
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
     func requestPlaylists(parserDelegate: AmpacheXmlParser) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlists")

@@ -107,16 +107,24 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     
     func syncLatestLibraryElements(library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
+        let oldRecentSongs = Set(library.getRecentSongs())
+        
         os_log("Sync newest albums", log: log, type: .info)
         let albumDelegate = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestLatestAlbums(parserDelegate: albumDelegate)
         library.saveContext()
         os_log("Sync songs of newest albums", log: log, type: .info)
+        
+        var recentlyAddedSongs: Set<Song> = Set()
         for album in albumDelegate.parsedAlbums {
             let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
             subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+            recentlyAddedSongs = recentlyAddedSongs.union(Set(songParser.parsedSongs))
         }
         os_log("%i newest Albums synced", log: log, type: .info, albumDelegate.parsedAlbums.count)
+        let notRecentSongsAnymore = oldRecentSongs.subtracting(recentlyAddedSongs)
+        notRecentSongsAnymore.forEach { $0.isRecentlyAdded = false }
+        recentlyAddedSongs.forEach { $0.isRecentlyAdded = true }
         library.saveContext()
     }
     

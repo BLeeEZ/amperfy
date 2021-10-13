@@ -5,6 +5,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
     private var fetchedResultsController: SongFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
+    private var displayFilter: DisplayCategoryFilter = .all
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,16 +19,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.rowHeight = SongTableCell.rowHeight
         
         optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
+        navigationItem.rightBarButtonItem = optionsButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            navigationItem.rightBarButtonItem = optionsButton
-        } else {
-            navigationItem.rightBarButtonItem = nil
-        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -45,9 +38,11 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                 let syncer = self.appDelegate.backendApi.createLibrarySyncer()
                 syncer.searchSongs(searchText: searchText, library: backgroundLibrary)
             }
-            fetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
+            fetchedResultsController.search(searchText: searchText, onlyCachedSongs: false, displayFilter: displayFilter)
         } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
-            fetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
+            fetchedResultsController.search(searchText: searchText, onlyCachedSongs: true, displayFilter: displayFilter)
+        } else if displayFilter != .all {
+            fetchedResultsController.search(searchText: searchText, onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1, displayFilter: displayFilter)
         } else {
             fetchedResultsController.showAllResults()
         }
@@ -57,22 +52,48 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     @objc private func optionsPressed() {
         let alert = UIAlertController(title: "Songs", message: nil, preferredStyle: .actionSheet)
 
-        alert.addAction(UIAlertAction(title: "Play random songs", style: .default, handler: { _ in
-            self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let randomSongsPlaylist = syncLibrary.createPlaylist()
-                syncer.requestRandomSongs(playlist: randomSongsPlaylist, count: 100, library: syncLibrary)
-                DispatchQueue.main.async {
-                    let playlistMain = randomSongsPlaylist.getManagedObject(in: self.appDelegate.persistentStorage.context, library: self.appDelegate.library)
-                    self.appDelegate.player.cleanPlaylist()
-                    self.appDelegate.player.addToPlaylist(playables: playlistMain.playables)
-                    self.appDelegate.player.play()
-                    self.appDelegate.library.deletePlaylist(playlistMain)
-                    self.appDelegate.library.saveContext()
+        if displayFilter == .recentlyAdded {
+            alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
+                self.displayFilter = .all
+                self.updateSearchResults(for: self.searchController)
+            }))
+        } else {
+            alert.addAction(UIAlertAction(title: "Show recently added", style: .default, handler: { _ in
+                self.displayFilter = .recentlyAdded
+                if self.appDelegate.persistentStorage.settings.isOnlineMode {
+                    self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                        let syncLibrary = LibraryStorage(context: context)
+                        let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                        syncer.syncLatestLibraryElements(library: syncLibrary)
+                        DispatchQueue.main.async {
+                            self.updateSearchResults(for: self.searchController)
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.updateSearchResults(for: self.searchController)
+                    }
                 }
-            }
-        }))
+            }))
+        }
+        if self.appDelegate.persistentStorage.settings.isOnlineMode {
+            alert.addAction(UIAlertAction(title: "Play random songs", style: .default, handler: { _ in
+                self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                    let syncLibrary = LibraryStorage(context: context)
+                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                    let randomSongsPlaylist = syncLibrary.createPlaylist()
+                    syncer.requestRandomSongs(playlist: randomSongsPlaylist, count: 100, library: syncLibrary)
+                    DispatchQueue.main.async {
+                        let playlistMain = randomSongsPlaylist.getManagedObject(in: self.appDelegate.persistentStorage.context, library: self.appDelegate.library)
+                        self.appDelegate.player.cleanPlaylist()
+                        self.appDelegate.player.addToPlaylist(playables: playlistMain.playables)
+                        self.appDelegate.player.play()
+                        self.appDelegate.library.deletePlaylist(playlistMain)
+                        self.appDelegate.library.saveContext()
+                    }
+                }
+            }))
+        }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)

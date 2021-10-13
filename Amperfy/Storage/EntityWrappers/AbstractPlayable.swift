@@ -125,6 +125,13 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         return false
     }
     
+    var isRecentlyAdded: Bool {
+        get { return playableManagedObject.isRecentlyAdded }
+        set {
+            if playableManagedObject.isRecentlyAdded != newValue { playableManagedObject.isRecentlyAdded = newValue }
+        }
+    }
+    
     var isSong: Bool {
         return playableManagedObject is SongMO
     }

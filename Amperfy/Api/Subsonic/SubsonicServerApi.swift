@@ -216,7 +216,7 @@ class SubsonicServerApi {
     func requestLatestAlbums(parserDelegate: SsXmlParser) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getAlbumList2") else { return }
         urlComp.addQueryItem(name: "type", value: "newest")
-        urlComp.addQueryItem(name: "size", value: 50)
+        urlComp.addQueryItem(name: "size", value: 20)
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     

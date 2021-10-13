@@ -1,6 +1,11 @@
 import Foundation
 import CoreData
 
+enum DisplayCategoryFilter {
+    case all
+    case recentlyAdded
+}
+
 class PodcastFetchedResultsController: CachedFetchedResultsController<PodcastMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
@@ -243,11 +248,12 @@ class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
-    func search(searchText: String, onlyCached: Bool) {
-        if searchText.count > 0 || onlyCached {
+    func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
+        if searchText.count > 0 || onlyCached || displayFilter != .all {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 AlbumMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedAlbums: onlyCached)
+                library.getFetchPredicate(onlyCachedAlbums: onlyCached),
+                library.getFetchPredicate(albumsDisplayFilter: displayFilter)
             ])
             search(predicate: predicate)
         } else {
@@ -264,11 +270,12 @@ class SongFetchedResultsController: CachedFetchedResultsController<SongMO> {
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
-    func search(searchText: String, onlyCachedSongs: Bool) {
-        if searchText.count > 0 || onlyCachedSongs {
+    func search(searchText: String, onlyCachedSongs: Bool, displayFilter: DisplayCategoryFilter) {
+        if searchText.count > 0 || onlyCachedSongs || displayFilter != .all {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs),
+                library.getFetchPredicate(songsDisplayFilter: displayFilter)
             ])
             search(predicate: predicate)
         } else {
