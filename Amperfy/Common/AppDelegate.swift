@@ -1,6 +1,5 @@
 import UIKit
 import MediaPlayer
-import NotificationBanner
 import os.log
 
 @UIApplicationMain
@@ -75,7 +74,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var backgroundFetchTriggeredSyncer = {
         return BackgroundFetchTriggeredSyncer(library: library, backendApi: backendApi, notificationManager: localNotificationManager)
     }()
-    private lazy var popupDisplaySemaphore = {
+    lazy var popupDisplaySemaphore = {
         return DispatchSemaphore(value: 1)
     }()
 
@@ -102,10 +101,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func configureBackgroundFetch() {
         UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
-    }
-    
-    func configureNotificationHandling() {
-        UNUserNotificationCenter.current().delegate = self
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -187,102 +182,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         playableDownloadManager.backgroundFetchCompletionHandler = completionHandler
     }
 
-}
-
-extension AppDelegate: UNUserNotificationCenterDelegate
-{
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler(.alert)
-    }
-
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        userStatistics.appStartedViaNotification()
-        let userInfo = response.notification.request.content.userInfo
-        guard let contentTypeRaw = userInfo[NotificationUserInfo.type] as? NSString, let contentType = NotificationContentType(rawValue: contentTypeRaw), let id = userInfo[NotificationUserInfo.id] as? String else { completionHandler(); return }
-
-        switch contentType {
-        case .podcastEpisode:
-            let episode = library.getPodcastEpisode(id: id)
-            if let podcast = episode?.podcast {
-                let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
-                podcastDetailVC.podcast = podcast
-                displayInLibraryTab(vc: podcastDetailVC)
-            }
-        }
-        completionHandler()
-    }
-    
-    private func displayInLibraryTab(vc: UIViewController) {
-        guard let topView = Self.topViewController(),
-              topView.presentedViewController == nil,
-              let hostingTabBarVC = topView as? UITabBarController
-        else { return }
-        
-        if hostingTabBarVC.popupPresentationState == .open,
-           let popupPlayerVC = hostingTabBarVC.popupContent as? PopupPlayerVC {
-            popupPlayerVC.closePopupPlayerAndDisplayInLibraryTab(vc: vc)
-        } else if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
-           hostingTabViewControllers.count > 0,
-           let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
-            libraryTabNavVC.pushViewController(vc, animated: false)
-            hostingTabBarVC.selectedIndex = 0
-        }
-    }
-}
-
-extension AppDelegate {
-    static func topViewController(base: UIViewController? = (UIApplication.shared.delegate as! AppDelegate).window?.rootViewController) -> UIViewController? {
-        if base?.presentedViewController is UIAlertController {
-            return base
-        }
-        if let nav = base as? UINavigationController {
-            return topViewController(base: nav.visibleViewController)
-        }
-        if let tab = base as? UITabBarController {
-            return tab
-        }
-        if let presented = base?.presentedViewController {
-            return topViewController(base: presented)
-        }
-        return base
-    }
-}
-
-/// Must be called from main thread
-protocol AlertDisplayable {
-    func display(notificationBanner popupVC: LibrarySyncPopupVC)
-    func display(popup popupVC: LibrarySyncPopupVC)
-}
-
-extension AppDelegate: AlertDisplayable {
-    func display(notificationBanner popupVC: LibrarySyncPopupVC) {
-        guard let topView = Self.topViewController(),
-              topView.presentedViewController == nil
-              else { return }
-
-        let banner = FloatingNotificationBanner(title: popupVC.topic, subtitle: popupVC.message, style: BannerStyle.from(logType: popupVC.logType), colors: AmperfyBannerColors())
-        
-        banner.onTap = {
-            self.display(popup: popupVC)
-        }
-        
-        banner.show(queuePosition: .back, bannerPosition: .top, on: topView, cornerRadius: 20, shadowBlurRadius: 10)
-        if let keyWindow = UIApplication.shared.keyWindow {
-            keyWindow.addSubview(banner)
-            keyWindow.bringSubviewToFront(banner)
-        }
-    }
-    
-    func display(popup popupVC: LibrarySyncPopupVC) {
-        guard let topView = Self.topViewController(),
-              topView.presentedViewController == nil,
-              self.popupDisplaySemaphore.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success
-              else { return }
-        popupVC.onClose = {
-            self.popupDisplaySemaphore.signal()
-        }
-        popupVC.modalPresentationStyle = .overCurrentContext
-        popupVC.modalTransitionStyle = .crossDissolve
-        topView.present(popupVC, animated: true, completion: nil)
-    }
 }

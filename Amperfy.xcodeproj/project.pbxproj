@@ -146,6 +146,8 @@
 		508FDE4A21F44E91005A0724 /* BackendAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */; };
 		508FDE4C21F58AFC005A0724 /* AppStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4B21F58AFC005A0724 /* AppStoryboard.swift */; };
 		508FDE5021F64ED6005A0724 /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4F21F64ED6005A0724 /* TabBarVC.swift */; };
+		509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */; };
+		509001B82716C8F400A8056D /* AppDelegateNotificationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001B72716C8F400A8056D /* AppDelegateNotificationExtensions.swift */; };
 		5090963826496A9500DD9826 /* UtilitiesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5090963726496A9500DD9826 /* UtilitiesTest.swift */; };
 		509121032625EF14008C57EC /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509121022625EF14008C57EC /* MarqueeLabel.swift */; };
 		5095F98C23C8389E008B0805 /* MusicPlayerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */; };
@@ -495,6 +497,8 @@
 		508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendAudioPlayer.swift; sourceTree = "<group>"; };
 		508FDE4B21F58AFC005A0724 /* AppStoryboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoryboard.swift; sourceTree = "<group>"; };
 		508FDE4F21F64ED6005A0724 /* TabBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarVC.swift; sourceTree = "<group>"; };
+		509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateAlertExtensions.swift; sourceTree = "<group>"; };
+		509001B72716C8F400A8056D /* AppDelegateNotificationExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateNotificationExtensions.swift; sourceTree = "<group>"; };
 		5090963726496A9500DD9826 /* UtilitiesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilitiesTest.swift; sourceTree = "<group>"; };
 		509121022625EF14008C57EC /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MarqueeLabel.swift; path = Carthage/Checkouts/MarqueeLabel/Sources/MarqueeLabel.swift; sourceTree = SOURCE_ROOT; };
 		5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayerTest.swift; sourceTree = "<group>"; };
@@ -781,6 +785,8 @@
 			isa = PBXGroup;
 			children = (
 				508385E721C5965B00C4BB32 /* AppDelegate.swift */,
+				509001B72716C8F400A8056D /* AppDelegateNotificationExtensions.swift */,
+				509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */,
 				50BA92FD21CED4AF00E5901D /* Utilities.swift */,
 				50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */,
 				5083861D21C82E8200C4BB32 /* BridgingHeader.h */,
@@ -1508,6 +1514,7 @@
 				50CA8E972601E06500C90791 /* ConcurrentTaskGroup.swift in Sources */,
 				5029288B26579DA900DA3A8F /* UserStatistics.swift in Sources */,
 				50C16C2421E7A3AC00F086F0 /* ClockTime.swift in Sources */,
+				509001B82716C8F400A8056D /* AppDelegateNotificationExtensions.swift in Sources */,
 				50BA92FC21CD841B00E5901D /* MusicPlayer.swift in Sources */,
 				506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */,
 				50C80F2826831DB40022F710 /* SsPodcastEpisodeParserDelegate.swift in Sources */,
@@ -1660,6 +1667,7 @@
 				5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */,
 				50BA930621D5715D00E5901D /* LibraryStorage.swift in Sources */,
 				50A7388522452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift in Sources */,
+				509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */,
 				50F81EE123BF6B1E00EAAC3E /* AbstractLibraryEntityMO+CoreDataProperties.swift in Sources */,
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
 				5029288F2657B78B00DA3A8F /* UserStatisticsMO+CoreDataProperties.swift in Sources */,
