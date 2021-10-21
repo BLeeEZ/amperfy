@@ -112,15 +112,83 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func syncMusicFolders(library: LibraryStorage) {
-        ampacheXmlServerApi.eventLogger.error(topic: "Internal Error", statusCode: .internalError, message: "GetMusicFolders API function is not support by Ampache")
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        let catalogParser = CatalogParserDelegate(library: library, syncWave: syncWave)
+        self.ampacheXmlServerApi.requestCatalogs(parserDelegate: catalogParser)
+        library.saveContext()
     }
     
     func syncIndexes(musicFolder: MusicFolder, library: LibraryStorage) {
-        ampacheXmlServerApi.eventLogger.error(topic: "Internal Error", statusCode: .internalError, message: "GetIndexes API function is not support by Ampache")
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        let artistParser = ArtistParserDelegate(library: library, syncWave: syncWave)
+        self.ampacheXmlServerApi.requestArtistWithinCatalog(of: musicFolder, parserDelegate: artistParser)
+        
+        let directoriesBeforeFetch = Set(musicFolder.directories)
+        var directoriesAfterFetch: Set<Directory> = Set()
+        for artist in artistParser.artistsParsed {
+            let artistDirId = "artist-\(artist.id)"
+            var curDir: Directory!
+            if let foundDir = library.getDirectory(id: artistDirId) {
+                curDir = foundDir
+            } else {
+                curDir = library.createDirectory()
+                curDir.id = artistDirId
+            }
+            curDir.name = artist.name
+            musicFolder.managedObject.addToDirectories(curDir.managedObject)
+            directoriesAfterFetch.insert(curDir)
+        }
+        
+        let removedDirectories = directoriesBeforeFetch.subtracting(directoriesAfterFetch)
+        removedDirectories.forEach{ library.deleteDirectory(directory: $0) }
+        
+        library.saveContext()
     }
     
     func sync(directory: Directory, library: LibraryStorage) {
-        ampacheXmlServerApi.eventLogger.error(topic: "Internal Error", statusCode: .internalError, message: "GetMusicDirectory API function is not support by Ampache")
+        if directory.id.starts(with: "album-") {
+            let albumId = String(directory.id.dropFirst("album-".count))
+            guard let album = library.getAlbum(id: albumId) else { return }
+            let songsBeforeFetch = Set(directory.songs)
+            sync(album: album, library: library)
+            directory.songs.forEach { directory.managedObject.removeFromSongs($0.managedObject) }
+            let songsToRemove = songsBeforeFetch.subtracting(Set(album.songs.compactMap{$0.asSong}))
+            songsToRemove.lazy.compactMap{$0.asSong}.forEach{
+                directory.managedObject.removeFromSongs($0.managedObject)
+            }
+            album.songs.compactMap{$0.asSong}.forEach{
+                directory.managedObject.addToSongs($0.managedObject)
+            }
+            library.saveContext()
+        } else if directory.id.starts(with: "artist-"){
+            let artistId = String(directory.id.dropFirst("artist-".count))
+            guard let artist = library.getArtist(id: artistId) else { return }
+            let directoriesBeforeFetch = Set(directory.subdirectories)
+            sync(artist: artist, library: library)
+
+            var directoriesAfterFetch: Set<Directory> = Set()
+            let artistAlbums = library.getAlbums(whichContainsSongsWithArtist: artist)
+            for album in artistAlbums {
+                let albumDirId = "album-\(album.id)"
+                var albumDir: Directory!
+                if let foundDir = library.getDirectory(id: albumDirId) {
+                    albumDir = foundDir
+                } else {
+                    albumDir = library.createDirectory()
+                    albumDir.id = albumDirId
+                }
+                albumDir.name = album.name
+                albumDir.artwork = album.artwork
+                directory.managedObject.addToSubdirectories(albumDir.managedObject)
+                directoriesAfterFetch.insert(albumDir)
+            }
+            
+            let directoriesToRemove = directoriesBeforeFetch.subtracting(directoriesAfterFetch)
+            directoriesToRemove.forEach{
+                directory.managedObject.removeFromSubdirectories($0.managedObject)
+            }
+            library.saveContext()
+        }
     }
     
     func syncRecentSongs(library: LibraryStorage) {

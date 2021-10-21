@@ -191,6 +191,12 @@ class AmpacheXmlServerApi {
         }
     }
     
+    func requestCatalogs(parserDelegate: AmpacheXmlParser) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "catalogs")
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
     func requestGenres(parserDelegate: AmpacheXmlParser) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "genres")
@@ -220,6 +226,16 @@ class AmpacheXmlServerApi {
         apiUrlComponent.addQueryItem(name: "add", value: addDate.asIso8601String)
         apiUrlComponent.addQueryItem(name: "offset", value: startIndex)
         apiUrlComponent.addQueryItem(name: "limit", value: pollCount)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
+    func requestArtistWithinCatalog(of catalog: MusicFolder, parserDelegate: AmpacheXmlParser) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "advanced_search")
+        apiUrlComponent.addQueryItem(name: "rule_1", value: "catalog")
+        apiUrlComponent.addQueryItem(name: "rule_1_operator", value: 0)
+        apiUrlComponent.addQueryItem(name: "rule_1_input", value: Int(catalog.id) ?? 0)
+        apiUrlComponent.addQueryItem(name: "type", value: "artist")
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     

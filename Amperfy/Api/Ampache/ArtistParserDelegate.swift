@@ -5,6 +5,7 @@ import os.log
 
 class ArtistParserDelegate: AmpacheXmlLibParser {
 
+    var artistsParsed = Set<Artist>()
     var artistBuffer: Artist?
     var genreIdToCreate: String?
 
@@ -55,6 +56,9 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
 		case "artist":
             parsedCount += 1
             parseNotifier?.notifyParsedObject(ofType: .artist)
+            if let parsedArtist = artistBuffer {
+                artistsParsed.insert(parsedArtist)
+            }
             artistBuffer = nil
 		default:
 			break

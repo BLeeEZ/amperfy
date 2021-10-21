@@ -148,6 +148,9 @@
 		508FDE5021F64ED6005A0724 /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4F21F64ED6005A0724 /* TabBarVC.swift */; };
 		509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */; };
 		509001B82716C8F400A8056D /* AppDelegateNotificationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001B72716C8F400A8056D /* AppDelegateNotificationExtensions.swift */; };
+		509001BF271829E200A8056D /* catalogs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 509001BE271829E200A8056D /* catalogs.xml */; };
+		509001C127182A1300A8056D /* CatalogParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001C027182A1300A8056D /* CatalogParserTest.swift */; };
+		509001C327182A4700A8056D /* CatalogParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001C227182A4700A8056D /* CatalogParserDelegate.swift */; };
 		5090963826496A9500DD9826 /* UtilitiesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5090963726496A9500DD9826 /* UtilitiesTest.swift */; };
 		509121032625EF14008C57EC /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509121022625EF14008C57EC /* MarqueeLabel.swift */; };
 		5095F98C23C8389E008B0805 /* MusicPlayerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */; };
@@ -500,6 +503,9 @@
 		509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateAlertExtensions.swift; sourceTree = "<group>"; };
 		509001B72716C8F400A8056D /* AppDelegateNotificationExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateNotificationExtensions.swift; sourceTree = "<group>"; };
 		509001BD2717120900A8056D /* Amperfy v14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v14.xcdatamodel"; sourceTree = "<group>"; };
+		509001BE271829E200A8056D /* catalogs.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = catalogs.xml; sourceTree = "<group>"; };
+		509001C027182A1300A8056D /* CatalogParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogParserTest.swift; sourceTree = "<group>"; };
+		509001C227182A4700A8056D /* CatalogParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogParserDelegate.swift; sourceTree = "<group>"; };
 		5090963726496A9500DD9826 /* UtilitiesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilitiesTest.swift; sourceTree = "<group>"; };
 		509121022625EF14008C57EC /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MarqueeLabel.swift; path = Carthage/Checkouts/MarqueeLabel/Sources/MarqueeLabel.swift; sourceTree = SOURCE_ROOT; };
 		5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayerTest.swift; sourceTree = "<group>"; };
@@ -1035,6 +1041,7 @@
 				50BA930721D75C5600E5901D /* AuthentificationHandshake.swift */,
 				501267B8264C187600E13F08 /* AmpacheXmlParser.swift */,
 				5083861921C827E600C4BB32 /* AuthParserDelegate.swift */,
+				509001C227182A4700A8056D /* CatalogParserDelegate.swift */,
 				507361C72632AB08005F151D /* GenreParserDelegate.swift */,
 				50BA92ED21CBF45D00E5901D /* ArtistParserDelegate.swift */,
 				50BA92EC21CBF45D00E5901D /* AlbumParserDelegate.swift */,
@@ -1168,6 +1175,7 @@
 				50DB11A6266533720033BFFA /* ErrorParserTest.swift */,
 				50DB118E266521610033BFFA /* GenreParserTest.swift */,
 				50DB1181266502100033BFFA /* ArtistParserTest.swift */,
+				509001C027182A1300A8056D /* CatalogParserTest.swift */,
 				50DB118A266511030033BFFA /* AlbumParserTest.swift */,
 				50DB1192266522F60033BFFA /* SongParserTest.swift */,
 				50DB119E26652E090033BFFA /* PlaylistsParserTest.swift */,
@@ -1183,6 +1191,7 @@
 			children = (
 				50DB11A026652FCB0033BFFA /* handshake.xml */,
 				50DB11A42665336B0033BFFA /* error-4700.xml */,
+				509001BE271829E200A8056D /* catalogs.xml */,
 				50DB118C266521290033BFFA /* genres.xml */,
 				50DB1184266502C00033BFFA /* artists.xml */,
 				50DB1188266510FF0033BFFA /* albums.xml */,
@@ -1432,6 +1441,7 @@
 				50AB92DC2666C53F00DCE45C /* directory_example_2.xml in Resources */,
 				50AB92C826662FCA00DCE45C /* album_example_2.xml in Resources */,
 				50DB119926652D070033BFFA /* playlist_songs.xml in Resources */,
+				509001BF271829E200A8056D /* catalogs.xml in Resources */,
 				50DB119D26652DFA0033BFFA /* playlists.xml in Resources */,
 				50AB92D22666C19500DCE45C /* musicFolders_example_1.xml in Resources */,
 				50AB92CE2666BC0B00DCE45C /* playlist_example_1.xml in Resources */,
@@ -1489,6 +1499,7 @@
 				50D92CCF25E3FE560017E91D /* MigrationPolicyV4toV5.swift in Sources */,
 				50C16C1E21E7A35C00F086F0 /* AlbumTableCell.swift in Sources */,
 				50120A2526281C1900B037B1 /* BasicTableViewController.swift in Sources */,
+				509001C327182A4700A8056D /* CatalogParserDelegate.swift in Sources */,
 				50F81EE223BF6B1E00EAAC3E /* PlayableFileMO+CoreDataClass.swift in Sources */,
 				50C16C1421E687AB00F086F0 /* ArtistTableCell.swift in Sources */,
 				501A7D4B2681E6DD0055A51B /* PodcastEpisodeParserDelegate.swift in Sources */,
@@ -1734,6 +1745,7 @@
 				50B798B223B7F51000551E62 /* PlaylistTest.swift in Sources */,
 				50DB118B266511030033BFFA /* AlbumParserTest.swift in Sources */,
 				50DB119F26652E090033BFFA /* PlaylistsParserTest.swift in Sources */,
+				509001C127182A1300A8056D /* CatalogParserTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

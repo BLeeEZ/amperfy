@@ -416,6 +416,17 @@ class LibraryStorage: PlayableFileCachable {
         return albums ?? [Album]()
     }
     
+    func getAlbums(whichContainsSongsWithArtist artist: Artist) -> [Album] {
+        let fetchRequest = AlbumMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+            self.getFetchPredicate(forArtist: artist),
+            AlbumMO.getFetchPredicateForAlbumsWhoseSongsHave(artist: artist)
+        ])
+        let foundAlbums = try? context.fetch(fetchRequest)
+        let albums = foundAlbums?.compactMap{ Album(managedObject: $0) }
+        return albums ?? [Album]()
+    }
+    
     func getPodcasts() -> [Podcast] {
         let fetchRequest = PodcastMO.identifierSortedFetchRequest
         let foundPodcasts = try? context.fetch(fetchRequest)

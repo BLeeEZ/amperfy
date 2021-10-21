@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <total_count>4</total_count>
+  <catalog id="1">
+    <name><![CDATA[music]]></name>
+    <type><![CDATA[local]]></type>
+    <gather_types><![CDATA[music]]></gather_types>
+    <enabled>1</enabled>
+    <last_add>1627949046</last_add>
+    <last_clean>1627949154</last_clean>
+    <last_update>1626835896</last_update>
+    <path><![CDATA[/mnt/files-music/ampache-test/music]]></path>
+    <rename_pattern><![CDATA[%T - %t]]></rename_pattern>
+    <sort_pattern><![CDATA[%a/%A]]></sort_pattern>
+  </catalog>
+  <catalog id="3">
+    <name><![CDATA[podcast]]></name>
+    <type><![CDATA[local]]></type>
+    <gather_types><![CDATA[podcast]]></gather_types>
+    <enabled>1</enabled>
+    <last_add>1617260634</last_add>
+    <last_clean>1617260599</last_clean>
+    <last_update>0</last_update>
+    <path><![CDATA[/mnt/files-music/ampache-test/podcast]]></path>
+    <rename_pattern><![CDATA[%T - %t]]></rename_pattern>
+    <sort_pattern><![CDATA[%a/%A]]></sort_pattern>
+  </catalog>
+  <catalog id="4">
+    <name><![CDATA[upload]]></name>
+    <type><![CDATA[local]]></type>
+    <gather_types><![CDATA[music]]></gather_types>
+    <enabled>1</enabled>
+    <last_add>1617260634</last_add>
+    <last_clean>1617260634</last_clean>
+    <last_update>0</last_update>
+    <path><![CDATA[/mnt/files-music/ampache-test/upload]]></path>
+    <rename_pattern><![CDATA[%T - %t]]></rename_pattern>
+    <sort_pattern><![CDATA[%a/%A]]></sort_pattern>
+  </catalog>
+  <catalog id="2">
+    <name><![CDATA[video]]></name>
+    <type><![CDATA[local]]></type>
+    <gather_types><![CDATA[clip]]></gather_types>
+    <enabled>1</enabled>
+    <last_add>1627949054</last_add>
+    <last_clean>1627949144</last_clean>
+    <last_update>0</last_update>
+    <path><![CDATA[/mnt/files-music/ampache-test/video]]></path>
+    <rename_pattern><![CDATA[%a - %t (%y)]]></rename_pattern>
+    <sort_pattern><![CDATA[]]></sort_pattern>
+  </catalog>
+</root>
