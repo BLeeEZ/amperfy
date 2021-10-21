@@ -1,13 +1,22 @@
 import Foundation
 import os.log
 
-class SubsonicApi: BackendApi {
+class SubsonicApi  {
         
     private let subsonicServerApi: SubsonicServerApi
 
     init(subsonicServerApi: SubsonicServerApi) {
         self.subsonicServerApi = subsonicServerApi
     }
+    
+    var authType: SubsonicApiAuthType {
+        get { return subsonicServerApi.authType }
+        set { subsonicServerApi.authType = newValue }
+    }
+    
+}
+    
+extension SubsonicApi: BackendApi {
     
     public var clientApiVersion: String {
         return subsonicServerApi.clientApiVersion.description

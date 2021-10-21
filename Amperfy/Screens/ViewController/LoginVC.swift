@@ -43,6 +43,10 @@ class LoginVC: UIViewController {
             self.selectedApiType = .subsonic
             self.updateApiSelectorText()
         }))
+        alert.addAction(UIAlertAction(title: BackenApiType.subsonic_legacy.selectorDescription, style: .default, handler: { _ in
+            self.selectedApiType = .subsonic_legacy
+            self.updateApiSelectorText()
+        }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         self.present(alert, animated: true, completion: nil)

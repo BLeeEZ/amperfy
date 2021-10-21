@@ -1794,7 +1794,7 @@
                                                 <constraint firstItem="zoe-sJ-ruU" firstAttribute="leading" secondItem="fCG-qM-bTV" secondAttribute="leadingMargin" id="A9N-mu-ruT"/>
                                                 <constraint firstAttribute="leadingMargin" secondItem="zoe-sJ-ruU" secondAttribute="trailing" constant="-150" id="Hnt-9i-hfB"/>
                                                 <constraint firstItem="zoe-sJ-ruU" firstAttribute="centerY" secondItem="fCG-qM-bTV" secondAttribute="centerY" id="IFO-WN-uAn"/>
-                                                <constraint firstItem="AbB-7I-y8n" firstAttribute="leading" secondItem="fCG-qM-bTV" secondAttribute="trailingMargin" constant="-100" id="PZn-1e-gto"/>
+                                                <constraint firstItem="AbB-7I-y8n" firstAttribute="leading" secondItem="fCG-qM-bTV" secondAttribute="trailingMargin" constant="-200" id="PZn-1e-gto"/>
                                                 <constraint firstItem="AbB-7I-y8n" firstAttribute="centerY" secondItem="fCG-qM-bTV" secondAttribute="centerY" id="eYF-yY-dIU"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="AbB-7I-y8n" secondAttribute="trailing" id="vqU-eH-Svm"/>
                                             </constraints>

@@ -5,6 +5,11 @@ protocol SubsonicUrlCreator {
     func getArtUrlString(forCoverArtId: String) -> String
 }
 
+enum SubsonicApiAuthType: Int {
+    case autoDetect = 0
+    case legacy = 1
+}
+
 class SubsonicServerApi {
     
     static let defaultClientApiVersionWithToken = SubsonicVersion(major: 1, minor: 13, patch: 0)
@@ -12,6 +17,7 @@ class SubsonicServerApi {
     
     var serverApiVersion: SubsonicVersion?
     var clientApiVersion = defaultClientApiVersionWithToken
+    var authType: SubsonicApiAuthType = .autoDetect
     
     private let log = OSLog(subsystem: AppDelegate.name, category: "Subsonic")
     private let eventLogger: EventLogger
@@ -40,20 +46,26 @@ class SubsonicServerApi {
         return authenticationToken
     }
     
-    private func determeClientApiVersionToUse() {
+    private func determeClientApiVersionToUse(providedCredentials: LoginCredentials? = nil) {
         if serverApiVersion == nil {
-            serverApiVersion = requestServerApiVersion()
+            serverApiVersion = requestServerApiVersion(providedCredentials: providedCredentials)
+            guard authType != .legacy else {
+                os_log("Client API legacy login", log: log, type: .info)
+                clientApiVersion = SubsonicServerApi.defaultClientApiVersionPreToken
+                return
+            }
             guard let serverApiVersion = serverApiVersion else {
+                os_log("Server API could not be fetched", log: log, type: .error)
                 clientApiVersion = SubsonicServerApi.defaultClientApiVersionWithToken
                 return
             }
-            os_log("The server API version is '%s'", log: log, type: .info, serverApiVersion.description)
+            os_log("Server API version is '%s'", log: log, type: .info, serverApiVersion.description)
             if serverApiVersion < SubsonicVersion.authenticationTokenRequiredServerApi {
                 clientApiVersion = SubsonicServerApi.defaultClientApiVersionPreToken
             } else {
                 clientApiVersion = SubsonicServerApi.defaultClientApiVersionWithToken
             }
-            os_log("The client API version is '%s'", log: log, type: .info, clientApiVersion.description)
+            os_log("Client API version is '%s'", log: log, type: .info, clientApiVersion.description)
         }
     }
     
@@ -76,7 +88,7 @@ class SubsonicServerApi {
               var urlComp = createBasicApiUrlComponent(forAction: forAction, providedCredentials: localCredentials)
         else { return nil }
         
-        determeClientApiVersionToUse()
+        determeClientApiVersionToUse(providedCredentials: localCredentials)
         
         urlComp.addQueryItem(name: "u", value: username)
         urlComp.addQueryItem(name: "v", value: clientApiVersion.description)
@@ -127,10 +139,6 @@ class SubsonicServerApi {
         parser.delegate = curDelegate
         let success = parser.parse()
         
-        if let serverApiVersion = curDelegate.serverApiVersion {
-            os_log("The server API version is '%s'", log: log, type: .info, serverApiVersion)
-        }
-        
         if let error = parser.parserError {
             os_log("Error during login parsing: %s", log: log, type: .error, error.localizedDescription)
             return false
@@ -172,8 +180,8 @@ class SubsonicServerApi {
         return createAuthenticatedApiUrlComponent(forAction: "getCoverArt", id: coverArtId)?.url
     }
     
-    func requestServerApiVersion() -> SubsonicVersion? {
-        guard let urlComp = createBasicApiUrlComponent(forAction: "ping") else { return nil }
+    func requestServerApiVersion(providedCredentials: LoginCredentials? = nil) -> SubsonicVersion? {
+        guard let urlComp = createBasicApiUrlComponent(forAction: "ping", providedCredentials: providedCredentials) else { return nil }
         let parserDelegate = SsPingParserDelegate()
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate, ignoreErrorResponse: true)
         guard let serverApiVersionString = parserDelegate.serverApiVersion else { return nil }

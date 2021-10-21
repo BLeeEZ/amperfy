@@ -5,12 +5,14 @@ enum BackenApiType: Int {
     case notDetected = 0
     case ampache = 1
     case subsonic = 2
+    case subsonic_legacy = 3
 
     var description : String {
         switch self {
         case .notDetected: return "NotDetected"
         case .ampache: return "Ampache"
         case .subsonic: return "Subsonic"
+        case .subsonic_legacy: return "Subsonic (legacy login)"
         }
     }
     
@@ -19,6 +21,7 @@ enum BackenApiType: Int {
         case .notDetected: return "Auto-Detect"
         case .ampache: return "Ampache"
         case .subsonic: return "Subsonic"
+        case .subsonic_legacy: return "Subsonic (legacy login)"
         }
     }
 }
@@ -63,6 +66,8 @@ class BackendProxy {
             return ampacheApi
         case .subsonic:
             return subsonicApi
+        case .subsonic_legacy:
+            return subsonicLegacyApi
         }
     }
  
@@ -70,7 +75,14 @@ class BackendProxy {
         return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(eventLogger: eventLogger))
     }()
     private lazy var subsonicApi: BackendApi = {
-        return SubsonicApi(subsonicServerApi: SubsonicServerApi(eventLogger: eventLogger))
+        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(eventLogger: eventLogger))
+        api.authType = .autoDetect
+        return api
+    }()
+    private lazy var subsonicLegacyApi: BackendApi = {
+        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(eventLogger: eventLogger))
+        api.authType = .legacy
+        return api
     }()
     
     init(eventLogger: EventLogger) {
@@ -79,18 +91,25 @@ class BackendProxy {
 
     func login(apiType: BackenApiType, credentials: LoginCredentials) throws -> BackenApiType {
         try checkServerReachablity(credentials: credentials)
-        if apiType != .subsonic {
+        if apiType == .notDetected || apiType == .ampache {
             ampacheApi.authenticate(credentials: credentials)
             if ampacheApi.isAuthenticated() {
                 selectedApi = .ampache
                 return .ampache
             }
         }
-        if apiType != .ampache {
+        if apiType == .notDetected || apiType == .subsonic {
             subsonicApi.authenticate(credentials: credentials)
             if subsonicApi.isAuthenticated() {
                 selectedApi = .subsonic
                 return .subsonic
+            }
+        }
+        if apiType == .notDetected || apiType == .subsonic_legacy {
+            subsonicLegacyApi.authenticate(credentials: credentials)
+            if subsonicLegacyApi.isAuthenticated() {
+                selectedApi = .subsonic_legacy
+                return .subsonic_legacy
             }
         }
         throw AuthenticationError(kind: .notAbleToLogin)
