@@ -368,6 +368,7 @@ class PlayerView: UIView {
     }
     
     func refreshCurrentlyPlayingInfo() {
+        refreshArtwork()
         if player.playlist.playables.count > 0 {
             let playableIndex = player.currentlyPlaying?.index ?? 0
             let playableInfo = player.playlist.playables[playableIndex]
@@ -375,10 +376,8 @@ class PlayerView: UIView {
             titleLargeLabel.text = playableInfo.title
             artistNameCompactLabel.text = playableInfo.creatorName
             artistNameLargeLabel.text = playableInfo.creatorName
-            artworkImage.image = playableInfo.image
             rootView?.popupItem.title = playableInfo.title
             rootView?.popupItem.subtitle = playableInfo.creatorName
-            rootView?.popupItem.image = playableInfo.image
             rootView?.changeBackgroundGradient(forPlayable: playableInfo)
             lastDisplayedPlayable = playableInfo
         } else {
@@ -386,11 +385,21 @@ class PlayerView: UIView {
             titleLargeLabel.text = "Not playing"
             artistNameCompactLabel.text = ""
             artistNameLargeLabel.text = ""
-            artworkImage.image = Artwork.defaultImage
             rootView?.popupItem.title = "Not playing"
             rootView?.popupItem.subtitle = ""
-            rootView?.popupItem.image = Artwork.defaultImage
             lastDisplayedPlayable = nil
+        }
+    }
+    
+    func refreshArtwork() {
+        if player.playlist.playables.count > 0 {
+            let playableIndex = player.currentlyPlaying?.index ?? 0
+            let playableInfo = player.playlist.playables[playableIndex]
+            artworkImage.image = playableInfo.image
+            rootView?.popupItem.image = playableInfo.image
+        } else {
+            artworkImage.image = Artwork.defaultImage
+            rootView?.popupItem.image = Artwork.defaultImage
         }
     }
 
@@ -478,6 +487,10 @@ extension PlayerView: MusicPlayable {
     
     func didPlaylistChange() {
         refreshPlayer()
+    }
+    
+    func didArtworkChange() {
+        refreshArtwork()
     }
 
 }

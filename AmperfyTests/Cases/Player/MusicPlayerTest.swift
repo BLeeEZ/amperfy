@@ -146,7 +146,7 @@ class MusicPlayerTest: XCTestCase {
         backendApi = MOCK_BackendApi()
         backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)
         playerData = library.getPlayerData()
-        testPlayer = MusicPlayer(coreData: playerData, playableDownloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
+        testPlayer = MusicPlayer(coreData: playerData, library: library, playableDownloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
         
         guard let songCachedFetched = library.getSong(id: "36") else { XCTFail(); return }
         songCached = songCachedFetched

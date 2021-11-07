@@ -1,5 +1,6 @@
 import Foundation
 import AVFoundation
+import UIKit
 import os.log
 
 protocol BackendAudioPlayerNotifiable {
@@ -125,8 +126,8 @@ class BackendAudioPlayer {
         guard let playable = playlistItem.playable, let playableData = cacheProxy.getFile(forPlayable: playable)?.data else { return }
         os_log(.default, "Play item: %s", playable.displayString)
         if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
-        let url = createLocalUrl(forFileData: playableData)
-        insert(playable: playable, withUrl: url)
+        let itemUrl = playableData.createLocalUrl(fileName: "curPlayItem.mp3")
+        insert(playable: playable, withUrl: itemUrl)
     }
     
     private func insertStreamPlayable(playlistItem: PlaylistItem) {
@@ -155,11 +156,15 @@ class BackendAudioPlayer {
         self.responder?.notifyItemPreparationFinished()
     }
     
-    private func createLocalUrl(forFileData fileData: Data) -> URL {
-        let tempDirectoryURL = NSURL.fileURL(withPath: NSTemporaryDirectory(), isDirectory: true)
-        let url = tempDirectoryURL.appendingPathComponent("curPlayItem.mp3")
-        try! fileData.write(to: url, options: Data.WritingOptions.atomic)
-        return url
+    func getEmbeddedArtworkFromID3Tag() -> UIImage? {
+        guard let item = player.currentItem else { return nil }
+        let metadataList = item.asset.metadata
+        guard let artworkAsset = metadataList.filter({ $0.commonKey == .commonKeyArtwork }).first,
+              let artworkData = artworkAsset.dataValue,
+              let artworkImage = UIImage(data: artworkData) else {
+            return nil
+        }
+        return artworkImage
     }
     
 }

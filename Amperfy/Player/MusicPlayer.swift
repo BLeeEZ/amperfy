@@ -9,6 +9,7 @@ protocol MusicPlayable {
     func didStopPlaying(playlistItem: PlaylistItem?)
     func didElapsedTimeChange()
     func didPlaylistChange()
+    func didArtworkChange()
 }
 
 enum RepeatMode: Int16 {
@@ -88,6 +89,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
 
     private var coreData: PlayerData
+    private let library: LibraryStorage
     private var playableDownloadManager: DownloadManageable
     private let backendAudioPlayer: BackendAudioPlayer
     private let userStatistics: UserStatistics
@@ -95,8 +97,9 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     private let replayInsteadPlayPreviousTimeInSec = 5.0
     private var remoteCommandCenter: MPRemoteCommandCenter?
     
-    init(coreData: PlayerData, playableDownloadManager: DownloadManageable, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
+    init(coreData: PlayerData, library: LibraryStorage, playableDownloadManager: DownloadManageable, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
         self.coreData = coreData
+        self.library = library
         self.playableDownloadManager = playableDownloadManager
         self.backendAudioPlayer = backendAudioPlayer
         self.backendAudioPlayer.isAutoCachePlayedItems = coreData.isAutoCachePlayedItems
@@ -154,8 +157,19 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         let playlistItem = playlist.items[playlistIndex]
         userStatistics.playedItem(repeatMode: repeatMode, isShuffle: isShuffle)
         backendAudioPlayer.requestToPlay(playlistItem: playlistItem)
+        extractEmbeddedArtwork(playlistItem: playlistItem)
         coreData.currentIndex = playlistIndex
         preDownloadNextItems(playlistIndex: playlistIndex)
+    }
+    
+    private func extractEmbeddedArtwork(playlistItem: PlaylistItem) {
+        if let embeddedImage = backendAudioPlayer.getEmbeddedArtworkFromID3Tag(), playlistItem.playable?.embeddedArtwork == nil {
+            let embeddedArtwork = library.createEmbeddedArtwork()
+            embeddedArtwork.setImage(fromData: embeddedImage.pngData())
+            embeddedArtwork.owner = playlistItem.playable
+            library.saveContext()
+            notifyArtworkChanged()
+        }
     }
     
     private func preDownloadNextItems(playlistIndex: Int) {
@@ -346,6 +360,12 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
             } else {
                 playable.playProgress = 0
             }
+        }
+    }
+    
+    func notifyArtworkChanged() {
+        for notifier in notifierList {
+            notifier.didArtworkChange()
         }
     }
     

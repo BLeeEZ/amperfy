@@ -239,6 +239,12 @@ extension Data {
     var sizeInByte: Int64 {
         return Int64(count)
     }
+    func createLocalUrl(fileName: String? = nil) -> URL {
+        let tempDirectoryURL = NSURL.fileURL(withPath: NSTemporaryDirectory(), isDirectory: true)
+        let url = tempDirectoryURL.appendingPathComponent(fileName ?? UUID().uuidString)
+        try! self.write(to: url, options: Data.WritingOptions.atomic)
+        return url
+    }
 }
 
 extension Date {

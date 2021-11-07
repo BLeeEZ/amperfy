@@ -1,6 +1,7 @@
 import Foundation
 import CoreData
 import UIKit
+import AVFoundation
 
 public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     /*
@@ -16,6 +17,23 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         super.init(managedObject: managedObject)
     }
 
+    override var image: UIImage {
+        guard let embeddedArtwork = playableManagedObject.embeddedArtwork,
+              let embeddedArtworkImageData = embeddedArtwork.imageData,
+              let embeddedArtworkImage = UIImage(data: embeddedArtworkImageData) else {
+            return super.image
+        }
+        return embeddedArtworkImage
+    }
+    var embeddedArtwork: EmbeddedArtwork? {
+        get {
+            guard let embeddedArtworkMO = playableManagedObject.embeddedArtwork else { return nil }
+            return EmbeddedArtwork(managedObject: embeddedArtworkMO)
+        }
+        set {
+            if playableManagedObject.embeddedArtwork != newValue?.managedObject { playableManagedObject.embeddedArtwork = newValue?.managedObject }
+        }
+    }
     var objectID: NSManagedObjectID {
         return playableManagedObject.objectID
     }

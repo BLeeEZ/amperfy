@@ -23,6 +23,7 @@ extension AbstractPlayableMO {
     @NSManaged public var download: DownloadMO?
     @NSManaged public var file: PlayableFileMO?
     @NSManaged public var playlistItems: NSOrderedSet?
+    @NSManaged public var embeddedArtwork: EmbeddedArtworkMO?
 
 }
 

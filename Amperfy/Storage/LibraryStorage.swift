@@ -17,7 +17,7 @@ enum PlaylistSearchCategory: Int {
 
 class LibraryStorage: PlayableFileCachable {
     
-    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName]
+    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName]
 
     private let log = OSLog(subsystem: AppDelegate.name, category: "LibraryStorage")
     private var context: NSManagedObjectContext
@@ -211,6 +211,18 @@ class LibraryStorage: PlayableFileCachable {
         clearStorage(ofType: PlayableFile.typeName)
     }
     
+    func createEmbeddedArtwork() -> EmbeddedArtwork {
+        return EmbeddedArtwork(managedObject: EmbeddedArtworkMO(context: context))
+    }
+    
+    func deleteEmbeddedArtworks() {
+        let fetchRequest = EmbeddedArtworkMO.fetchRequest()
+        guard let artworks = try? context.fetch(fetchRequest) else { return }
+        for artwork in artworks {
+            context.delete(artwork)
+        }
+    }
+
     func createArtwork() -> Artwork {
         return Artwork(managedObject: ArtworkMO(context: context))
     }

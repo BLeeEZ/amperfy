@@ -304,6 +304,9 @@ extension PopupPlayerVC: MusicPlayable {
         self.reloadData()
     }
     
+    func didArtworkChange() {
+    }
+    
     func closePopupPlayerAndDisplayInLibraryTab(vc: UIViewController) {
         guard let hostingTabBarVC = hostingTabBarVC else { return }
         hostingTabBarVC.closePopup(animated: true, completion: { () in
