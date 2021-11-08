@@ -99,6 +99,12 @@ class PodcastEpisodeTableCell: BasicTableCell {
                     self.appDelegate.player.addToPlaylist(playable: episode)
                 }))
             }
+            if appDelegate.persistentStorage.settings.isOnlineMode {
+                alert.addAction(UIAlertAction(title: "Delete on server", style: .default, handler: { _ in
+                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                    syncer.requestPodcastEpisodeDelete(podcastEpisode: episode)
+                }))
+            }
             if episode.isCached {
                 alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
                     self.appDelegate.library.deleteCache(ofPlayable: episode)

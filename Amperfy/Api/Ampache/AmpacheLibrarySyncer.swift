@@ -217,6 +217,11 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         playlist.append(playables: parser.parsedSongs)
         library.saveContext()
     }
+    
+    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) {
+        let parser = AmpacheXmlParser()
+        ampacheXmlServerApi.requestPodcastEpisodeDelete(parserDelegate: parser, id: podcastEpisode.id)
+    }
 
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {
         let playlistParser = PlaylistParserDelegate(library: library, parseNotifier: nil)

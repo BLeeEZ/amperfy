@@ -320,6 +320,13 @@ class AmpacheXmlServerApi {
         apiUrlComponent.addQueryItem(name: "limit", value: count)
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
+
+    func requestPodcastEpisodeDelete(parserDelegate: AmpacheXmlParser, id: String) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "podcast_episode_delete")
+        apiUrlComponent.addQueryItem(name: "filter", value: id)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
     
     func requestRecentSongs(parserDelegate: AmpacheXmlParser, count: Int) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }

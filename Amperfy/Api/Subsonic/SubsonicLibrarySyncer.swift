@@ -157,6 +157,11 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         library.saveContext()
     }
     
+    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) {
+        let songParser = SsXmlParser()
+        subsonicServerApi.requestPodcastEpisodeDelete(parserDelegate: songParser, id: podcastEpisode.id)
+    }
+    
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {
         let playlistParser = SsPlaylistParserDelegate(library: library)
         subsonicServerApi.requestPlaylists(parserDelegate: playlistParser)

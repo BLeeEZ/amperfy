@@ -234,6 +234,12 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
+    func requestPodcastEpisodeDelete(parserDelegate: SsXmlParser, id: String) {
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "deletePodcastEpisode") else { return }
+        urlComp.addQueryItem(name: "id", value: id)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+
     func requestSearchArtists(parserDelegate: SsXmlParser, searchText: String) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "search3") else { return }
         urlComp.addQueryItem(name: "query", value: searchText)
