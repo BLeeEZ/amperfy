@@ -40,11 +40,20 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
         case "description":
             episodeBuffer?.depiction = buffer
         case "pubdate":
-            //"3/27/21, 3:30 AM"
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "M-d-yy, h:mm a"
-            dateFormatter.timeZone = NSTimeZone(name: "UTC")! as TimeZone
-            episodeBuffer?.publishDate = dateFormatter.date(from: buffer) ?? Date(timeIntervalSince1970: TimeInterval())
+            if buffer.contains("/") { //"3/27/21, 3:30 AM"
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "M-d-yy, h:mm a"
+                dateFormatter.timeZone = NSTimeZone(name: "UTC")! as TimeZone
+                episodeBuffer?.publishDate = dateFormatter.date(from: buffer) ?? Date(timeIntervalSince1970: TimeInterval())
+            } else if buffer.count >= 21 { //"2011-02-03T14:46:43"
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+                dateFormatter.timeZone = NSTimeZone(name: "UTC")! as TimeZone
+                let dateWithoutTimeZoneString = String(buffer[..<buffer.index(buffer.startIndex, offsetBy: 19)])
+                episodeBuffer?.publishDate = dateFormatter.date(from: dateWithoutTimeZoneString) ?? Date(timeIntervalSince1970: TimeInterval())
+            } else {
+                os_log("Pubdate <%s> could not be parsed of podcast episode", log: log, type: .error, buffer)
+            }
         case "state":
             episodeBuffer?.remoteStatus = PodcastEpisodeRemoteStatus.create(from: buffer)
         case "filelength":

@@ -77,6 +77,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func syncIndexes(musicFolder: MusicFolder, library: LibraryStorage) {}
     func sync(directory: Directory, library: LibraryStorage) {}
     func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {}
+    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) {}
 }
 
 class MOCK_BackgroundLibrarySyncer: BackgroundLibrarySyncer {

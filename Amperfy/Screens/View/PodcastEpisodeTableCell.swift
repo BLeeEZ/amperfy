@@ -54,7 +54,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
             playProgressLabelPlayButtonDistance.constant = 8.0
         }
         if episode.userStatus == .syncingOnServer {
-            progressText += "\(CommonString.oneMiddleDot) \(episode.userStatus.description)"
+            progressText += " \(CommonString.oneMiddleDot) \(episode.userStatus.description)"
         }
         playProgressLabel.text = progressText
         if episode.isCached {
