@@ -7,6 +7,7 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
     
     var podcast: Podcast
     var episodeBuffer: PodcastEpisode?
+    var parsedEpisodes = [PodcastEpisode]()
     
     init(podcast: Podcast, library: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator) {
         self.podcast = podcast
@@ -56,8 +57,9 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
         
-        if elementName == "episode", episodeBuffer != nil {
+        if elementName == "episode", let episode = episodeBuffer {
             playableBuffer = nil
+            parsedEpisodes.append(episode)
             episodeBuffer = nil
         }
     }

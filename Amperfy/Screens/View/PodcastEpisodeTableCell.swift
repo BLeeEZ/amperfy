@@ -29,12 +29,12 @@ class PodcastEpisodeTableCell: BasicTableCell {
         podcastEpisodeImage.displayAndUpdate(entity: episode, via: appDelegate.artworkDownloadManager)
         
         optionsButton.setTitle(CommonString.threeMiddleDots, for: .normal)
-        if episode.userStatus == .syncingOnServer {
-            playEpisodeButton.setTitle(FontAwesomeIcon.Ban.asString, for: .normal)
-            playEpisodeButton.isEnabled = false
-        } else {
+        if episode.isAvailableToUser {
             playEpisodeButton.setTitle(FontAwesomeIcon.Play.asString, for: .normal)
             playEpisodeButton.isEnabled = true
+        } else {
+            playEpisodeButton.setTitle(FontAwesomeIcon.Ban.asString, for: .normal)
+            playEpisodeButton.isEnabled = false
         }
         infoLabel.text = "\(episode.publishDate.asShortDayMonthString)"
         descriptionLabel.text = episode.depiction ?? ""
@@ -53,7 +53,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
             playProgressBar.isHidden = true
             playProgressLabelPlayButtonDistance.constant = 8.0
         }
-        if episode.userStatus == .syncingOnServer {
+        if !episode.isAvailableToUser {
             progressText += " \(CommonString.oneMiddleDot) \(episode.userStatus.description)"
         }
         playProgressLabel.text = progressText
@@ -90,19 +90,13 @@ class PodcastEpisodeTableCell: BasicTableCell {
             alert.view.addSubview(headerView)
         }
     
-        if episode.userStatus != .syncingOnServer {
+        if episode.isAvailableToUser {
             if episode.isCached || appDelegate.persistentStorage.settings.isOnlineMode {
                 alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
                     self.appDelegate.player.play(playable: episode)
                 }))
                 alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
                     self.appDelegate.player.addToPlaylist(playable: episode)
-                }))
-            }
-            if appDelegate.persistentStorage.settings.isOnlineMode {
-                alert.addAction(UIAlertAction(title: "Delete on server", style: .default, handler: { _ in
-                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                    syncer.requestPodcastEpisodeDelete(podcastEpisode: episode)
                 }))
             }
             if episode.isCached {
@@ -115,6 +109,19 @@ class PodcastEpisodeTableCell: BasicTableCell {
                 alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
                     self.appDelegate.playableDownloadManager.download(object: episode)
                     self.refresh()
+                }))
+            }
+            if episode.remoteStatus != .deleted, appDelegate.persistentStorage.settings.isOnlineMode {
+                alert.addAction(UIAlertAction(title: "Delete on server", style: .destructive, handler: { _ in
+                    self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                        let library = LibraryStorage(context: context)
+                        let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                        let episodeAsync = PodcastEpisode(managedObject: context.object(with: episode.managedObject.objectID) as! PodcastEpisodeMO)
+                        syncer.requestPodcastEpisodeDelete(podcastEpisode: episodeAsync)
+                        if let podcastAsync = episodeAsync.podcast {
+                            syncer.sync(podcast: podcastAsync, library: library)
+                        }
+                    }
                 }))
             }
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))

@@ -7,6 +7,7 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
 
     var podcast: Podcast
     var episodeBuffer: PodcastEpisode?
+    var parsedEpisodes = [PodcastEpisode]()
 
     init(podcast: Podcast, library: LibraryStorage, syncWave: SyncWave) {
         self.podcast = podcast
@@ -65,6 +66,9 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
         case "podcast_episode":
             parsedCount += 1
             playableBuffer = nil
+            if let episode = episodeBuffer {
+                parsedEpisodes.append(episode)
+            }
             episodeBuffer = nil
         default:
             break

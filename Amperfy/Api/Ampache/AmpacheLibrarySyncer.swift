@@ -285,8 +285,14 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     
     func sync(podcast: Podcast, library: LibraryStorage) {
         guard ampacheXmlServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
+        let oldEpisodes = Set(podcast.episodes)
+        
         let podcastEpisodeParser = PodcastEpisodeParserDelegate(podcast: podcast, library: library, syncWave: syncWave)
         self.ampacheXmlServerApi.requestPodcastEpisodes(of: podcast, parserDelegate: podcastEpisodeParser)
+        library.saveContext()
+
+        let deletedEpisodes = oldEpisodes.subtracting(podcastEpisodeParser.parsedEpisodes)
+        deletedEpisodes.forEach { $0.remoteStatus = .deleted }
         library.saveContext()
     }
     

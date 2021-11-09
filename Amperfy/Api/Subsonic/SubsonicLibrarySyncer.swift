@@ -224,8 +224,14 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     
     func sync(podcast: Podcast, library: LibraryStorage) {
         guard subsonicServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
+        let oldEpisodes = Set(podcast.episodes)
+        
         let podcastEpisodeParser = SsPodcastEpisodeParserDelegate(podcast: podcast, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestPodcastEpisodes(parserDelegate: podcastEpisodeParser, id: podcast.id)
+        library.saveContext()
+        
+        let deletedEpisodes = oldEpisodes.subtracting(podcastEpisodeParser.parsedEpisodes)
+        deletedEpisodes.forEach { $0.remoteStatus = .deleted }
         library.saveContext()
     }
     

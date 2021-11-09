@@ -48,12 +48,14 @@ enum PodcastEpisodeUserStatus {
     case syncingOnServer
     case availableOnServer
     case cached
+    case deleted
     
     var description : String {
         switch self {
         case .syncingOnServer: return "Server syncing"
         case .availableOnServer: return "Available"
         case .cached: return "Cached"
+        case .deleted: return "Deleted on server"
         }
     }
 }
@@ -90,9 +92,14 @@ public class PodcastEpisode: AbstractPlayable {
             return .cached
         } else if remoteStatus == .completed {
             return .availableOnServer
+        } else if remoteStatus == .deleted {
+            return .deleted
         } else {
             return .syncingOnServer
         }
+    }
+    var isAvailableToUser: Bool {
+        return userStatus == .cached || userStatus == .availableOnServer
     }
     var streamId: String? {
         get { return managedObject.streamId }
