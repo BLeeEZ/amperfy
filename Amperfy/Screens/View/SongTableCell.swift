@@ -74,7 +74,7 @@ class SongTableCell: BasicTableCell {
             case .addToPlaylistAndPlay:
                 appDelegate.player.addToPlaylist(playable: song)
                 let indexInPlayerPlaylist = appDelegate.player.playlist.playables.count-1
-                appDelegate.player.play(elementInPlaylistAt: indexInPlayerPlaylist)
+                appDelegate.player.play(playerIndex: PlayerIndex(queueType: .playlist, index: indexInPlayerPlaylist))
             case .insertAsNextSongNoPlay:
                 appDelegate.player.addToPlaylist(playable: song)
                 let addedSongIndexInPlayerPlaylist = appDelegate.player.playlist.playables.count-1

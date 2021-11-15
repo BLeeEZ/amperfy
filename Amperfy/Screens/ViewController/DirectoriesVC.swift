@@ -81,6 +81,17 @@ class DirectoriesVC: BasicTableViewController {
         }
     }
     
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard indexPath.section == 1 else { return nil }
+        let adjustedIndexPath = IndexPath(row: indexPath.row , section: 0)
+        return UISwipeActionsConfiguration(actions: [
+            createWaitingQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath) in
+                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
+                self.appDelegate.player.addToWaitingQueue(playable: song)
+            }
+        ])
+    }
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard indexPath.section == 0, let navController = navigationController else { return }
 

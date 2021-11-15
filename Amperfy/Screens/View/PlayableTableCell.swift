@@ -1,6 +1,8 @@
 import UIKit
 import AudioToolbox
 
+typealias PlayerIndexConversionCallback = (PlayableTableCell) -> PlayerIndex?
+
 class PlayableTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
@@ -11,7 +13,7 @@ class PlayableTableCell: BasicTableCell {
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     
-    var playerIndex: Int?
+    var playerIndexConversionCallback: PlayerIndexConversionCallback?
     private var playable: AbstractPlayable?
     private var download: Download?
     private var rootView: UIViewController?
@@ -19,7 +21,7 @@ class PlayableTableCell: BasicTableCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        playerIndex = nil
+        playerIndexConversionCallback = nil
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
         self.addGestureRecognizer(longPressGesture)
     }
@@ -38,7 +40,7 @@ class PlayableTableCell: BasicTableCell {
         artistLabel.text = playable.creatorName
         artworkImage.displayAndUpdate(entity: playable, via: appDelegate.artworkDownloadManager)
         
-        if playerIndex != nil {
+        if playerIndexConversionCallback != nil {
             self.reorderLabel?.isHidden = false
             self.reorderLabel?.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Bars.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
         } else if download?.error != nil {
@@ -55,7 +57,7 @@ class PlayableTableCell: BasicTableCell {
             artistLabel.textColor = .systemRed
         } else if playable.isCached || download?.isFinishedSuccessfully ?? false {
             artistLabel.textColor = UIColor.defaultBlue
-        } else if playerIndex != nil {
+        } else if playerIndexConversionCallback != nil {
             artistLabel.textColor = UIColor.labelColor
         } else {
             artistLabel.textColor = UIColor.secondaryLabelColor
@@ -70,8 +72,8 @@ class PlayableTableCell: BasicTableCell {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let index = playerIndex, !isAlertPresented {
-            appDelegate.player.play(elementInPlaylistAt: index)
+        if let playerIndexConversionCallback = playerIndexConversionCallback, let playerIndex = playerIndexConversionCallback(self), !isAlertPresented {
+            appDelegate.player.play(playerIndex: playerIndex)
         }
         isAlertPresented = false
     }
@@ -113,7 +115,7 @@ class PlayableTableCell: BasicTableCell {
             alert.view.addSubview(headerView)
         }
     
-        if playerIndex == nil && (playable.isCached || appDelegate.persistentStorage.settings.isOnlineMode) {
+        if playerIndexConversionCallback == nil && (playable.isCached || appDelegate.persistentStorage.settings.isOnlineMode) {
             alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
                 self.appDelegate.player.play(playable: playable)
                 }))

@@ -497,6 +497,10 @@ class LibraryStorage: PlayableFileCachable {
             saveContext()
         }
         
+        if playerMO.waitingQueuePlaylist == nil {
+            playerMO.waitingQueuePlaylist = PlaylistMO(context: context)
+            saveContext()
+        }
         if playerMO.normalPlaylist == nil {
             playerMO.normalPlaylist = PlaylistMO(context: context)
             saveContext()
@@ -506,6 +510,7 @@ class LibraryStorage: PlayableFileCachable {
             saveContext()
         }
         
+        let waitingQueuePlaylist = Playlist(library: self, managedObject: playerMO.waitingQueuePlaylist!)
         let normalPlaylist = Playlist(library: self, managedObject: playerMO.normalPlaylist!)
         let shuffledPlaylist = Playlist(library: self, managedObject: playerMO.shuffledPlaylist!)
         
@@ -515,7 +520,7 @@ class LibraryStorage: PlayableFileCachable {
             shuffledPlaylist.shuffle()
         }
         
-        playerData = PlayerData(library: self, managedObject: playerMO, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
+        playerData = PlayerData(library: self, managedObject: playerMO, waitingQueuePlaylist: waitingQueuePlaylist, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
         
         return playerData
     }

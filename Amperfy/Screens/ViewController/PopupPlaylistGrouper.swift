@@ -2,23 +2,41 @@ import Foundation
 
 class PopupPlaylistGrouper {
     
-    let sectionNames = ["Previous", "Next"]
     var sections: [[AbstractPlayable]]
-    private var playIndex: Int
+    let sectionNames = ["Previous", "Waiting Queue", "Next"]
+    var playIndex: Int
+    let isWaitingQueueVisible: Bool
+    let isWaitingQueuePlaying: Bool
     
     init(player: MusicPlayer) {
-        playIndex = player.currentlyPlaying?.index ?? 0
+        playIndex = player.currentContextPlaylistIndex
+        isWaitingQueuePlaying = player.isWaitingQueuePlaying
+        isWaitingQueueVisible = player.waitingQueue.songCount > 0 && !(player.isWaitingQueuePlaying && player.waitingQueue.songCount == 1)
         
         let playlist = player.playlist
         var played = [AbstractPlayable]()
-        if playIndex > 0 {
-            played = Array(playlist.playables[0...playIndex-1])
+        if playIndex == 0, playlist.songCount > 0, isWaitingQueuePlaying {
+            played = [playlist.playables[0]]
+        } else if playIndex > 0 {
+            if isWaitingQueuePlaying {
+                played = Array(playlist.playables[0...playIndex])
+            } else {
+                played = Array(playlist.playables[0...playIndex-1])
+            }
         }
         var next = [AbstractPlayable]()
         if playlist.playables.count > 0, playIndex < playlist.playables.count-1 {
             next = Array(playlist.playables[(playIndex+1)...])
         }
-        sections = [played, next]
+        var waitingQueue = [AbstractPlayable]()
+        if isWaitingQueueVisible {
+            if isWaitingQueuePlaying {
+                waitingQueue = Array(player.waitingQueue.playables[1...])
+            } else {
+                waitingQueue = player.waitingQueue.playables
+            }
+        }
+        sections = [played, waitingQueue, next]
     }
     
     var beforeCurrentlyPlayingtIndexPath: IndexPath? {
@@ -47,22 +65,40 @@ class PopupPlaylistGrouper {
         }
     }
     
-    func convertIndexPathToPlaylistIndex(indexPath: IndexPath) -> Int {
+    func convertIndexPathToPlayerIndex(indexPath: IndexPath) -> PlayerIndex {
+        var queueType = PlayerQueueType.playlist
         var playlistIndex = indexPath.row
         if indexPath.section == 1 {
-            playlistIndex += (1 + sections[0].count)
+            queueType = .waitingQueue
+            if isWaitingQueuePlaying {
+                playlistIndex += 1
+            }
         }
-        return playlistIndex
+        if indexPath.section == 2 {
+            playlistIndex += sections[0].count
+            if !isWaitingQueuePlaying {
+                playlistIndex += 1
+            }
+        }
+        return PlayerIndex(queueType: queueType, index: playlistIndex)
     }
     
-    func convertPlaylistIndexToIndexPath(playlistIndex: Int) -> IndexPath? {
-        if playlistIndex == playIndex {
+    func convertPlayerIndexToIndexPath(playerIndex: PlayerIndex) -> IndexPath? {
+        if !isWaitingQueuePlaying, playerIndex.index == playIndex {
             return nil
         }
-        if playlistIndex < playIndex {
-            return IndexPath(row: playlistIndex, section: 0)
+        if playerIndex.queueType == .waitingQueue {
+            return IndexPath(row: playerIndex.index, section: 1)
         } else {
-            return IndexPath(row: playlistIndex-playIndex-1, section: 1)
+            if playerIndex.index < playIndex {
+                return IndexPath(row: playerIndex.index, section: 0)
+            } else {
+                if isWaitingQueuePlaying {
+                    return IndexPath(row: playerIndex.index-playIndex, section: 2)
+                } else {
+                    return IndexPath(row: playerIndex.index-playIndex-1, section: 2)
+                }
+            }
         }
     }
     

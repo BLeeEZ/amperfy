@@ -26,6 +26,11 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
             libraryElementDetailTableHeaderView.prepare(playableContainer: album, with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
+        
+        waitingQueueSwipeCallback = { (indexPath) in
+            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            self.appDelegate.player.addToWaitingQueue(playable: song)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

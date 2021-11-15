@@ -5,14 +5,16 @@ public class PlayerData: NSObject {
     
     private let library: LibraryStorage
     private let managedObject: PlayerMO
+    private let waitingQueuePlaylist: Playlist
     private let normalPlaylist: Playlist
     private let shuffledPlaylist: Playlist
     
     static let entityName: String = { return "Player" }()
     
-    init(library: LibraryStorage, managedObject: PlayerMO, normalPlaylist: Playlist, shuffledPlaylist: Playlist) {
+    init(library: LibraryStorage, managedObject: PlayerMO, waitingQueuePlaylist: Playlist, normalPlaylist: Playlist, shuffledPlaylist: Playlist) {
         self.library = library
         self.managedObject = managedObject
+        self.waitingQueuePlaylist = waitingQueuePlaylist
         self.normalPlaylist = normalPlaylist
         self.shuffledPlaylist = shuffledPlaylist
     }
@@ -37,11 +39,24 @@ public class PlayerData: NSObject {
         }
     }
     
+    public var isWaitingQueuePlaying: Bool {
+        get { return managedObject.isWaitingQueuePlaying }
+        set {
+            managedObject.isWaitingQueuePlaying = newValue
+            library.saveContext()
+        }
+    }
+    public var waitingQueue: Playlist {
+        return waitingQueuePlaylist
+    }
     public var playlist: Playlist {
         get { return activePlaylist }
     }
     public var currentItem: AbstractPlayable? {
         get {
+            if isWaitingQueuePlaying, waitingQueuePlaylist.songCount > 0 {
+                return waitingQueuePlaylist.playables.first
+            }
             guard currentIndex < playlist.playables.count else {
                 return nil
             }
@@ -51,6 +66,9 @@ public class PlayerData: NSObject {
     
     public var currentPlaylistItem: PlaylistItem? {
         get {
+            if isWaitingQueuePlaying, waitingQueuePlaylist.songCount > 0 {
+                return waitingQueuePlaylist.items.first
+            }
             guard currentIndex < playlist.playables.count else {
                 return nil
             }
@@ -143,10 +161,24 @@ public class PlayerData: NSObject {
         shuffledPlaylist.append(playables: playables)
     }
     
+    func addToWaitingQueue(playable: AbstractPlayable) {
+        waitingQueuePlaylist.append(playable: playable)
+    }
+    
+    func clearWaitingQueue() {
+        waitingQueuePlaylist.removeAllItems()
+    }
+    
     func removeAllItems() {
         currentIndex = 0
         normalPlaylist.removeAllItems()
         shuffledPlaylist.removeAllItems()
+    }
+    
+    func removeItemFromWaitingQueue(at index: Int) {
+        if index < waitingQueuePlaylist.playables.count {
+            waitingQueuePlaylist.remove(at: index)
+        }
     }
     
     func removeItemFromPlaylist(at index: Int) {
@@ -156,6 +188,8 @@ public class PlayerData: NSObject {
             inactivePlaylist.remove(firstOccurrenceOfPlayable: playableToRemove)
             if index < currentIndex {
                 currentIndex = currentIndex - 1
+            } else if isWaitingQueuePlaying, index == currentIndex {
+                currentIndex = currentIndex - 1
             }
         }
     }
@@ -163,13 +197,31 @@ public class PlayerData: NSObject {
     func movePlaylistItem(fromIndex: Int, to: Int) {
         if fromIndex < playlist.playables.count, to < playlist.playables.count, fromIndex != to {
             playlist.movePlaylistItem(fromIndex: fromIndex, to: to)
-            if currentIndex == fromIndex {
+            if currentIndex == fromIndex, isWaitingQueuePlaying {
+                // nothing
+            } else if currentIndex == to, fromIndex < currentIndex, isWaitingQueuePlaying {
+                // nothing
+            } else if currentIndex == fromIndex {
                 currentIndex = to
             } else if fromIndex < currentIndex, currentIndex <= to {
                 currentIndex = currentIndex - 1
             } else if to <= currentIndex, currentIndex < fromIndex {
                 currentIndex = currentIndex + 1
             }
+        }
+    }
+    
+    func incrementCurrentIndex() {
+        currentIndex += 1
+    }
+
+    func decrementCurrentIndex() {
+        currentIndex -= 1
+    }
+    
+    func moveWaitingQueueItem(fromIndex: Int, to: Int) {
+        if fromIndex < waitingQueuePlaylist.playables.count, to < waitingQueuePlaylist.playables.count, fromIndex != to {
+            waitingQueuePlaylist.movePlaylistItem(fromIndex: fromIndex, to: to)
         }
     }
     

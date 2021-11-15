@@ -14,5 +14,6 @@ extension UIView {
 class CommonScreenOperations {
     
     static let tableSectionHeightLarge: CGFloat = 40
+    static let tableSectionHeightFooter: CGFloat = 8
     
 }

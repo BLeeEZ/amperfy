@@ -7,9 +7,7 @@ protocol BackendAudioPlayerNotifiable {
     func didElapsedTimeChange()
     func stop()
     func playPrevious()
-    func playPreviousCached()
     func playNext()
-    func playNextCached()
     func didItemFinishedPlaying()
     func notifyItemPreparationFinished()
 }

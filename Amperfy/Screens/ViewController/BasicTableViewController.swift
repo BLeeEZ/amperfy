@@ -31,6 +31,20 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
 
 }
 
+typealias WaitingQueueSwipeCallback = (IndexPath) -> Void
+
+extension UIViewController {
+    func createWaitingQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping WaitingQueueSwipeCallback) -> UIContextualAction {
+        let action = UIContextualAction(style: .normal, title: "Add to Waiting Queue") { (action, view, completionHandler) in
+            actionCallback(indexPath)
+            completionHandler(true)
+        }
+        action.backgroundColor = .systemBlue
+        action.image = UIImage(named: "playlist")
+        return action
+    }
+}
+
 class BasicTableViewController: UITableViewController {
     
     var appDelegate: AppDelegate!
@@ -42,6 +56,7 @@ class BasicTableViewController: UITableViewController {
     var rowsToInsert = [IndexPath]()
     var rowsToDelete = [IndexPath]()
     var rowsToUpdate = [IndexPath]()
+    var waitingQueueSwipeCallback: WaitingQueueSwipeCallback?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,6 +72,13 @@ class BasicTableViewController: UITableViewController {
             searchController.searchBar.selectedScopeButtonIndex = 0
         }
         updateSearchResults(for: searchController)
+    }
+    
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let swipeCB = waitingQueueSwipeCallback else { return nil }
+        return UISwipeActionsConfiguration(actions: [
+            createWaitingQueueSwipeAction(indexPath: indexPath, actionCallback: swipeCB)
+        ])
     }
     
     func configureSearchController(placeholder: String?, scopeButtonTitles: [String]? = nil, showSearchBarAtEnter: Bool = false) {

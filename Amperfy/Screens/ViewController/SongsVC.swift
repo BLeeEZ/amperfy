@@ -21,6 +21,11 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
         navigationItem.rightBarButtonItem = optionsButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
+        
+        waitingQueueSwipeCallback = { (indexPath) in
+            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            self.appDelegate.player.addToWaitingQueue(playable: song)
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -85,7 +90,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                     syncer.requestRandomSongs(playlist: randomSongsPlaylist, count: 100, library: syncLibrary)
                     DispatchQueue.main.async {
                         let playlistMain = randomSongsPlaylist.getManagedObject(in: self.appDelegate.persistentStorage.context, library: self.appDelegate.library)
-                        self.appDelegate.player.cleanPlaylist()
+                        self.appDelegate.player.clearPlaylist()
                         self.appDelegate.player.addToPlaylist(playables: playlistMain.playables)
                         self.appDelegate.player.play()
                         self.appDelegate.library.deletePlaylist(playlistMain)

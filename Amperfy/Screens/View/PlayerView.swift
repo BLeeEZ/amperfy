@@ -369,9 +369,7 @@ class PlayerView: UIView {
     
     func refreshCurrentlyPlayingInfo() {
         refreshArtwork()
-        if player.playlist.playables.count > 0 {
-            let playableIndex = player.currentlyPlaying?.index ?? 0
-            let playableInfo = player.playlist.playables[playableIndex]
+        if let playableInfo = player.currentlyPlaying?.playable {
             titleCompactLabel.text = playableInfo.title
             titleLargeLabel.text = playableInfo.title
             artistNameCompactLabel.text = playableInfo.creatorName
@@ -392,9 +390,7 @@ class PlayerView: UIView {
     }
     
     func refreshArtwork() {
-        if player.playlist.playables.count > 0 {
-            let playableIndex = player.currentlyPlaying?.index ?? 0
-            let playableInfo = player.playlist.playables[playableIndex]
+        if let playableInfo = player.currentlyPlaying?.playable {
             artworkImage.image = playableInfo.image
             rootView?.popupItem.image = playableInfo.image
         } else {

@@ -34,6 +34,13 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
+        
+        waitingQueueSwipeCallback = { (indexPath) in
+            let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            if let playable = playlistItem.playable {
+                self.appDelegate.player.addToWaitingQueue(playable: playable)
+            }
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

@@ -37,14 +37,30 @@ enum RepeatMode: Int16 {
     }
 }
 
+enum PlayerQueueType: Int16 {
+    case playlist
+    case waitingQueue
+}
+
+struct PlayerIndex: Equatable {
+    let queueType: PlayerQueueType
+    let index: Int
+}
+
 class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     static let preDownloadCount = 3
     static let progressTimeStartThreshold: Double = 15.0
     static let progressTimeEndThreshold: Double = 15.0
     
-    var playlist: Playlist { 
+    var playlist: Playlist {
         return coreData.playlist
+    }
+    var waitingQueue: Playlist {
+        return coreData.waitingQueue
+    }
+    var isWaitingQueuePlaying: Bool {
+        return coreData.isWaitingQueuePlaying
     }
     var isPlaying: Bool {
         return backendAudioPlayer.isPlaying
@@ -54,6 +70,9 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
             return playingItem
         }
         return coreData.currentPlaylistItem
+    }
+    var currentContextPlaylistIndex: Int {
+        return coreData.currentIndex
     }
     var elapsedTime: Double {
         return backendAudioPlayer.elapsedTime
@@ -138,28 +157,66 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         coreData.addToPlaylist(playables: playables)
     }
     
+    func addToWaitingQueue(playable: AbstractPlayable) {
+        coreData.addToWaitingQueue(playable: playable)
+    }
+    
+    func incrementCurrentIndex() {
+        coreData.incrementCurrentIndex()
+    }
+
+    func decrementCurrentIndex() {
+        coreData.decrementCurrentIndex()
+    }
+    
+    
     func movePlaylistItem(fromIndex: Int, to: Int) {
         coreData.movePlaylistItem(fromIndex: fromIndex, to: to)
     }
     
+    func moveWaitingQueueItem(fromIndex: Int, to: Int) {
+        coreData.moveWaitingQueueItem(fromIndex: fromIndex, to: to)
+    }
+    
+    func removeFromWaitingQueue(at index: Int) {
+        guard index < waitingQueue.playables.count else { return }
+        if isWaitingQueuePlaying, waitingQueue.playables.count == 1 {
+            stop()
+        } else if isWaitingQueuePlaying, index == 0 {
+            playNext()
+        }
+        coreData.removeItemFromWaitingQueue(at: index)
+    }
+    
     func removeFromPlaylist(at index: Int) {
         guard index < playlist.playables.count else { return }
-        if playlist.playables.count <= 1 {
-            stop()
-        } else if index == coreData.currentIndex {
-            playNext()
+        if !isWaitingQueuePlaying {
+            if playlist.playables.count <= 1 {
+                stop()
+            } else if index == coreData.currentIndex {
+                playNext()
+            }
         }
         coreData.removeItemFromPlaylist(at: index)
     }
     
-    private func prepareItemAndInsertIntoPlayer(playlistIndex: Int) {
-        guard playlistIndex < playlist.playables.count else { return }
-        let playlistItem = playlist.items[playlistIndex]
+    private func prepareItemAndInsertIntoPlayer(playerIndex: PlayerIndex) {
+        var playlistItem: PlaylistItem!
+        coreData.isWaitingQueuePlaying = playerIndex.queueType == .waitingQueue
+        if playerIndex.queueType == .waitingQueue {
+            guard playerIndex.index < waitingQueue.songCount else { return }
+            playlistItem = waitingQueue.items[playerIndex.index]
+        } else {
+            guard playerIndex.index < playlist.playables.count else { return }
+            playlistItem = playlist.items[playerIndex.index]
+        }
         userStatistics.playedItem(repeatMode: repeatMode, isShuffle: isShuffle)
+        if playerIndex.queueType == .playlist {
+            coreData.currentIndex = playerIndex.index
+        }
         backendAudioPlayer.requestToPlay(playlistItem: playlistItem)
         extractEmbeddedArtwork(playlistItem: playlistItem)
-        coreData.currentIndex = playlistIndex
-        preDownloadNextItems(playlistIndex: playlistIndex)
+        preDownloadNextItems(playlistIndex: playerIndex.index)
     }
     
     private func extractEmbeddedArtwork(playlistItem: PlaylistItem) {
@@ -174,15 +231,26 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     private func preDownloadNextItems(playlistIndex: Int) {
         guard coreData.isAutoCachePlayedItems else { return }
-        var upcomingItemsCount = (playlist.playables.count-1) - playlistIndex
+        var upcomingItemsCount = waitingQueue.songCount + (playlist.playables.count-1) - playlistIndex
         if upcomingItemsCount > Self.preDownloadCount {
             upcomingItemsCount = Self.preDownloadCount
         }
         if upcomingItemsCount > 0 {
-            for i in 1...upcomingItemsCount {
-                let nextItemIndex = playlistIndex + i
-                if let playable = playlist.items[nextItemIndex].playable, !playable.isCached {
-                    playableDownloadManager.download(object: playable)
+            if waitingQueue.songCount > 0 {
+                let waitingQueuePreDownloads = min(Self.preDownloadCount, waitingQueue.songCount)
+                for i in 0...waitingQueuePreDownloads-1 {
+                    if let playable = waitingQueue.items[i].playable, !playable.isCached {
+                        playableDownloadManager.download(object: playable)
+                    }
+                }
+                upcomingItemsCount -= waitingQueuePreDownloads
+            }
+            if upcomingItemsCount > 0 {
+                for i in 1...upcomingItemsCount {
+                    let nextItemIndex = playlistIndex + i
+                    if let playable = playlist.items[nextItemIndex].playable, !playable.isCached {
+                        playableDownloadManager.download(object: playable)
+                    }
                 }
             }
         }
@@ -207,7 +275,11 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
     
     func play() {
         if !backendAudioPlayer.canBeContinued {
-            play(elementInPlaylistAt: coreData.currentIndex)
+            if isWaitingQueuePlaying {
+                play(playerIndex: PlayerIndex(queueType: .waitingQueue, index: 0))
+            } else {
+                play(playerIndex: PlayerIndex(queueType: .playlist, index: coreData.currentIndex))
+            }
         } else {
             backendAudioPlayer.continuePlay()
             if let curPlaylistItem = backendAudioPlayer.currentlyPlaying {
@@ -215,16 +287,26 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
             }
         }
     }
-    
+
     func play(playable: AbstractPlayable) {
-        cleanPlaylist()
+        clearPlaylist()
         addToPlaylist(playable: playable)
-        play(elementInPlaylistAt: coreData.currentIndex)
+        play(playerIndex: PlayerIndex(queueType: .playlist, index: coreData.currentIndex))
     }
     
-    func play(elementInPlaylistAt: Int) {
-        if elementInPlaylistAt >= 0, elementInPlaylistAt <= playlist.playables.count {
-            prepareItemAndInsertIntoPlayer(playlistIndex: elementInPlaylistAt)
+    func play(playerIndex: PlayerIndex) {
+        if playerIndex.queueType == .waitingQueue, playerIndex.index >= 0, playerIndex.index <= waitingQueue.songCount {
+            if playerIndex.index > 0 {
+                for _ in 1...playerIndex.index {
+                    coreData.removeItemFromWaitingQueue(at: 0)
+                }
+            }
+            prepareItemAndInsertIntoPlayer(playerIndex: PlayerIndex(queueType: .waitingQueue, index: 0))
+        } else if playerIndex.queueType == .playlist, playerIndex.index >= 0, playerIndex.index <= playlist.playables.count {
+            if isWaitingQueuePlaying {
+                coreData.removeItemFromWaitingQueue(at: 0)
+            }
+            prepareItemAndInsertIntoPlayer(playerIndex: playerIndex)
         } else {
             stop()
         }
@@ -240,41 +322,27 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
 
     func playPrevious() {
         if let prevElementIndex = coreData.previousIndex {
-            play(elementInPlaylistAt: prevElementIndex)
+            play(playerIndex: PlayerIndex(queueType: .playlist, index: prevElementIndex))
         } else if repeatMode == .all, !playlist.playables.isEmpty {
-            play(elementInPlaylistAt: playlist.lastPlayableIndex)
+            play(playerIndex: PlayerIndex(queueType: .playlist, index: playlist.lastPlayableIndex))
         } else if !playlist.playables.isEmpty {
-            play(elementInPlaylistAt: 0)
+            play(playerIndex: PlayerIndex(queueType: .playlist, index: 0))
+        } else if waitingQueue.songCount > 0 {
+            play(playerIndex: PlayerIndex(queueType: .waitingQueue, index: 0))
         } else {
             stop()
         }
     }
 
-    func playPreviousCached() {
-        if let prevItemIndex = playlist.previousCachedItemIndex(downwardsFrom: coreData.currentIndex) {
-            play(elementInPlaylistAt: prevItemIndex)
-        } else if repeatMode == .all, let prevItemIndex = playlist.previousCachedItemIndex(beginningAt: playlist.lastPlayableIndex) {
-            play(elementInPlaylistAt: prevItemIndex)
-        } else {
-            stop()
-        }
-    }
-    
     func playNext() {
-        if let nextItemIndex = coreData.nextIndex {
-            play(elementInPlaylistAt: nextItemIndex)
+        if !isWaitingQueuePlaying, waitingQueue.songCount > 0 {
+            play(playerIndex: PlayerIndex(queueType: .waitingQueue, index: 0))
+        } else if isWaitingQueuePlaying, waitingQueue.songCount > 1 {
+            play(playerIndex: PlayerIndex(queueType: .waitingQueue, index: 1))
+        } else if let nextItemIndex = coreData.nextIndex {
+            play(playerIndex: PlayerIndex(queueType: .playlist, index: nextItemIndex))
         } else if repeatMode == .all, !playlist.playables.isEmpty {
-            play(elementInPlaylistAt: 0)
-        } else {
-            stop()
-        }
-    }
-    
-    func playNextCached() {
-        if let nextItemIndex = playlist.nextCachedItemIndex(upwardsFrom: coreData.currentIndex) {
-            play(elementInPlaylistAt: nextItemIndex)
-        } else if repeatMode == .all, let nextItemIndex = playlist.nextCachedItemIndex(beginningAt: 0) {
-            play(elementInPlaylistAt: nextItemIndex)
+            play(playerIndex: PlayerIndex(queueType: .playlist, index: 0))
         } else {
             stop()
         }
@@ -303,8 +371,23 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable {
         }
     }
     
-    func cleanPlaylist() {
+    func clearWaitingQueue() {
+        if isWaitingQueuePlaying {
+            coreData.clearWaitingQueue()
+            playNext()
+        } else {
+            coreData.clearWaitingQueue()
+        }
+    }
+    
+    func clearPlaylist() {
         stop()
+        coreData.removeAllItems()
+    }
+    
+    func clearQueues() {
+        stop()
+        coreData.clearWaitingQueue()
         coreData.removeAllItems()
     }
     
