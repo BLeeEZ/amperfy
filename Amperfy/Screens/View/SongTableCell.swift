@@ -72,15 +72,9 @@ class SongTableCell: BasicTableCell {
             case .playAndErasePlaylist:
                 appDelegate.player.play(playable: song)
             case .addToPlaylistAndPlay:
-                appDelegate.player.addToPlaylist(playable: song)
-                let indexInPlayerPlaylist = appDelegate.player.playlist.playables.count-1
-                appDelegate.player.play(playerIndex: PlayerIndex(queueType: .playlist, index: indexInPlayerPlaylist))
+                appDelegate.player.appendToNextQueueAndPlay(playable: song)
             case .insertAsNextSongNoPlay:
-                appDelegate.player.addToPlaylist(playable: song)
-                let addedSongIndexInPlayerPlaylist = appDelegate.player.playlist.playables.count-1
-                if let curPlayingIndex = appDelegate.player.currentlyPlaying?.index {
-                    appDelegate.player.movePlaylistItem(fromIndex: addedSongIndexInPlayerPlaylist, to: curPlayingIndex+1)
-                }
+                appDelegate.player.insertAsNextSongNoPlay(playable: song)
             }
         }
         isAlertPresented = false

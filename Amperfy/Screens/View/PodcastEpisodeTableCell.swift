@@ -66,9 +66,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
 
     @IBAction func playEpisodeButtonPressed(_ sender: Any) {
         guard let episode = self.episode else { return }
-        appDelegate.player.addToPlaylist(playable: episode)
-        let indexInPlayerPlaylist = appDelegate.player.playlist.playables.count-1
-        appDelegate.player.play(playerIndex: PlayerIndex(queueType: .playlist, index: indexInPlayerPlaylist))
+        appDelegate.player.appendToNextQueueAndPlay(playable: episode)
     }
     
     @IBAction func optionsButtonPressed(_ sender: Any) {

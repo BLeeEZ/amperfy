@@ -5,12 +5,12 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var playerPlaceholderView: UIView!
     
+    static let sectionNames = ["Previous", "Waiting Queue", "Next"]
     private var playerViewToTableViewConstraint: NSLayoutConstraint?
     
     var appDelegate: AppDelegate!
     var player: MusicPlayer!
     var playerView: PlayerView!
-    var groupedPlaylist: PopupPlaylistGrouper!
     var hostingTabBarVC: TabBarVC?
     var backgroundColorGradient: PopupAnimatedGradientLayer!
     let backgroundGradientDelayTime: UInt32 = 2
@@ -26,7 +26,6 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         player = appDelegate.player
         player.addNotifier(notifier: self)
-        groupedPlaylist = PopupPlaylistGrouper(player: player)
         backgroundColorGradient = PopupAnimatedGradientLayer(view: view)
         backgroundColorGradient.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
         
@@ -50,13 +49,13 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
 
     func reloadData() {
-        groupedPlaylist = PopupPlaylistGrouper(player: player)
         tableView.reloadData()
     }
 
     func convertCellViewToPlayerIndex(cell: PlayableTableCell) -> PlayerIndex? {
-        guard let indexPath = tableView.indexPath(for: cell) else { return nil }
-        return groupedPlaylist.convertIndexPathToPlayerIndex(indexPath: indexPath)
+        guard let indexPath = tableView.indexPath(for: cell),
+              let playerIndex = PlayerIndex.create(from: indexPath) else { return nil }
+        return playerIndex
     }
     
     func changeBackgroundGradient(forPlayable playable: AbstractPlayable) {
@@ -89,8 +88,12 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func scrollToNextPlayingRow() {
-        if let nextPlayingIndex = groupedPlaylist.nextPlayingtIndexPath {
-            tableView.scrollToRow(at: nextPlayingIndex, at: .top, animated: true)
+        if player.waitingQueue.count > 0 {
+            tableView.scrollToRow(at: IndexPath(row: 0, section: 1), at: .top, animated: true)
+        } else if player.nextQueue.count > 0 {
+            tableView.scrollToRow(at: IndexPath(row: 0, section: 2), at: .top, animated: true)
+        } else if player.prevQueue.count > 0 {
+            tableView.scrollToRow(at: IndexPath(row: player.prevQueue.count-1, section: 0), at: .top, animated: true)
         }
     }
     
@@ -150,7 +153,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return groupedPlaylist.sectionNames[section]
+        return Self.sectionNames[section]
     }
 
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
@@ -164,22 +167,22 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         headerView.textLabel?.font = UIFont.systemFont(ofSize: 20)
         headerView.textLabel?.textColor = UIColor.labelColor
         // text needs to be overridden here, otherwise the text is completely capital
-        if section == 1, !groupedPlaylist.isWaitingQueueVisible {
+        if section == 1, player.waitingQueue.isEmpty {
             headerView.textLabel?.text = ""
         } else {
-            headerView.textLabel?.text = groupedPlaylist.sectionNames[section]
+            headerView.textLabel?.text = Self.sectionNames[section]
         }
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if section == 1, !groupedPlaylist.isWaitingQueueVisible {
+        if section == 1, player.waitingQueue.isEmpty {
             return CGFloat.leastNormalMagnitude
         }
         return CommonScreenOperations.tableSectionHeightLarge
     }
     
      func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-         if section == 1, !groupedPlaylist.isWaitingQueueVisible {
+         if section == 1, player.waitingQueue.isEmpty {
              return CGFloat.leastNormalMagnitude
          }
          return CommonScreenOperations.tableSectionHeightFooter
@@ -187,12 +190,18 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return groupedPlaylist.sections[section].count
+        switch(section) {
+        case 0: return player.prevQueue.count
+        case 1: return player.waitingQueue.count
+        case 2: return player.nextQueue.count
+        default: return 0
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: PlayableTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
-        let playable = groupedPlaylist.sections[indexPath.section][indexPath.row]
+        guard let playerIndex = PlayerIndex.create(from: indexPath) else { return cell }
+        let playable = player.getPlayable(at: playerIndex)
         cell.playerIndexConversionCallback = self.convertCellViewToPlayerIndex
         cell.backgroundColor = UIColor.clear
         cell.display(playable: playable, rootView: self)
@@ -202,11 +211,11 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         return UISwipeActionsConfiguration(actions: [
             createWaitingQueueSwipeAction(indexPath: indexPath) { (indexPath) in
-                let playable = self.groupedPlaylist.sections[indexPath.section][indexPath.row]
+                guard let playerIndex = PlayerIndex.create(from: indexPath) else { return }
+                let playable = self.player.getPlayable(at: playerIndex)
                 tableView.beginUpdates()
+                tableView.insertRows(at: [IndexPath(row: self.player.waitingQueue.count, section: 1)], with: .top)
                 self.player.addToWaitingQueue(playable: playable)
-                tableView.insertRows(at: [IndexPath(row: self.groupedPlaylist.sections[1].count, section: 1)], with: .top)
-                self.groupedPlaylist = PopupPlaylistGrouper(player: self.player)
                 tableView.endUpdates()
                 self.refreshWaitingQueueSectionHeader()
             }
@@ -216,13 +225,8 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     // Override to support editing the table view.
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let deletedPlaylistIndex = groupedPlaylist.convertIndexPathToPlayerIndex(indexPath: indexPath)
-            if deletedPlaylistIndex.queueType == .waitingQueue {
-                player.removeFromWaitingQueue(at: deletedPlaylistIndex.index)
-            } else {
-                player.removeFromPlaylist(at: deletedPlaylistIndex.index)
-            }
-            groupedPlaylist = PopupPlaylistGrouper(player: player)
+            guard let playerIndex = PlayerIndex.create(from: indexPath) else { return }
+            player.removePlayable(at: playerIndex)
             tableView.deleteRows(at: [indexPath], with: .fade)
             if indexPath.section == 1 {
                 refreshWaitingQueueSectionHeader()
@@ -232,56 +236,11 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     // Override to support rearranging the table view.
     func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        guard fromIndexPath != to else { return }
-        let fromPlaylistIndex = groupedPlaylist.convertIndexPathToPlayerIndex(indexPath: fromIndexPath)
-        var toPlaylistIndex = groupedPlaylist.convertIndexPathToPlayerIndex(indexPath: to)
-        if fromIndexPath.section == 0, to.section == 2 {
-            toPlaylistIndex = PlayerIndex(queueType: toPlaylistIndex.queueType, index: toPlaylistIndex.index-1)
-        }
-        
-        // source and target are not in the user queue -> no playlist index change, first next item is counted as has been played
-        if fromPlaylistIndex.queueType == .playlist, toPlaylistIndex.queueType == .playlist, groupedPlaylist.isWaitingQueuePlaying, fromPlaylistIndex == toPlaylistIndex {
-            if fromPlaylistIndex.index == groupedPlaylist.playIndex {
-                player.decrementCurrentIndex()
-            } else {
-                player.incrementCurrentIndex()
-            }
-        // source/target are not in the user queue
-        } else if fromPlaylistIndex.queueType == .playlist, toPlaylistIndex.queueType == .playlist {
-            player.movePlaylistItem(fromIndex: fromPlaylistIndex.index, to: toPlaylistIndex.index)
-            // moving item from next directly after current index in the prev section
-            if groupedPlaylist.isWaitingQueuePlaying, toPlaylistIndex.index == groupedPlaylist.playIndex+1,
-               to.section == 0, fromIndexPath.section != 0 {
-                player.incrementCurrentIndex()
-            // moving current index from the prev section to next section
-            } else if groupedPlaylist.isWaitingQueuePlaying, fromPlaylistIndex.index == groupedPlaylist.playIndex,
-               to.section > 0  {
-                player.decrementCurrentIndex()
-            // moving any prev item to top of next section
-            } else if groupedPlaylist.isWaitingQueuePlaying, toPlaylistIndex.index == groupedPlaylist.playIndex,
-               to.section > 0  {
-                player.decrementCurrentIndex()
-            }
-        // from user queue to user queue
-        } else if fromPlaylistIndex.queueType == .waitingQueue, toPlaylistIndex.queueType == .waitingQueue {
-            player.moveWaitingQueueItem(fromIndex: fromPlaylistIndex.index, to: toPlaylistIndex.index)
-        // from user queue to context queue
-        } else if fromPlaylistIndex.queueType == .waitingQueue {
-            player.addToPlaylist(playable: player.waitingQueue.playables[fromPlaylistIndex.index])
-            player.movePlaylistItem(fromIndex: player.playlist.songCount-1, to: toPlaylistIndex.index)
-            player.removeFromWaitingQueue(at: fromPlaylistIndex.index)
-            if groupedPlaylist.isWaitingQueuePlaying, toPlaylistIndex.index == groupedPlaylist.playIndex + 1, to.section == 0 {
-                player.incrementCurrentIndex()
-            }
-        // from context queue to user queue
-        } else if toPlaylistIndex.queueType == .waitingQueue {
-            player.addToWaitingQueue(playable: player.playlist.playables[fromPlaylistIndex.index])
-            player.moveWaitingQueueItem(fromIndex: player.waitingQueue.songCount-1, to: toPlaylistIndex.index)
-            player.removeFromPlaylist(at: fromPlaylistIndex.index)
-        }
-        
-        groupedPlaylist = PopupPlaylistGrouper(player: player)
-        
+        guard fromIndexPath != to,
+            let fromPlayerIndex = PlayerIndex.create(from: fromIndexPath),
+            let toPlayerIndex = PlayerIndex.create(from: to)
+        else { return }
+        player.movePlayable(from: fromPlayerIndex, to: toPlayerIndex)
         if fromIndexPath.section == 1 || to.section == 1 {
             refreshWaitingQueueSectionHeader()
         }
@@ -339,7 +298,12 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         if appDelegate.persistentStorage.settings.isOnlineMode {
             alert.addAction(UIAlertAction(title: "Add all songs to playlist", style: .default, handler: { _ in
                 let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-                selectPlaylistVC.itemsToAdd = self.appDelegate.player.playlist.playables.filterSongs()
+                var itemsToAdd = self.appDelegate.player.prevQueue.filterSongs()
+                if let currentlyPlaying = self.appDelegate.player.currentlyPlaying, currentlyPlaying.isSong {
+                    itemsToAdd.append(currentlyPlaying)
+                }
+                itemsToAdd.append(contentsOf: self.appDelegate.player.nextQueue.filterSongs())
+                selectPlaylistVC.itemsToAdd = itemsToAdd
                 let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
                 self.present(selectPlaylistNav, animated: true, completion: nil)
             }))
@@ -355,14 +319,14 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
 extension PopupPlayerVC: MusicPlayable {
 
-    func didStartPlaying(playlistItem: PlaylistItem) {
+    func didStartPlaying() {
         self.reloadData()
     }
     
     func didPause() {
     }
     
-    func didStopPlaying(playlistItem: PlaylistItem?) {
+    func didStopPlaying() {
         self.reloadData()
     }
 

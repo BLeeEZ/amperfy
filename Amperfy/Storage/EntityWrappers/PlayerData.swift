@@ -1,11 +1,37 @@
 import Foundation
 import CoreData
+import CoreMedia
+import UIKit
+
+protocol PlayerStatusPersistent {
+    func stop()
+    var isAutoCachePlayedItems: Bool { get set }
+    var isShuffle: Bool { get set }
+    var repeatMode: RepeatMode { get set }
+}
+
+protocol PlayerQueuesPersistent {
+    var isWaitingQueuePlaying: Bool { get set }
+    var isWaitingQueueVisible: Bool { get }
+    
+    var currentIndex: Int { get set }
+    var currentItem: AbstractPlayable? { get }
+    var activePlaylist: Playlist { get }
+    var inactivePlaylist: Playlist { get }
+    var waitingQueuePlaylist: Playlist { get }
+    
+    func addToPlaylist(playable: AbstractPlayable)
+    func addToPlaylist(playables: [AbstractPlayable])
+    func addToWaitingQueue(playable: AbstractPlayable)
+    func clearWaitingQueue()
+    func removeAllItems()
+}
 
 public class PlayerData: NSObject {
     
+    private let waitingQueuePlaylistInternal: Playlist
     private let library: LibraryStorage
     private let managedObject: PlayerMO
-    private let waitingQueuePlaylist: Playlist
     private let normalPlaylist: Playlist
     private let shuffledPlaylist: Playlist
     
@@ -14,67 +40,26 @@ public class PlayerData: NSObject {
     init(library: LibraryStorage, managedObject: PlayerMO, waitingQueuePlaylist: Playlist, normalPlaylist: Playlist, shuffledPlaylist: Playlist) {
         self.library = library
         self.managedObject = managedObject
-        self.waitingQueuePlaylist = waitingQueuePlaylist
+        self.waitingQueuePlaylistInternal = waitingQueuePlaylist
         self.normalPlaylist = normalPlaylist
         self.shuffledPlaylist = shuffledPlaylist
     }
-    
-    private var activePlaylist: Playlist {
-        get {
-            if !isShuffle {
-                return normalPlaylist
-            } else {
-                return shuffledPlaylist
-            }
-        }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? PlayerData else { return false }
+        return managedObject == object.managedObject
     }
+
+}
+
+extension PlayerData: PlayerStatusPersistent {
     
-    private var inactivePlaylist: Playlist {
-        get {
-            if !isShuffle {
-                return shuffledPlaylist
-            } else {
-                return normalPlaylist
-            }
-        }
+    func stop() {
+        currentIndex = 0
+        isWaitingQueuePlaying = false
+        waitingQueuePlaylistInternal.removeAllItems()
     }
     
-    public var isWaitingQueuePlaying: Bool {
-        get { return managedObject.isWaitingQueuePlaying }
-        set {
-            managedObject.isWaitingQueuePlaying = newValue
-            library.saveContext()
-        }
-    }
-    public var waitingQueue: Playlist {
-        return waitingQueuePlaylist
-    }
-    public var playlist: Playlist {
-        get { return activePlaylist }
-    }
-    public var currentItem: AbstractPlayable? {
-        get {
-            if isWaitingQueuePlaying, waitingQueuePlaylist.songCount > 0 {
-                return waitingQueuePlaylist.playables.first
-            }
-            guard currentIndex < playlist.playables.count else {
-                return nil
-            }
-            return playlist.playables[currentIndex]
-        }
-    }
-    
-    public var currentPlaylistItem: PlaylistItem? {
-        get {
-            if isWaitingQueuePlaying, waitingQueuePlaylist.songCount > 0 {
-                return waitingQueuePlaylist.items.first
-            }
-            guard currentIndex < playlist.playables.count else {
-                return nil
-            }
-            return playlist.items[currentIndex]
-        }
-    }
     var isAutoCachePlayedItems: Bool {
         get { return managedObject.autoCachePlayedItemSetting == 1 }
         set {
@@ -82,10 +67,9 @@ public class PlayerData: NSObject {
             library.saveContext()
         }
     }
+    
     var isShuffle: Bool {
-        get {
-            return managedObject.shuffleSetting == 1
-        }
+        get { return managedObject.shuffleSetting == 1 }
         set {
             if newValue {
                 shuffledPlaylist.shuffle()
@@ -102,6 +86,7 @@ public class PlayerData: NSObject {
             library.saveContext()
         }
     }
+    
     var repeatMode: RepeatMode {
         get {
             return RepeatMode(rawValue: managedObject.repeatSetting) ?? .off
@@ -111,46 +96,82 @@ public class PlayerData: NSObject {
             library.saveContext()
         }
     }
+
+}
+
+extension PlayerData: PlayerQueuesPersistent {
+
+    var isWaitingQueuePlaying: Bool {
+        get { return managedObject.isWaitingQueuePlaying }
+        set {
+            managedObject.isWaitingQueuePlaying = newValue
+            library.saveContext()
+        }
+    }
+    
+    var isWaitingQueueVisible: Bool {
+        return waitingQueuePlaylistInternal.songCount > 0 && !(isWaitingQueuePlaying && waitingQueuePlaylistInternal.songCount == 1)
+    }
+    
+    var activePlaylist: Playlist {
+        get {
+            if !isShuffle {
+                return normalPlaylist
+            } else {
+                return shuffledPlaylist
+            }
+        }
+    }
+    
+    var inactivePlaylist: Playlist {
+        get {
+            if !isShuffle {
+                return shuffledPlaylist
+            } else {
+                return normalPlaylist
+            }
+        }
+    }
     
     var currentIndex: Int {
         get {
-            if managedObject.currentIndex >= playlist.playables.count, managedObject.currentIndex < 0 {
+            if managedObject.currentIndex < 0, !isWaitingQueuePlaying {
+                managedObject.currentIndex = 0
+                library.saveContext()
+            }
+            if managedObject.currentIndex >= activePlaylist.playables.count, managedObject.currentIndex < -1 {
                 managedObject.currentIndex = 0
                 library.saveContext()
             }
             return Int(managedObject.currentIndex)
         }
         set {
-            if newValue >= 0, newValue < playlist.playables.count {
+            if newValue >= -1, newValue < activePlaylist.playables.count {
                 managedObject.currentIndex = Int32(newValue)
             } else {
-                managedObject.currentIndex = 0
+                managedObject.currentIndex = isWaitingQueuePlaying ? -1 : 0
             }
             library.saveContext()
         }
     }
+    
+    var currentItem: AbstractPlayable? {
+        get {
+            if isWaitingQueuePlaying, waitingQueuePlaylistInternal.songCount > 0 {
+                return waitingQueuePlaylistInternal.playables.first
+            }
+            guard activePlaylist.playables.count > 0 else { return nil }
+            guard currentIndex >= 0, currentIndex < activePlaylist.playables.count else {
+                return activePlaylist.playables[0]
+            }
+            return activePlaylist.playables[currentIndex]
+        }
+    }
 
-    var previousIndex: Int? {
-        let prevIndex = currentIndex - 1
-        guard prevIndex >= 0 else { return nil }
-        if prevIndex >= playlist.playables.count {
-            return nil
-        } else if playlist.playables.count == 0 {
-            return nil
-        } else {
-            return prevIndex
-        }
+    var waitingQueuePlaylist: Playlist {
+        get { return waitingQueuePlaylistInternal }
     }
-    
-    var nextIndex: Int? {
-        let nxtIndex = currentIndex + 1
-        if nxtIndex >= playlist.playables.count {
-            return nil
-        } else {
-            return nxtIndex
-        }
-    }
-    
+
     func addToPlaylist(playable: AbstractPlayable) {
         normalPlaylist.append(playable: playable)
         shuffledPlaylist.append(playable: playable)
@@ -162,72 +183,19 @@ public class PlayerData: NSObject {
     }
     
     func addToWaitingQueue(playable: AbstractPlayable) {
-        waitingQueuePlaylist.append(playable: playable)
+        waitingQueuePlaylistInternal.append(playable: playable)
     }
     
     func clearWaitingQueue() {
-        waitingQueuePlaylist.removeAllItems()
+        waitingQueuePlaylistInternal.removeAllItems()
     }
     
     func removeAllItems() {
         currentIndex = 0
+        isWaitingQueuePlaying = false
         normalPlaylist.removeAllItems()
         shuffledPlaylist.removeAllItems()
+        waitingQueuePlaylistInternal.removeAllItems()
     }
-    
-    func removeItemFromWaitingQueue(at index: Int) {
-        if index < waitingQueuePlaylist.playables.count {
-            waitingQueuePlaylist.remove(at: index)
-        }
-    }
-    
-    func removeItemFromPlaylist(at index: Int) {
-        if index < playlist.playables.count {
-            let playableToRemove = playlist.playables[index]
-            activePlaylist.remove(at: index)
-            inactivePlaylist.remove(firstOccurrenceOfPlayable: playableToRemove)
-            if index < currentIndex {
-                currentIndex = currentIndex - 1
-            } else if isWaitingQueuePlaying, index == currentIndex {
-                currentIndex = currentIndex - 1
-            }
-        }
-    }
-    
-    func movePlaylistItem(fromIndex: Int, to: Int) {
-        if fromIndex < playlist.playables.count, to < playlist.playables.count, fromIndex != to {
-            playlist.movePlaylistItem(fromIndex: fromIndex, to: to)
-            if currentIndex == fromIndex, isWaitingQueuePlaying {
-                // nothing
-            } else if currentIndex == to, fromIndex < currentIndex, isWaitingQueuePlaying {
-                // nothing
-            } else if currentIndex == fromIndex {
-                currentIndex = to
-            } else if fromIndex < currentIndex, currentIndex <= to {
-                currentIndex = currentIndex - 1
-            } else if to <= currentIndex, currentIndex < fromIndex {
-                currentIndex = currentIndex + 1
-            }
-        }
-    }
-    
-    func incrementCurrentIndex() {
-        currentIndex += 1
-    }
-
-    func decrementCurrentIndex() {
-        currentIndex -= 1
-    }
-    
-    func moveWaitingQueueItem(fromIndex: Int, to: Int) {
-        if fromIndex < waitingQueuePlaylist.playables.count, to < waitingQueuePlaylist.playables.count, fromIndex != to {
-            waitingQueuePlaylist.movePlaylistItem(fromIndex: fromIndex, to: to)
-        }
-    }
-    
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? PlayerData else { return false }
-        return managedObject == object.managedObject
-    }
-
 }
+    

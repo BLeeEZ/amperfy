@@ -369,7 +369,7 @@ class PlayerView: UIView {
     
     func refreshCurrentlyPlayingInfo() {
         refreshArtwork()
-        if let playableInfo = player.currentlyPlaying?.playable {
+        if let playableInfo = player.currentlyPlaying {
             titleCompactLabel.text = playableInfo.title
             titleLargeLabel.text = playableInfo.title
             artistNameCompactLabel.text = playableInfo.creatorName
@@ -390,7 +390,7 @@ class PlayerView: UIView {
     }
     
     func refreshArtwork() {
-        if let playableInfo = player.currentlyPlaying?.playable {
+        if let playableInfo = player.currentlyPlaying {
             artworkImage.image = playableInfo.image
             rootView?.popupItem.image = playableInfo.image
         } else {
@@ -464,7 +464,7 @@ class PlayerView: UIView {
 
 extension PlayerView: MusicPlayable {
 
-    func didStartPlaying(playlistItem: PlaylistItem) {
+    func didStartPlaying() {
         refreshPlayer()
     }
     
@@ -472,7 +472,7 @@ extension PlayerView: MusicPlayable {
         refreshPlayer()
     }
     
-    func didStopPlaying(playlistItem: PlaylistItem?) {
+    func didStopPlaying() {
         refreshPlayer()
         refreshCurrentlyPlayingInfo()
     }

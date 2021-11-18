@@ -41,12 +41,11 @@ public struct LogData: Encodable {
         logData.libraryInfo?.version = appDelegate.persistentStorage.librarySyncVersion.description
         
         var playerInfo = PlayerInfo()
-        playerInfo.playlistItemCount = appDelegate.player.playlist.items.count
         playerInfo.isPlaying = appDelegate.player.isPlaying
         playerInfo.repeatType = appDelegate.player.repeatMode.description
         playerInfo.isShuffle = appDelegate.player.isShuffle
-        playerInfo.songIndex = appDelegate.player.currentlyPlaying?.index ?? -99
-        playerInfo.playlistItemCount = appDelegate.player.playlist.items.count
+        playerInfo.songIndex = appDelegate.player.currentlyPlaying != nil ? 0 : -99
+        playerInfo.playlistItemCount = appDelegate.player.prevQueue.count + appDelegate.player.nextQueue.count + 1
         logData.playerInfo = playerInfo
         
         var userSettings = UserSettings()

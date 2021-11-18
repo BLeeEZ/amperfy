@@ -26,7 +26,7 @@ class BackendAudioPlayer {
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
     public private(set) var isPlaying: Bool = false
-    public private(set) var currentlyPlaying: PlaylistItem?
+    public private(set) var currentlyPlaying: AbstractPlayable?
     
     var responder: BackendAudioPlayerNotifiable?
     var elapsedTime: Double {
@@ -91,23 +91,16 @@ class BackendAudioPlayer {
         player.seek(to: CMTime(seconds: toSecond, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
     }
     
-    func updateCurrentlyPlayingReference(playlistItem: PlaylistItem) {
-        if currentlyPlaying?.playable?.id == playlistItem.playable?.id {
-            currentlyPlaying = playlistItem
-        }
-    }
-    
-    func requestToPlay(playlistItem: PlaylistItem) {
+    func requestToPlay(playable: AbstractPlayable) {
         semaphore.wait()
-        guard let playable = playlistItem.playable else { return }
         if !playable.isPlayableOniOS, let contentType = playable.contentType {
             player.pause()
             player.replaceCurrentItem(with: nil)
             eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playable.displayString)\" is not playable via Amperfy.")
         } else if playable.isCached {
-            insertCachedPlayable(playlistItem: playlistItem)
+            insertCachedPlayable(playable: playable)
         } else if !isOfflineMode{
-            insertStreamPlayable(playlistItem: playlistItem)
+            insertStreamPlayable(playable: playable)
             if isAutoCachePlayedItems {
                 playableDownloader.download(object: playable)
             }
@@ -116,20 +109,21 @@ class BackendAudioPlayer {
             player.replaceCurrentItem(with: nil)
         }
         self.continuePlay()
-        self.reactToInsertationFinish(playlistItem: playlistItem)
+        currentlyPlaying = playable
+        self.responder?.notifyItemPreparationFinished()
         semaphore.signal()
     }
     
-    private func insertCachedPlayable(playlistItem: PlaylistItem) {
-        guard let playable = playlistItem.playable, let playableData = cacheProxy.getFile(forPlayable: playable)?.data else { return }
+    private func insertCachedPlayable(playable: AbstractPlayable) {
+        guard let playableData = cacheProxy.getFile(forPlayable: playable)?.data else { return }
         os_log(.default, "Play item: %s", playable.displayString)
         if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
         let itemUrl = playableData.createLocalUrl(fileName: "curPlayItem.mp3")
         insert(playable: playable, withUrl: itemUrl)
     }
     
-    private func insertStreamPlayable(playlistItem: PlaylistItem) {
-        guard let playable = playlistItem.playable, let streamUrl = backendApi.generateUrl(forStreamingPlayable: playable) else { return }
+    private func insertStreamPlayable(playable: AbstractPlayable) {
+        guard let streamUrl = backendApi.generateUrl(forStreamingPlayable: playable) else { return }
         os_log(.default, "Stream item: %s", playable.displayString)
         if playable.isSong { userStatistics.playedSong(isPlayedFromCache: false) }
         insert(playable: playable, withUrl: streamUrl)
@@ -147,11 +141,6 @@ class BackendAudioPlayer {
         }
         player.replaceCurrentItem(with: item)
         NotificationCenter.default.addObserver(self, selector: #selector(itemFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
-    }
-    
-    private func reactToInsertationFinish(playlistItem: PlaylistItem) {
-        currentlyPlaying = playlistItem
-        self.responder?.notifyItemPreparationFinished()
     }
     
     func getEmbeddedArtworkFromID3Tag() -> UIImage? {
