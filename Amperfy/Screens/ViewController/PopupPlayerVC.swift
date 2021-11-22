@@ -5,7 +5,6 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var playerPlaceholderView: UIView!
     
-    static let sectionNames = ["Previous", "Waiting Queue", "Next"]
     private var playerViewToTableViewConstraint: NSLayoutConstraint?
     
     var appDelegate: AppDelegate!
@@ -14,6 +13,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var hostingTabBarVC: TabBarVC?
     var backgroundColorGradient: PopupAnimatedGradientLayer!
     let backgroundGradientDelayTime: UInt32 = 2
+    var sectionViews = [PopupPlayerSectionHeader]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,6 +38,13 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
         tableView.backgroundColor = UIColor.clear
+        
+        for queueType in PlayerQueueType.allCases {
+            if let sectionView = ViewBuilder<PopupPlayerSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+                sectionView.display(type: queueType)
+                sectionViews.append(sectionView)
+            }
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -153,32 +160,19 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return Self.sectionNames[section]
+        return nil
     }
 
-    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        refreshSectionHeaderView(view: view, forSection: section)
-    }
-    
-    func refreshSectionHeaderView(view: UIView, forSection section: Int) {
-        guard let headerView = view as? UITableViewHeaderFooterView else { return }
-        headerView.backgroundView = UIView()
-        headerView.backgroundView?.backgroundColor = UIColor.clear
-        headerView.textLabel?.font = UIFont.systemFont(ofSize: 20)
-        headerView.textLabel?.textColor = UIColor.labelColor
-        // text needs to be overridden here, otherwise the text is completely capital
-        if section == 1, player.waitingQueue.isEmpty {
-            headerView.textLabel?.text = ""
-        } else {
-            headerView.textLabel?.text = Self.sectionNames[section]
-        }
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        refreshWaitingQueueSectionHeader()
+        return sectionViews[section]
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 1, player.waitingQueue.isEmpty {
             return CGFloat.leastNormalMagnitude
         }
-        return CommonScreenOperations.tableSectionHeightLarge
+        return PopupPlayerSectionHeader.frameHeight
     }
     
      func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
@@ -247,9 +241,27 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func refreshWaitingQueueSectionHeader() {
-        if let sectionView = tableView.headerView(forSection: 1) {
-            refreshSectionHeaderView(view: sectionView, forSection: 1)
+        let waitingQueueSectionView = sectionViews[1]
+        if player.waitingQueue.isEmpty {
+            waitingQueueSectionView.hide()
+        } else {
+            waitingQueueSectionView.display(type: .waitingQueue, buttonTitle: "Clear") {
+                self.clearWaitingQueue()
+            }
         }
+    }
+    
+    func clearWaitingQueue() {
+        tableView.beginUpdates()
+        var indexPaths = [IndexPath]()
+        for i in 0...self.player.waitingQueue.count-1 {
+            indexPaths.append(IndexPath(row: i, section: 1))
+        }
+        tableView.deleteRows(at: indexPaths, with: .fade)
+        appDelegate.player.clearWaitingQueue()
+        tableView.endUpdates()
+        refreshWaitingQueueSectionHeader()
+        playerView.refreshPlayer()
     }
 
     // Override to support conditional rearranging of the table view.
@@ -290,11 +302,11 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             self.reloadData()
             self.playerView.refreshPlayer()
         }))
-        alert.addAction(UIAlertAction(title: "Clear Waiting Queue", style: .default, handler: { _ in
-            self.appDelegate.player.clearWaitingQueue()
-            self.reloadData()
-            self.playerView.refreshPlayer()
-        }))
+        if !player.waitingQueue.isEmpty {
+            alert.addAction(UIAlertAction(title: "Clear Waiting Queue", style: .default, handler: { _ in
+                self.clearWaitingQueue()
+            }))
+        }
         if appDelegate.persistentStorage.settings.isOnlineMode {
             alert.addAction(UIAlertAction(title: "Add all songs to playlist", style: .default, handler: { _ in
                 let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()

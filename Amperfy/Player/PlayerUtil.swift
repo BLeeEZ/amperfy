@@ -34,10 +34,18 @@ enum RepeatMode: Int16 {
     }
 }
 
-enum PlayerQueueType: Int {
+enum PlayerQueueType: Int, CaseIterable {
     case prev = 0
     case waitingQueue
     case next
+    
+    var description : String {
+        switch self {
+        case .prev: return "Previous"
+        case .waitingQueue: return "Waiting Queue"
+        case .next: return "Next"
+        }
+    }
 }
 
 struct PlayerIndex: Equatable {

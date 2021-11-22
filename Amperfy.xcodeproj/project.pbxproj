@@ -80,6 +80,8 @@
 		5029E0392235A8EC0027F96F /* CommonString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E0382235A8EC0027F96F /* CommonString.swift */; };
 		5029E03B2235ABB80027F96F /* OptionsBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */; };
 		502C0045224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502C0044224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift */; };
+		502E56BC27561AD900638BD2 /* PopupPlayerSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */; };
+		502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */; };
 		5040B2C4269CD19600911451 /* LocalNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5040B2C3269CD19600911451 /* LocalNotificationManager.swift */; };
 		5040B2C6269D947F00911451 /* BackgroundFetchTriggeredSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5040B2C5269D947F00911451 /* BackgroundFetchTriggeredSyncer.swift */; };
 		5041B8002212051A00603F02 /* ArtistDetailTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5041B7FF2212051A00603F02 /* ArtistDetailTableHeader.xib */; };
@@ -432,6 +434,8 @@
 		5029E0382235A8EC0027F96F /* CommonString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonString.swift; sourceTree = "<group>"; };
 		5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsBarButtonItem.swift; sourceTree = "<group>"; };
 		502C0044224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubsonicArtworkDownloadDelegate.swift; sourceTree = "<group>"; };
+		502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PopupPlayerSectionHeader.xib; sourceTree = "<group>"; };
+		502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupPlayerSectionHeader.swift; sourceTree = "<group>"; };
 		50377A53266E130300F0C3F3 /* Amperfy v9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v9.xcdatamodel"; sourceTree = "<group>"; };
 		5040B2C2269C451A00911451 /* Amperfy v12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v12.xcdatamodel"; sourceTree = "<group>"; };
 		5040B2C3269CD19600911451 /* LocalNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationManager.swift; sourceTree = "<group>"; };
@@ -1173,6 +1177,8 @@
 				50A85EF12689E8DC00FB3E31 /* PlayableTableCell.swift */,
 				508FDE3721F1E14F005A0724 /* NewPlaylistTableHeader.xib */,
 				508FDE3521F1E130005A0724 /* NewPlaylistTableHeader.swift */,
+				502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */,
+				502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */,
 				50CDF20F264BF0FB00F83EF6 /* LogEntryTableCell.xib */,
 				50CDF210264BF0FB00F83EF6 /* LogEntryTableCell.swift */,
 				500631FE23A1747B000F75A3 /* PlayerView.xib */,
@@ -1411,6 +1417,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */,
 				50A85F0A268A556700FB3E31 /* Amperfy.xcdatamodeld in Resources */,
 				500B7D3F21EC87FD0083ED6F /* SongActionSheetView.xib in Resources */,
 				5055AA5826835AB000096B8D /* PodcastEpisodeTableCell.xib in Resources */,
@@ -1557,6 +1564,7 @@
 				501A7D3226808F4D0055A51B /* PodcastMO+CoreDataProperties.swift in Sources */,
 				50DEEE0C265E3F9D0073FF20 /* DirectoriesVC.swift in Sources */,
 				50A85EEF2689C77F00FB3E31 /* PlayableParserDelegate.swift in Sources */,
+				502E56BC27561AD900638BD2 /* PopupPlayerSectionHeader.swift in Sources */,
 				50F81E8623BAF25900EAAC3E /* Album.swift in Sources */,
 				50F81EED23BF6B1E00EAAC3E /* ArtworkMO+CoreDataProperties.swift in Sources */,
 				50F81E9823BE4C1800EAAC3E /* SyncWave.swift in Sources */,
