@@ -10,7 +10,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     
     private var appDelegate: AppDelegate!
     private var playableContainer: PlayableContainable?
-    private var player: MusicPlayer?
+    private var player: PlayerFacade?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -38,7 +38,7 @@ class LibraryElementDetailTableHeaderView: UIView {
         }
     }
     
-    func prepare(playableContainer: PlayableContainable?, with player: MusicPlayer) {
+    func prepare(playableContainer: PlayableContainable?, with player: PlayerFacade) {
         self.playableContainer = playableContainer
         self.player = player
     }

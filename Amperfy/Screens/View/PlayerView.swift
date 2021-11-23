@@ -34,7 +34,7 @@ class PlayerView: UIView {
     var lastDisplayedPlayable: AbstractPlayable?
     
     private var appDelegate: AppDelegate!
-    private var player: MusicPlayer!
+    private var player: PlayerFacade!
     private var rootView: PopupPlayerVC?
     private var displayStyle: PlayerDisplayStyle!
     

@@ -8,7 +8,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     private var playerViewToTableViewConstraint: NSLayoutConstraint?
     
     var appDelegate: AppDelegate!
-    var player: MusicPlayer!
+    var player: PlayerFacade!
     var playerView: PlayerView!
     var hostingTabBarVC: TabBarVC?
     var backgroundColorGradient: PopupAnimatedGradientLayer!

@@ -33,13 +33,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var backendApi: BackendApi = {
         return backendProxy
     }()
-    lazy var player: MusicPlayer = {
+    lazy var player: PlayerFacade = {
         let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
         let playerData = library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
         let curPlayer = MusicPlayer(coreData: playerData, queueHandler: queueHandler, library: library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
-        curPlayer.isOfflineMode = persistentStorage.settings.isOfflineMode
-        return curPlayer
+
+        let audioSessionHandler = AudioSessionHandler(musicPlayer: curPlayer)
+        audioSessionHandler.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
+        audioSessionHandler.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
+        UIApplication.shared.beginReceivingRemoteControlEvents()
+        let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter.default())
+        curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
+        let remoteCommandCenterHandler = RemoteCommandCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter.shared())
+        remoteCommandCenterHandler.configureRemoteCommands()
+        curPlayer.addNotifier(notifier: remoteCommandCenterHandler)
+
+        let facadeImpl = PlayerFacadeImpl(playerStatus: playerData, queueHandler: queueHandler, musicPlayer: curPlayer, library: library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        facadeImpl.isOfflineMode = persistentStorage.settings.isOfflineMode
+        return facadeImpl
     }()
     lazy var playableDownloadManager: DownloadManageable = {
         let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi)
@@ -86,14 +98,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         player.reinit(playerStatus: playerData, queueHandler: queueHandler)
     }
 
-    func configureAudioSessionInterruptionAndRemoteControl() {
-        self.player.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
-        self.player.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
-        UIApplication.shared.beginReceivingRemoteControlEvents()
-        self.player.nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
-        self.player.configureRemoteCommands(remoteCommandCenter: MPRemoteCommandCenter.shared())
-    }
-    
     var isKeepScreenAlive: Bool {
         get { return UIApplication.shared.isIdleTimerDisabled }
         set { UIApplication.shared.isIdleTimerDisabled = newValue }
@@ -115,7 +119,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             os_log("application launch", log: self.log, type: .info)
         }
 
-        configureAudioSessionInterruptionAndRemoteControl()
         configureDefaultNavigationBarStyle()
         configureBackgroundFetch()
         configureNotificationHandling()
