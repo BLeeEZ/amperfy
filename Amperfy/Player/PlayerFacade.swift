@@ -31,6 +31,7 @@ protocol PlayerFacade {
 
     func play()
     func play(playable: AbstractPlayable)
+    func play(playables: [AbstractPlayable])
     func play(playerIndex: PlayerIndex)
     func appendToNextQueueAndPlay(playable: AbstractPlayable)
     func togglePlay()
@@ -149,8 +150,14 @@ class PlayerFacadeImpl: PlayerFacade {
     }
     
     func clearPlaylist() {
-        musicPlayer.stop()
-        queueHandler.removeAllItems()
+        if !queueHandler.isWaitingQueuePlaying {
+            if queueHandler.waitingQueue.isEmpty {
+                musicPlayer.stop()
+            } else {
+                play(playerIndex: PlayerIndex(queueType: .waitingQueue, index: 0))
+            }
+        }
+        queueHandler.clearPlaylistQueues()
     }
     
     func clearQueues() {
@@ -163,8 +170,11 @@ class PlayerFacadeImpl: PlayerFacade {
     }
     
     func play(playable: AbstractPlayable) {
-        clearPlaylist()
         musicPlayer.play(playable: playable)
+    }
+    
+    func play(playables: [AbstractPlayable]) {
+        musicPlayer.play(playables: playables)
     }
     
     func play(playerIndex: PlayerIndex) {

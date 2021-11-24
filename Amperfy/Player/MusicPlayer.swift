@@ -10,9 +10,6 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
     static let progressTimeEndThreshold: Double = 15.0
     
     var currentlyPlaying: AbstractPlayable? {
-        if let playingItem = backendAudioPlayer.currentlyPlaying {
-            return playingItem
-        }
         return queueHandler.currentlyPlaying
     }
 
@@ -123,10 +120,46 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
     }
 
     func play(playable: AbstractPlayable) {
-        stop()
-        queueHandler.clearWaitingQueue()
+        let topWaitingQueueItem = queueHandler.waitingQueue.first
+        let wasWaitingQueuePlaying = queueHandler.isWaitingQueuePlaying
+        queueHandler.clearPlaylistQueues()
         queueHandler.addToPlaylist(playable: playable)
-        insertIntoPlayer(playable: playable)
+        if queueHandler.waitingQueue.isEmpty {
+            if queueHandler.isWaitingQueuePlaying {
+                playNext()
+            } else {
+                play()
+            }
+        } else {
+            play(playerIndex: PlayerIndex(queueType: .next, index: 0))
+        }
+        if let topWaitingQueueItem = topWaitingQueueItem, !wasWaitingQueuePlaying {
+            queueHandler.addToWaitingQueue(playable: topWaitingQueueItem)
+            queueHandler.movePlayable(from: PlayerIndex(queueType: .waitingQueue, index: queueHandler.waitingQueue.count-1),
+                                      to: PlayerIndex(queueType: .waitingQueue, index: 0))
+        }
+    }
+    
+    func play(playables: [AbstractPlayable]) {
+        guard !playables.isEmpty else { return }
+        let topWaitingQueueItem = queueHandler.waitingQueue.first
+        let wasWaitingQueuePlaying = queueHandler.isWaitingQueuePlaying
+        queueHandler.clearPlaylistQueues()
+        queueHandler.addToPlaylist(playables: playables)
+        if queueHandler.waitingQueue.isEmpty {
+            if queueHandler.isWaitingQueuePlaying {
+                playNext()
+            } else {
+                play()
+            }
+        } else {
+            play(playerIndex: PlayerIndex(queueType: .next, index: 0))
+        }
+        if let topWaitingQueueItem = topWaitingQueueItem, !wasWaitingQueuePlaying {
+            queueHandler.addToWaitingQueue(playable: topWaitingQueueItem)
+            queueHandler.movePlayable(from: PlayerIndex(queueType: .waitingQueue, index: queueHandler.waitingQueue.count-1),
+                                      to: PlayerIndex(queueType: .waitingQueue, index: 0))
+        }
     }
     
     func play(playerIndex: PlayerIndex) {
@@ -176,7 +209,6 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
     
     //BackendAudioPlayerNotifiable
     func stop() {
-        queueHandler.clearWaitingQueue()
         backendAudioPlayer.stop()
         playerStatus.stop()
         notifyPlayerStopped()

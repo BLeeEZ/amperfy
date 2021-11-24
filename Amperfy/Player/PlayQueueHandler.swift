@@ -48,6 +48,10 @@ public class PlayQueueHandler  {
         }
     }
     
+    var isWaitingQueuePlaying: Bool {
+        return playerQueues.isWaitingQueuePlaying
+    }
+    
     func addToPlaylist(playable: AbstractPlayable) {
         playerQueues.addToPlaylist(playable: playable)
     }
@@ -58,6 +62,10 @@ public class PlayQueueHandler  {
     
     func addToWaitingQueue(playable: AbstractPlayable) {
         playerQueues.addToWaitingQueue(playable: playable)
+    }
+    
+    func clearPlaylistQueues() {
+        playerQueues.clearPlaylistQueues()
     }
     
     func clearWaitingQueue() {
@@ -226,10 +234,6 @@ public class PlayQueueHandler  {
         return playerQueues.waitingQueuePlaylist
     }
 
-    private var isWaitingQueuePlaying: Bool {
-        return playerQueues.isWaitingQueuePlaying
-    }
-    
     private var isWaitingQueueVisible: Bool {
         return playerQueues.isWaitingQueueVisible
     }
@@ -242,13 +246,13 @@ public class PlayQueueHandler  {
     private func removeItemFromPlaylist(at index: Int) {
         guard index < playlist.playables.count else { return }
         let playableToRemove = playlist.playables[index]
-        playlist.remove(at: index)
-        playerQueues.inactivePlaylist.remove(firstOccurrenceOfPlayable: playableToRemove)
         if index < currentIndex {
             currentIndex -= 1
         } else if isWaitingQueuePlaying, index == currentIndex {
             currentIndex -= 1
         }
+        playlist.remove(at: index)
+        playerQueues.inactivePlaylist.remove(firstOccurrenceOfPlayable: playableToRemove)
     }
     
     private func movePlaylistItem(fromIndex: Int, to: Int) {

@@ -24,6 +24,7 @@ protocol PlayerQueuesPersistent {
     func addToPlaylist(playables: [AbstractPlayable])
     func addToWaitingQueue(playable: AbstractPlayable)
     func clearWaitingQueue()
+    func clearPlaylistQueues()
     func removeAllItems()
 }
 
@@ -57,7 +58,7 @@ extension PlayerData: PlayerStatusPersistent {
     func stop() {
         currentIndex = 0
         isWaitingQueuePlaying = false
-        waitingQueuePlaylistInternal.removeAllItems()
+        clearWaitingQueue()
     }
     
     var isAutoCachePlayedItems: Bool {
@@ -139,7 +140,7 @@ extension PlayerData: PlayerQueuesPersistent {
                 managedObject.currentIndex = 0
                 library.saveContext()
             }
-            if managedObject.currentIndex >= activePlaylist.playables.count, managedObject.currentIndex < -1 {
+            if managedObject.currentIndex >= activePlaylist.playables.count || managedObject.currentIndex < -1 {
                 managedObject.currentIndex = 0
                 library.saveContext()
             }
@@ -184,6 +185,17 @@ extension PlayerData: PlayerQueuesPersistent {
     
     func addToWaitingQueue(playable: AbstractPlayable) {
         waitingQueuePlaylistInternal.append(playable: playable)
+    }
+    
+    func clearPlaylistQueues() {
+        normalPlaylist.removeAllItems()
+        shuffledPlaylist.removeAllItems()
+        if waitingQueuePlaylistInternal.songCount > 0 {
+            isWaitingQueuePlaying = true
+            currentIndex = -1
+        } else {
+            currentIndex = 0
+        }
     }
     
     func clearWaitingQueue() {

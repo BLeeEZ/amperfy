@@ -26,8 +26,7 @@ class BackendAudioPlayer {
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
     public private(set) var isPlaying: Bool = false
-    public private(set) var currentlyPlaying: AbstractPlayable?
-    
+
     var responder: BackendAudioPlayerNotifiable?
     var elapsedTime: Double {
         guard player.currentItem?.status == AVPlayerItem.Status.readyToPlay else {
@@ -84,7 +83,6 @@ class BackendAudioPlayer {
         isPlaying = false
         player.pause()
         player.replaceCurrentItem(with: nil)
-        currentlyPlaying = nil
     }
     
     func seek(toSecond: Double) {
@@ -109,7 +107,6 @@ class BackendAudioPlayer {
             player.replaceCurrentItem(with: nil)
         }
         self.continuePlay()
-        currentlyPlaying = playable
         self.responder?.notifyItemPreparationFinished()
         semaphore.signal()
     }

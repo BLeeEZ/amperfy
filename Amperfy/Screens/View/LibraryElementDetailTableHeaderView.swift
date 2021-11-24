@@ -20,13 +20,11 @@ class LibraryElementDetailTableHeaderView: UIView {
     
     @IBAction func playAllButtonPressed(_ sender: Any) {
         guard let playableContainer = playableContainer, let player = player else { return }
-        player.clearPlaylist()
         if appDelegate.persistentStorage.settings.isOnlineMode {
-            player.addToPlaylist(playables: playableContainer.playables)
+            player.play(playables: playableContainer.playables)
         } else {
-            player.addToPlaylist(playables: playableContainer.playables.filterCached())
+            player.play(playables: playableContainer.playables.filterCached())
         }
-        player.play()
     }
     
     @IBAction func addAllToPlayNextButtonPressed(_ sender: Any) {

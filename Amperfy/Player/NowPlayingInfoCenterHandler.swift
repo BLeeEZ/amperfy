@@ -31,13 +31,13 @@ class NowPlayingInfoCenterHandler {
 
 extension NowPlayingInfoCenterHandler: MusicPlayable {
     func didStartPlaying() {
-        if let curPlayable = backendAudioPlayer.currentlyPlaying {
+        if let curPlayable = musicPlayer.currentlyPlaying {
             updateNowPlayingInfo(playable: curPlayable)
         }
     }
     
     func didPause() {
-        if let curPlayable = backendAudioPlayer.currentlyPlaying {
+        if let curPlayable = musicPlayer.currentlyPlaying {
             updateNowPlayingInfo(playable: curPlayable)
         }
     }
@@ -45,7 +45,7 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
     func didStopPlaying() { }
     
     func didElapsedTimeChange() {
-        if let curPlayable = backendAudioPlayer.currentlyPlaying {
+        if let curPlayable = musicPlayer.currentlyPlaying {
             updateNowPlayingInfo(playable: curPlayable)
         }
     }
