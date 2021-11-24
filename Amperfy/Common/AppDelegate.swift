@@ -86,7 +86,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return LocalNotificationManager(userStatistics: userStatistics)
     }()
     lazy var backgroundFetchTriggeredSyncer = {
-        return BackgroundFetchTriggeredSyncer(library: library, backendApi: backendApi, notificationManager: localNotificationManager)
+        return BackgroundFetchTriggeredSyncer(persistentStorage: persistentStorage, backendApi: backendApi, notificationManager: localNotificationManager)
     }()
     lazy var popupDisplaySemaphore = {
         return DispatchSemaphore(value: 1)
@@ -179,9 +179,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         os_log("performFetchWithCompletionHandler", log: self.log, type: .info)
-        let fetchResult = backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
-        userStatistics.backgroundFetchPerformed(result: fetchResult)
-        completionHandler(fetchResult)
+        backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes() { fetchResult in
+            self.userStatistics.backgroundFetchPerformed(result: fetchResult)
+            completionHandler(fetchResult)
+        }
     }
     
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
