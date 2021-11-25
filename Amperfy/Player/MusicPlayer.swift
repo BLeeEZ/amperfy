@@ -14,16 +14,14 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
 
     private var playerStatus: PlayerStatusPersistent
     private var queueHandler: PlayQueueHandler
-    private let library: LibraryStorage
     private let backendAudioPlayer: BackendAudioPlayer
     private let userStatistics: UserStatistics
     private var notifierList = [MusicPlayable]()
     private let replayInsteadPlayPreviousTimeInSec = 5.0
 
-    init(coreData: PlayerStatusPersistent, queueHandler: PlayQueueHandler, library: LibraryStorage, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
+    init(coreData: PlayerStatusPersistent, queueHandler: PlayQueueHandler, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
         self.playerStatus = coreData
         self.queueHandler = queueHandler
-        self.library = library
         self.backendAudioPlayer = backendAudioPlayer
         self.backendAudioPlayer.isAutoCachePlayedItems = coreData.isAutoCachePlayedItems
         self.userStatistics = userStatistics
@@ -52,17 +50,6 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
     private func insertIntoPlayer(playable: AbstractPlayable) {
         userStatistics.playedItem(repeatMode: playerStatus.repeatMode, isShuffle: playerStatus.isShuffle)
         backendAudioPlayer.requestToPlay(playable: playable)
-        extractEmbeddedArtwork(playable: playable)
-    }
-    
-    private func extractEmbeddedArtwork(playable: AbstractPlayable) {
-        if playable.isCached, playable.embeddedArtwork == nil, let embeddedImage = backendAudioPlayer.getEmbeddedArtworkFromID3Tag() {
-            let embeddedArtwork = library.createEmbeddedArtwork()
-            embeddedArtwork.setImage(fromData: embeddedImage.pngData())
-            embeddedArtwork.owner = playable
-            library.saveContext()
-            notifyArtworkChanged()
-        }
     }
     
     //BackendAudioPlayerNotifiable

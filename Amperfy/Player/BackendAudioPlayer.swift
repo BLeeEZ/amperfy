@@ -28,18 +28,17 @@ class BackendAudioPlayer {
     public private(set) var isPlaying: Bool = false
 
     var responder: BackendAudioPlayerNotifiable?
+    var isPlayableLoaded: Bool {
+        return player.currentItem?.status == AVPlayerItem.Status.readyToPlay
+    }
     var elapsedTime: Double {
-        guard player.currentItem?.status == AVPlayerItem.Status.readyToPlay else {
-            return 0.0
-        }
+        guard isPlayableLoaded else { return 0.0 }
         let elapsedTimeInSeconds = player.currentTime().seconds
-        guard elapsedTimeInSeconds.isFinite else {
-            return 0.0
-        }
+        guard elapsedTimeInSeconds.isFinite else { return 0.0 }
         return elapsedTimeInSeconds
     }
     var duration: Double {
-        guard player.currentItem?.status == AVPlayerItem.Status.readyToPlay,
+        guard isPlayableLoaded,
               let duration = player.currentItem?.asset.duration.seconds,
               duration.isFinite else {
             return 0.0
@@ -141,7 +140,7 @@ class BackendAudioPlayer {
     }
     
     func getEmbeddedArtworkFromID3Tag() -> UIImage? {
-        guard let item = player.currentItem else { return nil }
+        guard isPlayableLoaded, let item = player.currentItem else { return nil }
         let metadataList = item.asset.metadata
         guard let artworkAsset = metadataList.filter({ $0.commonKey == .commonKeyArtwork }).first,
               let artworkData = artworkAsset.dataValue,
