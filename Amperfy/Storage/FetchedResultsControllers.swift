@@ -35,14 +35,14 @@ class PodcastEpisodesFetchedResultsController: BasicFetchedResultsController<Pod
         self.podcast = podcast
         let library = LibraryStorage(context: context)
         let fetchRequest = PodcastEpisodeMO.publishedDateSortedFetchRequest
-        fetchRequest.predicate = library.getFetchPredicate(forPodcast: podcast)
+        fetchRequest.predicate = library.getFetchPredicateForUserAvailableEpisodes(forPodcast: podcast)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                library.getFetchPredicate(forPodcast: podcast),
+                library.getFetchPredicateForUserAvailableEpisodes(forPodcast: podcast),
                 PodcastEpisodeMO.getIdentifierBasedSearchPredicate(searchText: searchText),
                 library.getFetchPredicate(onlyCachedPodcastEpisodes: onlyCachedSongs)
             ])

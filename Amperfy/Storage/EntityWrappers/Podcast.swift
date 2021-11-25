@@ -24,7 +24,7 @@ public class Podcast: AbstractLibraryEntity, PlayableContainable {
     }
     var episodes: [PodcastEpisode] {
         guard let episodesSet = managedObject.episodes, let episodesMO = episodesSet.array as? [PodcastEpisodeMO] else { return [PodcastEpisode]() }
-        return episodesMO.compactMap{ PodcastEpisode(managedObject: $0) }.sortByPublishDate()
+        return episodesMO.compactMap{ PodcastEpisode(managedObject: $0) }.filter{ $0.userStatus != .deleted }.sortByPublishDate()
     }
     var playables: [AbstractPlayable] { return episodes }
     
