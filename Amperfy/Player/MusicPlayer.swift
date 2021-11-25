@@ -5,7 +5,6 @@ import os.log
 
 class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
     
-    static let preDownloadCount = 3
     static let progressTimeStartThreshold: Double = 15.0
     static let progressTimeEndThreshold: Double = 15.0
     
@@ -16,17 +15,15 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
     private var playerStatus: PlayerStatusPersistent
     private var queueHandler: PlayQueueHandler
     private let library: LibraryStorage
-    private var playableDownloadManager: DownloadManageable
     private let backendAudioPlayer: BackendAudioPlayer
     private let userStatistics: UserStatistics
     private var notifierList = [MusicPlayable]()
     private let replayInsteadPlayPreviousTimeInSec = 5.0
 
-    init(coreData: PlayerStatusPersistent, queueHandler: PlayQueueHandler, library: LibraryStorage, playableDownloadManager: DownloadManageable, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
+    init(coreData: PlayerStatusPersistent, queueHandler: PlayQueueHandler, library: LibraryStorage, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
         self.playerStatus = coreData
         self.queueHandler = queueHandler
         self.library = library
-        self.playableDownloadManager = playableDownloadManager
         self.backendAudioPlayer = backendAudioPlayer
         self.backendAudioPlayer.isAutoCachePlayedItems = coreData.isAutoCachePlayedItems
         self.userStatistics = userStatistics
@@ -56,7 +53,6 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         userStatistics.playedItem(repeatMode: playerStatus.repeatMode, isShuffle: playerStatus.isShuffle)
         backendAudioPlayer.requestToPlay(playable: playable)
         extractEmbeddedArtwork(playable: playable)
-        preDownloadNextItems()
     }
     
     private func extractEmbeddedArtwork(playable: AbstractPlayable) {
@@ -66,31 +62,6 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
             embeddedArtwork.owner = playable
             library.saveContext()
             notifyArtworkChanged()
-        }
-    }
-    
-    private func preDownloadNextItems() {
-        guard playerStatus.isAutoCachePlayedItems else { return }
-        let upcomingItemsCount = min(queueHandler.waitingQueue.count + queueHandler.nextQueue.count, Self.preDownloadCount)
-        guard upcomingItemsCount > 0 else { return }
-        
-        let waitingQueueRangeEnd = min(queueHandler.waitingQueue.count, Self.preDownloadCount)
-        if waitingQueueRangeEnd > 0 {
-            for i in 0...waitingQueueRangeEnd-1 {
-                let playable = queueHandler.waitingQueue[i]
-                if !playable.isCached {
-                    playableDownloadManager.download(object: playable)
-                }
-            }
-        }
-        let nextQueueRangeEnd = min(queueHandler.nextQueue.count, Self.preDownloadCount-waitingQueueRangeEnd)
-        if nextQueueRangeEnd > 0 {
-            for i in 0...nextQueueRangeEnd-1 {
-                let playable = queueHandler.nextQueue[i]
-                if !playable.isCached {
-                    playableDownloadManager.download(object: playable)
-                }
-            }
         }
     }
     

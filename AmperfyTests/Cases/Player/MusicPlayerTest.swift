@@ -151,7 +151,7 @@ class MusicPlayerTest: XCTestCase {
         backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)
         playerData = library.getPlayerData()
         testQueueHandler = PlayQueueHandler(playerData: playerData)
-        testMusicPlayer = MusicPlayer(coreData: playerData, queueHandler: testQueueHandler, library: library, playableDownloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
+        testMusicPlayer = MusicPlayer(coreData: playerData, queueHandler: testQueueHandler, library: library, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
         testPlayer = PlayerFacadeImpl(playerStatus: playerData, queueHandler: testQueueHandler, musicPlayer: testMusicPlayer, library: library, playableDownloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
         
         guard let songCachedFetched = library.getSong(id: "36") else { XCTFail(); return }

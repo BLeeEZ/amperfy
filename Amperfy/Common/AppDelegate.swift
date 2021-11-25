@@ -37,7 +37,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
         let playerData = library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
-        let curPlayer = MusicPlayer(coreData: playerData, queueHandler: queueHandler, library: library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        let curPlayer = MusicPlayer(coreData: playerData, queueHandler: queueHandler, library: library, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        
+        let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(playerStatus: playerData, queueHandler: queueHandler, playableDownloadManager: playableDownloadManager)
+        curPlayer.addNotifier(notifier: playerDownloadPreparationHandler)
 
         let audioSessionHandler = AudioSessionHandler(musicPlayer: curPlayer)
         audioSessionHandler.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
