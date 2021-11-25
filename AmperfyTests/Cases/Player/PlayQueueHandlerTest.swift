@@ -90,6 +90,15 @@ class PlayQueueHandlerTest: XCTestCase {
         XCTAssertEqual(testQueueHandler.currentlyPlaying, nil)
     }
     
+    func testAddToWaitingQueueToEmptyPlayerStartsPlaying() {
+        guard let song = library.getSong(id: cdHelper.seeder.songs[5].id) else { XCTFail(); return }
+        testQueueHandler.addToWaitingQueue(playable: song)
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [Int]())
+    }
+    
     func testRemoveSongFromPlaylist() {
         prepareNoWaitingQueuePlaying()
         testPlayer.currentIndex = 1

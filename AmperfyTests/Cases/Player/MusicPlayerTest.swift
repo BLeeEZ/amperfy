@@ -373,8 +373,9 @@ class MusicPlayerTest: XCTestCase {
     func testPlaylistClear_EmptyPlaylist_WaitingQueueHasEntries() {
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
         testPlayer.addToWaitingQueue(playable: songId0)
+        XCTAssertFalse(testPlayer.isPlaying)
         testPlayer.clearPlaylist()
-        XCTAssertTrue(testPlayer.isPlaying)
+        XCTAssertFalse(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.waitingQueue.count, 0)
         XCTAssertEqual(testPlayer.nextQueue.count, 0)
@@ -386,6 +387,22 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.addToWaitingQueue(playable: songId0)
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.addToWaitingQueue(playable: songId1)
+        XCTAssertFalse(testPlayer.isPlaying)
+        testPlayer.clearPlaylist()
+        XCTAssertFalse(testPlayer.isPlaying)
+        XCTAssertEqual(testPlayer.prevQueue.count, 0)
+        XCTAssertEqual(testPlayer.waitingQueue.count, 1)
+        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
+    }
+    
+    func testPlaylistClear_EmptyPlaylist_WaitingQueueHasEntries3() {
+        guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        testPlayer.addToWaitingQueue(playable: songId0)
+        guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        testPlayer.addToWaitingQueue(playable: songId1)
+        testPlayer.play()
+        XCTAssertTrue(testPlayer.isPlaying)
         testPlayer.clearPlaylist()
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)

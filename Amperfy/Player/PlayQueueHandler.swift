@@ -62,6 +62,9 @@ public class PlayQueueHandler  {
     
     func addToWaitingQueue(playable: AbstractPlayable) {
         playerQueues.addToWaitingQueue(playable: playable)
+        if playerQueues.activePlaylist.songCount == 0 {
+            playerQueues.isWaitingQueuePlaying = true
+        }
     }
     
     func clearPlaylistQueues() {
