@@ -351,6 +351,12 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
 
+    func requestRecordSongPlay(parserDelegate: SsXmlParser, id: String) {
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "scrobble") else { return }
+        urlComp.addQueryItem(name: "id", value: id)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+
     private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: SsXmlParser, ignoreErrorResponse: Bool = false) {
         guard let url = fromUrlComponent.url else {
             os_log("URL could not be created: %s", log: log, type: .error, fromUrlComponent.description)

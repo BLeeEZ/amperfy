@@ -235,6 +235,12 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         library.saveContext()
     }
     
+    func recordPlay(song: Song) {
+        os_log("Record play: %s", log: log, type: .info, song.displayString)
+        let songParser = SsXmlParser()
+        subsonicServerApi.requestRecordSongPlay(parserDelegate: songParser, id: song.id)
+    }
+    
     func searchArtists(searchText: String, library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
         os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)

@@ -418,6 +418,16 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
+    func requestRecordPlay(parserDelegate: AmpacheXmlParser, song: Song) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "record_play")
+        if let username = credentials?.username {
+            apiUrlComponent.addQueryItem(name: "user", value: username)
+        }
+        apiUrlComponent.addQueryItem(name: "id", value: song.id)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
     func requestSearchArtists(parserDelegate: AmpacheXmlParser, searchText: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "artists")

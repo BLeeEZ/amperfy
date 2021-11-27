@@ -46,6 +46,7 @@ protocol LibrarySyncer {
     func sync(directory: Directory, library: LibraryStorage)
     func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage)
     func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode)
+    func recordPlay(song: Song)
 }
 
 protocol AbstractBackgroundLibrarySyncer {

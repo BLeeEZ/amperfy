@@ -12,6 +12,11 @@ protocol BackendAudioPlayerNotifiable {
     func notifyItemPreparationFinished()
 }
 
+enum PlayType {
+    case stream
+    case cache
+}
+
 class BackendAudioPlayer {
 
     private let playableDownloader: DownloadManageable
@@ -26,6 +31,7 @@ class BackendAudioPlayer {
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
     public private(set) var isPlaying: Bool = false
+    public private(set) var playType: PlayType?
 
     var responder: BackendAudioPlayerNotifiable?
     var isPlayableLoaded: Bool {
@@ -80,8 +86,7 @@ class BackendAudioPlayer {
     
     func stop() {
         isPlaying = false
-        player.pause()
-        player.replaceCurrentItem(with: nil)
+        clearPlayer()
     }
     
     func seek(toSecond: Double) {
@@ -91,8 +96,7 @@ class BackendAudioPlayer {
     func requestToPlay(playable: AbstractPlayable) {
         semaphore.wait()
         if !playable.isPlayableOniOS, let contentType = playable.contentType {
-            player.pause()
-            player.replaceCurrentItem(with: nil)
+            clearPlayer()
             eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playable.displayString)\" is not playable via Amperfy.")
         } else if playable.isCached {
             insertCachedPlayable(playable: playable)
@@ -102,17 +106,23 @@ class BackendAudioPlayer {
                 playableDownloader.download(object: playable)
             }
         } else {
-            player.pause()
-            player.replaceCurrentItem(with: nil)
+            clearPlayer()
         }
         self.continuePlay()
         self.responder?.notifyItemPreparationFinished()
         semaphore.signal()
     }
     
+    private func clearPlayer() {
+        playType = nil
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+    }
+    
     private func insertCachedPlayable(playable: AbstractPlayable) {
         guard let playableData = cacheProxy.getFile(forPlayable: playable)?.data else { return }
         os_log(.default, "Play item: %s", playable.displayString)
+        playType = .cache
         if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
         let itemUrl = playableData.createLocalUrl(fileName: "curPlayItem.mp3")
         insert(playable: playable, withUrl: itemUrl)
@@ -121,6 +131,7 @@ class BackendAudioPlayer {
     private func insertStreamPlayable(playable: AbstractPlayable) {
         guard let streamUrl = backendApi.generateUrl(forStreamingPlayable: playable) else { return }
         os_log(.default, "Stream item: %s", playable.displayString)
+        playType = .stream
         if playable.isSong { userStatistics.playedSong(isPlayedFromCache: false) }
         insert(playable: playable, withUrl: streamUrl)
     }

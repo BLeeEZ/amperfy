@@ -43,6 +43,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         curPlayer.addNotifier(notifier:  playerDownloadPreparationHandler)
         let embeddedArtworkExtractor = EmbeddedArtworkExtractor(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, library: library)
         curPlayer.addNotifier(notifier: embeddedArtworkExtractor)
+        let songPlayedSyncer = SongPlayedSyncer(persistentStorage: persistentStorage, musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, backendApi: backendApi)
+        curPlayer.addNotifier(notifier: songPlayedSyncer)
 
         let audioSessionHandler = AudioSessionHandler(musicPlayer: curPlayer)
         audioSessionHandler.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
