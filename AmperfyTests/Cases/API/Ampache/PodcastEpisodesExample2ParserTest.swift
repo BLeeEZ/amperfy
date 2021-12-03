@@ -1,13 +1,13 @@
 import XCTest
 @testable import Amperfy
 
-class PodcastEpisodesParserTest: AbstractAmpacheTest {
+class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
     
     var testPodcast: Podcast?
     
     override func setUp() {
         super.setUp()
-        xmlData = getTestFileData(name: "podcast_episodes")
+        xmlData = getTestFileData(name: "podcast_episodes_example_2")
         testPodcast = library.createPodcast()
         recreateParserDelegate()
     }
@@ -24,7 +24,7 @@ class PodcastEpisodesParserTest: AbstractAmpacheTest {
         XCTAssertEqual(episode.id, "44")
         XCTAssertEqual(episode.title, "COVID, Quickly, Episode 3: Vaccine Inequality--plus Your Body the Variant Fighter")
         XCTAssertEqual(episode.depiction, "Today we bring you the third episode in a new podcast series: COVID, Quickly. Every two weeks, Scientific American’s senior health editors Tanya...\n")
-        XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1616815800)//"3/27/21, 3:30 AM"
+        XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1638223676)//"2021-11-29T22:07:56+00:00"
         XCTAssertNil(episode.streamId)
         XCTAssertEqual(episode.remoteStatus, .completed)
         XCTAssertEqual(episode.podcast, podcast)
@@ -44,7 +44,7 @@ class PodcastEpisodesParserTest: AbstractAmpacheTest {
         XCTAssertEqual(episode.id, "46")
         XCTAssertEqual(episode.title, "Smartphones Can Hear the Shape of Your Door Keys")
         XCTAssertEqual(episode.depiction, "Can you pick a lock with just a smartphone? New research shows that doing so is possible.")
-        XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1616104800)//"3/18/21, 10:00 PM"
+        XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1637014020)//"2021-11-15T22:07:00+00:00"
         XCTAssertNil(episode.streamId)
         XCTAssertEqual(episode.remoteStatus, .downloading)
         XCTAssertEqual(episode.podcast, podcast)
@@ -64,7 +64,7 @@ class PodcastEpisodesParserTest: AbstractAmpacheTest {
         XCTAssertEqual(episode.id, "47")
         XCTAssertEqual(episode.title, "Chimpanzees Show Altruism while Gathering around the Juice Fountain")
         XCTAssertEqual(episode.depiction, "New research tries to tease out whether our closest animal relatives can be selfless.")
-        XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1615933800)//"3/16/21, 10:30 PM"
+        XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1636409977)//"2021-11-08T22:19:37+00:00"
         XCTAssertNil(episode.streamId)
         XCTAssertEqual(episode.remoteStatus, .downloading)
         XCTAssertEqual(episode.podcast, podcast)

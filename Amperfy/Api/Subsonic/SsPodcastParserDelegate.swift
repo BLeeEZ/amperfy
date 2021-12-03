@@ -30,10 +30,10 @@ class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
             }
             
             if let attributePodcastTitle = attributeDict["title"] {
-                podcastBuffer?.title = attributePodcastTitle
+                podcastBuffer?.title = attributePodcastTitle.html2String
             }
             if let attributeDescription = attributeDict["description"] {
-                podcastBuffer?.depiction = attributeDescription
+                podcastBuffer?.depiction = attributeDescription.html2String
             }
             if let attributeCoverArt = attributeDict["coverArt"] {
                 podcastBuffer?.artwork = parseArtwork(id: attributeCoverArt)

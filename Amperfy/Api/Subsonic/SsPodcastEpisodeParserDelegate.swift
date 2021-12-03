@@ -30,7 +30,7 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
             episodeBuffer?.podcast = podcast
 
             if let description = attributeDict["description"] {
-                episodeBuffer?.depiction = description
+                episodeBuffer?.depiction = description.html2String
             }
             if let publishDate = attributeDict["publishDate"], publishDate.count >= 19 {
                 //"2011-02-03T14:46:43"
@@ -58,6 +58,7 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
         
         if elementName == "episode", let episode = episodeBuffer {
+            episode.title = episode.title.html2String
             playableBuffer = nil
             parsedEpisodes.append(episode)
             episodeBuffer = nil

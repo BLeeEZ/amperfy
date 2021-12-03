@@ -120,6 +120,13 @@ extension String {
         guard self.hasPrefix(prefix) else { return self }
         return String(self.dropFirst(prefix.count))
     }
+    
+    private var html2AttributedString: NSAttributedString? {
+        Data(utf8).html2AttributedString
+    }
+    var html2String: String {
+        html2AttributedString?.string.html2AttributedString?.string ?? ""
+    }
 }
 
 extension Array {
@@ -245,6 +252,11 @@ extension Data {
         try! self.write(to: url, options: Data.WritingOptions.atomic)
         return url
     }
+
+    var html2AttributedString: NSAttributedString? {
+        return try? NSAttributedString(data: self, options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], documentAttributes: nil)
+    }
+    var html2String: String { html2AttributedString?.string.html2String ?? "" }
 }
 
 extension Date {

@@ -14,6 +14,8 @@
 		50048F9527590FAD0087EDFB /* PlayerDownloadPreparationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048F9427590FAD0087EDFB /* PlayerDownloadPreparationHandler.swift */; };
 		50048F972759186A0087EDFB /* EmbeddedArtworkExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048F962759186A0087EDFB /* EmbeddedArtworkExtractor.swift */; };
 		50048F99275954A40087EDFB /* SongPlayedSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048F98275954A30087EDFB /* SongPlayedSyncer.swift */; };
+		50048F9B275A4B5D0087EDFB /* podcast_episodes_example_2.xml in Resources */ = {isa = PBXBuildFile; fileRef = 50048F9A275A4B560087EDFB /* podcast_episodes_example_2.xml */; };
+		50048F9D275A4BA10087EDFB /* PodcastEpisodesExample2ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048F9C275A4BA10087EDFB /* PodcastEpisodesExample2ParserTest.swift */; };
 		50048FFF2671EFBD00064433 /* LibraryEntityImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048FFE2671EFBD00064433 /* LibraryEntityImage.swift */; };
 		500631FF23A1747B000F75A3 /* PlayerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500631FE23A1747B000F75A3 /* PlayerView.xib */; };
 		5006320123A174C0000F75A3 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5006320023A174C0000F75A3 /* PlayerView.swift */; };
@@ -374,6 +376,8 @@
 		50048F9427590FAD0087EDFB /* PlayerDownloadPreparationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerDownloadPreparationHandler.swift; sourceTree = "<group>"; };
 		50048F962759186A0087EDFB /* EmbeddedArtworkExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedArtworkExtractor.swift; sourceTree = "<group>"; };
 		50048F98275954A30087EDFB /* SongPlayedSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongPlayedSyncer.swift; sourceTree = "<group>"; };
+		50048F9A275A4B560087EDFB /* podcast_episodes_example_2.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = podcast_episodes_example_2.xml; sourceTree = "<group>"; };
+		50048F9C275A4BA10087EDFB /* PodcastEpisodesExample2ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastEpisodesExample2ParserTest.swift; sourceTree = "<group>"; };
 		50048FFE2671EFBD00064433 /* LibraryEntityImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryEntityImage.swift; sourceTree = "<group>"; };
 		500631FE23A1747B000F75A3 /* PlayerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlayerView.xib; sourceTree = "<group>"; };
 		5006320023A174C0000F75A3 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
@@ -1217,6 +1221,7 @@
 				50DB119726652B720033BFFA /* PlaylistSongsParserTest.swift */,
 				501A7D2226808AC10055A51B /* PodcastsParserTest.swift */,
 				501A7D2426808AE40055A51B /* PodcastEpisodesParserTest.swift */,
+				50048F9C275A4BA10087EDFB /* PodcastEpisodesExample2ParserTest.swift */,
 			);
 			path = Ampache;
 			sourceTree = "<group>";
@@ -1235,6 +1240,7 @@
 				50DB119626652B3F0033BFFA /* playlist_songs.xml */,
 				501A7D1F26808A9D0055A51B /* podcasts.xml */,
 				501A7D1E26808A9D0055A51B /* podcast_episodes.xml */,
+				50048F9A275A4B560087EDFB /* podcast_episodes_example_2.xml */,
 			);
 			path = Samples;
 			sourceTree = "<group>";
@@ -1472,6 +1478,7 @@
 			files = (
 				50DB11B326653A670033BFFA /* genres_example_1.xml in Resources */,
 				501A7D2726808CB70055A51B /* podcasts_example_1.xml in Resources */,
+				50048F9B275A4B5D0087EDFB /* podcast_episodes_example_2.xml in Resources */,
 				50DB1185266502C00033BFFA /* artists.xml in Resources */,
 				50DB118D266521290033BFFA /* genres.xml in Resources */,
 				501A7D2126808A9D0055A51B /* podcasts.xml in Resources */,
@@ -1790,6 +1797,7 @@
 				50AB92E02667564800DCE45C /* AbstractSsTest.swift in Sources */,
 				50B798AF23B7ED6200551E62 /* CoreDataSeeder.swift in Sources */,
 				5090963826496A9500DD9826 /* UtilitiesTest.swift in Sources */,
+				50048F9D275A4BA10087EDFB /* PodcastEpisodesExample2ParserTest.swift in Sources */,
 				50E964AF25E8E25E00E3210F /* SubsonicVersionTest.swift in Sources */,
 				5003D8F72678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift in Sources */,
 				50AB92D42666C1A000DCE45C /* SsDirectoriesExample1ParserTest.swift in Sources */,

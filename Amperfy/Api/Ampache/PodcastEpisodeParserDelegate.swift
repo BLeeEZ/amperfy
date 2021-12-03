@@ -39,7 +39,7 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "description":
-            episodeBuffer?.depiction = buffer
+            episodeBuffer?.depiction = buffer.html2String
         case "pubdate":
             if buffer.contains("/") { //"3/27/21, 3:30 AM"
                 let dateFormatter = DateFormatter()
@@ -67,6 +67,7 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
             parsedCount += 1
             playableBuffer = nil
             if let episode = episodeBuffer {
+                episode.title = episode.title.html2String
                 parsedEpisodes.append(episode)
             }
             episodeBuffer = nil
