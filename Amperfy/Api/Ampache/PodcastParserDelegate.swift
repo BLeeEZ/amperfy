@@ -5,12 +5,10 @@ import os.log
 
 class PodcastParserDelegate: AmpacheXmlLibParser {
     
+    var parsedPodcasts: Set<Podcast>
     private var podcastBuffer: Podcast?
-    private let oldPodcasts: Set<Podcast>
-    private var parsedPodcasts: Set<Podcast>
-    
+
     override init(library: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
-        oldPodcasts = Set(library.getPodcasts())
         parsedPodcasts = Set<Podcast>()
         super.init(library: library, syncWave: syncWave, parseNotifier: parseNotifier)
     }
@@ -30,6 +28,7 @@ class PodcastParserDelegate: AmpacheXmlLibParser {
                 podcastBuffer = library.createPodcast()
                 podcastBuffer?.id = podcastId
             }
+            podcastBuffer?.remoteStatus = .available
         default:
             break
         }
@@ -49,9 +48,6 @@ class PodcastParserDelegate: AmpacheXmlLibParser {
             }
             podcastBuffer = nil
             parseNotifier?.notifyParsedObject(ofType: .podcast)
-        case "root":
-            let outdatedPodcasts = oldPodcasts.subtracting(parsedPodcasts)
-            outdatedPodcasts.forEach{ library.deletePodcast($0) }
         default:
             break
         }

@@ -9,8 +9,9 @@ extension PodcastMO {
     }
 
     @NSManaged public var depiction: String?
-    @NSManaged public var title: String?
     @NSManaged public var episodes: NSOrderedSet?
+    @NSManaged public var status: Int16
+    @NSManaged public var title: String?
 
 }
 

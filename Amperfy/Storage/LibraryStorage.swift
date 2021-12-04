@@ -303,6 +303,17 @@ class LibraryStorage: PlayableFileCachable {
         return NSPredicate(format: "%K == %@", #keyPath(PlaylistItemMO.playlist), playlist.managedObject.objectID)
     }
     
+    func getFetchPredicateForAvailablePodcasts() -> NSPredicate {
+        return NSCompoundPredicate(orPredicateWithSubpredicates: [
+            getFetchPredicate(onlyCachedPodcasts: true),
+            getFetchPredicateForRemoteAvailablePodcasts()
+        ])
+    }
+    
+    func getFetchPredicateForRemoteAvailablePodcasts() -> NSPredicate {
+        return NSPredicate(format: "%K != %i", #keyPath(PodcastMO.status), PodcastRemoteStatus.deleted.rawValue)
+    }
+    
     func getFetchPredicateForUserAvailableEpisodes(forPodcast podcast: Podcast) -> NSPredicate {
         return NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "%K == %@", #keyPath(PodcastEpisodeMO.podcast), podcast.managedObject.objectID),
@@ -447,6 +458,14 @@ class LibraryStorage: PlayableFileCachable {
     
     func getPodcasts() -> [Podcast] {
         let fetchRequest = PodcastMO.identifierSortedFetchRequest
+        let foundPodcasts = try? context.fetch(fetchRequest)
+        let podcasts = foundPodcasts?.compactMap{ Podcast(managedObject: $0) }
+        return podcasts ?? [Podcast]()
+    }
+
+    func getRemoteAvailablePodcasts() -> [Podcast] {
+        let fetchRequest = PodcastMO.identifierSortedFetchRequest
+        fetchRequest.predicate = getFetchPredicateForRemoteAvailablePodcasts()
         let foundPodcasts = try? context.fetch(fetchRequest)
         let podcasts = foundPodcasts?.compactMap{ Podcast(managedObject: $0) }
         return podcasts ?? [Podcast]()

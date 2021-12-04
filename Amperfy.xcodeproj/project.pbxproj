@@ -378,6 +378,7 @@
 		50048F98275954A30087EDFB /* SongPlayedSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongPlayedSyncer.swift; sourceTree = "<group>"; };
 		50048F9A275A4B560087EDFB /* podcast_episodes_example_2.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = podcast_episodes_example_2.xml; sourceTree = "<group>"; };
 		50048F9C275A4BA10087EDFB /* PodcastEpisodesExample2ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastEpisodesExample2ParserTest.swift; sourceTree = "<group>"; };
+		50048F9E275A9AA10087EDFB /* Amperfy v17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v17.xcdatamodel"; sourceTree = "<group>"; };
 		50048FFE2671EFBD00064433 /* LibraryEntityImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryEntityImage.swift; sourceTree = "<group>"; };
 		500631FE23A1747B000F75A3 /* PlayerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlayerView.xib; sourceTree = "<group>"; };
 		5006320023A174C0000F75A3 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
@@ -2141,6 +2142,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				50048F9E275A9AA10087EDFB /* Amperfy v17.xcdatamodel */,
 				50A12F47273BBF7300E7B2AA /* Amperfy v16.xcdatamodel */,
 				50A12F402739203E00E7B2AA /* Amperfy v15.xcdatamodel */,
 				509001BD2717120900A8056D /* Amperfy v14.xcdatamodel */,
@@ -2158,7 +2160,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 50A12F47273BBF7300E7B2AA /* Amperfy v16.xcdatamodel */;
+			currentVersion = 50048F9E275A9AA10087EDFB /* Amperfy v17.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

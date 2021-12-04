@@ -2,6 +2,11 @@ import Foundation
 import CoreData
 import UIKit
 
+enum PodcastRemoteStatus: Int {
+    case available = 0
+    case deleted = 1
+}
+
 public class Podcast: AbstractLibraryEntity, PlayableContainable {
     
     let managedObject: PodcastMO
@@ -21,6 +26,10 @@ public class Podcast: AbstractLibraryEntity, PlayableContainable {
     var depiction: String {
         get { return managedObject.depiction ?? "" }
         set { if managedObject.depiction != newValue { managedObject.depiction = newValue } }
+    }
+    var remoteStatus: PodcastRemoteStatus {
+        get { return PodcastRemoteStatus(rawValue: Int(managedObject.status)) ?? .available }
+        set { if managedObject.status != newValue.rawValue { managedObject.status = Int16(newValue.rawValue) } }
     }
     var episodes: [PodcastEpisode] {
         guard let episodesSet = managedObject.episodes, let episodesMO = episodesSet.array as? [PodcastEpisodeMO] else { return [PodcastEpisode]() }

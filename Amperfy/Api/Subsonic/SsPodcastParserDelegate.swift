@@ -5,12 +5,10 @@ import os.log
 
 class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
     
+    var parsedPodcasts: Set<Podcast>
     private var podcastBuffer: Podcast?
-    private let oldPodcasts: Set<Podcast>
-    private var parsedPodcasts: Set<Podcast>
-    
+
     override init(library: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
-        oldPodcasts = Set(library.getPodcasts())
         parsedPodcasts = Set<Podcast>()
         super.init(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: parseNotifier)
     }
@@ -28,6 +26,7 @@ class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
                 podcastBuffer = library.createPodcast()
                 podcastBuffer?.id = podcastId
             }
+            podcastBuffer?.remoteStatus = .available
             
             if let attributePodcastTitle = attributeDict["title"] {
                 podcastBuffer?.title = attributePodcastTitle.html2String
@@ -49,9 +48,6 @@ class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
                 parsedPodcasts.insert(parsedPodcast)
             }
             podcastBuffer = nil
-        case "podcasts":
-            let outdatedPodcasts = oldPodcasts.subtracting(parsedPodcasts)
-            outdatedPodcasts.forEach{ library.deletePodcast($0) }
         default:
             break
         }

@@ -9,13 +9,16 @@ enum DisplayCategoryFilter {
 class PodcastFetchedResultsController: CachedFetchedResultsController<PodcastMO> {
     
     init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        let library = LibraryStorage(context: context)
         let fetchRequest = PodcastMO.identifierSortedFetchRequest
+        fetchRequest.predicate = library.getFetchPredicateForAvailablePodcasts()
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
         
     func search(searchText: String, onlyCached: Bool) {
         if searchText.count > 0 || onlyCached {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicateForAvailablePodcasts(),
                 PodcastMO.getIdentifierBasedSearchPredicate(searchText: searchText),
                 library.getFetchPredicate(onlyCachedPodcasts: onlyCached)
             ])
