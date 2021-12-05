@@ -61,6 +61,7 @@ class PodcastDetailTableHeader: UIView {
         }
         if podcast.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
+                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: podcast.playables)
                 self.appDelegate.library.deleteCache(of: podcast)
                 self.appDelegate.library.saveContext()
                 if let rootView = self.rootView {

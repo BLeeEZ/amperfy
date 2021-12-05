@@ -10,6 +10,7 @@ class DownloadManager: NSObject, DownloadManageable {
     var urlSession: URLSession!
     var backgroundFetchCompletionHandler: CompleteHandlerBlock?
     let log: OSLog
+    var isFailWithPopupError: Bool = true
     
     
     private let eventLogger: EventLogger
@@ -35,9 +36,17 @@ class DownloadManager: NSObject, DownloadManageable {
     func download(objects: [Downloadable]) {
         guard persistentStorage.settings.isOnlineMode else { return }
         let downloadObjects = objects.filter{ !$0.isCached }
-        if downloadObjects.count > 0 {
+        if !downloadObjects.isEmpty {
             self.requestManager.add(objects: downloadObjects)
         }
+    }
+    
+    func removeFinishedDownload(for object: Downloadable) {
+        requestManager.removeFinishedDownload(for: object)
+    }
+    
+    func removeFinishedDownload(for objects: [Downloadable]) {
+        requestManager.removeFinishedDownload(for: objects)
     }
 
     func start() {
@@ -136,7 +145,7 @@ class DownloadManager: NSObject, DownloadManageable {
             download.error = error
             if error != .apiErrorResponse {
                 os_log("Fetching %s FAILED: %s", log: self.log, type: .info, download.title, error.description)
-                eventLogger.error(topic: "Download Error", statusCode: .downloadError, message: "Error \"\(error.description)\" occured while downloading object \"\(download.title)\".")
+                eventLogger.error(topic: "Download Error", statusCode: .downloadError, message: "Error \"\(error.description)\" occured while downloading object \"\(download.title)\".", displayPopup: isFailWithPopupError)
             }
         }
         download.isDownloading = false
@@ -148,6 +157,7 @@ class DownloadManager: NSObject, DownloadManageable {
         download.resumeData = data
         if let responseError = downloadDelegate.validateDownloadedData(download: download) {
             os_log("Fetching %s API-ERROR StatusCode: %d, Message: %s", log: log, type: .error, download.title, responseError.statusCode, responseError.message)
+            eventLogger.report(error: responseError, displayPopup: isFailWithPopupError)
             finishDownload(download: download, context: context, error: .apiErrorResponse)
             return
         }

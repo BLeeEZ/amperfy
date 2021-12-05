@@ -76,6 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let requestManager = DownloadRequestManager(persistentStorage: persistentStorage, downloadDelegate: dlDelegate)
         requestManager.clearAllDownloads()
         let dlManager = DownloadManager(name: "ArtworkDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, eventLogger: eventLogger)
+        dlManager.isFailWithPopupError = false
         
         let configuration = URLSessionConfiguration.default
         var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)

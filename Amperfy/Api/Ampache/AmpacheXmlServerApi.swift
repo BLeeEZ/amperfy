@@ -177,7 +177,7 @@ class AmpacheXmlServerApi {
             authHandshake = nil
             os_log("Couldn't get a login token.", log: log, type: .error)
             if let apiError = curDelegate.error {
-                eventLogger.report(error: apiError)
+                eventLogger.report(error: apiError, displayPopup: true)
             }
             return nil
         }
@@ -461,7 +461,7 @@ class AmpacheXmlServerApi {
         parser.delegate = parserDelegate
         parser.parse()
         if let error = parserDelegate.error, AmpacheError.shouldErrorBeDisplayedToUser(statusCode: error.statusCode) {
-            eventLogger.report(error: error)
+            eventLogger.report(error: error, displayPopup: true)
         }
     }
 
@@ -491,9 +491,6 @@ class AmpacheXmlServerApi {
         let parser = XMLParser(data: data)
         parser.delegate = errorParser
         parser.parse()
-        if let error = errorParser.error, AmpacheError.shouldErrorBeDisplayedToUser(statusCode: error.statusCode) {
-            eventLogger.report(error: error)
-        }
         return errorParser.error
     }
     

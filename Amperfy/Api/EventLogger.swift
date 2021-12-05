@@ -25,15 +25,15 @@ class EventLogger {
         self.persistentContainer = persistentContainer
     }
     
-    func info(topic: String, statusCode: AmperfyLogStatusCode, message: String) {
-        report(topic: topic, statusCode: statusCode, message: message, logType: .info)
+    func info(topic: String, statusCode: AmperfyLogStatusCode, message: String, displayPopup: Bool) {
+        report(topic: topic, statusCode: statusCode, message: message, logType: .info, displayPopup: displayPopup)
     }
     
-    func error(topic: String, statusCode: AmperfyLogStatusCode, message: String) {
-        report(topic: topic, statusCode: statusCode, message: message, logType: .error)
+    func error(topic: String, statusCode: AmperfyLogStatusCode, message: String, displayPopup: Bool) {
+        report(topic: topic, statusCode: statusCode, message: message, logType: .error, displayPopup: displayPopup)
     }
     
-    private func report(topic: String, statusCode: AmperfyLogStatusCode, message: String, logType: LogEntryType) {
+    private func report(topic: String, statusCode: AmperfyLogStatusCode, message: String, logType: LogEntryType, displayPopup: Bool) {
         persistentContainer.performBackgroundTask { context in
             let library = LibraryStorage(context: context)
             let logEntry = library.createLogEntry()
@@ -47,11 +47,13 @@ class EventLogger {
             if let sameEntry = sameStatusCodeEntries.first, sameEntry.creationDate.compare(Date() - Double(sameEntry.suppressionTimeInterval)) == .orderedDescending {
                 return
             }
-            self.displayAlert(topic: topic, message: message, logEntry: logEntry)
+            if displayPopup {
+                self.displayAlert(topic: topic, message: message, logEntry: logEntry)
+            }
         }
     }
     
-    func report(error: ResponseError) {
+    func report(error: ResponseError, displayPopup: Bool) {
         persistentContainer.performBackgroundTask { context in
             let library = LibraryStorage(context: context)
             let logEntry = library.createLogEntry()
@@ -72,7 +74,9 @@ class EventLogger {
             if let sameEntry = sameStatusCodeEntries.first, sameEntry.creationDate.compare(Date() - Double(sameEntry.suppressionTimeInterval)) == .orderedDescending {
                 return
             }
-            self.displayAlert(topic: "API Error", message: alertMessage, logEntry: logEntry)
+            if displayPopup {
+                self.displayAlert(topic: "API Error", message: alertMessage, logEntry: logEntry)
+            }
         }
     }
     

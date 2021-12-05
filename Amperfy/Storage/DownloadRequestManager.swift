@@ -30,10 +30,34 @@ class DownloadRequestManager {
     }
 
     private func addLowPrio(object: Downloadable, library: LibraryStorage) {
-        if library.getDownload(id: object.uniqueID) == nil {
+        let existingDownload = library.getDownload(id: object.uniqueID)
+        
+        if existingDownload == nil {
             let download = library.createDownload()
             download.id = object.uniqueID
             download.element = object
+        } else if let existingDownload = existingDownload, existingDownload.errorDate != nil {
+            existingDownload.reset()
+        }
+    }
+    
+    func removeFinishedDownload(for object: Downloadable) {
+        persistentStorage.context.performAndWait {
+            let library = LibraryStorage(context: self.persistentStorage.context)
+            guard let existingDownload = library.getDownload(id: object.uniqueID), existingDownload.finishDate != nil else { return }
+            library.deleteDownload(existingDownload)
+            library.saveContext()
+        }
+    }
+    
+    func removeFinishedDownload(for objects: [Downloadable]) {
+        persistentStorage.context.performAndWait {
+            let library = LibraryStorage(context: self.persistentStorage.context)
+            for object in objects {
+                guard let existingDownload = library.getDownload(id: object.uniqueID), existingDownload.finishDate != nil else { continue }
+                library.deleteDownload(existingDownload)
+            }
+            library.saveContext()
         }
     }
 

@@ -97,7 +97,7 @@ class BackendAudioPlayer {
         semaphore.wait()
         if !playable.isPlayableOniOS, let contentType = playable.contentType {
             clearPlayer()
-            eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playable.displayString)\" is not playable via Amperfy.")
+            eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playable.displayString)\" is not playable via Amperfy.", displayPopup: true)
         } else if playable.isCached {
             insertCachedPlayable(playable: playable)
         } else if !isOfflineMode{

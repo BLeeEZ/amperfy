@@ -68,6 +68,7 @@ class GenreDetailTableHeader: UIView {
         }
         if genre.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
+                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: genre.playables)
                 self.appDelegate.library.deleteCache(of: genre)
                 self.appDelegate.library.saveContext()
                 if let rootView = self.rootView {

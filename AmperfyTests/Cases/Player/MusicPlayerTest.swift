@@ -39,6 +39,8 @@ class MOCK_SongDownloader: DownloadManageable {
     var backgroundFetchCompletionHandler: CompleteHandlerBlock? { get {return nil} set {} }
     func download(object: Downloadable) { downloadables.append(object) }
     func download(objects: [Downloadable]) { downloadables.append(contentsOf: objects) }
+    func removeFinishedDownload(for object: Downloadable) {}
+    func removeFinishedDownload(for objects: [Downloadable]) {}
     func clearFinishedDownloads() {}
     func resetFailedDownloads() {}
     func cancelDownloads() {}

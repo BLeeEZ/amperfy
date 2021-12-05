@@ -99,6 +99,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
             }
             if episode.isCached {
                 alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
+                    self.appDelegate.playableDownloadManager.removeFinishedDownload(for: episode)
                     self.appDelegate.library.deleteCache(ofPlayable: episode)
                     self.appDelegate.library.saveContext()
                     self.refresh()

@@ -70,6 +70,7 @@ class ArtistDetailTableHeader: UIView {
         }
         if artist.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
+                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: artist.playables)
                 self.appDelegate.library.deleteCache(of: artist)
                 self.appDelegate.library.saveContext()
                 if let rootView = self.rootView {

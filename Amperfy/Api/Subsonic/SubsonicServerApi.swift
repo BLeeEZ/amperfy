@@ -303,9 +303,6 @@ class SubsonicServerApi {
         let parser = XMLParser(data: data)
         parser.delegate = errorParser
         parser.parse()
-        if let error = errorParser.error {
-            eventLogger.report(error: error)
-        }
         return errorParser.error
     }
 
@@ -366,7 +363,7 @@ class SubsonicServerApi {
         parser.delegate = parserDelegate
         parser.parse()
         if !ignoreErrorResponse, let error = parserDelegate.error {
-            eventLogger.report(error: error)
+            eventLogger.report(error: error, displayPopup: true)
         }
     }
     

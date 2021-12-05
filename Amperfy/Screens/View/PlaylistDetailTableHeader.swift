@@ -98,6 +98,7 @@ class PlaylistDetailTableHeader: UIView {
         }
         if playlist.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
+                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: playlist.playables)
                 self.appDelegate.library.deleteCache(of: playlist)
                 self.appDelegate.library.saveContext()
                 if let rootView = self.rootView {

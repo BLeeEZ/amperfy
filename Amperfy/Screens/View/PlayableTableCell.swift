@@ -133,6 +133,7 @@ class PlayableTableCell: BasicTableCell {
         }
         if playable.isCached {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
+                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: playable)
                 self.appDelegate.library.deleteCache(ofPlayable: playable)
                 self.appDelegate.library.saveContext()
                 self.refresh()

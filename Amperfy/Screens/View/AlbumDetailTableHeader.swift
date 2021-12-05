@@ -73,6 +73,7 @@ class AlbumDetailTableHeader: UIView {
         }
         if album.hasCachedPlayables {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
+                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: album.playables)
                 self.appDelegate.library.deleteCache(of: album)
                 self.appDelegate.library.saveContext()
                 if let rootView = self.rootView {

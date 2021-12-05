@@ -134,6 +134,7 @@ class SongTableCell: BasicTableCell {
         }
         if song.isCached {
             alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
+                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: song)
                 self.appDelegate.library.deleteCache(ofPlayable: song)
                 self.appDelegate.library.saveContext()
                 self.refresh()
