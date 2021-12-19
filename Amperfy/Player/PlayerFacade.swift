@@ -11,7 +11,8 @@ protocol PlayerFacade {
     var currentlyPlaying: AbstractPlayable?  { get }
     var elapsedTime: Double { get }
     var duration: Double { get }
-    var isShuffle: Bool { get set }
+    var isShuffle: Bool { get }
+    func toggleShuffle()
     var repeatMode: RepeatMode { get set }
     var isOfflineMode: Bool { get set }
     var isAutoCachePlayedItems: Bool { get set }
@@ -84,11 +85,11 @@ class PlayerFacadeImpl: PlayerFacade {
         return backendAudioPlayer.duration
     }
     var isShuffle: Bool {
-        get { return playerStatus.isShuffle }
-        set {
-            playerStatus.isShuffle = newValue
-            musicPlayer.notifyPlaylistUpdated()
-        }
+        return playerStatus.isShuffle
+    }
+    func toggleShuffle() {
+        playerStatus.isShuffle = !isShuffle
+        musicPlayer.notifyPlaylistUpdated()
     }
     var repeatMode: RepeatMode {
         get { return playerStatus.repeatMode }

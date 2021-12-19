@@ -100,7 +100,7 @@ class PlayerView: UIView {
     }
     
     @IBAction func shuffleButtonPushed(_ sender: Any) {
-        player.isShuffle.toggle()
+        player.toggleShuffle()
         refreshShuffleButton()
         rootView?.scrollToNextPlayingRow()
     }
