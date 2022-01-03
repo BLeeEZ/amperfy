@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -267,6 +267,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Artists" id="r1Y-hi-fd7"/>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="OLQ-2i-rN9">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </refreshControl>
                     <connections>
@@ -314,6 +315,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Albums" id="tB5-PS-t7P"/>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="hYm-lD-F5a">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </refreshControl>
                     <connections>
@@ -359,6 +361,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Songs" id="bi8-mc-CgH"/>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="bF0-OW-Sag">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </refreshControl>
                 </tableViewController>
@@ -500,10 +503,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="a7T-Uc-nlO">
-                                <rect key="frame" x="42" y="208" width="330" height="360"/>
+                                <rect key="frame" x="52" y="208" width="310" height="360"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jwb-Ck-Kjx" userLabel="Optional Button" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                        <rect key="frame" x="58" y="262" width="214" height="30"/>
+                                        <rect key="frame" x="58" y="262" width="194" height="30"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="HAw-ey-9J9"/>
@@ -516,7 +519,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oJc-Ob-FSO" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                        <rect key="frame" x="58" y="302" width="214" height="30"/>
+                                        <rect key="frame" x="58" y="302" width="194" height="30"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="6UK-3l-Lo3"/>
@@ -528,7 +531,7 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="20" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RpK-J6-8f1" userLabel="Content Label">
-                                        <rect key="frame" x="18" y="94" width="302" height="158"/>
+                                        <rect key="frame" x="18" y="94" width="282" height="158"/>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <string key="text">Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
                                         <fontDescription key="fontDescription" type="system" pointSize="18"/>
@@ -536,7 +539,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3k1-vq-TUe" userLabel="Icon Background Label">
-                                        <rect key="frame" x="115" y="-30" width="100" height="100"/>
+                                        <rect key="frame" x="105" y="-30" width="100" height="100"/>
                                         <color key="backgroundColor" systemColor="systemBlueColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="3k1-vq-TUe" secondAttribute="height" multiplier="1:1" id="WGU-mK-IIK"/>
@@ -547,7 +550,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ycx-rF-ag8" userLabel="Icon Label">
-                                        <rect key="frame" x="115" y="-30" width="100" height="100"/>
+                                        <rect key="frame" x="105" y="-30" width="100" height="100"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="100" id="M75-dZ-Hrf"/>
@@ -558,7 +561,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bih-od-ZMX" userLabel="Title Label">
-                                        <rect key="frame" x="144.5" y="60" width="41" height="30"/>
+                                        <rect key="frame" x="134.5" y="60" width="41" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="gn9-tm-cXi"/>
                                         </constraints>
@@ -578,7 +581,7 @@
                                     <constraint firstAttribute="height" constant="360" id="IUC-UO-cZW"/>
                                     <constraint firstItem="3k1-vq-TUe" firstAttribute="centerY" secondItem="Ycx-rF-ag8" secondAttribute="centerY" id="JZw-uQ-58i"/>
                                     <constraint firstItem="RpK-J6-8f1" firstAttribute="topMargin" secondItem="bih-od-ZMX" secondAttribute="bottomMargin" constant="20" id="VjD-SV-cP4"/>
-                                    <constraint firstAttribute="width" constant="330" id="ZSr-Sn-Zqg"/>
+                                    <constraint firstAttribute="width" constant="310" id="ZSr-Sn-Zqg"/>
                                     <constraint firstItem="3k1-vq-TUe" firstAttribute="centerX" secondItem="Ycx-rF-ag8" secondAttribute="centerX" id="c2s-gx-8NX"/>
                                     <constraint firstAttribute="trailingMargin" secondItem="RpK-J6-8f1" secondAttribute="trailingMargin" constant="10" id="gHO-TN-izc"/>
                                     <constraint firstItem="Ycx-rF-ag8" firstAttribute="centerX" secondItem="a7T-Uc-nlO" secondAttribute="centerX" id="ghe-J7-mg2"/>
@@ -1772,7 +1775,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="API" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AbB-7I-y8n" userLabel="ActiveBackendApi Label">
-                                                    <rect key="frame" x="294" y="5" width="100" height="30"/>
+                                                    <rect key="frame" x="194" y="5" width="200" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="Cul-tw-hIz"/>
                                                     </constraints>
@@ -2439,6 +2442,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Genres" id="QuU-c2-iBn"/>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="g8Q-Jo-DTW">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </refreshControl>
                     <connections>

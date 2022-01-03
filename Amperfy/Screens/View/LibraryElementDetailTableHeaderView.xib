@@ -15,10 +15,10 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aFp-vU-e7e" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="16" y="0.0" width="150" height="30"/>
+                    <rect key="frame" x="16" y="0.0" width="140" height="30"/>
                     <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="150" id="wMX-TZ-gTK"/>
+                        <constraint firstAttribute="width" constant="140" id="wMX-TZ-gTK"/>
                         <constraint firstAttribute="height" constant="30" id="zRv-bG-E8F"/>
                     </constraints>
                     <state key="normal" title="Play all">
@@ -29,7 +29,7 @@
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bqP-jY-7uf" userLabel="Add All To Play Next Button" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="209" y="0.0" width="150" height="30"/>
+                    <rect key="frame" x="219" y="0.0" width="140" height="30"/>
                     <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <state key="normal" title="Add to play next">
                         <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
