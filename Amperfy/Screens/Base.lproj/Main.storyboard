@@ -23,7 +23,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Username" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aKf-Oy-Mn4">
-                                <rect key="frame" x="30" y="272" width="79" height="34"/>
+                                <rect key="frame" x="30" y="272" width="86" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -49,19 +49,19 @@
                                 </connections>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Password" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Dr-h8-7rI">
-                                <rect key="frame" x="30" y="314" width="79" height="34"/>
+                                <rect key="frame" x="30" y="314" width="86" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="API" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v9a-mi-SHt" userLabel="Api">
-                                <rect key="frame" x="30" y="361" width="79" height="20.5"/>
+                                <rect key="frame" x="30" y="361" width="86" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Server URL" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fDZ-Za-sK8">
-                                <rect key="frame" x="30" y="230" width="79" height="34"/>
+                                <rect key="frame" x="30" y="230" width="86" height="34"/>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -1456,7 +1456,7 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="o87-ve-X5M"/>
                                                     </constraints>
-                                                    <state key="normal" title="Reset app data">
+                                                    <state key="normal" title="Reset App Data">
                                                         <color key="titleColor" systemColor="systemRedColor"/>
                                                     </state>
                                                     <connections>
@@ -1891,7 +1891,7 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="hGD-JA-KPm"/>
                                                     </constraints>
-                                                    <state key="normal" title="Update password">
+                                                    <state key="normal" title="Update Password">
                                                         <color key="titleColor" systemColor="labelColor"/>
                                                     </state>
                                                     <connections>
