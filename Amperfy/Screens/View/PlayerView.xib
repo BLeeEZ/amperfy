@@ -26,7 +26,7 @@
                         <action selector="artistNameCompactPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="PSZ-f0-sKI"/>
                     </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8F1-fg-8m2" userLabel="Artist Name Compact Label" customClass="MarqueeLabel" customModule="Amperfy">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8F1-fg-8m2" userLabel="Artist Name Compact Label" customClass="MarqueeLabel" customModule="Amperfy">
                     <rect key="frame" x="124" y="95.5" width="235" height="23"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="23" id="avd-wI-xLF"/>
@@ -41,7 +41,7 @@
                         <action selector="titleCompactPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="9aD-KS-kRv"/>
                     </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pOR-k2-6Vf" userLabel="Title Compact Label" customClass="MarqueeLabel" customModule="Amperfy">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pOR-k2-6Vf" userLabel="Title Compact Label" customClass="MarqueeLabel" customModule="Amperfy">
                     <rect key="frame" x="124" y="58" width="235" height="25.5"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="25.5" id="Bvd-8w-sJe"/>
@@ -176,7 +176,7 @@
                         <action selector="artistNameLargePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Lno-fc-kKQ"/>
                     </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GST-UH-ejT" userLabel="Artist Name Large Label" customClass="MarqueeLabel" customModule="Amperfy">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GST-UH-ejT" userLabel="Artist Name Large Label" customClass="MarqueeLabel" customModule="Amperfy">
                     <rect key="frame" x="16" y="225.5" width="343" height="23"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="23" id="yJg-88-RGh"/>
@@ -191,7 +191,7 @@
                         <action selector="titleLargePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="f7Y-PD-RbX"/>
                     </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6NT-8n-tg9" userLabel="Title Large Label" customClass="MarqueeLabel" customModule="Amperfy">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6NT-8n-tg9" userLabel="Title Large Label" customClass="MarqueeLabel" customModule="Amperfy">
                     <rect key="frame" x="16" y="188" width="343" height="25.5"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="25.5" id="Srp-a1-Y1D"/>
