@@ -25,6 +25,8 @@ class LibraryElementDetailTableHeaderView: UIView {
         } else {
             player.play(playables: playableContainer.playables.filterCached())
         }
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
     }
     
     @IBAction func addAllToPlayNextButtonPressed(_ sender: Any) {
@@ -34,6 +36,8 @@ class LibraryElementDetailTableHeaderView: UIView {
         } else {
             player.addToPlaylist(playables: playableContainer.playables.filterCached())
         }
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
     }
     
     func prepare(playableContainer: PlayableContainable?, with player: PlayerFacade) {
