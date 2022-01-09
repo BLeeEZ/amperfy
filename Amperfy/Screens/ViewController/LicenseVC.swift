@@ -49,7 +49,7 @@ class LicenseVC: UIViewController {
 
          <body>
 
-         <h1>Copyright © 2019-2021 Maximilian Bauer<br />
+         <h1>Copyright © 2019-2022 Maximilian Bauer<br />
          All rights reserved.</h1>
          <p>GPLv3 Licensed</p>
 
