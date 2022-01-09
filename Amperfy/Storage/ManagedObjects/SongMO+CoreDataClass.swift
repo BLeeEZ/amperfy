@@ -15,6 +15,7 @@ extension SongMO: CoreDataIdentifyable {
     static var trackNumberSortedFetchRequest: NSFetchRequest<SongMO> {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "disk", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
             NSSortDescriptor(key: "track", ascending: true),
             NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
         ]

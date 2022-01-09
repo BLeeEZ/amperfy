@@ -116,6 +116,8 @@
 		506007232625E8BD00F9891D /* MarqueeLabel.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 505468712625C47D008005EC /* MarqueeLabel.xcframework */; };
 		506007242625E8BD00F9891D /* MarqueeLabel.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 505468712625C47D008005EC /* MarqueeLabel.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		50675E6D25F61164005737FD /* BasicTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50675E6C25F61163005737FD /* BasicTableCell.swift */; };
+		5067E372278C1DCA00807A78 /* album_multidisc_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5067E371278C1DC900807A78 /* album_multidisc_example_1.xml */; };
+		5067E374278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5067E373278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift */; };
 		5068D38026A85C2D0006710D /* DownloadError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5068D37F26A85C2D0006710D /* DownloadError.swift */; };
 		506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */; };
 		506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */; };
@@ -478,6 +480,8 @@
 		505AD87B2615C834001319B6 /* GenreMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenreMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		5067016125E3ADA200A3EF89 /* Amperfy v5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v5.xcdatamodel"; sourceTree = "<group>"; };
 		50675E6C25F61163005737FD /* BasicTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableCell.swift; sourceTree = "<group>"; };
+		5067E371278C1DC900807A78 /* album_multidisc_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = album_multidisc_example_1.xml; sourceTree = "<group>"; };
+		5067E373278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumMultidiscExample1ParserTest.swift; sourceTree = "<group>"; };
 		5068D37F26A85C2D0006710D /* DownloadError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadError.swift; sourceTree = "<group>"; };
 		506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v2.xcdatamodel"; sourceTree = "<group>"; };
 		506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsServerVC.swift; sourceTree = "<group>"; };
@@ -1257,6 +1261,7 @@
 				50AB92BD26660FE000DCE45C /* SsArtistParserTest.swift */,
 				5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */,
 				50AB92C326661F2600DCE45C /* SsAlbumParserTest.swift */,
+				5067E373278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift */,
 				50AB92C12666127100DCE45C /* SsSongExample1ParserTest.swift */,
 				50AB92E126675B7000DCE45C /* SsSongExample2ParserTest.swift */,
 				50AB92C92666BAC300DCE45C /* SsPlaylistsParserTest.swift */,
@@ -1279,6 +1284,7 @@
 				50DB11B226653A670033BFFA /* genres_example_1.xml */,
 				50AB92BB26660FD800DCE45C /* artists_example_1.xml */,
 				50AB92C526661F5800DCE45C /* artist_example_1.xml */,
+				5067E371278C1DC900807A78 /* album_multidisc_example_1.xml */,
 				50AB92BF2666126300DCE45C /* album_example_1.xml */,
 				50AB92C726662DAC00DCE45C /* album_example_2.xml */,
 				50AB92CB2666BAED00DCE45C /* playlists_example_1.xml */,
@@ -1488,6 +1494,7 @@
 				50AB92D62666C2C700DCE45C /* indexes_example_1.xml in Resources */,
 				50DB11AF266537910033BFFA /* error_example_1.xml in Resources */,
 				50AB92CC2666BAED00DCE45C /* playlists_example_1.xml in Resources */,
+				5067E372278C1DCA00807A78 /* album_multidisc_example_1.xml in Resources */,
 				501A7D2026808A9D0055A51B /* podcast_episodes.xml in Resources */,
 				50AB92BC26660FD900DCE45C /* artists_example_1.xml in Resources */,
 				50DB1189266510FF0033BFFA /* albums.xml in Resources */,
@@ -1807,6 +1814,7 @@
 				50AB92BE26660FE000DCE45C /* SsArtistParserTest.swift in Sources */,
 				501A7D3F2680B04F0055A51B /* SsPodcastEpisodesParserTest.swift in Sources */,
 				50F81E9023BCDE1600EAAC3E /* ArtworkTest.swift in Sources */,
+				5067E374278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift in Sources */,
 				501A7D2326808AC10055A51B /* PodcastsParserTest.swift in Sources */,
 				501A7D432680B8BF0055A51B /* SsPodcastParserTest.swift in Sources */,
 				50B798B223B7F51000551E62 /* PlaylistTest.swift in Sources */,

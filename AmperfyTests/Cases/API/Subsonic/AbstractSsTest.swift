@@ -1,4 +1,5 @@
 import XCTest
+import CoreData
 @testable import Amperfy
 
 class MOCK_SubsonicUrlCreator: SubsonicUrlCreator {
@@ -9,6 +10,7 @@ class MOCK_SubsonicUrlCreator: SubsonicUrlCreator {
 
 class AbstractSsParserTest: XCTestCase {
     
+    var context: NSManagedObjectContext!
     var cdHelper: CoreDataHelper!
     var library: LibraryStorage!
     var xmlData: Data?
@@ -19,7 +21,7 @@ class AbstractSsParserTest: XCTestCase {
 
     override func setUp() {
         cdHelper = CoreDataHelper()
-        let context = cdHelper.createInMemoryManagedObjectContext()
+        context = cdHelper.createInMemoryManagedObjectContext()
         cdHelper.clearContext(context: context)
         library = LibraryStorage(context: context)
         xmlErrorData = getTestFileData(name: "error_example_1")
