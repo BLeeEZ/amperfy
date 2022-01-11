@@ -35,10 +35,28 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
-        waitingQueueSwipeCallback = { (indexPath) in
+        waitingQueueInsertSwipeCallback = { (indexPath) in
             let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             if let playable = playlistItem.playable {
-                self.appDelegate.player.addToWaitingQueue(playable: playable)
+                self.appDelegate.player.addToWaitingQueueFirst(playable: playable)
+            }
+        }
+        nextQueueInsertSwipeCallback = { (indexPath) in
+            let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            if let playable = playlistItem.playable {
+                self.appDelegate.player.insertAsNextSongNoPlay(playable: playable)
+            }
+        }
+        waitingQueueAppendSwipeCallback = { (indexPath) in
+            let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            if let playable = playlistItem.playable {
+                self.appDelegate.player.addToWaitingQueueLast(playable: playable)
+            }
+        }
+        nextQueueAppendSwipeCallback = { (indexPath) in
+            let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            if let playable = playlistItem.playable {
+                self.appDelegate.player.addToPlaylist(playable: playable)
             }
         }
     }

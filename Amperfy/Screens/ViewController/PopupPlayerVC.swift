@@ -201,20 +201,6 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         cell.display(playable: playable, rootView: self)
         return cell
     }
-    
-    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        return UISwipeActionsConfiguration(actions: [
-            createWaitingQueueSwipeAction(indexPath: indexPath) { (indexPath) in
-                guard let playerIndex = PlayerIndex.create(from: indexPath) else { return }
-                let playable = self.player.getPlayable(at: playerIndex)
-                tableView.beginUpdates()
-                tableView.insertRows(at: [IndexPath(row: self.player.waitingQueue.count, section: 1)], with: .top)
-                self.player.addToWaitingQueue(playable: playable)
-                tableView.endUpdates()
-                self.refreshWaitingQueueSectionHeader()
-            }
-        ])
-    }
 
     // Override to support editing the table view.
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {

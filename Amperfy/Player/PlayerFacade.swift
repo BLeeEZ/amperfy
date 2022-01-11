@@ -22,7 +22,8 @@ protocol PlayerFacade {
     
     func addToPlaylist(playable: AbstractPlayable)
     func addToPlaylist(playables: [AbstractPlayable])
-    func addToWaitingQueue(playable: AbstractPlayable)
+    func addToWaitingQueueFirst(playable: AbstractPlayable)
+    func addToWaitingQueueLast(playable: AbstractPlayable)
     func removePlayable(at: PlayerIndex)
     func movePlayable(from: PlayerIndex, to: PlayerIndex)
     func insertAsNextSongNoPlay(playable: AbstractPlayable)
@@ -126,8 +127,12 @@ class PlayerFacadeImpl: PlayerFacade {
         queueHandler.addToPlaylist(playables: playables)
     }
     
-    func addToWaitingQueue(playable: AbstractPlayable) {
-        queueHandler.addToWaitingQueue(playable: playable)
+    func addToWaitingQueueFirst(playable: AbstractPlayable) {
+        queueHandler.addToWaitingQueueFirst(playable: playable)
+    }
+
+    func addToWaitingQueueLast(playable: AbstractPlayable) {
+        queueHandler.addToWaitingQueueLast(playable: playable)
     }
 
     func removePlayable(at: PlayerIndex) {

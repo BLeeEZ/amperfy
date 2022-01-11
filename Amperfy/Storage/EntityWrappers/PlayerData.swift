@@ -22,7 +22,8 @@ protocol PlayerQueuesPersistent {
     
     func addToPlaylist(playable: AbstractPlayable)
     func addToPlaylist(playables: [AbstractPlayable])
-    func addToWaitingQueue(playable: AbstractPlayable)
+    func addToWaitingQueueFirst(playable: AbstractPlayable)
+    func addToWaitingQueueLast(playable: AbstractPlayable)
     func clearWaitingQueue()
     func clearPlaylistQueues()
     func removeAllItems()
@@ -183,7 +184,16 @@ extension PlayerData: PlayerQueuesPersistent {
         shuffledPlaylist.append(playables: playables)
     }
     
-    func addToWaitingQueue(playable: AbstractPlayable) {
+    func addToWaitingQueueFirst(playable: AbstractPlayable) {
+        waitingQueuePlaylistInternal.append(playable: playable)
+        if isWaitingQueuePlaying && waitingQueuePlaylistInternal.songCount > 1 {
+            waitingQueuePlaylistInternal.movePlaylistItem(fromIndex: waitingQueuePlaylistInternal.songCount-1, to: 1)
+        } else {
+            waitingQueuePlaylistInternal.movePlaylistItem(fromIndex: waitingQueuePlaylistInternal.songCount-1, to: 0)
+        }
+    }
+    
+    func addToWaitingQueueLast(playable: AbstractPlayable) {
         waitingQueuePlaylistInternal.append(playable: playable)
     }
     

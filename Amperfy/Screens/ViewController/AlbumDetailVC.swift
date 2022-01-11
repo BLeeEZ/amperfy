@@ -27,9 +27,21 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         
-        waitingQueueSwipeCallback = { (indexPath) in
+        waitingQueueInsertSwipeCallback = { (indexPath) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.addToWaitingQueue(playable: song)
+            self.appDelegate.player.addToWaitingQueueFirst(playable: song)
+        }
+        nextQueueInsertSwipeCallback = { (indexPath) in
+            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            self.appDelegate.player.insertAsNextSongNoPlay(playable: song)
+        }
+        waitingQueueAppendSwipeCallback = { (indexPath) in
+            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            self.appDelegate.player.addToWaitingQueueLast(playable: song)
+        }
+        nextQueueAppendSwipeCallback = { (indexPath) in
+            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            self.appDelegate.player.addToPlaylist(playable: song)
         }
     }
     

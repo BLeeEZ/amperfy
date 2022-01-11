@@ -60,8 +60,15 @@ public class PlayQueueHandler  {
         playerQueues.addToPlaylist(playables: playables)
     }
     
-    func addToWaitingQueue(playable: AbstractPlayable) {
-        playerQueues.addToWaitingQueue(playable: playable)
+    func addToWaitingQueueFirst(playable: AbstractPlayable) {
+        playerQueues.addToWaitingQueueFirst(playable: playable)
+        if playerQueues.activePlaylist.songCount == 0 {
+            playerQueues.isWaitingQueuePlaying = true
+        }
+    }
+    
+    func addToWaitingQueueLast(playable: AbstractPlayable) {
+        playerQueues.addToWaitingQueueLast(playable: playable)
         if playerQueues.activePlaylist.songCount == 0 {
             playerQueues.isWaitingQueuePlaying = true
         }
@@ -74,7 +81,7 @@ public class PlayQueueHandler  {
     func clearWaitingQueue() {
         if isWaitingQueuePlaying, let currentWaitingQueueItem = currentlyPlaying {
             playerQueues.clearWaitingQueue()
-            addToWaitingQueue(playable: currentWaitingQueueItem)
+            addToWaitingQueueFirst(playable: currentWaitingQueueItem)
         } else {
             playerQueues.clearWaitingQueue()
         }
@@ -202,12 +209,12 @@ public class PlayQueueHandler  {
 
         // Prev ==> Waiting
         } else if from.queueType == .prev, to.queueType == .waitingQueue {
-            playerQueues.addToWaitingQueue(playable: prevQueue[from.index])
+            playerQueues.addToWaitingQueueLast(playable: prevQueue[from.index])
             moveWaitingQueueItem(fromIndex: waitingQueuePlaylist.songCount-1, to: to.index + waitingQueueOffsetIsWaitingQueuePlaying)
             removeItemFromPlaylist(at: from.index)
         // Next ==> Waiting
         } else if from.queueType == .next, to.queueType == .waitingQueue {
-            playerQueues.addToWaitingQueue(playable: nextQueue[from.index])
+            playerQueues.addToWaitingQueueLast(playable: nextQueue[from.index])
             moveWaitingQueueItem(fromIndex: waitingQueuePlaylist.songCount-1, to: to.index + waitingQueueOffsetIsWaitingQueuePlaying)
             removeItemFromPlaylist(at: offsetToNext+from.index)
         }

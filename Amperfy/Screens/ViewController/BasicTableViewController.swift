@@ -34,13 +34,51 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
 typealias WaitingQueueSwipeCallback = (IndexPath) -> Void
 
 extension UIViewController {
-    func createWaitingQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping WaitingQueueSwipeCallback) -> UIContextualAction {
-        let action = UIContextualAction(style: .normal, title: "Add to Waiting Queue") { (action, view, completionHandler) in
+    func createInsertNextQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping WaitingQueueSwipeCallback) -> UIContextualAction {
+        let action = UIContextualAction(style: .normal, title: "Insert into Next in Main Queue") { (action, view, completionHandler) in
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
             actionCallback(indexPath)
             completionHandler(true)
         }
         action.backgroundColor = .systemBlue
-        action.image = UIImage(named: "playlist")
+        action.image = UIImage(named: "main_insert")?.invertedImage()
+        return action
+    }
+    
+    func createInsertWaitingQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping WaitingQueueSwipeCallback) -> UIContextualAction {
+        let action = UIContextualAction(style: .normal, title: "Insert into Next in Waiting Queue") { (action, view, completionHandler) in
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            actionCallback(indexPath)
+            completionHandler(true)
+        }
+        action.backgroundColor = .systemOrange
+        action.image = UIImage(named: "waiting_insert")?.invertedImage()
+        return action
+    }
+    
+    func createAppendNextQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping WaitingQueueSwipeCallback) -> UIContextualAction {
+        let action = UIContextualAction(style: .normal, title: "Append to Next in Main Queue") { (action, view, completionHandler) in
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+            actionCallback(indexPath)
+            completionHandler(true)
+        }
+        action.backgroundColor = .systemBlue
+        action.image = UIImage(named: "main_append")?.invertedImage()
+        return action
+    }
+    
+    func createAppendWaitingQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping WaitingQueueSwipeCallback) -> UIContextualAction {
+        let action = UIContextualAction(style: .normal, title: "Append to Next in Waiting Queue") { (action, view, completionHandler) in
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            actionCallback(indexPath)
+            completionHandler(true)
+        }
+        action.backgroundColor = .systemOrange
+        action.image = UIImage(named: "waiting_append")?.invertedImage()
         return action
     }
 }
@@ -56,7 +94,10 @@ class BasicTableViewController: UITableViewController {
     var rowsToInsert = [IndexPath]()
     var rowsToDelete = [IndexPath]()
     var rowsToUpdate = [IndexPath]()
-    var waitingQueueSwipeCallback: WaitingQueueSwipeCallback?
+    var waitingQueueInsertSwipeCallback: WaitingQueueSwipeCallback?
+    var waitingQueueAppendSwipeCallback: WaitingQueueSwipeCallback?
+    var nextQueueInsertSwipeCallback: WaitingQueueSwipeCallback?
+    var nextQueueAppendSwipeCallback: WaitingQueueSwipeCallback?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,12 +116,22 @@ class BasicTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let swipeCB = waitingQueueSwipeCallback else { return nil }
+        guard let waitingCB = waitingQueueInsertSwipeCallback else { return nil }
+        guard let nextCB = nextQueueInsertSwipeCallback else { return nil }
         return UISwipeActionsConfiguration(actions: [
-            createWaitingQueueSwipeAction(indexPath: indexPath, actionCallback: swipeCB)
+            createInsertNextQueueSwipeAction(indexPath: indexPath, actionCallback: nextCB),
+            createInsertWaitingQueueSwipeAction(indexPath: indexPath, actionCallback: waitingCB)
         ])
     }
-    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let waitingCB = waitingQueueAppendSwipeCallback else { return nil }
+        guard let nextCB = nextQueueAppendSwipeCallback else { return nil }
+        return UISwipeActionsConfiguration(actions: [
+            createAppendNextQueueSwipeAction(indexPath: indexPath, actionCallback: nextCB),
+            createAppendWaitingQueueSwipeAction(indexPath: indexPath, actionCallback: waitingCB)
+        ])
+    }
+
     func configureSearchController(placeholder: String?, scopeButtonTitles: [String]? = nil, showSearchBarAtEnter: Bool = false) {
         searchController.searchResultsUpdater = self
         searchController.searchBar.autocapitalizationType = .none
