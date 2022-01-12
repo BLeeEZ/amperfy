@@ -26,8 +26,39 @@ class SearchVC: BasicTableViewController {
         tableView.register(nibName: AlbumTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.separatorStyle = .none
+        
+        swipeCallback = { (indexPath, completionHandler) in
+            self.determPlayables(at: indexPath) { playables in
+                completionHandler(playables)
+            }
+        }
     }
     
+    func determPlayables(at indexPath: IndexPath, completionHandler: @escaping (_ playables: [AbstractPlayable]) -> Void) {
+        switch indexPath.section {
+        case LibraryElement.Playlist.rawValue:
+            let playlist = playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            fetchDetails(of: playlist) {
+                completionHandler(playlist.playables)
+            }
+        case LibraryElement.Artist.rawValue:
+            let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            fetchDetails(of: artist) {
+                completionHandler(artist.playables)
+            }
+        case LibraryElement.Album.rawValue:
+            let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            fetchDetails(of: album) {
+                completionHandler(album.playables)
+            }
+        case LibraryElement.Song.rawValue:
+            let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            completionHandler([song])
+        default:
+            completionHandler([])
+        }
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         appDelegate.userStatistics.visited(.search)

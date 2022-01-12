@@ -32,6 +32,26 @@ class GenreDetailVC: BasicTableViewController {
             libraryElementDetailTableHeaderView.prepare(playableContainer: genre, with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
+        
+        swipeCallback = { (indexPath, completionHandler) in
+            switch indexPath.section+1 {
+            case LibraryElement.Artist.rawValue:
+                let artist = self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                self.fetchDetails(of: artist) {
+                    completionHandler(artist.playables)
+                }
+            case LibraryElement.Album.rawValue:
+                let album = self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                self.fetchDetails(of: album) {
+                    completionHandler(album.playables)
+                }
+            case LibraryElement.Song.rawValue:
+                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
+                completionHandler([song])
+            default:
+                completionHandler([])
+            }
+        }
     }
 
     // MARK: - Table view data source
@@ -125,36 +145,6 @@ class GenreDetailVC: BasicTableViewController {
         case LibraryElement.Song.rawValue: break
         default: break
         }
-    }
-    
-    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard indexPath.section == 2 else { return nil }
-        let adjustedIndexPath = IndexPath(row: indexPath.row , section: 0)
-        return UISwipeActionsConfiguration(actions: [
-            createInsertNextQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath) in
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                self.appDelegate.player.insertAsNextSongNoPlay(playable: song)
-            },
-            createInsertWaitingQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath) in
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                self.appDelegate.player.addToWaitingQueueFirst(playable: song)
-            }
-        ])
-    }
-
-    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard indexPath.section == 2 else { return nil }
-        let adjustedIndexPath = IndexPath(row: indexPath.row , section: 0)
-        return UISwipeActionsConfiguration(actions: [
-            createAppendNextQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath) in
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                self.appDelegate.player.addToPlaylist(playable: song)
-            },
-            createAppendWaitingQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath) in
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                self.appDelegate.player.addToWaitingQueueLast(playable: song)
-            }
-        ])
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

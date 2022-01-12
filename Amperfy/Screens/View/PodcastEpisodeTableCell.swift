@@ -94,7 +94,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
                     self.appDelegate.player.play(playable: episode)
                 }))
                 alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
-                    self.appDelegate.player.addToPlaylist(playable: episode)
+                    self.appDelegate.player.addToPlaylist(playables: [episode])
                 }))
             }
             if episode.isCached {

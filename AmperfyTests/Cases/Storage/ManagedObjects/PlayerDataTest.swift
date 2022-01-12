@@ -26,7 +26,7 @@ class PlayerDataTest: XCTestCase {
     func fillPlayerWithSomeSongs() {
         for i in 0...fillCount-1 {
             guard let song = library.getSong(id: cdHelper.seeder.songs[i].id) else { XCTFail(); return }
-            testPlayer.addToPlaylist(playable: song)
+            testPlayer.addToPlaylist(playables: [song])
         }
     }
     
@@ -129,11 +129,11 @@ class PlayerDataTest: XCTestCase {
         fillPlayerWithSomeSongs()
         guard let song1 = library.getSong(id: cdHelper.seeder.songs[6].id) else { XCTFail(); return }
         guard let song2 = library.getSong(id: cdHelper.seeder.songs[7].id) else { XCTFail(); return }
-        testPlayer.addToPlaylist(playable: song1)
+        testPlayer.addToPlaylist(playables: [song1])
         XCTAssertEqual(testPlayer.activePlaylist.playables.count, fillCount + 1)
         testPlayer.isShuffle = true
         XCTAssertEqual(testPlayer.activePlaylist.playables.count, fillCount + 1)
-        testPlayer.addToPlaylist(playable: song2)
+        testPlayer.addToPlaylist(playables: [song2])
         XCTAssertEqual(testPlayer.activePlaylist.playables.count, fillCount + 2)
         testPlayer.isShuffle = false
         XCTAssertEqual(testPlayer.activePlaylist.playables.count, fillCount + 2)
@@ -151,8 +151,8 @@ class PlayerDataTest: XCTestCase {
         
         guard let song1 = library.getSong(id: cdHelper.seeder.songs[6].id) else { XCTFail(); return }
         guard let song2 = library.getSong(id: cdHelper.seeder.songs[7].id) else { XCTFail(); return }
-        testPlayer.addToPlaylist(playable: song1)
-        testPlayer.addToPlaylist(playable: song2)
+        testPlayer.addToPlaylist(playables: [song1])
+        testPlayer.addToPlaylist(playables: [song2])
         testPlayer.removeAllItems()
         XCTAssertEqual(testPlayer.activePlaylist.playables.count, 0)
     }

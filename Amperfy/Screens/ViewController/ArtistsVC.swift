@@ -16,8 +16,15 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         tableView.register(nibName: ArtistTableCell.typeName)
         tableView.rowHeight = ArtistTableCell.rowHeight
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
+        
+        swipeCallback = { (indexPath, completionHandler) in
+            let artist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            self.fetchDetails(of: artist) {
+                completionHandler(artist.playables)
+            }
+        }
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: ArtistTableCell = dequeueCell(for: tableView, at: indexPath)
         let artist = fetchedResultsController.getWrappedEntity(at: indexPath)

@@ -85,13 +85,13 @@ class DirectoriesVC: BasicTableViewController {
         guard indexPath.section == 1 else { return nil }
         let adjustedIndexPath = IndexPath(row: indexPath.row , section: 0)
         return UISwipeActionsConfiguration(actions: [
-            createInsertNextQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath) in
+            createInsertNextQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath, completionHandler) in
                 let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                self.appDelegate.player.insertAsNextSongNoPlay(playable: song)
+                completionHandler([song])
             },
-            createInsertWaitingQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath) in
+            createInsertWaitingQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath, completionHandler) in
                 let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                self.appDelegate.player.addToWaitingQueueFirst(playable: song)
+                completionHandler([song])
             }
         ])
     }
@@ -100,13 +100,13 @@ class DirectoriesVC: BasicTableViewController {
         guard indexPath.section == 1 else { return nil }
         let adjustedIndexPath = IndexPath(row: indexPath.row , section: 0)
         return UISwipeActionsConfiguration(actions: [
-            createAppendNextQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath) in
+            createAppendNextQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath, completionHandler) in
                 let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                self.appDelegate.player.addToPlaylist(playable: song)
+                completionHandler([song])
             },
-            createAppendWaitingQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath) in
+            createAppendWaitingQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath, completionHandler) in
                 let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                self.appDelegate.player.addToWaitingQueueLast(playable: song)
+                completionHandler([song])
             }
         ])
     }

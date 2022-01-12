@@ -22,21 +22,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         navigationItem.rightBarButtonItem = optionsButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
-        waitingQueueInsertSwipeCallback = { (indexPath) in
+        swipeCallback = { (indexPath, completionHandler) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.addToWaitingQueueFirst(playable: song)
-        }
-        nextQueueInsertSwipeCallback = { (indexPath) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.insertAsNextSongNoPlay(playable: song)
-        }
-        waitingQueueAppendSwipeCallback = { (indexPath) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.addToWaitingQueueLast(playable: song)
-        }
-        nextQueueAppendSwipeCallback = { (indexPath) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.addToPlaylist(playable: song)
+            completionHandler([song])
         }
     }
 

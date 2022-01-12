@@ -16,6 +16,11 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         tableView.register(nibName: GenreTableCell.typeName)
         tableView.rowHeight = GenreTableCell.rowHeight
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
+        
+        swipeCallback = { (indexPath, completionHandler) in
+            let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            completionHandler(genre.playables)
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

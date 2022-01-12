@@ -24,36 +24,16 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
-        waitingQueueInsertSwipeCallback = { (indexPath) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.addToWaitingQueueFirst(playable: song)
-        }
-        nextQueueInsertSwipeCallback = { (indexPath) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.insertAsNextSongNoPlay(playable: song)
-        }
-        waitingQueueAppendSwipeCallback = { (indexPath) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.addToWaitingQueueLast(playable: song)
-        }
-        nextQueueAppendSwipeCallback = { (indexPath) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.addToPlaylist(playable: song)
+        swipeCallback = { (indexPath, completionHandler) in
+            let episode = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            completionHandler([episode])
         }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let library = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let podcastAsync = Podcast(managedObject: context.object(with: self.podcast.managedObject.objectID) as! PodcastMO)
-                syncer.sync(podcast: podcastAsync, library: library)
-                DispatchQueue.main.async {
-                    self.detailOperationsView?.refresh()
-                }
-            }
+        fetchDetails(of: self.podcast) {
+            self.detailOperationsView?.refresh()
         }
     }
     

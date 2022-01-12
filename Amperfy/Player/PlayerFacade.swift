@@ -20,13 +20,12 @@ protocol PlayerFacade {
     func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler)
     func seek(toSecond: Double)
     
-    func addToPlaylist(playable: AbstractPlayable)
     func addToPlaylist(playables: [AbstractPlayable])
-    func addToWaitingQueueFirst(playable: AbstractPlayable)
-    func addToWaitingQueueLast(playable: AbstractPlayable)
+    func addToWaitingQueueFirst(playables: [AbstractPlayable])
+    func addToWaitingQueueLast(playables: [AbstractPlayable])
     func removePlayable(at: PlayerIndex)
     func movePlayable(from: PlayerIndex, to: PlayerIndex)
-    func insertAsNextSongNoPlay(playable: AbstractPlayable)
+    func insertAsNextSongNoPlay(playables: [AbstractPlayable])
     func clearWaitingQueue()
     func clearPlaylist()
     func clearQueues()
@@ -119,20 +118,16 @@ class PlayerFacadeImpl: PlayerFacade {
         backendAudioPlayer.seek(toSecond: toSecond)
     }
     
-    func addToPlaylist(playable: AbstractPlayable) {
-        queueHandler.addToPlaylist(playable: playable)
-    }
-    
     func addToPlaylist(playables: [AbstractPlayable]) {
         queueHandler.addToPlaylist(playables: playables)
     }
-    
-    func addToWaitingQueueFirst(playable: AbstractPlayable) {
-        queueHandler.addToWaitingQueueFirst(playable: playable)
-    }
 
-    func addToWaitingQueueLast(playable: AbstractPlayable) {
-        queueHandler.addToWaitingQueueLast(playable: playable)
+    func addToWaitingQueueFirst(playables: [AbstractPlayable]) {
+        queueHandler.addToWaitingQueueFirst(playables: playables)
+    }
+    
+    func addToWaitingQueueLast(playables: [AbstractPlayable]) {
+        queueHandler.addToWaitingQueueLast(playables: playables)
     }
 
     func removePlayable(at: PlayerIndex) {
@@ -142,13 +137,15 @@ class PlayerFacadeImpl: PlayerFacade {
     func movePlayable(from: PlayerIndex, to: PlayerIndex) {
         queueHandler.movePlayable(from: from, to: to)
     }
-    
-    func insertAsNextSongNoPlay(playable: AbstractPlayable) {
-        queueHandler.addToPlaylist(playable: playable)
-        queueHandler.movePlayable(
-            from: PlayerIndex(queueType: .next, index: queueHandler.nextQueue.count-1),
-            to: PlayerIndex(queueType: .next, index: 0)
-        )
+
+    func insertAsNextSongNoPlay(playables: [AbstractPlayable]) {
+        for playable in playables.reversed() {
+            queueHandler.addToPlaylist(playables: [playable])
+            queueHandler.movePlayable(
+                from: PlayerIndex(queueType: .next, index: queueHandler.nextQueue.count-1),
+                to: PlayerIndex(queueType: .next, index: 0)
+            )
+        }
     }
     
     func clearWaitingQueue() {
@@ -188,7 +185,7 @@ class PlayerFacadeImpl: PlayerFacade {
     }
     
     func appendToNextQueueAndPlay(playable: AbstractPlayable) {
-        queueHandler.addToPlaylist(playable: playable)
+        queueHandler.addToPlaylist(playables: [playable])
         musicPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: queueHandler.nextQueue.count-1))
     }
     

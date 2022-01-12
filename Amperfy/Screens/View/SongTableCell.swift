@@ -74,7 +74,7 @@ class SongTableCell: BasicTableCell {
             case .addToPlaylistAndPlay:
                 appDelegate.player.appendToNextQueueAndPlay(playable: song)
             case .insertAsNextSongNoPlay:
-                appDelegate.player.insertAsNextSongNoPlay(playable: song)
+                appDelegate.player.insertAsNextSongNoPlay(playables: [song])
             }
         }
         isAlertPresented = false
@@ -121,7 +121,7 @@ class SongTableCell: BasicTableCell {
                 self.appDelegate.player.play(playable: song)
                 }))
                 alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
-                self.appDelegate.player.addToPlaylist(playable: song)
+                self.appDelegate.player.addToPlaylist(playables: [song])
             }))
         }
         if appDelegate.persistentStorage.settings.isOnlineMode {

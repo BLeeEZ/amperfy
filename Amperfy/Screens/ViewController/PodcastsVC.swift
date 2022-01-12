@@ -15,6 +15,13 @@ class PodcastsVC: SingleFetchedResultsTableViewController<PodcastMO> {
         configureSearchController(placeholder: "Search in \"Podcasts\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: PodcastTableCell.typeName)
         tableView.rowHeight = PodcastTableCell.rowHeight
+        
+        swipeCallback = { (indexPath, completionHandler) in
+            let podcast = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            self.fetchDetails(of: podcast) {
+                completionHandler(podcast.playables)
+            }
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

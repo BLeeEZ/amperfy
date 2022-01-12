@@ -51,24 +51,20 @@ public class PlayQueueHandler  {
     var isWaitingQueuePlaying: Bool {
         return playerQueues.isWaitingQueuePlaying
     }
-    
-    func addToPlaylist(playable: AbstractPlayable) {
-        playerQueues.addToPlaylist(playable: playable)
-    }
-    
+
     func addToPlaylist(playables: [AbstractPlayable]) {
         playerQueues.addToPlaylist(playables: playables)
     }
     
-    func addToWaitingQueueFirst(playable: AbstractPlayable) {
-        playerQueues.addToWaitingQueueFirst(playable: playable)
+    func addToWaitingQueueFirst(playables: [AbstractPlayable]) {
+        playerQueues.addToWaitingQueueFirst(playables: playables)
         if playerQueues.activePlaylist.songCount == 0 {
             playerQueues.isWaitingQueuePlaying = true
         }
     }
     
-    func addToWaitingQueueLast(playable: AbstractPlayable) {
-        playerQueues.addToWaitingQueueLast(playable: playable)
+    func addToWaitingQueueLast(playables: [AbstractPlayable]) {
+        playerQueues.addToWaitingQueueLast(playables: playables)
         if playerQueues.activePlaylist.songCount == 0 {
             playerQueues.isWaitingQueuePlaying = true
         }
@@ -81,7 +77,7 @@ public class PlayQueueHandler  {
     func clearWaitingQueue() {
         if isWaitingQueuePlaying, let currentWaitingQueueItem = currentlyPlaying {
             playerQueues.clearWaitingQueue()
-            addToWaitingQueueFirst(playable: currentWaitingQueueItem)
+            addToWaitingQueueFirst(playables: [currentWaitingQueueItem])
         } else {
             playerQueues.clearWaitingQueue()
         }
@@ -193,13 +189,13 @@ public class PlayQueueHandler  {
 
         // Waiting ==> Next
         } else if from.queueType == .waitingQueue, to.queueType == .next {
-            playerQueues.addToPlaylist(playable: waitingQueue[from.index])
+            playerQueues.addToPlaylist(playables: [waitingQueue[from.index]])
             let fromIndex = playlist.songCount-1
             movePlaylistItem(fromIndex: fromIndex, to: offsetToNext+to.index)
             removeItemFromWaitingQueue(at: from.index + waitingQueueOffsetIsWaitingQueuePlaying)
         // Waiting ==> Prev
         } else if from.queueType == .waitingQueue, to.queueType == .prev {
-            playerQueues.addToPlaylist(playable: waitingQueue[from.index])
+            playerQueues.addToPlaylist(playables: [waitingQueue[from.index]])
             let fromIndex = playlist.songCount-1
             movePlaylistItem(fromIndex: fromIndex, to: to.index)
             if isWaitingQueuePlaying {
@@ -209,12 +205,12 @@ public class PlayQueueHandler  {
 
         // Prev ==> Waiting
         } else if from.queueType == .prev, to.queueType == .waitingQueue {
-            playerQueues.addToWaitingQueueLast(playable: prevQueue[from.index])
+            playerQueues.addToWaitingQueueLast(playables: [prevQueue[from.index]])
             moveWaitingQueueItem(fromIndex: waitingQueuePlaylist.songCount-1, to: to.index + waitingQueueOffsetIsWaitingQueuePlaying)
             removeItemFromPlaylist(at: from.index)
         // Next ==> Waiting
         } else if from.queueType == .next, to.queueType == .waitingQueue {
-            playerQueues.addToWaitingQueueLast(playable: nextQueue[from.index])
+            playerQueues.addToWaitingQueueLast(playables: [nextQueue[from.index]])
             moveWaitingQueueItem(fromIndex: waitingQueuePlaylist.songCount-1, to: to.index + waitingQueueOffsetIsWaitingQueuePlaying)
             removeItemFromPlaylist(at: offsetToNext+from.index)
         }

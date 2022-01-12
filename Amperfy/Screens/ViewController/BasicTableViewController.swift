@@ -31,14 +31,16 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
 
 }
 
-typealias WaitingQueueSwipeCallback = (IndexPath) -> Void
+typealias QueueSwipeCallback = (IndexPath, _ completionHandler: @escaping (_ playables: [AbstractPlayable]) -> Void ) -> Void
 
-extension UIViewController {
-    func createInsertNextQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping WaitingQueueSwipeCallback) -> UIContextualAction {
+extension BasicTableViewController {
+    func createInsertNextQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
         let action = UIContextualAction(style: .normal, title: "Insert into Next in Main Queue") { (action, view, completionHandler) in
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
-            actionCallback(indexPath)
+            actionCallback(indexPath) { playables in
+                self.appDelegate.player.insertAsNextSongNoPlay(playables: playables)
+            }
             completionHandler(true)
         }
         action.backgroundColor = .systemBlue
@@ -46,11 +48,13 @@ extension UIViewController {
         return action
     }
     
-    func createInsertWaitingQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping WaitingQueueSwipeCallback) -> UIContextualAction {
+    func createInsertWaitingQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
         let action = UIContextualAction(style: .normal, title: "Insert into Next in Waiting Queue") { (action, view, completionHandler) in
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.impactOccurred()
-            actionCallback(indexPath)
+            actionCallback(indexPath) { playables in
+                self.appDelegate.player.addToWaitingQueueFirst(playables: playables)
+            }
             completionHandler(true)
         }
         action.backgroundColor = .systemOrange
@@ -58,11 +62,13 @@ extension UIViewController {
         return action
     }
     
-    func createAppendNextQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping WaitingQueueSwipeCallback) -> UIContextualAction {
+    func createAppendNextQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
         let action = UIContextualAction(style: .normal, title: "Append to Next in Main Queue") { (action, view, completionHandler) in
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
-            actionCallback(indexPath)
+            actionCallback(indexPath) { playables in
+                self.appDelegate.player.addToPlaylist(playables: playables)
+            }
             completionHandler(true)
         }
         action.backgroundColor = .systemBlue
@@ -70,11 +76,13 @@ extension UIViewController {
         return action
     }
     
-    func createAppendWaitingQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping WaitingQueueSwipeCallback) -> UIContextualAction {
+    func createAppendWaitingQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
         let action = UIContextualAction(style: .normal, title: "Append to Next in Waiting Queue") { (action, view, completionHandler) in
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.impactOccurred()
-            actionCallback(indexPath)
+            actionCallback(indexPath) { playables in
+                self.appDelegate.player.addToWaitingQueueLast(playables: playables)
+            }
             completionHandler(true)
         }
         action.backgroundColor = .systemOrange
@@ -94,10 +102,7 @@ class BasicTableViewController: UITableViewController {
     var rowsToInsert = [IndexPath]()
     var rowsToDelete = [IndexPath]()
     var rowsToUpdate = [IndexPath]()
-    var waitingQueueInsertSwipeCallback: WaitingQueueSwipeCallback?
-    var waitingQueueAppendSwipeCallback: WaitingQueueSwipeCallback?
-    var nextQueueInsertSwipeCallback: WaitingQueueSwipeCallback?
-    var nextQueueAppendSwipeCallback: WaitingQueueSwipeCallback?
+    var swipeCallback: QueueSwipeCallback?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -116,19 +121,17 @@ class BasicTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let waitingCB = waitingQueueInsertSwipeCallback else { return nil }
-        guard let nextCB = nextQueueInsertSwipeCallback else { return nil }
+        guard let swipeCB = swipeCallback else { return nil }
         return UISwipeActionsConfiguration(actions: [
-            createInsertNextQueueSwipeAction(indexPath: indexPath, actionCallback: nextCB),
-            createInsertWaitingQueueSwipeAction(indexPath: indexPath, actionCallback: waitingCB)
+            createInsertNextQueueSwipeAction(indexPath: indexPath, actionCallback: swipeCB),
+            createInsertWaitingQueueSwipeAction(indexPath: indexPath, actionCallback: swipeCB)
         ])
     }
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let waitingCB = waitingQueueAppendSwipeCallback else { return nil }
-        guard let nextCB = nextQueueAppendSwipeCallback else { return nil }
+        guard let swipeCB = swipeCallback else { return nil }
         return UISwipeActionsConfiguration(actions: [
-            createAppendNextQueueSwipeAction(indexPath: indexPath, actionCallback: nextCB),
-            createAppendWaitingQueueSwipeAction(indexPath: indexPath, actionCallback: waitingCB)
+            createAppendNextQueueSwipeAction(indexPath: indexPath, actionCallback: swipeCB),
+            createAppendWaitingQueueSwipeAction(indexPath: indexPath, actionCallback: swipeCB)
         ])
     }
 

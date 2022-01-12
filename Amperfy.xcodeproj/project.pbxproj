@@ -118,6 +118,7 @@
 		50675E6D25F61164005737FD /* BasicTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50675E6C25F61163005737FD /* BasicTableCell.swift */; };
 		5067E372278C1DCA00807A78 /* album_multidisc_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5067E371278C1DC900807A78 /* album_multidisc_example_1.xml */; };
 		5067E374278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5067E373278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift */; };
+		5067E376278EB2D900807A78 /* BasicTableViewFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5067E375278EB2D900807A78 /* BasicTableViewFetcher.swift */; };
 		5068D38026A85C2D0006710D /* DownloadError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5068D37F26A85C2D0006710D /* DownloadError.swift */; };
 		506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */; };
 		506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */; };
@@ -482,6 +483,7 @@
 		50675E6C25F61163005737FD /* BasicTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableCell.swift; sourceTree = "<group>"; };
 		5067E371278C1DC900807A78 /* album_multidisc_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = album_multidisc_example_1.xml; sourceTree = "<group>"; };
 		5067E373278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumMultidiscExample1ParserTest.swift; sourceTree = "<group>"; };
+		5067E375278EB2D900807A78 /* BasicTableViewFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableViewFetcher.swift; sourceTree = "<group>"; };
 		5068D37F26A85C2D0006710D /* DownloadError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadError.swift; sourceTree = "<group>"; };
 		506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v2.xcdatamodel"; sourceTree = "<group>"; };
 		506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsServerVC.swift; sourceTree = "<group>"; };
@@ -1126,6 +1128,7 @@
 			children = (
 				50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */,
 				50120A2426281C1900B037B1 /* BasicTableViewController.swift */,
+				5067E375278EB2D900807A78 /* BasicTableViewFetcher.swift */,
 				50DEEE03265E25A40073FF20 /* MusicFoldersVC.swift */,
 				50DEEE09265E392C0073FF20 /* IndexesVC.swift */,
 				50DEEE0B265E3F9D0073FF20 /* DirectoriesVC.swift */,
@@ -1141,6 +1144,7 @@
 				5007CE4021EF5F4300BC5CBA /* PlaylistsVC.swift */,
 				5007CE4621EF6A8E00BC5CBA /* PlaylistDetailVC.swift */,
 				50065EB321F0584D0066FC32 /* PlaylistSelectorVC.swift */,
+				50C16C0521E241B200F086F0 /* SearchVC.swift */,
 				5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */,
 				5077F935221E6D0E0099CA91 /* DownloadsVC.swift */,
 				5077F93D222489510099CA91 /* SettingsVC.swift */,
@@ -1151,7 +1155,6 @@
 				5020BD2625DC0A8100CDD37A /* SettingsSongActionOnTabVC.swift */,
 				50CDF20D264BEF5500F83EF6 /* EventLogVC.swift */,
 				500ECAE322B26B9500A3CF84 /* LicenseVC.swift */,
-				50C16C0521E241B200F086F0 /* SearchVC.swift */,
 				50C16C1F21E7A37000F086F0 /* Segues.swift */,
 				508385E921C5965B00C4BB32 /* LoginVC.swift */,
 				50BA930321D10F0000E5901D /* SyncVC.swift */,
@@ -1620,6 +1623,7 @@
 				50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */,
 				501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */,
 				5009863C2208CB650057A1A6 /* OptionsButton.swift in Sources */,
+				5067E376278EB2D900807A78 /* BasicTableViewFetcher.swift in Sources */,
 				501A7D3B2680A9680055A51B /* PodcastParserDelegate.swift in Sources */,
 				507361E72632BAFB005F151D /* GenreTableCell.swift in Sources */,
 				501171362756A8E100B7C08D /* NowPlayingInfoCenterHandler.swift in Sources */,

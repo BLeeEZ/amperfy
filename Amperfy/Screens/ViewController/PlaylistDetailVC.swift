@@ -35,28 +35,10 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
-        waitingQueueInsertSwipeCallback = { (indexPath) in
+        swipeCallback = { (indexPath, completionHandler) in
             let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             if let playable = playlistItem.playable {
-                self.appDelegate.player.addToWaitingQueueFirst(playable: playable)
-            }
-        }
-        nextQueueInsertSwipeCallback = { (indexPath) in
-            let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            if let playable = playlistItem.playable {
-                self.appDelegate.player.insertAsNextSongNoPlay(playable: playable)
-            }
-        }
-        waitingQueueAppendSwipeCallback = { (indexPath) in
-            let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            if let playable = playlistItem.playable {
-                self.appDelegate.player.addToWaitingQueueLast(playable: playable)
-            }
-        }
-        nextQueueAppendSwipeCallback = { (indexPath) in
-            let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            if let playable = playlistItem.playable {
-                self.appDelegate.player.addToPlaylist(playable: playable)
+                completionHandler([playable])
             }
         }
     }
@@ -71,16 +53,8 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         } else {
             navigationItem.rightBarButtonItem = nil
         }
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let playlistAsync = self.playlist.getManagedObject(in: context, library: syncLibrary)
-                syncer.syncDown(playlist: playlistAsync, library: syncLibrary)
-                DispatchQueue.main.async {
-                    self.playlistOperationsView?.refresh()
-                }
-            }
+        self.fetchDetails(of: self.playlist) {
+            self.playlistOperationsView?.refresh()
         }
     }
     

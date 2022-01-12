@@ -120,7 +120,7 @@ class PlayableTableCell: BasicTableCell {
                 self.appDelegate.player.play(playable: playable)
                 }))
                 alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
-                self.appDelegate.player.addToPlaylist(playable: playable)
+                self.appDelegate.player.addToPlaylist(playables: [playable])
             }))
         }
         if playable.isSong && appDelegate.persistentStorage.settings.isOnlineMode {

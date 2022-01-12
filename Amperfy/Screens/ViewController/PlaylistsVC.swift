@@ -22,6 +22,13 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
+        
+        swipeCallback = { (indexPath, completionHandler) in
+            let playlist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            self.fetchDetails(of: playlist) {
+                completionHandler(playlist.playables)
+            }
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

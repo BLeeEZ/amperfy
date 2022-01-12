@@ -27,35 +27,16 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         
-        waitingQueueInsertSwipeCallback = { (indexPath) in
+        swipeCallback = { (indexPath, completionHandler) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.addToWaitingQueueFirst(playable: song)
-        }
-        nextQueueInsertSwipeCallback = { (indexPath) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.insertAsNextSongNoPlay(playable: song)
-        }
-        waitingQueueAppendSwipeCallback = { (indexPath) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.addToWaitingQueueLast(playable: song)
-        }
-        nextQueueAppendSwipeCallback = { (indexPath) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.appDelegate.player.addToPlaylist(playable: song)
+            completionHandler([song])
         }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let library = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.sync(album: self.album, library: library)
-                DispatchQueue.main.async {
-                    self.detailOperationsView?.refresh()
-                }
-            }
+        self.fetchDetails(of: album) {
+            self.detailOperationsView?.refresh()
         }
     }
     

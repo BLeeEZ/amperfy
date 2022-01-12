@@ -21,6 +21,13 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
         navigationItem.rightBarButtonItem = optionsButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
+        
+        swipeCallback = { (indexPath, completionHandler) in
+            let album = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            self.fetchDetails(of: album) {
+                completionHandler(album.playables)
+            }
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
