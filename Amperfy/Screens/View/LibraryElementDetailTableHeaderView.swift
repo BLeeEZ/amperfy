@@ -32,9 +32,9 @@ class LibraryElementDetailTableHeaderView: UIView {
     @IBAction func addAllToPlayNextButtonPressed(_ sender: Any) {
         guard let playableContainer = playableContainer, let player = player else { return }
         if appDelegate.persistentStorage.settings.isOnlineMode {
-            player.addToPlaylist(playables: playableContainer.playables)
+            player.appendToNextInMainQueue(playables: playableContainer.playables)
         } else {
-            player.addToPlaylist(playables: playableContainer.playables.filterCached())
+            player.appendToNextInMainQueue(playables: playableContainer.playables.filterCached())
         }
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)

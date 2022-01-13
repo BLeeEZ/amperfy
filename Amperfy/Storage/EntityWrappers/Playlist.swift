@@ -154,6 +154,20 @@ public class Playlist: PlayableContainable, Identifyable {
         return nextCachedItemIndex(upwardsFrom: beginningAt-1)
     }
     
+    func insert(playables playablesToInsert: [AbstractPlayable], index insertIndex: Int = 0) {
+        let localSortedPlaylistItems = sortedPlaylistItems
+        guard insertIndex <= localSortedPlaylistItems.count && insertIndex >= 0, playablesToInsert.count > 0 else { return }
+        let oldItemsAfterIndex = sortedPlaylistItems[insertIndex...]
+        for localItem in oldItemsAfterIndex {
+            localItem.order += playablesToInsert.count
+        }
+        for (index, playable) in playablesToInsert.enumerated() {
+            createPlaylistItem(for: playable, customOrder: index + insertIndex)
+        }
+        songCount += playablesToInsert.count
+        library.saveContext()
+    }
+
     func append(playable: AbstractPlayable) {
         createPlaylistItem(for: playable)
         songCount += 1
@@ -167,10 +181,10 @@ public class Playlist: PlayableContainable, Identifyable {
         songCount += playablesToAppend.count
         library.saveContext()
     }
-    
-    private func createPlaylistItem(for playable: AbstractPlayable) {
+
+    private func createPlaylistItem(for playable: AbstractPlayable, customOrder: Int? = nil) {
         let playlistItem = library.createPlaylistItem()
-        playlistItem.order = managedObject.items!.count
+        playlistItem.order = customOrder ?? managedObject.items!.count
         playlistItem.playlist = self
         playlistItem.playable = playable
     }

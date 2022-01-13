@@ -91,6 +91,157 @@ class PlaylistTest: XCTestCase {
         }
     }
     
+    func testSongInsertInvalidIndexes() {
+        guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        resetTestPlaylist()
+        testPlaylist.insert(playables: [song1, song2], index: -1)
+        checkTestPlaylistNoChange()
+        testPlaylist.insert(playables: [song1, song2], index: -5)
+        checkTestPlaylistNoChange()
+        testPlaylist.insert(playables: [], index: -1)
+        checkTestPlaylistNoChange()
+        testPlaylist.insert(playables: [], index: -5)
+        checkTestPlaylistNoChange()
+        testPlaylist.insert(playables: [song1, song2], index: 6)
+        checkTestPlaylistNoChange()
+        testPlaylist.insert(playables: [], index: 6)
+        checkTestPlaylistNoChange()
+        testPlaylist.insert(playables: [song1, song2], index: 100)
+        checkTestPlaylistNoChange()
+        testPlaylist.insert(playables: [], index: 100)
+        checkTestPlaylistNoChange()
+    }
+    
+    func testSongInsert() {
+        let playlist = library.createPlaylist()
+        guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
+        guard let song4 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
+        guard let song5 = library.getSong(id: cdHelper.seeder.songs[4].id) else { XCTFail(); return }
+        XCTAssertEqual(playlist.items.count, 0)
+        playlist.insert(playables: [song5])
+        XCTAssertEqual(playlist.items.count, 1)
+        playlist.insert(playables: [song4])
+        XCTAssertEqual(playlist.items.count, 2)
+        playlist.insert(playables: [song1, song2, song3])
+        XCTAssertEqual(playlist.items.count, 5)
+        
+        for (index,entry) in playlist.items.enumerated() {
+            XCTAssertEqual(entry.order, index)
+            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+        }
+    }
+    
+    func testSongInsert1() {
+        let playlist = library.createPlaylist()
+        guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
+        guard let song4 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
+        guard let song5 = library.getSong(id: cdHelper.seeder.songs[4].id) else { XCTFail(); return }
+        XCTAssertEqual(playlist.items.count, 0)
+        playlist.insert(playables: [song5], index: 0)
+        playlist.insert(playables: [song4], index: 0)
+        XCTAssertEqual(playlist.items.count, 2)
+        playlist.insert(playables: [song1, song2, song3], index: 0)
+        XCTAssertEqual(playlist.items.count, 5)
+        
+        for (index,entry) in playlist.items.enumerated() {
+            XCTAssertEqual(entry.order, index)
+            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+        }
+    }
+    
+    func testSongInsertCustomIndex() {
+        let playlist = library.createPlaylist()
+        guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
+        guard let song4 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
+        guard let song5 = library.getSong(id: cdHelper.seeder.songs[4].id) else { XCTFail(); return }
+        playlist.insert(playables: [song5], index: 0)
+        playlist.insert(playables: [song4], index: 0)
+        playlist.insert(playables: [song2], index: 0)
+        playlist.insert(playables: [song1], index: 0)
+        playlist.insert(playables: [song3], index: 2)
+
+        for (index,entry) in playlist.items.enumerated() {
+            XCTAssertEqual(index, entry.order)
+            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+        }
+    }
+    
+    func testSongInsertCustomIndex2() {
+        let playlist = library.createPlaylist()
+        guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
+        guard let song4 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
+        guard let song5 = library.getSong(id: cdHelper.seeder.songs[4].id) else { XCTFail(); return }
+        playlist.insert(playables: [song4], index: 0)
+        playlist.insert(playables: [song3], index: 0)
+        playlist.insert(playables: [song2], index: 0)
+        playlist.insert(playables: [song1], index: 0)
+        playlist.insert(playables: [song5], index: 4)
+
+        for (index,entry) in playlist.items.enumerated() {
+            XCTAssertEqual(index, entry.order)
+            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+        }
+    }
+    
+    func testSongInsertCustomIndex3() {
+        let playlist = library.createPlaylist()
+        guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        playlist.insert(playables: [song1], index: 0)
+        playlist.insert(playables: [song2], index: 1)
+
+        for (index,entry) in playlist.items.enumerated() {
+            XCTAssertEqual(index, entry.order)
+            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+        }
+    }
+    
+    func testSongInsertCustomIndex4() {
+        let playlist = library.createPlaylist()
+        guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
+        guard let song4 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
+        guard let song5 = library.getSong(id: cdHelper.seeder.songs[4].id) else { XCTFail(); return }
+        playlist.insert(playables: [song5], index: 0)
+        playlist.insert(playables: [song1], index: 0)
+        
+        playlist.insert(playables: [song2, song3, song4], index: 1)
+
+        for (index,entry) in playlist.items.enumerated() {
+            XCTAssertEqual(index, entry.order)
+            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+        }
+    }
+
+    func testSongInsertEmpty() {
+        let playlist = library.createPlaylist()
+        guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
+        XCTAssertEqual(playlist.items.count, 0)
+        playlist.insert(playables: [])
+        XCTAssertEqual(playlist.items.count, 0)
+        playlist.insert(playables: [song1, song2, song3])
+        XCTAssertEqual(playlist.items.count, 3)
+        playlist.insert(playables: [])
+        XCTAssertEqual(playlist.items.count, 3)
+        
+        for (index,entry) in playlist.items.enumerated() {
+            XCTAssertEqual(entry.order, index)
+            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+        }
+    }
+    
     func testDefaultPlaylist() {
         XCTAssertTrue(defaultPlaylist.hasCachedPlayables)
         XCTAssertEqual(defaultPlaylist.playables.count, 5)

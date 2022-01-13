@@ -90,8 +90,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                     syncer.requestRandomSongs(playlist: randomSongsPlaylist, count: 100, library: syncLibrary)
                     DispatchQueue.main.async {
                         let playlistMain = randomSongsPlaylist.getManagedObject(in: self.appDelegate.persistentStorage.context, library: self.appDelegate.library)
-                        self.appDelegate.player.clearPlaylist()
-                        self.appDelegate.player.addToPlaylist(playables: playlistMain.playables)
+                        self.appDelegate.player.clearMainQueue()
+                        self.appDelegate.player.appendToNextInMainQueue(playables: playlistMain.playables)
                         self.appDelegate.player.play()
                         self.appDelegate.library.deletePlaylist(playlistMain)
                         self.appDelegate.library.saveContext()

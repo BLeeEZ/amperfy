@@ -20,9 +20,10 @@ protocol PlayerQueuesPersistent {
     var inactivePlaylist: Playlist { get }
     var waitingQueuePlaylist: Playlist { get }
     
-    func addToPlaylist(playables: [AbstractPlayable])
-    func addToWaitingQueueFirst(playables: [AbstractPlayable])
-    func addToWaitingQueueLast(playables: [AbstractPlayable])
+    func insertFirstToNextInMainQueue(playables: [AbstractPlayable])
+    func appendToNextInMainQueue(playables: [AbstractPlayable])
+    func insertFirstToWaitingQueue(playables: [AbstractPlayable])
+    func appendToWaitingQueue(playables: [AbstractPlayable])
     func clearWaitingQueue()
     func clearPlaylistQueues()
     func removeAllItems()
@@ -173,20 +174,22 @@ extension PlayerData: PlayerQueuesPersistent {
         get { return waitingQueuePlaylistInternal }
     }
 
-    func addToPlaylist(playables: [AbstractPlayable]) {
+    func insertFirstToNextInMainQueue(playables: [AbstractPlayable]) {
+        normalPlaylist.insert(playables: playables, index: currentIndex)
+        shuffledPlaylist.insert(playables: playables, index: currentIndex)
+    }
+    
+    func appendToNextInMainQueue(playables: [AbstractPlayable]) {
         normalPlaylist.append(playables: playables)
         shuffledPlaylist.append(playables: playables)
     }
     
-    func addToWaitingQueueFirst(playables: [AbstractPlayable]) {
-        let targetIndex = isWaitingQueuePlaying && waitingQueuePlaylistInternal.songCount > 1 ? 1 : 0
-        for playable in playables.reversed() {
-            waitingQueuePlaylistInternal.append(playable: playable)
-            waitingQueuePlaylistInternal.movePlaylistItem(fromIndex: waitingQueuePlaylistInternal.songCount-1, to: targetIndex)
-        }
+    func insertFirstToWaitingQueue(playables: [AbstractPlayable]) {
+        let targetIndex = isWaitingQueuePlaying && waitingQueuePlaylistInternal.songCount > 0 ? 1 : 0
+        waitingQueuePlaylistInternal.insert(playables: playables, index: targetIndex)
     }
     
-    func addToWaitingQueueLast(playables: [AbstractPlayable]) {
+    func appendToWaitingQueue(playables: [AbstractPlayable]) {
         waitingQueuePlaylistInternal.append(playables: playables)
     }
     

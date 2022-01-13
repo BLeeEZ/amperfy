@@ -66,7 +66,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
 
     @IBAction func playEpisodeButtonPressed(_ sender: Any) {
         guard let episode = self.episode else { return }
-        appDelegate.player.appendToNextQueueAndPlay(playable: episode)
+        appDelegate.player.appendToNextInMainQueueAndPlay(playable: episode)
     }
     
     @IBAction func optionsButtonPressed(_ sender: Any) {
@@ -94,7 +94,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
                     self.appDelegate.player.play(playable: episode)
                 }))
                 alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
-                    self.appDelegate.player.addToPlaylist(playables: [episode])
+                    self.appDelegate.player.appendToNextInMainQueue(playables: [episode])
                 }))
             }
             if episode.isCached {

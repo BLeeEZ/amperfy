@@ -39,7 +39,7 @@ extension BasicTableViewController {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             actionCallback(indexPath) { playables in
-                self.appDelegate.player.insertAsNextSongNoPlay(playables: playables)
+                self.appDelegate.player.insertFirstToNextInMainQueue(playables: playables)
             }
             completionHandler(true)
         }
@@ -53,7 +53,7 @@ extension BasicTableViewController {
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.impactOccurred()
             actionCallback(indexPath) { playables in
-                self.appDelegate.player.addToWaitingQueueFirst(playables: playables)
+                self.appDelegate.player.insertFirstToWaitingQueue(playables: playables)
             }
             completionHandler(true)
         }
@@ -67,7 +67,7 @@ extension BasicTableViewController {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             actionCallback(indexPath) { playables in
-                self.appDelegate.player.addToPlaylist(playables: playables)
+                self.appDelegate.player.appendToNextInMainQueue(playables: playables)
             }
             completionHandler(true)
         }
@@ -81,7 +81,7 @@ extension BasicTableViewController {
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.impactOccurred()
             actionCallback(indexPath) { playables in
-                self.appDelegate.player.addToWaitingQueueLast(playables: playables)
+                self.appDelegate.player.appendToWaitingQueue(playables: playables)
             }
             completionHandler(true)
         }

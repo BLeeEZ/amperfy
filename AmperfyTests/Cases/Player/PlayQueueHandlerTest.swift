@@ -39,7 +39,7 @@ class PlayQueueHandlerTest: XCTestCase {
     func fillPlayerWithSomeSongs() {
         for i in 0...fillCount-1 {
             guard let song = library.getSong(id: cdHelper.seeder.songs[i].id) else { XCTFail(); return }
-            testPlayer.addToPlaylist(playables: [song])
+            testPlayer.appendToNextInMainQueue(playables: [song])
         }
     }
     
@@ -47,7 +47,7 @@ class PlayQueueHandlerTest: XCTestCase {
         fillPlayerWithSomeSongs()
         for i in 0...3 {
             guard let song = library.getSong(id: cdHelper.seeder.songs[fillCount+i].id) else { XCTFail(); return }
-            testPlayer.addToWaitingQueueLast(playables: [song])
+            testPlayer.appendToWaitingQueue(playables: [song])
         }
     }
 
@@ -92,7 +92,7 @@ class PlayQueueHandlerTest: XCTestCase {
     
     func testAddToWaitingQueueToEmptyPlayerStartsPlaying() {
         guard let song = library.getSong(id: cdHelper.seeder.songs[5].id) else { XCTFail(); return }
-        testQueueHandler.addToWaitingQueueFirst(playables: [song])
+        testQueueHandler.insertFirstToWaitingQueue(playables: [song])
         checkCurrentlyPlaying(idToBe: 5)
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
@@ -139,7 +139,7 @@ class PlayQueueHandlerTest: XCTestCase {
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
         checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [5, 6, 7, 8])
-        testPlayer.addToWaitingQueueFirst(playables: [song])
+        testPlayer.insertFirstToWaitingQueue(playables: [song])
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
         checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [1, 5, 6, 7, 8])
@@ -157,7 +157,7 @@ class PlayQueueHandlerTest: XCTestCase {
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
         checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [])
-        testPlayer.addToWaitingQueueFirst(playables: [song])
+        testPlayer.insertFirstToWaitingQueue(playables: [song])
         checkCurrentlyPlaying(idToBe: 2)
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
@@ -172,7 +172,7 @@ class PlayQueueHandlerTest: XCTestCase {
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
         checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [6, 7, 8])
-        testPlayer.addToWaitingQueueFirst(playables: [song])
+        testPlayer.insertFirstToWaitingQueue(playables: [song])
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
         checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [1, 6, 7, 8])
@@ -189,7 +189,7 @@ class PlayQueueHandlerTest: XCTestCase {
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
         checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [])
-        testPlayer.addToWaitingQueueFirst(playables: [song])
+        testPlayer.insertFirstToWaitingQueue(playables: [song])
         checkCurrentlyPlaying(idToBe: 5)
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
@@ -204,7 +204,7 @@ class PlayQueueHandlerTest: XCTestCase {
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
         checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [5, 6, 7, 8])
-        testPlayer.addToWaitingQueueLast(playables: [song])
+        testPlayer.appendToWaitingQueue(playables: [song])
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
         checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [5, 6, 7, 8, 1])
@@ -218,7 +218,7 @@ class PlayQueueHandlerTest: XCTestCase {
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
         checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [6, 7, 8])
-        testPlayer.addToWaitingQueueLast(playables: [song])
+        testPlayer.appendToWaitingQueue(playables: [song])
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
         checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [6, 7, 8, 1])
