@@ -849,6 +849,121 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertEqual(playerData.currentIndex, 2)
     }
     
+    func testPlayer_InsertNextInMainQueue_emptyMainQueue() {
+        testPlayer.clearMainQueue()
+        playerData.currentIndex = 0
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [])
+        testPlayer.insertFirstToNextInMainQueue(playables: [songCached])
+        checkCurrentlyPlaying(idToBe: 4)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [])
+    }
+    
+    func testPlayer_InsertNextInMainQueue_emptyMainQueue_waitingQueuePlaing() {
+        playerData.currentIndex = 0
+        testPlayer.insertFirstToWaitingQueue(playables: [songCached])
+        checkCurrentlyPlaying(idToBe: 4)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [])
+        testPlayer.insertFirstToNextInMainQueue(playables: [songToDownload])
+        checkCurrentlyPlaying(idToBe: 4)
+        XCTAssertEqual(playerData.currentIndex, -1)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [])
+    }
+    
+    func testPlayer_InsertNextInMainQueue_WithWaitingQueuePlaying_nextEmpty() {
+        prepareWithWaitingQueuePlaying()
+        playerData.currentIndex = 2
+        testPlayer.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
+        testPlayer.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [6, 7, 8])
+        testPlayer.insertFirstToNextInMainQueue(playables: [songCached])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [6, 7, 8])
+    }
+    
+    func testPlayer_InsertNextInMainQueue_noWaitingQueuePlaying_nextEmpty() {
+        prepareNoWaitingQueuePlaying()
+        playerData.currentIndex = 2
+        testPlayer.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
+        testPlayer.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [5, 6, 7, 8])
+        testPlayer.insertFirstToNextInMainQueue(playables: [songCached])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [5, 6, 7, 8])
+    }
+
+    func testPlayer_InsertNextInMainQueue_WithWaitingQueuePlaying() {
+        prepareWithWaitingQueuePlaying()
+        playerData.currentIndex = 2
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [6, 7, 8])
+        testPlayer.insertFirstToNextInMainQueue(playables: [songCached])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4, 3, 4])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [6, 7, 8])
+    }
+    
+    func testPlayer_InsertNextInMainQueue_noWaitingQueuePlaying() {
+        prepareNoWaitingQueuePlaying()
+        playerData.currentIndex = 2
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [5, 6, 7, 8])
+        testPlayer.insertFirstToNextInMainQueue(playables: [songCached])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4, 3, 4])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [5, 6, 7, 8])
+    }
+    
+
+    func testPlayer_AppendNextInMainQueue_WithWaitingQueuePlaying() {
+        prepareWithWaitingQueuePlaying()
+        playerData.currentIndex = 2
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [6, 7, 8])
+        testPlayer.appendToNextInMainQueue(playables: [songToDownload])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4, 0])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [6, 7, 8])
+    }
+    
+    func testPlayer_AppendNextInMainQueue_noWaitingQueuePlaying() {
+        prepareNoWaitingQueuePlaying()
+        playerData.currentIndex = 2
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [5, 6, 7, 8])
+        testPlayer.appendToNextInMainQueue(playables: [songToDownload])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4, 0])
+        checkQueueItems(queue: testQueueHandler.waitingQueue, seedIds: [5, 6, 7, 8])
+    }
+    
     func testPlayer_PlayPrev_WithWaitingQueue_noWaitingQueuePlaying() {
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 3

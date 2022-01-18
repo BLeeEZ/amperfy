@@ -175,8 +175,15 @@ extension PlayerData: PlayerQueuesPersistent {
     }
 
     func insertFirstToNextInMainQueue(playables: [AbstractPlayable]) {
-        normalPlaylist.insert(playables: playables, index: currentIndex)
-        shuffledPlaylist.insert(playables: playables, index: currentIndex)
+        var targetIndex = currentIndex+1
+        if normalPlaylist.songCount == 0 {
+            if isWaitingQueuePlaying {
+                currentIndex = -1
+            }
+            targetIndex = 0
+        }
+        normalPlaylist.insert(playables: playables, index: targetIndex)
+        shuffledPlaylist.insert(playables: playables, index: targetIndex)
     }
     
     func appendToNextInMainQueue(playables: [AbstractPlayable]) {
