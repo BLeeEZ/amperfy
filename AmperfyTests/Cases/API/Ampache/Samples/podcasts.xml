@@ -15,7 +15,7 @@
     <art><![CDATA[https://music.com.au/image.php?object_id=1&object_type=podcast&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.jpg]]></art>
     <flag>0</flag>
     <preciserating/>
-    <rating/>
+    <rating>2</rating>
     <averagerating/>
   </podcast>
   <podcast id="2">
@@ -49,7 +49,7 @@
     <art><![CDATA[https://music.com.au/image.php?object_id=5&object_type=podcast&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.jpg?v=2]]></art>
     <flag>0</flag>
     <preciserating/>
-    <rating/>
+    <rating>1</rating>
     <averagerating/>
   </podcast>
 </root>

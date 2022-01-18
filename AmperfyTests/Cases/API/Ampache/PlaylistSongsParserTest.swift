@@ -92,6 +92,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         var song = playlist.playables[0].asSong!
         XCTAssertEqual(song.id, "56")
         XCTAssertEqual(song.title, "Black&BlueSmoke")
+        XCTAssertEqual(song.rating, 4)
         XCTAssertEqual(song.artist?.id, "2")
         XCTAssertEqual(song.artist?.name, "Synthetic")
         XCTAssertEqual(song.album?.id, "2")
@@ -113,6 +114,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         song = playlist.playables[1].asSong!
         XCTAssertEqual(song.id, "107")
         XCTAssertEqual(song.title, "Arrest Me")
+        XCTAssertEqual(song.rating, 1)
         XCTAssertEqual(song.artist?.id, "20")
         XCTAssertEqual(song.artist?.name, "R/B")
         XCTAssertEqual(song.album?.id, "12")
@@ -134,6 +136,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         song = playlist.playables[2].asSong!
         XCTAssertEqual(song.id, "115")
         XCTAssertEqual(song.title, "Are we going Crazy")
+        XCTAssertEqual(song.rating, 0)
         XCTAssertEqual(song.artist?.id, "27")
         XCTAssertEqual(song.artist?.name, "Chi.Otic")
         XCTAssertEqual(song.album?.id, "12")

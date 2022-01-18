@@ -38,6 +38,9 @@ class PlayerView: UIView {
     private var rootView: PopupPlayerVC?
     private var displayStyle: PlayerDisplayStyle!
     
+    @IBOutlet weak var ratingPlaceholderView: UIView!
+    @IBOutlet weak var ratingView: RatingView?
+    
     @IBOutlet weak var titleCompactLabel: MarqueeLabel!
     @IBOutlet weak var titleCompactButton: UIButton!
     @IBOutlet weak var titleLargeLabel: MarqueeLabel!
@@ -66,6 +69,7 @@ class PlayerView: UIView {
     @IBOutlet weak var infoLargeToProgressDistanceConstraint: NSLayoutConstraint!
     private var artworkXPositionConstraint: NSLayoutConstraint?
     @IBOutlet weak var timeSliderToArtworkDistanceConstraint: NSLayoutConstraint!
+    @IBOutlet weak var ratingToBottomControlDistanceConstraint: NSLayoutConstraint!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -78,6 +82,11 @@ class PlayerView: UIView {
     
     func prepare(toWorkOnRootView: PopupPlayerVC? ) {
         self.rootView = toWorkOnRootView
+        if let ratingView = ViewBuilder<RatingView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: ratingPlaceholderView.bounds.size.width, height: RatingView.frameHeight)) {
+            self.ratingView = ratingView
+            ratingPlaceholderView.addSubview(ratingView)
+        }
+        ratingPlaceholderView.backgroundColor = .clear
         refreshPlayer()
     }
     
@@ -225,6 +234,8 @@ class PlayerView: UIView {
         self.artworkXPositionConstraint?.isActive = true
     
         UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut, animations: ({
+            self.ratingPlaceholderView.alpha = 0
+            self.ratingPlaceholderView.isHidden = true
             self.titleCompactLabel.alpha = 1
             self.titleCompactButton.isHidden = false
             self.titleLargeLabel.alpha = 0
@@ -259,6 +270,8 @@ class PlayerView: UIView {
         elementsBelowArtworkHeight += artistNameLargeLabel.frame.size.height
         elementsBelowArtworkHeight += playButton.frame.size.height
         elementsBelowArtworkHeight += displayPlaylistButton.frame.size.height
+        elementsBelowArtworkHeight += ratingToBottomControlDistanceConstraint.constant
+        elementsBelowArtworkHeight += ratingPlaceholderView.frame.size.height
         
         let planedArtworkHeight = availableRootWidth
         let fullLargeHeight = artworkImage.frame.origin.y + planedArtworkHeight + elementsBelowArtworkHeight +  PlayerView.margin.bottom
@@ -291,6 +304,8 @@ class PlayerView: UIView {
         self.artworkXPositionConstraint?.isActive = true
 
         UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseIn, animations: ({
+            self.ratingPlaceholderView.alpha = 1
+            self.ratingPlaceholderView.isHidden = false
             self.titleCompactLabel.alpha = 0
             self.titleCompactButton.isHidden = true
             self.titleLargeLabel.alpha = 1
@@ -369,6 +384,7 @@ class PlayerView: UIView {
     
     func refreshCurrentlyPlayingInfo() {
         refreshArtwork()
+        refreshRatingInfo()
         if let playableInfo = player.currentlyPlaying {
             titleCompactLabel.text = playableInfo.title
             titleLargeLabel.text = playableInfo.title
@@ -458,6 +474,10 @@ class PlayerView: UIView {
         } else {
             displayPlaylistButton.tintColor = .labelColor
         }
+    }
+    
+    func refreshRatingInfo() {
+        ratingView?.prepare(entity: player.currentlyPlaying)
     }
     
 }

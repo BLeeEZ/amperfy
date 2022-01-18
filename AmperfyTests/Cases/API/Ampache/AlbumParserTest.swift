@@ -32,6 +32,7 @@ class AlbumParserTest: AbstractAmpacheTest {
         var album = albums[0]
         XCTAssertEqual(album.id, "12")
         XCTAssertEqual(album.name, "Buried in Nausea")
+        XCTAssertEqual(album.rating, 2)
         XCTAssertEqual(album.artist?.id, "19")
         XCTAssertEqual(album.artist?.name, "Various Artists")
         XCTAssertEqual(album.year, 2012)
@@ -43,6 +44,7 @@ class AlbumParserTest: AbstractAmpacheTest {
         album = albums[1]
         XCTAssertEqual(album.id, "98")
         XCTAssertEqual(album.name, "Blibb uu")
+        XCTAssertEqual(album.rating, 0)
         XCTAssertEqual(album.artist?.id, "12") // Artist not pre created
         XCTAssertEqual(album.artist?.name, "9958A")
         XCTAssertEqual(album.year, 1974)
@@ -53,6 +55,7 @@ class AlbumParserTest: AbstractAmpacheTest {
         album = albums[2]
         XCTAssertEqual(album.id, "99")
         XCTAssertEqual(album.name, "123 GOo")
+        XCTAssertEqual(album.rating, 0)
         XCTAssertEqual(album.artist?.id, "91")
         XCTAssertEqual(album.artist?.name, "ZZZasdf")
         XCTAssertEqual(album.year, 2002)

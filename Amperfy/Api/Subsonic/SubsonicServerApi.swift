@@ -221,6 +221,11 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
+    func requestSong(parserDelegate: SsXmlParser, id: String) {
+        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getSong", id: id) else { return }
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
     func requestLatestAlbums(parserDelegate: SsXmlParser) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getAlbumList2") else { return }
         urlComp.addQueryItem(name: "type", value: "newest")
@@ -351,6 +356,13 @@ class SubsonicServerApi {
     func requestRecordSongPlay(parserDelegate: SsXmlParser, id: String) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "scrobble") else { return }
         urlComp.addQueryItem(name: "id", value: id)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+
+    func requestSongRating(parserDelegate: SsXmlParser, id: String, rating: Int) {
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "setRating") else { return }
+        urlComp.addQueryItem(name: "id", value: id)
+        urlComp.addQueryItem(name: "rating", value: rating)
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
 

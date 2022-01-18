@@ -8,6 +8,7 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
     var albumBuffer: Album?
     var artistIdToCreate: String?
     var genreIdToCreate: String?
+    var rating: Int = 0
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
@@ -62,8 +63,12 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
             albumBuffer?.name = buffer
 		case "album":
             parsedCount += 1
+            albumBuffer?.rating = rating
+            rating = 0
             parseNotifier?.notifyParsedObject(ofType: .album)
             albumBuffer = nil
+        case "rating":
+            rating = Int(buffer) ?? 0
 		case "year":
             albumBuffer?.year = Int(buffer) ?? 0
         case "songcount":

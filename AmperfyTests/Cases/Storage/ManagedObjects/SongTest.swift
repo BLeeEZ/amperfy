@@ -119,5 +119,24 @@ class SongTest: XCTestCase {
         guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertEqual(songFetched.syncInfo?.id, testWaveId)
     }
+    
+    func testRating() {
+        testSong.rating = -1
+        XCTAssertEqual(testSong.rating, 0)
+        testSong.rating = 5
+        XCTAssertEqual(testSong.rating, 5)
+        testSong.rating = 1
+        XCTAssertEqual(testSong.rating, 1)
+        testSong.rating = 6
+        XCTAssertEqual(testSong.rating, 1)
+        testSong.rating = 0
+        XCTAssertEqual(testSong.rating, 0)
+        testSong.rating = 2
+        XCTAssertEqual(testSong.rating, 2)
+        testSong.rating = -500
+        XCTAssertEqual(testSong.rating, 2)
+        testSong.rating = 500
+        XCTAssertEqual(testSong.rating, 2)
+    }
 
 }

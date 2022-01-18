@@ -66,6 +66,8 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
         case "podcast_episode":
             parsedCount += 1
             playableBuffer = nil
+            episodeBuffer?.rating = rating
+            rating = 0
             if let episode = episodeBuffer {
                 episode.title = episode.title.html2String
                 parsedEpisodes.append(episode)

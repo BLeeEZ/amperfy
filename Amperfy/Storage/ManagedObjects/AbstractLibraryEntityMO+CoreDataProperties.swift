@@ -9,6 +9,7 @@ extension AbstractLibraryEntityMO {
     }
 
     @NSManaged public var id: String
+    @NSManaged public var rating: Int16
     @NSManaged public var artwork: ArtworkMO?
 
 }

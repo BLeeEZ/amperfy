@@ -37,6 +37,7 @@ class SsPlayableParserDelegate: SsXmlLibWithArtworkParser {
             if let disk = attributeDict["discNumber"] {
                 playableBuffer?.disk = disk
             }
+            playableBuffer?.rating = Int(attributeDict["userRating"] ?? "0") ?? 0
             if let coverArtId = attributeDict["coverArt"] {
                 playableBuffer?.artwork = parseArtwork(id: coverArtId)
             }

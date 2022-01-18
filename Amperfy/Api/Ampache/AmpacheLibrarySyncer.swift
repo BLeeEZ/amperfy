@@ -111,6 +111,13 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         library.saveContext()
     }
     
+    func sync(song: Song, library: LibraryStorage) {
+        guard let syncWave = song.syncInfo ?? library.getLatestSyncWave() else { return }
+        let songParser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+        self.ampacheXmlServerApi.requestSongInfo(of: song, parserDelegate: songParser)
+        library.saveContext()
+    }
+    
     func syncMusicFolders(library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
         let catalogParser = CatalogParserDelegate(library: library, syncWave: syncWave)
@@ -306,6 +313,12 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         os_log("Record play: %s", log: log, type: .info, song.displayString)
         let parser = AmpacheXmlParser()
         ampacheXmlServerApi.requestRecordPlay(parserDelegate: parser, song: song)
+    }
+    
+    func setRating(for song: Song, rating: Int) {
+        guard rating >= 0 && rating <= 5 else { return }
+        os_log("Rate %i stars: %s", log: log, type: .info, rating, song.displayString)
+        ampacheXmlServerApi.requestRate(song: song, rating: rating)
     }
     
     func searchArtists(searchText: String, library: LibraryStorage) {

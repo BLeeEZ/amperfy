@@ -29,6 +29,7 @@ class SsArtistParserDelegate: SsXmlLibWithArtworkParser {
             if let attributeCoverArtId = attributeDict["coverArt"] {
                 artistBuffer?.artwork = parseArtwork(id: attributeCoverArtId)
             }
+            artistBuffer?.rating = Int(attributeDict["userRating"] ?? "0") ?? 0
 		}    
     }
     

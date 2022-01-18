@@ -64,6 +64,7 @@ class SongParserTest: AbstractAmpacheTest {
         song = songs[1]
         XCTAssertEqual(song.id, "107")
         XCTAssertEqual(song.title, "Arrest Me")
+        XCTAssertEqual(song.rating, 2)
         XCTAssertEqual(song.artist?.id, "20")
         XCTAssertEqual(song.artist?.name, "R/B")
         XCTAssertEqual(song.album?.id, "12")
@@ -86,6 +87,7 @@ class SongParserTest: AbstractAmpacheTest {
         song = songs[2]
         XCTAssertEqual(song.id, "85")
         XCTAssertEqual(song.title, "Beq Ultra Fat")
+        XCTAssertEqual(song.rating, 1)
         XCTAssertEqual(song.artist?.id, "14")
         XCTAssertEqual(song.artist?.name, "Nofi/found.")
         XCTAssertNil(song.album)
@@ -106,6 +108,7 @@ class SongParserTest: AbstractAmpacheTest {
         song = songs[3]
         XCTAssertEqual(song.id, "56")
         XCTAssertEqual(song.title, "Black&BlueSmoke")
+        XCTAssertEqual(song.rating, 0)
         XCTAssertEqual(song.artist?.id, "2") // Artist not pre created
         XCTAssertEqual(song.artist?.name, "Synthetic")
         XCTAssertEqual(song.album?.id, "2")

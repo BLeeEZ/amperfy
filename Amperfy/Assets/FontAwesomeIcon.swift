@@ -16,11 +16,18 @@ enum FontAwesomeIcon: Int {
     case Podcast = 0xf2ce
     case Ban = 0xf05e
     case Bell = 0xf0f3
+    case Star = 0xf005
     
     var asString: String {
         return String(format: "%C", self.rawValue)
     }
     
+    static var fontNameRegular: String {
+        return "FontAwesome5Free-Regular"
+    }
+    static var fontNameSolid: String {
+        return "FontAwesome5FreeSolid"
+    }
     static var fontName: String {
         return "FontAwesome5FreeSolid"
     }

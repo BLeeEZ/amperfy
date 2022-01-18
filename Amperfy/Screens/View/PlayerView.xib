@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -229,12 +229,20 @@
                         <action selector="optionsPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="GoF-SV-ZGx"/>
                     </connections>
                 </button>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VVf-kL-Ei5">
+                    <rect key="frame" x="0.0" y="318" width="375" height="35"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="35" id="pnm-AN-M7t"/>
+                    </constraints>
+                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="Byk-rx-3Lv" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="09a-HO-3ex"/>
                 <constraint firstItem="pOR-k2-6Vf" firstAttribute="leading" secondItem="zQR-aF-4SD" secondAttribute="trailing" constant="8" placeholder="YES" id="1Tc-Wz-ga6"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="VVf-kL-Ei5" secondAttribute="trailing" id="3V4-FB-e7L"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="3yB-kd-VKC"/>
                 <constraint firstItem="uqN-6M-JGc" firstAttribute="trailing" secondItem="6NT-8n-tg9" secondAttribute="trailing" id="5Qh-JN-9Zn"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="top" secondItem="2Oi-ys-XoJ" secondAttribute="top" id="678-gg-X1u"/>
@@ -245,6 +253,7 @@
                 <constraint firstItem="PZj-JS-NGq" firstAttribute="centerY" secondItem="Byk-rx-3Lv" secondAttribute="centerY" id="8Uv-ea-oRY"/>
                 <constraint firstItem="mhL-mu-zks" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="80" id="9Em-Tj-USw"/>
                 <constraint firstItem="Byk-rx-3Lv" firstAttribute="leading" secondItem="PZj-JS-NGq" secondAttribute="trailing" constant="10.5" id="Ezu-ES-Kc9"/>
+                <constraint firstItem="VVf-kL-Ei5" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="IHy-h6-9bV"/>
                 <constraint firstItem="zQR-aF-4SD" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" placeholder="YES" id="IIW-s1-vo9"/>
                 <constraint firstItem="Fzn-VY-lpT" firstAttribute="leading" secondItem="GST-UH-ejT" secondAttribute="leading" id="KAn-Lo-bQl"/>
                 <constraint firstItem="Fzn-VY-lpT" firstAttribute="top" secondItem="GST-UH-ejT" secondAttribute="top" id="MVj-w8-wYH"/>
@@ -269,6 +278,7 @@
                 <constraint firstItem="Fzn-VY-lpT" firstAttribute="trailing" secondItem="GST-UH-ejT" secondAttribute="trailing" id="bYb-V0-xVg"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="leading" secondItem="pOR-k2-6Vf" secondAttribute="leading" id="c3V-lE-hW9"/>
                 <constraint firstItem="ZVN-JG-VAA" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="d30-WX-xQT"/>
+                <constraint firstItem="VVf-kL-Ei5" firstAttribute="top" secondItem="zaZ-s9-erE" secondAttribute="bottom" constant="15" id="fD8-gR-3On"/>
                 <constraint firstItem="GST-UH-ejT" firstAttribute="leading" secondItem="6NT-8n-tg9" secondAttribute="leading" id="g9V-Mx-b5w"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="top" secondItem="pOR-k2-6Vf" secondAttribute="bottom" constant="12" id="ghg-6R-wWp"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="zQR-aF-4SD" secondAttribute="bottom" constant="18" id="guh-i3-Npn"/>
@@ -303,6 +313,8 @@
                 <outlet property="infoLargeToProgressDistanceConstraint" destination="Qu9-nI-cVh" id="iph-Qw-oog"/>
                 <outlet property="playButton" destination="Byk-rx-3Lv" id="03r-73-6Na"/>
                 <outlet property="playerOptionsControlGroupToPlayDistanceConstraint" destination="Msk-f3-yHP" id="wvO-AW-NHd"/>
+                <outlet property="ratingPlaceholderView" destination="VVf-kL-Ei5" id="cix-bZ-01K"/>
+                <outlet property="ratingToBottomControlDistanceConstraint" destination="fD8-gR-3On" id="nb2-tu-SRk"/>
                 <outlet property="remainingTimeLabel" destination="t1c-hF-UMw" id="hPl-lK-efe"/>
                 <outlet property="repeatButton" destination="zaZ-s9-erE" id="GdF-O9-5q9"/>
                 <outlet property="shuffleButton" destination="mhL-mu-zks" id="GGU-BH-0MG"/>
@@ -318,16 +330,16 @@
     </objects>
     <designables>
         <designable name="6NT-8n-tg9">
-            <size key="intrinsicContentSize" width="105" height="25.5"/>
+            <size key="intrinsicContentSize" width="110" height="25.5"/>
         </designable>
         <designable name="8F1-fg-8m2">
-            <size key="intrinsicContentSize" width="97.5" height="23"/>
+            <size key="intrinsicContentSize" width="100.5" height="23"/>
         </designable>
         <designable name="GST-UH-ejT">
-            <size key="intrinsicContentSize" width="97.5" height="23"/>
+            <size key="intrinsicContentSize" width="100.5" height="23"/>
         </designable>
         <designable name="pOR-k2-6Vf">
-            <size key="intrinsicContentSize" width="105" height="25.5"/>
+            <size key="intrinsicContentSize" width="110" height="25.5"/>
         </designable>
     </designables>
     <resources>
@@ -335,6 +347,9 @@
         <image name="playlist" width="30" height="30"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

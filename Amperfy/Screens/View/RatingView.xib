@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Font Awesome 5 Free-Solid-900.otf">
+            <string>FontAwesome5FreeSolid</string>
+        </array>
+        <array key="fa-regular-400.ttf">
+            <string>FontAwesome5Free-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="RatingView" customModule="Amperfy" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oop-3d-nRF">
+                    <rect key="frame" x="70" y="0.0" width="35" height="35"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="oop-3d-nRF" secondAttribute="height" multiplier="1:1" id="cVZ-O1-lJx"/>
+                        <constraint firstAttribute="height" constant="35" id="qMu-PO-OiK"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="30"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="">
+                        <color key="titleColor" systemColor="systemYellowColor"/>
+                    </state>
+                    <state key="disabled" title=""/>
+                    <connections>
+                        <action selector="starOnePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="jqo-R2-KfF"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fTR-Ir-ipe">
+                    <rect key="frame" x="120" y="0.0" width="35" height="35"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="fTR-Ir-ipe" secondAttribute="height" multiplier="1:1" id="AU9-HY-mys"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="30"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="">
+                        <color key="titleColor" systemColor="systemYellowColor"/>
+                    </state>
+                    <connections>
+                        <action selector="starTwoPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="cXi-Ui-bGV"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kEG-NR-Hko">
+                    <rect key="frame" x="170" y="0.0" width="35" height="35"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="kEG-NR-Hko" secondAttribute="height" multiplier="1:1" id="LUd-RG-nwL"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="30"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="">
+                        <color key="titleColor" systemColor="systemYellowColor"/>
+                    </state>
+                    <connections>
+                        <action selector="starThreePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="NTb-vK-AmH"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3yu-2O-3Ep">
+                    <rect key="frame" x="220" y="0.0" width="35" height="35"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="3yu-2O-3Ep" secondAttribute="height" multiplier="1:1" id="jzJ-lG-Rch"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="FontAwesome5Free-Regular" family="Font Awesome 5 Free" pointSize="30"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="">
+                        <color key="titleColor" systemColor="systemYellowColor"/>
+                    </state>
+                    <connections>
+                        <action selector="starFourPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="wKD-IN-bwG"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YaS-fz-MO5">
+                    <rect key="frame" x="270" y="0.0" width="35" height="35"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="YaS-fz-MO5" secondAttribute="height" multiplier="1:1" id="gN3-dS-2Wn"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="FontAwesome5Free-Regular" family="Font Awesome 5 Free" pointSize="30"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="">
+                        <color key="titleColor" systemColor="systemYellowColor"/>
+                    </state>
+                    <connections>
+                        <action selector="starFivePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="j9T-eQ-95K"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B9d-6B-Biq">
+                    <rect key="frame" x="0.0" y="-3.5" width="70" height="42"/>
+                    <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="30"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="">
+                        <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </state>
+                    <connections>
+                        <action selector="clearRatingPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="UuQ-VG-Crj"/>
+                    </connections>
+                </button>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <constraints>
+                <constraint firstItem="fTR-Ir-ipe" firstAttribute="leading" secondItem="oop-3d-nRF" secondAttribute="trailing" constant="15" id="87B-Dq-5EO"/>
+                <constraint firstItem="fTR-Ir-ipe" firstAttribute="height" secondItem="oop-3d-nRF" secondAttribute="height" id="Fnc-W8-R5y"/>
+                <constraint firstItem="kEG-NR-Hko" firstAttribute="centerY" secondItem="oop-3d-nRF" secondAttribute="centerY" id="HY3-uW-k0d"/>
+                <constraint firstItem="fTR-Ir-ipe" firstAttribute="centerY" secondItem="oop-3d-nRF" secondAttribute="centerY" id="Ha2-zb-SMP"/>
+                <constraint firstItem="oop-3d-nRF" firstAttribute="leading" secondItem="B9d-6B-Biq" secondAttribute="trailing" id="Qhv-Mq-Sql"/>
+                <constraint firstItem="YaS-fz-MO5" firstAttribute="height" secondItem="oop-3d-nRF" secondAttribute="height" id="S1m-Ts-HWq"/>
+                <constraint firstItem="3yu-2O-3Ep" firstAttribute="centerY" secondItem="oop-3d-nRF" secondAttribute="centerY" id="SX1-eK-f9e"/>
+                <constraint firstItem="oop-3d-nRF" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="Ubo-MD-GNl"/>
+                <constraint firstItem="kEG-NR-Hko" firstAttribute="leading" secondItem="fTR-Ir-ipe" secondAttribute="trailing" constant="15" id="XDV-vA-aMd"/>
+                <constraint firstItem="B9d-6B-Biq" firstAttribute="left" secondItem="iN0-l3-epB" secondAttribute="left" id="XIj-fw-qvt"/>
+                <constraint firstItem="3yu-2O-3Ep" firstAttribute="leading" secondItem="kEG-NR-Hko" secondAttribute="trailing" constant="15" id="bDh-Ce-ITW"/>
+                <constraint firstItem="B9d-6B-Biq" firstAttribute="centerY" secondItem="oop-3d-nRF" secondAttribute="centerY" id="cWG-BM-bYS"/>
+                <constraint firstItem="kEG-NR-Hko" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="dfe-zg-kbS"/>
+                <constraint firstItem="YaS-fz-MO5" firstAttribute="centerY" secondItem="oop-3d-nRF" secondAttribute="centerY" id="dgo-yC-Mld"/>
+                <constraint firstItem="YaS-fz-MO5" firstAttribute="leading" secondItem="3yu-2O-3Ep" secondAttribute="trailing" constant="15" id="jM3-f1-1tU"/>
+                <constraint firstItem="kEG-NR-Hko" firstAttribute="height" secondItem="oop-3d-nRF" secondAttribute="height" id="qdv-2P-6Ml"/>
+                <constraint firstItem="3yu-2O-3Ep" firstAttribute="height" secondItem="oop-3d-nRF" secondAttribute="height" id="tBq-s5-eLn"/>
+            </constraints>
+            <connections>
+                <outlet property="clearRatingButton" destination="B9d-6B-Biq" id="ohj-3M-fXb"/>
+                <outlet property="starFive" destination="YaS-fz-MO5" id="1I4-gb-mcy"/>
+                <outlet property="starFour" destination="3yu-2O-3Ep" id="fff-so-MDt"/>
+                <outlet property="starOne" destination="oop-3d-nRF" id="hnE-5b-WdR"/>
+                <outlet property="starThree" destination="kEG-NR-Hko" id="04e-ve-IW1"/>
+                <outlet property="starTwo" destination="fTR-Ir-ipe" id="82g-NR-Mk8"/>
+            </connections>
+            <point key="canvasLocation" x="132" y="129"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="systemYellowColor">
+            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

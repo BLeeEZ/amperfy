@@ -29,6 +29,7 @@ protocol LibrarySyncer {
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?)
     func sync(artist: Artist, library: LibraryStorage)
     func sync(album: Album, library: LibraryStorage)
+    func sync(song: Song, library: LibraryStorage)
     func syncLatestLibraryElements(library: LibraryStorage)
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage)
     func syncDown(playlist: Playlist, library: LibraryStorage)
@@ -47,6 +48,7 @@ protocol LibrarySyncer {
     func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage)
     func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode)
     func recordPlay(song: Song)
+    func setRating(for song: Song, rating: Int)
 }
 
 protocol AbstractBackgroundLibrarySyncer {

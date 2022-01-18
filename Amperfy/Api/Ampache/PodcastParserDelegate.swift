@@ -7,6 +7,7 @@ class PodcastParserDelegate: AmpacheXmlLibParser {
     
     var parsedPodcasts: Set<Podcast>
     private var podcastBuffer: Podcast?
+    var rating: Int = 0
 
     override init(library: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
         parsedPodcasts = Set<Podcast>()
@@ -40,9 +41,13 @@ class PodcastParserDelegate: AmpacheXmlLibParser {
             podcastBuffer?.title = buffer.html2String
         case "description":
             podcastBuffer?.depiction = buffer.html2String
+        case "rating":
+            rating = Int(buffer) ?? 0
         case "art":
             podcastBuffer?.artwork = parseArtwork(urlString: buffer)
         case "podcast":
+            podcastBuffer?.rating = rating
+            rating = 0
             if let parsedPodcast = podcastBuffer {
                 parsedPodcasts.insert(parsedPodcast)
             }

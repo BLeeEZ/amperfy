@@ -5,9 +5,9 @@
     <artists ignoredArticles="The El La Los Las Le Les">
         <index name="A">
             <artist id="5449" name="A-Ha" coverArt="ar-5449" albumCount="4"/>
-            <artist id="5421" name="ABBA" coverArt="ar-5421" albumCount="6"/>
+            <artist id="5421" name="ABBA" coverArt="ar-5421" albumCount="6" userRating="3"/>
             <artist id="5432" name="AC/DC" coverArt="ar-5432" albumCount="15"/>
-            <artist id="6633" name="Aaron Neville" coverArt="ar-6633" albumCount="1"/>
+            <artist id="6633" name="Aaron Neville" coverArt="ar-6633" albumCount="1" userRating="5"/>
         </index>
         <index name="B">
             <artist id="5950" name="Bob Marley" coverArt="ar-5950" albumCount="8"/>

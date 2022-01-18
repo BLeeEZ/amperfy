@@ -6,6 +6,7 @@ import os.log
 class PlayableParserDelegate: AmpacheXmlLibParser {
 
     var playableBuffer: AbstractPlayable?
+    var rating: Int = 0
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
@@ -15,6 +16,8 @@ class PlayableParserDelegate: AmpacheXmlLibParser {
         switch(elementName) {
         case "title":
             playableBuffer?.title = buffer
+        case "rating":
+            rating = Int(buffer) ?? 0
         case "track":
             playableBuffer?.track = Int(buffer) ?? 0
         case "url":

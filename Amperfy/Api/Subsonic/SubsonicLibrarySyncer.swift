@@ -105,6 +105,13 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         library.saveContext()
     }
     
+    func sync(song: Song, library: LibraryStorage) {
+        guard let syncWave = song.syncInfo ?? library.getLatestSyncWave() else { return }
+        let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestSong(parserDelegate: songParser, id: song.id)
+        library.saveContext()
+    }
+    
     func syncLatestLibraryElements(library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
         let oldRecentSongs = Set(library.getRecentSongs())
@@ -243,8 +250,15 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     
     func recordPlay(song: Song) {
         os_log("Record play: %s", log: log, type: .info, song.displayString)
-        let songParser = SsXmlParser()
-        subsonicServerApi.requestRecordSongPlay(parserDelegate: songParser, id: song.id)
+        let parser = SsXmlParser()
+        subsonicServerApi.requestRecordSongPlay(parserDelegate: parser, id: song.id)
+    }
+    
+    func setRating(for song: Song, rating: Int) {
+        guard rating >= 0 && rating <= 5 else { return }
+        os_log("Rate %i stars: %s", log: log, type: .info, rating, song.displayString)
+        let parser = SsXmlParser()
+        subsonicServerApi.requestSongRating(parserDelegate: parser, id: song.id, rating: rating)
     }
     
     func searchArtists(searchText: String, library: LibraryStorage) {

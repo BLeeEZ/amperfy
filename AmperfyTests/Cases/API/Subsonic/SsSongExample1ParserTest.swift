@@ -28,6 +28,7 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
         var song = songs[6]
         XCTAssertEqual(song.id, "71463")
         XCTAssertEqual(song.title, "The Jack")
+        XCTAssertEqual(song.rating, 0)
         XCTAssertEqual(song.artist?.id, "5432")
         XCTAssertEqual(song.artist?.name, "AC/DC")
         XCTAssertEqual(song.album?.id, "11053")
@@ -49,6 +50,7 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
         song = songs[1]
         XCTAssertEqual(song.id, "71458")
         XCTAssertEqual(song.title, "It's A Long Way To The Top")
+        XCTAssertEqual(song.rating, 1)
         XCTAssertEqual(song.artist?.id, "5432")
         XCTAssertEqual(song.artist?.name, "AC/DC")
         XCTAssertEqual(song.album?.id, "11053")
@@ -70,6 +72,7 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
         
         song = songs[5]
         XCTAssertEqual(song.id, "71462")
+        XCTAssertEqual(song.rating, 5)
         XCTAssertEqual(song.title, "She's Got Balls")
         XCTAssertEqual(song.artist?.id, "5432")
         XCTAssertEqual(song.artist?.name, "AC/DC")

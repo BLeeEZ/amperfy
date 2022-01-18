@@ -90,6 +90,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         var song = playlist.playables[0].asSong!
         XCTAssertEqual(song.id, "657")
         XCTAssertEqual(song.title, "Making Me Nervous")
+        XCTAssertEqual(song.rating, 2)
         XCTAssertEqual(song.artist?.id, "45")
         XCTAssertEqual(song.artist?.name, "Brad Sucks")
         XCTAssertEqual(song.album?.id, "58")
@@ -111,6 +112,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         song = playlist.playables[2].asSong!
         XCTAssertEqual(song.id, "748")
         XCTAssertEqual(song.title, "Stories from Emona II")
+        XCTAssertEqual(song.rating, 0)
         XCTAssertEqual(song.artist?.id, "51") // Artist not pre created
         XCTAssertEqual(song.artist?.name, "Maya Filipič")
         XCTAssertEqual(song.album?.id, "68")
@@ -131,6 +133,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         song = playlist.playables[5].asSong!
         XCTAssertEqual(song.id, "805")
         XCTAssertEqual(song.title, "Bajo siete lunas (intro)")
+        XCTAssertEqual(song.rating, 1)
         XCTAssertEqual(song.artist?.id, "54")
         XCTAssertEqual(song.artist?.name, "PeerGynt Lobogris")
         XCTAssertEqual(song.album?.id, "74") // Album not pre created

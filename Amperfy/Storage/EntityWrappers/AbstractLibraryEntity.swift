@@ -19,6 +19,13 @@ public class AbstractLibraryEntity {
             if managedObject.id != newValue { managedObject.id = newValue }
         }
     }
+    var rating: Int {
+        get { return Int(managedObject.rating) }
+        set {
+            guard Int16.isValid(value: newValue), managedObject.rating != Int16(newValue), newValue >= 0, newValue <= 5 else { return }
+            managedObject.rating = Int16(newValue)
+        }
+    }
     var artwork: Artwork? {
         get {
             guard let artworkMO = managedObject.artwork else { return nil }

@@ -16,6 +16,7 @@ class SsAlbumParserTest: AbstractSsParserTest {
         var album = albums[1]
         XCTAssertEqual(album.id, "11047")
         XCTAssertEqual(album.name, "Back In Black")
+        XCTAssertEqual(album.rating, 1)
         XCTAssertEqual(album.artist?.id, "5432") // Artist not pre created
         XCTAssertEqual(album.artist?.name, "AC/DC")
         XCTAssertEqual(album.year, 0)
@@ -29,6 +30,7 @@ class SsAlbumParserTest: AbstractSsParserTest {
         album = albums[6]
         XCTAssertEqual(album.id, "11052")
         XCTAssertEqual(album.name, "For Those About To Rock")
+        XCTAssertEqual(album.rating, 0)
         XCTAssertEqual(album.artist?.id, "5432")
         XCTAssertEqual(album.artist?.name, "AC/DC")
         XCTAssertEqual(album.year, 0)
@@ -41,6 +43,7 @@ class SsAlbumParserTest: AbstractSsParserTest {
         album = albums[7]
         XCTAssertEqual(album.id, "11053")
         XCTAssertEqual(album.name, "High Voltage")
+        XCTAssertEqual(album.rating, 0)
         XCTAssertEqual(album.artist?.id, "5432")
         XCTAssertEqual(album.artist?.name, "AC/DC")
         XCTAssertEqual(album.year, 0)
@@ -53,6 +56,7 @@ class SsAlbumParserTest: AbstractSsParserTest {
         album = albums[14]
         XCTAssertEqual(album.id, "11061")
         XCTAssertEqual(album.name, "Who Made Who")
+        XCTAssertEqual(album.rating, 5)
         XCTAssertEqual(album.artist?.id, "5432")
         XCTAssertEqual(album.artist?.name, "AC/DC")
         XCTAssertEqual(album.year, 0)
