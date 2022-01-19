@@ -188,7 +188,7 @@ class PlayerView: UIView {
         }
     }
     
-    private func renderAnimation(animationDuration: TimeInterval = defaultAnimationDuration) {
+    func renderAnimation(animationDuration: TimeInterval = defaultAnimationDuration) {
         if displayStyle == .compact {
             rootView?.scrollToNextPlayingRow()
             renderAnimationSwitchToCompact(animationDuration: animationDuration)
@@ -248,7 +248,7 @@ class PlayerView: UIView {
         bottomControlToProgressDistanceConstraint.constant = titleLargeLabel.frame.height + artistNameLargeLabel.frame.height + artistToTitleLargeDistanceConstraint.constant + infoLargeToProgressDistanceConstraint.constant
         playerOptionsControlGroupToPlayDistanceConstraint.constant = CGFloat(0.0)
         
-        let availableRootWidth = rootView.view.frame.size.width - PlayerView.margin.left -  PlayerView.margin.right
+        let availableRootWidth = rootView.frameSizeWithRotationAdjusment.width - PlayerView.margin.left -  PlayerView.margin.right
         let availableRootHeight = rootView.availableFrameHeightForLargePlayer
         
         var elementsBelowArtworkHeight = timeSliderToArtworkDistanceConstraint.constant

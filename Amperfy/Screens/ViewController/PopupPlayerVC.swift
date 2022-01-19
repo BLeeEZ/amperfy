@@ -9,11 +9,12 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     var appDelegate: AppDelegate!
     var player: PlayerFacade!
-    var playerView: PlayerView!
+    var playerView: PlayerView?
     var hostingTabBarVC: TabBarVC?
-    var backgroundColorGradient: PopupAnimatedGradientLayer!
+    var backgroundColorGradient: PopupAnimatedGradientLayer?
     let backgroundGradientDelayTime: UInt32 = 2
     var sectionViews = [PopupPlayerSectionHeader]()
+    var nextViewSizeDueToDeviceRotation: CGSize?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,12 +28,12 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         player = appDelegate.player
         player.addNotifier(notifier: self)
         backgroundColorGradient = PopupAnimatedGradientLayer(view: view)
-        backgroundColorGradient.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
+        backgroundColorGradient?.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
         
         if let createdPlayerView = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: playerPlaceholderView.bounds.size.width, height: playerPlaceholderView.bounds.size.height)) {
             playerView = createdPlayerView
-            playerView.prepare(toWorkOnRootView: self)
-            playerPlaceholderView.addSubview(playerView)
+            createdPlayerView.prepare(toWorkOnRootView: self)
+            playerPlaceholderView.addSubview(createdPlayerView)
         }
         
         tableView.register(nibName: PlayableTableCell.typeName)
@@ -52,7 +53,19 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate.userStatistics.visited(.popupPlayer)
         reloadData()
         adjustConstraintsForCompactPlayer()
-        self.playerView.viewWillAppear(animated)
+        self.playerView?.viewWillAppear(animated)
+    }
+    
+    // Detecet device (iPad) rotation
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        nextViewSizeDueToDeviceRotation = size
+        backgroundColorGradient?.gradientLayer.adjustTo(size: size)
+        playerView?.renderAnimation(animationDuration: TimeInterval(0.0))
+    }
+    
+    override func didRotate(from fromInterfaceOrientation: UIInterfaceOrientation) {
+        nextViewSizeDueToDeviceRotation = nil
     }
 
     func reloadData() {
@@ -69,6 +82,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         var customColor: UIColor?
         let artwork = playable.image
 
+        guard let playerView = playerView else { return }
         if playerView.lastDisplayedPlayable != playable {
             DispatchQueue.global().async {
                 if artwork != Artwork.defaultImage {
@@ -76,11 +90,11 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 }
                 sleep(self.backgroundGradientDelayTime)
                 DispatchQueue.main.async {
-                    if self.playerView.lastDisplayedPlayable == playable {
+                    if playerView.lastDisplayedPlayable == playable {
                         if let customColor = customColor {
-                            self.backgroundColorGradient.changeBackground(style: self.traitCollection.userInterfaceStyle, customColor: customColor)
+                            self.backgroundColorGradient?.changeBackground(style: self.traitCollection.userInterfaceStyle, customColor: customColor)
                         } else {
-                            self.backgroundColorGradient.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
+                            self.backgroundColorGradient?.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
                         }
                     }
                 }
@@ -91,7 +105,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     // handle dark/light mode change
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        backgroundColorGradient.applyStyleChange(traitCollection.userInterfaceStyle)
+        backgroundColorGradient?.applyStyleChange(traitCollection.userInterfaceStyle)
     }
     
     func scrollToNextPlayingRow() {
@@ -106,9 +120,14 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     // MARK: - PopupPlayer frame height animation
     
+    var frameSizeWithRotationAdjusment: CGSize {
+        return nextViewSizeDueToDeviceRotation ?? view.frame.size
+    }
+
     var availableFrameHeightForLargePlayer: CGFloat {
-        let playerOriginPoint = self.playerView.convert(self.playerView.frame.origin, to: self.view)
-        return self.view.frame.size.height - playerOriginPoint.y
+        guard let playerView = playerView else { return 0.0 }
+        let playerOriginPoint = playerView.convert(playerView.frame.origin, to: self.view)
+        return frameSizeWithRotationAdjusment.height - playerOriginPoint.y
     }
     
     func renderAnimationForCompactPlayer(ofHight: CGFloat, animationDuration: TimeInterval) {
@@ -247,7 +266,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate.player.clearWaitingQueue()
         tableView.endUpdates()
         refreshWaitingQueueSectionHeader()
-        playerView.refreshPlayer()
+        playerView?.refreshPlayer()
     }
 
     // Override to support conditional rearranging of the table view.
@@ -286,7 +305,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         alert.addAction(UIAlertAction(title: "Clear Player", style: .default, handler: { _ in
             self.appDelegate.player.clearQueues()
             self.reloadData()
-            self.playerView.refreshPlayer()
+            self.playerView?.refreshPlayer()
         }))
         if !player.waitingQueue.isEmpty {
             alert.addAction(UIAlertAction(title: "Clear Waiting Queue", style: .default, handler: { _ in

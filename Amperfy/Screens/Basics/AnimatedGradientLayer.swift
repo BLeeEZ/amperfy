@@ -19,6 +19,10 @@ class AnimatedGradientLayer {
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
     
+    func adjustTo(size: CGSize) {
+        gradientLayer.frame = CGRect(x: gradientLayer.frame.origin.x, y: gradientLayer.frame.origin.y, width: size.width, height: size.height)
+    }
+    
     func setColors(_ newColors: [CGColor]) {
         if !isAnimated {
             gradientLayer.colors = newColors
