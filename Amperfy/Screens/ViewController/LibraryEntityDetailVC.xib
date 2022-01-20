@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="ipad7_9" orientation="portrait" layout="fullscreen" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="LibraryEntityDetailVC" customModule="Amperfy" customModuleProvider="target">
+            <connections>
+                <outlet property="addToPlaylistButton" destination="QhC-Il-SGI" id="7eP-Ge-A8h"/>
+                <outlet property="albumLabel" destination="91a-FO-77z" id="TXB-dU-Xvq"/>
+                <outlet property="artistLabel" destination="nTF-ts-4gP" id="Xxx-Zu-aO8"/>
+                <outlet property="artworkImage" destination="wrZ-NE-prP" id="fuv-rL-GXZ"/>
+                <outlet property="cancelButton" destination="jma-L5-peG" id="vQN-gZ-0h4"/>
+                <outlet property="handleCacheButton" destination="XcM-qv-zHW" id="4Vx-rZ-Hsz"/>
+                <outlet property="infoLabel" destination="fUI-xV-Cyd" id="1bT-eh-Ick"/>
+                <outlet property="mainNextAppendButton" destination="cvP-d9-XH3" id="WVV-eY-aV6"/>
+                <outlet property="mainNextInsertButton" destination="kjv-5v-4aM" id="maa-mS-ha7"/>
+                <outlet property="playButton" destination="XDf-oc-z0s" id="IAJ-69-QUw"/>
+                <outlet property="ratingPlaceholderView" destination="Ms2-ug-0W5" id="aGe-eH-y39"/>
+                <outlet property="showAlbumButton" destination="AeI-2x-Stq" id="G9k-St-EVA"/>
+                <outlet property="showArtistButton" destination="RYw-hT-MnF" id="rqs-ew-lyG"/>
+                <outlet property="titleLabel" destination="KnP-8k-7qE" id="4FX-nq-vVd"/>
+                <outlet property="view" destination="wqe-oZ-YvP" id="ILu-un-vFS"/>
+                <outlet property="waitingQueueAppendButton" destination="op5-Jc-HYB" id="iVj-kc-SZj"/>
+                <outlet property="waitingQueueInsertButton" destination="ccE-KC-Sa9" id="FUW-Ut-pcq"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="wqe-oZ-YvP">
+            <rect key="frame" x="0.0" y="0.0" width="744" height="1133"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Z3t-pV-Lbw">
+                    <rect key="frame" x="20" y="40" width="704" height="1057"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="J91-VR-QdL">
+                            <rect key="frame" x="0.0" y="0.0" width="704" height="724"/>
+                            <subviews>
+                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wrZ-NE-prP" userLabel="Artwork" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
+                                    <rect key="frame" x="40" y="0.0" width="624" height="624"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="wrZ-NE-prP" secondAttribute="height" multiplier="1:1" id="B0C-cv-xrn"/>
+                                    </constraints>
+                                </imageView>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7yG-AI-SV8">
+                                    <rect key="frame" x="258" y="634" width="188" height="90"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KnP-8k-7qE" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="76" y="2" width="36.5" height="24"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="24" id="WQo-dQ-sra"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="trailingBuffer">
+                                                    <real key="value" value="30"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nTF-ts-4gP" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="76.5" y="28" width="35.5" height="20"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="20" id="fBa-4V-jjb"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                            <nil key="highlightedColor"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="trailingBuffer">
+                                                    <real key="value" value="30"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Album" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="91a-FO-77z" userLabel="Album" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="73.5" y="50" width="41.5" height="20"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="20" id="vcP-wu-wk4"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                            <nil key="highlightedColor"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="trailingBuffer">
+                                                    <real key="value" value="30"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </label>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RYw-hT-MnF" userLabel="ShowArtistButton" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="76.5" y="28" width="35.5" height="20"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                            <connections>
+                                                <action selector="pressedShowArtist:" destination="-1" eventType="touchUpInside" id="Z6n-KS-HUQ"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AeI-2x-Stq" userLabel="ShowAlbumButton" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="73.5" y="50" width="41.5" height="20"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                            <connections>
+                                                <action selector="pressedShowAlbum:" destination="-1" eventType="touchUpInside" id="fST-xC-D8l"/>
+                                            </connections>
+                                        </button>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fUI-xV-Cyd" userLabel="Info" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="82" y="72" width="24.5" height="20"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="20" id="fqZ-9I-3rG"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                            <nil key="highlightedColor"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="trailingBuffer">
+                                                    <real key="value" value="30"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </label>
+                                    </subviews>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                    <constraints>
+                                        <constraint firstItem="KnP-8k-7qE" firstAttribute="top" secondItem="7yG-AI-SV8" secondAttribute="top" constant="2" id="0sb-zJ-Plm"/>
+                                        <constraint firstItem="KnP-8k-7qE" firstAttribute="centerX" secondItem="7yG-AI-SV8" secondAttribute="centerX" id="12X-gz-A40"/>
+                                        <constraint firstItem="RYw-hT-MnF" firstAttribute="bottom" secondItem="nTF-ts-4gP" secondAttribute="bottom" id="53V-5U-xG7"/>
+                                        <constraint firstAttribute="trailing" secondItem="KnP-8k-7qE" secondAttribute="trailing" id="5qq-zt-0ql"/>
+                                        <constraint firstItem="nTF-ts-4gP" firstAttribute="top" secondItem="KnP-8k-7qE" secondAttribute="bottom" constant="2" id="7VC-3j-fpq"/>
+                                        <constraint firstItem="fUI-xV-Cyd" firstAttribute="leading" secondItem="KnP-8k-7qE" secondAttribute="leading" id="ATs-I3-iaR"/>
+                                        <constraint firstItem="nTF-ts-4gP" firstAttribute="leading" secondItem="KnP-8k-7qE" secondAttribute="leading" id="I7E-BQ-qCB"/>
+                                        <constraint firstItem="AeI-2x-Stq" firstAttribute="top" secondItem="91a-FO-77z" secondAttribute="top" id="Iyi-6g-VBW"/>
+                                        <constraint firstItem="AeI-2x-Stq" firstAttribute="bottom" secondItem="91a-FO-77z" secondAttribute="bottom" id="Jur-VQ-VMb"/>
+                                        <constraint firstItem="KnP-8k-7qE" firstAttribute="leading" secondItem="7yG-AI-SV8" secondAttribute="leading" id="Low-Zp-7Gb"/>
+                                        <constraint firstItem="91a-FO-77z" firstAttribute="trailing" secondItem="KnP-8k-7qE" secondAttribute="trailing" id="SsA-Jv-Ehz"/>
+                                        <constraint firstItem="fUI-xV-Cyd" firstAttribute="trailing" secondItem="KnP-8k-7qE" secondAttribute="trailing" id="XZ6-sd-FNf"/>
+                                        <constraint firstItem="AeI-2x-Stq" firstAttribute="leading" secondItem="91a-FO-77z" secondAttribute="leading" id="Xoj-I6-Fu3"/>
+                                        <constraint firstItem="91a-FO-77z" firstAttribute="centerX" secondItem="7yG-AI-SV8" secondAttribute="centerX" id="aQa-mr-V4C"/>
+                                        <constraint firstItem="nTF-ts-4gP" firstAttribute="trailing" secondItem="KnP-8k-7qE" secondAttribute="trailing" id="ba6-zE-clg"/>
+                                        <constraint firstItem="RYw-hT-MnF" firstAttribute="trailing" secondItem="nTF-ts-4gP" secondAttribute="trailing" id="eUQ-EQ-Rpv"/>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="170" id="eyt-rg-ejG"/>
+                                        <constraint firstItem="fUI-xV-Cyd" firstAttribute="top" secondItem="91a-FO-77z" secondAttribute="bottom" constant="2" id="fZa-4O-ura"/>
+                                        <constraint firstAttribute="height" constant="90" id="ft1-Xj-zQi"/>
+                                        <constraint firstItem="fUI-xV-Cyd" firstAttribute="centerX" secondItem="7yG-AI-SV8" secondAttribute="centerX" id="gci-Cb-QWo"/>
+                                        <constraint firstItem="91a-FO-77z" firstAttribute="leading" secondItem="KnP-8k-7qE" secondAttribute="leading" id="gpb-uc-4bx"/>
+                                        <constraint firstItem="91a-FO-77z" firstAttribute="top" secondItem="nTF-ts-4gP" secondAttribute="bottom" constant="2" id="h11-r4-jf7"/>
+                                        <constraint firstItem="RYw-hT-MnF" firstAttribute="leading" secondItem="nTF-ts-4gP" secondAttribute="leading" id="kAp-cx-Ozl"/>
+                                        <constraint firstItem="RYw-hT-MnF" firstAttribute="top" secondItem="nTF-ts-4gP" secondAttribute="top" id="tO1-xS-Rzb"/>
+                                        <constraint firstItem="nTF-ts-4gP" firstAttribute="centerX" secondItem="7yG-AI-SV8" secondAttribute="centerX" id="uDK-05-n7D"/>
+                                        <constraint firstItem="AeI-2x-Stq" firstAttribute="trailing" secondItem="91a-FO-77z" secondAttribute="trailing" id="vBP-8l-hyf"/>
+                                    </constraints>
+                                    <variation key="default">
+                                        <mask key="constraints">
+                                            <exclude reference="12X-gz-A40"/>
+                                        </mask>
+                                    </variation>
+                                    <variation key="heightClass=regular-widthClass=regular">
+                                        <mask key="constraints">
+                                            <include reference="12X-gz-A40"/>
+                                            <exclude reference="5qq-zt-0ql"/>
+                                            <exclude reference="Low-Zp-7Gb"/>
+                                            <exclude reference="I7E-BQ-qCB"/>
+                                            <exclude reference="ba6-zE-clg"/>
+                                            <include reference="uDK-05-n7D"/>
+                                            <exclude reference="SsA-Jv-Ehz"/>
+                                            <include reference="aQa-mr-V4C"/>
+                                            <exclude reference="gpb-uc-4bx"/>
+                                            <exclude reference="ATs-I3-iaR"/>
+                                            <exclude reference="XZ6-sd-FNf"/>
+                                            <include reference="gci-Cb-QWo"/>
+                                        </mask>
+                                    </variation>
+                                </view>
+                            </subviews>
+                            <variation key="heightClass=regular-widthClass=regular" alignment="center" axis="vertical"/>
+                        </stackView>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ms2-ug-0W5" userLabel="RatingPlaceholder">
+                            <rect key="frame" x="0.0" y="732" width="704" height="35"/>
+                            <color key="backgroundColor" systemColor="systemYellowColor"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="35" id="0f6-ht-NEA"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CHO-IQ-iDP">
+                            <rect key="frame" x="0.0" y="775" width="704" height="90"/>
+                            <subviews>
+                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="0rd-B5-V1p" userLabel="WaitingQueueStackView">
+                                    <rect key="frame" x="0.0" y="0.0" width="704" height="40"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ccE-KC-Sa9" userLabel="WaitingQueueInsert" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="0.0" y="0.0" width="347" height="40"/>
+                                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                                            <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <inset key="imageEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Insert Waiting Queue" image="waiting_insert"/>
+                                            <connections>
+                                                <action selector="pressedInsertWaitingQueue:" destination="-1" eventType="touchUpInside" id="TDY-F1-xas"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="op5-Jc-HYB" userLabel="WaitingQueueAppend" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="357" y="0.0" width="347" height="40"/>
+                                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                                            <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <state key="normal" title="Append to Waiting Queue" image="waiting_append"/>
+                                            <connections>
+                                                <action selector="pressedAppendWaitingQueue:" destination="-1" eventType="touchUpInside" id="MXm-IX-Hnm"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="80" id="Q8k-gr-rOZ">
+                                            <variation key="heightClass=regular-widthClass=regular" constant="40"/>
+                                        </constraint>
+                                    </constraints>
+                                </stackView>
+                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="YHf-HP-LxX" userLabel="NextInMainQueueStackView">
+                                    <rect key="frame" x="0.0" y="50" width="704" height="40"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kjv-5v-4aM" userLabel="NextInMainQueueInsert" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="0.0" y="0.0" width="347" height="40"/>
+                                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                                            <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <inset key="imageEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Insert Next in Main Queue" image="main_insert"/>
+                                            <connections>
+                                                <action selector="pressedInsertNextInMainQueue:" destination="-1" eventType="touchUpInside" id="bVn-xP-gee"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cvP-d9-XH3" userLabel="NextInMainQueueAppend" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="357" y="0.0" width="347" height="40"/>
+                                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                                            <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <state key="normal" title="Append to Next in Main Queue" image="main_append"/>
+                                            <connections>
+                                                <action selector="pressedAppendNextInMainQueue:" destination="-1" eventType="touchUpInside" id="XHR-vU-y9j"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                </stackView>
+                            </subviews>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <constraints>
+                                <constraint firstItem="0rd-B5-V1p" firstAttribute="leading" secondItem="CHO-IQ-iDP" secondAttribute="leading" id="CU4-Yr-geZ"/>
+                                <constraint firstItem="0rd-B5-V1p" firstAttribute="top" secondItem="CHO-IQ-iDP" secondAttribute="top" id="J6u-QW-JbZ"/>
+                                <constraint firstItem="YHf-HP-LxX" firstAttribute="leading" secondItem="CHO-IQ-iDP" secondAttribute="leading" id="NBJ-6g-FGu"/>
+                                <constraint firstAttribute="height" constant="170" id="OR9-wP-Yer">
+                                    <variation key="heightClass=regular-widthClass=regular" constant="90"/>
+                                </constraint>
+                                <constraint firstItem="YHf-HP-LxX" firstAttribute="height" secondItem="0rd-B5-V1p" secondAttribute="height" id="OaI-VB-UoG"/>
+                                <constraint firstAttribute="bottom" secondItem="YHf-HP-LxX" secondAttribute="bottom" id="cSg-s2-FKc"/>
+                                <constraint firstItem="0rd-B5-V1p" firstAttribute="leading" secondItem="CHO-IQ-iDP" secondAttribute="leading" id="edO-MK-1uX"/>
+                                <constraint firstAttribute="trailing" secondItem="0rd-B5-V1p" secondAttribute="trailing" id="hTh-Rw-MFv"/>
+                                <constraint firstAttribute="trailing" secondItem="YHf-HP-LxX" secondAttribute="trailing" id="uO4-gt-ARC"/>
+                            </constraints>
+                        </view>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XDf-oc-z0s" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="873" width="704" height="40"/>
+                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="Yn5-c3-LL4"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="Play"/>
+                            <connections>
+                                <action selector="pressedPlay:" destination="-1" eventType="touchUpInside" id="gFi-Ep-1tY"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QhC-Il-SGI" userLabel="AddToPlaylist" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="921" width="704" height="40"/>
+                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="csB-P8-wd3"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="Add to Playlist"/>
+                            <connections>
+                                <action selector="pressedAddToPlaylist:" destination="-1" eventType="touchUpInside" id="SZD-ge-Zvr"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XcM-qv-zHW" userLabel="HandleCache" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="969" width="704" height="40"/>
+                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="FdU-Oz-KAU"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="Download/Remove"/>
+                            <connections>
+                                <action selector="pressedHandleCache:" destination="-1" eventType="touchUpInside" id="RrJ-8y-kOa"/>
+                            </connections>
+                        </button>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZeO-Lx-9J7">
+                            <rect key="frame" x="0.0" y="1017" width="704" height="40"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jma-L5-peG" userLabel="Cancel" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="704" height="40"/>
+                                    <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="us2-5g-R6H"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                    <color key="tintColor" systemColor="secondaryLabelColor"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="Cancel"/>
+                                    <connections>
+                                        <action selector="pressedCancel:" destination="-1" eventType="touchUpInside" id="Ael-Cq-zhS"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <constraints>
+                                <constraint firstAttribute="trailing" secondItem="jma-L5-peG" secondAttribute="trailing" id="ELU-Fn-cF5"/>
+                                <constraint firstItem="jma-L5-peG" firstAttribute="leading" secondItem="ZeO-Lx-9J7" secondAttribute="leading" id="fBg-LY-arU"/>
+                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="40" id="g1T-Hs-jmS"/>
+                                <constraint firstAttribute="bottom" secondItem="jma-L5-peG" secondAttribute="bottom" id="qac-E8-8Sd"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <variation key="heightClass=regular-widthClass=regular" distribution="fill"/>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="lQu-AP-ojd"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="Z3t-pV-Lbw" firstAttribute="leading" secondItem="wqe-oZ-YvP" secondAttribute="leadingMargin" id="0aD-fZ-Zd1"/>
+                <constraint firstAttribute="trailingMargin" secondItem="Z3t-pV-Lbw" secondAttribute="trailing" id="1Wo-vl-ydM"/>
+                <constraint firstAttribute="bottomMargin" secondItem="Z3t-pV-Lbw" secondAttribute="bottom" constant="16" id="ViX-M3-dj6"/>
+                <constraint firstItem="Z3t-pV-Lbw" firstAttribute="top" secondItem="wqe-oZ-YvP" secondAttribute="topMargin" constant="16" id="h3y-7B-bNS"/>
+            </constraints>
+            <point key="canvasLocation" x="781.875" y="-621.12676056338034"/>
+        </view>
+    </objects>
+    <designables>
+        <designable name="91a-FO-77z">
+            <size key="intrinsicContentSize" width="41.5" height="17"/>
+        </designable>
+        <designable name="KnP-8k-7qE">
+            <size key="intrinsicContentSize" width="36.5" height="23"/>
+        </designable>
+        <designable name="fUI-xV-Cyd">
+            <size key="intrinsicContentSize" width="24.5" height="17"/>
+        </designable>
+        <designable name="nTF-ts-4gP">
+            <size key="intrinsicContentSize" width="35.5" height="17"/>
+        </designable>
+    </designables>
+    <resources>
+        <image name="main_append" width="30" height="30"/>
+        <image name="main_insert" width="30" height="30"/>
+        <image name="waiting_append" width="30" height="30"/>
+        <image name="waiting_insert" width="30" height="30"/>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="secondarySystemFillColor">
+            <color red="0.47058823529411764" green="0.47058823529411764" blue="0.50196078431372548" alpha="0.16" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemYellowColor">
+            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

@@ -302,6 +302,8 @@
 		50DEEE18265ED5790073FF20 /* MusicFolderMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE14265ED5790073FF20 /* MusicFolderMO+CoreDataClass.swift */; };
 		50DEEE19265ED5790073FF20 /* MusicFolderMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE15265ED5790073FF20 /* MusicFolderMO+CoreDataProperties.swift */; };
 		50DEEE1B265ED65B0073FF20 /* MusicFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE1A265ED65B0073FF20 /* MusicFolder.swift */; };
+		50E3D8D02796CB2B009A9680 /* LibraryEntityDetailVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50E3D8CF2796CB2B009A9680 /* LibraryEntityDetailVC.xib */; };
+		50E3D8D22796CB8A009A9680 /* LibraryEntityDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E3D8D12796CB8A009A9680 /* LibraryEntityDetailVC.swift */; };
 		50E964AA25E8E20E00E3210F /* SubsonicVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E964A925E8E20E00E3210F /* SubsonicVersion.swift */; };
 		50E964AF25E8E25E00E3210F /* SubsonicVersionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */; };
 		50F81E8623BAF25900EAAC3E /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E8523BAF25900EAAC3E /* Album.swift */; };
@@ -686,6 +688,8 @@
 		50DEEE15265ED5790073FF20 /* MusicFolderMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicFolderMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50DEEE1A265ED65B0073FF20 /* MusicFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicFolder.swift; sourceTree = "<group>"; };
 		50E15407261311590021F47D /* Amperfy v6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v6.xcdatamodel"; sourceTree = "<group>"; };
+		50E3D8CF2796CB2B009A9680 /* LibraryEntityDetailVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LibraryEntityDetailVC.xib; sourceTree = "<group>"; };
+		50E3D8D12796CB8A009A9680 /* LibraryEntityDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryEntityDetailVC.swift; sourceTree = "<group>"; };
 		50E964A925E8E20E00E3210F /* SubsonicVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersion.swift; sourceTree = "<group>"; };
 		50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersionTest.swift; sourceTree = "<group>"; };
 		50EF2CB1267F658B0011C42F /* SnapKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SnapKit.xcframework; path = Carthage/Build/SnapKit.xcframework; sourceTree = "<group>"; };
@@ -1172,6 +1176,8 @@
 				5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */,
 				508FDE4F21F64ED6005A0724 /* TabBarVC.swift */,
 				50BA92FF21CFDEBD00E5901D /* LibraryVC.swift */,
+				50E3D8CF2796CB2B009A9680 /* LibraryEntityDetailVC.xib */,
+				50E3D8D12796CB8A009A9680 /* LibraryEntityDetailVC.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -1479,6 +1485,7 @@
 				43FBE27F250D4DFD00D5F9B3 /* LaunchScreen.storyboard in Resources */,
 				504CE14E27920965005E0DE7 /* RatingView.xib in Resources */,
 				50763F1922AD942A00D062A0 /* AlbumDetailTableHeader.xib in Resources */,
+				50E3D8D02796CB2B009A9680 /* LibraryEntityDetailVC.xib in Resources */,
 				50DEEE08265E27300073FF20 /* DirectoryTableCell.xib in Resources */,
 				501A7D53268223270055A51B /* PodcastTableCell.xib in Resources */,
 				500B7D4521EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib in Resources */,
@@ -1779,6 +1786,7 @@
 				501A7D462681C11C0055A51B /* PodcastEpisodeMO+CoreDataClass.swift in Sources */,
 				50CDF209264BC6BB00F83EF6 /* LogEntryMO+CoreDataClass.swift in Sources */,
 				50DEEE18265ED5790073FF20 /* MusicFolderMO+CoreDataClass.swift in Sources */,
+				50E3D8D22796CB8A009A9680 /* LibraryEntityDetailVC.swift in Sources */,
 				505905BC261D980C007C34CB /* PlayableContainable.swift in Sources */,
 				50F81EE423BF6B1E00EAAC3E /* SyncWaveMO+CoreDataClass.swift in Sources */,
 				50F81EEA23BF6B1E00EAAC3E /* PlaylistItemMO+CoreDataClass.swift in Sources */,

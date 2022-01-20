@@ -9,9 +9,8 @@ class RatingView: UIView {
     @IBOutlet weak var starFour: UIButton!
     @IBOutlet weak var starFive: UIButton!
 
-    static let frameHeight: CGFloat = 35.0 + margin.top + margin.bottom
-    static let margin = UIView.defaultMarginTopElement
-    
+    static let frameHeight: CGFloat = 35.0
+
     private var appDelegate: AppDelegate!
     private var libraryEntity: AbstractLibraryEntity?
     
@@ -28,7 +27,6 @@ class RatingView: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        self.layoutMargins = Self.margin
     }
     
     func prepare(entity: AbstractLibraryEntity?) {
@@ -38,8 +36,7 @@ class RatingView: UIView {
     }
     
     private var ratingSong: Song? {
-        if self.appDelegate.persistentStorage.settings.isOnlineMode,
-           let entity = libraryEntity,
+        if let entity = libraryEntity,
            let playable = entity as? AbstractPlayable,
            let song = playable.asSong {
             return song
@@ -49,56 +46,46 @@ class RatingView: UIView {
     }
     
     private func fetchSongInfo() {
+        guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
         guard let ratingSong = ratingSong else { return }
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            if self.appDelegate.persistentStorage.settings.isOnlineMode {
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
-                let songAsync = Song(managedObject: context.object(with: ratingSong.managedObject.objectID) as! SongMO)
-                syncer.sync(song: songAsync, library: syncLibrary)
-                syncLibrary.saveContext()
-                DispatchQueue.main.async {
-                    self.refresh()
-                }
+            let syncLibrary = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
+            let songAsync = Song(managedObject: context.object(with: ratingSong.managedObject.objectID) as! SongMO)
+            syncer.sync(song: songAsync, library: syncLibrary)
+            syncLibrary.saveContext()
+            DispatchQueue.main.async {
+                self.refresh()
             }
         }
     }
     
     private func refresh() {
-        if let ratingSong = ratingSong {
-            for (index, button) in stars.enumerated() {
-                if index < ratingSong.rating {
-                    button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameSolid, size: 30)!]), for: .normal)
-                } else {
-                    button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameRegular, size: 30)!]), for: .normal)
-                }
-                button.isEnabled = true
-                button.setTitleColor(.yellow, for: .normal)
-            }
-            clearRatingButton.isEnabled = true
-        } else {
-            for button in stars {
+        let rating = ratingSong?.rating ?? 0
+        for (index, button) in stars.enumerated() {
+            if index < rating {
+                button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameSolid, size: 30)!]), for: .normal)
+            } else {
                 button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameRegular, size: 30)!]), for: .normal)
-                button.isEnabled = false
-                button.setTitleColor(.lightGray, for: .normal)
             }
-            clearRatingButton.isEnabled = false
+            button.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
+            button.setTitleColor(self.appDelegate.persistentStorage.settings.isOnlineMode ? .yellow : .lightGray, for: .normal)
         }
+        clearRatingButton.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
     }
     
     private func setRating(rating: Int) {
+        guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
         guard let ratingSong = ratingSong else { return }
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            if self.appDelegate.persistentStorage.settings.isOnlineMode {
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
-                let songAsync = Song(managedObject: context.object(with: ratingSong.managedObject.objectID) as! SongMO)
-                syncer.setRating(for: songAsync, rating: rating)
-                songAsync.rating = rating
-                syncLibrary.saveContext()
-                DispatchQueue.main.async {
-                    self.refresh()
-                }
+            let syncLibrary = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
+            let songAsync = Song(managedObject: context.object(with: ratingSong.managedObject.objectID) as! SongMO)
+            syncer.setRating(for: songAsync, rating: rating)
+            songAsync.rating = rating
+            syncLibrary.saveContext()
+            DispatchQueue.main.async {
+                self.refresh()
             }
         }
     }
