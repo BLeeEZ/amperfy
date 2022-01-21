@@ -33,8 +33,8 @@ class SongTableCell: BasicTableCell {
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     
-    private var song: Song?
-    private var rootView: UIViewController?
+    var song: Song?
+    var rootView: UIViewController?
     private var isAlertPresented = false
 
     override func awakeFromNib() {

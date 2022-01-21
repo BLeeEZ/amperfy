@@ -13,8 +13,8 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Album\"", scopeButtonTitles: ["All", "Cached"])
-        tableView.register(nibName: SongTableCell.typeName)
-        tableView.rowHeight = SongTableCell.rowHeight
+        tableView.register(nibName: AlbumSongTableCell.typeName)
+        tableView.rowHeight = AlbumSongTableCell.albumSongRowHeight
         
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: AlbumDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
         if let albumDetailTableHeaderView = ViewBuilder<AlbumDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: AlbumDetailTableHeader.frameHeight)) {
@@ -41,7 +41,7 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
+        let cell: AlbumSongTableCell = dequeueCell(for: tableView, at: indexPath)
         let song = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(song: song, rootView: self)
         return cell

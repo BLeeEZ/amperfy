@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="default" indentationWidth="10" rowHeight="55" id="pd9-97-MJI" customClass="AlbumSongTableCell" customModule="Amperfy" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="488" height="55"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="pd9-97-MJI" id="WOq-tb-OTF">
+                <rect key="frame" x="0.0" y="0.0" width="488" height="55"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Song Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hPr-VQ-rTt">
+                        <rect key="frame" x="45" y="6.5" width="427" height="22"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="22" id="XXp-uK-dh5"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="99" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GFX-bI-uSL">
+                        <rect key="frame" x="16" y="16.5" width="21" height="22"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="21" id="g0W-SQ-Cz4"/>
+                            <constraint firstAttribute="height" constant="22" id="ijt-ct-tMF"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" systemColor="secondaryLabelColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YMj-gk-9M5">
+                        <rect key="frame" x="45" y="30.5" width="427" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="16" id="A6m-Tf-noi"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" systemColor="secondaryLabelColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailingMargin" secondItem="hPr-VQ-rTt" secondAttribute="trailing" id="0Jf-pS-3te"/>
+                    <constraint firstItem="YMj-gk-9M5" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="0cg-qO-oSe"/>
+                    <constraint firstItem="GFX-bI-uSL" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="9NK-Zt-Udb"/>
+                    <constraint firstItem="hPr-VQ-rTt" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" constant="-10" id="bvj-Mr-vRL"/>
+                    <constraint firstItem="GFX-bI-uSL" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leadingMargin" id="fOI-Fn-425"/>
+                    <constraint firstItem="YMj-gk-9M5" firstAttribute="top" secondItem="hPr-VQ-rTt" secondAttribute="bottom" constant="2" id="hWk-ln-K9O"/>
+                    <constraint firstItem="hPr-VQ-rTt" firstAttribute="leading" secondItem="GFX-bI-uSL" secondAttribute="trailing" constant="8" id="lqV-fj-OxU"/>
+                    <constraint firstItem="YMj-gk-9M5" firstAttribute="trailing" secondItem="hPr-VQ-rTt" secondAttribute="trailing" id="y6K-XE-CyN"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="artistLabel" destination="YMj-gk-9M5" id="uoo-D3-R7t"/>
+                <outlet property="titleLabel" destination="hPr-VQ-rTt" id="wmq-Vm-6lz"/>
+                <outlet property="trackNumberLabel" destination="GFX-bI-uSL" id="Vzm-7H-jGn"/>
+            </connections>
+            <point key="canvasLocation" x="233.59999999999999" y="-210.04497751124438"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		43FBE27F250D4DFD00D5F9B3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */; };
+		5000C1FD2799B00F00DD73BB /* AlbumSongTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5000C1FC2799B00F00DD73BB /* AlbumSongTableCell.swift */; };
+		5000C1FE2799B32700DD73BB /* AlbumSongTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5000C1FB2799B00F00DD73BB /* AlbumSongTableCell.xib */; };
 		5002565725E69DC800674CE1 /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5002565625E69DC700674CE1 /* SpinnerViewController.swift */; };
 		5003D8F72678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */; };
 		5003D8FB267B3390006946BF /* LibrarySyncPopupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */; };
@@ -379,6 +381,8 @@
 
 /* Begin PBXFileReference section */
 		43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		5000C1FB2799B00F00DD73BB /* AlbumSongTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlbumSongTableCell.xib; sourceTree = "<group>"; };
+		5000C1FC2799B00F00DD73BB /* AlbumSongTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumSongTableCell.swift; sourceTree = "<group>"; };
 		5002565625E69DC700674CE1 /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
 		5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserPreCreatedArtistsTest.swift; sourceTree = "<group>"; };
 		5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySyncPopupVC.swift; sourceTree = "<group>"; };
@@ -1202,6 +1206,8 @@
 				507361E52632BAFB005F151D /* GenreTableCell.swift */,
 				50763F1722AD942A00D062A0 /* AlbumDetailTableHeader.xib */,
 				50763F1822AD942A00D062A0 /* AlbumDetailTableHeader.swift */,
+				5000C1FB2799B00F00DD73BB /* AlbumSongTableCell.xib */,
+				5000C1FC2799B00F00DD73BB /* AlbumSongTableCell.swift */,
 				50C16C2521E7CBA500F086F0 /* AlbumTableCell.xib */,
 				50C16C1D21E7A35C00F086F0 /* AlbumTableCell.swift */,
 				5041B7FF2212051A00603F02 /* ArtistDetailTableHeader.xib */,
@@ -1474,6 +1480,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */,
+				5000C1FE2799B32700DD73BB /* AlbumSongTableCell.xib in Resources */,
 				50A85F0A268A556700FB3E31 /* Amperfy.xcdatamodeld in Resources */,
 				500B7D3F21EC87FD0083ED6F /* SongActionSheetView.xib in Resources */,
 				5006BCB427959FD000D3C961 /* fa-regular-400.ttf in Resources */,
@@ -1667,6 +1674,7 @@
 				50E964AA25E8E20E00E3210F /* SubsonicVersion.swift in Sources */,
 				50CDF202264BB1C000F83EF6 /* EventLogger.swift in Sources */,
 				50048F99275954A40087EDFB /* SongPlayedSyncer.swift in Sources */,
+				5000C1FD2799B00F00DD73BB /* AlbumSongTableCell.swift in Sources */,
 				50AFA1492632E83100F198DD /* GenreDetailTableHeader.swift in Sources */,
 				50073BE12230245D000130D8 /* DownloadManagerSessionExtension.swift in Sources */,
 				5029E0392235A8EC0027F96F /* CommonString.swift in Sources */,
