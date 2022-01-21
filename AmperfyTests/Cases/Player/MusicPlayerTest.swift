@@ -63,6 +63,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?) {}
     func sync(artist: Artist, library: LibraryStorage) {}
     func sync(album: Album, library: LibraryStorage) {}
+    func sync(song: Song, library: LibraryStorage) {}
     func syncLatestLibraryElements(library: LibraryStorage) {}
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {}
     func syncDown(playlist: Playlist, library: LibraryStorage) {}
@@ -80,7 +81,8 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func sync(directory: Directory, library: LibraryStorage) {}
     func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {}
     func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) {}
-    func recordPlay(song: Song) { }
+    func recordPlay(song: Song) {}
+    func setRating(for song: Song, rating: Int) {}
 }
 
 class MOCK_BackgroundLibrarySyncer: BackgroundLibrarySyncer {
