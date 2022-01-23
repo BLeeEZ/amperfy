@@ -46,7 +46,7 @@ class GenreDetailVC: BasicTableViewController {
                     completionHandler(album.playables)
                 }
             case LibraryElement.Song.rawValue:
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
+                let song = self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
                 completionHandler([song])
             default:
                 completionHandler([])
