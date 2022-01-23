@@ -86,7 +86,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
             if queueHandler.isWaitingQueuePlaying {
                 playNext()
             } else {
-                play()
+                insertIntoPlayer(playable: playable)
             }
         } else {
             play(playerIndex: PlayerIndex(queueType: .next, index: 0))
@@ -97,7 +97,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
     }
     
     func play(playables: [AbstractPlayable]) {
-        guard !playables.isEmpty else { return }
+        guard let firstPlayable = playables.first else { return }
         let topWaitingQueueItem = queueHandler.waitingQueue.first
         let wasWaitingQueuePlaying = queueHandler.isWaitingQueuePlaying
         queueHandler.clearPlaylistQueues()
@@ -106,7 +106,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
             if queueHandler.isWaitingQueuePlaying {
                 playNext()
             } else {
-                play()
+                insertIntoPlayer(playable: firstPlayable)
             }
         } else {
             play(playerIndex: PlayerIndex(queueType: .next, index: 0))
