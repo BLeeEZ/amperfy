@@ -7,6 +7,10 @@ enum ImageStatus: Int16 {
     case NotChecked = 1
     case CustomImage = 2
     case FetchError = 3
+    
+    var isDownloadRecommended: Bool {
+        return self == .NotChecked
+    }
 }
 
 public struct ArtworkRemoteInfo {
@@ -91,17 +95,6 @@ public class Artwork: NSObject {
         return managedObject == object.managedObject
     }
     
-    static func executeIf(entity: AbstractLibraryEntity, hasBeenUpdatedIn notification: Notification, completionHandler: ()->()) {
-        let objKeys = [NSUpdatedObjectsKey, NSRefreshedObjectsKey]
-        
-        for objKey in objKeys {
-            if let refreshedObjects = notification.userInfo?[objKey] as? Set<NSManagedObject>, !refreshedObjects.isEmpty {
-                let foundReference = refreshedObjects.lazy.compactMap{ $0 as? ArtworkMO }.compactMap{ Artwork(managedObject: $0) }.filter{ $0.owners.contains(where: {$0.isEqual(entity)}) }.first
-                if foundReference != nil { completionHandler(); return }
-            }
-        }
-    }
-
 }
 
 extension Artwork: Downloadable {

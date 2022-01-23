@@ -17,6 +17,10 @@ extension Bool {
     mutating func toggle() {
         self = !self
     }
+    
+    static func random(probabilityForTrueInPercent probability: Float) -> Bool{
+        return Float.random(in: 0..<100) <= probability
+    }
 }
 
 extension Int16 {

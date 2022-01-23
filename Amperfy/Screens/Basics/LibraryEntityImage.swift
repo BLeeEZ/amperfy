@@ -1,7 +1,6 @@
 import UIKit
-import CoreData
 
-class LibraryEntityImage: RoundedImage {
+class LibraryEntityImage: RoundedImage, UIArtworkUpdatable {
     
     var entity: AbstractLibraryEntity?
     
@@ -13,24 +12,17 @@ class LibraryEntityImage: RoundedImage {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        NotificationCenter.default.addObserver(self, selector: #selector(contextDidSave(_:)), name: Notification.Name.NSManagedObjectContextObjectsDidChange, object: appDelegate.persistentStorage.context)
+        appDelegate.uiArtworkUpdater.add(image: self)
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    @objc func contextDidSave(_ notification: Notification) {
-        if let entity = entity {
-            Artwork.executeIf(entity: entity, hasBeenUpdatedIn: notification) {
-                refresh()
-            }
-        }
+        let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.uiArtworkUpdater.remove(image: self)
     }
     
     func displayAndUpdate(entity: AbstractLibraryEntity, via artworkDownloadManager: DownloadManageable) {
         display(entity: entity)
-        if let artwork = entity.artwork {
+        if let artwork = entity.artwork, artwork.status.isDownloadRecommended || Bool.random(probabilityForTrueInPercent: 5) {
             artworkDownloadManager.download(object: artwork)
         }
     }

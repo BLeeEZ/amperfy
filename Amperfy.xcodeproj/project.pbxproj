@@ -88,6 +88,7 @@
 		5029288F2657B78B00DA3A8F /* UserStatisticsMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288D2657B78B00DA3A8F /* UserStatisticsMO+CoreDataProperties.swift */; };
 		5029E0392235A8EC0027F96F /* CommonString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E0382235A8EC0027F96F /* CommonString.swift */; };
 		5029E03B2235ABB80027F96F /* OptionsBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */; };
+		502B9BF0279EB15700173A10 /* UIArtworkUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502B9BEF279EB15700173A10 /* UIArtworkUpdateManager.swift */; };
 		502C0045224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502C0044224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift */; };
 		502E56BC27561AD900638BD2 /* PopupPlayerSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */; };
 		502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */; };
@@ -455,6 +456,7 @@
 		5029288D2657B78B00DA3A8F /* UserStatisticsMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserStatisticsMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		5029E0382235A8EC0027F96F /* CommonString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonString.swift; sourceTree = "<group>"; };
 		5029E03A2235ABB80027F96F /* OptionsBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsBarButtonItem.swift; sourceTree = "<group>"; };
+		502B9BEF279EB15700173A10 /* UIArtworkUpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIArtworkUpdateManager.swift; sourceTree = "<group>"; };
 		502C0044224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubsonicArtworkDownloadDelegate.swift; sourceTree = "<group>"; };
 		502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PopupPlayerSectionHeader.xib; sourceTree = "<group>"; };
 		502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupPlayerSectionHeader.swift; sourceTree = "<group>"; };
@@ -846,6 +848,7 @@
 				5029288626564C6800DA3A8F /* LogData.swift */,
 				5040B2C3269CD19600911451 /* LocalNotificationManager.swift */,
 				50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */,
+				502B9BEF279EB15700173A10 /* UIArtworkUpdateManager.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1570,6 +1573,7 @@
 				5011713027565B2A00B7C08D /* PlayerFacade.swift in Sources */,
 				50F81E8E23BC6FEA00EAAC3E /* Artwork.swift in Sources */,
 				5086F88B223E867500546F5A /* SsAlbumParserDelegate.swift in Sources */,
+				502B9BF0279EB15700173A10 /* UIArtworkUpdateManager.swift in Sources */,
 				5086F87B22397B8400546F5A /* BackendApi.swift in Sources */,
 				502040302202341500ED48A3 /* PlaylistParserDelegate.swift in Sources */,
 				506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */,

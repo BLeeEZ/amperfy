@@ -84,6 +84,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return dlManager
     }()
+    lazy var uiArtworkUpdater = {
+        return UIArtworkUpdateManager(persistentStorage: persistentStorage)
+    }()
     lazy var libraryUpdater = {
         return LibraryUpdater(persistentStorage: persistentStorage, backendApi: backendApi)
     }()

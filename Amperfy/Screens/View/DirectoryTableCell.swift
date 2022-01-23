@@ -1,7 +1,7 @@
 import UIKit
 import CoreData
 
-class DirectoryTableCell: BasicTableCell {
+class DirectoryTableCell: BasicTableCell, UIArtworkUpdatable {
     
     @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var artworkImage: LibraryEntityImage!
@@ -11,25 +11,21 @@ class DirectoryTableCell: BasicTableCell {
     
     private var folder: MusicFolder?
     private var directory: Directory?
+    var entity: AbstractLibraryEntity? {
+        return directory
+    }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        NotificationCenter.default.addObserver(self, selector: #selector(contextDidSave(_:)), name: Notification.Name.NSManagedObjectContextObjectsDidChange, object: appDelegate.persistentStorage.context)
+        appDelegate.uiArtworkUpdater.add(directoryCell: self)
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(self)
+        let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.uiArtworkUpdater.remove(directoryCell: self)
     }
-    
-    @objc func contextDidSave(_ notification: Notification) {
-        if let directory = directory {
-            Artwork.executeIf(entity: directory, hasBeenUpdatedIn: notification) {
-                refresh()
-            }
-        }
-    }
-    
+
     func display(folder: MusicFolder) {
         self.folder = folder
         self.directory = nil
@@ -45,7 +41,7 @@ class DirectoryTableCell: BasicTableCell {
         refresh()
     }
     
-    private func refresh() {
+    internal func refresh() {
         iconLabel.isHidden = true
         artworkImage.isHidden = true
         
