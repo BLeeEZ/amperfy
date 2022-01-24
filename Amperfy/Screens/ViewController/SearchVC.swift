@@ -110,12 +110,12 @@ class SearchVC: BasicTableViewController {
         case LibraryElement.Artist.rawValue:
             let cell: ArtistTableCell = dequeueCell(for: tableView, at: indexPath)
             let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(artist: artist)
+            cell.display(artist: artist, rootView: self)
             return cell
         case LibraryElement.Album.rawValue:
             let cell: AlbumTableCell = dequeueCell(for: tableView, at: indexPath)
             let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(album: album)
+            cell.display(album: album, rootView: self)
             return cell
         case LibraryElement.Song.rawValue:
             let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)

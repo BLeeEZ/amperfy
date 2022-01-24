@@ -359,13 +359,14 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
 
-    func requestSongRating(parserDelegate: SsXmlParser, id: String, rating: Int) {
+    // Only songs, albums, artists are supported by the subsonic API
+    func requestRating(parserDelegate: SsXmlParser, id: String, rating: Int) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "setRating") else { return }
         urlComp.addQueryItem(name: "id", value: id)
         urlComp.addQueryItem(name: "rating", value: rating)
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
-
+    
     private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: SsXmlParser, ignoreErrorResponse: Bool = false) {
         guard let url = fromUrlComponent.url else {
             os_log("URL could not be created: %s", log: log, type: .error, fromUrlComponent.description)

@@ -239,6 +239,13 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
+    func requestArtistInfo(of artist: Artist, parserDelegate: AmpacheXmlParser) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "artist")
+        apiUrlComponent.addQueryItem(name: "filter", value: artist.id)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+
     func requestArtistAlbums(of artist: Artist, parserDelegate: AmpacheXmlParser) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "artist_albums")
@@ -250,6 +257,13 @@ class AmpacheXmlServerApi {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "artist_songs")
         apiUrlComponent.addQueryItem(name: "filter", value: artist.id)
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
+    func requestAlbumInfo(of album: Album, parserDelegate: AmpacheXmlParser) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "album")
+        apiUrlComponent.addQueryItem(name: "filter", value: album.id)
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
@@ -440,6 +454,26 @@ class AmpacheXmlServerApi {
         apiUrlComponent.addQueryItem(name: "action", value: "rate")
         apiUrlComponent.addQueryItem(name: "type", value: "song")
         apiUrlComponent.addQueryItem(name: "id", value: song.id)
+        apiUrlComponent.addQueryItem(name: "rating", value: rating)
+        let errorParser = AmpacheXmlParser()
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
+    }
+    
+    func requestRate(album: Album, rating: Int) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "rate")
+        apiUrlComponent.addQueryItem(name: "type", value: "album")
+        apiUrlComponent.addQueryItem(name: "id", value: album.id)
+        apiUrlComponent.addQueryItem(name: "rating", value: rating)
+        let errorParser = AmpacheXmlParser()
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
+    }
+    
+    func requestRate(artist: Artist, rating: Int) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "rate")
+        apiUrlComponent.addQueryItem(name: "type", value: "artist")
+        apiUrlComponent.addQueryItem(name: "id", value: artist.id)
         apiUrlComponent.addQueryItem(name: "rating", value: rating)
         let errorParser = AmpacheXmlParser()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)

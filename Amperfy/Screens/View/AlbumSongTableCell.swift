@@ -7,12 +7,6 @@ class AlbumSongTableCell: SongTableCell {
     
     @IBOutlet weak var trackNumberLabel: UILabel!
 
-    override func display(song: Song, rootView: UIViewController) {
-        self.song = song
-        self.rootView = rootView
-        refresh()
-    }
-    
     override func refresh() {
         guard let song = song else { return }
         trackNumberLabel.text = song.track > 0 ? "\(song.track)" : ""

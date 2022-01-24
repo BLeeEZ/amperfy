@@ -82,7 +82,9 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {}
     func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) {}
     func recordPlay(song: Song) {}
-    func setRating(for song: Song, rating: Int) {}
+    func setRating(song: Song, rating: Int) {}
+    func setRating(album: Album, rating: Int) {}
+    func setRating(artist: Artist, rating: Int) {}
 }
 
 class MOCK_BackgroundLibrarySyncer: BackgroundLibrarySyncer {

@@ -28,7 +28,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: ArtistTableCell = dequeueCell(for: tableView, at: indexPath)
         let artist = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(artist: artist)
+        cell.display(artist: artist, rootView: self)
         return cell
     }
     

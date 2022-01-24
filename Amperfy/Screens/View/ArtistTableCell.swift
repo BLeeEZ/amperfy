@@ -8,10 +8,18 @@ class ArtistTableCell: BasicTableCell {
     
     static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
     
-    private var artist: Artist!
+    private var artist: Artist?
+    private var rootView: UITableViewController?
     
-    func display(artist: Artist) {
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
+        self.addGestureRecognizer(longPressGesture)
+    }
+
+    func display(artist: Artist, rootView: UITableViewController) {
         self.artist = artist
+        self.rootView = rootView
         artistLabel.text = artist.name
         artworkImage.displayAndUpdate(entity: artist, via: appDelegate.artworkDownloadManager)
         var infoText = ""
@@ -26,6 +34,21 @@ class ArtistTableCell: BasicTableCell {
             infoText += " \(CommonString.oneMiddleDot) \(artist.songCount) Songs"
         }
         infoLabel.text = infoText
+    }
+
+    @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {
+        if gesture.state == .began {
+            displayMenu()
+        }
+    }
+    
+    func displayMenu() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let artist = artist, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(artist: artist, on: rootView)
+        rootView.present(detailVC, animated: true)
     }
 
 }

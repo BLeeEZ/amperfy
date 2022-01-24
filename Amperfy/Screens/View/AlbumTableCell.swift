@@ -9,10 +9,18 @@ class AlbumTableCell: BasicTableCell {
     
     static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
     
-    private var album: Album!
+    private var album: Album?
+    private var rootView: UITableViewController?
     
-    func display(album: Album) {
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
+        self.addGestureRecognizer(longPressGesture)
+    }
+    
+    func display(album: Album, rootView: UITableViewController) {
         self.album = album
+        self.rootView = rootView
         albumLabel.text = album.name
         artistLabel.text = album.artist?.name
         artworkImage.displayAndUpdate(entity: album, via: appDelegate.artworkDownloadManager)
@@ -25,4 +33,19 @@ class AlbumTableCell: BasicTableCell {
         infoLabel.text = infoText
     }
 
+    @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {
+        if gesture.state == .began {
+            displayMenu()
+        }
+    }
+    
+    func displayMenu() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let album = album, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(album: album, on: rootView)
+        rootView.present(detailVC, animated: true)
+    }
+    
 }

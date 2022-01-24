@@ -92,6 +92,8 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         let artistParser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestArtist(parserDelegate: artistParser, id: artist.id)
         for album in artist.albums {
+            let albumParser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+            subsonicServerApi.requestAlbum(parserDelegate: albumParser, id: album.id)
             let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
             subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
         }
@@ -100,6 +102,8 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     
     func sync(album: Album, library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
+        let albumParser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        subsonicServerApi.requestAlbum(parserDelegate: albumParser, id: album.id)
         let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
         library.saveContext()
@@ -254,11 +258,25 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         subsonicServerApi.requestRecordSongPlay(parserDelegate: parser, id: song.id)
     }
     
-    func setRating(for song: Song, rating: Int) {
+    func setRating(song: Song, rating: Int) {
         guard rating >= 0 && rating <= 5 else { return }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, song.displayString)
         let parser = SsXmlParser()
-        subsonicServerApi.requestSongRating(parserDelegate: parser, id: song.id, rating: rating)
+        subsonicServerApi.requestRating(parserDelegate: parser, id: song.id, rating: rating)
+    }
+    
+    func setRating(album: Album, rating: Int) {
+        guard rating >= 0 && rating <= 5 else { return }
+        os_log("Rate %i stars: %s", log: log, type: .info, rating, album.name)
+        let parser = SsXmlParser()
+        subsonicServerApi.requestRating(parserDelegate: parser, id: album.id, rating: rating)
+    }
+    
+    func setRating(artist: Artist, rating: Int) {
+        guard rating >= 0 && rating <= 5 else { return }
+        os_log("Rate %i stars: %s", log: log, type: .info, rating, artist.name)
+        let parser = SsXmlParser()
+        subsonicServerApi.requestRating(parserDelegate: parser, id: artist.id, rating: rating)
     }
     
     func searchArtists(searchText: String, library: LibraryStorage) {

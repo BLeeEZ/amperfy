@@ -38,49 +38,22 @@ class ArtistDetailTableHeader: UIView {
         } else {
             infoText += "\(artist.albumCount) Albums"
         }
+        infoText += " \(CommonString.oneMiddleDot) "
+        if artist.songCount == 1 {
+            infoText.append("1 Song")
+        } else {
+            infoText.append("\(artist.songCount) Songs")
+        }
         infoLabel.text = infoText
     }
 
     @IBAction func optionsButtonPressed(_ sender: Any) {
-        if let artist = self.artist, let rootView = self.rootView {
-            let alert = createAlert(forArtist: artist)
-            alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
-            rootView.present(alert, animated: true, completion: nil)
-        }
-    }
-    
-    func createAlert(forArtist artist: Artist) -> UIAlertController {
-        let alert = UIAlertController(title: artist.name, message: nil, preferredStyle: .actionSheet)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
-                let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-                selectPlaylistVC.itemsToAdd = artist.songs
-                let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-                if let rootView = self.rootView {
-                    rootView.present(selectPlaylistNav, animated: true, completion: nil)
-                }
-            }))
-            alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-                for song in artist.songs {
-                    if !song.isCached {
-                        self.appDelegate.playableDownloadManager.download(object: song)
-                    }
-                }
-            }))
-        }
-        if artist.hasCachedPlayables {
-            alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
-                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: artist.playables)
-                self.appDelegate.library.deleteCache(of: artist)
-                self.appDelegate.library.saveContext()
-                if let rootView = self.rootView {
-                    rootView.tableView.reloadData()
-                }
-            }))
-        }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        return alert
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let artist = self.artist, let rootView = self.rootView, rootView.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(artist: artist, on: rootView)
+        rootView.present(detailVC, animated: true)
     }
     
 }

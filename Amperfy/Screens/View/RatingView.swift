@@ -29,9 +29,8 @@ class RatingView: UIView {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
     }
     
-    func prepare(entity: AbstractLibraryEntity?) {
+    func display(entity: AbstractLibraryEntity?) {
         libraryEntity = entity
-        fetchSongInfo()
         refresh()
     }
     
@@ -45,23 +44,26 @@ class RatingView: UIView {
         }
     }
     
-    private func fetchSongInfo() {
-        guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
-        guard let ratingSong = ratingSong else { return }
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
-            let songAsync = Song(managedObject: context.object(with: ratingSong.managedObject.objectID) as! SongMO)
-            syncer.sync(song: songAsync, library: syncLibrary)
-            syncLibrary.saveContext()
-            DispatchQueue.main.async {
-                self.refresh()
-            }
+    private var ratingAlbum: Album? {
+        if let entity = libraryEntity,
+           let album = entity as? Album {
+            return album
+        } else {
+            return nil
+        }
+    }
+
+    private var ratingArtist: Artist? {
+        if let entity = libraryEntity,
+           let artist = entity as? Artist {
+            return artist
+        } else {
+            return nil
         }
     }
     
     private func refresh() {
-        let rating = ratingSong?.rating ?? 0
+        let rating = ratingSong?.rating ?? ratingAlbum?.rating ?? ratingArtist?.rating ?? 0
         for (index, button) in stars.enumerated() {
             if index < rating {
                 button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameSolid, size: 30)!]), for: .normal)
@@ -76,13 +78,22 @@ class RatingView: UIView {
     
     private func setRating(rating: Int) {
         guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
-        guard let ratingSong = ratingSong else { return }
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let syncLibrary = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
-            let songAsync = Song(managedObject: context.object(with: ratingSong.managedObject.objectID) as! SongMO)
-            syncer.setRating(for: songAsync, rating: rating)
-            songAsync.rating = rating
+            if let song = self.ratingSong {
+                let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
+                syncer.setRating(song: songAsync, rating: rating)
+                songAsync.rating = rating
+            } else if let album = self.ratingAlbum {
+                let albumAsync = Album(managedObject: context.object(with: album.managedObject.objectID) as! AlbumMO)
+                syncer.setRating(album: albumAsync, rating: rating)
+                albumAsync.rating = rating
+            } else if let artist = self.ratingArtist {
+                let artistAsync = Artist(managedObject: context.object(with: artist.managedObject.objectID) as! ArtistMO)
+                syncer.setRating(artist: artistAsync, rating: rating)
+                artistAsync.rating = rating
+            }
             syncLibrary.saveContext()
             DispatchQueue.main.async {
                 self.refresh()

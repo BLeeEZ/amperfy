@@ -34,7 +34,7 @@ class SongTableCell: BasicTableCell {
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     
     var song: Song?
-    var rootView: UIViewController?
+    var rootView: UITableViewController?
     private var isAlertPresented = false
 
     override func awakeFromNib() {
@@ -43,7 +43,7 @@ class SongTableCell: BasicTableCell {
         self.addGestureRecognizer(longPressGesture)
     }
     
-    func display(song: Song, rootView: UIViewController) {
+    func display(song: Song, rootView: UITableViewController) {
         self.song = song
         self.rootView = rootView
         refresh()
@@ -97,14 +97,13 @@ class SongTableCell: BasicTableCell {
     }
     
     func displayMenu() {
-        if let song = song, let rootView = rootView, rootView.presentingViewController == nil {
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
-            isAlertPresented = true
-            let detailVC = LibraryEntityDetailVC()
-            detailVC.display(playable: song, on: rootView)
-            rootView.present(detailVC, animated: true)
-        }
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let song = song, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        isAlertPresented = true
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(playable: song, on: rootView)
+        rootView.present(detailVC, animated: true)
     }
 
 }

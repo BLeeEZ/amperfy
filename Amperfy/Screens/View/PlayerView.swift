@@ -87,6 +87,7 @@ class PlayerView: UIView {
             ratingPlaceholderView.addSubview(ratingView)
         }
         ratingPlaceholderView.backgroundColor = .clear
+        fetchSongInfoAndUpdateViews()
         refreshPlayer()
     }
     
@@ -382,6 +383,21 @@ class PlayerView: UIView {
         rootView?.popupItem.trailingBarButtonItems = [ barButtonItem ]
     }
     
+    func fetchSongInfoAndUpdateViews() {
+        guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard let song = player.currentlyPlaying?.asSong else { return }
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            let syncLibrary = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
+            let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
+            syncer.sync(song: songAsync, library: syncLibrary)
+            syncLibrary.saveContext()
+            DispatchQueue.main.async {
+                self.refreshCurrentlyPlayingInfo()
+            }
+        }
+    }
+    
     func refreshCurrentlyPlayingInfo() {
         refreshArtwork()
         refreshRatingInfo()
@@ -477,7 +493,7 @@ class PlayerView: UIView {
     }
     
     func refreshRatingInfo() {
-        ratingView?.prepare(entity: player.currentlyPlaying)
+        ratingView?.display(entity: player.currentlyPlaying)
     }
     
 }
@@ -485,6 +501,7 @@ class PlayerView: UIView {
 extension PlayerView: MusicPlayable {
 
     func didStartPlaying() {
+        fetchSongInfoAndUpdateViews()
         refreshPlayer()
     }
     

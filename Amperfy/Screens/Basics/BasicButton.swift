@@ -8,7 +8,7 @@ class BasicButton: UIButton {
     }
     
     func configureStyle() {
-        layer.cornerRadius = 15
+        layer.cornerRadius = 10
     }
 
 }

@@ -33,7 +33,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: AlbumTableCell = dequeueCell(for: tableView, at: indexPath)
         let album = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(album: album)
+        cell.display(album: album, rootView: self)
         return cell
     }
     

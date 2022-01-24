@@ -97,6 +97,8 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     
     func sync(artist: Artist, library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
+        let artistParser = ArtistParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+        self.ampacheXmlServerApi.requestArtistInfo(of: artist, parserDelegate: artistParser)
         let albumParser = AlbumParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
         self.ampacheXmlServerApi.requestArtistAlbums(of: artist, parserDelegate: albumParser)
         let songParser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
@@ -106,6 +108,8 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     
     func sync(album: Album, library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
+        let albumParser = AlbumParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+        self.ampacheXmlServerApi.requestAlbumInfo(of: album, parserDelegate: albumParser)
         let songParser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
         self.ampacheXmlServerApi.requestAlbumSongs(of: album, parserDelegate: songParser)
         library.saveContext()
@@ -315,10 +319,22 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         ampacheXmlServerApi.requestRecordPlay(parserDelegate: parser, song: song)
     }
     
-    func setRating(for song: Song, rating: Int) {
+    func setRating(song: Song, rating: Int) {
         guard rating >= 0 && rating <= 5 else { return }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, song.displayString)
         ampacheXmlServerApi.requestRate(song: song, rating: rating)
+    }
+    
+    func setRating(album: Album, rating: Int) {
+        guard rating >= 0 && rating <= 5 else { return }
+        os_log("Rate %i stars: %s", log: log, type: .info, rating, album.name)
+        ampacheXmlServerApi.requestRate(album: album, rating: rating)
+    }
+    
+    func setRating(artist: Artist, rating: Int) {
+        guard rating >= 0 && rating <= 5 else { return }
+        os_log("Rate %i stars: %s", log: log, type: .info, rating, artist.name)
+        ampacheXmlServerApi.requestRate(artist: artist, rating: rating)
     }
     
     func searchArtists(searchText: String, library: LibraryStorage) {

@@ -17,7 +17,8 @@
                 <outlet property="artistLabel" destination="nTF-ts-4gP" id="Xxx-Zu-aO8"/>
                 <outlet property="artworkImage" destination="wrZ-NE-prP" id="fuv-rL-GXZ"/>
                 <outlet property="cancelButton" destination="jma-L5-peG" id="vQN-gZ-0h4"/>
-                <outlet property="handleCacheButton" destination="XcM-qv-zHW" id="4Vx-rZ-Hsz"/>
+                <outlet property="deleteCacheButton" destination="qeo-wc-t8G" id="ybz-ZC-3Ow"/>
+                <outlet property="downloadButton" destination="XcM-qv-zHW" id="1jN-7g-KdT"/>
                 <outlet property="infoLabel" destination="fUI-xV-Cyd" id="1bT-eh-Ick"/>
                 <outlet property="mainNextAppendButton" destination="cvP-d9-XH3" id="WVV-eY-aV6"/>
                 <outlet property="mainNextInsertButton" destination="kjv-5v-4aM" id="maa-mS-ha7"/>
@@ -40,16 +41,16 @@
                     <rect key="frame" x="20" y="40" width="704" height="1057"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="J91-VR-QdL">
-                            <rect key="frame" x="0.0" y="0.0" width="704" height="724"/>
+                            <rect key="frame" x="0.0" y="0.0" width="704" height="666"/>
                             <subviews>
                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wrZ-NE-prP" userLabel="Artwork" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
-                                    <rect key="frame" x="40" y="0.0" width="624" height="624"/>
+                                    <rect key="frame" x="69" y="0.0" width="566" height="566"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="wrZ-NE-prP" secondAttribute="height" multiplier="1:1" id="B0C-cv-xrn"/>
                                     </constraints>
                                 </imageView>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7yG-AI-SV8">
-                                    <rect key="frame" x="258" y="634" width="188" height="90"/>
+                                    <rect key="frame" x="258" y="576" width="188" height="90"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KnP-8k-7qE" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
                                             <rect key="frame" x="76" y="2" width="36.5" height="24"/>
@@ -179,14 +180,14 @@
                             <variation key="heightClass=regular-widthClass=regular" alignment="center" axis="vertical"/>
                         </stackView>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ms2-ug-0W5" userLabel="RatingPlaceholder">
-                            <rect key="frame" x="0.0" y="732" width="704" height="35"/>
-                            <color key="backgroundColor" systemColor="systemYellowColor"/>
+                            <rect key="frame" x="0.0" y="674" width="704" height="45"/>
+                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="35" id="0f6-ht-NEA"/>
+                                <constraint firstAttribute="height" constant="45" id="0f6-ht-NEA"/>
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CHO-IQ-iDP">
-                            <rect key="frame" x="0.0" y="775" width="704" height="90"/>
+                            <rect key="frame" x="0.0" y="727" width="704" height="90"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="0rd-B5-V1p" userLabel="WaitingQueueStackView">
                                     <rect key="frame" x="0.0" y="0.0" width="704" height="40"/>
@@ -248,8 +249,8 @@
                             </subviews>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <constraints>
+                                <constraint firstItem="YHf-HP-LxX" firstAttribute="top" secondItem="0rd-B5-V1p" secondAttribute="bottom" constant="10" id="2nO-3s-bap"/>
                                 <constraint firstItem="0rd-B5-V1p" firstAttribute="leading" secondItem="CHO-IQ-iDP" secondAttribute="leading" id="CU4-Yr-geZ"/>
-                                <constraint firstItem="0rd-B5-V1p" firstAttribute="top" secondItem="CHO-IQ-iDP" secondAttribute="top" id="J6u-QW-JbZ"/>
                                 <constraint firstItem="YHf-HP-LxX" firstAttribute="leading" secondItem="CHO-IQ-iDP" secondAttribute="leading" id="NBJ-6g-FGu"/>
                                 <constraint firstAttribute="height" constant="170" id="OR9-wP-Yer">
                                     <variation key="heightClass=regular-widthClass=regular" constant="90"/>
@@ -262,7 +263,7 @@
                             </constraints>
                         </view>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XDf-oc-z0s" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="873" width="704" height="40"/>
+                            <rect key="frame" x="0.0" y="825" width="704" height="40"/>
                             <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="40" id="Yn5-c3-LL4"/>
@@ -275,7 +276,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QhC-Il-SGI" userLabel="AddToPlaylist" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="921" width="704" height="40"/>
+                            <rect key="frame" x="0.0" y="873" width="704" height="40"/>
                             <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="40" id="csB-P8-wd3"/>
@@ -287,17 +288,30 @@
                                 <action selector="pressedAddToPlaylist:" destination="-1" eventType="touchUpInside" id="SZD-ge-Zvr"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XcM-qv-zHW" userLabel="HandleCache" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="969" width="704" height="40"/>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XcM-qv-zHW" userLabel="Download" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="921" width="704" height="40"/>
                             <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="40" id="FdU-Oz-KAU"/>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                            <state key="normal" title="Download/Remove"/>
+                            <state key="normal" title="Download"/>
                             <connections>
-                                <action selector="pressedHandleCache:" destination="-1" eventType="touchUpInside" id="RrJ-8y-kOa"/>
+                                <action selector="pressedDownload:" destination="-1" eventType="touchUpInside" id="GCD-zo-O2p"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qeo-wc-t8G" userLabel="DeleteCache" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="969" width="704" height="40"/>
+                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="34k-6a-iTB"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="Remove from Cache"/>
+                            <connections>
+                                <action selector="pressedDeleteCache:" destination="-1" eventType="touchUpInside" id="gt2-RZ-7gd"/>
                             </connections>
                         </button>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZeO-Lx-9J7">
@@ -368,9 +382,6 @@
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemYellowColor">
-            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
