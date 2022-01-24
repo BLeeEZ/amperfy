@@ -183,6 +183,10 @@ extension Array where Element: AbstractPlayable {
         return self.filter{ $0.isCached }
     }
     
+    func filterCached(dependigOn isFilterActive: Bool) -> [Element] {
+        return isFilterActive ? self.filter{ $0.isCached } : self
+    }
+    
     func filterCustomArt() -> [Element] {
         return self.filter{ $0.artwork != nil }
     }

@@ -20,22 +20,14 @@ class LibraryElementDetailTableHeaderView: UIView {
     
     @IBAction func playAllButtonPressed(_ sender: Any) {
         guard let playableContainer = playableContainer, let player = player else { return }
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            player.play(playables: playableContainer.playables)
-        } else {
-            player.play(playables: playableContainer.playables.filterCached())
-        }
+        player.play(playables: playableContainer.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode))
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
     }
     
     @IBAction func addAllToPlayNextButtonPressed(_ sender: Any) {
         guard let playableContainer = playableContainer, let player = player else { return }
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            player.appendToNextInMainQueue(playables: playableContainer.playables)
-        } else {
-            player.appendToNextInMainQueue(playables: playableContainer.playables.filterCached())
-        }
+        player.appendToNextInMainQueue(playables: playableContainer.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode))
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
     }

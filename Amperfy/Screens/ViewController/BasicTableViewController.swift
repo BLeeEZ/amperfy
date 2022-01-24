@@ -39,7 +39,7 @@ extension BasicTableViewController {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             actionCallback(indexPath) { playables in
-                self.appDelegate.player.insertFirstToNextInMainQueue(playables: playables)
+                self.appDelegate.player.insertFirstToNextInMainQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
             }
             completionHandler(true)
         }
@@ -53,7 +53,7 @@ extension BasicTableViewController {
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.impactOccurred()
             actionCallback(indexPath) { playables in
-                self.appDelegate.player.insertFirstToWaitingQueue(playables: playables)
+                self.appDelegate.player.insertFirstToWaitingQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
             }
             completionHandler(true)
         }
@@ -67,7 +67,7 @@ extension BasicTableViewController {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             actionCallback(indexPath) { playables in
-                self.appDelegate.player.appendToNextInMainQueue(playables: playables)
+                self.appDelegate.player.appendToNextInMainQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
             }
             completionHandler(true)
         }
@@ -81,7 +81,7 @@ extension BasicTableViewController {
             let generator = UIImpactFeedbackGenerator(style: .light)
             generator.impactOccurred()
             actionCallback(indexPath) { playables in
-                self.appDelegate.player.appendToWaitingQueue(playables: playables)
+                self.appDelegate.player.appendToWaitingQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
             }
             completionHandler(true)
         }
