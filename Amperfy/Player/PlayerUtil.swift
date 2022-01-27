@@ -41,9 +41,9 @@ enum PlayerQueueType: Int, CaseIterable {
     
     var description : String {
         switch self {
-        case .prev: return "Previous in Main Queue"
+        case .prev: return "Previous"
         case .waitingQueue: return "Next in Waiting Queue"
-        case .next: return "Next in Main Queue"
+        case .next: return "Next"
         }
     }
 }

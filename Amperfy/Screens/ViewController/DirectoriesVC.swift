@@ -80,8 +80,8 @@ class DirectoriesVC: BasicTableViewController {
             return 0.0
         }
     }
-    
-    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard indexPath.section == 1 else { return nil }
         let adjustedIndexPath = IndexPath(row: indexPath.row , section: 0)
         return UISwipeActionsConfiguration(actions: [
@@ -89,22 +89,7 @@ class DirectoriesVC: BasicTableViewController {
                 let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
                 completionHandler([song])
             },
-            createInsertWaitingQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath, completionHandler) in
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                completionHandler([song])
-            }
-        ])
-    }
-
-    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard indexPath.section == 1 else { return nil }
-        let adjustedIndexPath = IndexPath(row: indexPath.row , section: 0)
-        return UISwipeActionsConfiguration(actions: [
             createAppendNextQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath, completionHandler) in
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                completionHandler([song])
-            },
-            createAppendWaitingQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath, completionHandler) in
                 let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
                 completionHandler([song])
             }

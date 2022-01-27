@@ -247,26 +247,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func refreshWaitingQueueSectionHeader() {
         let waitingQueueSectionView = sectionViews[1]
-        if player.waitingQueue.isEmpty {
-            waitingQueueSectionView.hide()
-        } else {
-            waitingQueueSectionView.display(type: .waitingQueue, buttonTitle: "Clear") {
-                self.clearWaitingQueue()
-            }
-        }
-    }
-    
-    func clearWaitingQueue() {
-        tableView.beginUpdates()
-        var indexPaths = [IndexPath]()
-        for i in 0...self.player.waitingQueue.count-1 {
-            indexPaths.append(IndexPath(row: i, section: 1))
-        }
-        tableView.deleteRows(at: indexPaths, with: .fade)
-        appDelegate.player.clearWaitingQueue()
-        tableView.endUpdates()
-        refreshWaitingQueueSectionHeader()
-        playerView?.refreshPlayer()
+        waitingQueueSectionView.hide()
     }
 
     // Override to support conditional rearranging of the table view.
@@ -307,11 +288,6 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             self.reloadData()
             self.playerView?.refreshPlayer()
         }))
-        if !player.waitingQueue.isEmpty {
-            alert.addAction(UIAlertAction(title: "Clear Waiting Queue", style: .default, handler: { _ in
-                self.clearWaitingQueue()
-            }))
-        }
         if appDelegate.persistentStorage.settings.isOnlineMode {
             alert.addAction(UIAlertAction(title: "Add all songs to playlist", style: .default, handler: { _ in
                 let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
