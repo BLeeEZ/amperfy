@@ -22,6 +22,16 @@ class DirectoriesVC: BasicTableViewController {
         navigationItem.title = directory.name
         tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
+        
+        swipeCallback = { (indexPath, completionHandler) in
+            switch indexPath.section {
+            case 1:
+                let song = self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                completionHandler([song])
+            default:
+                completionHandler([])
+            }
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -90,20 +100,15 @@ class DirectoriesVC: BasicTableViewController {
             return 0.0
         }
     }
+    
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard indexPath.section == 1 else { return nil }
+        return super.tableView(tableView, leadingSwipeActionsConfigurationForRowAt: indexPath)
+    }
 
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard indexPath.section == 1 else { return nil }
-        let adjustedIndexPath = IndexPath(row: indexPath.row , section: 0)
-        return UISwipeActionsConfiguration(actions: [
-            createInsertNextQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath, completionHandler) in
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                completionHandler([song])
-            },
-            createAppendNextQueueSwipeAction(indexPath: adjustedIndexPath) { (indexPath, completionHandler) in
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: indexPath)
-                completionHandler([song])
-            }
-        ])
+        return super.tableView(tableView, trailingSwipeActionsConfigurationForRowAt: indexPath)
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

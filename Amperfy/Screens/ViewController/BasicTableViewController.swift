@@ -35,7 +35,7 @@ typealias QueueSwipeCallback = (IndexPath, _ completionHandler: @escaping (_ pla
 
 extension BasicTableViewController {
     func createInsertNextQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
-        let action = UIContextualAction(style: .normal, title: "Play Next") { (action, view, completionHandler) in
+        let action = UIContextualAction(style: .normal, title: "Insert Context Queue") { (action, view, completionHandler) in
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             actionCallback(indexPath) { playables in
@@ -48,8 +48,22 @@ extension BasicTableViewController {
         return action
     }
     
+    func createInsertWaitingQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
+        let action = UIContextualAction(style: .normal, title: "Insert User Queue") { (action, view, completionHandler) in
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            actionCallback(indexPath) { playables in
+                self.appDelegate.player.insertFirstToWaitingQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+            }
+            completionHandler(true)
+        }
+        action.backgroundColor = .systemBlue
+        action.image = UIImage(named: "user_queue_insert")?.invertedImage()
+        return action
+    }
+    
     func createAppendNextQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
-        let action = UIContextualAction(style: .normal, title: "Play Later") { (action, view, completionHandler) in
+        let action = UIContextualAction(style: .normal, title: "Append Context Queue") { (action, view, completionHandler) in
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             actionCallback(indexPath) { playables in
@@ -59,6 +73,20 @@ extension BasicTableViewController {
         }
         action.backgroundColor = .systemOrange
         action.image = UIImage(named: "context_queue_append")?.invertedImage()
+        return action
+    }
+    
+    func createAppendWaitingQueueSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
+        let action = UIContextualAction(style: .normal, title: "Append User Queue") { (action, view, completionHandler) in
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            actionCallback(indexPath) { playables in
+                self.appDelegate.player.appendToWaitingQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+            }
+            completionHandler(true)
+        }
+        action.backgroundColor = .systemOrange
+        action.image = UIImage(named: "user_queue_append")?.invertedImage()
         return action
     }
 }
@@ -92,11 +120,18 @@ class BasicTableViewController: UITableViewController {
         updateSearchResults(for: searchController)
     }
     
-    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let swipeCB = swipeCallback else { return nil }
         return UISwipeActionsConfiguration(actions: [
             createInsertNextQueueSwipeAction(indexPath: indexPath, actionCallback: swipeCB),
             createAppendNextQueueSwipeAction(indexPath: indexPath, actionCallback: swipeCB)
+        ])
+    }
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let swipeCB = swipeCallback else { return nil }
+        return UISwipeActionsConfiguration(actions: [
+            createInsertWaitingQueueSwipeAction(indexPath: indexPath, actionCallback: swipeCB),
+            createAppendWaitingQueueSwipeAction(indexPath: indexPath, actionCallback: swipeCB)
         ])
     }
 
