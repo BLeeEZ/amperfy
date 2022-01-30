@@ -12,9 +12,9 @@ extension PlaylistMO {
     @NSManaged public var name: String?
     @NSManaged public var songCount: Int16
     @NSManaged public var items: NSSet?
-    @NSManaged public var playersNormalPlaylist: PlayerMO?
-    @NSManaged public var playersShuffledPlaylist: PlayerMO?
-    @NSManaged public var playersWaitingQueuePlaylist: PlayerMO?
+    @NSManaged public var playersContextPlaylist: PlayerMO?
+    @NSManaged public var playersShuffledContextPlaylist: PlayerMO?
+    @NSManaged public var playersUserQueuePlaylist: PlayerMO?
 
 }
 

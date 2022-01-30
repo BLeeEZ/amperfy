@@ -6,9 +6,9 @@ public final class PlaylistMO: NSManagedObject {
 
     static var excludeSystemPlaylistsFetchPredicate: NSPredicate {
         return NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersNormalPlaylist)),
-            NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersShuffledPlaylist)),
-            NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersWaitingQueuePlaylist))
+            NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersContextPlaylist)),
+            NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersShuffledContextPlaylist)),
+            NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersUserQueuePlaylist))
         ])
     }
 

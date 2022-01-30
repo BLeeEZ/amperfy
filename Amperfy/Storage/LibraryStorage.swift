@@ -522,30 +522,30 @@ class LibraryStorage: PlayableFileCachable {
             saveContext()
         }
         
-        if playerMO.waitingQueuePlaylist == nil {
-            playerMO.waitingQueuePlaylist = PlaylistMO(context: context)
+        if playerMO.userQueuePlaylist == nil {
+            playerMO.userQueuePlaylist = PlaylistMO(context: context)
             saveContext()
         }
-        if playerMO.normalPlaylist == nil {
-            playerMO.normalPlaylist = PlaylistMO(context: context)
+        if playerMO.contextPlaylist == nil {
+            playerMO.contextPlaylist = PlaylistMO(context: context)
             saveContext()
         }
-        if playerMO.shuffledPlaylist == nil {
-            playerMO.shuffledPlaylist = PlaylistMO(context: context)
+        if playerMO.shuffledContextPlaylist == nil {
+            playerMO.shuffledContextPlaylist = PlaylistMO(context: context)
             saveContext()
         }
         
-        let waitingQueuePlaylist = Playlist(library: self, managedObject: playerMO.waitingQueuePlaylist!)
-        let normalPlaylist = Playlist(library: self, managedObject: playerMO.normalPlaylist!)
-        let shuffledPlaylist = Playlist(library: self, managedObject: playerMO.shuffledPlaylist!)
+        let userQueuePlaylist = Playlist(library: self, managedObject: playerMO.userQueuePlaylist!)
+        let contextPlaylist = Playlist(library: self, managedObject: playerMO.contextPlaylist!)
+        let shuffledContextPlaylist = Playlist(library: self, managedObject: playerMO.shuffledContextPlaylist!)
         
-        if shuffledPlaylist.items.count != normalPlaylist.items.count {
-            shuffledPlaylist.removeAllItems()
-            shuffledPlaylist.append(playables: normalPlaylist.playables)
-            shuffledPlaylist.shuffle()
+        if shuffledContextPlaylist.items.count != contextPlaylist.items.count {
+            shuffledContextPlaylist.removeAllItems()
+            shuffledContextPlaylist.append(playables: contextPlaylist.playables)
+            shuffledContextPlaylist.shuffle()
         }
         
-        playerData = PlayerData(library: self, managedObject: playerMO, waitingQueuePlaylist: waitingQueuePlaylist, normalPlaylist: normalPlaylist, shuffledPlaylist: shuffledPlaylist)
+        playerData = PlayerData(library: self, managedObject: playerMO, userQueue: userQueuePlaylist, contextQueue: contextPlaylist, shuffledContextQueue: shuffledContextPlaylist)
         
         return playerData
     }

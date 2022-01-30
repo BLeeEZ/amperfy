@@ -36,13 +36,13 @@ enum RepeatMode: Int16 {
 
 enum PlayerQueueType: Int, CaseIterable {
     case prev = 0
-    case waitingQueue
+    case user
     case next
     
     var description : String {
         switch self {
         case .prev: return "Previous"
-        case .waitingQueue: return "Next in Waiting Queue"
+        case .user: return "Next in User Queue"
         case .next: return "Next"
         }
     }

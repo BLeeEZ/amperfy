@@ -79,23 +79,23 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
 
     func play(context: PlayContext) {
         guard let activePlayable = context.getActivePlayable() else { return }
-        let topWaitingQueueItem = queueHandler.waitingQueue.first
-        let wasWaitingQueuePlaying = queueHandler.isWaitingQueuePlaying
-        queueHandler.clearPlaylistQueues()
-        queueHandler.appendToNextInMainQueue(playables: context.playables)
-        if !wasWaitingQueuePlaying {
-            if queueHandler.waitingQueue.isEmpty {
+        let topUserQueueItem = queueHandler.userQueue.first
+        let wasUserQueuePlaying = queueHandler.isUserQueuePlaying
+        queueHandler.clearContextQueue()
+        queueHandler.appendContextQueue(playables: context.playables)
+        if !wasUserQueuePlaying {
+            if queueHandler.userQueue.isEmpty {
                 if context.index == 0 {
                     insertIntoPlayer(playable: activePlayable)
                 } else {
                     play(playerIndex: PlayerIndex(queueType: .next, index: context.index-1))
                 }
             } else {
-                play(playerIndex: PlayerIndex(queueType: .waitingQueue, index: 0))
+                play(playerIndex: PlayerIndex(queueType: .user, index: 0))
             }
         }
-        if let topWaitingQueueItem = topWaitingQueueItem, !wasWaitingQueuePlaying {
-            queueHandler.insertFirstToWaitingQueue(playables: [topWaitingQueueItem])
+        if let topUserQueueItem = topUserQueueItem, !wasUserQueuePlaying {
+            queueHandler.insertUserQueue(playables: [topUserQueueItem])
         }
     }
     
@@ -128,8 +128,8 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
 
     //BackendAudioPlayerNotifiable
     func playNext() {
-        if queueHandler.waitingQueue.count > 0 {
-            play(playerIndex: PlayerIndex(queueType: .waitingQueue, index: 0))
+        if queueHandler.userQueue.count > 0 {
+            play(playerIndex: PlayerIndex(queueType: .user, index: 0))
         } else if queueHandler.nextQueue.count > 0 {
             play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         } else if playerStatus.repeatMode == .all, !queueHandler.prevQueue.isEmpty {

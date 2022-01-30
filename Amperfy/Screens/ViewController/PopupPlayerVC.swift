@@ -109,11 +109,11 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func scrollToNextPlayingRow() {
-        if player.waitingQueue.count > 0 {
+        if !player.userQueue.isEmpty {
             tableView.scrollToRow(at: IndexPath(row: 0, section: 1), at: .top, animated: true)
-        } else if player.nextQueue.count > 0 {
+        } else if !player.nextQueue.isEmpty {
             tableView.scrollToRow(at: IndexPath(row: 0, section: 2), at: .top, animated: true)
-        } else if player.prevQueue.count > 0 {
+        } else if !player.prevQueue.isEmpty {
             tableView.scrollToRow(at: IndexPath(row: player.prevQueue.count-1, section: 0), at: .top, animated: true)
         }
     }
@@ -183,19 +183,19 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        refreshWaitingQueueSectionHeader()
+        refreshUserQueueSectionHeader()
         return sectionViews[section]
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if section == 1, player.waitingQueue.isEmpty {
+        if section == 1, player.userQueue.isEmpty {
             return CGFloat.leastNormalMagnitude
         }
         return PopupPlayerSectionHeader.frameHeight
     }
     
      func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-         if section == 1, player.waitingQueue.isEmpty {
+         if section == 1, player.userQueue.isEmpty {
              return CGFloat.leastNormalMagnitude
          }
          return CommonScreenOperations.tableSectionHeightFooter
@@ -205,7 +205,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch(section) {
         case 0: return player.prevQueue.count
-        case 1: return player.waitingQueue.count
+        case 1: return player.userQueue.count
         case 2: return player.nextQueue.count
         default: return 0
         }
@@ -231,7 +231,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             player.removePlayable(at: playerIndex)
             tableView.deleteRows(at: [indexPath], with: .fade)
             if indexPath.section == 1 {
-                refreshWaitingQueueSectionHeader()
+                refreshUserQueueSectionHeader()
             }
         }
     }
@@ -244,31 +244,31 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         else { return }
         player.movePlayable(from: fromPlayerIndex, to: toPlayerIndex)
         if fromIndexPath.section == 1 || to.section == 1 {
-            refreshWaitingQueueSectionHeader()
+            refreshUserQueueSectionHeader()
         }
     }
     
-    func refreshWaitingQueueSectionHeader() {
-        let waitingQueueSectionView = sectionViews[1]
-        if player.waitingQueue.isEmpty {
-            waitingQueueSectionView.hide()
+    func refreshUserQueueSectionHeader() {
+        let userQueueSectionView = sectionViews[1]
+        if player.userQueue.isEmpty {
+            userQueueSectionView.hide()
         } else {
-            waitingQueueSectionView.display(type: .waitingQueue, buttonTitle: "Clear") {
-                self.clearWaitingQueue()
+            userQueueSectionView.display(type: .user, buttonTitle: "Clear") {
+                self.clearUserQueue()
             }
         }
     }
     
-    func clearWaitingQueue() {
+    func clearUserQueue() {
         tableView.beginUpdates()
         var indexPaths = [IndexPath]()
-        for i in 0...self.player.waitingQueue.count-1 {
+        for i in 0...self.player.userQueue.count-1 {
             indexPaths.append(IndexPath(row: i, section: 1))
         }
         tableView.deleteRows(at: indexPaths, with: .fade)
-        appDelegate.player.clearWaitingQueue()
+        appDelegate.player.clearUserQueue()
         tableView.endUpdates()
-        refreshWaitingQueueSectionHeader()
+        refreshUserQueueSectionHeader()
         playerView?.refreshPlayer()
     }
 
@@ -310,9 +310,9 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             self.reloadData()
             self.playerView?.refreshPlayer()
         }))
-        if !player.waitingQueue.isEmpty {
-            alert.addAction(UIAlertAction(title: "Clear Waiting Queue", style: .default, handler: { _ in
-                self.clearWaitingQueue()
+        if !player.userQueue.isEmpty {
+            alert.addAction(UIAlertAction(title: "Clear User Queue", style: .default, handler: { _ in
+                self.clearUserQueue()
             }))
         }
         if appDelegate.persistentStorage.settings.isOnlineMode {

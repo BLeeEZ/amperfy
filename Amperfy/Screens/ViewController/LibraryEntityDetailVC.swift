@@ -12,10 +12,10 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var infoLabel: MarqueeLabel!
     @IBOutlet weak var artworkImage: LibraryEntityImage!
     
-    @IBOutlet weak var waitingQueueInsertButton: BasicButton!
-    @IBOutlet weak var waitingQueueAppendButton: BasicButton!
-    @IBOutlet weak var mainNextInsertButton: BasicButton!
-    @IBOutlet weak var mainNextAppendButton: BasicButton!
+    @IBOutlet weak var userQueueInsertButton: BasicButton!
+    @IBOutlet weak var userQueueAppendButton: BasicButton!
+    @IBOutlet weak var contextQueueInsertButton: BasicButton!
+    @IBOutlet weak var contextQueueAppendButton: BasicButton!
     
     @IBOutlet weak var ratingPlaceholderView: UIView!
     @IBOutlet weak var ratingView: RatingView?
@@ -61,21 +61,21 @@ class LibraryEntityDetailVC: UIViewController {
         ratingPlaceholderView.layer.cornerRadius = 10
         refresh()
         
-        waitingQueueInsertButton.contentMode = .center
-        waitingQueueInsertButton.imageView?.contentMode = .scaleAspectFill
-        waitingQueueInsertButton.titleLabel!.lineBreakMode = .byWordWrapping;
+        userQueueInsertButton.contentMode = .center
+        userQueueInsertButton.imageView?.contentMode = .scaleAspectFill
+        userQueueInsertButton.titleLabel!.lineBreakMode = .byWordWrapping;
         
-        waitingQueueAppendButton.contentMode = .center
-        waitingQueueAppendButton.imageView?.contentMode = .scaleAspectFill
-        waitingQueueAppendButton.titleLabel!.lineBreakMode = .byWordWrapping;
+        userQueueAppendButton.contentMode = .center
+        userQueueAppendButton.imageView?.contentMode = .scaleAspectFill
+        userQueueAppendButton.titleLabel!.lineBreakMode = .byWordWrapping;
 
-        mainNextInsertButton.contentMode = .center
-        mainNextInsertButton.imageView?.contentMode = .scaleAspectFill
-        mainNextInsertButton.titleLabel!.lineBreakMode = .byWordWrapping;
+        contextQueueInsertButton.contentMode = .center
+        contextQueueInsertButton.imageView?.contentMode = .scaleAspectFill
+        contextQueueInsertButton.titleLabel!.lineBreakMode = .byWordWrapping;
 
-        mainNextAppendButton.contentMode = .center
-        mainNextAppendButton.imageView?.contentMode = .scaleAspectFill
-        mainNextAppendButton.titleLabel!.lineBreakMode = .byWordWrapping;
+        contextQueueAppendButton.contentMode = .center
+        contextQueueAppendButton.imageView?.contentMode = .scaleAspectFill
+        contextQueueAppendButton.titleLabel!.lineBreakMode = .byWordWrapping;
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -152,10 +152,10 @@ class LibraryEntityDetailVC: UIViewController {
         if !artist.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
             playButton.isHidden = true
             playShuffledButton.isHidden = true
-            waitingQueueInsertButton.isHidden = true
-            waitingQueueAppendButton.isHidden = true
-            mainNextInsertButton.isHidden = true
-            mainNextAppendButton.isHidden = true
+            userQueueInsertButton.isHidden = true
+            userQueueAppendButton.isHidden = true
+            contextQueueInsertButton.isHidden = true
+            contextQueueAppendButton.isHidden = true
         }
         if appDelegate.persistentStorage.settings.isOfflineMode {
             addToPlaylistButton.isHidden = true
@@ -198,10 +198,10 @@ class LibraryEntityDetailVC: UIViewController {
         if !album.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
             playButton.isHidden = true
             playShuffledButton.isHidden = true
-            waitingQueueInsertButton.isHidden = true
-            waitingQueueAppendButton.isHidden = true
-            mainNextInsertButton.isHidden = true
-            mainNextAppendButton.isHidden = true
+            userQueueInsertButton.isHidden = true
+            userQueueAppendButton.isHidden = true
+            contextQueueInsertButton.isHidden = true
+            contextQueueAppendButton.isHidden = true
         }
         if appDelegate.persistentStorage.settings.isOfflineMode {
             addToPlaylistButton.isHidden = true
@@ -248,10 +248,10 @@ class LibraryEntityDetailVC: UIViewController {
         }
         playShuffledButton.isHidden = true
         if playerIndexCb != nil || !song.isCached && appDelegate.persistentStorage.settings.isOfflineMode {
-            waitingQueueInsertButton.isHidden = true
-            waitingQueueAppendButton.isHidden = true
-            mainNextInsertButton.isHidden = true
-            mainNextAppendButton.isHidden = true
+            userQueueInsertButton.isHidden = true
+            userQueueAppendButton.isHidden = true
+            contextQueueInsertButton.isHidden = true
+            contextQueueAppendButton.isHidden = true
         }
         if appDelegate.persistentStorage.settings.isOfflineMode {
             addToPlaylistButton.isHidden = true
@@ -299,10 +299,10 @@ class LibraryEntityDetailVC: UIViewController {
         if playerIndexCb != nil ||
            (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
            (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode) {
-            waitingQueueInsertButton.isHidden = true
-            waitingQueueAppendButton.isHidden = true
-            mainNextInsertButton.isHidden = true
-            mainNextAppendButton.isHidden = true
+            userQueueInsertButton.isHidden = true
+            userQueueAppendButton.isHidden = true
+            contextQueueInsertButton.isHidden = true
+            contextQueueAppendButton.isHidden = true
         }
         addToPlaylistButton.isHidden = true
         if podcastEpisode.isCached {
@@ -427,28 +427,28 @@ class LibraryEntityDetailVC: UIViewController {
         }
     }
     
-    @IBAction func pressedInsertWaitingQueue(_ sender: Any) {
+    @IBAction func pressedInsertUserQueue(_ sender: Any) {
         dismiss(animated: true)
         guard !entityPlayables.isEmpty else { return }
-        self.appDelegate.player.insertFirstToWaitingQueue(playables: entityPlayables)
+        self.appDelegate.player.insertUserQueue(playables: entityPlayables)
     }
     
-    @IBAction func pressedAppendWaitingQueue(_ sender: Any) {
+    @IBAction func pressedAppendUserQueue(_ sender: Any) {
         dismiss(animated: true)
         guard !entityPlayables.isEmpty else { return }
-        self.appDelegate.player.appendToWaitingQueue(playables: entityPlayables)
+        self.appDelegate.player.appendUserQueue(playables: entityPlayables)
     }
     
-    @IBAction func pressedInsertNextInMainQueue(_ sender: Any) {
+    @IBAction func pressedInsertContextQueue(_ sender: Any) {
         dismiss(animated: true)
         guard !entityPlayables.isEmpty else { return }
-        self.appDelegate.player.insertFirstToNextInMainQueue(playables: entityPlayables)
+        self.appDelegate.player.insertContextQueue(playables: entityPlayables)
     }
     
-    @IBAction func pressedAppendNextInMainQueue(_ sender: Any) {
+    @IBAction func pressedAppendContextQueue(_ sender: Any) {
         dismiss(animated: true)
         guard !entityPlayables.isEmpty else { return }
-        self.appDelegate.player.appendToNextInMainQueue(playables: entityPlayables)
+        self.appDelegate.player.appendContextQueue(playables: entityPlayables)
     }
     
     @IBAction func pressedCancel(_ sender: Any) {

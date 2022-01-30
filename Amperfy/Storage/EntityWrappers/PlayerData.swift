@@ -11,40 +11,40 @@ protocol PlayerStatusPersistent {
 }
 
 protocol PlayerQueuesPersistent {
-    var isWaitingQueuePlaying: Bool { get set }
-    var isWaitingQueueVisible: Bool { get }
+    var isUserQueuePlaying: Bool { get set }
+    var isUserQueueVisible: Bool { get }
     
     var currentIndex: Int { get set }
     var currentItem: AbstractPlayable? { get }
-    var activePlaylist: Playlist { get }
-    var inactivePlaylist: Playlist { get }
-    var waitingQueuePlaylist: Playlist { get }
+    var contextQueue: Playlist { get }
+    var inactiveContextQueue: Playlist { get }
+    var userQueuePlaylist: Playlist { get }
     
-    func insertFirstToNextInMainQueue(playables: [AbstractPlayable])
-    func appendToNextInMainQueue(playables: [AbstractPlayable])
-    func insertFirstToWaitingQueue(playables: [AbstractPlayable])
-    func appendToWaitingQueue(playables: [AbstractPlayable])
-    func clearWaitingQueue()
-    func clearPlaylistQueues()
+    func insertContextQueue(playables: [AbstractPlayable])
+    func appendContextQueue(playables: [AbstractPlayable])
+    func insertUserQueue(playables: [AbstractPlayable])
+    func appendUserQueue(playables: [AbstractPlayable])
+    func clearUserQueue()
+    func clearContextQueue()
     func removeAllItems()
 }
 
 public class PlayerData: NSObject {
     
-    private let waitingQueuePlaylistInternal: Playlist
+    private let userQueuePlaylistInternal: Playlist
     private let library: LibraryStorage
     private let managedObject: PlayerMO
-    private let normalPlaylist: Playlist
-    private let shuffledPlaylist: Playlist
+    private let contextPlaylist: Playlist
+    private let shuffledContextPlaylist: Playlist
     
     static let entityName: String = { return "Player" }()
     
-    init(library: LibraryStorage, managedObject: PlayerMO, waitingQueuePlaylist: Playlist, normalPlaylist: Playlist, shuffledPlaylist: Playlist) {
+    init(library: LibraryStorage, managedObject: PlayerMO, userQueue: Playlist, contextQueue: Playlist, shuffledContextQueue: Playlist) {
         self.library = library
         self.managedObject = managedObject
-        self.waitingQueuePlaylistInternal = waitingQueuePlaylist
-        self.normalPlaylist = normalPlaylist
-        self.shuffledPlaylist = shuffledPlaylist
+        self.userQueuePlaylistInternal = userQueue
+        self.contextPlaylist = contextQueue
+        self.shuffledContextPlaylist = shuffledContextQueue
     }
 
     override public func isEqual(_ object: Any?) -> Bool {
@@ -58,8 +58,8 @@ extension PlayerData: PlayerStatusPersistent {
     
     func stop() {
         currentIndex = 0
-        isWaitingQueuePlaying = false
-        clearWaitingQueue()
+        isUserQueuePlaying = false
+        clearUserQueue()
     }
     
     var isAutoCachePlayedItems: Bool {
@@ -74,13 +74,13 @@ extension PlayerData: PlayerStatusPersistent {
         get { return managedObject.shuffleSetting == 1 }
         set {
             if newValue {
-                shuffledPlaylist.shuffle()
-                if let curPlayable = currentItem, let indexOfCurrentItemInShuffledPlaylist = shuffledPlaylist.getFirstIndex(playable: curPlayable) {
-                    shuffledPlaylist.movePlaylistItem(fromIndex: indexOfCurrentItemInShuffledPlaylist, to: 0)
+                shuffledContextPlaylist.shuffle()
+                if let curPlayable = currentItem, let indexOfCurrentItemInShuffledPlaylist = shuffledContextPlaylist.getFirstIndex(playable: curPlayable) {
+                    shuffledContextPlaylist.movePlaylistItem(fromIndex: indexOfCurrentItemInShuffledPlaylist, to: 0)
                     currentIndex = 0
                 }
             } else {
-                if let curPlayable = currentItem, let indexOfCurrentItemInNormalPlaylist = normalPlaylist.getFirstIndex(playable: curPlayable) {
+                if let curPlayable = currentItem, let indexOfCurrentItemInNormalPlaylist = contextPlaylist.getFirstIndex(playable: curPlayable) {
                     currentIndex = indexOfCurrentItemInNormalPlaylist
                 }
             }
@@ -102,56 +102,55 @@ extension PlayerData: PlayerStatusPersistent {
 }
 
 extension PlayerData: PlayerQueuesPersistent {
-
-    var isWaitingQueuePlaying: Bool {
-        get { return managedObject.isWaitingQueuePlaying }
+    var isUserQueuePlaying: Bool {
+        get { return managedObject.isUserQueuePlaying }
         set {
-            managedObject.isWaitingQueuePlaying = newValue
+            managedObject.isUserQueuePlaying = newValue
             library.saveContext()
         }
     }
     
-    var isWaitingQueueVisible: Bool {
-        return waitingQueuePlaylistInternal.songCount > 0 && !(isWaitingQueuePlaying && waitingQueuePlaylistInternal.songCount == 1)
+    var isUserQueueVisible: Bool {
+        return userQueuePlaylistInternal.songCount > 0 && !(isUserQueuePlaying && userQueuePlaylistInternal.songCount == 1)
     }
     
-    var activePlaylist: Playlist {
+    var contextQueue: Playlist {
         get {
             if !isShuffle {
-                return normalPlaylist
+                return contextPlaylist
             } else {
-                return shuffledPlaylist
+                return shuffledContextPlaylist
             }
         }
     }
     
-    var inactivePlaylist: Playlist {
+    var inactiveContextQueue: Playlist {
         get {
             if !isShuffle {
-                return shuffledPlaylist
+                return shuffledContextPlaylist
             } else {
-                return normalPlaylist
+                return contextPlaylist
             }
         }
     }
     
     var currentIndex: Int {
         get {
-            if managedObject.currentIndex < 0, !isWaitingQueuePlaying {
+            if managedObject.currentIndex < 0, !isUserQueuePlaying {
                 managedObject.currentIndex = 0
                 library.saveContext()
             }
-            if managedObject.currentIndex >= activePlaylist.playables.count || managedObject.currentIndex < -1 {
+            if managedObject.currentIndex >= contextQueue.playables.count || managedObject.currentIndex < -1 {
                 managedObject.currentIndex = 0
                 library.saveContext()
             }
             return Int(managedObject.currentIndex)
         }
         set {
-            if newValue >= -1, newValue < activePlaylist.playables.count {
+            if newValue >= -1, newValue < contextQueue.playables.count {
                 managedObject.currentIndex = Int32(newValue)
             } else {
-                managedObject.currentIndex = isWaitingQueuePlaying ? -1 : 0
+                managedObject.currentIndex = isUserQueuePlaying ? -1 : 0
             }
             library.saveContext()
         }
@@ -159,68 +158,68 @@ extension PlayerData: PlayerQueuesPersistent {
     
     var currentItem: AbstractPlayable? {
         get {
-            if isWaitingQueuePlaying, waitingQueuePlaylistInternal.songCount > 0 {
-                return waitingQueuePlaylistInternal.playables.first
+            if isUserQueuePlaying, userQueuePlaylistInternal.songCount > 0 {
+                return userQueuePlaylistInternal.playables.first
             }
-            guard activePlaylist.playables.count > 0 else { return nil }
-            guard currentIndex >= 0, currentIndex < activePlaylist.playables.count else {
-                return activePlaylist.playables[0]
+            guard contextQueue.playables.count > 0 else { return nil }
+            guard currentIndex >= 0, currentIndex < contextQueue.playables.count else {
+                return contextQueue.playables[0]
             }
-            return activePlaylist.playables[currentIndex]
+            return contextQueue.playables[currentIndex]
         }
     }
 
-    var waitingQueuePlaylist: Playlist {
-        get { return waitingQueuePlaylistInternal }
+    var userQueuePlaylist: Playlist {
+        get { return userQueuePlaylistInternal }
     }
 
-    func insertFirstToNextInMainQueue(playables: [AbstractPlayable]) {
+    func insertContextQueue(playables: [AbstractPlayable]) {
         var targetIndex = currentIndex+1
-        if normalPlaylist.songCount == 0 {
-            if isWaitingQueuePlaying {
+        if contextPlaylist.songCount == 0 {
+            if isUserQueuePlaying {
                 currentIndex = -1
             }
             targetIndex = 0
         }
-        normalPlaylist.insert(playables: playables, index: targetIndex)
-        shuffledPlaylist.insert(playables: playables, index: targetIndex)
+        contextPlaylist.insert(playables: playables, index: targetIndex)
+        shuffledContextPlaylist.insert(playables: playables, index: targetIndex)
     }
     
-    func appendToNextInMainQueue(playables: [AbstractPlayable]) {
-        normalPlaylist.append(playables: playables)
-        shuffledPlaylist.append(playables: playables)
+    func appendContextQueue(playables: [AbstractPlayable]) {
+        contextPlaylist.append(playables: playables)
+        shuffledContextPlaylist.append(playables: playables)
     }
     
-    func insertFirstToWaitingQueue(playables: [AbstractPlayable]) {
-        let targetIndex = isWaitingQueuePlaying && waitingQueuePlaylistInternal.songCount > 0 ? 1 : 0
-        waitingQueuePlaylistInternal.insert(playables: playables, index: targetIndex)
+    func insertUserQueue(playables: [AbstractPlayable]) {
+        let targetIndex = isUserQueuePlaying && userQueuePlaylistInternal.songCount > 0 ? 1 : 0
+        userQueuePlaylistInternal.insert(playables: playables, index: targetIndex)
     }
     
-    func appendToWaitingQueue(playables: [AbstractPlayable]) {
-        waitingQueuePlaylistInternal.append(playables: playables)
+    func appendUserQueue(playables: [AbstractPlayable]) {
+        userQueuePlaylistInternal.append(playables: playables)
     }
     
-    func clearPlaylistQueues() {
-        normalPlaylist.removeAllItems()
-        shuffledPlaylist.removeAllItems()
-        if waitingQueuePlaylistInternal.songCount > 0 {
-            isWaitingQueuePlaying = true
+    func clearContextQueue() {
+        contextPlaylist.removeAllItems()
+        shuffledContextPlaylist.removeAllItems()
+        if userQueuePlaylistInternal.songCount > 0 {
+            isUserQueuePlaying = true
             currentIndex = -1
         } else {
             currentIndex = 0
         }
     }
     
-    func clearWaitingQueue() {
-        waitingQueuePlaylistInternal.removeAllItems()
+    func clearUserQueue() {
+        userQueuePlaylistInternal.removeAllItems()
     }
     
     func removeAllItems() {
         currentIndex = 0
-        isWaitingQueuePlaying = false
-        normalPlaylist.removeAllItems()
-        shuffledPlaylist.removeAllItems()
-        waitingQueuePlaylistInternal.removeAllItems()
+        isUserQueuePlaying = false
+        contextPlaylist.removeAllItems()
+        shuffledContextPlaylist.removeAllItems()
+        userQueuePlaylistInternal.removeAllItems()
     }
 }
     

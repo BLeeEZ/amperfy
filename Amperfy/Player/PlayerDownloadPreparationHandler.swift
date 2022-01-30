@@ -15,19 +15,19 @@ class PlayerDownloadPreparationHandler {
     }
     
     private func preDownloadNextItems() {
-        let upcomingItemsCount = min(queueHandler.waitingQueue.count + queueHandler.nextQueue.count, Self.preDownloadCount)
+        let upcomingItemsCount = min(queueHandler.userQueue.count + queueHandler.nextQueue.count, Self.preDownloadCount)
         guard upcomingItemsCount > 0 else { return }
         
-        let waitingQueueRangeEnd = min(queueHandler.waitingQueue.count, Self.preDownloadCount)
-        if waitingQueueRangeEnd > 0 {
-            for i in 0...waitingQueueRangeEnd-1 {
-                let playable = queueHandler.waitingQueue[i]
+        let userQueueRangeEnd = min(queueHandler.userQueue.count, Self.preDownloadCount)
+        if userQueueRangeEnd > 0 {
+            for i in 0...userQueueRangeEnd-1 {
+                let playable = queueHandler.userQueue[i]
                 if !playable.isCached {
                     playableDownloadManager.download(object: playable)
                 }
             }
         }
-        let nextQueueRangeEnd = min(queueHandler.nextQueue.count, Self.preDownloadCount-waitingQueueRangeEnd)
+        let nextQueueRangeEnd = min(queueHandler.nextQueue.count, Self.preDownloadCount-userQueueRangeEnd)
         if nextQueueRangeEnd > 0 {
             for i in 0...nextQueueRangeEnd-1 {
                 let playable = queueHandler.nextQueue[i]

@@ -570,6 +570,7 @@
 		50A738802244B03700D3F2D4 /* SsPlayableParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPlayableParserDelegate.swift; sourceTree = "<group>"; };
 		50A7388222451ED200D3F2D4 /* SsPlaylistParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPlaylistParserDelegate.swift; sourceTree = "<group>"; };
 		50A7388422452C1900D3F2D4 /* SsPlaylistSongsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPlaylistSongsParserDelegate.swift; sourceTree = "<group>"; };
+		50A79E0C27A80E2A002E0D2D /* Amperfy v19.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v19.xcdatamodel"; sourceTree = "<group>"; };
 		50A85EEA2689C0A500FB3E31 /* AbstractPlayable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbstractPlayable.swift; sourceTree = "<group>"; };
 		50A85EEC2689C5DB00FB3E31 /* SsSongParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSongParserDelegate.swift; sourceTree = "<group>"; };
 		50A85EEE2689C77F00FB3E31 /* PlayableParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayableParserDelegate.swift; sourceTree = "<group>"; };
@@ -2187,6 +2188,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				50A79E0C27A80E2A002E0D2D /* Amperfy v19.xcdatamodel */,
 				5067E37727916AE100807A78 /* Amperfy v18.xcdatamodel */,
 				50048F9E275A9AA10087EDFB /* Amperfy v17.xcdatamodel */,
 				50A12F47273BBF7300E7B2AA /* Amperfy v16.xcdatamodel */,
@@ -2206,7 +2208,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 5067E37727916AE100807A78 /* Amperfy v18.xcdatamodel */;
+			currentVersion = 50A79E0C27A80E2A002E0D2D /* Amperfy v19.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
