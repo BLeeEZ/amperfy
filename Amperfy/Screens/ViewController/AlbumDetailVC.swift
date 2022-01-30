@@ -23,7 +23,9 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
             detailOperationsView = albumDetailTableHeaderView
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: AlbumDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(playableContainer: album, with: appDelegate.player)
+            libraryElementDetailTableHeaderView.prepare(
+                playContextCb: {() in PlayContext(playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
+                with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         
@@ -40,10 +42,19 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         }
     }
     
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell),
+              let songs = self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
+        else { return nil }
+        let selectedSong = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+        guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
+        return PlayContext(index: playContextIndex, playables: songs)
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: AlbumSongTableCell = dequeueCell(for: tableView, at: indexPath)
         let song = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(song: song, rootView: self)
+        cell.display(song: song, playContextCb: convertCellViewToPlayContext, rootView: self)
         return cell
     }
     

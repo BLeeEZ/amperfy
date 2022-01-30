@@ -64,6 +64,12 @@ class SearchVC: BasicTableViewController {
         appDelegate.userStatistics.visited(.search)
     }
 
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell), indexPath.section == LibraryElement.Song.rawValue else { return nil }
+        let song = songFetchedResultsController.getWrappedEntity(at: indexPath)
+        return PlayContext(playables: [song])
+    }
+
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -120,7 +126,7 @@ class SearchVC: BasicTableViewController {
         case LibraryElement.Song.rawValue:
             let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
             let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(song: song, rootView: self)
+            cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
             return cell
         default:
             return UITableViewCell()

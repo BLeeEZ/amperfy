@@ -77,39 +77,22 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         }
     }
 
-    func play(playable: AbstractPlayable) {
+    func play(context: PlayContext) {
+        guard let activePlayable = context.getActivePlayable() else { return }
         let topWaitingQueueItem = queueHandler.waitingQueue.first
         let wasWaitingQueuePlaying = queueHandler.isWaitingQueuePlaying
         queueHandler.clearPlaylistQueues()
-        queueHandler.appendToNextInMainQueue(playables: [playable])
-        if queueHandler.waitingQueue.isEmpty {
-            if queueHandler.isWaitingQueuePlaying {
-                playNext()
+        queueHandler.appendToNextInMainQueue(playables: context.playables)
+        if !wasWaitingQueuePlaying {
+            if queueHandler.waitingQueue.isEmpty {
+                if context.index == 0 {
+                    insertIntoPlayer(playable: activePlayable)
+                } else {
+                    play(playerIndex: PlayerIndex(queueType: .next, index: context.index-1))
+                }
             } else {
-                insertIntoPlayer(playable: playable)
+                play(playerIndex: PlayerIndex(queueType: .waitingQueue, index: 0))
             }
-        } else {
-            play(playerIndex: PlayerIndex(queueType: .next, index: 0))
-        }
-        if let topWaitingQueueItem = topWaitingQueueItem, !wasWaitingQueuePlaying {
-            queueHandler.insertFirstToWaitingQueue(playables: [topWaitingQueueItem])
-        }
-    }
-    
-    func play(playables: [AbstractPlayable]) {
-        guard let firstPlayable = playables.first else { return }
-        let topWaitingQueueItem = queueHandler.waitingQueue.first
-        let wasWaitingQueuePlaying = queueHandler.isWaitingQueuePlaying
-        queueHandler.clearPlaylistQueues()
-        queueHandler.appendToNextInMainQueue(playables: playables)
-        if queueHandler.waitingQueue.isEmpty {
-            if queueHandler.isWaitingQueuePlaying {
-                playNext()
-            } else {
-                insertIntoPlayer(playable: firstPlayable)
-            }
-        } else {
-            play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         }
         if let topWaitingQueueItem = topWaitingQueueItem, !wasWaitingQueuePlaying {
             queueHandler.insertFirstToWaitingQueue(playables: [topWaitingQueueItem])

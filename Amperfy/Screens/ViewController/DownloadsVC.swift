@@ -49,12 +49,19 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
     override func viewWillAppear(_ animated: Bool) {
         fetchedResultsController.fetch()
     }
+    
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell) else { return nil }
+        let downdload = fetchedResultsController.getWrappedEntity(at: indexPath)
+        guard let playable = downdload.element as? AbstractPlayable else { return nil }
+        return PlayContext(playables: [playable])
+    }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
         let download = fetchedResultsController.getWrappedEntity(at: indexPath)
         if let playable = download.element as? AbstractPlayable {
-            cell.display(playable: playable, rootView: self, download: download)
+            cell.display(playable: playable, playContextCb: convertCellViewToPlayContext, rootView: self, download: download)
         }
         return cell
     }

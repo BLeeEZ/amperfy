@@ -1,6 +1,9 @@
 import Foundation
 import UIKit
 
+typealias GetPlayContextCallback = () -> PlayContext?
+typealias GetPlayerIndexCallback = () -> PlayerIndex?
+
 class LibraryEntityDetailVC: UIViewController {
     
     @IBOutlet weak var titleLabel: MarqueeLabel!
@@ -18,14 +21,18 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var ratingView: RatingView?
 
     @IBOutlet weak var playButton: UIButton!
+    @IBOutlet weak var playShuffledButton: BasicButton!
     @IBOutlet weak var addToPlaylistButton: UIButton!
     @IBOutlet weak var downloadButton: UIButton!
     @IBOutlet weak var deleteCacheButton: UIButton!
+    @IBOutlet weak var deleteOnServerButton: UIButton!
     @IBOutlet weak var showArtistButton: UIButton!
     @IBOutlet weak var showAlbumButton: UIButton!
     @IBOutlet weak var cancelButton: UIButton!
     
-    private var rootView: UITableViewController?
+    private var rootView: UIViewController?
+    private var playContextCb: GetPlayContextCallback?
+    private var playerIndexCb: GetPlayerIndexCallback?
     private var appDelegate: AppDelegate!
     private var playable: AbstractPlayable?
     private var album: Album?
@@ -52,13 +59,7 @@ class LibraryEntityDetailVC: UIViewController {
             ratingPlaceholderView.addSubview(ratingView)
         }
         ratingPlaceholderView.layer.cornerRadius = 10
-        if let playable = playable {
-            configureFor(playable: playable)
-        } else if let album = album {
-            configureFor(album: album)
-        } else if let artist = artist {
-            configureFor(artist: artist)
-        }
+        refresh()
         
         waitingQueueInsertButton.contentMode = .center
         waitingQueueInsertButton.imageView?.contentMode = .scaleAspectFill
@@ -76,7 +77,7 @@ class LibraryEntityDetailVC: UIViewController {
         mainNextAppendButton.imageView?.contentMode = .scaleAspectFill
         mainNextAppendButton.titleLabel!.lineBreakMode = .byWordWrapping;
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
@@ -99,24 +100,28 @@ class LibraryEntityDetailVC: UIViewController {
         }
     }
     
-    func display(artist: Artist, on rootView: UITableViewController) {
+    func display(artist: Artist, on rootView: UIViewController) {
         self.artist = artist
         self.rootView = rootView
     }
 
-    func display(album: Album, on rootView: UITableViewController) {
+    func display(album: Album, on rootView: UIViewController) {
         self.album = album
         self.rootView = rootView
     }
     
-    func display(playable: AbstractPlayable, on rootView: UITableViewController) {
+    func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextCallback, on rootView: UIViewController, playerIndexCb: GetPlayerIndexCallback? = nil) {
         self.playable = playable
+        self.playContextCb = playContextCb
+        self.playerIndexCb = playerIndexCb
         self.rootView = rootView
     }
 
     func refresh() {
-        if let playable = playable {
-            configureFor(playable: playable)
+        if let song = playable?.asSong {
+            configureFor(song: song)
+        } else if let podcastEpisode = playable?.asPodcastEpisode {
+            configureFor(podcastEpisode: podcastEpisode)
         } else if let album = album {
             configureFor(album: album)
         } else if let artist = artist {
@@ -146,6 +151,7 @@ class LibraryEntityDetailVC: UIViewController {
 
         if !artist.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
             playButton.isHidden = true
+            playShuffledButton.isHidden = true
             waitingQueueInsertButton.isHidden = true
             waitingQueueAppendButton.isHidden = true
             mainNextInsertButton.isHidden = true
@@ -164,6 +170,7 @@ class LibraryEntityDetailVC: UIViewController {
             downloadButton.isHidden = true
             deleteCacheButton.isHidden = true
         }
+        deleteOnServerButton.isHidden = true
         ratingView?.display(entity: artist)
     }
     
@@ -190,6 +197,7 @@ class LibraryEntityDetailVC: UIViewController {
 
         if !album.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
             playButton.isHidden = true
+            playShuffledButton.isHidden = true
             waitingQueueInsertButton.isHidden = true
             waitingQueueAppendButton.isHidden = true
             mainNextInsertButton.isHidden = true
@@ -208,36 +216,38 @@ class LibraryEntityDetailVC: UIViewController {
             downloadButton.isHidden = true
             deleteCacheButton.isHidden = true
         }
+        deleteOnServerButton.isHidden = true
         ratingView?.display(entity: album)
     }
     
-    private func configureFor(playable: AbstractPlayable) {
-        titleLabel.text = playable.title
-        artistLabel.text = playable.creatorName
-        if playable.asSong?.artist == nil {
+    private func configureFor(song: Song) {
+        titleLabel.text = song.title
+        artistLabel.text = song.creatorName
+        if song.asSong?.artist == nil {
             showArtistButton.isHidden = true
         }
-        albumLabel.text = playable.asSong?.album?.name
-        if playable.asSong?.album == nil {
+        albumLabel.text = song.asSong?.album?.name
+        if song.asSong?.album == nil {
             showAlbumButton.isHidden = true
         }
-        artworkImage.displayAndUpdate(entity: playable, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
+        artworkImage.displayAndUpdate(entity: song, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
         var infoContent = [String]()
-        if let song = playable.asSong {
-            if song.track > 0 {
-                infoContent.append("Track \(song.track)")
-            }
-            if song.year > 0 {
-                infoContent.append("Year \(song.year)")
-            } else if let albumYear = song.album?.year, albumYear > 0 {
-                infoContent.append("Year \(albumYear)")
-            }
-            infoContent.append("\(song.duration.asDurationString)")
+        if song.track > 0 {
+            infoContent.append("Track \(song.track)")
         }
+        if song.year > 0 {
+            infoContent.append("Year \(song.year)")
+        } else if let albumYear = song.album?.year, albumYear > 0 {
+            infoContent.append("Year \(albumYear)")
+        }
+        infoContent.append("\(song.duration.asDurationString)")
         infoLabel.text = infoContent.joined(separator: " \(CommonString.oneMiddleDot) ")
 
-        if !playable.isCached && appDelegate.persistentStorage.settings.isOfflineMode {
+        if !song.isCached && appDelegate.persistentStorage.settings.isOfflineMode {
             playButton.isHidden = true
+        }
+        playShuffledButton.isHidden = true
+        if playerIndexCb != nil || !song.isCached && appDelegate.persistentStorage.settings.isOfflineMode {
             waitingQueueInsertButton.isHidden = true
             waitingQueueAppendButton.isHidden = true
             mainNextInsertButton.isHidden = true
@@ -246,7 +256,7 @@ class LibraryEntityDetailVC: UIViewController {
         if appDelegate.persistentStorage.settings.isOfflineMode {
             addToPlaylistButton.isHidden = true
         }
-        if playable.isCached {
+        if song.isCached {
             downloadButton.isHidden = true
             deleteCacheButton.isHidden = false
         } else if appDelegate.persistentStorage.settings.isOnlineMode {
@@ -256,13 +266,79 @@ class LibraryEntityDetailVC: UIViewController {
             downloadButton.isHidden = true
             deleteCacheButton.isHidden = true
         }
+        deleteOnServerButton.isHidden = true
         ratingView?.display(entity: playable)
+    }
+    
+    private func configureFor(podcastEpisode: PodcastEpisode) {
+        titleLabel.text = podcastEpisode.title
+        artistLabel.text = podcastEpisode.creatorName
+        if podcastEpisode.asPodcastEpisode?.podcast == nil {
+            showArtistButton.isHidden = true
+        }
+        albumLabel.text = ""
+        showAlbumButton.isHidden = true
+        artworkImage.displayAndUpdate(entity: podcastEpisode, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
+        var infoContent = [String]()
+        infoContent.append("\(podcastEpisode.publishDate.asShortDayMonthString)")
+        if (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
+           (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode) {
+            infoContent.append("Not Available")
+        } else if let remainingTime = podcastEpisode.remainingTimeInSec {
+            infoContent.append("\(remainingTime.asDurationString) left")
+        } else {
+            infoContent.append("\(podcastEpisode.duration.asDurationString)")
+        }
+        infoLabel.text = infoContent.joined(separator: " \(CommonString.oneMiddleDot) ")
+
+        if (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
+           (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode) {
+            playButton.isHidden = true
+        }
+        playShuffledButton.isHidden = true
+        if playerIndexCb != nil ||
+           (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
+           (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode) {
+            waitingQueueInsertButton.isHidden = true
+            waitingQueueAppendButton.isHidden = true
+            mainNextInsertButton.isHidden = true
+            mainNextAppendButton.isHidden = true
+        }
+        addToPlaylistButton.isHidden = true
+        if podcastEpisode.isCached {
+            downloadButton.isHidden = true
+            deleteCacheButton.isHidden = false
+        } else if podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode {
+            downloadButton.isHidden = false
+            deleteCacheButton.isHidden = true
+        } else {
+            downloadButton.isHidden = true
+            deleteCacheButton.isHidden = true
+        }
+        deleteOnServerButton.isHidden = podcastEpisode.remoteStatus == .deleted || appDelegate.persistentStorage.settings.isOfflineMode
+        ratingPlaceholderView.isHidden = true
     }
     
     @IBAction func pressedPlay(_ sender: Any) {
         dismiss(animated: true)
         guard !entityPlayables.isEmpty else { return }
-        self.appDelegate.player.play(playables: entityPlayables)
+        if let playerIndex = playerIndexCb?() {
+            self.appDelegate.player.play(playerIndex: playerIndex)
+        } else if let context = playContextCb?() {
+            self.appDelegate.player.play(context: context)
+        } else {
+            self.appDelegate.player.play(context: PlayContext(playables: entityPlayables))
+        }
+    }
+    
+    @IBAction func pressPlayShuffled(_ sender: Any) {
+        dismiss(animated: true)
+        guard !entityPlayables.isEmpty else { return }
+        if let context = playContextCb?() {
+            self.appDelegate.player.playShuffled(context: context)
+        } else {
+            self.appDelegate.player.playShuffled(context: PlayContext(playables: entityPlayables))
+        }
     }
     
     @IBAction func pressedAddToPlaylist(_ sender: Any) {
@@ -286,37 +362,57 @@ class LibraryEntityDetailVC: UIViewController {
             appDelegate.playableDownloadManager.removeFinishedDownload(for: playable)
             appDelegate.library.deleteCache(ofPlayable: playable)
             appDelegate.library.saveContext()
-            if let rootView = self.rootView {
-                rootView.tableView.reloadData()
+            if let rootTableView = self.rootView as? UITableViewController{
+                rootTableView.tableView.reloadData()
             }
             refresh()
         } else if let album = album, album.hasCachedPlayables {
             appDelegate.playableDownloadManager.removeFinishedDownload(for: album.playables)
             appDelegate.library.deleteCache(of: album)
             appDelegate.library.saveContext()
-            if let rootView = self.rootView {
-                rootView.tableView.reloadData()
+            if let rootTableView = self.rootView as? UITableViewController{
+                rootTableView.tableView.reloadData()
             }
             refresh()
         } else if let artist = artist, artist.hasCachedPlayables {
             appDelegate.playableDownloadManager.removeFinishedDownload(for: artist.playables)
             appDelegate.library.deleteCache(of: artist)
             appDelegate.library.saveContext()
-            if let rootView = self.rootView {
-                rootView.tableView.reloadData()
+            if let rootTableView = self.rootView as? UITableViewController{
+                rootTableView.tableView.reloadData()
             }
             refresh()
         }
     }
     
+    @IBAction func pressedDeleteOnServer(_ sender: Any) {
+        guard let podcastEpisode = playable?.asPodcastEpisode else { return }
+        self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            let library = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+            let episodeAsync = PodcastEpisode(managedObject: context.object(with: podcastEpisode.managedObject.objectID) as! PodcastEpisodeMO)
+            syncer.requestPodcastEpisodeDelete(podcastEpisode: episodeAsync)
+            if let podcastAsync = episodeAsync.podcast {
+                syncer.sync(podcast: podcastAsync, library: library)
+            }
+        }
+        dismiss(animated: true)
+    }
+    
     @IBAction func pressedShowArtist(_ sender: Any) {
-        let artist = playable?.asSong?.artist ?? album?.artist
         dismiss(animated: true) {
-            guard let artist = artist, let navController = self.rootView?.navigationController else { return }
-            self.appDelegate.userStatistics.usedAction(.alertGoToArtist)
-            let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
-            artistDetailVC.artist = artist
-            navController.pushViewController(artistDetailVC, animated: true)
+            guard let navController = self.rootView?.navigationController else { return }
+            if let artist = self.playable?.asSong?.artist ?? self.album?.artist {
+                self.appDelegate.userStatistics.usedAction(.alertGoToArtist)
+                let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
+                artistDetailVC.artist = artist
+                navController.pushViewController(artistDetailVC, animated: true)
+            } else if let podcast = self.playable?.asPodcastEpisode?.podcast {
+                self.appDelegate.userStatistics.usedAction(.alertGoToPodcast)
+                let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
+                podcastDetailVC.podcast = podcast
+                navController.pushViewController(podcastDetailVC, animated: true)
+            }
         }
     }
     

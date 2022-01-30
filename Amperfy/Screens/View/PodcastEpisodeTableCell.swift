@@ -39,15 +39,12 @@ class PodcastEpisodeTableCell: BasicTableCell {
         infoLabel.text = "\(episode.publishDate.asShortDayMonthString)"
         descriptionLabel.text = episode.depiction ?? ""
         
-        let playDuration = episode.playDuration
-        let playProgress = episode.playProgress
         var progressText = ""
-        if playDuration > 0, playProgress > 0 {
-            let remainingTime = playDuration - playProgress
+        if let remainingTime = episode.remainingTimeInSec, let playProgressPercent = episode.playProgressPercent {
             progressText = "\(remainingTime.asDurationString) left"
             playProgressBar.isHidden = false
             playProgressLabelPlayButtonDistance.constant = (2 * 8.0) + playProgressBar.frame.width
-            playProgressBar.progress = Float(playProgress) / Float(playDuration)
+            playProgressBar.progress = playProgressPercent
         } else {
             progressText = "\(episode.duration.asDurationString)"
             playProgressBar.isHidden = true
@@ -70,12 +67,15 @@ class PodcastEpisodeTableCell: BasicTableCell {
     }
     
     @IBAction func optionsButtonPressed(_ sender: Any) {
-        guard let episode = self.episode, let rootView = rootView else { return }
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        let alert = createAlert(forEpisode: episode, rootView: rootView)
-        alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
-        rootView.present(alert, animated: true, completion: nil)
+        guard let episode = self.episode, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(
+            playable: episode,
+            playContextCb: {() in PlayContext(playables: [episode])},
+            on: rootView)
+        rootView.present(detailVC, animated: true)
     }
     
     func createAlert(forEpisode episode: PodcastEpisode, rootView: UIViewController) -> UIAlertController {
@@ -91,7 +91,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
         if episode.isAvailableToUser {
             if episode.isCached || appDelegate.persistentStorage.settings.isOnlineMode {
                 alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
-                    self.appDelegate.player.play(playable: episode)
+                    self.appDelegate.player.play(context: PlayContext(playables: [episode]))
                 }))
                 alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
                     self.appDelegate.player.appendToNextInMainQueue(playables: [episode])

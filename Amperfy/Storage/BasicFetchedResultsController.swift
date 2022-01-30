@@ -129,7 +129,6 @@ class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSF
     let managedObjectContext: NSManagedObjectContext
     let defaultPredicate: NSPredicate?
     let library: LibraryStorage
-    
     var delegateInternal: NSFetchedResultsControllerDelegate?
     var delegate: NSFetchedResultsControllerDelegate? {
         set {
@@ -217,6 +216,18 @@ extension BasicFetchedResultsController where ResultType == SongMO {
         let songMO = fetchResultsController.object(at: indexPath)
         return Song(managedObject: songMO)
     }
+    
+    func getContextSongs(onlyCachedSongs: Bool) -> [AbstractPlayable]? {
+        guard let basicPredicate = defaultPredicate else { return nil }
+        let cachedFetchRequest = fetchResultsController.fetchRequest.copy() as! NSFetchRequest<SongMO>
+        cachedFetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            basicPredicate,
+            library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+        ])
+        let songsMO = try? managedObjectContext.fetch(cachedFetchRequest)
+        let songs = songsMO?.compactMap{ Song(managedObject: $0) }
+        return songs
+    }
 }
 
 extension BasicFetchedResultsController where ResultType == PlaylistMO {
@@ -230,6 +241,12 @@ extension BasicFetchedResultsController where ResultType == PlaylistItemMO {
     func getWrappedEntity(at indexPath: IndexPath) -> PlaylistItem {
         let itemMO = fetchResultsController.object(at: indexPath)
         return PlaylistItem(library: library, managedObject: itemMO)
+    }
+    
+    var songs: [AbstractPlayable]? {
+        let itemsMO = try? managedObjectContext.fetch(fetchResultsController.fetchRequest)
+        let playablesMO = itemsMO?.compactMap{ $0.playable }
+        return playablesMO?.compactMap{ AbstractPlayable(managedObject: $0) }
     }
 }
 

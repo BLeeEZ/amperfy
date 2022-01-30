@@ -27,7 +27,9 @@ class ArtistDetailVC: BasicTableViewController {
             detailOperationsView = artistDetailTableHeaderView
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: ArtistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(playableContainer: artist, with: appDelegate.player)
+            libraryElementDetailTableHeaderView.prepare(
+                playContextCb: {() in PlayContext(playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
+                with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         
@@ -54,6 +56,16 @@ class ArtistDetailVC: BasicTableViewController {
         }
     }
 
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell),
+              indexPath.section+2 == LibraryElement.Song.rawValue,
+              let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
+        else { return nil }
+        let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+        guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
+        return PlayContext(index: playContextIndex, playables: songs)
+    }
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -92,7 +104,7 @@ class ArtistDetailVC: BasicTableViewController {
         case LibraryElement.Song.rawValue:
             let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
             let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(song: song, rootView: self)
+            cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
             return cell
         default:
             return UITableViewCell()

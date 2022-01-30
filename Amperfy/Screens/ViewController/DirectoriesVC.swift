@@ -36,6 +36,16 @@ class DirectoriesVC: BasicTableViewController {
         }
     }
     
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell),
+              indexPath.section == 1,
+              let songs = songsFetchedResultsController.getContextSongs(onlyCachedSongs: appDelegate.persistentStorage.settings.isOfflineMode)
+        else { return nil }
+        let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+        guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
+        return PlayContext(index: playContextIndex, playables: songs)
+    }
+
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -63,7 +73,7 @@ class DirectoriesVC: BasicTableViewController {
         case 1:
             let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
             let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(song: song, rootView: self)
+            cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
             return cell
         default:
             return UITableViewCell()

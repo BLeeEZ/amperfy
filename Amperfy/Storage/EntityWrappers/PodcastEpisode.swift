@@ -105,6 +105,14 @@ public class PodcastEpisode: AbstractPlayable {
         get { return managedObject.streamId }
         set { if managedObject.streamId != newValue { managedObject.streamId = newValue } }
     }
+    var remainingTimeInSec: Int? {
+        guard playDuration > 0, playProgress > 0 else { return nil}
+            return playDuration - playProgress
+    }
+    var playProgressPercent: Float? {
+        guard playDuration > 0, playProgress > 0 else { return nil}
+            return Float(playProgress) / Float(playDuration)
+    }
     var podcast: Podcast? {
         get {
             guard let podcastMO = managedObject.podcast else { return nil }

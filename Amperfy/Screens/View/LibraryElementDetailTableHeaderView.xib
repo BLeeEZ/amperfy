@@ -14,28 +14,32 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aFp-vU-e7e" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aFp-vU-e7e" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="16" y="0.0" width="140" height="30"/>
                     <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="140" id="wMX-TZ-gTK"/>
                         <constraint firstAttribute="height" constant="30" id="zRv-bG-E8F"/>
                     </constraints>
-                    <state key="normal" title="Play all">
+                    <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="4" maxX="0.0" maxY="4"/>
+                    <state key="normal" title="Play" image="play">
                         <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </state>
                     <connections>
                         <action selector="playAllButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="phc-Oa-Z7W"/>
                     </connections>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bqP-jY-7uf" userLabel="Add All To Play Next Button" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bqP-jY-7uf" userLabel="Add All To Play Next Button" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="219" y="0.0" width="140" height="30"/>
                     <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    <state key="normal" title="Add to play next">
+                    <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="4" maxX="0.0" maxY="4"/>
+                    <state key="normal" title="Shuffled" image="shuffle">
                         <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </state>
                     <connections>
-                        <action selector="addAllToPlayNextButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="5XX-8k-A7F"/>
+                        <action selector="addAllShuffledButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="jJy-6e-BVq"/>
                     </connections>
                 </button>
             </subviews>
@@ -49,10 +53,14 @@
                 <constraint firstItem="bqP-jY-7uf" firstAttribute="centerY" secondItem="aFp-vU-e7e" secondAttribute="centerY" id="knR-BP-snu"/>
             </constraints>
             <connections>
-                <outlet property="addAllToPlaylistButton" destination="bqP-jY-7uf" id="BdA-xb-n9g"/>
                 <outlet property="playAllButton" destination="aFp-vU-e7e" id="pTl-kf-Ow2"/>
+                <outlet property="playShuffledButton" destination="bqP-jY-7uf" id="3fZ-TL-t1I"/>
             </connections>
             <point key="canvasLocation" x="140" y="135"/>
         </view>
     </objects>
+    <resources>
+        <image name="play" width="30" height="30"/>
+        <image name="shuffle" width="30" height="30"/>
+    </resources>
 </document>

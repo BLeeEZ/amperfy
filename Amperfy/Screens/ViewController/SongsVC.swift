@@ -31,8 +31,14 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
         let song = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(song: song, rootView: self)
+        cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
         return cell
+    }
+    
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell) else { return nil }
+        let song = fetchedResultsController.getWrappedEntity(at: indexPath)
+        return PlayContext(playables: [song])
     }
     
     override func updateSearchResults(for searchController: UISearchController) {

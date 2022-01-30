@@ -195,8 +195,16 @@ extension Array where Element: AbstractPlayable {
         return self.lazy.filter{ $0.isCached }.first != nil
     }
     
+    func sortById() -> [Element] {
+        return self.sorted{ $0.id < $1.id }
+    }
+    
+    func sortByTitle() -> [Element] {
+        return self.sortById().sorted{ $0.title < $1.title }
+    }
+    
     func sortByTrackNumber() -> [Element] {
-        return self.sorted{ $0.track < $1.track }
+        return self.sortById().sorted{ $0.track < $1.track }
     }
     
     func filterSongs() -> [Element] {

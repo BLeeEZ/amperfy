@@ -215,9 +215,12 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         let cell: PlayableTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
         guard let playerIndex = PlayerIndex.create(from: indexPath) else { return cell }
         let playable = player.getPlayable(at: playerIndex)
-        cell.playerIndexConversionCallback = self.convertCellViewToPlayerIndex
         cell.backgroundColor = UIColor.clear
-        cell.display(playable: playable, rootView: self)
+        cell.display(
+            playable: playable,
+            playContextCb: {(_) in PlayContext(playables: [])},
+            rootView: self,
+            playerIndexCb: convertCellViewToPlayerIndex)
         return cell
     }
 

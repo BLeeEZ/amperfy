@@ -35,16 +35,19 @@ class SongTableCell: BasicTableCell {
     
     var song: Song?
     var rootView: UITableViewController?
+    var playContextCb: PlayContextdeterminationCallback?
     private var isAlertPresented = false
 
     override func awakeFromNib() {
         super.awakeFromNib()
+        playContextCb = nil
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
         self.addGestureRecognizer(longPressGesture)
     }
     
-    func display(song: Song, rootView: UITableViewController) {
+    func display(song: Song, playContextCb: @escaping PlayContextdeterminationCallback, rootView: UITableViewController) {
         self.song = song
+        self.playContextCb = playContextCb
         self.rootView = rootView
         refresh()
     }
@@ -64,18 +67,11 @@ class SongTableCell: BasicTableCell {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let song = song else { return }
+        guard let song = song, let context = playContextCb?(self) else { return }
 
         if !isAlertPresented && (song.isCached || appDelegate.persistentStorage.settings.isOnlineMode) {
             hideSearchBarKeyboardInRootView()
-            switch appDelegate.persistentStorage.settings.songActionOnTab {
-            case .playAndErasePlaylist:
-                appDelegate.player.play(playable: song)
-            case .addToPlaylistAndPlay:
-                appDelegate.player.appendToNextInMainQueueAndPlay(playable: song)
-            case .insertAsNextSongNoPlay:
-                appDelegate.player.insertFirstToNextInMainQueue(playables: [song])
-            }
+            appDelegate.player.play(context: context)
         }
         isAlertPresented = false
     }
@@ -102,7 +98,7 @@ class SongTableCell: BasicTableCell {
         guard let song = song, let rootView = rootView, rootView.presentingViewController == nil else { return }
         isAlertPresented = true
         let detailVC = LibraryEntityDetailVC()
-        detailVC.display(playable: song, on: rootView)
+        detailVC.display(playable: song, playContextCb: {() in self.playContextCb?(self)}, on: rootView)
         rootView.present(detailVC, animated: true)
     }
 

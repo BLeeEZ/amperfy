@@ -285,13 +285,13 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testPlaySong_Cached() {
-        testPlayer.play(playable: songCached)
+        testPlayer.play(context: PlayContext(playables: [songCached]))
         XCTAssertEqual(testPlayer.currentlyPlaying, songCached)
     }
     
     func testPlaySong_CheckPlaylistClear() {
         prepareWithCachedPlaylist()
-        testPlayer.play(playable: songCached)
+        testPlayer.play(context: PlayContext(playables: [songCached]))
         XCTAssertEqual(testPlayer.prevQueue, [AbstractPlayable]())
         XCTAssertEqual(testPlayer.waitingQueue, [AbstractPlayable]())
         XCTAssertEqual(testPlayer.nextQueue, [AbstractPlayable]())
@@ -514,12 +514,12 @@ class MusicPlayerTest: XCTestCase {
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         guard let songId2 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
-        testPlayer.play(playables: [songId1, songId2, songId3])
+        testPlayer.play(context: PlayContext(playables: [songId1, songId2, songId3]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.waitingQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 2)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
+        XCTAssertEqual(testPlayer.nextQueue.count, 3)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying8() {
@@ -531,12 +531,12 @@ class MusicPlayerTest: XCTestCase {
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         guard let songId2 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
-        testPlayer.play(playables: [songId1, songId2, songId3])
+        testPlayer.play(context: PlayContext(playables: [songId1, songId2, songId3]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.waitingQueue.count, 1)
-        XCTAssertEqual(testPlayer.nextQueue.count, 2)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
+        XCTAssertEqual(testPlayer.nextQueue.count, 3)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
 
     func testPlaySong_WaitingQueuePlaying8() {
@@ -546,12 +546,12 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.appendToWaitingQueue(playables: [songId0])
 
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-        testPlayer.play(playable: songId1)
+        testPlayer.play(context: PlayContext(playables: [songId1]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.waitingQueue.count, 1)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
+        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
 
     func testPlaySong_WaitingQueuePlaying9() {
@@ -566,12 +566,12 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.playNext()
 
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
-        testPlayer.play(playable: songId3)
+        testPlayer.play(context: PlayContext(playables: [songId3]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.waitingQueue.count, 2)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId3)
+        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying3() {
@@ -586,12 +586,12 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.playNext()
         
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
-        testPlayer.play(playables: [songId3])
+        testPlayer.play(context: PlayContext(playables: [songId3]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.waitingQueue.count, 2)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId3)
+        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying4() {
@@ -602,12 +602,12 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.playNext()
         
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-        testPlayer.play(playable: songId1)
+        testPlayer.play(context: PlayContext(playables: [songId1]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.waitingQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
+        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying5() {
@@ -618,21 +618,21 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.playNext()
         
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-        testPlayer.play(playables: [songId1])
+        testPlayer.play(context: PlayContext(playables: [songId1]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.waitingQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
+        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying6() {
         prepareWithCachedPlaylist()
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
-        testPlayer.play(playables: [songId0])
+        testPlayer.play(context: PlayContext(playables: [songId0]))
 
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-        testPlayer.play(playables: [songId1])
+        testPlayer.play(context: PlayContext(playables: [songId1]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.waitingQueue.count, 0)
@@ -646,7 +646,7 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testSeek_FilledPlaylist() {
-        testPlayer.play(playable: songCached)
+        testPlayer.play(context: PlayContext(playables: [songCached]))
         testPlayer.seek(toSecond: 3.0)
         mockAVPlayer.useMockCurrentItem = true
         let elapsedTime = testPlayer.elapsedTime
@@ -717,7 +717,7 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testPlayPrevious_RepeatAll_OnlyOneSong() {
-        testPlayer.play(playable: songCached)
+        testPlayer.play(context: PlayContext(playables: [songCached]))
         testPlayer.repeatMode = .all
         testMusicPlayer.playPrevious()
         testMusicPlayer.playPrevious()
@@ -772,7 +772,7 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testPlayNext_RepeatAll_OnlyOneSong() {
-        testPlayer.play(playable: songCached)
+        testPlayer.play(context: PlayContext(playables: [songCached]))
         testPlayer.repeatMode = .all
         testPlayer.playNext()
         testPlayer.playNext()

@@ -30,7 +30,9 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
             playlistOperationsView = playlistDetailTableHeaderView
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: playlistTableHeaderFrameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(playableContainer: playlist, with: appDelegate.player)
+            libraryElementDetailTableHeaderView.prepare(
+                playContextCb: {() in PlayContext(playables: self.fetchedResultsController.songs ?? [])},
+                with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
@@ -58,6 +60,13 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         }
     }
     
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell),
+              let songs = self.fetchedResultsController.songs
+        else { return nil }
+        return PlayContext(index: indexPath.row, playables: songs)
+    }
+
     @objc private func startEditing() {
         navigationItem.rightBarButtonItem = doneButton
         tableView.isEditing = true
@@ -74,7 +83,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
         let playlistItem = fetchedResultsController.getWrappedEntity(at: indexPath)
         if let playable = playlistItem.playable, let song = playable.asSong {
-            cell.display(song: song, rootView: self)
+            cell.display(song: song, playContextCb: convertCellViewToPlayContext, rootView: self)
         }
         return cell
     }

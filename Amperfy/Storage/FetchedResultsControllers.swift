@@ -461,7 +461,7 @@ class DirectorySubdirectoriesFetchedResultsController: BasicFetchedResultsContro
 class DirectorySongsFetchedResultsController: BasicFetchedResultsController<SongMO> {
     
     let directory: Directory
-    
+
     init(for directory: Directory, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
         self.directory = directory
         let library = LibraryStorage(context: context)

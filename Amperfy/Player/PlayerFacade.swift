@@ -1,6 +1,21 @@
 import Foundation
 import MediaPlayer
 
+struct PlayContext {
+    let index: Int
+    let playables: [AbstractPlayable]
+    
+    init(index: Int = 0, playables: [AbstractPlayable]) {
+        self.index = index
+        self.playables = playables
+    }
+
+    func getActivePlayable() -> AbstractPlayable? {
+        guard playables.count > 0, index < playables.count else { return nil }
+        return playables[index]
+    }
+}
+
 protocol PlayerFacade {
     var prevQueue: [AbstractPlayable] { get }
     var waitingQueue: [AbstractPlayable] { get }
@@ -31,8 +46,8 @@ protocol PlayerFacade {
     func clearQueues()
 
     func play()
-    func play(playable: AbstractPlayable)
-    func play(playables: [AbstractPlayable])
+    func play(context: PlayContext)
+    func playShuffled(context: PlayContext)
     func play(playerIndex: PlayerIndex)
     func appendToNextInMainQueueAndPlay(playable: AbstractPlayable)
     func togglePlay()
@@ -166,12 +181,18 @@ class PlayerFacadeImpl: PlayerFacade {
         musicPlayer.play()
     }
     
-    func play(playable: AbstractPlayable) {
-        musicPlayer.play(playable: playable)
+    func play(context: PlayContext) {
+        if playerStatus.isShuffle { playerStatus.isShuffle = false }
+        musicPlayer.play(context: context)
     }
     
-    func play(playables: [AbstractPlayable]) {
-        musicPlayer.play(playables: playables)
+    func playShuffled(context: PlayContext) {
+        guard !context.playables.isEmpty else { return }
+        if playerStatus.isShuffle { playerStatus.isShuffle = false }
+        let shuffleContext = PlayContext(index: Int.random(in: 0...context.playables.count-1), playables: context.playables)
+        musicPlayer.play(context: shuffleContext)
+        playerStatus.isShuffle = true
+        musicPlayer.notifyPlaylistUpdated()
     }
     
     func play(playerIndex: PlayerIndex) {
