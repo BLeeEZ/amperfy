@@ -14,6 +14,9 @@ class RatingView: UIView {
     private var appDelegate: AppDelegate!
     private var libraryEntity: AbstractLibraryEntity?
     
+    var activeStarColor: UIColor = .backgroundColor
+    var inactiveStarColor: UIColor = .secondaryLabelColor
+    
     lazy var stars: [UIButton] = {
         var stars = [UIButton]()
         stars.append(starOne)
@@ -71,7 +74,8 @@ class RatingView: UIView {
                 button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameRegular, size: 30)!]), for: .normal)
             }
             button.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
-            button.setTitleColor(self.appDelegate.persistentStorage.settings.isOnlineMode ? .yellow : .lightGray, for: .normal)
+            button.setTitleColor(self.appDelegate.persistentStorage.settings.isOnlineMode ? activeStarColor : inactiveStarColor, for: .normal)
+            button.tintColor = self.appDelegate.persistentStorage.settings.isOnlineMode ? activeStarColor : inactiveStarColor
         }
         clearRatingButton.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
     }

@@ -24,7 +24,7 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: AlbumDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
-                playContextCb: {() in PlayContext(playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
+                playContextCb: {() in PlayContext(name: self.album.name, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
@@ -48,7 +48,7 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         else { return nil }
         let selectedSong = self.fetchedResultsController.getWrappedEntity(at: indexPath)
         guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
-        return PlayContext(index: playContextIndex, playables: songs)
+        return PlayContext(name: album.name, index: playContextIndex, playables: songs)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

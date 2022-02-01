@@ -15,6 +15,10 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     let backgroundGradientDelayTime: UInt32 = 2
     var sectionViews = [PopupPlayerSectionHeader]()
     var nextViewSizeDueToDeviceRotation: CGSize?
+    
+    var nextSectionName: String {
+        "Next from: \(player.contextName)"
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +46,11 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         for queueType in PlayerQueueType.allCases {
             if let sectionView = ViewBuilder<PopupPlayerSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-                sectionView.display(type: queueType)
+                if queueType == .next {
+                    sectionView.display(name: nextSectionName)
+                } else {
+                    sectionView.display(name: queueType.description)
+                }
                 sectionViews.append(sectionView)
             }
         }
@@ -69,6 +77,8 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
 
     func reloadData() {
+        let nextSectionView = sectionViews[2]
+        nextSectionView.display(name: nextSectionName)
         tableView.reloadData()
     }
 
@@ -218,7 +228,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         cell.backgroundColor = UIColor.clear
         cell.display(
             playable: playable,
-            playContextCb: {(_) in PlayContext(playables: [])},
+            playContextCb: {(_) in PlayContext(name: "", playables: [])},
             rootView: self,
             playerIndexCb: convertCellViewToPlayerIndex)
         return cell
@@ -253,7 +263,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         if player.userQueue.isEmpty {
             userQueueSectionView.hide()
         } else {
-            userQueueSectionView.display(type: .user, buttonTitle: "Clear") {
+            userQueueSectionView.display(name: PlayerQueueType.user.description, buttonTitle: "Clear") {
                 self.clearUserQueue()
             }
         }

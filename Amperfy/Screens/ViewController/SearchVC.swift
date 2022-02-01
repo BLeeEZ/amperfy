@@ -67,7 +67,7 @@ class SearchVC: BasicTableViewController {
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
         guard let indexPath = tableView.indexPath(for: cell), indexPath.section == LibraryElement.Song.rawValue else { return nil }
         let song = songFetchedResultsController.getWrappedEntity(at: indexPath)
-        return PlayContext(playables: [song])
+        return PlayContext(name: song.title, playables: [song])
     }
 
     // MARK: - Table view data source

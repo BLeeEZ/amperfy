@@ -31,7 +31,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: playlistTableHeaderFrameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
-                playContextCb: {() in PlayContext(playables: self.fetchedResultsController.songs ?? [])},
+                playContextCb: {() in PlayContext(name: self.playlist.name, playables: self.fetchedResultsController.songs ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
@@ -64,7 +64,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         guard let indexPath = tableView.indexPath(for: cell),
               let songs = self.fetchedResultsController.songs
         else { return nil }
-        return PlayContext(index: indexPath.row, playables: songs)
+        return PlayContext(name: playlist.name, index: indexPath.row, playables: songs)
     }
 
     @objc private func startEditing() {

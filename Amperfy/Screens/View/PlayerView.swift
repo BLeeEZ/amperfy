@@ -84,6 +84,7 @@ class PlayerView: UIView {
         self.rootView = toWorkOnRootView
         if let ratingView = ViewBuilder<RatingView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: ratingPlaceholderView.bounds.size.width, height: RatingView.frameHeight)) {
             self.ratingView = ratingView
+            self.ratingView?.activeStarColor = .defaultBlue
             ratingPlaceholderView.addSubview(ratingView)
         }
         ratingPlaceholderView.backgroundColor = .clear
@@ -328,34 +329,11 @@ class PlayerView: UIView {
         refreshPlayer()
         renderAnimation(animationDuration: TimeInterval(0.0))
         
-        titleCompactLabel.leadingBuffer = 0.0
-        titleCompactLabel.trailingBuffer = 30.0
-        titleCompactLabel.animationDelay = 2.0
-        titleCompactLabel.type = .continuous
-        titleCompactLabel.speed = .rate(20.0)
-        titleCompactLabel.fadeLength = 10.0
-        
-        titleLargeLabel.leadingBuffer = 0.0
-        titleLargeLabel.trailingBuffer = 30.0
-        titleLargeLabel.animationDelay = 2.0
-        titleLargeLabel.type = .continuous
-        titleLargeLabel.speed = .rate(20.0)
-        titleLargeLabel.fadeLength = 10.0
-        
-        artistNameCompactLabel.leadingBuffer = 0.0
-        artistNameCompactLabel.trailingBuffer = 30.0
-        artistNameCompactLabel.animationDelay = 2.0
-        artistNameCompactLabel.type = .continuous
-        artistNameCompactLabel.speed = .rate(20.0)
-        artistNameCompactLabel.fadeLength = 10.0
-        
-        artistNameLargeLabel.leadingBuffer = 0.0
-        artistNameLargeLabel.trailingBuffer = 30.0
-        artistNameLargeLabel.animationDelay = 2.0
-        artistNameLargeLabel.type = .continuous
-        artistNameLargeLabel.speed = .rate(20.0)
-        artistNameLargeLabel.fadeLength = 10.0
-        
+        titleCompactLabel.applyAmperfyStyle()
+        titleLargeLabel.applyAmperfyStyle()
+        artistNameCompactLabel.applyAmperfyStyle()
+        artistNameLargeLabel.applyAmperfyStyle()
+
         timeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
         timeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
     }

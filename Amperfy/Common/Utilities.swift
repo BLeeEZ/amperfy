@@ -211,6 +211,14 @@ extension UIColor {
             return UIColor.systemGray
         }
     }
+    
+    static var backgroundColor: UIColor {
+        if #available(iOS 13.0, *) {
+            return UIColor.systemBackground
+        } else {
+            return UIColor.white
+        }
+    }
 }
 
 extension UIActivityIndicatorView {
@@ -510,5 +518,16 @@ extension UIDevice {
         guard let values = try? fileURL.resourceValues(forKeys: [.volumeAvailableCapacityKey]),
               let capacity = values.volumeAvailableCapacity else { return nil }
         return Int64(capacity)
+    }
+}
+
+extension MarqueeLabel {
+    func applyAmperfyStyle() {
+        self.leadingBuffer = 0.0
+        self.trailingBuffer = 30.0
+        self.animationDelay = 2.0
+        self.type = .continuous
+        self.speed = .rate(30.0)
+        self.fadeLength = 10.0
     }
 }

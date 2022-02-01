@@ -1,6 +1,8 @@
 import UIKit
 
 class BasicButton: UIButton {
+    
+    static let cornerRadius = 10.0
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -8,7 +10,7 @@ class BasicButton: UIButton {
     }
     
     func configureStyle() {
-        layer.cornerRadius = 10
+        layer.cornerRadius = Self.cornerRadius
     }
 
 }

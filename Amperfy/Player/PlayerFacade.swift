@@ -3,9 +3,11 @@ import MediaPlayer
 
 struct PlayContext {
     let index: Int
+    let name: String
     let playables: [AbstractPlayable]
     
-    init(index: Int = 0, playables: [AbstractPlayable]) {
+    init(name: String, index: Int = 0, playables: [AbstractPlayable]) {
+        self.name = name
         self.index = index
         self.playables = playables
     }
@@ -24,6 +26,7 @@ protocol PlayerFacade {
     var isPlaying: Bool { get }
     func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable
     var currentlyPlaying: AbstractPlayable?  { get }
+    var contextName: String { get }
     var elapsedTime: Double { get }
     var duration: Double { get }
     var isShuffle: Bool { get }
@@ -92,6 +95,16 @@ class PlayerFacadeImpl: PlayerFacade {
     }
     var currentlyPlaying: AbstractPlayable? {
         return musicPlayer.currentlyPlaying
+    }
+    var contextName: String {
+        get {
+            guard queueHandler.contextName.isEmpty else { return queueHandler.contextName }
+            if queueHandler.prevQueue.isEmpty, queueHandler.nextQueue.isEmpty, queueHandler.currentlyPlaying == nil || queueHandler.isUserQueuePlaying {
+                return ""
+            } else {
+                return "Mixed Context"
+            }
+        }
     }
     var elapsedTime: Double {
         return backendAudioPlayer.elapsedTime
@@ -173,6 +186,7 @@ class PlayerFacadeImpl: PlayerFacade {
     }
     
     func clearQueues() {
+        musicPlayer.stop()
         clearContextQueue()
         queueHandler.clearUserQueue()
     }
@@ -189,7 +203,7 @@ class PlayerFacadeImpl: PlayerFacade {
     func playShuffled(context: PlayContext) {
         guard !context.playables.isEmpty else { return }
         if playerStatus.isShuffle { playerStatus.isShuffle = false }
-        let shuffleContext = PlayContext(index: Int.random(in: 0...context.playables.count-1), playables: context.playables)
+        let shuffleContext = PlayContext(name: context.name, index: Int.random(in: 0...context.playables.count-1), playables: context.playables)
         musicPlayer.play(context: shuffleContext)
         playerStatus.isShuffle = true
         musicPlayer.notifyPlaylistUpdated()

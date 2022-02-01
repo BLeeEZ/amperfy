@@ -17,6 +17,7 @@ protocol PlayerQueuesPersistent {
     var currentIndex: Int { get set }
     var currentItem: AbstractPlayable? { get }
     var contextQueue: Playlist { get }
+    var contextName: String { get set }
     var inactiveContextQueue: Playlist { get }
     var userQueuePlaylist: Playlist { get }
     
@@ -132,6 +133,11 @@ extension PlayerData: PlayerQueuesPersistent {
                 return contextPlaylist
             }
         }
+    }
+    
+    var contextName: String {
+        get { contextPlaylist.name }
+        set { contextPlaylist.name = newValue }
     }
     
     var currentIndex: Int {

@@ -8,7 +8,9 @@ class LibraryEntityDetailVC: UIViewController {
     
     @IBOutlet weak var titleLabel: MarqueeLabel!
     @IBOutlet weak var artistLabel: MarqueeLabel!
+    @IBOutlet weak var showArtistButton: UIButton!
     @IBOutlet weak var albumLabel: MarqueeLabel!
+    @IBOutlet weak var showAlbumButton: UIButton!
     @IBOutlet weak var infoLabel: MarqueeLabel!
     @IBOutlet weak var artworkImage: LibraryEntityImage!
     
@@ -26,9 +28,22 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var downloadButton: UIButton!
     @IBOutlet weak var deleteCacheButton: UIButton!
     @IBOutlet weak var deleteOnServerButton: UIButton!
-    @IBOutlet weak var showArtistButton: UIButton!
-    @IBOutlet weak var showAlbumButton: UIButton!
+    
+    private var buttonsOfMainCluster: [UIButton] {
+        return [
+            playButton,
+            playShuffledButton,
+            addToPlaylistButton,
+            downloadButton,
+            deleteCacheButton,
+            deleteOnServerButton,
+            
+        ]
+    }
+    
     @IBOutlet weak var cancelButton: UIButton!
+    @IBOutlet weak var mainStackClusterHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var playButtonHeightConstraint: NSLayoutConstraint!
     
     private var rootView: UIViewController?
     private var playContextCb: GetPlayContextCallback?
@@ -49,33 +64,68 @@ class LibraryEntityDetailVC: UIViewController {
         }
         return playables
     }
+    private var contextName: String {
+        var name = ""
+        if let playable = playable {
+            name = playable.title
+        } else if let album = album {
+            name = album.name
+        } else if let artist = artist {
+            name = artist.name
+        }
+        return name
+    }
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        titleLabel.applyAmperfyStyle()
         if let ratingView = ViewBuilder<RatingView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: ratingPlaceholderView.bounds.size.width, height: RatingView.frameHeight+10)) {
             self.ratingView = ratingView
             ratingPlaceholderView.addSubview(ratingView)
         }
-        ratingPlaceholderView.layer.cornerRadius = 10
+        ratingPlaceholderView.layer.cornerRadius = BasicButton.cornerRadius
         refresh()
-        
+
         userQueueInsertButton.contentMode = .center
         userQueueInsertButton.imageView?.contentMode = .scaleAspectFill
-        userQueueInsertButton.titleLabel!.lineBreakMode = .byWordWrapping;
-        
+        userQueueInsertButton.titleLabel!.lineBreakMode = .byWordWrapping
+        userQueueInsertButton.layer.maskedCorners = [.layerMinXMinYCorner]
+
         userQueueAppendButton.contentMode = .center
         userQueueAppendButton.imageView?.contentMode = .scaleAspectFill
         userQueueAppendButton.titleLabel!.lineBreakMode = .byWordWrapping;
+        userQueueAppendButton.layer.maskedCorners = [.layerMaxXMinYCorner]
 
         contextQueueInsertButton.contentMode = .center
         contextQueueInsertButton.imageView?.contentMode = .scaleAspectFill
-        contextQueueInsertButton.titleLabel!.lineBreakMode = .byWordWrapping;
+        contextQueueInsertButton.titleLabel!.lineBreakMode = .byWordWrapping
+        contextQueueInsertButton.layer.maskedCorners = [.layerMinXMaxYCorner]
 
         contextQueueAppendButton.contentMode = .center
         contextQueueAppendButton.imageView?.contentMode = .scaleAspectFill
-        contextQueueAppendButton.titleLabel!.lineBreakMode = .byWordWrapping;
+        contextQueueAppendButton.titleLabel!.lineBreakMode = .byWordWrapping
+        contextQueueAppendButton.layer.maskedCorners = [.layerMaxXMaxYCorner]
+        
+        playButton.imageView?.contentMode = .scaleAspectFit
+        playShuffledButton.imageView?.contentMode = .scaleAspectFit
+        
+        let visibleMainButtons = buttonsOfMainCluster.filter{!$0.isHidden}
+        var mainStackHeight = 0.0
+        if visibleMainButtons.count == 1 {
+            mainStackHeight = playButtonHeightConstraint.constant
+        } else if visibleMainButtons.count > 1 {
+            mainStackHeight = ((playButtonHeightConstraint.constant + 1.0) * CGFloat(visibleMainButtons.count)) - 1
+        }
+        mainStackClusterHeightConstraint.constant = mainStackHeight
+        
+        let firstButtonCluster = visibleMainButtons.first
+        firstButtonCluster?.layer.cornerRadius = BasicButton.cornerRadius
+        firstButtonCluster?.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        let lastButtonCluster = visibleMainButtons.last
+        lastButtonCluster?.layer.cornerRadius = BasicButton.cornerRadius
+        lastButtonCluster?.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -327,7 +377,7 @@ class LibraryEntityDetailVC: UIViewController {
         } else if let context = playContextCb?() {
             self.appDelegate.player.play(context: context)
         } else {
-            self.appDelegate.player.play(context: PlayContext(playables: entityPlayables))
+            self.appDelegate.player.play(context: PlayContext(name: contextName, playables: entityPlayables))
         }
     }
     
@@ -337,7 +387,7 @@ class LibraryEntityDetailVC: UIViewController {
         if let context = playContextCb?() {
             self.appDelegate.player.playShuffled(context: context)
         } else {
-            self.appDelegate.player.playShuffled(context: PlayContext(playables: entityPlayables))
+            self.appDelegate.player.playShuffled(context: PlayContext(name: contextName, playables: entityPlayables))
         }
     }
     

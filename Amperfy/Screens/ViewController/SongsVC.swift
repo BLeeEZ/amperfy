@@ -38,7 +38,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
         guard let indexPath = tableView.indexPath(for: cell) else { return nil }
         let song = fetchedResultsController.getWrappedEntity(at: indexPath)
-        return PlayContext(playables: [song])
+        return PlayContext(name: song.title, playables: [song])
     }
     
     override func updateSearchResults(for searchController: UISearchController) {

@@ -53,7 +53,7 @@ class DirectoriesVC: BasicTableViewController {
         else { return nil }
         let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
         guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
-        return PlayContext(index: playContextIndex, playables: songs)
+        return PlayContext(name: directory.name, index: playContextIndex, playables: songs)
     }
 
     // MARK: - Table view data source

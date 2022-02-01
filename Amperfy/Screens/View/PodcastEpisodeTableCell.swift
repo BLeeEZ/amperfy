@@ -73,7 +73,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(
             playable: episode,
-            playContextCb: {() in PlayContext(playables: [episode])},
+            playContextCb: {() in PlayContext(name: episode.title, playables: [episode])},
             on: rootView)
         rootView.present(detailVC, animated: true)
     }
@@ -91,7 +91,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
         if episode.isAvailableToUser {
             if episode.isCached || appDelegate.persistentStorage.settings.isOnlineMode {
                 alert.addAction(UIAlertAction(title: "Play", style: .default, handler: { _ in
-                    self.appDelegate.player.play(context: PlayContext(playables: [episode]))
+                    self.appDelegate.player.play(context: PlayContext(name: episode.title, playables: [episode]))
                 }))
                 alert.addAction(UIAlertAction(title: "Add to play next", style: .default, handler: { _ in
                     self.appDelegate.player.appendContextQueue(playables: [episode])

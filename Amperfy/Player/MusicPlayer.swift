@@ -83,6 +83,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         let wasUserQueuePlaying = queueHandler.isUserQueuePlaying
         queueHandler.clearContextQueue()
         queueHandler.appendContextQueue(playables: context.playables)
+        queueHandler.contextName = context.name
         if !wasUserQueuePlaying {
             if queueHandler.userQueue.isEmpty {
                 if context.index == 0 {

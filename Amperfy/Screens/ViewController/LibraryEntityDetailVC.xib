@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <device id="retina6_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
@@ -23,7 +23,9 @@
                 <outlet property="deleteOnServerButton" destination="o9z-34-kMZ" id="P3Q-u6-ON7"/>
                 <outlet property="downloadButton" destination="XcM-qv-zHW" id="1jN-7g-KdT"/>
                 <outlet property="infoLabel" destination="fUI-xV-Cyd" id="1bT-eh-Ick"/>
+                <outlet property="mainStackClusterHeightConstraint" destination="FlB-wv-mVd" id="xaO-2n-Ujf"/>
                 <outlet property="playButton" destination="XDf-oc-z0s" id="IAJ-69-QUw"/>
+                <outlet property="playButtonHeightConstraint" destination="Yn5-c3-LL4" id="j7n-tY-DMt"/>
                 <outlet property="playShuffledButton" destination="SOj-o1-qLh" id="o2K-pA-jnp"/>
                 <outlet property="ratingPlaceholderView" destination="Ms2-ug-0W5" id="aGe-eH-y39"/>
                 <outlet property="showAlbumButton" destination="AeI-2x-Stq" id="G9k-St-EVA"/>
@@ -35,27 +37,27 @@
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view contentMode="scaleToFill" ambiguous="YES" id="wqe-oZ-YvP">
-            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+        <view contentMode="scaleToFill" id="wqe-oZ-YvP">
+            <rect key="frame" x="0.0" y="0.0" width="428" height="926"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Z3t-pV-Lbw">
-                    <rect key="frame" x="16" y="16" width="343" height="635"/>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Z3t-pV-Lbw">
+                    <rect key="frame" x="20" y="60" width="388" height="816"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="J91-VR-QdL">
-                            <rect key="frame" x="0.0" y="0.0" width="343" height="58"/>
+                            <rect key="frame" x="0.0" y="0.0" width="388" height="90"/>
                             <subviews>
                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wrZ-NE-prP" userLabel="Artwork" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="0.0" width="58" height="58"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="90" height="90"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="wrZ-NE-prP" secondAttribute="height" multiplier="1:1" id="B0C-cv-xrn"/>
                                     </constraints>
                                 </imageView>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7yG-AI-SV8">
-                                    <rect key="frame" x="68" y="0.0" width="275" height="58"/>
+                                    <rect key="frame" x="100" y="0.0" width="288" height="90"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KnP-8k-7qE" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="2" width="275" height="24"/>
+                                            <rect key="frame" x="0.0" y="2" width="288" height="24"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="24" id="WQo-dQ-sra"/>
                                             </constraints>
@@ -69,7 +71,7 @@
                                             </userDefinedRuntimeAttributes>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nTF-ts-4gP" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="28" width="275" height="20"/>
+                                            <rect key="frame" x="0.0" y="28" width="288" height="20"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="20" id="fBa-4V-jjb"/>
                                             </constraints>
@@ -83,7 +85,7 @@
                                             </userDefinedRuntimeAttributes>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Album" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="91a-FO-77z" userLabel="Album" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="50" width="275" height="20"/>
+                                            <rect key="frame" x="0.0" y="50" width="288" height="20"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="20" id="vcP-wu-wk4"/>
                                             </constraints>
@@ -97,7 +99,7 @@
                                             </userDefinedRuntimeAttributes>
                                         </label>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RYw-hT-MnF" userLabel="ShowArtistButton" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="28" width="275" height="20"/>
+                                            <rect key="frame" x="0.0" y="28" width="288" height="20"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                             <connections>
@@ -105,7 +107,7 @@
                                             </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AeI-2x-Stq" userLabel="ShowAlbumButton" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="50" width="275" height="20"/>
+                                            <rect key="frame" x="0.0" y="50" width="288" height="20"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                             <connections>
@@ -113,7 +115,7 @@
                                             </connections>
                                         </button>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fUI-xV-Cyd" userLabel="Info" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="72" width="275" height="20"/>
+                                            <rect key="frame" x="0.0" y="72" width="288" height="20"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="20" id="fqZ-9I-3rG"/>
                                             </constraints>
@@ -182,21 +184,21 @@
                             <variation key="heightClass=regular-widthClass=regular" alignment="center" axis="vertical"/>
                         </stackView>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ms2-ug-0W5" userLabel="RatingPlaceholder">
-                            <rect key="frame" x="0.0" y="66" width="343" height="45"/>
-                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                            <rect key="frame" x="0.0" y="98" width="388" height="45"/>
+                            <color key="backgroundColor" systemColor="tintColor"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="45" id="0f6-ht-NEA"/>
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CHO-IQ-iDP">
-                            <rect key="frame" x="0.0" y="119" width="343" height="170"/>
+                            <rect key="frame" x="0.0" y="151" width="388" height="141"/>
                             <subviews>
-                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="0rd-B5-V1p" userLabel="UserQueueStackView">
-                                    <rect key="frame" x="0.0" y="0.0" width="343" height="80"/>
+                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="0rd-B5-V1p" userLabel="UserQueueStackView">
+                                    <rect key="frame" x="0.0" y="0.0" width="388" height="70"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ccE-KC-Sa9" userLabel="UserQueueInsert" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="166.5" height="80"/>
-                                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="193.66666666666666" height="70"/>
+                                            <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <inset key="imageEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -206,8 +208,8 @@
                                             </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="op5-Jc-HYB" userLabel="UserQueueAppend" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="176.5" y="0.0" width="166.5" height="80"/>
-                                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                                            <rect key="frame" x="194.66666666666663" y="0.0" width="193.33333333333337" height="70"/>
+                                            <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <state key="normal" title="Append User Queue" image="user_queue_append"/>
@@ -217,17 +219,17 @@
                                         </button>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstAttribute="height" constant="80" id="Q8k-gr-rOZ">
+                                        <constraint firstAttribute="height" constant="70" id="Q8k-gr-rOZ">
                                             <variation key="heightClass=regular-widthClass=regular" constant="40"/>
                                         </constraint>
                                     </constraints>
                                 </stackView>
-                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="YHf-HP-LxX" userLabel="ContextQueueStackView">
-                                    <rect key="frame" x="0.0" y="90" width="343" height="80"/>
+                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="YHf-HP-LxX" userLabel="ContextQueueStackView">
+                                    <rect key="frame" x="0.0" y="71" width="388" height="70"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kjv-5v-4aM" userLabel="ContextQueueInsert" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="166.5" height="80"/>
-                                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="193.66666666666666" height="70"/>
+                                            <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <inset key="imageEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -237,8 +239,8 @@
                                             </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cvP-d9-XH3" userLabel="ContextQueueAppend" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="176.5" y="0.0" width="166.5" height="80"/>
-                                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                                            <rect key="frame" x="194.66666666666663" y="0.0" width="193.33333333333337" height="70"/>
+                                            <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <state key="normal" title="Append Context Queue" image="context_queue_append"/>
@@ -251,10 +253,10 @@
                             </subviews>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <constraints>
-                                <constraint firstItem="YHf-HP-LxX" firstAttribute="top" secondItem="0rd-B5-V1p" secondAttribute="bottom" constant="10" id="2nO-3s-bap"/>
+                                <constraint firstItem="YHf-HP-LxX" firstAttribute="top" secondItem="0rd-B5-V1p" secondAttribute="bottom" constant="1" id="2nO-3s-bap"/>
                                 <constraint firstItem="0rd-B5-V1p" firstAttribute="leading" secondItem="CHO-IQ-iDP" secondAttribute="leading" id="CU4-Yr-geZ"/>
                                 <constraint firstItem="YHf-HP-LxX" firstAttribute="leading" secondItem="CHO-IQ-iDP" secondAttribute="leading" id="NBJ-6g-FGu"/>
-                                <constraint firstAttribute="height" constant="170" id="OR9-wP-Yer">
+                                <constraint firstAttribute="height" constant="141" id="OR9-wP-Yer">
                                     <variation key="heightClass=regular-widthClass=regular" constant="90"/>
                                 </constraint>
                                 <constraint firstItem="YHf-HP-LxX" firstAttribute="height" secondItem="0rd-B5-V1p" secondAttribute="height" id="OaI-VB-UoG"/>
@@ -264,105 +266,114 @@
                                 <constraint firstAttribute="trailing" secondItem="YHf-HP-LxX" secondAttribute="trailing" id="uO4-gt-ARC"/>
                             </constraints>
                         </view>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XDf-oc-z0s" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="297" width="343" height="40"/>
-                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="40" id="Yn5-c3-LL4"/>
-                            </constraints>
-                            <inset key="imageEdgeInsets" minX="0.0" minY="8" maxX="6" maxY="8"/>
-                            <state key="normal" title="Play" image="play"/>
-                            <connections>
-                                <action selector="pressedPlay:" destination="-1" eventType="touchUpInside" id="gFi-Ep-1tY"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SOj-o1-qLh" userLabel="PlayShuffled" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="345" width="343" height="40"/>
-                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="40" id="Zw7-lt-bM2"/>
-                            </constraints>
-                            <inset key="imageEdgeInsets" minX="0.0" minY="8" maxX="6" maxY="8"/>
-                            <state key="normal" title="Play Shuffled" image="shuffle"/>
-                            <connections>
-                                <action selector="pressPlayShuffled:" destination="-1" eventType="touchUpInside" id="ESg-bw-nRp"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QhC-Il-SGI" userLabel="AddToPlaylist" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="393" width="343" height="40"/>
-                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="40" id="csB-P8-wd3"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                            <state key="normal" title="Add to Playlist"/>
-                            <connections>
-                                <action selector="pressedAddToPlaylist:" destination="-1" eventType="touchUpInside" id="SZD-ge-Zvr"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XcM-qv-zHW" userLabel="Download" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="441" width="343" height="40"/>
-                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="40" id="FdU-Oz-KAU"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                            <state key="normal" title="Download"/>
-                            <connections>
-                                <action selector="pressedDownload:" destination="-1" eventType="touchUpInside" id="GCD-zo-O2p"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qeo-wc-t8G" userLabel="DeleteCache" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="489" width="343" height="40"/>
-                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="40" id="34k-6a-iTB"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                            <state key="normal" title="Remove from Cache"/>
-                            <connections>
-                                <action selector="pressedDeleteCache:" destination="-1" eventType="touchUpInside" id="gt2-RZ-7gd"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o9z-34-kMZ" userLabel="DeleteOnServer" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="537" width="343" height="40"/>
-                            <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="40" id="WRY-gO-2JQ"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                            <state key="normal" title="Delete on Server"/>
-                            <connections>
-                                <action selector="pressedDeleteOnServer:" destination="-1" eventType="touchUpInside" id="luM-R5-mVF"/>
-                            </connections>
-                        </button>
-                        <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZeO-Lx-9J7">
-                            <rect key="frame" x="0.0" y="585" width="343" height="50"/>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="qzF-wh-zOU" userLabel="MainStackCluster">
+                            <rect key="frame" x="0.0" y="300" width="388" height="265"/>
                             <subviews>
-                                <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jma-L5-peG" userLabel="Cancel" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="10" width="343" height="40"/>
-                                    <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XDf-oc-z0s">
+                                    <rect key="frame" x="0.0" y="0.0" width="388" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemFillColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="Yn5-c3-LL4"/>
+                                    </constraints>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="8" maxX="6" maxY="8"/>
+                                    <state key="normal" title="Play" image="play"/>
+                                    <connections>
+                                        <action selector="pressedPlay:" destination="-1" eventType="touchUpInside" id="gFi-Ep-1tY"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SOj-o1-qLh" userLabel="PlayShuffled">
+                                    <rect key="frame" x="0.0" y="45" width="388" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemFillColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="Zw7-lt-bM2"/>
+                                    </constraints>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="8" maxX="6" maxY="8"/>
+                                    <state key="normal" title="Play Shuffled" image="shuffle"/>
+                                    <connections>
+                                        <action selector="pressPlayShuffled:" destination="-1" eventType="touchUpInside" id="ESg-bw-nRp"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QhC-Il-SGI" userLabel="AddToPlaylist">
+                                    <rect key="frame" x="0.0" y="90" width="388" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemFillColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="csB-P8-wd3"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="Add to Playlist"/>
+                                    <connections>
+                                        <action selector="pressedAddToPlaylist:" destination="-1" eventType="touchUpInside" id="SZD-ge-Zvr"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XcM-qv-zHW" userLabel="Download">
+                                    <rect key="frame" x="0.0" y="135" width="388" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemFillColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="FdU-Oz-KAU"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="Download"/>
+                                    <connections>
+                                        <action selector="pressedDownload:" destination="-1" eventType="touchUpInside" id="GCD-zo-O2p"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qeo-wc-t8G" userLabel="DeleteCache">
+                                    <rect key="frame" x="0.0" y="180" width="388" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemFillColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="34k-6a-iTB"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="Remove from Cache"/>
+                                    <connections>
+                                        <action selector="pressedDeleteCache:" destination="-1" eventType="touchUpInside" id="gt2-RZ-7gd"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o9z-34-kMZ" userLabel="DeleteOnServer">
+                                    <rect key="frame" x="0.0" y="225" width="388" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemFillColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="WRY-gO-2JQ"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="Delete on Server"/>
+                                    <connections>
+                                        <action selector="pressedDeleteOnServer:" destination="-1" eventType="touchUpInside" id="luM-R5-mVF"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="265" id="FlB-wv-mVd"/>
+                            </constraints>
+                        </stackView>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZeO-Lx-9J7">
+                            <rect key="frame" x="0.0" y="573" width="388" height="243"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jma-L5-peG" userLabel="Cancel" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="203" width="388" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemFillColor"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="40" id="us2-5g-R6H"/>
                                     </constraints>
                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                     <color key="tintColor" systemColor="secondaryLabelColor"/>
                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                    <state key="normal" title="Cancel"/>
+                                    <state key="normal" title="Cancel">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                    </state>
                                     <connections>
                                         <action selector="pressedCancel:" destination="-1" eventType="touchUpInside" id="Ael-Cq-zhS"/>
                                     </connections>
                                 </button>
                             </subviews>
-                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <constraints>
                                 <constraint firstAttribute="trailing" secondItem="jma-L5-peG" secondAttribute="trailing" id="ELU-Fn-cF5"/>
                                 <constraint firstItem="jma-L5-peG" firstAttribute="leading" secondItem="ZeO-Lx-9J7" secondAttribute="leading" id="fBg-LY-arU"/>
-                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="40" id="g1T-Hs-jmS"/>
+                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="45" id="g1T-Hs-jmS"/>
                                 <constraint firstAttribute="bottom" secondItem="jma-L5-peG" secondAttribute="bottom" id="qac-E8-8Sd"/>
                             </constraints>
                         </view>
@@ -383,16 +394,16 @@
     </objects>
     <designables>
         <designable name="91a-FO-77z">
-            <size key="intrinsicContentSize" width="41.5" height="17"/>
+            <size key="intrinsicContentSize" width="41.333333333333336" height="17"/>
         </designable>
         <designable name="KnP-8k-7qE">
-            <size key="intrinsicContentSize" width="36.5" height="23"/>
+            <size key="intrinsicContentSize" width="36.666666666666664" height="23"/>
         </designable>
         <designable name="fUI-xV-Cyd">
-            <size key="intrinsicContentSize" width="24.5" height="17"/>
+            <size key="intrinsicContentSize" width="24.666666666666668" height="17"/>
         </designable>
         <designable name="nTF-ts-4gP">
-            <size key="intrinsicContentSize" width="35.5" height="17"/>
+            <size key="intrinsicContentSize" width="35.333333333333336" height="17"/>
         </designable>
     </designables>
     <resources>
@@ -402,14 +413,20 @@
         <image name="shuffle" width="30" height="30"/>
         <image name="user_queue_append" width="30" height="30"/>
         <image name="user_queue_insert" width="30" height="30"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
-        <systemColor name="secondarySystemFillColor">
-            <color red="0.47058823529411764" green="0.47058823529411764" blue="0.50196078431372548" alpha="0.16" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemFillColor">
+            <color red="0.47058823529411764" green="0.47058823529411764" blue="0.50196078431372548" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="tintColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

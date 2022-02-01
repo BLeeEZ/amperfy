@@ -28,7 +28,7 @@ class ArtistDetailVC: BasicTableViewController {
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: ArtistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
-                playContextCb: {() in PlayContext(playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
+                playContextCb: {() in PlayContext(name: self.artist.name, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
@@ -63,7 +63,7 @@ class ArtistDetailVC: BasicTableViewController {
         else { return nil }
         let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
         guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
-        return PlayContext(index: playContextIndex, playables: songs)
+        return PlayContext(name: artist.name, index: playContextIndex, playables: songs)
     }
     
     // MARK: - Table view data source
