@@ -326,6 +326,18 @@ class PlaylistItemsFetchedResultsController: BasicFetchedResultsController<Playl
         fetchRequest.predicate = library.getFetchPredicate(forPlaylist: playlist)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
+    
+    func search(onlyCachedSongs: Bool) {
+        if onlyCachedSongs {
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicate(forPlaylist: playlist),
+                library.getFetchPredicate(onlyCachedPlaylistItems: onlyCachedSongs)
+            ])
+            search(predicate: predicate)
+        } else {
+            showAllResults()
+        }
+    }
 
 }
 

@@ -243,10 +243,16 @@ extension BasicFetchedResultsController where ResultType == PlaylistItemMO {
         return PlaylistItem(library: library, managedObject: itemMO)
     }
     
-    var songs: [AbstractPlayable]? {
-        let itemsMO = try? managedObjectContext.fetch(fetchResultsController.fetchRequest)
-        let playablesMO = itemsMO?.compactMap{ $0.playable }
-        return playablesMO?.compactMap{ AbstractPlayable(managedObject: $0) }
+    func getContextSongs(onlyCachedSongs: Bool) -> [AbstractPlayable]? {
+        guard let basicPredicate = defaultPredicate else { return nil }
+        let cachedFetchRequest = fetchResultsController.fetchRequest.copy() as! NSFetchRequest<PlaylistItemMO>
+        cachedFetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            basicPredicate,
+            library.getFetchPredicate(onlyCachedPlaylistItems: onlyCachedSongs)
+        ])
+        let playlistItemsMO = try? managedObjectContext.fetch(cachedFetchRequest)
+        let playables = playlistItemsMO?.compactMap{ $0.playable }.compactMap{ AbstractPlayable(managedObject: $0) }
+        return playables
     }
 }
 

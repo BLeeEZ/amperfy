@@ -52,6 +52,7 @@ class LibraryEntityDetailVC: UIViewController {
     private var playable: AbstractPlayable?
     private var album: Album?
     private var artist: Artist?
+    private var playlist: Playlist?
     
     private var entityPlayables: [AbstractPlayable] {
         var playables = [AbstractPlayable]()
@@ -61,6 +62,8 @@ class LibraryEntityDetailVC: UIViewController {
             playables = album.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode)
         } else if let artist = artist {
             playables = artist.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode)
+        } else if let playlist = playlist {
+            playables = playlist.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode)
         }
         return playables
     }
@@ -72,11 +75,12 @@ class LibraryEntityDetailVC: UIViewController {
             name = album.name
         } else if let artist = artist {
             name = artist.name
+        } else if let playlist = playlist {
+            name = playlist.name
         }
         return name
     }
-    
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
@@ -142,12 +146,20 @@ class LibraryEntityDetailVC: UIViewController {
             } else if let artist = self.artist {
                 let artistAsync = Artist(managedObject: context.object(with: artist.managedObject.objectID) as! ArtistMO)
                 syncer.sync(artist: artistAsync, library: syncLibrary)
+            } else if let playlist = self.playlist {
+                let playlistAsync = Playlist(library: syncLibrary, managedObject: context.object(with: playlist.managedObject.objectID) as! PlaylistMO)
+                syncer.syncDown(playlist: playlistAsync, library: syncLibrary)
             }
             syncLibrary.saveContext()
             DispatchQueue.main.async {
                 self.refresh()
             }
         }
+    }
+    
+    func display(playlist: Playlist, on rootView: UIViewController) {
+        self.playlist = playlist
+        self.rootView = rootView
     }
     
     func display(artist: Artist, on rootView: UIViewController) {
@@ -176,9 +188,52 @@ class LibraryEntityDetailVC: UIViewController {
             configureFor(album: album)
         } else if let artist = artist {
             configureFor(artist: artist)
+        } else if let playlist = playlist {
+            configureFor(playlist: playlist)
         }
     }
 
+    private func configureFor(playlist: Playlist) {
+        titleLabel.text = playlist.name
+        artistLabel.isHidden = true
+        showArtistButton.isHidden = true
+        albumLabel.isHidden =  true
+        showAlbumButton.isHidden = true
+        artworkImage.refresh()
+        var infoContent = [String]()
+        if playlist.songCount == 1 {
+            infoContent.append("1 Song")
+        } else {
+            infoContent.append("\(playlist.songCount) Songs")
+        }
+        if playlist.isSmartPlaylist {
+            infoContent.append("Smart Playlist")
+        }
+        infoLabel.text = infoContent.joined(separator: " \(CommonString.oneMiddleDot) ")
+
+        if !playlist.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
+            playButton.isHidden = true
+            playShuffledButton.isHidden = true
+            userQueueInsertButton.isHidden = true
+            userQueueAppendButton.isHidden = true
+            contextQueueInsertButton.isHidden = true
+            contextQueueAppendButton.isHidden = true
+        }
+        addToPlaylistButton.isHidden = true
+        if playlist.hasCachedPlayables {
+            downloadButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
+            deleteCacheButton.isHidden = false
+        } else if appDelegate.persistentStorage.settings.isOnlineMode {
+            downloadButton.isHidden = false
+            deleteCacheButton.isHidden = true
+        } else {
+            downloadButton.isHidden = true
+            deleteCacheButton.isHidden = true
+        }
+        deleteOnServerButton.isHidden = true
+        ratingPlaceholderView.isHidden = true
+    }
+    
     private func configureFor(artist: Artist) {
         titleLabel.text = artist.name
         artistLabel.isHidden = true
@@ -427,6 +482,14 @@ class LibraryEntityDetailVC: UIViewController {
         } else if let artist = artist, artist.hasCachedPlayables {
             appDelegate.playableDownloadManager.removeFinishedDownload(for: artist.playables)
             appDelegate.library.deleteCache(of: artist)
+            appDelegate.library.saveContext()
+            if let rootTableView = self.rootView as? UITableViewController{
+                rootTableView.tableView.reloadData()
+            }
+            refresh()
+        } else if let playlist = playlist, playlist.hasCachedPlayables {
+            appDelegate.playableDownloadManager.removeFinishedDownload(for: playlist.playables)
+            appDelegate.library.deleteCache(of: playlist)
             appDelegate.library.saveContext()
             if let rootTableView = self.rootView as? UITableViewController{
                 rootTableView.tableView.reloadData()

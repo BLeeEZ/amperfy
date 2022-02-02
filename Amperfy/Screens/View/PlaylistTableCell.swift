@@ -11,7 +11,18 @@ class PlaylistTableCell: BasicTableCell {
     
     static let rowHeight: CGFloat = 70.0 + margin.bottom + margin.top
     
-    func display(playlist: Playlist) {
+    private var playlist: Playlist?
+    private var rootView: UITableViewController?
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
+        self.addGestureRecognizer(longPressGesture)
+    }
+    
+    func display(playlist: Playlist, rootView: UITableViewController?) {
+        self.playlist = playlist
+        self.rootView = rootView
         nameLabel.text = playlist.name
         var images = [UIImageView]()
         images.append(art1Image)
@@ -41,6 +52,21 @@ class PlaylistTableCell: BasicTableCell {
             infoText += " \(CommonString.oneMiddleDot) Smart Playlist"
         }
         infoLabel.text = infoText
+    }
+    
+    @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {
+        if gesture.state == .began {
+            displayMenu()
+        }
+    }
+    
+    func displayMenu() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let playlist = playlist, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(playlist: playlist, on: rootView)
+        rootView.present(detailVC, animated: true)
     }
     
 }

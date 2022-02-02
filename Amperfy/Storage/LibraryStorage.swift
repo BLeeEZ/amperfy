@@ -352,6 +352,14 @@ class LibraryStorage: PlayableFileCachable {
         }
     }
     
+    func getFetchPredicate(onlyCachedPlaylistItems: Bool) -> NSPredicate {
+        if onlyCachedPlaylistItems {
+            return NSPredicate(format: "%K != nil", #keyPath(PlaylistItemMO.playable.file))
+        } else {
+            return NSPredicate.alwaysTrue
+        }
+    }
+    
     func getFetchPredicate(onlyCachedSongs: Bool) -> NSPredicate {
         if onlyCachedSongs {
             return NSPredicate(format: "%K != nil", #keyPath(SongMO.file))

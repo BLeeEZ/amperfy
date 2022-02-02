@@ -81,34 +81,12 @@ class PlaylistDetailTableHeader: UIView {
     }
     
     @IBAction func optionsButtonPressed(_ sender: Any) {
-        if let playlist = self.playlist, let rootView = self.rootView {
-            let alert = createAlert(forPlaylist: playlist)
-            alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
-            rootView.present(alert, animated: true, completion: nil)
-        }
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let playlist = playlist, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(playlist: playlist, on: rootView)
+        rootView.present(detailVC, animated: true)
     }
 
-    func createAlert(forPlaylist playlist: Playlist) -> UIAlertController {
-        let alert = UIAlertController(title: playlist.name, message: nil, preferredStyle: .actionSheet)
-        
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            alert.addAction(UIAlertAction(title: "Download all songs", style: .default, handler: { _ in
-                self.appDelegate.playableDownloadManager.download(objects: playlist.playables)
-            }))
-        }
-        if playlist.hasCachedPlayables {
-            alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
-                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: playlist.playables)
-                self.appDelegate.library.deleteCache(of: playlist)
-                self.appDelegate.library.saveContext()
-                if let rootView = self.rootView {
-                    rootView.tableView.reloadData()
-                }
-            }))
-        }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        return alert
-    }
-    
 }

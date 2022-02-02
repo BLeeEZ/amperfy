@@ -31,7 +31,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: playlistTableHeaderFrameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
-                playContextCb: {() in PlayContext(name: self.playlist.name, playables: self.fetchedResultsController.songs ?? [])},
+                playContextCb: {() in PlayContext(name: self.playlist.name, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
@@ -62,7 +62,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
         guard let indexPath = tableView.indexPath(for: cell),
-              let songs = self.fetchedResultsController.songs
+              let songs = fetchedResultsController.getContextSongs(onlyCachedSongs: appDelegate.persistentStorage.settings.isOfflineMode)
         else { return nil }
         return PlayContext(name: playlist.name, index: indexPath.row, playables: songs)
     }
@@ -145,7 +145,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     }
     
     override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.fetch()
+        fetchedResultsController.search(onlyCachedSongs: appDelegate.persistentStorage.settings.isOfflineMode)
         tableView.reloadData()
     }
     

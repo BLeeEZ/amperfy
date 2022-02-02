@@ -45,7 +45,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(playlist: playlist)
+        cell.display(playlist: playlist, rootView: self)
         return cell
     }
     

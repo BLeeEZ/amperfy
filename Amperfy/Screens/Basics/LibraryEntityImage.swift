@@ -28,7 +28,7 @@ class LibraryEntityImage: RoundedImage, UIArtworkUpdatable {
     }
     
     func refresh() {
-        self.image = entity?.image
+        self.image = entity?.image ?? Artwork.defaultImage
     }
     
 }
