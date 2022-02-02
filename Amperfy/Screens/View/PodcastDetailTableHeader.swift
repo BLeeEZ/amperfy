@@ -45,33 +45,12 @@ class PodcastDetailTableHeader: UIView {
     }
 
     @IBAction func optionsButtonPressed(_ sender: Any) {
-        if let podcast = self.podcast, let rootView = self.rootView {
-            let alert = createAlert(forPodcast: podcast)
-            alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
-            rootView.present(alert, animated: true, completion: nil)
-        }
-    }
-    
-    func createAlert(forPodcast podcast: Podcast) -> UIAlertController {
-        let alert = UIAlertController(title: podcast.title, message: nil, preferredStyle: .actionSheet)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-                podcast.cachePlayables(downloadManager: self.appDelegate.playableDownloadManager)
-            }))
-        }
-        if podcast.hasCachedPlayables {
-            alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
-                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: podcast.playables)
-                self.appDelegate.library.deleteCache(of: podcast)
-                self.appDelegate.library.saveContext()
-                if let rootView = self.rootView {
-                    rootView.tableView.reloadData()
-                }
-            }))
-        }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        return alert
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let podcast = self.podcast, let rootView = self.rootView, rootView.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(podcast: podcast, on: rootView)
+        rootView.present(detailVC, animated: true)
     }
     
 }

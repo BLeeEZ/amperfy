@@ -38,7 +38,7 @@ class PodcastsVC: SingleFetchedResultsTableViewController<PodcastMO> {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: PodcastTableCell = dequeueCell(for: tableView, at: indexPath)
         let podcast = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(podcast: podcast)
+        cell.display(podcast: podcast, rootView: self)
         return cell
     }
     

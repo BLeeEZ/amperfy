@@ -54,6 +54,7 @@ class LibraryEntityDetailVC: UIViewController {
     private var artist: Artist?
     private var genre: Genre?
     private var playlist: Playlist?
+    private var podcast: Podcast?
     
     private var entityPlayables: [AbstractPlayable] {
         var playables = [AbstractPlayable]()
@@ -67,6 +68,8 @@ class LibraryEntityDetailVC: UIViewController {
             playables = genre.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode)
         } else if let playlist = playlist {
             playables = playlist.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode)
+        } else if let podcast = podcast {
+            playables = podcast.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode)
         }
         return playables
     }
@@ -82,6 +85,8 @@ class LibraryEntityDetailVC: UIViewController {
             name = genre.name
         } else if let playlist = playlist {
             name = playlist.name
+        } else if let podcast = podcast {
+            name = podcast.title
         }
         return name
     }
@@ -90,6 +95,9 @@ class LibraryEntityDetailVC: UIViewController {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         titleLabel.applyAmperfyStyle()
+        artistLabel.applyAmperfyStyle()
+        albumLabel.applyAmperfyStyle()
+        infoLabel.applyAmperfyStyle()
         if let ratingView = ViewBuilder<RatingView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: ratingPlaceholderView.bounds.size.width, height: RatingView.frameHeight+10)) {
             self.ratingView = ratingView
             ratingPlaceholderView.addSubview(ratingView)
@@ -157,12 +165,20 @@ class LibraryEntityDetailVC: UIViewController {
             } else if let playlist = self.playlist {
                 let playlistAsync = Playlist(library: syncLibrary, managedObject: context.object(with: playlist.managedObject.objectID) as! PlaylistMO)
                 syncer.syncDown(playlist: playlistAsync, library: syncLibrary)
+            } else if let podcast = self.podcast {
+                let podcastAsync = Podcast(managedObject: context.object(with: podcast.managedObject.objectID) as! PodcastMO)
+                syncer.sync(podcast: podcastAsync, library: syncLibrary)
             }
             syncLibrary.saveContext()
             DispatchQueue.main.async {
                 self.refresh()
             }
         }
+    }
+    
+    func display(podcast: Podcast, on rootView: UIViewController) {
+        self.podcast = podcast
+        self.rootView = rootView
     }
     
     func display(playlist: Playlist, on rootView: UIViewController) {
@@ -205,6 +221,8 @@ class LibraryEntityDetailVC: UIViewController {
             configureFor(genre: genre)
         } else if let playlist = playlist {
             configureFor(playlist: playlist)
+        } else if let podcast = podcast {
+            configureFor(podcast: podcast)
         }
     }
 
@@ -286,6 +304,46 @@ class LibraryEntityDetailVC: UIViewController {
             addToPlaylistButton.isHidden = true
         }
         if genre.hasCachedPlayables {
+            downloadButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
+            deleteCacheButton.isHidden = false
+        } else if appDelegate.persistentStorage.settings.isOnlineMode {
+            downloadButton.isHidden = false
+            deleteCacheButton.isHidden = true
+        } else {
+            downloadButton.isHidden = true
+            deleteCacheButton.isHidden = true
+        }
+        deleteOnServerButton.isHidden = true
+        ratingPlaceholderView.isHidden = true
+    }
+    
+    private func configureFor(podcast: Podcast) {
+        titleLabel.text = podcast.title
+        artistLabel.isHidden = true
+        showArtistButton.isHidden = true
+        albumLabel.isHidden =  true
+        showAlbumButton.isHidden = true
+        artworkImage.displayAndUpdate(entity: podcast, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
+        var infoContent = [String]()
+        if podcast.episodes.count == 1 {
+            infoContent.append("1 Episode")
+        } else {
+            infoContent.append("\(podcast.episodes.count) Episodes")
+        }
+        infoLabel.text = infoContent.joined(separator: " \(CommonString.oneMiddleDot) ")
+
+        if !podcast.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
+            playButton.isHidden = true
+            playShuffledButton.isHidden = true
+            userQueueInsertButton.isHidden = true
+            userQueueAppendButton.isHidden = true
+            contextQueueInsertButton.isHidden = true
+            contextQueueAppendButton.isHidden = true
+        }
+        if appDelegate.persistentStorage.settings.isOfflineMode {
+            addToPlaylistButton.isHidden = true
+        }
+        if podcast.hasCachedPlayables {
             downloadButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
             deleteCacheButton.isHidden = false
         } else if appDelegate.persistentStorage.settings.isOnlineMode {
@@ -555,6 +613,14 @@ class LibraryEntityDetailVC: UIViewController {
         } else if let genre = genre, genre.hasCachedPlayables {
             appDelegate.playableDownloadManager.removeFinishedDownload(for: genre.playables)
             appDelegate.library.deleteCache(of: genre)
+            appDelegate.library.saveContext()
+            if let rootTableView = self.rootView as? UITableViewController{
+                rootTableView.tableView.reloadData()
+            }
+            refresh()
+        } else if let podcast = podcast, podcast.hasCachedPlayables {
+            appDelegate.playableDownloadManager.removeFinishedDownload(for: podcast.playables)
+            appDelegate.library.deleteCache(of: podcast)
             appDelegate.library.saveContext()
             if let rootTableView = self.rootView as? UITableViewController{
                 rootTableView.tableView.reloadData()
