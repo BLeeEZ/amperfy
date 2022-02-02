@@ -52,6 +52,7 @@ class LibraryEntityDetailVC: UIViewController {
     private var playable: AbstractPlayable?
     private var album: Album?
     private var artist: Artist?
+    private var genre: Genre?
     private var playlist: Playlist?
     
     private var entityPlayables: [AbstractPlayable] {
@@ -62,6 +63,8 @@ class LibraryEntityDetailVC: UIViewController {
             playables = album.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode)
         } else if let artist = artist {
             playables = artist.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode)
+        } else if let genre = genre {
+            playables = genre.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode)
         } else if let playlist = playlist {
             playables = playlist.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode)
         }
@@ -75,6 +78,8 @@ class LibraryEntityDetailVC: UIViewController {
             name = album.name
         } else if let artist = artist {
             name = artist.name
+        } else if let genre = genre {
+            name = genre.name
         } else if let playlist = playlist {
             name = playlist.name
         }
@@ -146,6 +151,9 @@ class LibraryEntityDetailVC: UIViewController {
             } else if let artist = self.artist {
                 let artistAsync = Artist(managedObject: context.object(with: artist.managedObject.objectID) as! ArtistMO)
                 syncer.sync(artist: artistAsync, library: syncLibrary)
+            } else if let genre = self.genre {
+                let genreAsync = Genre(managedObject: context.object(with: genre.managedObject.objectID) as! GenreMO)
+                syncer.sync(genre: genreAsync, library: syncLibrary)
             } else if let playlist = self.playlist {
                 let playlistAsync = Playlist(library: syncLibrary, managedObject: context.object(with: playlist.managedObject.objectID) as! PlaylistMO)
                 syncer.syncDown(playlist: playlistAsync, library: syncLibrary)
@@ -162,6 +170,11 @@ class LibraryEntityDetailVC: UIViewController {
         self.rootView = rootView
     }
     
+    func display(genre: Genre, on rootView: UIViewController) {
+        self.genre = genre
+        self.rootView = rootView
+    }
+
     func display(artist: Artist, on rootView: UIViewController) {
         self.artist = artist
         self.rootView = rootView
@@ -188,6 +201,8 @@ class LibraryEntityDetailVC: UIViewController {
             configureFor(album: album)
         } else if let artist = artist {
             configureFor(artist: artist)
+        } else if let genre = genre {
+            configureFor(genre: genre)
         } else if let playlist = playlist {
             configureFor(playlist: playlist)
         }
@@ -221,6 +236,56 @@ class LibraryEntityDetailVC: UIViewController {
         }
         addToPlaylistButton.isHidden = true
         if playlist.hasCachedPlayables {
+            downloadButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
+            deleteCacheButton.isHidden = false
+        } else if appDelegate.persistentStorage.settings.isOnlineMode {
+            downloadButton.isHidden = false
+            deleteCacheButton.isHidden = true
+        } else {
+            downloadButton.isHidden = true
+            deleteCacheButton.isHidden = true
+        }
+        deleteOnServerButton.isHidden = true
+        ratingPlaceholderView.isHidden = true
+    }
+    
+    private func configureFor(genre: Genre) {
+        titleLabel.text = genre.name
+        artistLabel.isHidden = true
+        showArtistButton.isHidden = true
+        albumLabel.isHidden =  true
+        showAlbumButton.isHidden = true
+        artworkImage.displayAndUpdate(entity: genre, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
+        var infoContent = [String]()
+        if genre.artists.count == 1 {
+            infoContent.append("1 Artist")
+        } else {
+            infoContent.append("\(genre.artists.count) Artists")
+        }
+        if genre.albums.count == 1 {
+            infoContent.append("1 Album")
+        } else {
+            infoContent.append("\(genre.albums.count) Albums")
+        }
+        if genre.songs.count == 1 {
+            infoContent.append("1 Song")
+        } else {
+            infoContent.append("\(genre.songs.count) Songs")
+        }
+        infoLabel.text = infoContent.joined(separator: " \(CommonString.oneMiddleDot) ")
+
+        if !genre.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
+            playButton.isHidden = true
+            playShuffledButton.isHidden = true
+            userQueueInsertButton.isHidden = true
+            userQueueAppendButton.isHidden = true
+            contextQueueInsertButton.isHidden = true
+            contextQueueAppendButton.isHidden = true
+        }
+        if appDelegate.persistentStorage.settings.isOfflineMode {
+            addToPlaylistButton.isHidden = true
+        }
+        if genre.hasCachedPlayables {
             downloadButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
             deleteCacheButton.isHidden = false
         } else if appDelegate.persistentStorage.settings.isOnlineMode {
@@ -482,6 +547,14 @@ class LibraryEntityDetailVC: UIViewController {
         } else if let artist = artist, artist.hasCachedPlayables {
             appDelegate.playableDownloadManager.removeFinishedDownload(for: artist.playables)
             appDelegate.library.deleteCache(of: artist)
+            appDelegate.library.saveContext()
+            if let rootTableView = self.rootView as? UITableViewController{
+                rootTableView.tableView.reloadData()
+            }
+            refresh()
+        } else if let genre = genre, genre.hasCachedPlayables {
+            appDelegate.playableDownloadManager.removeFinishedDownload(for: genre.playables)
+            appDelegate.library.deleteCache(of: genre)
             appDelegate.library.saveContext()
             if let rootTableView = self.rootView as? UITableViewController{
                 rootTableView.tableView.reloadData()

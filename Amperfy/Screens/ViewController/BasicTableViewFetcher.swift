@@ -2,6 +2,21 @@ import Foundation
 
 extension BasicTableViewController {
     
+    func fetchDetails(of genre: Genre, completionHandler: @escaping () -> Void) {
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                let library = LibraryStorage(context: context)
+                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                syncer.sync(genre: genre, library: library)
+                DispatchQueue.main.async {
+                    completionHandler()
+                }
+            }
+        } else {
+            completionHandler()
+        }
+    }
+
     func fetchDetails(of artist: Artist, completionHandler: @escaping () -> Void) {
         if appDelegate.persistentStorage.settings.isOnlineMode {
             appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in

@@ -7,6 +7,7 @@ class GenreDetailVC: BasicTableViewController {
     private var artistsFetchedResultsController: GenreArtistsFetchedResultsController!
     private var albumsFetchedResultsController: GenreAlbumsFetchedResultsController!
     private var songsFetchedResultsController: GenreSongsFetchedResultsController!
+    private var detailOperationsView: GenreDetailTableHeader?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +28,7 @@ class GenreDetailVC: BasicTableViewController {
         if let genreDetailTableHeaderView = ViewBuilder<GenreDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenreDetailTableHeader.frameHeight)) {
             genreDetailTableHeaderView.prepare(toWorkOn: genre, rootView: self)
             tableView.tableHeaderView?.addSubview(genreDetailTableHeaderView)
+            detailOperationsView = genreDetailTableHeaderView
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenreDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
@@ -53,6 +55,13 @@ class GenreDetailVC: BasicTableViewController {
             default:
                 completionHandler([])
             }
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.fetchDetails(of: genre) {
+            self.detailOperationsView?.refresh()
         }
     }
     

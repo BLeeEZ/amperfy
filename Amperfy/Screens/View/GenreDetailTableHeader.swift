@@ -8,6 +8,7 @@ class GenreDetailTableHeader: UIView {
     
     static let frameHeight: CGFloat = 150.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginTopElement
+    
     private var genre: Genre?
     private var appDelegate: AppDelegate!
     private var rootView: GenreDetailVC?
@@ -22,6 +23,11 @@ class GenreDetailTableHeader: UIView {
         guard let genre = genre else { return }
         self.genre = genre
         self.rootView = rootView
+        refresh()
+    }
+        
+    func refresh() {
+        guard let genre = genre else { return }
         nameLabel.text = genre.name
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
@@ -40,45 +46,22 @@ class GenreDetailTableHeader: UIView {
         } else {
             infoText += "\(genre.albums.count) Albums"
         }
+        infoText += " \(CommonString.oneMiddleDot) "
+        if genre.songs.count == 1 {
+            infoText += "1 Song"
+        } else {
+            infoText += "\(genre.songs.count) Songs"
+        }
         infoLabel.text = infoText
     }
 
     @IBAction func optionsButtonPressed(_ sender: Any) {
-        if let genre = self.genre, let rootView = self.rootView {
-            let alert = createAlert(for: genre)
-            alert.setOptionsForIPadToDisplayPopupCentricIn(view: rootView.view)
-            rootView.present(alert, animated: true, completion: nil)
-        }
-    }
-    
-    func createAlert(for genre: Genre) -> UIAlertController {
-        let alert = UIAlertController(title: genre.name, message: nil, preferredStyle: .actionSheet)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            alert.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: { _ in
-                let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-                selectPlaylistVC.itemsToAdd = genre.songs
-                let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-                if let rootView = self.rootView {
-                    rootView.present(selectPlaylistNav, animated: true, completion: nil)
-                }
-            }))
-            alert.addAction(UIAlertAction(title: "Download", style: .default, handler: { _ in
-                self.appDelegate.playableDownloadManager.download(objects: genre.songs)
-            }))
-        }
-        if genre.hasCachedPlayables {
-            alert.addAction(UIAlertAction(title: "Remove from cache", style: .default, handler: { _ in
-                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: genre.playables)
-                self.appDelegate.library.deleteCache(of: genre)
-                self.appDelegate.library.saveContext()
-                if let rootView = self.rootView {
-                    rootView.tableView.reloadData()
-                }
-            }))
-        }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        return alert
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let genre = self.genre, let rootView = self.rootView, rootView.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(genre: genre, on: rootView)
+        rootView.present(detailVC, animated: true)
     }
     
 }

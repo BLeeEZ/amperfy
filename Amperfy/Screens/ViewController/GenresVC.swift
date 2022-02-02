@@ -26,7 +26,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: GenreTableCell = dequeueCell(for: tableView, at: indexPath)
         let genre = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(genre: genre)
+        cell.display(genre: genre, rootView: self)
         return cell
     }
     

@@ -95,6 +95,17 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         statusNotifyier?.notifySyncFinished()
     }
     
+    func sync(genre: Genre, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        for album in genre.albums {
+            let albumParser = AlbumParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+            self.ampacheXmlServerApi.requestAlbumInfo(of: album, parserDelegate: albumParser)
+            let songParser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+            self.ampacheXmlServerApi.requestAlbumSongs(of: album, parserDelegate: songParser)
+        }
+        library.saveContext()
+    }
+    
     func sync(artist: Artist, library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
         let artistParser = ArtistParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)

@@ -87,6 +87,17 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         statusNotifyier?.notifySyncFinished()
     }
     
+    func sync(genre: Genre, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        for album in genre.albums {
+            let albumParser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+            subsonicServerApi.requestAlbum(parserDelegate: albumParser, id: album.id)
+            let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+            subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+        }
+        library.saveContext()
+    }
+    
     func sync(artist: Artist, library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
         let artistParser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
