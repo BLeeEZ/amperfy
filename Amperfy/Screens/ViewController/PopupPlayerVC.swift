@@ -313,36 +313,12 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func optionsPressed() {
         appDelegate.userStatistics.usedAction(.playerOptions)
-        let alert = UIAlertController(title: "Player", message: nil, preferredStyle: .actionSheet)
-        
-        alert.addAction(UIAlertAction(title: "Clear Player", style: .default, handler: { _ in
-            self.appDelegate.player.clearQueues()
-            self.reloadData()
-            self.playerView?.refreshPlayer()
-        }))
-        if !player.userQueue.isEmpty {
-            alert.addAction(UIAlertAction(title: "Clear User Queue", style: .default, handler: { _ in
-                self.clearUserQueue()
-            }))
-        }
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            alert.addAction(UIAlertAction(title: "Add all songs to playlist", style: .default, handler: { _ in
-                let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-                var itemsToAdd = self.appDelegate.player.prevQueue.filterSongs()
-                if let currentlyPlaying = self.appDelegate.player.currentlyPlaying, currentlyPlaying.isSong {
-                    itemsToAdd.append(currentlyPlaying)
-                }
-                itemsToAdd.append(contentsOf: self.appDelegate.player.nextQueue.filterSongs())
-                selectPlaylistVC.itemsToAdd = itemsToAdd
-                let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-                self.present(selectPlaylistNav, animated: true, completion: nil)
-            }))
-        }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
-        
-        self.present(alert, animated: true, completion: nil)
+        guard let playable = self.player.currentlyPlaying, self.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(playable: playable,
+                         playContextCb: nil,
+                         on: self)
+        self.present(detailVC, animated: true)
     }
 
 }

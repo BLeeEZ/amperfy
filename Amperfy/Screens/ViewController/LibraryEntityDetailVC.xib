@@ -12,11 +12,14 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="LibraryEntityDetailVC" customModule="Amperfy" customModuleProvider="target">
             <connections>
+                <outlet property="addContextQueueToPlaylistButton" destination="KyE-9D-LUO" id="oYU-d6-O5e"/>
                 <outlet property="addToPlaylistButton" destination="QhC-Il-SGI" id="7eP-Ge-A8h"/>
                 <outlet property="albumLabel" destination="91a-FO-77z" id="TXB-dU-Xvq"/>
                 <outlet property="artistLabel" destination="nTF-ts-4gP" id="Xxx-Zu-aO8"/>
                 <outlet property="artworkImage" destination="wrZ-NE-prP" id="fuv-rL-GXZ"/>
                 <outlet property="cancelButton" destination="jma-L5-peG" id="vQN-gZ-0h4"/>
+                <outlet property="clearPlayerButton" destination="pbs-jx-sT0" id="65v-4X-VXI"/>
+                <outlet property="clearUserQueueButton" destination="jcw-t1-z3e" id="pW6-5r-Ro2"/>
                 <outlet property="contextQueueAppendButton" destination="cvP-d9-XH3" id="tBY-6A-wG6"/>
                 <outlet property="contextQueueInsertButton" destination="kjv-5v-4aM" id="xVW-T1-CWr"/>
                 <outlet property="deleteCacheButton" destination="qeo-wc-t8G" id="ybz-ZC-3Ow"/>
@@ -27,6 +30,8 @@
                 <outlet property="playButton" destination="XDf-oc-z0s" id="IAJ-69-QUw"/>
                 <outlet property="playButtonHeightConstraint" destination="Yn5-c3-LL4" id="j7n-tY-DMt"/>
                 <outlet property="playShuffledButton" destination="SOj-o1-qLh" id="o2K-pA-jnp"/>
+                <outlet property="playerStackClusterHeightConstraint" destination="9jR-kE-MjG" id="gOi-Dl-Ctz"/>
+                <outlet property="playerStackView" destination="seo-iu-BAW" id="jlp-yz-xup"/>
                 <outlet property="ratingPlaceholderView" destination="Ms2-ug-0W5" id="aGe-eH-y39"/>
                 <outlet property="showAlbumButton" destination="AeI-2x-Stq" id="G9k-St-EVA"/>
                 <outlet property="showArtistButton" destination="RYw-hT-MnF" id="rqs-ew-lyG"/>
@@ -350,11 +355,58 @@
                                 <constraint firstAttribute="height" constant="265" id="FlB-wv-mVd"/>
                             </constraints>
                         </stackView>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="seo-iu-BAW" userLabel="Player Stack View">
+                            <rect key="frame" x="0.0" y="573" width="388" height="122"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pbs-jx-sT0" userLabel="ClearPlayer">
+                                    <rect key="frame" x="0.0" y="0.0" width="388" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemFillColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="W3U-Um-gR7"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="Clear Player"/>
+                                    <connections>
+                                        <action selector="pressedClearPlayer:" destination="-1" eventType="touchUpInside" id="290-bg-YO1"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jcw-t1-z3e" userLabel="ClearUserQueue">
+                                    <rect key="frame" x="0.0" y="41" width="388" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemFillColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="EPT-Qv-4us"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="Clear User Queue"/>
+                                    <connections>
+                                        <action selector="pressedClearUserQueue:" destination="-1" eventType="touchUpInside" id="mmp-pr-I9n"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KyE-9D-LUO" userLabel="AddAllSongsToPlaylist">
+                                    <rect key="frame" x="0.0" y="82" width="388" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemFillColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="2sq-0l-0Qb"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="Add Context Queue to Playlist"/>
+                                    <connections>
+                                        <action selector="pressedAddContextQueueToPlaylist:" destination="-1" eventType="touchUpInside" id="q3b-cb-fff"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="122" id="9jR-kE-MjG"/>
+                            </constraints>
+                        </stackView>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZeO-Lx-9J7">
-                            <rect key="frame" x="0.0" y="573" width="388" height="243"/>
+                            <rect key="frame" x="0.0" y="703" width="388" height="113"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jma-L5-peG" userLabel="Cancel" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="203" width="388" height="40"/>
+                                    <rect key="frame" x="0.0" y="73" width="388" height="40"/>
                                     <color key="backgroundColor" systemColor="systemFillColor"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="40" id="us2-5g-R6H"/>

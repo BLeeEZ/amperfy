@@ -29,6 +29,11 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var deleteCacheButton: UIButton!
     @IBOutlet weak var deleteOnServerButton: UIButton!
     
+    @IBOutlet weak var playerStackView: UIStackView!
+    @IBOutlet weak var clearPlayerButton: UIButton!
+    @IBOutlet weak var clearUserQueueButton: UIButton!
+    @IBOutlet weak var addContextQueueToPlaylistButton: UIButton!
+
     private var buttonsOfMainCluster: [UIButton] {
         return [
             playButton,
@@ -37,12 +42,12 @@ class LibraryEntityDetailVC: UIViewController {
             downloadButton,
             deleteCacheButton,
             deleteOnServerButton,
-            
         ]
     }
     
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var mainStackClusterHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var playerStackClusterHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var playButtonHeightConstraint: NSLayoutConstraint!
     
     private var rootView: UIViewController?
@@ -103,6 +108,7 @@ class LibraryEntityDetailVC: UIViewController {
             ratingPlaceholderView.addSubview(ratingView)
         }
         ratingPlaceholderView.layer.cornerRadius = BasicButton.cornerRadius
+        playerStackView.isHidden = true
         refresh()
 
         userQueueInsertButton.contentMode = .center
@@ -125,8 +131,12 @@ class LibraryEntityDetailVC: UIViewController {
         contextQueueAppendButton.titleLabel!.lineBreakMode = .byWordWrapping
         contextQueueAppendButton.layer.maskedCorners = [.layerMaxXMaxYCorner]
         
-        playButton.imageView?.contentMode = .scaleAspectFit
-        playShuffledButton.imageView?.contentMode = .scaleAspectFit
+        if !playButton.isHidden {
+            playButton.imageView?.contentMode = .scaleAspectFit
+        }
+        if !playShuffledButton.isHidden {
+            playShuffledButton.imageView?.contentMode = .scaleAspectFit
+        }
         
         let visibleMainButtons = buttonsOfMainCluster.filter{!$0.isHidden}
         var mainStackHeight = 0.0
@@ -141,8 +151,12 @@ class LibraryEntityDetailVC: UIViewController {
         firstButtonCluster?.layer.cornerRadius = BasicButton.cornerRadius
         firstButtonCluster?.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         let lastButtonCluster = visibleMainButtons.last
+        if firstButtonCluster == lastButtonCluster {
+            lastButtonCluster?.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        } else {
+            lastButtonCluster?.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        }
         lastButtonCluster?.layer.cornerRadius = BasicButton.cornerRadius
-        lastButtonCluster?.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -201,7 +215,7 @@ class LibraryEntityDetailVC: UIViewController {
         self.rootView = rootView
     }
     
-    func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextCallback, on rootView: UIViewController, playerIndexCb: GetPlayerIndexCallback? = nil) {
+    func display(playable: AbstractPlayable, playContextCb: GetPlayContextCallback?, on rootView: UIViewController, playerIndexCb: GetPlayerIndexCallback? = nil) {
         self.playable = playable
         self.playContextCb = playContextCb
         self.playerIndexCb = playerIndexCb
@@ -471,11 +485,11 @@ class LibraryEntityDetailVC: UIViewController {
         infoContent.append("\(song.duration.asDurationString)")
         infoLabel.text = infoContent.joined(separator: " \(CommonString.oneMiddleDot) ")
 
-        if !song.isCached && appDelegate.persistentStorage.settings.isOfflineMode {
+        if (playContextCb == nil) || (!song.isCached && appDelegate.persistentStorage.settings.isOfflineMode) {
             playButton.isHidden = true
         }
         playShuffledButton.isHidden = true
-        if playerIndexCb != nil || !song.isCached && appDelegate.persistentStorage.settings.isOfflineMode {
+        if (playContextCb == nil) || playerIndexCb != nil || (!song.isCached && appDelegate.persistentStorage.settings.isOfflineMode) {
             userQueueInsertButton.isHidden = true
             userQueueAppendButton.isHidden = true
             contextQueueInsertButton.isHidden = true
@@ -496,6 +510,7 @@ class LibraryEntityDetailVC: UIViewController {
         }
         deleteOnServerButton.isHidden = true
         ratingView?.display(entity: playable)
+        configurePlayerStack()
     }
     
     private func configureFor(podcastEpisode: PodcastEpisode) {
@@ -519,12 +534,14 @@ class LibraryEntityDetailVC: UIViewController {
         }
         infoLabel.text = infoContent.joined(separator: " \(CommonString.oneMiddleDot) ")
 
-        if (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
+        if (playContextCb == nil) ||
+           (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
            (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode) {
             playButton.isHidden = true
         }
         playShuffledButton.isHidden = true
-        if playerIndexCb != nil ||
+        if (playContextCb == nil) ||
+           (playerIndexCb != nil) ||
            (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
            (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode) {
             userQueueInsertButton.isHidden = true
@@ -545,6 +562,45 @@ class LibraryEntityDetailVC: UIViewController {
         }
         deleteOnServerButton.isHidden = podcastEpisode.remoteStatus == .deleted || appDelegate.persistentStorage.settings.isOfflineMode
         ratingPlaceholderView.isHidden = true
+        configurePlayerStack()
+    }
+    
+    func configurePlayerStack() {
+        guard playContextCb == nil else {
+            playerStackView.isHidden = true
+            return
+        }
+        
+        playerStackView.isHidden = false
+        clearPlayerButton.isHidden = false
+        clearUserQueueButton.isHidden = appDelegate.player.userQueue.isEmpty
+        addContextQueueToPlaylistButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
+        
+        let playerButtons: [UIButton] = [
+            clearPlayerButton,
+            clearUserQueueButton,
+            addContextQueueToPlaylistButton
+        ]
+
+        let visiblePlayerButtons = playerButtons.filter{!$0.isHidden}
+        var stackHeight = 0.0
+        if visiblePlayerButtons.count == 1 {
+            stackHeight = playButtonHeightConstraint.constant
+        } else if visiblePlayerButtons.count > 1 {
+            stackHeight = ((playButtonHeightConstraint.constant + 1.0) * CGFloat(visiblePlayerButtons.count)) - 1
+        }
+        playerStackClusterHeightConstraint.constant = stackHeight
+        
+        let firstButton = visiblePlayerButtons.first
+        firstButton?.layer.cornerRadius = BasicButton.cornerRadius
+        firstButton?.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        let lastButton = visiblePlayerButtons.last
+        lastButton?.layer.cornerRadius = BasicButton.cornerRadius
+        if firstButton == lastButton {
+            lastButton?.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        } else {
+            lastButton?.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        }
     }
     
     @IBAction func pressedPlay(_ sender: Any) {
@@ -580,6 +636,7 @@ class LibraryEntityDetailVC: UIViewController {
     }
 
     @IBAction func pressedDownload(_ sender: Any) {
+        dismiss(animated: true)
         if !entityPlayables.isEmpty {
             appDelegate.playableDownloadManager.download(objects: entityPlayables)
         }
@@ -653,17 +710,24 @@ class LibraryEntityDetailVC: UIViewController {
     
     @IBAction func pressedShowArtist(_ sender: Any) {
         dismiss(animated: true) {
-            guard let navController = self.rootView?.navigationController else { return }
             if let artist = self.playable?.asSong?.artist ?? self.album?.artist {
                 self.appDelegate.userStatistics.usedAction(.alertGoToArtist)
                 let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
                 artistDetailVC.artist = artist
-                navController.pushViewController(artistDetailVC, animated: true)
+                if let popupPlayer = self.rootView as? PopupPlayerVC {
+                    popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
+                } else if let navController = self.rootView?.navigationController {
+                    navController.pushViewController(artistDetailVC, animated: true)
+                }
             } else if let podcast = self.playable?.asPodcastEpisode?.podcast {
                 self.appDelegate.userStatistics.usedAction(.alertGoToPodcast)
                 let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
                 podcastDetailVC.podcast = podcast
-                navController.pushViewController(podcastDetailVC, animated: true)
+                if let popupPlayer = self.rootView as? PopupPlayerVC {
+                    popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
+                } else if let navController = self.rootView?.navigationController {
+                    navController.pushViewController(podcastDetailVC, animated: true)
+                }
             }
         }
     }
@@ -671,11 +735,15 @@ class LibraryEntityDetailVC: UIViewController {
     @IBAction func pressedShowAlbum(_ sender: Any) {
         let album = playable?.asSong?.album
         dismiss(animated: true) {
-            guard let album = album, let navController = self.rootView?.navigationController else { return }
+            guard let album = album  else { return }
             self.appDelegate.userStatistics.usedAction(.alertGoToAlbum)
             let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
             albumDetailVC.album = album
-            navController.pushViewController(albumDetailVC, animated: true)
+            if let popupPlayer = self.rootView as? PopupPlayerVC {
+                popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
+            } else if let navController = self.rootView?.navigationController {
+                navController.pushViewController(albumDetailVC, animated: true)
+            }
         }
     }
     
@@ -701,6 +769,35 @@ class LibraryEntityDetailVC: UIViewController {
         dismiss(animated: true)
         guard !entityPlayables.isEmpty else { return }
         self.appDelegate.player.appendContextQueue(playables: entityPlayables)
+    }
+    
+    @IBAction func pressedClearPlayer(_ sender: Any) {
+        dismiss(animated: true)
+        self.appDelegate.player.clearQueues()
+        if let popupPlayer = self.rootView as? PopupPlayerVC {
+            popupPlayer.reloadData()
+            popupPlayer.playerView?.refreshPlayer()
+        }
+    }
+    
+    @IBAction func pressedClearUserQueue(_ sender: Any) {
+        dismiss(animated: true)
+        if let popupPlayer = self.rootView as? PopupPlayerVC {
+            popupPlayer.clearUserQueue()
+        }
+    }
+    
+    @IBAction func pressedAddContextQueueToPlaylist(_ sender: Any) {
+        dismiss(animated: true)
+        let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
+        var itemsToAdd = self.appDelegate.player.prevQueue.filterSongs()
+        if let currentlyPlaying = self.appDelegate.player.currentlyPlaying, currentlyPlaying.isSong {
+            itemsToAdd.append(currentlyPlaying)
+        }
+        itemsToAdd.append(contentsOf: self.appDelegate.player.nextQueue.filterSongs())
+        selectPlaylistVC.itemsToAdd = itemsToAdd
+        let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+        rootView?.present(selectPlaylistNav, animated: true, completion: nil)
     }
     
     @IBAction func pressedCancel(_ sender: Any) {
