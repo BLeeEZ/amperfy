@@ -1,6 +1,14 @@
 import Foundation
 
+enum DetailType {
+    case short
+    case long
+}
+
 protocol PlayableContainable {
+    var name: String { get }
+    func infoDetails(for api: BackenApiType, type: DetailType) -> [String]
+    func info(for api: BackenApiType, type: DetailType) -> String
     var playables: [AbstractPlayable] { get }
     var duration: Int { get }
     var hasCachedPlayables: Bool { get }
@@ -22,6 +30,10 @@ extension PlayableContainable {
                 downloadManager.download(object: playable)
             }
         }
+    }
+    
+    func info(for api: BackenApiType, type: DetailType) -> String {
+        return infoDetails(for: api, type: type).joined(separator: " \(CommonString.oneMiddleDot) ")
     }
     
 }

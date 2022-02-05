@@ -7,7 +7,7 @@ enum PodcastRemoteStatus: Int {
     case deleted = 1
 }
 
-public class Podcast: AbstractLibraryEntity, PlayableContainable {
+public class Podcast: AbstractLibraryEntity {
     
     let managedObject: PodcastMO
     
@@ -35,8 +35,7 @@ public class Podcast: AbstractLibraryEntity, PlayableContainable {
         guard let episodesSet = managedObject.episodes, let episodesMO = episodesSet.array as? [PodcastEpisodeMO] else { return [PodcastEpisode]() }
         return episodesMO.compactMap{ PodcastEpisode(managedObject: $0) }.filter{ $0.userStatus != .deleted }.sortByPublishDate()
     }
-    var playables: [AbstractPlayable] { return episodes }
-    
+
     override var image: UIImage {
         if super.image != Artwork.defaultImage {
             return super.image
@@ -44,6 +43,27 @@ public class Podcast: AbstractLibraryEntity, PlayableContainable {
         return Artwork.defaultImage
     }
 
+}
+
+extension Podcast: PlayableContainable  {
+    var name: String {
+        return title
+    }
+    func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+        var infoContent = [String]()
+        if episodes.count == 1 {
+            infoContent.append("1 Episode")
+        } else {
+            infoContent.append("\(episodes.count) Episodes")
+        }
+        if type == .long {
+            infoContent.append("\(episodes.reduce(0, {$0 + $1.duration}).asDurationString)")
+        }
+        return infoContent
+    }
+    var playables: [AbstractPlayable] {
+        return episodes
+    }
 }
 
 extension Podcast: Hashable, Equatable {

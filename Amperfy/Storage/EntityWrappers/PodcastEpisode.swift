@@ -143,7 +143,22 @@ public class PodcastEpisode: AbstractPlayable {
         info += ")"
         return info
     }
-
+    
+    override func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+        var infoContent = [String]()
+        if type == .long {
+            infoContent.append("\(publishDate.asShortDayMonthString)")
+            if !isAvailableToUser && !isCached  {
+                infoContent.append("Not Available")
+            } else if let remainingTime = remainingTimeInSec {
+                infoContent.append("\(remainingTime.asDurationString) left")
+            } else {
+                infoContent.append("\(duration.asDurationString)")
+            }
+        }
+        return infoContent
+    }
+    
 }
 
 extension Array where Element: PodcastEpisode {

@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Artist: AbstractLibraryEntity, PlayableContainable {
+public class Artist: AbstractLibraryEntity {
     
     let managedObject: ArtistMO
     
@@ -69,6 +69,29 @@ public class Artist: AbstractLibraryEntity, PlayableContainable {
         }
     }
 
+}
+
+extension Artist: PlayableContainable  {
+    func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+        var infoContent = [String]()
+        if albumCount == 1 {
+            infoContent.append("1 Album")
+        } else {
+            infoContent.append("\(albumCount) Albums")
+        }
+        if songs.count == 1 {
+            infoContent.append("1 Song")
+        } else {
+            infoContent.append("\(songCount) Songs")
+        }
+        if type == .long {
+            infoContent.append("\(duration.asDurationString)")
+            if let genre = genre {
+                infoContent.append("Genre: \(genre.name)")
+            }
+        }
+        return infoContent
+    }
 }
 
 extension Artist: Hashable, Equatable {

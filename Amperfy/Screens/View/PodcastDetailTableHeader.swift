@@ -4,7 +4,7 @@ class PodcastDetailTableHeader: UIView {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var podcastImage: LibraryEntityImage!
-    @IBOutlet weak var infoLabel: UILabel!
+    @IBOutlet weak var infoLabel: MarqueeLabel!
     @IBOutlet weak var descriptionLabel: UILabel!
     
     static let frameHeight: CGFloat = 245.0 + margin.top + margin.bottom
@@ -32,15 +32,8 @@ class PodcastDetailTableHeader: UIView {
         titleLabel.lineBreakMode = .byWordWrapping
         titleLabel.numberOfLines = 0
         podcastImage.displayAndUpdate(entity: podcast, via: appDelegate.artworkDownloadManager)
-        var infoText = ""
-        let episodeCount = podcast.episodes.count
-        if episodeCount == 1 {
-            infoText += "1 Episode"
-        } else {
-            infoText += "\(episodeCount) Episodes"
-        }
-        infoText += " \(CommonString.oneMiddleDot) \(podcast.episodes.reduce(0, {$0 + $1.duration}).asDurationString)"
-        infoLabel.text = infoText
+        infoLabel.applyAmperfyStyle()
+        infoLabel.text = podcast.info(for: appDelegate.backendProxy.selectedApi, type: .long)
         descriptionLabel.text = podcast.depiction
     }
 

@@ -24,13 +24,7 @@ class AlbumTableCell: BasicTableCell {
         albumLabel.text = album.name
         artistLabel.text = album.artist?.name
         artworkImage.displayAndUpdate(entity: album, via: appDelegate.artworkDownloadManager)
-        var infoText = ""
-        if album.songCount == 1 {
-            infoText += "1 Song"
-        } else {
-            infoText += "\(album.songCount) Songs"
-        }
-        infoLabel.text = infoText
+        infoLabel.text = album.info(for: appDelegate.backendProxy.selectedApi, type: .short)
     }
 
     @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {

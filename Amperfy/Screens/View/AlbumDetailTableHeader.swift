@@ -4,7 +4,7 @@ class AlbumDetailTableHeader: UIView {
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var albumImage: LibraryEntityImage!
-    @IBOutlet weak var infoLabel: UILabel!
+    @IBOutlet weak var infoLabel: MarqueeLabel!
     
     static let frameHeight: CGFloat = 150.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginTopElement
@@ -31,17 +31,8 @@ class AlbumDetailTableHeader: UIView {
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
         albumImage.displayAndUpdate(entity: album, via: appDelegate.artworkDownloadManager)
-        var infoText = ""
-        if album.songCount == 1 {
-            infoText += "1 Song"
-        } else {
-            infoText += "\(album.songCount) Songs"
-        }
-        infoText += " \(CommonString.oneMiddleDot) \(album.duration.asDurationString)"
-        if album.year != 0 {
-            infoText += " \(CommonString.oneMiddleDot) Year \(album.year)"
-        }
-        infoLabel.text = infoText
+        infoLabel.applyAmperfyStyle()
+        infoLabel.text = album.info(for: appDelegate.backendProxy.selectedApi, type: .long)
     }
 
     @IBAction func optionsButtonPressed(_ sender: Any) {

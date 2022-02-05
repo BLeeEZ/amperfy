@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Genre: AbstractLibraryEntity, PlayableContainable {
+public class Genre: AbstractLibraryEntity {
     
     let managedObject: GenreMO
     
@@ -38,7 +38,6 @@ public class Genre: AbstractLibraryEntity, PlayableContainable {
             Song(managedObject: $0)
         }
     }
-    var playables: [AbstractPlayable] { return songs }
     var syncInfo: SyncWave? {
         get {
             guard let syncInfoMO = managedObject.syncInfo else { return nil }
@@ -48,4 +47,34 @@ public class Genre: AbstractLibraryEntity, PlayableContainable {
         }
     }
 
+}
+
+extension Genre: PlayableContainable  {
+    func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+        var infoContent = [String]()
+        if api == .ampache {
+            if artists.count == 1 {
+                infoContent.append("1 Artist")
+            } else {
+                infoContent.append("\(artists.count) Artists")
+            }
+        }
+        if albums.count == 1 {
+            infoContent.append("1 Album")
+        } else {
+            infoContent.append("\(albums.count) Albums")
+        }
+        if songs.count == 1 {
+            infoContent.append("1 Song")
+        } else {
+            infoContent.append("\(songs.count) Songs")
+        }
+        if type == .long {
+            infoContent.append("\(songs.reduce(0, {$0 + $1.duration}).asDurationString)")
+        }
+        return infoContent
+    }
+    var playables: [AbstractPlayable] {
+        return songs
+    }
 }

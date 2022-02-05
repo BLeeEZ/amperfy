@@ -4,7 +4,7 @@ class GenreDetailTableHeader: UIView {
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var genreImage: LibraryEntityImage!
-    @IBOutlet weak var infoLabel: UILabel!
+    @IBOutlet weak var infoLabel: MarqueeLabel!
     
     static let frameHeight: CGFloat = 150.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginTopElement
@@ -32,27 +32,8 @@ class GenreDetailTableHeader: UIView {
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
         genreImage.displayAndUpdate(entity: genre, via: appDelegate.artworkDownloadManager)
-        var infoText = ""
-        if appDelegate.backendProxy.selectedApi == .ampache {
-            if genre.artists.count == 1 {
-                infoText += "1 Artist"
-            } else {
-                infoText += "\(genre.artists.count) Artists"
-            }
-            infoText += " \(CommonString.oneMiddleDot) "
-        }
-        if genre.albums.count == 1 {
-            infoText += "1 Album"
-        } else {
-            infoText += "\(genre.albums.count) Albums"
-        }
-        infoText += " \(CommonString.oneMiddleDot) "
-        if genre.songs.count == 1 {
-            infoText += "1 Song"
-        } else {
-            infoText += "\(genre.songs.count) Songs"
-        }
-        infoLabel.text = infoText
+        infoLabel.applyAmperfyStyle()
+        infoLabel.text = genre.info(for: appDelegate.backendProxy.selectedApi, type: .long)
     }
 
     @IBAction func optionsButtonPressed(_ sender: Any) {

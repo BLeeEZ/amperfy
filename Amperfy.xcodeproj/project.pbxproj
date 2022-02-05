@@ -33,8 +33,6 @@
 		5009863C2208CB650057A1A6 /* OptionsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009863B2208CB650057A1A6 /* OptionsButton.swift */; };
 		5009863E2208CC1E0057A1A6 /* BasicButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009863D2208CC1E0057A1A6 /* BasicButton.swift */; };
 		500B2B312249607B00D14EF4 /* BackendProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B2B302249607B00D14EF4 /* BackendProxy.swift */; };
-		500B7D3F21EC87FD0083ED6F /* SongActionSheetView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500B7D3E21EC87FD0083ED6F /* SongActionSheetView.xib */; };
-		500B7D4121EC893B0083ED6F /* SongActionSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4021EC893B0083ED6F /* SongActionSheetView.swift */; };
 		500B7D4321ECFCDD0083ED6F /* LibraryElementEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4221ECFCDD0083ED6F /* LibraryElementEnum.swift */; };
 		500B7D4521EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500B7D4421EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib */; };
 		500B7D4721EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */; };
@@ -407,8 +405,6 @@
 		5009863B2208CB650057A1A6 /* OptionsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsButton.swift; sourceTree = "<group>"; };
 		5009863D2208CC1E0057A1A6 /* BasicButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicButton.swift; sourceTree = "<group>"; };
 		500B2B302249607B00D14EF4 /* BackendProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendProxy.swift; sourceTree = "<group>"; };
-		500B7D3E21EC87FD0083ED6F /* SongActionSheetView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SongActionSheetView.xib; sourceTree = "<group>"; };
-		500B7D4021EC893B0083ED6F /* SongActionSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongActionSheetView.swift; sourceTree = "<group>"; };
 		500B7D4221ECFCDD0083ED6F /* LibraryElementEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryElementEnum.swift; sourceTree = "<group>"; };
 		500B7D4421EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LibraryElementDetailTableHeaderView.xib; sourceTree = "<group>"; };
 		500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryElementDetailTableHeaderView.swift; sourceTree = "<group>"; };
@@ -1197,8 +1193,6 @@
 				500B7D4821EDD6250083ED6F /* ViewBuilder.swift */,
 				500B7D4421EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib */,
 				500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */,
-				500B7D3E21EC87FD0083ED6F /* SongActionSheetView.xib */,
-				500B7D4021EC893B0083ED6F /* SongActionSheetView.swift */,
 				50AFA1482632E83100F198DD /* GenreDetailTableHeader.xib */,
 				50AFA1472632E83100F198DD /* GenreDetailTableHeader.swift */,
 				50DEEE06265E27070073FF20 /* DirectoryTableCell.xib */,
@@ -1483,7 +1477,6 @@
 				502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */,
 				5000C1FE2799B32700DD73BB /* AlbumSongTableCell.xib in Resources */,
 				50A85F0A268A556700FB3E31 /* Amperfy.xcdatamodeld in Resources */,
-				500B7D3F21EC87FD0083ED6F /* SongActionSheetView.xib in Resources */,
 				5006BCB427959FD000D3C961 /* fa-regular-400.ttf in Resources */,
 				5055AA5826835AB000096B8D /* PodcastEpisodeTableCell.xib in Resources */,
 				50C16C0C21E52BBB00F086F0 /* SongTableCell.xib in Resources */,
@@ -1759,7 +1752,6 @@
 				50C16C1021E5463E00F086F0 /* ArtistsVC.swift in Sources */,
 				50A12F4627392B2400E7B2AA /* EmbeddedArtwork.swift in Sources */,
 				50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */,
-				500B7D4121EC893B0083ED6F /* SongActionSheetView.swift in Sources */,
 				50F81EDC23BF6B1E00EAAC3E /* ArtistMO+CoreDataClass.swift in Sources */,
 				501267B9264C187600E13F08 /* AmpacheXmlParser.swift in Sources */,
 				508FDE3C21F2FA3A005A0724 /* PlaylistDetailTableHeader.swift in Sources */,

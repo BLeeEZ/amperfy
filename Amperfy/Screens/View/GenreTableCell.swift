@@ -22,27 +22,7 @@ class GenreTableCell: BasicTableCell {
         self.rootView = rootView
         genreLabel.text = genre.name
         artworkImage.displayAndUpdate(entity: genre, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
-        var infoText = ""
-        if appDelegate.backendProxy.selectedApi == .ampache {
-            if genre.artists.count == 1 {
-                infoText += "1 Artist"
-            } else {
-                infoText += "\(genre.artists.count) Artists"
-            }
-            infoText += " \(CommonString.oneMiddleDot) "
-        }
-        if genre.albums.count == 1 {
-            infoText += "1 Album"
-        } else {
-            infoText += "\(genre.albums.count) Albums"
-        }
-        infoText += " \(CommonString.oneMiddleDot) "
-        if genre.songs.count == 1 {
-            infoText += "1 Song"
-        } else {
-            infoText += "\(genre.songs.count) Songs"
-        }
-        infoLabel.text = infoText
+        infoLabel.text = genre.info(for: appDelegate.backendProxy.selectedApi, type: .short)
     }
     
     @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {

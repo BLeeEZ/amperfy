@@ -201,6 +201,12 @@ class LibraryStorage: PlayableFileCachable {
         }
     }
     
+    func deleteCache(of playables: [AbstractPlayable]) {
+        for playable in playables {
+            deleteCache(ofPlayable: playable)
+        }
+    }
+
     func deleteCache(of playableContainer: PlayableContainable) {
         for playable in playableContainer.playables {
             deleteCache(ofPlayable: playable)

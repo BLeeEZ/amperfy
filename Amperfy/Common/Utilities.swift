@@ -523,11 +523,23 @@ extension UIDevice {
 
 extension MarqueeLabel {
     func applyAmperfyStyle() {
-        self.leadingBuffer = 0.0
-        self.trailingBuffer = 30.0
-        self.animationDelay = 2.0
-        self.type = .continuous
-        self.speed = .rate(30.0)
-        self.fadeLength = 10.0
+        if trailingBuffer != 30.0 {
+            self.trailingBuffer = 30.0
+        }
+        if leadingBuffer != 0.0 {
+            self.leadingBuffer = 0.0
+        }
+        if animationDelay != 2.0 {
+            self.animationDelay = 2.0
+        }
+        if type != .continuous {
+            self.type = .continuous
+        }
+        if speed.value != 30.0 {
+            self.speed = .rate(30.0)
+        }
+        if fadeLength != 10.0 {
+            self.fadeLength = 10.0
+        }
     }
 }

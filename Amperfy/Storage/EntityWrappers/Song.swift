@@ -76,6 +76,25 @@ public class Song: AbstractPlayable, Identifyable {
         return info
     }
     
+    override func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+        var infoContent = [String]()
+        if type == .long {
+            if track > 0 {
+                infoContent.append("Track \(track)")
+            }
+            infoContent.append("\(duration.asDurationString)")
+            if year > 0 {
+                infoContent.append("Year \(year)")
+            } else if let albumYear = album?.year, albumYear > 0 {
+                infoContent.append("Year \(albumYear)")
+            }
+            if let genre = genre {
+                infoContent.append("Genre: \(genre.name)")
+            }
+        }
+        return infoContent
+    }
+    
     var identifier: String {
         return title
     }

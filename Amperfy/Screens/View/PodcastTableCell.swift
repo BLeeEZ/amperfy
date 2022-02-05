@@ -22,16 +22,7 @@ class PodcastTableCell: BasicTableCell {
         self.rootView = rootView
         podcastLabel.text = podcast.title
         podcastImage.displayAndUpdate(entity: podcast, via: appDelegate.artworkDownloadManager)
-        var infoText = ""
-        let episodeCount = podcast.episodes.count
-        if episodeCount == 0 {
-            infoText += ""
-        } else if episodeCount == 1 {
-            infoText += "1 Episode"
-        } else {
-            infoText += "\(episodeCount) Episodes"
-        }
-        infoLabel.text = infoText
+        infoLabel.text = podcast.info(for: appDelegate.backendProxy.selectedApi, type: .short)
     }
 
     @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {

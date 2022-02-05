@@ -11,8 +11,7 @@ class PlaylistDetailTableHeader: UIView {
     @IBOutlet weak var art4Image: LibraryEntityImage!
     @IBOutlet weak var art5Image: LibraryEntityImage!
     @IBOutlet weak var art6Image: LibraryEntityImage!
-    @IBOutlet weak var smartPlaylistLabel: UILabel!
-    @IBOutlet weak var songCountLabel: UILabel!
+    @IBOutlet weak var infoLabel: MarqueeLabel!
     
     static let frameHeight: CGFloat = 109.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginTopElement
@@ -40,17 +39,8 @@ class PlaylistDetailTableHeader: UIView {
         nameTextField.text = playlist.name
         nameLabel.text = playlist.name
         refreshArtworks(playlist: playlist)
-        var infoText = ""
-        if playlist.songCount == 1 {
-            infoText += "1 Song"
-        } else {
-            infoText += "\(playlist.songCount) Songs"
-        }
-        infoText += " \(CommonString.oneMiddleDot) \(playlist.duration.asDurationString)"
-        songCountLabel.text = infoText
-        if !playlist.isSmartPlaylist {
-            smartPlaylistLabel.isHidden = true
-        }
+        infoLabel.applyAmperfyStyle()
+        infoLabel.text = playlist.info(for: appDelegate.backendProxy.selectedApi, type: .long)
     }
     
     func refreshArtworks(playlist: Playlist?) {

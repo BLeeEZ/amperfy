@@ -164,7 +164,26 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         guard self.isPodcastEpisode, let playablePodcastEpisode = playableManagedObject as? PodcastEpisodeMO else { return nil }
         return PodcastEpisode(managedObject: playablePodcastEpisode)
     }
+    func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+        var infoContent = [String]()
+        if type == .long {
+            if year > 0 {
+                infoContent.append("Year \(year)")
+            }
+            infoContent.append("\(duration.asDurationString)")
+        }
+        return infoContent
+    }
 
+}
+
+extension AbstractPlayable: PlayableContainable  {
+    var name: String {
+        return title
+    }
+    var playables: [AbstractPlayable] {
+        return [self]
+    }
 }
 
 extension AbstractPlayable: Hashable, Equatable {

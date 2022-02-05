@@ -22,18 +22,7 @@ class ArtistTableCell: BasicTableCell {
         self.rootView = rootView
         artistLabel.text = artist.name
         artworkImage.displayAndUpdate(entity: artist, via: appDelegate.artworkDownloadManager)
-        var infoText = ""
-        if artist.albumCount == 1 {
-            infoText += "1 Album"
-        } else {
-            infoText += "\(artist.albumCount) Albums"
-        }
-        if artist.songCount == 1 {
-            infoText += " \(CommonString.oneMiddleDot) 1 Song"
-        } else if artist.songCount > 1 {
-            infoText += " \(CommonString.oneMiddleDot) \(artist.songCount) Songs"
-        }
-        infoLabel.text = infoText
+        infoLabel.text = artist.info(for: appDelegate.backendProxy.selectedApi, type: .short)
     }
 
     @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {

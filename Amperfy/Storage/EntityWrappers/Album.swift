@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import UIKit
 
-public class Album: AbstractLibraryEntity, PlayableContainable {
+public class Album: AbstractLibraryEntity {
     
     let managedObject: AlbumMO
     
@@ -86,6 +86,27 @@ public class Album: AbstractLibraryEntity, PlayableContainable {
         return Artwork.defaultImage
     }
 
+}
+
+extension Album: PlayableContainable  {
+    func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+        var infoContent = [String]()
+        if songs.count == 1 {
+            infoContent.append("1 Song")
+        } else {
+            infoContent.append("\(songs.count) Songs")
+        }
+        if type == .long {
+            if year > 0 {
+                infoContent.append("Year \(year)")
+            }
+            if let genre = genre {
+                infoContent.append("Genre: \(genre.name)")
+            }
+            infoContent.append("\(duration.asDurationString)")
+        }
+        return infoContent
+    }
 }
 
 extension Album: Hashable, Equatable {

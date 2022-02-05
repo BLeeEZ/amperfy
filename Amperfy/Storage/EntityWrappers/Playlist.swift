@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import os.log
 
-public class Playlist: PlayableContainable, Identifyable {
+public class Playlist: Identifyable {
     
     static let smartPlaylistIdPrefix = "smart_"
     static var typeName: String {
@@ -283,6 +283,24 @@ public class Playlist: PlayableContainable, Identifyable {
         }
     }
 
+}
+
+extension Playlist: PlayableContainable  {
+    func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+        var infoContent = [String]()
+        if songCount == 1 {
+            infoContent.append("1 Song")
+        } else {
+            infoContent.append("\(songCount) Songs")
+        }
+        if isSmartPlaylist {
+            infoContent.append("Smart Playlist")
+        }
+        if type == .long {
+            infoContent.append("\(playables.reduce(0, {$0 + $1.duration}).asDurationString)")
+        }
+        return infoContent
+    }
 }
 
 extension Playlist: Hashable, Equatable {

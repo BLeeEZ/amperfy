@@ -41,17 +41,7 @@ class PlaylistTableCell: BasicTableCell {
                 artImage.image = customArtworkSongs[index].image
             }
         }
-        
-        var infoText = ""
-        if playlist.songCount == 1 {
-            infoText += "1 Song"
-        } else {
-            infoText += "\(playlist.songCount) Songs"
-        }
-        if playlist.isSmartPlaylist {
-            infoText += " \(CommonString.oneMiddleDot) Smart Playlist"
-        }
-        infoLabel.text = infoText
+        infoLabel.text = playlist.info(for: appDelegate.backendProxy.selectedApi, type: .short)
     }
     
     @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {

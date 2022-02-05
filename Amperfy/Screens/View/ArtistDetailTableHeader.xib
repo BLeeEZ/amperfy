@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -22,8 +22,8 @@
                         <constraint firstAttribute="height" constant="125" id="z50-iu-tvM"/>
                     </constraints>
                 </imageView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="152 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bXW-Pg-Y2Y" userLabel="Info Label">
-                    <rect key="frame" x="16" y="133" width="67.5" height="17"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="152 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bXW-Pg-Y2Y" userLabel="Info Label" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                    <rect key="frame" x="16" y="133" width="343" height="17"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <color key="textColor" systemColor="secondaryLabelColor"/>
                     <nil key="highlightedColor"/>
@@ -54,6 +54,7 @@
             <constraints>
                 <constraint firstAttribute="trailingMargin" secondItem="8vs-AB-Tkb" secondAttribute="trailing" id="1ud-wl-WLN"/>
                 <constraint firstItem="Arb-mj-xt4" firstAttribute="leading" secondItem="j2g-G9-4Tx" secondAttribute="trailing" constant="8" id="BHq-Zz-cv5"/>
+                <constraint firstAttribute="trailingMargin" secondItem="bXW-Pg-Y2Y" secondAttribute="trailing" id="Ggi-uf-63S"/>
                 <constraint firstItem="bXW-Pg-Y2Y" firstAttribute="top" secondItem="j2g-G9-4Tx" secondAttribute="bottom" constant="8" id="RdQ-ms-T3J"/>
                 <constraint firstItem="8vs-AB-Tkb" firstAttribute="bottom" secondItem="j2g-G9-4Tx" secondAttribute="bottom" id="RiV-3e-Ius"/>
                 <constraint firstAttribute="trailingMargin" secondItem="Arb-mj-xt4" secondAttribute="trailing" id="WhT-tv-ylP"/>
@@ -70,6 +71,11 @@
             <point key="canvasLocation" x="-297" y="106"/>
         </view>
     </objects>
+    <designables>
+        <designable name="bXW-Pg-Y2Y">
+            <size key="intrinsicContentSize" width="67.5" height="17"/>
+        </designable>
+    </designables>
     <resources>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
