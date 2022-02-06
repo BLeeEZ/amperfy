@@ -63,7 +63,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
 
     @IBAction func playEpisodeButtonPressed(_ sender: Any) {
         guard let episode = self.episode else { return }
-        appDelegate.player.appendContextQueueAndPlay(playable: episode)
+        appDelegate.player.play(context: PlayContext(name: episode.title, playables: [episode]))
     }
     
     @IBAction func optionsButtonPressed(_ sender: Any) {

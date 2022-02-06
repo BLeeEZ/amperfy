@@ -52,7 +52,6 @@ protocol PlayerFacade {
     func play(context: PlayContext)
     func playShuffled(context: PlayContext)
     func play(playerIndex: PlayerIndex)
-    func appendContextQueueAndPlay(playable: AbstractPlayable)
     func togglePlay()
     func stop()
     func playPreviousOrReplay()
@@ -211,11 +210,6 @@ class PlayerFacadeImpl: PlayerFacade {
     
     func play(playerIndex: PlayerIndex) {
         musicPlayer.play(playerIndex: playerIndex)
-    }
-    
-    func appendContextQueueAndPlay(playable: AbstractPlayable) {
-        queueHandler.appendContextQueue(playables: [playable])
-        musicPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: queueHandler.nextQueue.count-1))
     }
     
     func togglePlay() {
