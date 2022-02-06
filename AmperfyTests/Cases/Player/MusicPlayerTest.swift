@@ -61,6 +61,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     var playlistCount: Int = 0
     var podcastCount: Int = 0
     func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?) {}
+    func sync(genre: Genre, library: LibraryStorage) {}
     func sync(artist: Artist, library: LibraryStorage) {}
     func sync(album: Album, library: LibraryStorage) {}
     func sync(song: Song, library: LibraryStorage) {}
