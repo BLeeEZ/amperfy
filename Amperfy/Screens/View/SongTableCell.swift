@@ -11,7 +11,7 @@ class SongTableCell: BasicTableCell {
     
     var song: Song?
     var rootView: UITableViewController?
-    var playContextCb: PlayContextdeterminationCallback?
+    var playContextCb: GetPlayContextFromTableCellCallback?
     private var isAlertPresented = false
 
     override func awakeFromNib() {
@@ -21,7 +21,7 @@ class SongTableCell: BasicTableCell {
         self.addGestureRecognizer(longPressGesture)
     }
     
-    func display(song: Song, playContextCb: @escaping PlayContextdeterminationCallback, rootView: UITableViewController) {
+    func display(song: Song, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UITableViewController) {
         self.song = song
         self.playContextCb = playContextCb
         self.rootView = rootView

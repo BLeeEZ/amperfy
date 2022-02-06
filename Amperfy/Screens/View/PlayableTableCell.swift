@@ -1,8 +1,8 @@
 import UIKit
 import AudioToolbox
 
-typealias PlayContextdeterminationCallback = (UITableViewCell) -> PlayContext?
-typealias PlayerIndexConversionCallback = (PlayableTableCell) -> PlayerIndex?
+typealias GetPlayContextFromTableCellCallback = (UITableViewCell) -> PlayContext?
+typealias GetPlayerIndexFromTableCellCallback = (PlayableTableCell) -> PlayerIndex?
 
 class PlayableTableCell: BasicTableCell {
     
@@ -14,8 +14,8 @@ class PlayableTableCell: BasicTableCell {
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     
-    private var playerIndexCb: PlayerIndexConversionCallback?
-    private var playContextCb: PlayContextdeterminationCallback?
+    private var playerIndexCb: GetPlayerIndexFromTableCellCallback?
+    private var playContextCb: GetPlayContextFromTableCellCallback?
     private var playable: AbstractPlayable?
     private var download: Download?
     private var rootView: UIViewController?
@@ -27,7 +27,7 @@ class PlayableTableCell: BasicTableCell {
         self.addGestureRecognizer(longPressGesture)
     }
     
-    func display(playable: AbstractPlayable, playContextCb: @escaping PlayContextdeterminationCallback, rootView: UIViewController, playerIndexCb: PlayerIndexConversionCallback? = nil, download: Download? = nil) {
+    func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, download: Download? = nil) {
         self.playable = playable
         self.playContextCb = playContextCb
         self.playerIndexCb = playerIndexCb
