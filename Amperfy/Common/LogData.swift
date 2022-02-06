@@ -50,7 +50,8 @@ public struct LogData: Encodable {
         
         var userSettings = UserSettings()
         let settings = appDelegate.persistentStorage.settings
-        userSettings.songActionOnTab = settings.songActionOnTab.description
+        userSettings.swipeLeadingActions = settings.swipeActionSettings.leading.compactMap{ $0.displayName }
+        userSettings.swipeTrailingActions = settings.swipeActionSettings.trailing.compactMap{ $0.displayName }
         userSettings.playerDisplayStyle = settings.playerDisplayStyle.description
         userSettings.isOfflineMode = settings.isOfflineMode
         logData.userSettings = userSettings
@@ -116,7 +117,8 @@ public struct PlayerInfo: Encodable {
 }
 
 public struct UserSettings: Encodable {
-    public var songActionOnTab: String?
+    public var swipeLeadingActions: [String]?
+    public var swipeTrailingActions: [String]?
     public var playerDisplayStyle: String?
     public var isOfflineMode: Bool?
 }

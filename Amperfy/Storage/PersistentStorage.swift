@@ -11,6 +11,8 @@ class PersistentStorage {
         case LibraryIsSynced = "libraryIsSynced"
         
         case SongActionOnTab = "songActionOnTab"
+        case SwipeLeadingActionSettings = "swipeLeadingActionSettings"
+        case SwipeTrailingActionSettings = "swipeTrailingActionSettings"
         case PlayerDisplayStyle = "playerDisplayStyle"
         case IsOfflineMode = "isOfflineMode"
         case LibrarySyncVersion = "librarySyncVersion"
@@ -19,12 +21,21 @@ class PersistentStorage {
     }
     
     class Settings {
-        var songActionOnTab: SongActionOnTab {
+        var swipeActionSettings: SwipeActionSettings {
             get {
-                let songActionOnTabRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongActionOnTab.rawValue) as? Int ?? SongActionOnTab.defaultValue.rawValue
-                return SongActionOnTab(rawValue: songActionOnTabRaw) ?? SongActionOnTab.defaultValue
+                guard let swipeLeadingActionsRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SwipeLeadingActionSettings.rawValue) as? [Int],
+                    let swipeTrailingActionsRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SwipeTrailingActionSettings.rawValue) as? [Int]
+                else {
+                    return SwipeActionSettings.defaultSettings
+                }
+                let swipeLeadingActions = swipeLeadingActionsRaw.compactMap{ SwipeActionType(rawValue: $0) }
+                let swipeTrailingActions = swipeTrailingActionsRaw.compactMap{ SwipeActionType(rawValue: $0) }
+                return SwipeActionSettings(leading: swipeLeadingActions, trailing: swipeTrailingActions)
             }
-            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.SongActionOnTab.rawValue) }
+            set {
+                UserDefaults.standard.set(newValue.leading.compactMap{ $0.rawValue }, forKey: UserDefaultsKey.SwipeLeadingActionSettings.rawValue)
+                UserDefaults.standard.set(newValue.trailing.compactMap{ $0.rawValue }, forKey: UserDefaultsKey.SwipeTrailingActionSettings.rawValue)
+            }
         }
         
         var playerDisplayStyle: PlayerDisplayStyle {

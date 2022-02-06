@@ -34,69 +34,44 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
 typealias QueueSwipeCallback = (IndexPath, _ completionHandler: @escaping (_ playables: [AbstractPlayable]) -> Void ) -> Void
 
 extension BasicTableViewController {
-    func createContextQueueInsertSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
-        let action = UIContextualAction(style: .normal, title: "Insert Context Queue") { (action, view, completionHandler) in
+    func createSwipeAction(for actionType: SwipeActionType, buttonColor: UIColor, indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
+        let action = UIContextualAction(style: .normal, title: actionType.displayName) { (action, view, completionHandler) in
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             actionCallback(indexPath) { playables in
-                self.appDelegate.player.insertContextQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                switch actionType {
+                case .insertUserQueue:
+                    self.appDelegate.player.insertUserQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                case .appendUserQueue:
+                    self.appDelegate.player.appendUserQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                case .insertContextQueue:
+                    self.appDelegate.player.insertContextQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                case .appendContextQueue:
+                    self.appDelegate.player.appendContextQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                case .download:
+                    self.appDelegate.playableDownloadManager.download(objects: playables)
+                case .removeFromCache:
+                    self.appDelegate.playableDownloadManager.removeFinishedDownload(for: playables)
+                    self.appDelegate.library.deleteCache(of: playables)
+                    self.appDelegate.library.saveContext()
+                }
             }
             completionHandler(true)
         }
-        action.backgroundColor = .systemBlue
-        action.image = UIImage(named: "context_queue_insert")?.invertedImage()
-        return action
-    }
-    
-    func createContextQueueAppendSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
-        let action = UIContextualAction(style: .normal, title: "Append Context Queue") { (action, view, completionHandler) in
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
-            actionCallback(indexPath) { playables in
-                self.appDelegate.player.appendContextQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
-            }
-            completionHandler(true)
-        }
-        action.backgroundColor = .systemOrange
-        action.image = UIImage(named: "context_queue_append")?.invertedImage()
-        return action
-    }
-    
-    func createUserQueueInsertSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
-        let action = UIContextualAction(style: .normal, title: "Insert User Queue") { (action, view, completionHandler) in
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
-            actionCallback(indexPath) { playables in
-                self.appDelegate.player.insertUserQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
-            }
-            completionHandler(true)
-        }
-        action.backgroundColor = .systemBlue
-        action.image = UIImage(named: "user_queue_insert")?.invertedImage()
-        return action
-    }
-    
-    func createUserQueueAppendSwipeAction(indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
-        let action = UIContextualAction(style: .normal, title: "Append User Queue") { (action, view, completionHandler) in
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
-            actionCallback(indexPath) { playables in
-                self.appDelegate.player.appendUserQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
-            }
-            completionHandler(true)
-        }
-        action.backgroundColor = .systemOrange
-        action.image = UIImage(named: "user_queue_append")?.invertedImage()
+        action.backgroundColor = buttonColor
+        action.image = actionType.image.invertedImage()
         return action
     }
 }
 
 class BasicTableViewController: UITableViewController {
     
+    private static let swipeButtonColors: [UIColor] = [.defaultBlue, .systemOrange, .systemGreen, .systemGray]
+    private static let changeCountToPerformeDataReload = 30
+    
     var appDelegate: AppDelegate!
     let searchController = UISearchController(searchResultsController: nil)
     
-    private static let changeCountToPerformeDataReload = 30
     var sectionChanges = false
     var noAnimationAtNextDataChange = false
     var rowsToInsert = [IndexPath]()
@@ -122,17 +97,21 @@ class BasicTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let swipeCB = swipeCallback else { return nil }
-        return UISwipeActionsConfiguration(actions: [
-            createContextQueueInsertSwipeAction(indexPath: indexPath, actionCallback: swipeCB),
-            createContextQueueAppendSwipeAction(indexPath: indexPath, actionCallback: swipeCB)
-        ])
+        var actions = [UIContextualAction]()
+        for (index, actionType) in appDelegate.persistentStorage.settings.swipeActionSettings.leading.enumerated() {
+            let buttonColor = Self.swipeButtonColors.element(at: index) ?? Self.swipeButtonColors.last!
+            actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, actionCallback: swipeCB))
+        }
+        return UISwipeActionsConfiguration(actions: actions)
     }
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let swipeCB = swipeCallback else { return nil }
-        return UISwipeActionsConfiguration(actions: [
-            createUserQueueInsertSwipeAction(indexPath: indexPath, actionCallback: swipeCB),
-            createUserQueueAppendSwipeAction(indexPath: indexPath, actionCallback: swipeCB)
-        ])
+        var actions = [UIContextualAction]()
+        for (index, actionType) in appDelegate.persistentStorage.settings.swipeActionSettings.trailing.enumerated() {
+            let buttonColor = Self.swipeButtonColors.element(at: index) ?? Self.swipeButtonColors.last!
+            actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, actionCallback: swipeCB))
+        }
+        return UISwipeActionsConfiguration(actions: actions)
     }
 
     func configureSearchController(placeholder: String?, scopeButtonTitles: [String]? = nil, showSearchBarAtEnter: Bool = false) {

@@ -298,6 +298,12 @@ extension URLComponents {
     }
 }
 
+extension Array {
+    func element(at index: Int) -> Element? {
+        return index < self.count ? self[index] : nil
+    }
+}
+
 extension Array where Element: Equatable {
     func allIndices(of element: Element) -> [Int] {
         return self.enumerated().filter {

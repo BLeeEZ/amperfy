@@ -1,30 +1,6 @@
 import UIKit
 import AudioToolbox
 
-enum SongActionOnTab: Int {
-    case playAndErasePlaylist = 0
-    case addToPlaylistAndPlay = 2
-    case insertAsNextSongNoPlay = 3
-    
-    static let defaultValue: SongActionOnTab = .addToPlaylistAndPlay
-    
-    var description : String {
-        switch self {
-        case .playAndErasePlaylist: return "PlayAndErasePlaylist"
-        case .addToPlaylistAndPlay: return "AddToPlaylistAndPlay"
-        case .insertAsNextSongNoPlay: return "InsertAsNextSongNoPlay"
-        }
-    }
-    
-    var displayText : String {
-        switch self {
-        case .playAndErasePlaylist: return "Clear current playlist and play song"
-        case .addToPlaylistAndPlay: return "Insert song at the end and play song"
-        case .insertAsNextSongNoPlay: return "Insert as next song to play"
-        }
-    }
-}
-
 class SongTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
