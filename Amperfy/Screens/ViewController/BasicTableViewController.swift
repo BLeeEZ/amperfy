@@ -104,6 +104,7 @@ class BasicTableViewController: UITableViewController {
         }
         return UISwipeActionsConfiguration(actions: actions)
     }
+
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let swipeCB = swipeCallback else { return nil }
         var actions = [UIContextualAction]()
