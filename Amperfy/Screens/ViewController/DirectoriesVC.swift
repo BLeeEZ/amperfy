@@ -26,10 +26,12 @@ class DirectoriesVC: BasicTableViewController {
         swipeCallback = { (indexPath, completionHandler) in
             switch indexPath.section {
             case 1:
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                completionHandler([song])
+                let songIndexPath = IndexPath(row: indexPath.row, section: 0)
+                let song = self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
+                let playContext = self.convertIndexPathToPlayContext(songIndexPath: songIndexPath)
+                completionHandler(SwipeActionContext(containable: song, playContext: playContext))
             default:
-                completionHandler([])
+                completionHandler(nil)
             }
         }
     }
@@ -46,16 +48,21 @@ class DirectoriesVC: BasicTableViewController {
         }
     }
     
-    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
-        guard let indexPath = tableView.indexPath(for: cell),
-              indexPath.section == 1,
-              let songs = songsFetchedResultsController.getContextSongs(onlyCachedSongs: appDelegate.persistentStorage.settings.isOfflineMode)
+    func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
+        guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
         else { return nil }
-        let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+        let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
         guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
         return PlayContext(name: directory.name, index: playContextIndex, playables: songs)
     }
-
+    
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell),
+              indexPath.section == 1
+        else { return nil }
+        return convertIndexPathToPlayContext(songIndexPath: IndexPath(row: indexPath.row, section: 0))
+    }
+    
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {

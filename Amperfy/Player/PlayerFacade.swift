@@ -5,7 +5,20 @@ struct PlayContext {
     let index: Int
     let name: String
     let playables: [AbstractPlayable]
+    var isKeepIndexDuringShuffle: Bool = false
     
+    init() {
+        self.name = ""
+        self.index = 0
+        self.playables = []
+    }
+    
+    init(containable: PlayableContainable) {
+        self.name = containable.name
+        self.index = 0
+        self.playables = containable.playables
+    }
+
     init(name: String, index: Int = 0, playables: [AbstractPlayable]) {
         self.name = name
         self.index = index
@@ -15,6 +28,11 @@ struct PlayContext {
     func getActivePlayable() -> AbstractPlayable? {
         guard playables.count > 0, index < playables.count else { return nil }
         return playables[index]
+    }
+    
+    func getWithShuffledIndex() -> PlayContext {
+        guard !isKeepIndexDuringShuffle else { return self }
+        return PlayContext(name: name, index: Int.random(in: 0...playables.count-1), playables: playables)
     }
 }
 
@@ -202,7 +220,7 @@ class PlayerFacadeImpl: PlayerFacade {
     func playShuffled(context: PlayContext) {
         guard !context.playables.isEmpty else { return }
         if playerStatus.isShuffle { playerStatus.isShuffle = false }
-        let shuffleContext = PlayContext(name: context.name, index: Int.random(in: 0...context.playables.count-1), playables: context.playables)
+        let shuffleContext = context.getWithShuffledIndex()
         musicPlayer.play(context: shuffleContext)
         playerStatus.isShuffle = true
         musicPlayer.notifyPlaylistUpdated()

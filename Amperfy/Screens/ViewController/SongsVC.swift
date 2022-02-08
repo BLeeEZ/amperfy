@@ -24,7 +24,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         
         swipeCallback = { (indexPath, completionHandler) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            completionHandler([song])
+            let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
+            completionHandler(SwipeActionContext(containable: song, playContext: playContext))
         }
     }
 
@@ -35,10 +36,14 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         return cell
     }
     
+    func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
+        let song = fetchedResultsController.getWrappedEntity(at: songIndexPath)
+        return PlayContext(name: song.title, playables: [song])
+    }
+    
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
         guard let indexPath = tableView.indexPath(for: cell) else { return nil }
-        let song = fetchedResultsController.getWrappedEntity(at: indexPath)
-        return PlayContext(name: song.title, playables: [song])
+        return convertIndexPathToPlayContext(songIndexPath: indexPath)
     }
     
     override func updateSearchResults(for searchController: UISearchController) {

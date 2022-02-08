@@ -8,7 +8,10 @@ enum SwipeActionType: Int, CaseIterable {
     case appendContextQueue = 3
     case download = 4
     case removeFromCache = 5
-    
+    case addToPlaylist = 6
+    case play = 7
+    case playShuffled = 8
+
     var displayName: String {
         switch self {
         case .insertUserQueue:
@@ -23,6 +26,12 @@ enum SwipeActionType: Int, CaseIterable {
             return "Download"
         case .removeFromCache:
             return "Remove from Cache"
+        case .addToPlaylist:
+            return "Add to playlist"
+        case .play:
+            return "Play"
+        case .playShuffled:
+            return "Play shuffled"
         }
     }
 
@@ -40,6 +49,12 @@ enum SwipeActionType: Int, CaseIterable {
             return "Download"
         case .removeFromCache:
             return "Remove from Cache"
+        case .addToPlaylist:
+            return "Add to playlist"
+        case .play:
+            return "Play"
+        case .playShuffled:
+            return "Play shuffled"
         }
     }
 
@@ -57,6 +72,12 @@ enum SwipeActionType: Int, CaseIterable {
             return UIImage(named: "download") ?? Artwork.defaultImage
         case .removeFromCache:
             return UIImage(named: "trash") ?? Artwork.defaultImage
+        case .addToPlaylist:
+            return UIImage(named: "playlist") ?? Artwork.defaultImage
+        case .play:
+            return UIImage(named: "play") ?? Artwork.defaultImage
+        case .playShuffled:
+            return UIImage(named: "shuffle") ?? Artwork.defaultImage
         }
     }
 }
@@ -90,5 +111,20 @@ struct SwipeActionSettings {
                 .insertUserQueue,
                 .download
         ])
+    }
+}
+
+struct SwipeActionContext {
+    let containable: PlayableContainable
+    private let customPlayContext: PlayContext?
+    
+    var playables: [AbstractPlayable] { return containable.playables }
+    var playContext: PlayContext {
+        return customPlayContext ?? PlayContext(containable: containable)
+    }
+
+    init(containable: PlayableContainable, playContext: PlayContext? = nil) {
+        self.containable = containable
+        self.customPlayContext = playContext
     }
 }

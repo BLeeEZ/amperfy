@@ -19,7 +19,7 @@ class PodcastsVC: SingleFetchedResultsTableViewController<PodcastMO> {
         swipeCallback = { (indexPath, completionHandler) in
             let podcast = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             self.fetchDetails(of: podcast) {
-                completionHandler(podcast.playables)
+                completionHandler(SwipeActionContext(containable: podcast))
             }
         }
     }

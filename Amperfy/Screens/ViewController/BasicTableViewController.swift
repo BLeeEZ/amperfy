@@ -31,29 +31,43 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
 
 }
 
-typealias QueueSwipeCallback = (IndexPath, _ completionHandler: @escaping (_ playables: [AbstractPlayable]) -> Void ) -> Void
+typealias SwipeActionCallback = (IndexPath, _ completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void ) -> Void
 
 extension BasicTableViewController {
-    func createSwipeAction(for actionType: SwipeActionType, buttonColor: UIColor, indexPath: IndexPath, actionCallback: @escaping QueueSwipeCallback) -> UIContextualAction {
+    func createSwipeAction(for actionType: SwipeActionType, buttonColor: UIColor, indexPath: IndexPath, actionCallback: @escaping SwipeActionCallback) -> UIContextualAction {
         let action = UIContextualAction(style: .normal, title: actionType.displayName) { (action, view, completionHandler) in
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
-            actionCallback(indexPath) { playables in
+            actionCallback(indexPath) { actionContext in
+                guard let actionContext = actionContext else { return }
                 switch actionType {
                 case .insertUserQueue:
-                    self.appDelegate.player.insertUserQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    self.appDelegate.player.insertUserQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
                 case .appendUserQueue:
-                    self.appDelegate.player.appendUserQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    self.appDelegate.player.appendUserQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
                 case .insertContextQueue:
-                    self.appDelegate.player.insertContextQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    self.appDelegate.player.insertContextQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
                 case .appendContextQueue:
-                    self.appDelegate.player.appendContextQueue(playables: playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    self.appDelegate.player.appendContextQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
                 case .download:
-                    self.appDelegate.playableDownloadManager.download(objects: playables)
+                    self.appDelegate.playableDownloadManager.download(objects: actionContext.playables)
                 case .removeFromCache:
-                    self.appDelegate.playableDownloadManager.removeFinishedDownload(for: playables)
-                    self.appDelegate.library.deleteCache(of: playables)
+                    self.appDelegate.playableDownloadManager.removeFinishedDownload(for: actionContext.playables)
+                    self.appDelegate.library.deleteCache(of: actionContext.playables)
                     self.appDelegate.library.saveContext()
+                case .addToPlaylist:
+                    let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
+                    selectPlaylistVC.itemsToAdd = actionContext.playables
+                    let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+                    self.present(selectPlaylistNav, animated: true)
+                case .play:
+                    self.appDelegate.player.play(context: actionContext.playContext)
+                case .playShuffled:
+                    var playContext = actionContext.playContext
+                    if actionContext.playables.count <= 1 {
+                        playContext.isKeepIndexDuringShuffle = true
+                    }
+                    self.appDelegate.player.playShuffled(context: playContext)
                 }
             }
             completionHandler(true)
@@ -77,8 +91,8 @@ class BasicTableViewController: UITableViewController {
     var rowsToInsert = [IndexPath]()
     var rowsToDelete = [IndexPath]()
     var rowsToUpdate = [IndexPath]()
-    var swipeCallback: QueueSwipeCallback?
-    
+    var swipeCallback: SwipeActionCallback?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
@@ -106,6 +120,7 @@ class BasicTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard !tableView.isEditing else { return nil }
         guard let swipeCB = swipeCallback else { return nil }
         var actions = [UIContextualAction]()
         for (index, actionType) in appDelegate.persistentStorage.settings.swipeActionSettings.trailing.enumerated() {

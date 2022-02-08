@@ -38,13 +38,15 @@ class ArtistDetailVC: BasicTableViewController {
             case LibraryElement.Album.rawValue:
                 let album = self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
                 self.fetchDetails(of: album) {
-                    completionHandler(album.playables)
+                    completionHandler(SwipeActionContext(containable: album))
                 }
             case LibraryElement.Song.rawValue:
-                let song = self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                completionHandler([song])
+                let songIndexPath = IndexPath(row: indexPath.row, section: 0)
+                let song = self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
+                let playContext = self.convertIndexPathToPlayContext(songIndexPath: songIndexPath)
+                completionHandler(SwipeActionContext(containable: song, playContext: playContext))
             default:
-                completionHandler([])
+                completionHandler(nil)
             }
         }
     }
@@ -56,14 +58,19 @@ class ArtistDetailVC: BasicTableViewController {
         }
     }
 
-    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
-        guard let indexPath = tableView.indexPath(for: cell),
-              indexPath.section+2 == LibraryElement.Song.rawValue,
-              let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
+    func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
+        guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
         else { return nil }
-        let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+        let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
         guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
         return PlayContext(name: artist.name, index: playContextIndex, playables: songs)
+    }
+    
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell),
+              indexPath.section+2 == LibraryElement.Song.rawValue
+        else { return nil }
+        return convertIndexPathToPlayContext(songIndexPath: IndexPath(row: indexPath.row, section: 0))
     }
     
     // MARK: - Table view data source

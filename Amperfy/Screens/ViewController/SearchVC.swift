@@ -28,34 +28,34 @@ class SearchVC: BasicTableViewController {
         tableView.separatorStyle = .none
         
         swipeCallback = { (indexPath, completionHandler) in
-            self.determPlayables(at: indexPath) { playables in
-                completionHandler(playables)
+            self.determSwipeActionContext(at: indexPath) { actionContext in
+                completionHandler(actionContext)
             }
         }
     }
     
-    func determPlayables(at indexPath: IndexPath, completionHandler: @escaping (_ playables: [AbstractPlayable]) -> Void) {
+    func determSwipeActionContext(at indexPath: IndexPath, completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void) {
         switch indexPath.section {
         case LibraryElement.Playlist.rawValue:
             let playlist = playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             fetchDetails(of: playlist) {
-                completionHandler(playlist.playables)
+                completionHandler(SwipeActionContext(containable: playlist))
             }
         case LibraryElement.Artist.rawValue:
             let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             fetchDetails(of: artist) {
-                completionHandler(artist.playables)
+                completionHandler(SwipeActionContext(containable: artist))
             }
         case LibraryElement.Album.rawValue:
             let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             fetchDetails(of: album) {
-                completionHandler(album.playables)
+                completionHandler(SwipeActionContext(containable: album))
             }
         case LibraryElement.Song.rawValue:
             let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            completionHandler([song])
+            completionHandler(SwipeActionContext(containable: song))
         default:
-            completionHandler([])
+            completionHandler(nil)
         }
     }
 

@@ -26,7 +26,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         swipeCallback = { (indexPath, completionHandler) in
             let playlist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             self.fetchDetails(of: playlist) {
-                completionHandler(playlist.playables)
+                completionHandler(SwipeActionContext(containable: playlist))
             }
         }
     }

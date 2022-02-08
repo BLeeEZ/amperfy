@@ -19,7 +19,9 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         
         swipeCallback = { (indexPath, completionHandler) in
             let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            completionHandler(genre.playables)
+            self.fetchDetails(of: genre) {
+                completionHandler(SwipeActionContext(containable: genre))
+            }
         }
     }
 

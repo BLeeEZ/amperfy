@@ -25,7 +25,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         swipeCallback = { (indexPath, completionHandler) in
             let album = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             self.fetchDetails(of: album) {
-                completionHandler(album.playables)
+                completionHandler(SwipeActionContext(containable: album))
             }
         }
     }

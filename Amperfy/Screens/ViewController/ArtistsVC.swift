@@ -20,7 +20,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         swipeCallback = { (indexPath, completionHandler) in
             let artist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             self.fetchDetails(of: artist) {
-                completionHandler(artist.playables)
+                completionHandler(SwipeActionContext(containable: artist))
             }
         }
     }

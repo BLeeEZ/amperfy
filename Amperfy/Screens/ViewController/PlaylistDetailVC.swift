@@ -39,8 +39,9 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         
         swipeCallback = { (indexPath, completionHandler) in
             let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            if let playable = playlistItem.playable {
-                completionHandler([playable])
+            if let song = playlistItem.playable {
+                let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
+                completionHandler(SwipeActionContext(containable: song, playContext: playContext))
             }
         }
     }
@@ -60,11 +61,16 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         }
     }
     
-    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
-        guard let indexPath = tableView.indexPath(for: cell),
-              let songs = fetchedResultsController.getContextSongs(onlyCachedSongs: appDelegate.persistentStorage.settings.isOfflineMode)
+    func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
+        guard let songs = fetchedResultsController.getContextSongs(onlyCachedSongs: appDelegate.persistentStorage.settings.isOfflineMode)
         else { return nil }
-        return PlayContext(name: playlist.name, index: indexPath.row, playables: songs)
+        return PlayContext(name: playlist.name, index: songIndexPath.row, playables: songs)
+    }
+    
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell)
+        else { return nil }
+        return convertIndexPathToPlayContext(songIndexPath: IndexPath(row: indexPath.row, section: 0))
     }
 
     @objc private func startEditing() {

@@ -31,7 +31,8 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         
         swipeCallback = { (indexPath, completionHandler) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            completionHandler([song])
+            let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
+            completionHandler(SwipeActionContext(containable: song, playContext: playContext))
         }
     }
     
@@ -42,13 +43,17 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         }
     }
     
-    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
-        guard let indexPath = tableView.indexPath(for: cell),
-              let songs = self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
+    func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
+        guard let songs = self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
         else { return nil }
-        let selectedSong = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+        let selectedSong = self.fetchedResultsController.getWrappedEntity(at: songIndexPath)
         guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
         return PlayContext(name: album.name, index: playContextIndex, playables: songs)
+    }
+    
+    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+        guard let indexPath = tableView.indexPath(for: cell) else { return nil }
+        return convertIndexPathToPlayContext(songIndexPath: indexPath)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
