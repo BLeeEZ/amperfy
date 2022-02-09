@@ -216,7 +216,6 @@
 		50ACAF0F27B112A20039913C /* SwipeActionTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ACAF0D27B112A10039913C /* SwipeActionTableCell.swift */; };
 		50ACAF1027B113440039913C /* SwipeActionTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50ACAF0E27B112A10039913C /* SwipeActionTableCell.xib */; };
 		50ACAF1227B144040039913C /* SwipeActionSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ACAF1127B144040039913C /* SwipeActionSettings.swift */; };
-		50ACAF1427B277B50039913C /* Entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = 50ACAF1327B277B50039913C /* Entitlements.plist */; };
 		50ACAF1627B283940039913C /* AppDelegateCarPlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ACAF1527B283940039913C /* AppDelegateCarPlay.swift */; };
 		50ADCD482660E70D007FE3BD /* SettingsPlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ADCD472660E70D007FE3BD /* SettingsPlayerVC.swift */; };
 		50AFA1492632E83100F198DD /* GenreDetailTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AFA1472632E83100F198DD /* GenreDetailTableHeader.swift */; };
@@ -1386,7 +1385,6 @@
 				508385E021C5965B00C4BB32 /* Sources */,
 				508385E121C5965B00C4BB32 /* Frameworks */,
 				508385E221C5965B00C4BB32 /* Resources */,
-				50B8333824FFDF6C0095B46A /* Increase Build Number */,
 				5054687F2625CC61008005EC /* Embed Frameworks */,
 			);
 			buildRules = (
@@ -1563,27 +1561,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		50B8333824FFDF6C0095B46A /* Increase Build Number */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Increase Build Number";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		508385E021C5965B00C4BB32 /* Sources */ = {
