@@ -14,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     var window: UIWindow?
-
+    
     lazy var log = {
         return OSLog(subsystem: AppDelegate.name, category: "AppDelegate")
     }()
@@ -102,6 +102,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var popupDisplaySemaphore = {
         return DispatchSemaphore(value: 1)
     }()
+    lazy var carPlayHandler = {
+        return CarPlayHandler(persistentStorage: self.persistentStorage, library: self.library, backendApi: self.backendApi, player: self.player, playableContentManager: MPPlayableContentManager.shared())
+    }()
 
     func reinit() {
         let playerData = library.getPlayerData()
@@ -154,6 +157,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         artworkDownloadManager.start()
         playableDownloadManager.start()
         userStatistics.sessionStarted()
+        carPlayHandler.initialize()
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()
         self.window?.rootViewController = initialViewController
         self.window?.makeKeyAndVisible()        
@@ -200,5 +204,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         os_log("handleEventsForBackgroundURLSession: %s", log: self.log, type: .info, identifier)
         playableDownloadManager.backgroundFetchCompletionHandler = completionHandler
     }
-
+    
 }

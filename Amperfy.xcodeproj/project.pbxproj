@@ -216,6 +216,8 @@
 		50ACAF0F27B112A20039913C /* SwipeActionTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ACAF0D27B112A10039913C /* SwipeActionTableCell.swift */; };
 		50ACAF1027B113440039913C /* SwipeActionTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50ACAF0E27B112A10039913C /* SwipeActionTableCell.xib */; };
 		50ACAF1227B144040039913C /* SwipeActionSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ACAF1127B144040039913C /* SwipeActionSettings.swift */; };
+		50ACAF1427B277B50039913C /* Entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = 50ACAF1327B277B50039913C /* Entitlements.plist */; };
+		50ACAF1627B283940039913C /* AppDelegateCarPlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ACAF1527B283940039913C /* AppDelegateCarPlay.swift */; };
 		50ADCD482660E70D007FE3BD /* SettingsPlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ADCD472660E70D007FE3BD /* SettingsPlayerVC.swift */; };
 		50AFA1492632E83100F198DD /* GenreDetailTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AFA1472632E83100F198DD /* GenreDetailTableHeader.swift */; };
 		50AFA14E2632E95900F198DD /* GenreDetailTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50AFA1482632E83100F198DD /* GenreDetailTableHeader.xib */; };
@@ -604,6 +606,8 @@
 		50ACAF0D27B112A10039913C /* SwipeActionTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActionTableCell.swift; sourceTree = "<group>"; };
 		50ACAF0E27B112A10039913C /* SwipeActionTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SwipeActionTableCell.xib; sourceTree = "<group>"; };
 		50ACAF1127B144040039913C /* SwipeActionSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActionSettings.swift; sourceTree = "<group>"; };
+		50ACAF1327B277B50039913C /* Entitlements.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
+		50ACAF1527B283940039913C /* AppDelegateCarPlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateCarPlay.swift; sourceTree = "<group>"; };
 		50ADCD472660E70D007FE3BD /* SettingsPlayerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPlayerVC.swift; sourceTree = "<group>"; };
 		50AFA1472632E83100F198DD /* GenreDetailTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreDetailTableHeader.swift; sourceTree = "<group>"; };
 		50AFA1482632E83100F198DD /* GenreDetailTableHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenreDetailTableHeader.xib; sourceTree = "<group>"; };
@@ -857,6 +861,7 @@
 				508385E721C5965B00C4BB32 /* AppDelegate.swift */,
 				509001B72716C8F400A8056D /* AppDelegateNotificationExtensions.swift */,
 				509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */,
+				50ACAF1527B283940039913C /* AppDelegateCarPlay.swift */,
 				50BA92FD21CED4AF00E5901D /* Utilities.swift */,
 				50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */,
 				5083861D21C82E8200C4BB32 /* BridgingHeader.h */,
@@ -904,6 +909,7 @@
 				50BA92F221CC26BE00E5901D /* Storage */,
 				508385EE21C5965E00C4BB32 /* Assets.xcassets */,
 				508385F321C5965E00C4BB32 /* Info.plist */,
+				50ACAF1327B277B50039913C /* Entitlements.plist */,
 			);
 			path = Amperfy;
 			sourceTree = "<group>";
@@ -1606,6 +1612,7 @@
 				5086F88B223E867500546F5A /* SsAlbumParserDelegate.swift in Sources */,
 				502B9BF0279EB15700173A10 /* UIArtworkUpdateManager.swift in Sources */,
 				5086F87B22397B8400546F5A /* BackendApi.swift in Sources */,
+				50ACAF1627B283940039913C /* AppDelegateCarPlay.swift in Sources */,
 				502040302202341500ED48A3 /* PlaylistParserDelegate.swift in Sources */,
 				506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */,
 				5007CE4121EF5F4300BC5CBA /* PlaylistsVC.swift in Sources */,
@@ -2023,6 +2030,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Amperfy/Entitlements.plist;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2046,6 +2054,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Amperfy/Entitlements.plist;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

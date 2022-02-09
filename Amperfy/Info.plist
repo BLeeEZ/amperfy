@@ -36,6 +36,8 @@
 		<string>audio</string>
 		<string>fetch</string>
 	</array>
+	<key>UIBrowsableContentSupportsSectionedBrowsing</key>
+	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
