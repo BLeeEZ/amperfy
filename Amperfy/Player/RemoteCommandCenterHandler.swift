@@ -3,11 +3,11 @@ import MediaPlayer
 
 class RemoteCommandCenterHandler {
     
-    private let musicPlayer: MusicPlayer
+    private var musicPlayer: PlayerFacade
     private let backendAudioPlayer: BackendAudioPlayer
     private let remoteCommandCenter: MPRemoteCommandCenter
 
-    init(musicPlayer: MusicPlayer, backendAudioPlayer: BackendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter) {
+    init(musicPlayer: PlayerFacade, backendAudioPlayer: BackendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter) {
         self.musicPlayer = musicPlayer
         self.backendAudioPlayer = backendAudioPlayer
         self.remoteCommandCenter = remoteCommandCenter
@@ -26,7 +26,7 @@ class RemoteCommandCenterHandler {
         
         remoteCommandCenter.togglePlayPauseCommand.isEnabled = true
         remoteCommandCenter.togglePlayPauseCommand.addTarget(handler: { (event) in
-            self.musicPlayer.togglePlay()
+            self.musicPlayer.togglePlayPause()
             return .success})
         
         remoteCommandCenter.previousTrackCommand.isEnabled = true
@@ -39,6 +39,21 @@ class RemoteCommandCenterHandler {
             self.musicPlayer.playNext()
             return .success})
         
+        remoteCommandCenter.changeRepeatModeCommand.isEnabled = true
+        remoteCommandCenter.changeRepeatModeCommand.addTarget(handler: { (event) in
+            guard let command = event as? MPChangeRepeatModeCommandEvent else { return .noSuchContent}
+            self.musicPlayer.setRepeatMode(RepeatMode.fromMPRepeatType(type: command.repeatType))
+            return .success})
+
+        remoteCommandCenter.changeShuffleModeCommand.isEnabled = true
+        remoteCommandCenter.changeShuffleModeCommand.addTarget(handler: { (event) in
+            guard let command = event as? MPChangeShuffleModeCommandEvent else { return .noSuchContent}
+            if (command.shuffleType == .off && self.musicPlayer.isShuffle) ||
+               (command.shuffleType != .off && !self.musicPlayer.isShuffle) {
+            }
+            self.musicPlayer.toggleShuffle()
+            return .success })
+
         remoteCommandCenter.changePlaybackPositionCommand.isEnabled = true
         remoteCommandCenter.changePlaybackPositionCommand.addTarget(handler: { (event) in
             guard let command = event as? MPChangePlaybackPositionCommandEvent else { return .noSuchContent}
@@ -75,6 +90,16 @@ class RemoteCommandCenterHandler {
             remoteCommandCenter.skipBackwardCommand.isEnabled = true
             remoteCommandCenter.skipForwardCommand.isEnabled = true
         }
+        updateShuffle()
+        updateRepeat()
+    }
+    
+    private func updateShuffle() {
+        remoteCommandCenter.changeShuffleModeCommand.currentShuffleType = musicPlayer.isShuffle ? .items : .off
+    }
+
+    private func updateRepeat() {
+        remoteCommandCenter.changeRepeatModeCommand.currentRepeatType = musicPlayer.repeatMode.asMPRepeatType
     }
 
 }
@@ -89,4 +114,12 @@ extension RemoteCommandCenterHandler: MusicPlayable {
     func didElapsedTimeChange() { }
     func didPlaylistChange() { }
     func didArtworkChange() { }
+    
+    func didShuffleChange() {
+        updateShuffle()
+    }
+    
+    func didRepeatChange() {
+        updateRepeat()
+    }
 }

@@ -746,7 +746,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayPrevious_RepeatAll() {
         prepareWithCachedPlaylist()
-        testPlayer.repeatMode = .all
+        testPlayer.setRepeatMode(.all)
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         testMusicPlayer.playPrevious()
         testMusicPlayer.playPrevious()
@@ -755,7 +755,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayPrevious_RepeatAll_OnlyOneSong() {
         testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
-        testPlayer.repeatMode = .all
+        testPlayer.setRepeatMode(.all)
         testMusicPlayer.playPrevious()
         testMusicPlayer.playPrevious()
         XCTAssertEqual(playerData.currentIndex, 0)
@@ -801,7 +801,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayNext_RepeatAll() {
         prepareWithCachedPlaylist()
-        testPlayer.repeatMode = .all
+        testPlayer.setRepeatMode(.all)
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 7))
         testPlayer.playNext()
         testPlayer.playNext()
@@ -810,7 +810,7 @@ class MusicPlayerTest: XCTestCase {
     
     func testPlayNext_RepeatAll_OnlyOneSong() {
         testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
-        testPlayer.repeatMode = .all
+        testPlayer.setRepeatMode(.all)
         testPlayer.playNext()
         testPlayer.playNext()
         XCTAssertEqual(playerData.currentIndex, 0)
@@ -856,24 +856,24 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testTogglePlay_EmptyPlaylist() {
-        testPlayer.togglePlay()
+        testPlayer.togglePlayPause()
         XCTAssertFalse(testPlayer.isPlaying)
-        testPlayer.togglePlay()
+        testPlayer.togglePlayPause()
         XCTAssertFalse(testPlayer.isPlaying)
-        testPlayer.togglePlay()
+        testPlayer.togglePlayPause()
         XCTAssertFalse(testPlayer.isPlaying)
     }
     
     func testTogglePlay_AfterPlay() {
         prepareWithCachedPlaylist()
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 6))
-        testPlayer.togglePlay()
+        testPlayer.togglePlayPause()
         XCTAssertFalse(testPlayer.isPlaying)
-        testPlayer.togglePlay()
+        testPlayer.togglePlayPause()
         XCTAssertTrue(testPlayer.isPlaying)
-        testPlayer.togglePlay()
+        testPlayer.togglePlayPause()
         XCTAssertFalse(testPlayer.isPlaying)
-        testPlayer.togglePlay()
+        testPlayer.togglePlayPause()
         XCTAssertTrue(testPlayer.isPlaying)
     }
     
@@ -1026,7 +1026,7 @@ class MusicPlayerTest: XCTestCase {
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 0
-        testPlayer.repeatMode = .all
+        testPlayer.setRepeatMode(.all)
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 4)
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
@@ -1064,7 +1064,7 @@ class MusicPlayerTest: XCTestCase {
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = -1
-        testPlayer.repeatMode = .all
+        testPlayer.setRepeatMode(.all)
         checkCurrentlyPlaying(idToBe: 5)
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 4)
@@ -1156,7 +1156,7 @@ class MusicPlayerTest: XCTestCase {
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3, 4])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
         checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
-        testPlayer.repeatMode = .all
+        testPlayer.setRepeatMode(.all)
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 0)
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
@@ -1172,7 +1172,7 @@ class MusicPlayerTest: XCTestCase {
         checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3, 4])
         checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
         checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
-        testPlayer.repeatMode = .single
+        testPlayer.setRepeatMode(.single)
         testPlayer.playNext()
         XCTAssertFalse(testPlayer.isPlaying)
         XCTAssertFalse(playerData.isUserQueuePlaying)

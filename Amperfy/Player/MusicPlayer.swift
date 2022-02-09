@@ -152,7 +152,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         notifyPlayerStopped()
     }
     
-    func togglePlay() {
+    func togglePlayPause() {
         if(backendAudioPlayer.isPlaying) {
             pause()
         } else {
@@ -229,6 +229,18 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
     func notifyPlaylistUpdated() {
         for notifier in notifierList {
             notifier.didPlaylistChange()
+        }
+    }
+
+    func notifyShuffleUpdated() {
+        for notifier in notifierList {
+            notifier.didShuffleChange()
+        }
+    }
+
+    func notifyRepeatUpdated() {
+        for notifier in notifierList {
+            notifier.didRepeatChange()
         }
     }
 

@@ -1,4 +1,5 @@
 import Foundation
+import MediaPlayer
 
 protocol MusicPlayable {
     func didStartPlaying()
@@ -7,6 +8,13 @@ protocol MusicPlayable {
     func didElapsedTimeChange()
     func didPlaylistChange()
     func didArtworkChange()
+    func didShuffleChange()
+    func didRepeatChange()
+}
+
+extension MusicPlayable {
+    func didShuffleChange() { }
+    func didRepeatChange() { }
 }
 
 enum RepeatMode: Int16 {
@@ -14,14 +22,14 @@ enum RepeatMode: Int16 {
     case all
     case single
 
-    mutating func switchToNextMode() {
+    var nextMode: RepeatMode {
         switch self {
         case .off:
-            self = .all
+            return .all
         case .all:
-            self = .single
+            return .single
         case .single:
-            self = .off
+            return .off
         }
     }
     
@@ -30,6 +38,27 @@ enum RepeatMode: Int16 {
         case .off: return "Off"
         case .all: return "All"
         case .single: return "Single"
+        }
+    }
+    
+    var asMPRepeatType: MPRepeatType {
+        switch self {
+        case .off: return .off
+        case .all: return .all
+        case .single: return .one
+        }
+    }
+    
+    static func fromMPRepeatType(type: MPRepeatType) -> RepeatMode {
+        switch type {
+        case .off:
+            return .off
+        case .one:
+            return .single
+        case .all:
+            return .all
+        default:
+            return .off
         }
     }
 }

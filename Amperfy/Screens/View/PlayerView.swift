@@ -93,7 +93,7 @@ class PlayerView: UIView {
     }
     
     @IBAction func playButtonPushed(_ sender: Any) {
-        player.togglePlay()
+        player.togglePlayPause()
         refreshPlayButtonTitle()
     }
     
@@ -106,7 +106,7 @@ class PlayerView: UIView {
     }
     
     @IBAction func repeatButtonPushed(_ sender: Any) {
-        player.repeatMode.switchToNextMode()
+        player.setRepeatMode(player.repeatMode.nextMode)
         refreshRepeatButton()
     }
     
@@ -502,6 +502,14 @@ extension PlayerView: MusicPlayable {
     
     func didArtworkChange() {
         refreshArtwork()
+    }
+    
+    func didShuffleChange() {
+        refreshShuffleButton()
+    }
+    
+    func didRepeatChange() {
+        refreshRepeatButton()
     }
 
 }

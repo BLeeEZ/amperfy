@@ -37,6 +37,9 @@ class BackendAudioPlayer {
     var isPlayableLoaded: Bool {
         return player.currentItem?.status == AVPlayerItem.Status.readyToPlay
     }
+    var isStopped: Bool {
+        return playType == nil
+    }
     var elapsedTime: Double {
         guard isPlayableLoaded else { return 0.0 }
         let elapsedTimeInSeconds = player.currentTime().seconds

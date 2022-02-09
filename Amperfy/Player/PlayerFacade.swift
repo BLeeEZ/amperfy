@@ -49,7 +49,8 @@ protocol PlayerFacade {
     var duration: Double { get }
     var isShuffle: Bool { get }
     func toggleShuffle()
-    var repeatMode: RepeatMode { get set }
+    var repeatMode: RepeatMode { get }
+    func setRepeatMode(_: RepeatMode)
     var isOfflineMode: Bool { get set }
     var isAutoCachePlayedItems: Bool { get set }
 
@@ -70,7 +71,8 @@ protocol PlayerFacade {
     func play(context: PlayContext)
     func playShuffled(context: PlayContext)
     func play(playerIndex: PlayerIndex)
-    func togglePlay()
+    func pause()
+    func togglePlayPause()
     func stop()
     func playPreviousOrReplay()
     func playNext()
@@ -134,11 +136,15 @@ class PlayerFacadeImpl: PlayerFacade {
     }
     func toggleShuffle() {
         playerStatus.isShuffle = !isShuffle
+        musicPlayer.notifyShuffleUpdated()
         musicPlayer.notifyPlaylistUpdated()
     }
     var repeatMode: RepeatMode {
-        get { return playerStatus.repeatMode }
-        set { playerStatus.repeatMode = newValue }
+        return playerStatus.repeatMode
+    }
+    func setRepeatMode(_ newValue: RepeatMode) {
+        playerStatus.repeatMode = newValue
+        musicPlayer.notifyRepeatUpdated()
     }
     var isOfflineMode: Bool {
         get { return backendAudioPlayer.isOfflineMode }
@@ -223,6 +229,7 @@ class PlayerFacadeImpl: PlayerFacade {
         let shuffleContext = context.getWithShuffledIndex()
         musicPlayer.play(context: shuffleContext)
         playerStatus.isShuffle = true
+        musicPlayer.notifyShuffleUpdated()
         musicPlayer.notifyPlaylistUpdated()
     }
     
@@ -230,8 +237,12 @@ class PlayerFacadeImpl: PlayerFacade {
         musicPlayer.play(playerIndex: playerIndex)
     }
     
-    func togglePlay() {
-        musicPlayer.togglePlay()
+    func pause() {
+        musicPlayer.pause()
+    }
+    
+    func togglePlayPause() {
+        musicPlayer.togglePlayPause()
     }
     
     func stop() {

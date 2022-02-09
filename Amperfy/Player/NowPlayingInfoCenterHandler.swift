@@ -12,10 +12,11 @@ class NowPlayingInfoCenterHandler {
         self.backendAudioPlayer = backendAudioPlayer
         self.nowPlayingInfoCenter = nowPlayingInfoCenter
     }
-    
+
     func updateNowPlayingInfo(playable: AbstractPlayable) {
         let albumTitle = playable.asSong?.album?.name ?? ""
         nowPlayingInfoCenter.nowPlayingInfo = [
+            MPMediaItemPropertyIsCloudItem: !playable.isCached,
             MPMediaItemPropertyTitle: playable.title,
             MPMediaItemPropertyAlbumTitle: albumTitle,
             MPMediaItemPropertyArtist: playable.creatorName,
@@ -40,9 +41,12 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
         if let curPlayable = musicPlayer.currentlyPlaying {
             updateNowPlayingInfo(playable: curPlayable)
         }
+        nowPlayingInfoCenter.nowPlayingInfo = [:]
     }
     
-    func didStopPlaying() { }
+    func didStopPlaying() {
+        nowPlayingInfoCenter.nowPlayingInfo = nil
+    }
     
     func didElapsedTimeChange() {
         if let curPlayable = musicPlayer.currentlyPlaying {

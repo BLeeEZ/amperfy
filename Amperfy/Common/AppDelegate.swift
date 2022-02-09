@@ -46,18 +46,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let songPlayedSyncer = SongPlayedSyncer(persistentStorage: persistentStorage, musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, backendApi: backendApi)
         curPlayer.addNotifier(notifier: songPlayedSyncer)
 
+        let facadeImpl = PlayerFacadeImpl(playerStatus: playerData, queueHandler: queueHandler, musicPlayer: curPlayer, library: library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        facadeImpl.isOfflineMode = persistentStorage.settings.isOfflineMode
+        
         let audioSessionHandler = AudioSessionHandler(musicPlayer: curPlayer)
         audioSessionHandler.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
         audioSessionHandler.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
         UIApplication.shared.beginReceivingRemoteControlEvents()
         let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter.default())
         curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
-        let remoteCommandCenterHandler = RemoteCommandCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter.shared())
+        let remoteCommandCenterHandler = RemoteCommandCenterHandler(musicPlayer: facadeImpl, backendAudioPlayer: backendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter.shared())
         remoteCommandCenterHandler.configureRemoteCommands()
         curPlayer.addNotifier(notifier: remoteCommandCenterHandler)
 
-        let facadeImpl = PlayerFacadeImpl(playerStatus: playerData, queueHandler: queueHandler, musicPlayer: curPlayer, library: library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
-        facadeImpl.isOfflineMode = persistentStorage.settings.isOfflineMode
         return facadeImpl
     }()
     lazy var playableDownloadManager: DownloadManageable = {
