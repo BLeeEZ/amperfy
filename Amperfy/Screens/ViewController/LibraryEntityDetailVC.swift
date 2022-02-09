@@ -125,7 +125,6 @@ class LibraryEntityDetailVC: UIViewController {
         if !playShuffledButton.isHidden {
             playShuffledButton.imageView?.contentMode = .scaleAspectFit
         }
-        Self.configureRoundButtonCluster(buttons: buttonsOfMainCluster, containerView: mainClusterStackView, hightConstraint: mainStackClusterHeightConstraint, buttonHeight: playButtonHeightConstraint.constant)
     }
     
     override func viewWillLayoutSubviews() {
@@ -214,6 +213,7 @@ class LibraryEntityDetailVC: UIViewController {
             visibleButtons[0].layer.cornerRadius = BasicButton.cornerRadius
             visibleButtons[0].layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         } else {
+            visibleButtons.forEach{ $0.layer.maskedCorners = [] }
             let firstButton = visibleButtons.first
             firstButton?.layer.cornerRadius = BasicButton.cornerRadius
             firstButton?.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
@@ -271,6 +271,7 @@ class LibraryEntityDetailVC: UIViewController {
         } else if let podcast = podcast {
             configureFor(podcast: podcast)
         }
+        Self.configureRoundButtonCluster(buttons: buttonsOfMainCluster, containerView: mainClusterStackView, hightConstraint: mainStackClusterHeightConstraint, buttonHeight: playButtonHeightConstraint.constant)
     }
 
     private func configureFor(playlist: Playlist) {
