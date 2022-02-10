@@ -33,6 +33,20 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
 
 typealias SwipeActionCallback = (IndexPath, _ completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void ) -> Void
 
+struct SwipeDisplaySettings {
+    var isAddToPlaylistAllowed = true
+    
+    func isAllowedToDisplay(actionType: SwipeActionType, isOfflineMode: Bool) -> Bool {
+        if actionType == .addToPlaylist, !isAddToPlaylistAllowed {
+            return false
+        }
+        if isOfflineMode, actionType == .addToPlaylist || actionType == .download {
+            return false
+        }
+        return true
+    }
+}
+
 extension BasicTableViewController {
     func createSwipeAction(for actionType: SwipeActionType, buttonColor: UIColor, indexPath: IndexPath, actionCallback: @escaping SwipeActionCallback) -> UIContextualAction {
         let action = UIContextualAction(style: .normal, title: actionType.displayName) { (action, view, completionHandler) in
@@ -91,6 +105,7 @@ class BasicTableViewController: UITableViewController {
     var rowsToInsert = [IndexPath]()
     var rowsToDelete = [IndexPath]()
     var rowsToUpdate = [IndexPath]()
+    var swipeDisplaySettings = SwipeDisplaySettings()
     var swipeCallback: SwipeActionCallback?
 
     override func viewDidLoad() {
@@ -113,6 +128,7 @@ class BasicTableViewController: UITableViewController {
         guard let swipeCB = swipeCallback else { return nil }
         var actions = [UIContextualAction]()
         for (index, actionType) in appDelegate.persistentStorage.settings.swipeActionSettings.leading.enumerated() {
+            if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, isOfflineMode: appDelegate.persistentStorage.settings.isOfflineMode) { continue }
             let buttonColor = Self.swipeButtonColors.element(at: index) ?? Self.swipeButtonColors.last!
             actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, actionCallback: swipeCB))
         }
@@ -124,6 +140,7 @@ class BasicTableViewController: UITableViewController {
         guard let swipeCB = swipeCallback else { return nil }
         var actions = [UIContextualAction]()
         for (index, actionType) in appDelegate.persistentStorage.settings.swipeActionSettings.trailing.enumerated() {
+            if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, isOfflineMode: appDelegate.persistentStorage.settings.isOfflineMode) { continue }
             let buttonColor = Self.swipeButtonColors.element(at: index) ?? Self.swipeButtonColors.last!
             actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, actionCallback: swipeCB))
         }

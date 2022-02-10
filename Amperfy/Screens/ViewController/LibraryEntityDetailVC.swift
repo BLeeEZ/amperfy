@@ -288,7 +288,9 @@ class LibraryEntityDetailVC: UIViewController {
             playShuffledButton.isHidden = true
             queueContainerView.isHidden = true
         }
-        addToPlaylistButton.isHidden = true
+        if appDelegate.persistentStorage.settings.isOfflineMode {
+            addToPlaylistButton.isHidden = true
+        }
         if playlist.hasCachedPlayables {
             downloadButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
             deleteCacheButton.isHidden = false

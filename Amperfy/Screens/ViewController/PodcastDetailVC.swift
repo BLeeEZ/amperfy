@@ -24,6 +24,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
+        swipeDisplaySettings.isAddToPlaylistAllowed = false
         swipeCallback = { (indexPath, completionHandler) in
             let episode = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             completionHandler(SwipeActionContext(containable: episode))

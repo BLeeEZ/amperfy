@@ -16,6 +16,7 @@ class PodcastsVC: SingleFetchedResultsTableViewController<PodcastMO> {
         tableView.register(nibName: PodcastTableCell.typeName)
         tableView.rowHeight = PodcastTableCell.rowHeight
         
+        swipeDisplaySettings.isAddToPlaylistAllowed = false
         swipeCallback = { (indexPath, completionHandler) in
             let podcast = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             self.fetchDetails(of: podcast) {
