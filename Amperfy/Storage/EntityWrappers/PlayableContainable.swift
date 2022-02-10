@@ -7,6 +7,8 @@ enum DetailType {
 
 protocol PlayableContainable {
     var name: String { get }
+    var subtitle: String? { get }
+    var subsubtitle: String? { get }
     func infoDetails(for api: BackenApiType, type: DetailType) -> [String]
     func info(for api: BackenApiType, type: DetailType) -> String
     var playables: [AbstractPlayable] { get }

@@ -13,6 +13,7 @@ struct CarPlayPlayableItem {
     func asContentItem() -> MPContentItem {
         let item = MPContentItem(identifier: element.name)
         item.title = element.name
+        item.subtitle = element.subtitle
         item.isContainer = true
         item.isPlayable = true
         item.isStreamingContent = !element.playables.hasCachedItems
@@ -52,6 +53,7 @@ struct CarPlayContainerItem {
     func asContentItem() -> MPContentItem {
         let item = MPContentItem(identifier: element.name)
         item.title = element.name
+        item.subtitle = element.subtitle
         item.isContainer = true
         item.isPlayable = false
         if let image = image {

@@ -50,6 +50,8 @@ public class Genre: AbstractLibraryEntity {
 }
 
 extension Genre: PlayableContainable  {
+    var subtitle: String? { return nil }
+    var subsubtitle: String? { return nil }
     func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
         var infoContent = [String]()
         if api == .ampache {

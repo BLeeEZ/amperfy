@@ -178,9 +178,9 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
 }
 
 extension AbstractPlayable: PlayableContainable  {
-    var name: String {
-        return title
-    }
+    var name: String { return title }
+    var subtitle: String? { return creatorName }
+    var subsubtitle: String? { return asSong?.album?.name }
     var playables: [AbstractPlayable] {
         return [self]
     }

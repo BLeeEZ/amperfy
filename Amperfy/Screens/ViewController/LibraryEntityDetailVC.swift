@@ -256,6 +256,17 @@ class LibraryEntityDetailVC: UIViewController {
     }
 
     func refresh() {
+        titleLabel.text = entityContainer.name
+        artistLabel.text = entityContainer.subtitle
+        artistLabel.isHidden = entityContainer.subtitle == nil
+        showArtistButton.isHidden = entityContainer.subtitle == nil
+        
+        albumLabel.text = entityContainer.subsubtitle
+        albumLabel.isHidden = entityContainer.subsubtitle == nil
+        showAlbumButton.isHidden = entityContainer.subsubtitle == nil
+        
+        infoLabel.text = entityContainer.info(for: appDelegate.backendProxy.selectedApi, type: .long)
+
         if let song = playable?.asSong {
             configureFor(song: song)
         } else if let podcastEpisode = playable?.asPodcastEpisode {
@@ -275,13 +286,7 @@ class LibraryEntityDetailVC: UIViewController {
     }
 
     private func configureFor(playlist: Playlist) {
-        titleLabel.text = playlist.name
-        artistLabel.isHidden = true
-        showArtistButton.isHidden = true
-        albumLabel.isHidden =  true
-        showAlbumButton.isHidden = true
         artworkImage.refresh()
-        infoLabel.text = playlist.info(for: appDelegate.backendProxy.selectedApi, type: .long)
 
         if !playlist.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
             playButton.isHidden = true
@@ -306,13 +311,7 @@ class LibraryEntityDetailVC: UIViewController {
     }
     
     private func configureFor(genre: Genre) {
-        titleLabel.text = genre.name
-        artistLabel.isHidden = true
-        showArtistButton.isHidden = true
-        albumLabel.isHidden =  true
-        showAlbumButton.isHidden = true
         artworkImage.displayAndUpdate(entity: genre, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
-        infoLabel.text = genre.info(for: appDelegate.backendProxy.selectedApi, type: .long)
 
         if !genre.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
             playButton.isHidden = true
@@ -337,13 +336,7 @@ class LibraryEntityDetailVC: UIViewController {
     }
     
     private func configureFor(podcast: Podcast) {
-        titleLabel.text = podcast.title
-        artistLabel.isHidden = true
-        showArtistButton.isHidden = true
-        albumLabel.isHidden =  true
-        showAlbumButton.isHidden = true
         artworkImage.displayAndUpdate(entity: podcast, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
-        infoLabel.text = podcast.info(for: appDelegate.backendProxy.selectedApi, type: .long)
 
         if !podcast.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
             playButton.isHidden = true
@@ -368,13 +361,7 @@ class LibraryEntityDetailVC: UIViewController {
     }
     
     private func configureFor(artist: Artist) {
-        titleLabel.text = artist.name
-        artistLabel.isHidden = true
-        showArtistButton.isHidden = true
-        albumLabel.isHidden =  true
-        showAlbumButton.isHidden = true
         artworkImage.displayAndUpdate(entity: artist, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
-        infoLabel.text = artist.info(for: appDelegate.backendProxy.selectedApi, type: .long)
 
         if !artist.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
             playButton.isHidden = true
@@ -399,15 +386,7 @@ class LibraryEntityDetailVC: UIViewController {
     }
     
     private func configureFor(album: Album) {
-        titleLabel.text = album.name
-        artistLabel.text = album.artist?.name ?? ""
-        if album.artist == nil {
-            showArtistButton.isHidden = true
-        }
-        albumLabel.isHidden =  true
-        showAlbumButton.isHidden = true
         artworkImage.displayAndUpdate(entity: album, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
-        infoLabel.text = album.info(for: appDelegate.backendProxy.selectedApi, type: .long)
 
         if !album.hasCachedPlayables && appDelegate.persistentStorage.settings.isOfflineMode {
             playButton.isHidden = true
@@ -432,17 +411,7 @@ class LibraryEntityDetailVC: UIViewController {
     }
     
     private func configureFor(song: Song) {
-        titleLabel.text = song.title
-        artistLabel.text = song.creatorName
-        if song.asSong?.artist == nil {
-            showArtistButton.isHidden = true
-        }
-        albumLabel.text = song.asSong?.album?.name
-        if song.asSong?.album == nil {
-            showAlbumButton.isHidden = true
-        }
         artworkImage.displayAndUpdate(entity: song, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
-        infoLabel.text = song.info(for: appDelegate.backendProxy.selectedApi, type: .long)
 
         if (playContextCb == nil) || (!song.isCached && appDelegate.persistentStorage.settings.isOfflineMode) {
             playButton.isHidden = true
@@ -470,15 +439,7 @@ class LibraryEntityDetailVC: UIViewController {
     }
     
     private func configureFor(podcastEpisode: PodcastEpisode) {
-        titleLabel.text = podcastEpisode.title
-        artistLabel.text = podcastEpisode.creatorName
-        if podcastEpisode.asPodcastEpisode?.podcast == nil {
-            showArtistButton.isHidden = true
-        }
-        albumLabel.text = ""
-        showAlbumButton.isHidden = true
         artworkImage.displayAndUpdate(entity: podcastEpisode, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
-        infoLabel.text = podcastEpisode.info(for: appDelegate.backendProxy.selectedApi, type: .long)
 
         if (playContextCb == nil) ||
            (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||

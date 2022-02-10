@@ -46,9 +46,9 @@ public class Podcast: AbstractLibraryEntity {
 }
 
 extension Podcast: PlayableContainable  {
-    var name: String {
-        return title
-    }
+    var name: String { return title }
+    var subtitle: String? { return nil }
+    var subsubtitle: String? { return nil }
     func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
         var infoContent = [String]()
         if episodes.count == 1 {

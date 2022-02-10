@@ -72,6 +72,8 @@ public class Artist: AbstractLibraryEntity {
 }
 
 extension Artist: PlayableContainable  {
+    var subtitle: String? { return nil }
+    var subsubtitle: String? { return nil }
     func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
         var infoContent = [String]()
         if albumCount == 1 {

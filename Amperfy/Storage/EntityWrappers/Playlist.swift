@@ -286,6 +286,8 @@ public class Playlist: Identifyable {
 }
 
 extension Playlist: PlayableContainable  {
+    var subtitle: String? { return nil }
+    var subsubtitle: String? { return nil }
     func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
         var infoContent = [String]()
         if songCount == 1 {
