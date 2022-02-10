@@ -79,4 +79,9 @@ extension Genre: PlayableContainable  {
     var playables: [AbstractPlayable] {
         return songs
     }
+    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+        let library = LibraryStorage(context: context)
+        let genreAsync = Genre(managedObject: context.object(with: managedObject.objectID) as! GenreMO)
+        syncer.sync(genre: genreAsync, library: library)
+    }
 }

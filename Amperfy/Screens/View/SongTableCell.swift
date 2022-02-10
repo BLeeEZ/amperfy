@@ -74,7 +74,7 @@ class SongTableCell: BasicTableCell {
         guard let song = song, let rootView = rootView, rootView.presentingViewController == nil else { return }
         isAlertPresented = true
         let detailVC = LibraryEntityDetailVC()
-        detailVC.display(playable: song, playContextCb: {() in self.playContextCb?(self)}, on: rootView)
+        detailVC.display(container: song, on: rootView, playContextCb: {() in self.playContextCb?(self)})
         rootView.present(detailVC, animated: true)
     }
 

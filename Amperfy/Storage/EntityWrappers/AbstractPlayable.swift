@@ -184,6 +184,14 @@ extension AbstractPlayable: PlayableContainable  {
     var playables: [AbstractPlayable] {
         return [self]
     }
+    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+        guard let song = asSong else { return }
+        let library = LibraryStorage(context: context)
+        let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
+        syncer.sync(song: songAsync, library: library)
+    }
+    var isRateable: Bool { return isSong }
+    var isDownloadAvailable: Bool { return asPodcastEpisode?.isAvailableToUser ?? true }
 }
 
 extension AbstractPlayable: Hashable, Equatable {
@@ -212,6 +220,10 @@ extension Array where Element: AbstractPlayable {
     
     var hasCachedItems: Bool {
         return self.lazy.filter{ $0.isCached }.first != nil
+    }
+    
+    var isCachedCompletely: Bool {
+        return filterCached().count == count
     }
     
     func sortById() -> [Element] {

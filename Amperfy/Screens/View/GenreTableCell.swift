@@ -36,7 +36,7 @@ class GenreTableCell: BasicTableCell {
         generator.impactOccurred()
         guard let genre = genre, let rootView = rootView, rootView.presentingViewController == nil else { return }
         let detailVC = LibraryEntityDetailVC()
-        detailVC.display(genre: genre, on: rootView)
+        detailVC.display(container: genre, on: rootView)
         rootView.present(detailVC, animated: true)
     }
 

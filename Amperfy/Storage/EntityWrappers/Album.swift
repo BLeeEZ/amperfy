@@ -109,6 +109,12 @@ extension Album: PlayableContainable  {
         }
         return infoContent
     }
+    var isRateable: Bool { return true }
+    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+        let library = LibraryStorage(context: context)
+        let albumAsync = Album(managedObject: context.object(with: managedObject.objectID) as! AlbumMO)
+        syncer.sync(album: albumAsync, library: library)
+    }
 }
 
 extension Album: Hashable, Equatable {

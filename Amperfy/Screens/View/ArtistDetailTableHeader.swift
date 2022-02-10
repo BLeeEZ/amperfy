@@ -41,7 +41,7 @@ class ArtistDetailTableHeader: UIView {
         generator.impactOccurred()
         guard let artist = self.artist, let rootView = self.rootView, rootView.presentingViewController == nil else { return }
         let detailVC = LibraryEntityDetailVC()
-        detailVC.display(artist: artist, on: rootView)
+        detailVC.display(container: artist, on: rootView)
         rootView.present(detailVC, animated: true)
     }
     

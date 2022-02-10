@@ -303,6 +303,11 @@ extension Playlist: PlayableContainable  {
         }
         return infoContent
     }
+    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+        let library = LibraryStorage(context: context)
+        let playlistAsync = getManagedObject(in: context, library: library)
+        syncer.syncDown(playlist: playlistAsync, library: library)
+    }
 }
 
 extension Playlist: Hashable, Equatable {

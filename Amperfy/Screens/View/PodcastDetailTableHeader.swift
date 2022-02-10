@@ -42,7 +42,7 @@ class PodcastDetailTableHeader: UIView {
         generator.impactOccurred()
         guard let podcast = self.podcast, let rootView = self.rootView, rootView.presentingViewController == nil else { return }
         let detailVC = LibraryEntityDetailVC()
-        detailVC.display(podcast: podcast, on: rootView)
+        detailVC.display(container: podcast, on: rootView)
         rootView.present(detailVC, animated: true)
     }
     

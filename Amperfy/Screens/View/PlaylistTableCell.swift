@@ -55,7 +55,7 @@ class PlaylistTableCell: BasicTableCell {
         generator.impactOccurred()
         guard let playlist = playlist, let rootView = rootView, rootView.presentingViewController == nil else { return }
         let detailVC = LibraryEntityDetailVC()
-        detailVC.display(playlist: playlist, on: rootView)
+        detailVC.display(container: playlist, on: rootView)
         rootView.present(detailVC, animated: true)
     }
     

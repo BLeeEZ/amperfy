@@ -19,7 +19,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         
         swipeCallback = { (indexPath, completionHandler) in
             let artist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.fetchDetails(of: artist) {
+            artist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
                 completionHandler(SwipeActionContext(containable: artist))
             }
         }

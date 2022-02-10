@@ -27,7 +27,7 @@ enum SwipeActionType: Int, CaseIterable {
         case .removeFromCache:
             return "Remove from Cache"
         case .addToPlaylist:
-            return "Add to playlist"
+            return "Add to Playlist"
         case .play:
             return "Play"
         case .playShuffled:
@@ -50,7 +50,7 @@ enum SwipeActionType: Int, CaseIterable {
         case .removeFromCache:
             return "Remove from Cache"
         case .addToPlaylist:
-            return "Add to playlist"
+            return "Add to Playlist"
         case .play:
             return "Play"
         case .playShuffled:

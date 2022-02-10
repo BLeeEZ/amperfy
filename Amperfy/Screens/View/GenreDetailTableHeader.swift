@@ -41,7 +41,7 @@ class GenreDetailTableHeader: UIView {
         generator.impactOccurred()
         guard let genre = self.genre, let rootView = self.rootView, rootView.presentingViewController == nil else { return }
         let detailVC = LibraryEntityDetailVC()
-        detailVC.display(genre: genre, on: rootView)
+        detailVC.display(container: genre, on: rootView)
         rootView.present(detailVC, animated: true)
     }
     

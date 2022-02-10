@@ -64,6 +64,11 @@ extension Podcast: PlayableContainable  {
     var playables: [AbstractPlayable] {
         return episodes
     }
+    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+        let library = LibraryStorage(context: context)
+        let podcastAsync = Podcast(managedObject: context.object(with: managedObject.objectID) as! PodcastMO)
+        syncer.sync(podcast: podcastAsync, library: library)
+    }
 }
 
 extension Podcast: Hashable, Equatable {

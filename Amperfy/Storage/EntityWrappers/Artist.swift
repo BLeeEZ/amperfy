@@ -94,6 +94,12 @@ extension Artist: PlayableContainable  {
         }
         return infoContent
     }
+    var isRateable: Bool { return true }
+    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+        let library = LibraryStorage(context: context)
+        let artistAsync = Artist(managedObject: context.object(with: managedObject.objectID) as! ArtistMO)
+        syncer.sync(artist: artistAsync, library: library)
+    }
 }
 
 extension Artist: Hashable, Equatable {

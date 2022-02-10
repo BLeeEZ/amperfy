@@ -106,9 +106,9 @@ class PlayableTableCell: BasicTableCell {
         let playContextLambda = {() in self.playContextCb?(self)}
         let playerIndexLambda = playerIndexCb != nil ? {() in self.playerIndexCb?(self)} : nil
         detailVC.display(
-            playable: playable,
-            playContextCb: playContextLambda,
+            container: playable,
             on: rootView,
+            playContextCb: playContextLambda,
             playerIndexCb: playerIndexLambda)
         rootView.present(detailVC, animated: true)
     }

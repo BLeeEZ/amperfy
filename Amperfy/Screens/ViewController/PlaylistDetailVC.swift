@@ -56,7 +56,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         } else {
             navigationItem.rightBarButtonItem = nil
         }
-        self.fetchDetails(of: self.playlist) {
+        playlist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
             self.playlistOperationsView?.refresh()
         }
     }

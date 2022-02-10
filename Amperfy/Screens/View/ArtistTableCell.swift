@@ -36,7 +36,7 @@ class ArtistTableCell: BasicTableCell {
         generator.impactOccurred()
         guard let artist = artist, let rootView = rootView, rootView.presentingViewController == nil else { return }
         let detailVC = LibraryEntityDetailVC()
-        detailVC.display(artist: artist, on: rootView)
+        detailVC.display(container: artist, on: rootView)
         rootView.present(detailVC, animated: true)
     }
 

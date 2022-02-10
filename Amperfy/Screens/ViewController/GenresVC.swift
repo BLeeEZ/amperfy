@@ -19,7 +19,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         
         swipeCallback = { (indexPath, completionHandler) in
             let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.fetchDetails(of: genre) {
+            genre.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
                 completionHandler(SwipeActionContext(containable: genre))
             }
         }

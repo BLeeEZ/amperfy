@@ -24,7 +24,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         
         swipeCallback = { (indexPath, completionHandler) in
             let album = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.fetchDetails(of: album) {
+            album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
                 completionHandler(SwipeActionContext(containable: album))
             }
         }

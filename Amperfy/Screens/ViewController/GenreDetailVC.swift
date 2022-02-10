@@ -41,12 +41,12 @@ class GenreDetailVC: BasicTableViewController {
             switch indexPath.section+1 {
             case LibraryElement.Artist.rawValue:
                 let artist = self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                self.fetchDetails(of: artist) {
+                artist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
                     completionHandler(SwipeActionContext(containable: artist))
                 }
             case LibraryElement.Album.rawValue:
                 let album = self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                self.fetchDetails(of: album) {
+                album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
                     completionHandler(SwipeActionContext(containable: album))
                 }
             case LibraryElement.Song.rawValue:
@@ -62,7 +62,7 @@ class GenreDetailVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.fetchDetails(of: genre) {
+        genre.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
             self.detailOperationsView?.refresh()
         }
     }

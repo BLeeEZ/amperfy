@@ -121,7 +121,6 @@
 		50675E6D25F61164005737FD /* BasicTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50675E6C25F61163005737FD /* BasicTableCell.swift */; };
 		5067E372278C1DCA00807A78 /* album_multidisc_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5067E371278C1DC900807A78 /* album_multidisc_example_1.xml */; };
 		5067E374278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5067E373278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift */; };
-		5067E376278EB2D900807A78 /* BasicTableViewFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5067E375278EB2D900807A78 /* BasicTableViewFetcher.swift */; };
 		5068D38026A85C2D0006710D /* DownloadError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5068D37F26A85C2D0006710D /* DownloadError.swift */; };
 		506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */; };
 		506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */; };
@@ -496,7 +495,6 @@
 		50675E6C25F61163005737FD /* BasicTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableCell.swift; sourceTree = "<group>"; };
 		5067E371278C1DC900807A78 /* album_multidisc_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = album_multidisc_example_1.xml; sourceTree = "<group>"; };
 		5067E373278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumMultidiscExample1ParserTest.swift; sourceTree = "<group>"; };
-		5067E375278EB2D900807A78 /* BasicTableViewFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableViewFetcher.swift; sourceTree = "<group>"; };
 		5067E37727916AE100807A78 /* Amperfy v18.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v18.xcdatamodel"; sourceTree = "<group>"; };
 		5068D37F26A85C2D0006710D /* DownloadError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadError.swift; sourceTree = "<group>"; };
 		506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v2.xcdatamodel"; sourceTree = "<group>"; };
@@ -1156,7 +1154,6 @@
 			children = (
 				50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */,
 				50120A2426281C1900B037B1 /* BasicTableViewController.swift */,
-				5067E375278EB2D900807A78 /* BasicTableViewFetcher.swift */,
 				50DEEE03265E25A40073FF20 /* MusicFoldersVC.swift */,
 				50DEEE09265E392C0073FF20 /* IndexesVC.swift */,
 				50DEEE0B265E3F9D0073FF20 /* DirectoriesVC.swift */,
@@ -1645,7 +1642,6 @@
 				50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */,
 				501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */,
 				5009863C2208CB650057A1A6 /* OptionsButton.swift in Sources */,
-				5067E376278EB2D900807A78 /* BasicTableViewFetcher.swift in Sources */,
 				501A7D3B2680A9680055A51B /* PodcastParserDelegate.swift in Sources */,
 				507361E72632BAFB005F151D /* GenreTableCell.swift in Sources */,
 				501171362756A8E100B7C08D /* NowPlayingInfoCenterHandler.swift in Sources */,

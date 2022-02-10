@@ -165,12 +165,7 @@ class CarPlayHandler: NSObject {
         var playlistItems = [CarPlayPlayableItem]()
         for playlist in playlists {
             let item = CarPlayPlayableItem(element: playlist, image: nil) { completionHandler in
-                if self.persistentStorage.settings.isOnlineMode {
-                    self.persistentStorage.context.performAndWait {
-                        let syncer = self.backendApi.createLibrarySyncer()
-                        syncer.syncDown(playlist: playlist, library: self.library)
-                    }
-                }
+                playlist.fetchSync(storage: self.persistentStorage, backendApi: self.backendApi)
                 completionHandler()
             }
             playlistItems.append(item)
@@ -182,12 +177,7 @@ class CarPlayHandler: NSObject {
         var podcastItems = [CarPlayPlayableItem]()
         for podcast in podcasts {
             let item = CarPlayPlayableItem(element: podcast, image: podcast.image) { completionHandler in
-                if self.persistentStorage.settings.isOnlineMode {
-                    self.persistentStorage.context.performAndWait {
-                        let syncer = self.backendApi.createLibrarySyncer()
-                        syncer.sync(podcast: podcast, library: self.library)
-                    }
-                }
+                podcast.fetchSync(storage: self.persistentStorage, backendApi: self.backendApi)
                 completionHandler()
             }
             podcastItems.append(item)

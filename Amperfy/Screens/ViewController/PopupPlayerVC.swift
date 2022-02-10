@@ -315,9 +315,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate.userStatistics.usedAction(.playerOptions)
         guard let playable = self.player.currentlyPlaying, self.presentingViewController == nil else { return }
         let detailVC = LibraryEntityDetailVC()
-        detailVC.display(playable: playable,
-                         playContextCb: nil,
-                         on: self)
+        detailVC.display(container: playable, on: self, playContextCb: nil)
         self.present(detailVC, animated: true)
     }
 

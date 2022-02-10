@@ -38,7 +38,7 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.fetchDetails(of: album) {
+        album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
             self.detailOperationsView?.refresh()
         }
     }

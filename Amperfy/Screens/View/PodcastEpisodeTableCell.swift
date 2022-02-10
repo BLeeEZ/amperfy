@@ -72,9 +72,9 @@ class PodcastEpisodeTableCell: BasicTableCell {
         guard let episode = self.episode, let rootView = rootView, rootView.presentingViewController == nil else { return }
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(
-            playable: episode,
-            playContextCb: {() in PlayContext(name: episode.title, playables: [episode])},
-            on: rootView)
+            container: episode,
+            on: rootView,
+            playContextCb: {() in PlayContext(name: episode.title, playables: [episode])})
         rootView.present(detailVC, animated: true)
     }
 

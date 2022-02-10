@@ -19,7 +19,7 @@ class PodcastsVC: SingleFetchedResultsTableViewController<PodcastMO> {
         swipeDisplaySettings.isAddToPlaylistAllowed = false
         swipeCallback = { (indexPath, completionHandler) in
             let podcast = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            self.fetchDetails(of: podcast) {
+            podcast.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
                 completionHandler(SwipeActionContext(containable: podcast))
             }
         }

@@ -38,7 +38,7 @@ class AlbumTableCell: BasicTableCell {
         generator.impactOccurred()
         guard let album = album, let rootView = rootView, rootView.presentingViewController == nil else { return }
         let detailVC = LibraryEntityDetailVC()
-        detailVC.display(album: album, on: rootView)
+        detailVC.display(container: album, on: rootView)
         rootView.present(detailVC, animated: true)
     }
     
