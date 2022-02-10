@@ -59,7 +59,10 @@ class LibraryEntityDetailVC: UIViewController {
 
     @IBOutlet weak var cancelButton: UIButton!
     
+    static let detailLabelsClusterNormalHeight = 90.0
     @IBOutlet weak var detailLabelsClusterHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var artistNameLabelHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var albumNameLabelHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var ratingHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var queueStackHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var mainStackClusterHeightConstraint: NSLayoutConstraint!
@@ -127,6 +130,14 @@ class LibraryEntityDetailVC: UIViewController {
             artistLabel.textAlignment = .center
             albumLabel.textAlignment = .center
             infoLabel.textAlignment = .center
+            var detailClusterHeight = Self.detailLabelsClusterNormalHeight
+            if artistLabel.isHidden {
+                detailClusterHeight -= artistNameLabelHeightConstraint.constant
+            }
+            if albumLabel.isHidden {
+                detailClusterHeight -= albumNameLabelHeightConstraint.constant
+            }
+            detailLabelsClusterHeightConstraint.constant = detailClusterHeight
         } else {
             elementInfoStackView.alignment = .fill
             elementInfoStackView.axis = .horizontal
@@ -134,6 +145,7 @@ class LibraryEntityDetailVC: UIViewController {
             artistLabel.textAlignment = .left
             albumLabel.textAlignment = .left
             infoLabel.textAlignment = .left
+            detailLabelsClusterHeightConstraint.constant = Self.detailLabelsClusterNormalHeight
         }
     }
 
