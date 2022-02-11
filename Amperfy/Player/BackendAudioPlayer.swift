@@ -65,7 +65,8 @@ class BackendAudioPlayer {
         self.playableDownloader = playableDownloader
         self.cacheProxy = cacheProxy
         self.userStatistics = userStatistics
-        
+
+        self.player.allowsExternalPlayback = false // Disable video transmission via AirPlay -> only audio
         player.addPeriodicTimeObserver(forInterval: updateElapsedTimeInterval, queue: DispatchQueue.main) { [weak self] time in
             if let self = self {
                 self.responder?.didElapsedTimeChange()
