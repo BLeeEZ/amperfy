@@ -36,11 +36,12 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
   cd amperfy
   ./update-carthage.sh
   ```
-  >Hint: If you migrate from a development setup previous v1.0.5 you need to delete the `./Carthage` folder and update Carthage via `./update-carthage.sh`.
 
 3. Open the `Amperfy.xcodeproj` file.
 
 4. Build and run the "Amperfy" scheme
+
+  >Real device testing: Amperfy has Apple CarPlay support. To test it on a real device a developer certificate with granted access to `com.apple.developer.playable-content` is requiered. To test Amperfy without Apple CarPlay clear the entitlement signing entry under Amperfy -> Targets: Amperfy -> Build Settings -> Signing -> `Code Signing Entitlements` (clear `Amperfy/Entitlements.plist`)
 
 ## Beta test releases
 
