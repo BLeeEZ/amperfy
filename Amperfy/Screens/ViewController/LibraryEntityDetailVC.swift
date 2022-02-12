@@ -67,6 +67,7 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var queueStackHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var mainStackClusterHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var playerStackClusterHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var playerActionsLabelHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var playButtonHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var cancelButtonHeightConstraint: NSLayoutConstraint!
     
@@ -164,14 +165,14 @@ class LibraryEntityDetailVC: UIViewController {
         button.layer.maskedCorners = [corner]
     }
     
-    static func configureRoundButtonCluster(buttons: [UIButton], containerView: UIView, hightConstraint: NSLayoutConstraint, buttonHeight: CGFloat) {
+    static func configureRoundButtonCluster(buttons: [UIButton], containerView: UIView, hightConstraint: NSLayoutConstraint, buttonHeight: CGFloat, offsetHeight: CGFloat = 0.0) {
         guard !containerView.isHidden else { return }
         let visibleButtons = buttons.filter{!$0.isHidden}
         var height = 0.0
         if visibleButtons.count == 1 {
-            height = buttonHeight
+            height = buttonHeight + offsetHeight
         } else if visibleButtons.count > 1 {
-            height = ((buttonHeight + 1.0) * CGFloat(visibleButtons.count)) - 1
+            height = ((buttonHeight + 1.0) * CGFloat(visibleButtons.count)) - 1 + offsetHeight
         }
         hightConstraint.constant = height
         containerView.isHidden = visibleButtons.isEmpty
@@ -304,7 +305,7 @@ class LibraryEntityDetailVC: UIViewController {
         clearUserQueueButton.isHidden = appDelegate.player.userQueue.isEmpty
         addContextQueueToPlaylistButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
         
-        Self.configureRoundButtonCluster(buttons: playerControlButtons, containerView: playerStackView, hightConstraint: playerStackClusterHeightConstraint, buttonHeight: playButtonHeightConstraint.constant)
+        Self.configureRoundButtonCluster(buttons: playerControlButtons, containerView: playerStackView, hightConstraint: playerStackClusterHeightConstraint, buttonHeight: playButtonHeightConstraint.constant, offsetHeight: playerActionsLabelHeightConstraint.constant + 1.0)
     }
     
     @IBAction func pressedPlay(_ sender: Any) {
