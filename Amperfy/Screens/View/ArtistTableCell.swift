@@ -21,7 +21,7 @@ class ArtistTableCell: BasicTableCell {
         self.artist = artist
         self.rootView = rootView
         artistLabel.text = artist.name
-        artworkImage.displayAndUpdate(entity: artist, via: appDelegate.artworkDownloadManager)
+        artworkImage.displayAndUpdate(entity: artist)
         infoLabel.text = artist.info(for: appDelegate.backendProxy.selectedApi, type: .short)
     }
 

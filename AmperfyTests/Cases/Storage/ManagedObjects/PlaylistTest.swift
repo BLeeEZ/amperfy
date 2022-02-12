@@ -50,7 +50,7 @@ class PlaylistTest: XCTestCase {
         XCTAssertEqual(playlist.items.count, 0)
         XCTAssertEqual(playlist.id, "")
         XCTAssertEqual(playlist.lastPlayableIndex, 0)
-        XCTAssertFalse(playlist.hasCachedPlayables)
+        XCTAssertFalse(playlist.playables.hasCachedItems)
         
         let name = "Test 234"
         playlist.name = name
@@ -243,7 +243,7 @@ class PlaylistTest: XCTestCase {
     }
     
     func testDefaultPlaylist() {
-        XCTAssertTrue(defaultPlaylist.hasCachedPlayables)
+        XCTAssertTrue(defaultPlaylist.playables.hasCachedItems)
         XCTAssertEqual(defaultPlaylist.playables.count, 5)
         XCTAssertEqual(defaultPlaylist.items.count, 5)
         XCTAssertEqual(defaultPlaylist.lastPlayableIndex, 4)
@@ -344,9 +344,9 @@ class PlaylistTest: XCTestCase {
     }
     
     func testhasCachedSongs() {
-        XCTAssertFalse(playlistNoCached.hasCachedPlayables)
-        XCTAssertTrue(defaultPlaylist.hasCachedPlayables)
-        XCTAssertTrue(playlistThreeCached.hasCachedPlayables)
+        XCTAssertFalse(playlistNoCached.playables.hasCachedItems)
+        XCTAssertTrue(defaultPlaylist.playables.hasCachedItems)
+        XCTAssertTrue(playlistThreeCached.playables.hasCachedItems)
     }
     
     func testPreviousCachedSongIndex() {

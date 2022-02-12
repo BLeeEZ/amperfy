@@ -7,6 +7,7 @@ class DownloadManager: NSObject, DownloadManageable {
     let persistentStorage: PersistentStorage
     let requestManager: DownloadRequestManager
     let downloadDelegate: DownloadManagerDelegate
+    let notificationHandler: EventNotificationHandler
     var urlSession: URLSession!
     var backgroundFetchCompletionHandler: CompleteHandlerBlock?
     let log: OSLog
@@ -20,11 +21,12 @@ class DownloadManager: NSObject, DownloadManageable {
     private var isRunning = false
     private var isActive = false
     
-    init(name: String, persistentStorage: PersistentStorage, requestManager: DownloadRequestManager, downloadDelegate: DownloadManagerDelegate, eventLogger: EventLogger) {
+    init(name: String, persistentStorage: PersistentStorage, requestManager: DownloadRequestManager, downloadDelegate: DownloadManagerDelegate, notificationHandler: EventNotificationHandler, eventLogger: EventLogger) {
         log = OSLog(subsystem: AppDelegate.name, category: name)
         self.persistentStorage = persistentStorage
         self.requestManager = requestManager
         self.downloadDelegate = downloadDelegate
+        self.notificationHandler = notificationHandler
         self.eventLogger = eventLogger
     }
     
@@ -166,6 +168,7 @@ class DownloadManager: NSObject, DownloadManageable {
         download.resumeData = nil
         download.isDownloading = false
         library.saveContext()
+        notificationHandler.post(name: .downloadFinishedSuccess, object: self, userInfo: DownloadNotification(id: download.element.uniqueID).asNotificationUserInfo)
     }
     
 }

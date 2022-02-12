@@ -33,7 +33,7 @@ class SongTableCell: BasicTableCell {
         titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         artistLabel.text = song.creatorName
         
-        artworkImage.displayAndUpdate(entity: song, via: appDelegate.artworkDownloadManager)
+        artworkImage.displayAndUpdate(entity: song)
 
         if song.isCached {
             artistLabel.textColor = UIColor.defaultBlue

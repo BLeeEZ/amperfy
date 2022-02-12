@@ -31,7 +31,7 @@ class ArtistDetailTableHeader: UIView {
         nameLabel.text = artist.name
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
-        artistImage.displayAndUpdate(entity: artist, via: appDelegate.artworkDownloadManager)
+        artistImage.displayAndUpdate(entity: artist)
         infoLabel.applyAmperfyStyle()
         infoLabel.text = artist.info(for: appDelegate.backendProxy.selectedApi, type: .long)
     }

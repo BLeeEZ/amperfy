@@ -26,7 +26,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
     func refresh() {
         guard let episode = self.episode else { return }
         podcastEpisodeLabel.text = episode.title
-        podcastEpisodeImage.displayAndUpdate(entity: episode, via: appDelegate.artworkDownloadManager)
+        podcastEpisodeImage.displayAndUpdate(entity: episode)
         
         optionsButton.setTitle(CommonString.threeMiddleDots, for: .normal)
         if episode.isAvailableToUser {

@@ -199,7 +199,7 @@ class LibraryEntityDetailVC: UIViewController {
 
     func refresh() {
         if let libraryEntity = entityContainer as? AbstractLibraryEntity {
-            artworkImage.displayAndUpdate(entity: libraryEntity, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
+            artworkImage.displayAndUpdate(entity: libraryEntity)
             if entityContainer.isRateable {
                 ratingView?.display(entity: libraryEntity)
             }

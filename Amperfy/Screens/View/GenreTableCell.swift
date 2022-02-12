@@ -21,7 +21,7 @@ class GenreTableCell: BasicTableCell {
         self.genre = genre
         self.rootView = rootView
         genreLabel.text = genre.name
-        artworkImage.displayAndUpdate(entity: genre, via: (UIApplication.shared.delegate as! AppDelegate).artworkDownloadManager)
+        artworkImage.displayAndUpdate(entity: genre)
         infoLabel.text = genre.info(for: appDelegate.backendProxy.selectedApi, type: .short)
     }
     

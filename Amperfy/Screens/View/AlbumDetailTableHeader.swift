@@ -30,7 +30,7 @@ class AlbumDetailTableHeader: UIView {
         nameLabel.text = album.name
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
-        albumImage.displayAndUpdate(entity: album, via: appDelegate.artworkDownloadManager)
+        albumImage.displayAndUpdate(entity: album)
         infoLabel.applyAmperfyStyle()
         infoLabel.text = album.info(for: appDelegate.backendProxy.selectedApi, type: .long)
     }

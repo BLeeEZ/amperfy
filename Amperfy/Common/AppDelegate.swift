@@ -33,6 +33,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var backendApi: BackendApi = {
         return backendProxy
     }()
+    lazy var notificationHandler: EventNotificationHandler = {
+        return EventNotificationHandler()
+    }()
     lazy var player: PlayerFacade = {
         let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
         let playerData = library.getPlayerData()
@@ -64,7 +67,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var playableDownloadManager: DownloadManageable = {
         let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi)
         let requestManager = DownloadRequestManager(persistentStorage: persistentStorage, downloadDelegate: dlDelegate)
-        let dlManager = DownloadManager(name: "PlayableDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, eventLogger: eventLogger)
+        let dlManager = DownloadManager(name: "PlayableDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
         
         let configuration = URLSessionConfiguration.background(withIdentifier: "\(Bundle.main.bundleIdentifier!).PlayableDownloader.background")
         var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
@@ -76,7 +79,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
         let requestManager = DownloadRequestManager(persistentStorage: persistentStorage, downloadDelegate: dlDelegate)
         requestManager.clearAllDownloads()
-        let dlManager = DownloadManager(name: "ArtworkDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, eventLogger: eventLogger)
+        let dlManager = DownloadManager(name: "ArtworkDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
         dlManager.isFailWithPopupError = false
         
         let configuration = URLSessionConfiguration.default
@@ -84,9 +87,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dlManager.urlSession = urlSession
         
         return dlManager
-    }()
-    lazy var uiArtworkUpdater = {
-        return UIArtworkUpdateManager(persistentStorage: persistentStorage)
     }()
     lazy var libraryUpdater = {
         return LibraryUpdater(persistentStorage: persistentStorage, backendApi: backendApi)

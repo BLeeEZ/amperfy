@@ -21,7 +21,7 @@ class PodcastTableCell: BasicTableCell {
         self.podcast = podcast
         self.rootView = rootView
         podcastLabel.text = podcast.title
-        podcastImage.displayAndUpdate(entity: podcast, via: appDelegate.artworkDownloadManager)
+        podcastImage.displayAndUpdate(entity: podcast)
         infoLabel.text = podcast.info(for: appDelegate.backendProxy.selectedApi, type: .short)
     }
 

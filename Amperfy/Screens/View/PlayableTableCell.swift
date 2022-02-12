@@ -41,7 +41,7 @@ class PlayableTableCell: BasicTableCell {
         titleLabel.attributedText = NSMutableAttributedString(string: playable.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         
         artistLabel.text = playable.creatorName
-        artworkImage.displayAndUpdate(entity: playable, via: appDelegate.artworkDownloadManager)
+        artworkImage.displayAndUpdate(entity: playable)
         
         if playerIndexCb != nil {
             self.reorderLabel?.isHidden = false

@@ -31,7 +31,7 @@ class PodcastDetailTableHeader: UIView {
         titleLabel.text = podcast.title
         titleLabel.lineBreakMode = .byWordWrapping
         titleLabel.numberOfLines = 0
-        podcastImage.displayAndUpdate(entity: podcast, via: appDelegate.artworkDownloadManager)
+        podcastImage.displayAndUpdate(entity: podcast)
         infoLabel.applyAmperfyStyle()
         infoLabel.text = podcast.info(for: appDelegate.backendProxy.selectedApi, type: .long)
         descriptionLabel.text = podcast.depiction

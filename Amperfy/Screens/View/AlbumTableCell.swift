@@ -23,7 +23,7 @@ class AlbumTableCell: BasicTableCell {
         self.rootView = rootView
         albumLabel.text = album.name
         artistLabel.text = album.artist?.name
-        artworkImage.displayAndUpdate(entity: album, via: appDelegate.artworkDownloadManager)
+        artworkImage.displayAndUpdate(entity: album)
         infoLabel.text = album.info(for: appDelegate.backendProxy.selectedApi, type: .short)
     }
 

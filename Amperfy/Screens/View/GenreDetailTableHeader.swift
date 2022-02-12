@@ -31,7 +31,7 @@ class GenreDetailTableHeader: UIView {
         nameLabel.text = genre.name
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
-        genreImage.displayAndUpdate(entity: genre, via: appDelegate.artworkDownloadManager)
+        genreImage.displayAndUpdate(entity: genre)
         infoLabel.applyAmperfyStyle()
         infoLabel.text = genre.info(for: appDelegate.backendProxy.selectedApi, type: .long)
     }

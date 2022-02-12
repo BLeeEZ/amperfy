@@ -51,7 +51,7 @@ class PlaylistDetailTableHeader: UIView {
         let playables = playlist.playables
         for (index, artImage) in images.enumerated() {
             guard playables.count > index else { break }
-            artImage.displayAndUpdate(entity: playables[index], via: appDelegate.artworkDownloadManager)
+            artImage.displayAndUpdate(entity: playables[index])
         }
     }
     

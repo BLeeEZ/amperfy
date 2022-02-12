@@ -1,7 +1,7 @@
 import UIKit
 import CoreData
 
-class DirectoryTableCell: BasicTableCell, UIArtworkUpdatable {
+class DirectoryTableCell: BasicTableCell {
     
     @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var artworkImage: LibraryEntityImage!
@@ -17,13 +17,11 @@ class DirectoryTableCell: BasicTableCell, UIArtworkUpdatable {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        appDelegate.uiArtworkUpdater.add(directoryCell: self)
+        appDelegate.notificationHandler.register(self, selector: #selector(self.artworkDownloadFinishedSuccessful(notification:)), name: .downloadFinishedSuccess, object: appDelegate.artworkDownloadManager)
     }
     
     deinit {
-        let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        appDelegate.uiArtworkUpdater.remove(directoryCell: self)
+        appDelegate.notificationHandler.remove(self, name: .downloadFinishedSuccess, object: appDelegate.artworkDownloadManager)
     }
 
     func display(folder: MusicFolder) {
@@ -41,7 +39,15 @@ class DirectoryTableCell: BasicTableCell, UIArtworkUpdatable {
         refresh()
     }
     
-    internal func refresh() {
+    @objc private func artworkDownloadFinishedSuccessful(notification: Notification) {
+        if let downloadNotification = DownloadNotification.fromNotification(notification),
+           let artwork = entity?.artwork,
+           artwork.uniqueID == downloadNotification.id {
+            refresh()
+        }
+    }
+    
+    private func refresh() {
         iconLabel.isHidden = true
         artworkImage.isHidden = true
         
