@@ -31,7 +31,7 @@ class SsIndexesParserTest: AbstractSsParserTest {
         var song = songs[0]
         XCTAssertEqual(song.id, "111")
         XCTAssertEqual(song.title, "Dancing Queen")
-        XCTAssertNil(song.artist)
+        XCTAssertEqual(song.artist?.name, "ABBA")
         XCTAssertNil(song.album)
         XCTAssertNil(song.disk)
         XCTAssertEqual(song.track, 7)
@@ -50,7 +50,7 @@ class SsIndexesParserTest: AbstractSsParserTest {
         song = songs[1]
         XCTAssertEqual(song.id, "112")
         XCTAssertEqual(song.title, "Money, Money, Money")
-        XCTAssertNil(song.artist)
+        XCTAssertEqual(song.artist?.name, "ABBA")
         XCTAssertNil(song.album)
         XCTAssertNil(song.disk)
         XCTAssertEqual(song.track, 7)

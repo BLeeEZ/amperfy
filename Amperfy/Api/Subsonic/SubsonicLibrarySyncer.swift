@@ -36,7 +36,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         subsonicServerApi.requestArtists(parserDelegate: artistParser)
         syncLibrary.saveContext()
          
-        let artists = syncLibrary.getArtists()
+        let artists = syncLibrary.getArtists().filter{ !$0.id.isEmpty }
         albumCount = artists.count
         statusNotifyier?.notifySyncStarted(ofType: .album)
         let artistBatches = artists.chunked(intoSubarrayCount: taskGroup.maxTaskSlots)
@@ -59,6 +59,19 @@ class SubsonicLibrarySyncer: LibrarySyncer {
             }
         }
         taskGroup.waitTillAllTasksFinished()
+        // Delete duplicated artists due to concurrence
+        let allArtists = syncLibrary.getArtists()
+        var uniqueArtists: [String: Artist] = [:]
+        for artist in allArtists {
+            if uniqueArtists[artist.id] != nil {
+                let artistAlbums = artist.albums
+                artistAlbums.forEach{ $0.artist = uniqueArtists[artist.id] }
+                os_log("Delete multiple Artist <%s> with id %s", log: log, type: .info, artist.name, artist.id)
+                syncLibrary.deleteArtist(artist: artist)
+            } else {
+                uniqueArtists[artist.id] = artist
+            }
+        }
         // Delete duplicated albums due to concurrence
         let albums = syncLibrary.getAlbums()
         var uniqueAlbums: [String: Album] = [:]
@@ -99,7 +112,9 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func sync(artist: Artist, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard let syncWave = library.getLatestSyncWave(),
+              !artist.id.isEmpty
+        else { return }
         let artistParser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestArtist(parserDelegate: artistParser, id: artist.id)
         for album in artist.albums {

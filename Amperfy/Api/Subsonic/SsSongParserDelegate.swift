@@ -38,6 +38,16 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
                     os_log("Artist <%s> with id %s has been created", log: log, type: .error, artistName, artistId)
                     songBuffer?.artist = artist
                 }
+            } else if let songBuffer = songBuffer, songBuffer.artist == nil, let artistName = attributeDict["artist"] {
+                if let existingLocalArtist = library.getArtistLocal(name: artistName) {
+                    songBuffer.artist = existingLocalArtist
+                } else {
+                    let artist = library.createArtist()
+                    artist.name = artistName
+                    artist.syncInfo = syncWave
+                    songBuffer.artist = artist
+                    os_log("Local Artist <%s> has been created (no id)", log: log, type: .error, artistName)
+                }
             }
 
             if let albumId = attributeDict["albumId"] {

@@ -53,7 +53,7 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
         song = songs[1]
         XCTAssertEqual(song.id, "112")
         XCTAssertEqual(song.title, "Money, Money, Money")
-        XCTAssertNil(song.artist)
+        XCTAssertEqual(song.artist?.name, "ABBA")
         XCTAssertNil(song.album)
         XCTAssertNil(song.disk)
         XCTAssertEqual(song.track, 7)

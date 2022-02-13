@@ -127,6 +127,10 @@ class LibraryStorage: PlayableFileCachable {
         return Artist(managedObject: artistMO)
     }
     
+    func deleteArtist(artist: Artist) {
+        context.delete(artist.managedObject)
+    }
+    
     func createAlbum() -> Album {
         let albumMO = AlbumMO(context: context)
         return Album(managedObject: albumMO)
@@ -610,6 +614,17 @@ class LibraryStorage: PlayableFileCachable {
     func getArtist(id: String) -> Artist? {
         let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(ArtistMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let artists = try? context.fetch(fetchRequest)
+        return artists?.lazy.compactMap{ Artist(managedObject: $0) }.first
+    }
+    
+    func getArtistLocal(name: String) -> Artist? {
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == %@", #keyPath(ArtistMO.id), ""),
+            NSPredicate(format: "%K == %@", #keyPath(ArtistMO.name), NSString(string: name))
+        ])
         fetchRequest.fetchLimit = 1
         let artists = try? context.fetch(fetchRequest)
         return artists?.lazy.compactMap{ Artist(managedObject: $0) }.first
