@@ -6,7 +6,7 @@ class SearchVC: BasicTableViewController {
     private var playlistFetchedResultsController: PlaylistFetchedResultsController!
     private var artistFetchedResultsController: ArtistFetchedResultsController!
     private var albumFetchedResultsController: AlbumFetchedResultsController!
-    private var songFetchedResultsController: SongFetchedResultsController!
+    private var songFetchedResultsController: SongsFetchedResultsController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,7 +17,7 @@ class SearchVC: BasicTableViewController {
         artistFetchedResultsController.delegate = self
         albumFetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         albumFetchedResultsController.delegate = self
-        songFetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        songFetchedResultsController = SongsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         songFetchedResultsController.delegate = self
         
         configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"])

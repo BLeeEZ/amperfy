@@ -12,6 +12,13 @@ extension SongMO: CoreDataIdentifyable {
         return \SongMO.title
     }
     
+    static var excludeServerDeleteUncachedSongsFetchPredicate: NSPredicate {
+        return NSCompoundPredicate(orPredicateWithSubpredicates: [
+            NSPredicate(format: "%K > 0", #keyPath(SongMO.size)),
+            NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
+        ])
+    }
+    
     static var trackNumberSortedFetchRequest: NSFetchRequest<SongMO> {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fetchRequest.sortDescriptors = [

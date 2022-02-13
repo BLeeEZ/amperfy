@@ -3,7 +3,7 @@ import CoreData
 
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
-    private var fetchedResultsController: SongFetchedResultsController!
+    private var fetchedResultsController: SongsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var displayFilter: DisplayCategoryFilter = .all
     
@@ -11,7 +11,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.songs)
         
-        fetchedResultsController = SongFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = SongsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Songs\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
