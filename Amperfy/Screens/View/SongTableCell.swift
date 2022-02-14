@@ -47,6 +47,8 @@ class SongTableCell: BasicTableCell {
 
         if !isAlertPresented && (song.isCached || appDelegate.persistentStorage.settings.isOnlineMode) {
             hideSearchBarKeyboardInRootView()
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
             appDelegate.player.play(context: context)
         }
         isAlertPresented = false

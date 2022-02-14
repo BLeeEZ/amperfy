@@ -85,19 +85,21 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         queueHandler.appendContextQueue(playables: context.playables)
         queueHandler.contextName = context.name
         if !wasUserQueuePlaying {
-            if queueHandler.userQueue.isEmpty {
-                if context.index == 0 {
-                    insertIntoPlayer(playable: activePlayable)
-                } else {
-                    play(playerIndex: PlayerIndex(queueType: .next, index: context.index-1))
-                }
+            if context.index == 0 {
+                insertIntoPlayer(playable: activePlayable)
             } else {
+                play(playerIndex: PlayerIndex(queueType: .next, index: context.index-1))
+            }
+            if let topUserQueueItem = topUserQueueItem {
+                queueHandler.insertUserQueue(playables: [topUserQueueItem])
                 play(playerIndex: PlayerIndex(queueType: .user, index: 0))
             }
+        } else if context.index > 0, let currentlyPlayingElement = currentlyPlaying {
+            _ = queueHandler.markAndGetPlayableAsPlaying(at: PlayerIndex(queueType: .next, index: context.index-1))
+            queueHandler.insertUserQueue(playables: [currentlyPlayingElement])
+            _ = queueHandler.markAndGetPlayableAsPlaying(at: PlayerIndex(queueType: .user, index: 0))
         }
-        if let topUserQueueItem = topUserQueueItem, !wasUserQueuePlaying {
-            queueHandler.insertUserQueue(playables: [topUserQueueItem])
-        }
+        play()
     }
     
     func play(playerIndex: PlayerIndex) {
@@ -105,6 +107,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
             stop()
             return
         }
+        print("insertIntoPlayer id: \(playable.id)")
         insertIntoPlayer(playable: playable)
     }
     
