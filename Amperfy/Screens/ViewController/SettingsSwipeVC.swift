@@ -20,6 +20,15 @@ class SettingsSwipeVC: UITableViewController {
         tableView.isEditing = true
         tableView.reloadData()
     }
+    
+    // handle dark/light mode change
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        for visibleCell in tableView.visibleCells {
+            let cell = visibleCell as! SwipeActionTableCell
+            cell.refreshStyle()
+        }
+    }
 
     // MARK: - Table view data source
     
