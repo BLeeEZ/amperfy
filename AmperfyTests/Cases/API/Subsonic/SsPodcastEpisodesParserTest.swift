@@ -23,7 +23,7 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
         XCTAssertEqual(episode.depiction, "This week Dr Chris fills us in on the UK's largest free science festival, plus all this week's big scientific discoveries.")
         XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1296744403) //"2011-02-03T14:46:43"
         XCTAssertEqual(episode.streamId, "523")
-        XCTAssertEqual(episode.remoteStatus, .completed)
+        XCTAssertEqual(episode.podcastStatus, .completed)
         XCTAssertEqual(episode.podcast, podcast)
         XCTAssertNil(episode.disk)
         XCTAssertEqual(episode.track, 0)
@@ -43,7 +43,7 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
         XCTAssertEqual(episode.depiction, "This week Dr Karl tells the gruesome tale of a surgeon who operated on himself.")
         XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1315068472) // "2011-09-03T16:47:52"
         XCTAssertEqual(episode.streamId, "524")
-        XCTAssertEqual(episode.remoteStatus, .completed)
+        XCTAssertEqual(episode.podcastStatus, .completed)
         XCTAssertEqual(episode.podcast, podcast)
         XCTAssertNil(episode.disk)
         XCTAssertEqual(episode.track, 0)

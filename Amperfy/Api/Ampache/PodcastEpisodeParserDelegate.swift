@@ -56,7 +56,7 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
                 os_log("Pubdate <%s> could not be parsed of podcast episode", log: log, type: .error, buffer)
             }
         case "state":
-            episodeBuffer?.remoteStatus = PodcastEpisodeRemoteStatus.create(from: buffer)
+            episodeBuffer?.podcastStatus = PodcastEpisodeRemoteStatus.create(from: buffer)
         case "filelength":
             episodeBuffer?.remoteDuration = buffer.asDurationInSeconds ?? 0
         case "filesize":

@@ -22,6 +22,7 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
                 albumBuffer?.id = albumId
                 albumBuffer?.syncInfo = syncWave
             }
+            albumBuffer?.remoteStatus = .available
             
             if let attributeAlbumtName = attributeDict["name"] {
                 albumBuffer?.name = attributeAlbumtName

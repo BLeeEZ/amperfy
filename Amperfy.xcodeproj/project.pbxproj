@@ -560,6 +560,7 @@
 		5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayerTest.swift; sourceTree = "<group>"; };
 		50964D5723B54BBA00B685B2 /* Amperfy v3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v3.xcdatamodel"; sourceTree = "<group>"; };
 		50973ADC2636E4C4005497CA /* SsGenreParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SsGenreParserDelegate.swift; sourceTree = "<group>"; };
+		50A01FBD27BCD4BD000368EF /* Amperfy v20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v20.xcdatamodel"; sourceTree = "<group>"; };
 		50A12F402739203E00E7B2AA /* Amperfy v15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v15.xcdatamodel"; sourceTree = "<group>"; };
 		50A12F412739239800E7B2AA /* EmbeddedArtworkMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmbeddedArtworkMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50A12F422739239800E7B2AA /* EmbeddedArtworkMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmbeddedArtworkMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -2182,6 +2183,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				50A01FBD27BCD4BD000368EF /* Amperfy v20.xcdatamodel */,
 				50A79E0C27A80E2A002E0D2D /* Amperfy v19.xcdatamodel */,
 				5067E37727916AE100807A78 /* Amperfy v18.xcdatamodel */,
 				50048F9E275A9AA10087EDFB /* Amperfy v17.xcdatamodel */,
@@ -2202,7 +2204,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 50A79E0C27A80E2A002E0D2D /* Amperfy v19.xcdatamodel */;
+			currentVersion = 50A01FBD27BCD4BD000368EF /* Amperfy v20.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

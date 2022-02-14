@@ -28,8 +28,10 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
             if let artistId = attributeDict["artistId"] {
                 if let guessedArtist = guessedArtist, guessedArtist.id == artistId {
                     songBuffer?.artist = guessedArtist
+                    songBuffer?.artist?.remoteStatus = .available
                 } else if let artist = library.getArtist(id: artistId) {
                     songBuffer?.artist = artist
+                    songBuffer?.artist?.remoteStatus = .available
                 } else if let artistName = attributeDict["artist"] {
                     let artist = library.createArtist()
                     artist.id = artistId
@@ -53,8 +55,10 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
             if let albumId = attributeDict["albumId"] {
                 if let guessedAlbum = guessedAlbum, guessedAlbum.id == albumId {
                     songBuffer?.album = guessedAlbum
+                    songBuffer?.album?.remoteStatus = .available
                 } else if let album = library.getAlbum(id: albumId) {
                     songBuffer?.album = album
+                    songBuffer?.album?.remoteStatus = .available
                 } else if let albumName = attributeDict["album"] {
                     let album = library.createAlbum()
                     album.id = albumId

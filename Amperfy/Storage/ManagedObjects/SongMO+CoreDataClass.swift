@@ -14,8 +14,11 @@ extension SongMO: CoreDataIdentifyable {
     
     static var excludeServerDeleteUncachedSongsFetchPredicate: NSPredicate {
         return NSCompoundPredicate(orPredicateWithSubpredicates: [
-            NSPredicate(format: "%K > 0", #keyPath(SongMO.size)),
-            NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
+            NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "%K > 0", #keyPath(SongMO.size)),
+                NSPredicate(format: "%K == %i", #keyPath(SongMO.album.remoteStatus), RemoteStatus.available.rawValue)
+            ]),
+            NSPredicate(format: "%K != nil", #keyPath(SongMO.file)),
         ])
     }
     

@@ -105,8 +105,13 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         for album in genre.albums {
             let albumParser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
             subsonicServerApi.requestAlbum(parserDelegate: albumParser, id: album.id)
-            let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-            subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+            if let error = albumParser.error?.asSubsonicError, !error.isRemoteAvailable {
+                os_log("Album <%s> is remote deleted", log: log, type: .info, album.name)
+                album.remoteStatus = .deleted
+            } else {
+                let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+                subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+            }
         }
         library.saveContext()
     }
@@ -117,11 +122,20 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         else { return }
         let artistParser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestArtist(parserDelegate: artistParser, id: artist.id)
+        if let error = artistParser.error?.asSubsonicError, !error.isRemoteAvailable {
+            os_log("Artist <%s> is remote deleted", log: log, type: .info, artist.name)
+            artist.remoteStatus = .deleted
+        }
         for album in artist.albums {
             let albumParser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
             subsonicServerApi.requestAlbum(parserDelegate: albumParser, id: album.id)
-            let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-            subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+            if let error = albumParser.error?.asSubsonicError, !error.isRemoteAvailable {
+                os_log("Album <%s> is remote deleted", log: log, type: .info, album.name)
+                album.remoteStatus = .deleted
+            } else {
+                let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+                subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+            }
         }
         library.saveContext()
     }
@@ -130,8 +144,13 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         guard let syncWave = library.getLatestSyncWave() else { return }
         let albumParser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestAlbum(parserDelegate: albumParser, id: album.id)
-        let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+        if let error = albumParser.error?.asSubsonicError, !error.isRemoteAvailable {
+            os_log("Album <%s> is remote deleted", log: log, type: .info, album.name)
+            album.remoteStatus = .deleted
+        } else {
+            let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+            subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+        }
         library.saveContext()
     }
     
@@ -274,7 +293,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         library.saveContext()
         
         let deletedEpisodes = oldEpisodes.subtracting(podcastEpisodeParser.parsedEpisodes)
-        deletedEpisodes.forEach { $0.remoteStatus = .deleted }
+        deletedEpisodes.forEach { $0.podcastStatus = .deleted }
         library.saveContext()
     }
     

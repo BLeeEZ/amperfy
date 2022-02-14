@@ -27,7 +27,7 @@ class PodcastEpisodesParserTest: AbstractAmpacheTest {
         XCTAssertEqual(episode.depiction, "Today we bring you the third episode in a new podcast series: COVID, Quickly. Every two weeks, Scientific American’s senior health editors Tanya...\n")
         XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1616815800)//"3/27/21, 3:30 AM"
         XCTAssertNil(episode.streamId)
-        XCTAssertEqual(episode.remoteStatus, .completed)
+        XCTAssertEqual(episode.podcastStatus, .completed)
         XCTAssertEqual(episode.podcast, podcast)
         XCTAssertNil(episode.disk)
         XCTAssertEqual(episode.track, 0)
@@ -48,7 +48,7 @@ class PodcastEpisodesParserTest: AbstractAmpacheTest {
         XCTAssertEqual(episode.depiction, "Can you pick a lock with just a smartphone? New research shows that doing so is possible.")
         XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1616104800)//"3/18/21, 10:00 PM"
         XCTAssertNil(episode.streamId)
-        XCTAssertEqual(episode.remoteStatus, .downloading)
+        XCTAssertEqual(episode.podcastStatus, .downloading)
         XCTAssertEqual(episode.podcast, podcast)
         XCTAssertNil(episode.disk)
         XCTAssertEqual(episode.track, 0)
@@ -69,7 +69,7 @@ class PodcastEpisodesParserTest: AbstractAmpacheTest {
         XCTAssertEqual(episode.depiction, "New research tries to tease out whether our closest animal relatives can be selfless.")
         XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1615933800)//"3/16/21, 10:30 PM"
         XCTAssertNil(episode.streamId)
-        XCTAssertEqual(episode.remoteStatus, .downloading)
+        XCTAssertEqual(episode.podcastStatus, .downloading)
         XCTAssertEqual(episode.podcast, podcast)
         XCTAssertNil(episode.disk)
         XCTAssertEqual(episode.track, 0)

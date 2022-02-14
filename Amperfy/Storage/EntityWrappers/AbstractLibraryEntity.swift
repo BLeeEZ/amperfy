@@ -1,6 +1,11 @@
 import Foundation
 import UIKit
 
+enum RemoteStatus: Int {
+    case available = 0
+    case deleted = 1
+}
+
 public class AbstractLibraryEntity {
 
     private let managedObject: AbstractLibraryEntityMO
@@ -24,6 +29,13 @@ public class AbstractLibraryEntity {
         set {
             guard Int16.isValid(value: newValue), managedObject.rating != Int16(newValue), newValue >= 0, newValue <= 5 else { return }
             managedObject.rating = Int16(newValue)
+        }
+    }
+    var remoteStatus: RemoteStatus {
+        get { return RemoteStatus(rawValue: Int(managedObject.remoteStatus)) ?? .available }
+        set {
+            guard Int16.isValid(value: newValue.rawValue), managedObject.remoteStatus != Int16(newValue.rawValue) else { return }
+            managedObject.remoteStatus = Int16(newValue.rawValue)
         }
     }
     var artwork: Artwork? {

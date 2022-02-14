@@ -290,7 +290,7 @@ class LibraryEntityDetailVC: UIViewController {
            (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
            (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode)
         addToPlaylistButton.isHidden = true
-        deleteOnServerButton.isHidden = podcastEpisode.remoteStatus == .deleted || appDelegate.persistentStorage.settings.isOfflineMode
+        deleteOnServerButton.isHidden = podcastEpisode.podcastStatus == .deleted || appDelegate.persistentStorage.settings.isOfflineMode
         configurePlayerStack()
     }
     

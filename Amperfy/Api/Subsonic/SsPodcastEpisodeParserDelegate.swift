@@ -41,7 +41,7 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
                 episodeBuffer?.publishDate = dateFormatter.date(from: dateWithoutTimeZoneString) ?? Date(timeIntervalSince1970: TimeInterval())
             }
             if let status = attributeDict["status"] {
-                episodeBuffer?.remoteStatus = PodcastEpisodeRemoteStatus.create(from: status)
+                episodeBuffer?.podcastStatus = PodcastEpisodeRemoteStatus.create(from: status)
             }
             if let streamId = attributeDict["streamId"] {
                 episodeBuffer?.streamId = streamId

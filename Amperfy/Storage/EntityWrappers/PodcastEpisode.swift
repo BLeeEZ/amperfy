@@ -83,16 +83,16 @@ public class PodcastEpisode: AbstractPlayable {
         get { return managedObject.publishDate ?? Date() }
         set { if managedObject.publishDate != newValue { managedObject.publishDate = newValue } }
     }
-    var remoteStatus: PodcastEpisodeRemoteStatus {
+    var podcastStatus: PodcastEpisodeRemoteStatus {
         get { return PodcastEpisodeRemoteStatus(rawValue: Int(managedObject.status)) ?? .undefined }
         set { if managedObject.status != newValue.rawValue { managedObject.status = Int16(newValue.rawValue) } }
     }
     var userStatus: PodcastEpisodeUserStatus {
         if isCached {
             return .cached
-        } else if remoteStatus == .completed {
+        } else if podcastStatus == .completed {
             return .availableOnServer
-        } else if remoteStatus == .deleted {
+        } else if podcastStatus == .deleted {
             return .deleted
         } else {
             return .syncingOnServer
@@ -139,7 +139,7 @@ public class PodcastEpisode: AbstractPlayable {
 
         info += " description: \(depiction ?? "-")"
         info += " publishDate: \(publishDate.asIso8601String),"
-        info += " remoteStatus: \(remoteStatus)"
+        info += " podcastStatus: \(podcastStatus)"
         info += ")"
         return info
     }

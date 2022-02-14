@@ -2,9 +2,16 @@ import Foundation
 import CoreData
 import os.log
 
+extension ResponseError {
+    var asAmpacheError: AmpacheXmlServerApi.AmpacheError? {
+        return AmpacheXmlServerApi.AmpacheError(rawValue: statusCode)
+    }
+}
+
 class AmpacheXmlServerApi {
     
     enum AmpacheError: Int {
+        case empty = 0
         case accessControlNotEnabled = 4700 // The API is disabled. Enable 'access_control' in your config
         case receivedInvalidHandshake = 4701 //This is a temporary error, this means no valid session was passed or the handshake failed
         case accessDenied = 4703 // The requested method is not available
@@ -16,8 +23,12 @@ class AmpacheXmlServerApi {
                                 // You can check the error message for details, but do not re-attempt the exact same request
         case failedAccessCheck = 4742 // Access denied to the requested object or function for this user
         
-        static func shouldErrorBeDisplayedToUser(statusCode: Int) -> Bool {
-            return statusCode != 0 && statusCode != AmpacheError.notFound.rawValue
+        var shouldErrorBeDisplayedToUser: Bool {
+            return self != .empty && self != .notFound
+        }
+        
+        var isRemoteAvailable: Bool {
+            return self != .notFound
         }
     }
     
@@ -511,8 +522,8 @@ class AmpacheXmlServerApi {
         let parser = XMLParser(contentsOf: url)!
         parser.delegate = parserDelegate
         parser.parse()
-        if let error = parserDelegate.error, AmpacheError.shouldErrorBeDisplayedToUser(statusCode: error.statusCode) {
-            eventLogger.report(error: error, displayPopup: true)
+        if let error = parserDelegate.error, let ampacheError = error.asAmpacheError, ampacheError != .empty {
+            eventLogger.report(error: error, displayPopup: ampacheError.shouldErrorBeDisplayedToUser)
         }
     }
 

@@ -10,7 +10,34 @@ enum SubsonicApiAuthType: Int {
     case legacy = 1
 }
 
+extension ResponseError {
+    var asSubsonicError: SubsonicServerApi.SubsonicError? {
+        return SubsonicServerApi.SubsonicError(rawValue: statusCode)
+    }
+}
+
+
 class SubsonicServerApi {
+    
+    enum SubsonicError: Int {
+        case generic = 0 // A generic error.
+        case requiredParameterMissing = 10 // Required parameter is missing.
+        case clientVersionToLow = 20 // Incompatible Subsonic REST protocol version. Client must upgrade.
+        case serverVerionToLow = 30 // Incompatible Subsonic REST protocol version. Server must upgrade.
+        case wrongUsernameOrPassword = 40 // Wrong username or password.
+        case tokenAuthenticationNotSupported = 41 // Token authentication not supported for LDAP users.
+        case userIsNotAuthorized = 50 // User is not authorized for the given operation.
+        case trialPeriodForServerIsOver = 60 // The trial period for the Subsonic server is over. Please upgrade to Subsonic Premium. Visit subsonic.org for details.
+        case requestedDataNotFound = 70 // The requested data was not found.
+        
+        var shouldErrorBeDisplayedToUser: Bool {
+            return self != .requestedDataNotFound
+        }
+
+        var isRemoteAvailable: Bool {
+            return self != .requestedDataNotFound
+        }
+    }
     
     static let defaultClientApiVersionWithToken = SubsonicVersion(major: 1, minor: 13, patch: 0)
     static let defaultClientApiVersionPreToken = SubsonicVersion(major: 1, minor: 11, patch: 0)
@@ -375,8 +402,8 @@ class SubsonicServerApi {
         let parser = XMLParser(contentsOf: url)!
         parser.delegate = parserDelegate
         parser.parse()
-        if !ignoreErrorResponse, let error = parserDelegate.error {
-            eventLogger.report(error: error, displayPopup: true)
+        if !ignoreErrorResponse, let error = parserDelegate.error, let subsonicError = error.asSubsonicError {
+            eventLogger.report(error: error, displayPopup: subsonicError.shouldErrorBeDisplayedToUser)
         }
     }
     
