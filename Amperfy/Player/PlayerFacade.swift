@@ -171,18 +171,22 @@ class PlayerFacadeImpl: PlayerFacade {
     
     func insertContextQueue(playables: [AbstractPlayable]) {
         queueHandler.insertContextQueue(playables: playables)
+        musicPlayer.notifyPlaylistUpdated()
     }
     
     func appendContextQueue(playables: [AbstractPlayable]) {
         queueHandler.appendContextQueue(playables: playables)
+        musicPlayer.notifyPlaylistUpdated()
     }
 
     func insertUserQueue(playables: [AbstractPlayable]) {
         queueHandler.insertUserQueue(playables: playables)
+        musicPlayer.notifyPlaylistUpdated()
     }
     
     func appendUserQueue(playables: [AbstractPlayable]) {
         queueHandler.appendUserQueue(playables: playables)
+        musicPlayer.notifyPlaylistUpdated()
     }
 
     func removePlayable(at: PlayerIndex) {
@@ -212,6 +216,7 @@ class PlayerFacadeImpl: PlayerFacade {
         musicPlayer.stop()
         clearContextQueue()
         queueHandler.clearUserQueue()
+        musicPlayer.notifyPlayerStopped()
     }
 
     func play() {

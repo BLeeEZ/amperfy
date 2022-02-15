@@ -5,14 +5,21 @@ import LNPopupController
 class TabBarVC: UITabBarController {
     
     var appDelegate: AppDelegate!
+    var popupPlayer: PopupPlayerVC?
+    var isPopupPlayerInitialized = false
+    var isPopupBarDisplayed = false
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.player.addNotifier(notifier: self)
+    }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        
-        let popupPlayer = PopupPlayerVC.instantiateFromAppStoryboard()
-        popupPlayer.hostingTabBarVC = self
-        self.presentPopupBar(withContentViewController: popupPlayer, animated: true, completion: nil)
+        self.popupPlayer = PopupPlayerVC.instantiateFromAppStoryboard()
+        popupPlayer?.hostingTabBarVC = self
+        displayPopupBar()
         self.popupBar.tintColor = UIColor.defaultBlue
         self.popupBar.imageView.layer.cornerRadius = 5
         self.popupBar.progressViewStyle = .bottom
@@ -35,6 +42,31 @@ class TabBarVC: UITabBarController {
         } else {
             displayNotificationAuthorization()
         }
+    }
+    
+    private func handlePopupBar() {
+        if appDelegate.player.currentlyPlaying != nil {
+            displayPopupBar()
+        } else {
+            hidePopupPlayer()
+        }
+    }
+    
+    private func displayPopupBar() {
+        guard let popupPlayer = popupPlayer, !isPopupBarDisplayed, appDelegate.player.currentlyPlaying != nil else { return }
+        isPopupBarDisplayed = true
+        if isPopupPlayerInitialized {
+            popupPlayer.reloadData()
+        }
+        self.presentPopupBar(withContentViewController: popupPlayer, animated: true, completion: nil)
+        isPopupPlayerInitialized = true
+    }
+    
+    private func hidePopupPlayer() {
+        guard let popupPlayer = popupPlayer, isPopupBarDisplayed else { return }
+        isPopupBarDisplayed = false
+        popupPlayer.reloadData()
+        self.dismissPopupBar(animated: false, completion: nil)
     }
     
     private func displaySyncInfo() {
@@ -72,4 +104,23 @@ class TabBarVC: UITabBarController {
         }
     }
 
+}
+
+extension TabBarVC: MusicPlayable {
+    func didStartPlaying() {
+        handlePopupBar()
+    }
+    func didPause() {
+        handlePopupBar()
+    }
+    func didStopPlaying() {
+        handlePopupBar()
+    }
+    func didElapsedTimeChange() { }
+    func didPlaylistChange() {
+        handlePopupBar()
+    }
+    func didArtworkChange() { }
+    func didShuffleChange() { }
+    func didRepeatChange() { }
 }

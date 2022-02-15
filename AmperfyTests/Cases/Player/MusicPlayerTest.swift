@@ -681,11 +681,9 @@ class MusicPlayerTest: XCTestCase {
         playerData.removeAllItems()
         playerData.isUserQueuePlaying = false
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
-        print("\(songId0.id)")
         testPlayer.appendUserQueue(playables: [songId0])
 
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-        print("\(songId1.id)")
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)

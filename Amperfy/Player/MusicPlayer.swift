@@ -107,7 +107,6 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
             stop()
             return
         }
-        print("insertIntoPlayer id: \(playable.id)")
         insertIntoPlayer(playable: playable)
     }
     
