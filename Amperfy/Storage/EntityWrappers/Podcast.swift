@@ -44,7 +44,7 @@ extension Podcast: PlayableContainable  {
         var infoContent = [String]()
         if episodes.count == 1 {
             infoContent.append("1 Episode")
-        } else {
+        } else if episodes.count > 1 {
             infoContent.append("\(episodes.count) Episodes")
         }
         if type == .long {

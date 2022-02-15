@@ -96,10 +96,10 @@ class LibraryEntityDetailVC: UIViewController {
         playerStackView.isHidden = true
         refresh()
 
-        Self.configureRoundQueueButton(button: userQueueInsertButton, corner: .layerMinXMinYCorner)
-        Self.configureRoundQueueButton(button: userQueueAppendButton, corner: .layerMaxXMinYCorner)
-        Self.configureRoundQueueButton(button: contextQueueInsertButton, corner: .layerMinXMaxYCorner)
-        Self.configureRoundQueueButton(button: contextQueueAppendButton, corner: .layerMaxXMaxYCorner)
+        Self.configureRoundQueueButton(button: contextQueueInsertButton, corner: .layerMinXMinYCorner)
+        Self.configureRoundQueueButton(button: userQueueInsertButton, corner: .layerMaxXMinYCorner)
+        Self.configureRoundQueueButton(button: contextQueueAppendButton, corner: .layerMinXMaxYCorner)
+        Self.configureRoundQueueButton(button: userQueueAppendButton, corner: .layerMaxXMaxYCorner)
 
         if !playButton.isHidden {
             playButton.imageView?.contentMode = .scaleAspectFit

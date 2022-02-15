@@ -3,10 +3,9 @@ import UIKit
 class GenreTableCell: BasicTableCell {
     
     @IBOutlet weak var genreLabel: UILabel!
-    @IBOutlet weak var artworkImage: LibraryEntityImage!
     @IBOutlet weak var infoLabel: UILabel!
     
-    static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
+    static let rowHeight: CGFloat = 38.0 + margin.bottom + margin.top
     
     private var genre: Genre?
     private var rootView: UITableViewController?
@@ -21,7 +20,6 @@ class GenreTableCell: BasicTableCell {
         self.genre = genre
         self.rootView = rootView
         genreLabel.text = genre.name
-        artworkImage.displayAndUpdate(entity: genre)
         infoLabel.text = genre.info(for: appDelegate.backendProxy.selectedApi, type: .short)
     }
     

@@ -166,8 +166,19 @@
                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="0rd-B5-V1p" userLabel="UserQueueStackView">
                                     <rect key="frame" x="0.0" y="9" width="984" height="40"/>
                                     <subviews>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ccE-KC-Sa9" userLabel="UserQueueInsert" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kjv-5v-4aM" userLabel="ContextQueueInsert" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="491.5" height="40"/>
+                                            <color key="backgroundColor" systemColor="systemFillColor"/>
+                                            <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <inset key="imageEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Insert Context Queue" image="context_queue_insert"/>
+                                            <connections>
+                                                <action selector="pressedInsertContextQueue:" destination="-1" eventType="touchUpInside" id="2Zy-02-NDD"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ccE-KC-Sa9" userLabel="UserQueueInsert" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="492.5" y="0.0" width="491.5" height="40"/>
                                             <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
@@ -175,16 +186,6 @@
                                             <state key="normal" title="Insert User Queue" image="user_queue_insert"/>
                                             <connections>
                                                 <action selector="pressedInsertUserQueue:" destination="-1" eventType="touchUpInside" id="TWN-e4-1aX"/>
-                                            </connections>
-                                        </button>
-                                        <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="op5-Jc-HYB" userLabel="UserQueueAppend" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="492.5" y="0.0" width="491.5" height="40"/>
-                                            <color key="backgroundColor" systemColor="systemFillColor"/>
-                                            <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
-                                            <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
-                                            <state key="normal" title="Append User Queue" image="user_queue_append"/>
-                                            <connections>
-                                                <action selector="pressedAppendUserQueue:" destination="-1" eventType="touchUpInside" id="bgL-aQ-WK3"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -197,25 +198,24 @@
                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="YHf-HP-LxX" userLabel="ContextQueueStackView">
                                     <rect key="frame" x="0.0" y="50" width="984" height="40"/>
                                     <subviews>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kjv-5v-4aM" userLabel="ContextQueueInsert" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cvP-d9-XH3" userLabel="ContextQueueAppend" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="491.5" height="40"/>
-                                            <color key="backgroundColor" systemColor="systemFillColor"/>
-                                            <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
-                                            <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
-                                            <inset key="imageEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                            <state key="normal" title="Insert Context Queue" image="context_queue_insert"/>
-                                            <connections>
-                                                <action selector="pressedInsertContextQueue:" destination="-1" eventType="touchUpInside" id="2Zy-02-NDD"/>
-                                            </connections>
-                                        </button>
-                                        <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cvP-d9-XH3" userLabel="ContextQueueAppend" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="492.5" y="0.0" width="491.5" height="40"/>
                                             <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                             <state key="normal" title="Append Context Queue" image="context_queue_append"/>
                                             <connections>
                                                 <action selector="pressedAppendContextQueue:" destination="-1" eventType="touchUpInside" id="6Tq-ho-AH3"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="op5-Jc-HYB" userLabel="UserQueueAppend" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                            <rect key="frame" x="492.5" y="0.0" width="491.5" height="40"/>
+                                            <color key="backgroundColor" systemColor="systemFillColor"/>
+                                            <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                            <state key="normal" title="Append User Queue" image="user_queue_append"/>
+                                            <connections>
+                                                <action selector="pressedAppendUserQueue:" destination="-1" eventType="touchUpInside" id="bgL-aQ-WK3"/>
                                             </connections>
                                         </button>
                                     </subviews>

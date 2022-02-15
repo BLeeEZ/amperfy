@@ -95,8 +95,12 @@ extension Album: PlayableContainable  {
         var infoContent = [String]()
         if songs.count == 1 {
             infoContent.append("1 Song")
-        } else {
+        } else if songs.count > 1 {
             infoContent.append("\(songs.count) Songs")
+        } else if songCount == 1 {
+            infoContent.append("1 Song")
+        } else if songCount > 1 {
+            infoContent.append("\(songCount) Songs")
         }
         if type == .long {
             if year > 0 {

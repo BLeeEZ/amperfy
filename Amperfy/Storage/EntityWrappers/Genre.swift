@@ -57,18 +57,18 @@ extension Genre: PlayableContainable  {
         if api == .ampache {
             if artists.count == 1 {
                 infoContent.append("1 Artist")
-            } else {
+            } else if artists.count > 1 {
                 infoContent.append("\(artists.count) Artists")
             }
         }
         if albums.count == 1 {
             infoContent.append("1 Album")
-        } else {
+        } else if albums.count > 1 {
             infoContent.append("\(albums.count) Albums")
         }
         if songs.count == 1 {
             infoContent.append("1 Song")
-        } else {
+        } else if songs.count > 1 {
             infoContent.append("\(songs.count) Songs")
         }
         if type == .long {

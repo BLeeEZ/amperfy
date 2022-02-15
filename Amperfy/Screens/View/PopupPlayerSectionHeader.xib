@@ -29,7 +29,7 @@
                     </connections>
                 </button>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="j9L-PC-uFW" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="16" y="16" width="44" height="21.5"/>
+                    <rect key="frame" x="16" y="16" width="343" height="21.5"/>
                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
                     <nil key="highlightedColor"/>
                 </label>
@@ -37,27 +37,26 @@
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
                 <constraint firstItem="j9L-PC-uFW" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="1FA-EV-ugn"/>
-                <constraint firstItem="aNt-bX-pEf" firstAttribute="leading" secondItem="j9L-PC-uFW" secondAttribute="trailing" constant="8" id="51h-hM-OSe"/>
-                <constraint firstAttribute="trailingMargin" secondItem="aNt-bX-pEf" secondAttribute="trailing" id="Ftr-mx-d44"/>
-                <constraint firstAttribute="trailing" secondItem="j9L-PC-uFW" secondAttribute="trailing" constant="16" id="Poh-20-BwX"/>
+                <constraint firstAttribute="trailingMargin" secondItem="j9L-PC-uFW" secondAttribute="trailing" id="51h-hM-OSe"/>
+                <constraint firstItem="j9L-PC-uFW" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="Erw-ZL-R0E"/>
                 <constraint firstItem="aNt-bX-pEf" firstAttribute="centerY" secondItem="j9L-PC-uFW" secondAttribute="centerY" id="RFf-sQ-Iqs"/>
                 <constraint firstItem="j9L-PC-uFW" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="ji5-GE-UzS"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="aNt-bX-pEf" secondAttribute="trailing" constant="16" id="oaX-H2-SfW"/>
+                <constraint firstAttribute="trailingMargin" secondItem="aNt-bX-pEf" secondAttribute="trailing" id="oaX-H2-SfW"/>
             </constraints>
-            <variation key="default">
-                <mask key="constraints">
-                    <exclude reference="51h-hM-OSe"/>
-                </mask>
-            </variation>
             <connections>
-                <outlet property="labelRightGapToButtonConstraint" destination="51h-hM-OSe" id="yCb-WM-G0F"/>
-                <outlet property="labelRightGapToSafeAreaTrailingConstraint" destination="Poh-20-BwX" id="5ub-SY-Pt2"/>
+                <outlet property="labelTrailingToSuperviewTrailingConstraint" destination="51h-hM-OSe" id="DGj-Z8-afm"/>
                 <outlet property="nameLabel" destination="j9L-PC-uFW" id="Di9-m4-GyQ"/>
                 <outlet property="rightButton" destination="aNt-bX-pEf" id="eKv-ll-rzX"/>
+                <outlet property="rightButtonWidthConstraint" destination="Eng-0s-D0B" id="pUr-gf-cOa"/>
             </connections>
             <point key="canvasLocation" x="-316" y="133"/>
         </view>
     </objects>
+    <designables>
+        <designable name="j9L-PC-uFW">
+            <size key="intrinsicContentSize" width="44" height="21.5"/>
+        </designable>
+    </designables>
     <resources>
         <systemColor name="systemBlueColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

@@ -16,9 +16,17 @@ class TabBarVC: UITabBarController {
         self.popupBar.tintColor = UIColor.defaultBlue
         self.popupBar.imageView.layer.cornerRadius = 5
         self.popupBar.progressViewStyle = .bottom
-        self.popupBar.barStyle = .prominent
+        self.popupBar.barStyle = .compact
         self.popupBar.marqueeScrollEnabled = true
-        self.popupBar.subtitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.defaultBlue]
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
+        self.popupBar.titleTextAttributes = [
+            NSAttributedString.Key.paragraphStyle: paragraph
+        ]
+        self.popupBar.subtitleTextAttributes = [
+            NSAttributedString.Key.foregroundColor: UIColor.defaultBlue,
+            NSAttributedString.Key.paragraphStyle: paragraph
+        ]
         self.popupContentView.popupCloseButtonStyle = .chevron
         self.popupInteractionStyle = .snap
         
