@@ -4,7 +4,8 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
 
     var album: Album!
     private var fetchedResultsController: AlbumSongsFetchedResultsController!
-    private var detailOperationsView: AlbumDetailTableHeader?
+    private var optionsButton: UIBarButtonItem!
+    private var detailOperationsView: GenericDetailTableHeader?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,18 +17,21 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.register(nibName: AlbumSongTableCell.typeName)
         tableView.rowHeight = AlbumSongTableCell.albumSongRowHeight
         
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: AlbumDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
-        if let albumDetailTableHeaderView = ViewBuilder<AlbumDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: AlbumDetailTableHeader.frameHeight)) {
-            albumDetailTableHeaderView.prepare(toWorkOnAlbum: album, rootView: self)
-            tableView.tableHeaderView?.addSubview(albumDetailTableHeaderView)
-            detailOperationsView = albumDetailTableHeaderView
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
+        if let genericDetailTableHeaderView = ViewBuilder<GenericDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight)) {
+            genericDetailTableHeaderView.prepare(toWorkOn: album, rootView: self)
+            tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
+            detailOperationsView = genericDetailTableHeaderView
         }
-        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: AlbumDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
                 playContextCb: {() in PlayContext(name: self.album.name, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
+        
+        optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
+        navigationItem.rightBarButtonItem = optionsButton
         
         swipeCallback = { (indexPath, completionHandler) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
@@ -66,6 +70,15 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     override func updateSearchResults(for searchController: UISearchController) {
         fetchedResultsController.search(searchText: searchController.searchBar.text ?? "", onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1 )
         tableView.reloadData()
+    }
+    
+    @objc private func optionsPressed() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let album = self.album, self.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(container: album, on: self)
+        present(detailVC, animated: true)
     }
     
 }

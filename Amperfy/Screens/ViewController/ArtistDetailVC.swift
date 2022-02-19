@@ -6,7 +6,8 @@ class ArtistDetailVC: BasicTableViewController {
     var artist: Artist!
     private var albumsFetchedResultsController: ArtistAlbumsItemsFetchedResultsController!
     private var songsFetchedResultsController: ArtistSongsItemsFetchedResultsController!
-    private var detailOperationsView: ArtistDetailTableHeader?
+    private var optionsButton: UIBarButtonItem!
+    private var detailOperationsView: GenericDetailTableHeader?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,18 +21,21 @@ class ArtistDetailVC: BasicTableViewController {
         tableView.register(nibName: SongTableCell.typeName)
         
         configureSearchController(placeholder: "Albums and Songs", scopeButtonTitles: ["All", "Cached"])
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ArtistDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
-        if let artistDetailTableHeaderView = ViewBuilder<ArtistDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ArtistDetailTableHeader.frameHeight)) {
-            artistDetailTableHeaderView.prepare(toWorkOnArtist: artist, rootView: self)
-            tableView.tableHeaderView?.addSubview(artistDetailTableHeaderView)
-            detailOperationsView = artistDetailTableHeaderView
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
+        if let genericDetailTableHeaderView = ViewBuilder<GenericDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight)) {
+            genericDetailTableHeaderView.prepare(toWorkOn: artist, rootView: self)
+            tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
+            detailOperationsView = genericDetailTableHeaderView
         }
-        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: ArtistDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
                 playContextCb: {() in PlayContext(name: self.artist.name, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
+        
+        optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
+        navigationItem.rightBarButtonItem = optionsButton
         
         swipeCallback = { (indexPath, completionHandler) in
             switch indexPath.section+2 {
@@ -188,6 +192,15 @@ class ArtistDetailVC: BasicTableViewController {
     }
     
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
+    }
+    
+    @objc private func optionsPressed() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let artist = self.artist, self.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(container: artist, on: self)
+        present(detailVC, animated: true)
     }
     
 }

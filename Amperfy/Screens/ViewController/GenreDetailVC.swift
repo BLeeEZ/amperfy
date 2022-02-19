@@ -7,7 +7,8 @@ class GenreDetailVC: BasicTableViewController {
     private var artistsFetchedResultsController: GenreArtistsFetchedResultsController!
     private var albumsFetchedResultsController: GenreAlbumsFetchedResultsController!
     private var songsFetchedResultsController: GenreSongsFetchedResultsController!
-    private var detailOperationsView: GenreDetailTableHeader?
+    private var optionsButton: UIBarButtonItem!
+    private var detailOperationsView: GenericDetailTableHeader?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,18 +25,21 @@ class GenreDetailVC: BasicTableViewController {
         tableView.register(nibName: SongTableCell.typeName)
         
         configureSearchController(placeholder: "Artists, Albums and Songs", scopeButtonTitles: ["All", "Cached"])
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenreDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
-        if let genreDetailTableHeaderView = ViewBuilder<GenreDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenreDetailTableHeader.frameHeight)) {
-            genreDetailTableHeaderView.prepare(toWorkOn: genre, rootView: self)
-            tableView.tableHeaderView?.addSubview(genreDetailTableHeaderView)
-            detailOperationsView = genreDetailTableHeaderView
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
+        if let genericDetailTableHeaderView = ViewBuilder<GenericDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight)) {
+            genericDetailTableHeaderView.prepare(toWorkOn: genre, rootView: self)
+            tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
+            detailOperationsView = genericDetailTableHeaderView
         }
-        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenreDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
                 playContextCb: {() in PlayContext(name: self.genre.name, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
+        
+        optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
+        navigationItem.rightBarButtonItem = optionsButton
         
         swipeCallback = { (indexPath, completionHandler) in
             switch indexPath.section+1 {
@@ -223,6 +227,15 @@ class GenreDetailVC: BasicTableViewController {
     }
     
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
+    }
+    
+    @objc private func optionsPressed() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let genre = self.genre, self.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(container: genre, on: self)
+        present(detailVC, animated: true)
     }
     
 }
