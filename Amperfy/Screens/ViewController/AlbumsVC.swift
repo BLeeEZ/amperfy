@@ -15,8 +15,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Albums\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
-        tableView.register(nibName: AlbumTableCell.typeName)
-        tableView.rowHeight = AlbumTableCell.rowHeight
+        tableView.register(nibName: GenericTableCell.typeName)
+        tableView.rowHeight = GenericTableCell.rowHeight
         
         optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
         navigationItem.rightBarButtonItem = optionsButton
@@ -31,9 +31,9 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: AlbumTableCell = dequeueCell(for: tableView, at: indexPath)
+        let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
         let album = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(album: album, rootView: self)
+        cell.display(container: album, rootView: self)
         return cell
     }
     

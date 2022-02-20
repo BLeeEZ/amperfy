@@ -26,12 +26,8 @@ public class Podcast: AbstractLibraryEntity {
         guard let episodesSet = managedObject.episodes, let episodesMO = episodesSet.array as? [PodcastEpisodeMO] else { return [PodcastEpisode]() }
         return episodesMO.compactMap{ PodcastEpisode(managedObject: $0) }.filter{ $0.userStatus != .deleted }.sortByPublishDate()
     }
-
-    override var image: UIImage {
-        if super.image != Artwork.defaultImage {
-            return super.image
-        }
-        return Artwork.defaultImage
+    override var defaultImage: UIImage {
+        return UIImage.podcastArtwork
     }
 
 }
@@ -59,6 +55,9 @@ extension Podcast: PlayableContainable  {
         let library = LibraryStorage(context: context)
         let podcastAsync = Podcast(managedObject: context.object(with: managedObject.objectID) as! PodcastMO)
         syncer.sync(podcast: podcastAsync, library: library)
+    }
+    var artworkCollection: ArtworkCollection {
+        return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
     }
 }
 

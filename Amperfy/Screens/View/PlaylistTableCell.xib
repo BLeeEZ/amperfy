@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -18,36 +18,11 @@
                 <rect key="frame" x="0.0" y="0.0" width="406" height="92"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ELd-mq-eKZ" userLabel="art1" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
-                        <rect key="frame" x="16" y="11" width="35" height="35"/>
-                        <constraints>
-                            <constraint firstAttribute="width" secondItem="ELd-mq-eKZ" secondAttribute="height" multiplier="1:1" id="5oa-nm-y2p"/>
-                            <constraint firstAttribute="width" constant="35" id="aoa-NM-Y3N"/>
-                        </constraints>
-                    </imageView>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="CoM-cP-AFY" userLabel="art2" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
-                        <rect key="frame" x="51" y="11" width="35" height="35"/>
-                        <constraints>
-                            <constraint firstAttribute="width" secondItem="CoM-cP-AFY" secondAttribute="height" multiplier="1:1" id="L6h-13-zPV"/>
-                        </constraints>
-                    </imageView>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="6p5-nV-8sB" userLabel="art3" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
-                        <rect key="frame" x="16" y="46" width="35" height="35"/>
-                        <constraints>
-                            <constraint firstAttribute="width" secondItem="6p5-nV-8sB" secondAttribute="height" multiplier="1:1" id="7Ol-0z-gpN"/>
-                        </constraints>
-                    </imageView>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZzK-67-ki6" userLabel="art4" customClass="RoundedImage" customModule="Amperfy" customModuleProvider="target">
-                        <rect key="frame" x="51" y="46" width="35" height="35"/>
-                        <constraints>
-                            <constraint firstAttribute="width" secondItem="ZzK-67-ki6" secondAttribute="height" multiplier="1:1" id="3eh-gR-qpG"/>
-                        </constraints>
-                    </imageView>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="TxE-Fh-ozu">
-                        <rect key="frame" x="94" y="27" width="296" height="38.5"/>
+                        <rect key="frame" x="86" y="27" width="304" height="38.5"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Playlist Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MMM-Yr-IkZ">
-                                <rect key="frame" x="0.0" y="0.0" width="296" height="20.5"/>
+                                <rect key="frame" x="0.0" y="0.0" width="304" height="20.5"/>
                                 <constraints>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="20" id="MBe-4a-Yhx"/>
                                 </constraints>
@@ -56,7 +31,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="20 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4aC-eY-cVv" userLabel="Info Label">
-                                <rect key="frame" x="0.0" y="22.5" width="296" height="16"/>
+                                <rect key="frame" x="0.0" y="22.5" width="304" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="16" id="NkY-6C-FCB"/>
                                 </constraints>
@@ -66,30 +41,26 @@
                             </label>
                         </subviews>
                     </stackView>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TkT-gC-6LF" customClass="EntityImageView" customModule="Amperfy" customModuleProvider="target">
+                        <rect key="frame" x="8" y="11" width="70" height="70"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="TkT-gC-6LF" secondAttribute="height" multiplier="1:1" id="E8b-Kt-N2B"/>
+                            <constraint firstAttribute="width" constant="70" id="iNA-Cl-W6I"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="ZzK-67-ki6" firstAttribute="centerY" secondItem="6p5-nV-8sB" secondAttribute="centerY" id="3aD-vZ-czi"/>
-                    <constraint firstItem="ELd-mq-eKZ" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="HTA-F6-yEf"/>
-                    <constraint firstItem="6p5-nV-8sB" firstAttribute="centerX" secondItem="ELd-mq-eKZ" secondAttribute="centerX" id="KuZ-l5-GnN"/>
-                    <constraint firstItem="6p5-nV-8sB" firstAttribute="width" secondItem="ELd-mq-eKZ" secondAttribute="width" id="LgQ-bI-CBq"/>
-                    <constraint firstItem="6p5-nV-8sB" firstAttribute="top" secondItem="ELd-mq-eKZ" secondAttribute="bottom" id="TYo-T8-do2"/>
-                    <constraint firstItem="CoM-cP-AFY" firstAttribute="centerY" secondItem="ELd-mq-eKZ" secondAttribute="centerY" id="Vcj-Hf-D6k"/>
+                    <constraint firstItem="TkT-gC-6LF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="2vG-6C-BAk"/>
+                    <constraint firstItem="TkT-gC-6LF" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="HCl-M9-BrL"/>
+                    <constraint firstItem="TxE-Fh-ozu" firstAttribute="leading" secondItem="TkT-gC-6LF" secondAttribute="trailing" constant="8" id="OcW-Ql-tV0"/>
                     <constraint firstAttribute="trailingMargin" secondItem="TxE-Fh-ozu" secondAttribute="trailing" id="bfa-IE-DcM"/>
-                    <constraint firstItem="TxE-Fh-ozu" firstAttribute="leading" secondItem="CoM-cP-AFY" secondAttribute="trailing" constant="8" id="dD1-8S-4ed"/>
-                    <constraint firstItem="CoM-cP-AFY" firstAttribute="leading" secondItem="ELd-mq-eKZ" secondAttribute="trailing" id="ggD-P4-QG4"/>
                     <constraint firstItem="TxE-Fh-ozu" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="pF2-Kr-tcV"/>
-                    <constraint firstItem="ELd-mq-eKZ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="qHf-C1-rnP"/>
-                    <constraint firstItem="ZzK-67-ki6" firstAttribute="width" secondItem="ELd-mq-eKZ" secondAttribute="width" id="tn1-uD-Ayt"/>
-                    <constraint firstItem="CoM-cP-AFY" firstAttribute="width" secondItem="ELd-mq-eKZ" secondAttribute="width" id="wA4-yT-rxI"/>
-                    <constraint firstItem="ZzK-67-ki6" firstAttribute="centerX" secondItem="CoM-cP-AFY" secondAttribute="centerX" id="zdK-wW-rE1"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
-                <outlet property="art1Image" destination="ELd-mq-eKZ" id="PNP-l5-ZEQ"/>
-                <outlet property="art2Image" destination="CoM-cP-AFY" id="scL-L8-2bL"/>
-                <outlet property="art3Image" destination="6p5-nV-8sB" id="4c5-nX-CuM"/>
-                <outlet property="art4Image" destination="ZzK-67-ki6" id="L6C-WJ-2yn"/>
+                <outlet property="entityImage" destination="TkT-gC-6LF" id="yW3-q4-HkL"/>
                 <outlet property="infoLabel" destination="4aC-eY-cVv" id="K2N-YG-aT2"/>
                 <outlet property="nameLabel" destination="MMM-Yr-IkZ" id="isL-UW-3LQ"/>
             </connections>
@@ -99,6 +70,9 @@
     <resources>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

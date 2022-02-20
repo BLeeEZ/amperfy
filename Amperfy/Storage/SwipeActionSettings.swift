@@ -61,23 +61,23 @@ enum SwipeActionType: Int, CaseIterable {
     var image: UIImage {
         switch self {
         case .insertUserQueue:
-            return UIImage(named: "user_queue_insert") ?? Artwork.defaultImage
+            return UIImage.userQueueInsert
         case .appendUserQueue:
-            return UIImage(named: "user_queue_append") ?? Artwork.defaultImage
+            return UIImage.userQueueAppend
         case .insertContextQueue:
-            return UIImage(named: "context_queue_insert") ?? Artwork.defaultImage
+            return UIImage.contextQueueInsert
         case .appendContextQueue:
-            return UIImage(named: "context_queue_append") ?? Artwork.defaultImage
+            return UIImage.contextQueueAppend
         case .download:
-            return UIImage(named: "download") ?? Artwork.defaultImage
+            return UIImage.download
         case .removeFromCache:
-            return UIImage(named: "trash") ?? Artwork.defaultImage
+            return UIImage.trash
         case .addToPlaylist:
-            return UIImage(named: "playlist") ?? Artwork.defaultImage
+            return UIImage.playlistBlack
         case .play:
-            return UIImage(named: "play") ?? Artwork.defaultImage
+            return UIImage.play
         case .playShuffled:
-            return UIImage(named: "shuffle") ?? Artwork.defaultImage
+            return UIImage.shuffle
         }
     }
 }

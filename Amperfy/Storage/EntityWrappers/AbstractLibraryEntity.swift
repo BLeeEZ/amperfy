@@ -49,9 +49,12 @@ public class AbstractLibraryEntity {
     }
     var image: UIImage {
         guard let img = artwork?.image else {
-            return Artwork.defaultImage
+            return defaultImage
         }
         return img
+    }
+    var defaultImage: UIImage {
+        return UIImage.songArtwork
     }
     func isEqual(_ other: AbstractLibraryEntity) -> Bool {
         return managedObject == other.managedObject

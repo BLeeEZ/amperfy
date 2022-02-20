@@ -13,8 +13,8 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Artists\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
-        tableView.register(nibName: ArtistTableCell.typeName)
-        tableView.rowHeight = ArtistTableCell.rowHeight
+        tableView.register(nibName: GenericTableCell.typeName)
+        tableView.rowHeight = GenericTableCell.rowHeight
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         swipeCallback = { (indexPath, completionHandler) in
@@ -26,9 +26,9 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: ArtistTableCell = dequeueCell(for: tableView, at: indexPath)
+        let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
         let artist = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(artist: artist, rootView: self)
+        cell.display(container: artist, rootView: self)
         return cell
     }
     

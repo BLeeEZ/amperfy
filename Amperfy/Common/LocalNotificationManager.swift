@@ -94,7 +94,7 @@ class LocalNotificationManager {
         let url = tempDirectoryURL.appendingPathComponent(fileIdentifier)
         var imgData = image.pngData()
         if imgData == nil {
-            imgData = Artwork.defaultImage.pngData()
+            imgData = UIImage.amperfyMosaicArtwork.pngData()
         }
         try! imgData!.write(to: url, options: Data.WritingOptions.atomic)
         return url

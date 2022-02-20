@@ -5,7 +5,7 @@ class SongTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
-    @IBOutlet weak var artworkImage: LibraryEntityImage!
+    @IBOutlet weak var entityImage: EntityImageView!
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     
@@ -33,7 +33,7 @@ class SongTableCell: BasicTableCell {
         titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         artistLabel.text = song.creatorName
         
-        artworkImage.displayAndUpdate(entity: song)
+        entityImage.display(container: song)
 
         if song.isCached {
             artistLabel.textColor = UIColor.defaultBlue

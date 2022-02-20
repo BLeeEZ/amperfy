@@ -1,6 +1,7 @@
 import Foundation
 import CoreData
 import os.log
+import UIKit
 
 public class Playlist: Identifyable {
     
@@ -282,6 +283,10 @@ public class Playlist: Identifyable {
             library.saveContext()
         }
     }
+    
+    var defaultImage: UIImage {
+        return UIImage.playlistArtwork
+    }
 
 }
 
@@ -307,6 +312,21 @@ extension Playlist: PlayableContainable  {
         let library = LibraryStorage(context: context)
         let playlistAsync = getManagedObject(in: context, library: library)
         syncer.syncDown(playlist: playlistAsync, library: library)
+    }
+    var artworkCollection: ArtworkCollection {
+        if songCount < 500 {
+            let customArtworkSongs = playables.filterCustomArt()
+            if customArtworkSongs.isEmpty {
+                return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: nil)
+            } else if customArtworkSongs.count == 1 {
+                return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: customArtworkSongs[0])
+            } else {
+                let quadImages = Array(customArtworkSongs.prefix(4))
+                return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: customArtworkSongs[0], quadImageEntity: quadImages)
+            }
+        } else {
+            return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: nil)
+        }
     }
 }
 

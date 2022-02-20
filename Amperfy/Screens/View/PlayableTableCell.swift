@@ -8,7 +8,7 @@ class PlayableTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
-    @IBOutlet weak var artworkImage: LibraryEntityImage!
+    @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var downloadProgress: UIProgressView!
     @IBOutlet weak var reorderLabel: UILabel?
     
@@ -41,7 +41,7 @@ class PlayableTableCell: BasicTableCell {
         titleLabel.attributedText = NSMutableAttributedString(string: playable.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         
         artistLabel.text = playable.creatorName
-        artworkImage.displayAndUpdate(entity: playable)
+        entityImage.display(container: playable)
         
         if playerIndexCb != nil {
             self.reorderLabel?.isHidden = false

@@ -20,12 +20,12 @@ class ArtworkTest: XCTestCase {
         let artwork = library.createArtwork()
         XCTAssertEqual(artwork.status.rawValue, ImageStatus.IsDefaultImage.rawValue)
         XCTAssertEqual(artwork.url, "")
-        XCTAssertEqual(artwork.image, Artwork.defaultImage)
+        XCTAssertNil(artwork.image)
         XCTAssertEqual(artwork.owners.count, 0)
     }
     
     func testDefaultImage() {
-        XCTAssertEqual(Artwork.defaultImage, UIImage(named: "song"))
+        XCTAssertEqual(UIImage.songArtwork, UIImage.songArtwork)
     }
     
     func testStatus() {
@@ -66,7 +66,7 @@ class ArtworkTest: XCTestCase {
         testArtwork.setImage(fromData: testData)
         XCTAssertEqual(testArtwork.managedObject.imageData, testData)
         XCTAssertEqual(testArtwork.status, ImageStatus.NotChecked)
-        XCTAssertEqual(testArtwork.image, Artwork.defaultImage)
+        XCTAssertNil(testArtwork.image)
     }
     
     func testOwners() {

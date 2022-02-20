@@ -13,8 +13,8 @@ class PodcastsVC: SingleFetchedResultsTableViewController<PodcastMO> {
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Podcasts\"", scopeButtonTitles: ["All", "Cached"])
-        tableView.register(nibName: PodcastTableCell.typeName)
-        tableView.rowHeight = PodcastTableCell.rowHeight
+        tableView.register(nibName: GenericTableCell.typeName)
+        tableView.rowHeight = GenericTableCell.rowHeight
         
         swipeDisplaySettings.isAddToPlaylistAllowed = false
         swipeCallback = { (indexPath, completionHandler) in
@@ -37,9 +37,9 @@ class PodcastsVC: SingleFetchedResultsTableViewController<PodcastMO> {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: PodcastTableCell = dequeueCell(for: tableView, at: indexPath)
+        let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
         let podcast = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(podcast: podcast, rootView: self)
+        cell.display(container: podcast, rootView: self)
         return cell
     }
     

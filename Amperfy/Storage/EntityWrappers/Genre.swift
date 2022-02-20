@@ -46,6 +46,9 @@ public class Genre: AbstractLibraryEntity {
             if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
         }
     }
+    override var defaultImage: UIImage {
+        return UIImage.genreArtwork
+    }
 
 }
 
@@ -83,5 +86,8 @@ extension Genre: PlayableContainable  {
         let library = LibraryStorage(context: context)
         let genreAsync = Genre(managedObject: context.object(with: managedObject.objectID) as! GenreMO)
         syncer.sync(genre: genreAsync, library: library)
+    }
+    var artworkCollection: ArtworkCollection {
+        return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
     }
 }

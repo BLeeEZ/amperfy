@@ -3,7 +3,7 @@ import UIKit
 class PodcastEpisodeTableCell: BasicTableCell {
     
     @IBOutlet weak var podcastEpisodeLabel: UILabel!
-    @IBOutlet weak var podcastEpisodeImage: LibraryEntityImage!
+    @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var playEpisodeButton: UIButton!
@@ -26,7 +26,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
     func refresh() {
         guard let episode = self.episode else { return }
         podcastEpisodeLabel.text = episode.title
-        podcastEpisodeImage.displayAndUpdate(entity: episode)
+        entityImage.display(container: episode)
         
         optionsButton.setTitle(CommonString.threeMiddleDots, for: .normal)
         if episode.isAvailableToUser {

@@ -174,6 +174,9 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         }
         return infoContent
     }
+    override var defaultImage: UIImage {
+        return isPodcastEpisode ? UIImage.podcastEpisodeArtwork : UIImage.songArtwork
+    }
 
 }
 
@@ -192,6 +195,9 @@ extension AbstractPlayable: PlayableContainable  {
     }
     var isRateable: Bool { return isSong }
     var isDownloadAvailable: Bool { return asPodcastEpisode?.isAvailableToUser ?? true }
+    var artworkCollection: ArtworkCollection {
+        return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
+    }
 }
 
 extension AbstractPlayable: Hashable, Equatable {

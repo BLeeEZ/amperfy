@@ -1,6 +1,8 @@
 import UIKit
 
 class RoundedImage: UIImageView {
+    
+    static let cornerRadius: CGFloat = 5.0
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -8,7 +10,7 @@ class RoundedImage: UIImageView {
     }
     
     func configureStyle() {
-        layer.cornerRadius = 5
+        layer.cornerRadius = Self.cornerRadius
         layer.masksToBounds = true
     }
     

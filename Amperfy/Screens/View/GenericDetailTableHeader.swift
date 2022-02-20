@@ -3,7 +3,7 @@ import UIKit
 class GenericDetailTableHeader: UIView {
     
     @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var entityImage: LibraryEntityImage!
+    @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var infoLabel: MarqueeLabel!
     
     static let frameHeight: CGFloat = 150.0 + margin.top + margin.bottom
@@ -31,9 +31,7 @@ class GenericDetailTableHeader: UIView {
         nameLabel.text = entityContainer.name
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
-        if let entity = entityContainer as? AbstractLibraryEntity {
-            entityImage.displayAndUpdate(entity: entity)
-        }
+        entityImage.display(container: entityContainer)
         infoLabel.applyAmperfyStyle()
         infoLabel.text = entityContainer.info(for: appDelegate.backendProxy.selectedApi, type: .long)
     }

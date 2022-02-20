@@ -4,6 +4,7 @@ class LibraryEntityImage: RoundedImage {
     
     let appDelegate: AppDelegate
     var entity: AbstractLibraryEntity?
+    var backupImage: UIImage?
 
     required init?(coder: NSCoder) {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
@@ -17,6 +18,7 @@ class LibraryEntityImage: RoundedImage {
     
     func display(entity: AbstractLibraryEntity) {
         self.entity = entity
+        self.backupImage = entity.defaultImage
         refresh()
     }
 
@@ -27,8 +29,14 @@ class LibraryEntityImage: RoundedImage {
         }
     }
     
+    func display(image: UIImage) {
+        self.backupImage = image
+        self.entity = nil
+        refresh()
+    }
+    
     func refresh() {
-        self.image = entity?.image ?? Artwork.defaultImage
+        self.image = entity?.image ?? backupImage ?? UIImage.songArtwork
     }
     
     @objc private func artworkDownloadFinishedSuccessful(notification: Notification) {

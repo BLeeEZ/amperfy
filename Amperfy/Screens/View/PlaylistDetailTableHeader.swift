@@ -45,7 +45,7 @@ class PlaylistDetailTableHeader: UIView {
     
     func refreshArtworks(playlist: Playlist?) {
         let images: [LibraryEntityImage] = [art1Image, art2Image, art3Image, art4Image, art5Image, art6Image]
-        images.forEach{ $0.image = Artwork.defaultImage }
+        images.forEach{ $0.image = UIImage.songArtwork }
         
         guard let playlist = playlist else { return }
         let playables = playlist.playables

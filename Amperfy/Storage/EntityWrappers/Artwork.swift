@@ -26,10 +26,6 @@ public class Artwork: NSObject {
         self.managedObject = managedObject
     }
 
-    static var defaultImage: UIImage = {
-        return UIImage(named: "song") ?? UIImage()
-    }()
-
     var id: String {
         get { return managedObject.id }
         set { if managedObject.id != newValue { managedObject.id = newValue } }
@@ -63,7 +59,7 @@ public class Artwork: NSObject {
                 img = UIImage(data: data as Data)
             }
         default:
-            img = Artwork.defaultImage
+            break
         }
         return img
     }

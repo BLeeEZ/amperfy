@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "musical_note.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

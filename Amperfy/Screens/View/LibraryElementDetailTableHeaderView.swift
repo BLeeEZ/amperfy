@@ -38,9 +38,9 @@ class LibraryElementDetailTableHeaderView: UIView {
     func prepare(playContextCb: GetPlayContextCallback?, with player: PlayerFacade) {
         self.playContextCb = playContextCb
         self.player = player
-        playAllButton.setImage(UIImage(named: "play")?.invertedImage(), for: .normal)
+        playAllButton.setImage(UIImage.play.invertedImage(), for: .normal)
         playAllButton.imageView?.contentMode = .scaleAspectFit
-        playShuffledButton.setImage(UIImage(named: "shuffle")?.invertedImage(), for: .normal)
+        playShuffledButton.setImage(UIImage.shuffle.invertedImage(), for: .normal)
         playShuffledButton.imageView?.contentMode = .scaleAspectFit
     }
     

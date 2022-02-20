@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -26,6 +26,14 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Uwb-Vy-dE7" customClass="EntityImageView" customModule="Amperfy" customModuleProvider="target">
+                        <rect key="frame" x="16" y="11" width="48" height="48"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="Uwb-Vy-dE7" secondAttribute="height" multiplier="1:1" id="2o5-VW-kTA"/>
+                            <constraint firstAttribute="width" constant="48" id="PdF-S9-lw7"/>
+                        </constraints>
+                    </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nJe-7h-3tU">
                         <rect key="frame" x="72" y="38" width="372" height="16"/>
                         <constraints>
@@ -35,29 +43,22 @@
                         <color key="textColor" systemColor="secondaryLabelColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Kb7-OT-MQ5" userLabel="Artwork" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
-                        <rect key="frame" x="16" y="11" width="48" height="48"/>
-                        <constraints>
-                            <constraint firstAttribute="width" secondItem="Kb7-OT-MQ5" secondAttribute="height" multiplier="1:1" id="fhb-YD-hTx"/>
-                            <constraint firstAttribute="width" constant="48" id="iSI-nj-yJY"/>
-                        </constraints>
-                    </imageView>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailingMargin" secondItem="hPr-VQ-rTt" secondAttribute="trailing" constant="8" id="AUO-iE-pDI"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="top" secondItem="hPr-VQ-rTt" secondAttribute="bottom" constant="2" id="E4f-kL-YK1"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" constant="3" id="PbZ-KR-6Uu"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="Pwh-zQ-8MT"/>
-                    <constraint firstItem="Kb7-OT-MQ5" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="RGP-0j-GXj"/>
-                    <constraint firstItem="Kb7-OT-MQ5" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leadingMargin" id="Uld-ix-WQV"/>
-                    <constraint firstItem="hPr-VQ-rTt" firstAttribute="leading" secondItem="Kb7-OT-MQ5" secondAttribute="trailing" constant="8" id="YjP-mp-fEC"/>
+                    <constraint firstItem="hPr-VQ-rTt" firstAttribute="leading" secondItem="Uwb-Vy-dE7" secondAttribute="trailing" constant="8" id="YjP-mp-fEC"/>
+                    <constraint firstItem="Uwb-Vy-dE7" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="b4X-h3-kb4"/>
+                    <constraint firstItem="Uwb-Vy-dE7" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leadingMargin" id="gsz-pP-Pmt"/>
                     <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="hPr-VQ-rTt" secondAttribute="trailing" id="hho-eL-Cqq"/>
                     <constraint firstAttribute="trailingMargin" secondItem="nJe-7h-3tU" secondAttribute="trailing" constant="8" id="ybP-eq-wcE"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="artistLabel" destination="nJe-7h-3tU" id="SlX-ew-mVM"/>
-                <outlet property="artworkImage" destination="Kb7-OT-MQ5" id="tFa-Ih-i2W"/>
+                <outlet property="entityImage" destination="Uwb-Vy-dE7" id="hLh-iq-m4X"/>
                 <outlet property="titleLabel" destination="hPr-VQ-rTt" id="Gwv-hx-ZdG"/>
             </connections>
             <point key="canvasLocation" x="217.59999999999999" y="-203.29835082458771"/>
@@ -66,6 +67,9 @@
     <resources>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

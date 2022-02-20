@@ -135,7 +135,7 @@ class CarPlayHandler: NSObject {
     }
     
     func populate() {
-        let recentSongsData = CarPlayTabData(title: "Recent Songs", image: UIImage(named: "musical_notes")!) { completionHandler in
+        let recentSongsData = CarPlayTabData(title: "Recent Songs", image: UIImage.musicalNotesCarplay) { completionHandler in
             if self.persistentStorage.settings.isOnlineMode {
                 self.persistentStorage.context.performAndWait {
                     let syncer = self.backendApi.createLibrarySyncer()
@@ -160,7 +160,7 @@ class CarPlayHandler: NSObject {
         }
         recentSongsData.playableItems = songItems
 
-        let playlistsData = CarPlayTabData(title: "Playlists", image: UIImage(named: "playlist_carplay")!, fetchCB: nil)
+        let playlistsData = CarPlayTabData(title: "Playlists", image: UIImage.playlistCarplay, fetchCB: nil)
         let playlists = library.getPlaylistsForCarPlay()
         var playlistItems = [CarPlayPlayableItem]()
         for playlist in playlists {
@@ -172,7 +172,7 @@ class CarPlayHandler: NSObject {
         }
         playlistsData.playableItems = playlistItems
 
-        let podcastsData = CarPlayTabData(title: "Podcasts", image: UIImage(named: "podcast_carplay")!, fetchCB: nil)
+        let podcastsData = CarPlayTabData(title: "Podcasts", image: UIImage.podcastCarplay, fetchCB: nil)
         let podcasts = library.getPodcastsForCarPlay()
         var podcastItems = [CarPlayPlayableItem]()
         for podcast in podcasts {

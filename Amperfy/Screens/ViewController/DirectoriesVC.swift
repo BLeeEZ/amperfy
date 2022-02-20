@@ -15,13 +15,11 @@ class DirectoriesVC: BasicTableViewController {
         subdirectoriesFetchedResultsController.delegate = self
         songsFetchedResultsController = DirectorySongsFetchedResultsController(for: directory, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         songsFetchedResultsController.delegate = self
-        tableView.register(nibName: AlbumTableCell.typeName)
+        tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
         
         configureSearchController(placeholder: "Directories and Songs", scopeButtonTitles: ["All", "Cached"])
         navigationItem.title = directory.name
-        tableView.register(nibName: DirectoryTableCell.typeName)
-        tableView.register(nibName: SongTableCell.typeName)
         
         swipeCallback = { (indexPath, completionHandler) in
             switch indexPath.section {

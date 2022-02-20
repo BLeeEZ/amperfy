@@ -54,7 +54,7 @@ class DirectoryTableCell: BasicTableCell {
         if let directory = directory {
             infoLabel.text = directory.name
             artworkImage.display(entity: directory)
-            if let artwork = directory.artwork, let directoryImage = artwork.image, directoryImage != Artwork.defaultImage {
+            if let artwork = directory.artwork, let directoryImage = artwork.image, directoryImage != directory.defaultImage {
                 artworkImage.isHidden = false
             } else {
                 iconLabel.isHidden = false

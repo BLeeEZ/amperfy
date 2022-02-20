@@ -13,8 +13,8 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Genres\"", scopeButtonTitles: ["All", "Cached"])
-        tableView.register(nibName: GenreTableCell.typeName)
-        tableView.rowHeight = GenreTableCell.rowHeight
+        tableView.register(nibName: GenericTableCell.typeName)
+        tableView.rowHeight = GenericTableCell.rowHeightWithoutImage
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         swipeCallback = { (indexPath, completionHandler) in
@@ -26,9 +26,10 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: GenreTableCell = dequeueCell(for: tableView, at: indexPath)
+        let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
         let genre = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(genre: genre, rootView: self)
+        cell.display(container: genre, rootView: self)
+        cell.entityImage.isHidden = true
         return cell
     }
     

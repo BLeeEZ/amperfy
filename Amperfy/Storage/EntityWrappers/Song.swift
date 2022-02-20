@@ -99,19 +99,6 @@ public class Song: AbstractPlayable, Identifyable {
         return title
     }
 
-    override var image: UIImage {
-        if let curAlbum = album, !curAlbum.isOrphaned, curAlbum.image != Artwork.defaultImage {
-            return curAlbum.image
-        }
-        if super.image != Artwork.defaultImage {
-            return super.image
-        }
-        if let artistArt = artist?.artwork?.image {
-            return artistArt
-        }
-        return Artwork.defaultImage
-    }
-
 }
 
 extension Array where Element: Song {

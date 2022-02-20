@@ -22,8 +22,8 @@ class SearchVC: BasicTableViewController {
         
         configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: PlaylistTableCell.typeName)
-        tableView.register(nibName: ArtistTableCell.typeName)
-        tableView.register(nibName: AlbumTableCell.typeName)
+        tableView.register(nibName: GenericTableCell.typeName)
+        tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.separatorStyle = .none
         
@@ -114,14 +114,14 @@ class SearchVC: BasicTableViewController {
             cell.display(playlist: playlist, rootView: self)
             return cell
         case LibraryElement.Artist.rawValue:
-            let cell: ArtistTableCell = dequeueCell(for: tableView, at: indexPath)
+            let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
             let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(artist: artist, rootView: self)
+            cell.display(container: artist, rootView: self)
             return cell
         case LibraryElement.Album.rawValue:
-            let cell: AlbumTableCell = dequeueCell(for: tableView, at: indexPath)
+            let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
             let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(album: album, rootView: self)
+            cell.display(container: album, rootView: self)
             return cell
         case LibraryElement.Song.rawValue:
             let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
@@ -153,9 +153,9 @@ class SearchVC: BasicTableViewController {
         case LibraryElement.Playlist.rawValue:
             return PlaylistTableCell.rowHeight
         case LibraryElement.Artist.rawValue:
-            return ArtistTableCell.rowHeight
+            return GenericTableCell.rowHeight
         case LibraryElement.Album.rawValue:
-            return AlbumTableCell.rowHeight
+            return GenericTableCell.rowHeight
         case LibraryElement.Song.rawValue:
             return SongTableCell.rowHeight
         default:

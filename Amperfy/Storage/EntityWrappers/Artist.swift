@@ -68,6 +68,9 @@ public class Artist: AbstractLibraryEntity {
             if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
         }
     }
+    override var defaultImage: UIImage {
+        return UIImage.artistArtwork
+    }
 
 }
 
@@ -112,6 +115,9 @@ extension Artist: PlayableContainable  {
         let library = LibraryStorage(context: context)
         let artistAsync = Artist(managedObject: context.object(with: managedObject.objectID) as! ArtistMO)
         syncer.sync(artist: artistAsync, library: library)
+    }
+    var artworkCollection: ArtworkCollection {
+        return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
     }
 }
 

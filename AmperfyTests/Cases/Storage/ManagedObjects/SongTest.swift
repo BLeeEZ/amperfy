@@ -30,7 +30,7 @@ class SongTest: XCTestCase {
         XCTAssertEqual(song.syncInfo, nil)
         XCTAssertEqual(song.displayString, "Unknown Artist - Unknown Title")
         XCTAssertEqual(song.identifier, "Unknown Title")
-        XCTAssertEqual(song.image, Artwork.defaultImage)
+        XCTAssertEqual(song.image, UIImage.songArtwork)
         XCTAssertFalse(song.isCached)
     }
     
@@ -97,15 +97,15 @@ class SongTest: XCTestCase {
     }
     
     func testArtworkAndImage() {
-        let testData = Artwork.defaultImage.pngData()!
-        let testImg = Artwork.defaultImage
+        let testData = UIImage.songArtwork.pngData()!
+        let testImg = UIImage.songArtwork
         testSong.artwork = library.createArtwork()
         testSong.artwork?.setImage(fromData: testData)
-        XCTAssertEqual(testSong.artwork?.image, testImg)
+        XCTAssertNil(testSong.artwork?.image)
         XCTAssertEqual(testSong.image, testImg)
         library.saveContext()
         guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
-        XCTAssertEqual(songFetched.artwork?.image, testImg)
+        XCTAssertNil(songFetched.artwork?.image)
         XCTAssertEqual(songFetched.image, testImg)
     }
     

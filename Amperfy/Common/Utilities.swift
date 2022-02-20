@@ -192,6 +192,8 @@ extension UIColor {
         return UIColor(hue: hue, saturation: saturation, lightness: of, alpha: alpha)
     }
     
+    // 007AFF
+    // r:0 g:122 b:255
     static var defaultBlue: UIColor {
         return UIView().tintColor
     }
@@ -359,6 +361,16 @@ extension UIView {
         gradientLayer.locations = [0, 1]
         gradientLayer.frame = bounds
         layer.insertSublayer(gradientLayer, at: 0)
+    }
+    
+    var screenshot: UIImage? {
+        UIGraphicsBeginImageContextWithOptions(layer.frame.size, false, 0)
+        defer {
+            UIGraphicsEndImageContext()
+        }
+        guard let context = UIGraphicsGetCurrentContext() else { return nil }
+        layer.render(in: context)
+        return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
 

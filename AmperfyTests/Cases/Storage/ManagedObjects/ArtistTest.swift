@@ -28,7 +28,7 @@ class ArtistTest: XCTestCase {
         XCTAssertEqual(artist.albums.count, 0)
         XCTAssertEqual(artist.syncInfo, nil)
         XCTAssertNil(artist.artwork)
-        XCTAssertEqual(artist.image, Artwork.defaultImage)
+        XCTAssertEqual(artist.image, UIImage.artistArtwork)
     }
     
     func testName() {
@@ -64,15 +64,15 @@ class ArtistTest: XCTestCase {
     }
     
     func testArtworkAndImage() {
-        let testData = Artwork.defaultImage.pngData()!
-        let testImg = Artwork.defaultImage
+        let testData = UIImage.artistArtwork.pngData()!
+        let testImg = UIImage.artistArtwork
         testArtist.artwork = library.createArtwork()
         testArtist.artwork?.setImage(fromData: testData)
-        XCTAssertEqual(testArtist.artwork?.image, testImg)
+        XCTAssertNil(testArtist.artwork?.image)
         XCTAssertEqual(testArtist.image, testImg)
         library.saveContext()
         guard let artistFetched = library.getArtist(id: testId) else { XCTFail(); return }
-        XCTAssertEqual(artistFetched.artwork?.image, testImg)
+        XCTAssertNil(artistFetched.artwork?.image)
         XCTAssertEqual(artistFetched.image, testImg)
     }
 

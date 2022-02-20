@@ -17,7 +17,7 @@ class ArtistDetailVC: BasicTableViewController {
         albumsFetchedResultsController.delegate = self
         songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(for: artist, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         songsFetchedResultsController.delegate = self
-        tableView.register(nibName: AlbumTableCell.typeName)
+        tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
         
         configureSearchController(placeholder: "Albums and Songs", scopeButtonTitles: ["All", "Cached"])
@@ -108,9 +108,9 @@ class ArtistDetailVC: BasicTableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section+2 {
         case LibraryElement.Album.rawValue:
-            let cell: AlbumTableCell = dequeueCell(for: tableView, at: indexPath)
+            let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
             let album = albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(album: album, rootView: self)
+            cell.display(container: album, rootView: self)
             return cell
         case LibraryElement.Song.rawValue:
             let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
@@ -136,7 +136,7 @@ class ArtistDetailVC: BasicTableViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch indexPath.section+2 {
         case LibraryElement.Album.rawValue:
-            return AlbumTableCell.rowHeight
+            return GenericTableCell.rowHeight
         case LibraryElement.Song.rawValue:
             return SongTableCell.rowHeight
         default:

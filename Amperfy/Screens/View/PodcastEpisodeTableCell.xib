@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -22,6 +22,14 @@
                 <rect key="frame" x="0.0" y="0.0" width="375" height="162"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eg7-pd-DMm" customClass="EntityImageView" customModule="Amperfy" customModuleProvider="target">
+                        <rect key="frame" x="16" y="11" width="60" height="60"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="60" id="SmC-SV-mrJ"/>
+                            <constraint firstAttribute="width" secondItem="eg7-pd-DMm" secondAttribute="height" multiplier="1:1" id="XER-Ms-xhJ"/>
+                        </constraints>
+                    </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Episode with a very very very long title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZWe-re-U6e">
                         <rect key="frame" x="84" y="28" width="275" height="42"/>
                         <constraints>
@@ -31,13 +39,6 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="MKV-RW-ITd" userLabel="Art" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
-                        <rect key="frame" x="16" y="11" width="60" height="60"/>
-                        <constraints>
-                            <constraint firstAttribute="width" secondItem="MKV-RW-ITd" secondAttribute="height" multiplier="1:1" id="4mb-dO-Xu4"/>
-                            <constraint firstAttribute="height" constant="60" id="Rms-0h-ITJ"/>
-                        </constraints>
-                    </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5. May - Cached " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g7h-Ca-aH3" userLabel="Info Label">
                         <rect key="frame" x="84" y="13" width="97" height="15"/>
                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
@@ -99,34 +100,34 @@
                     <constraint firstItem="g7h-Ca-aH3" firstAttribute="top" secondItem="4aT-Z7-2jl" secondAttribute="topMargin" constant="2" id="2as-tc-g9Z"/>
                     <constraint firstItem="ulS-LU-PlW" firstAttribute="centerY" secondItem="Eiy-n7-Hlt" secondAttribute="centerY" id="5jk-KG-qhy"/>
                     <constraint firstItem="ulS-LU-PlW" firstAttribute="leading" secondItem="wFl-mR-cDH" secondAttribute="trailing" constant="8" id="8AH-it-afb"/>
+                    <constraint firstItem="eg7-pd-DMm" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="8kN-IT-JYH"/>
+                    <constraint firstItem="eg7-pd-DMm" firstAttribute="top" secondItem="4aT-Z7-2jl" secondAttribute="topMargin" id="9ce-c5-l3u"/>
                     <constraint firstAttribute="trailingMargin" secondItem="ZWe-re-U6e" secondAttribute="trailing" id="9tO-1D-PDW"/>
                     <constraint firstAttribute="trailingMargin" secondItem="ulS-LU-PlW" secondAttribute="trailing" id="BS7-SJ-YW4"/>
                     <constraint firstItem="GdC-Xn-gpu" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="BfQ-y0-Yeh"/>
                     <constraint firstItem="GdC-Xn-gpu" firstAttribute="bottom" secondItem="Eiy-n7-Hlt" secondAttribute="top" constant="-5" id="CCu-zP-P6y"/>
-                    <constraint firstItem="GdC-Xn-gpu" firstAttribute="top" secondItem="MKV-RW-ITd" secondAttribute="bottom" constant="5" id="If8-XT-5aH"/>
+                    <constraint firstItem="GdC-Xn-gpu" firstAttribute="top" secondItem="eg7-pd-DMm" secondAttribute="bottom" constant="5" id="If8-XT-5aH"/>
                     <constraint firstItem="ulS-LU-PlW" firstAttribute="width" secondItem="Eiy-n7-Hlt" secondAttribute="width" id="IzF-ng-qvH"/>
-                    <constraint firstItem="ZWe-re-U6e" firstAttribute="leading" secondItem="MKV-RW-ITd" secondAttribute="trailing" constant="8" id="LuL-b5-m52"/>
+                    <constraint firstItem="ZWe-re-U6e" firstAttribute="leading" secondItem="eg7-pd-DMm" secondAttribute="trailing" constant="8" id="LuL-b5-m52"/>
                     <constraint firstAttribute="trailingMargin" secondItem="GdC-Xn-gpu" secondAttribute="trailing" id="NhM-JY-DGW"/>
                     <constraint firstItem="Eiy-n7-Hlt" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="PEc-3D-EOs"/>
                     <constraint firstItem="JqZ-Gw-nZk" firstAttribute="leading" secondItem="Eiy-n7-Hlt" secondAttribute="trailing" constant="8" id="Sem-h3-7qU"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="top" secondItem="g7h-Ca-aH3" secondAttribute="bottom" id="ZXs-eS-5vO"/>
                     <constraint firstItem="Eiy-n7-Hlt" firstAttribute="centerY" secondItem="wFl-mR-cDH" secondAttribute="centerY" id="Zck-Kj-YzB"/>
                     <constraint firstItem="wFl-mR-cDH" firstAttribute="leading" secondItem="Eiy-n7-Hlt" secondAttribute="trailing" constant="96" id="cXb-o7-oqW"/>
-                    <constraint firstItem="MKV-RW-ITd" firstAttribute="top" secondItem="4aT-Z7-2jl" secondAttribute="topMargin" id="fcN-PG-Lfu"/>
-                    <constraint firstItem="MKV-RW-ITd" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="gIw-WX-LLe"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="leading" secondItem="g7h-Ca-aH3" secondAttribute="leading" id="sNC-OG-0am"/>
                     <constraint firstItem="JqZ-Gw-nZk" firstAttribute="centerY" secondItem="Eiy-n7-Hlt" secondAttribute="centerY" id="vML-RP-SG7"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="descriptionLabel" destination="GdC-Xn-gpu" id="nAu-Sq-alT"/>
+                <outlet property="entityImage" destination="eg7-pd-DMm" id="x2x-zC-PJi"/>
                 <outlet property="infoLabel" destination="g7h-Ca-aH3" id="qfA-wN-xBY"/>
                 <outlet property="optionsButton" destination="ulS-LU-PlW" id="7Dj-hH-UFV"/>
                 <outlet property="playEpisodeButton" destination="Eiy-n7-Hlt" id="vcv-6f-mON"/>
                 <outlet property="playProgressBar" destination="JqZ-Gw-nZk" id="2HZ-OE-Vi2"/>
                 <outlet property="playProgressLabel" destination="wFl-mR-cDH" id="Nm9-Ub-yOF"/>
                 <outlet property="playProgressLabelPlayButtonDistance" destination="cXb-o7-oqW" id="lby-wk-43e"/>
-                <outlet property="podcastEpisodeImage" destination="MKV-RW-ITd" id="zcn-Ko-xMS"/>
                 <outlet property="podcastEpisodeLabel" destination="ZWe-re-U6e" id="EVi-Od-y9M"/>
             </connections>
             <point key="canvasLocation" x="53.600000000000001" y="-109.74512743628186"/>
@@ -135,6 +136,9 @@
     <resources>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

@@ -15,7 +15,7 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var albumLabel: MarqueeLabel!
     @IBOutlet weak var showAlbumButton: UIButton!
     @IBOutlet weak var infoLabel: MarqueeLabel!
-    @IBOutlet weak var artworkImage: LibraryEntityImage!
+    @IBOutlet weak var entityImage: EntityImageView!
     
     @IBOutlet weak var queueContainerView: UIView!
     @IBOutlet weak var userQueueInsertButton: BasicButton!
@@ -125,8 +125,9 @@ class LibraryEntityDetailVC: UIViewController {
         remainingSpace -= cancelButtonHeightConstraint.constant
         // Big Artwork
         if remainingSpace > detailLabelsClusterHeightConstraint.constant {
-            elementInfoStackView.alignment = .fill
             elementInfoStackView.axis = .vertical
+            elementInfoStackView.alignment = .fill
+            elementInfoStackView.distribution = .fill
             titleLabel.textAlignment = .center
             artistLabel.textAlignment = .center
             albumLabel.textAlignment = .center
@@ -140,8 +141,9 @@ class LibraryEntityDetailVC: UIViewController {
             }
             detailLabelsClusterHeightConstraint.constant = detailClusterHeight
         } else {
-            elementInfoStackView.alignment = .fill
             elementInfoStackView.axis = .horizontal
+            elementInfoStackView.alignment = .fill
+            elementInfoStackView.distribution = .fill
             titleLabel.textAlignment = .left
             artistLabel.textAlignment = .left
             albumLabel.textAlignment = .left
@@ -199,14 +201,11 @@ class LibraryEntityDetailVC: UIViewController {
     }
 
     func refresh() {
-        if let libraryEntity = entityContainer as? AbstractLibraryEntity {
-            artworkImage.displayAndUpdate(entity: libraryEntity)
-            if entityContainer.isRateable {
-                ratingView?.display(entity: libraryEntity)
-            }
-            ratingPlaceholderView.isHidden = !entityContainer.isRateable
+        entityImage.display(container: entityContainer)
+        if let libraryEntity = entityContainer as? AbstractLibraryEntity, entityContainer.isRateable {
+            ratingView?.display(entity: libraryEntity)
+            ratingPlaceholderView.isHidden = false
         } else {
-            artworkImage.refresh()
             ratingPlaceholderView.isHidden = true
         }
         titleLabel.text = entityContainer.name

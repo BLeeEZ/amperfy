@@ -15,19 +15,20 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3rO-9J-GXf" customClass="EntityImageView" customModule="Amperfy" customModuleProvider="target">
+                    <rect key="frame" x="16" y="0.0" width="125" height="125"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="125" id="IVQ-Ck-Py1"/>
+                        <constraint firstAttribute="width" secondItem="3rO-9J-GXf" secondAttribute="height" multiplier="1:1" id="rFl-l0-KJV"/>
+                    </constraints>
+                </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3 Artists 4 Albums 152 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iPX-Fa-tH3" userLabel="Info Label" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="16" y="133" width="343" height="17"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <color key="textColor" systemColor="secondaryLabelColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="j2g-G9-4Tx" userLabel="Genre Image" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="16" y="0.0" width="125" height="125"/>
-                    <constraints>
-                        <constraint firstAttribute="width" secondItem="j2g-G9-4Tx" secondAttribute="height" multiplier="1:1" id="Cqp-Xd-eh0"/>
-                        <constraint firstAttribute="height" constant="125" id="z50-iu-tvM"/>
-                    </constraints>
-                </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Arb-mj-xt4" userLabel="Name Label">
                     <rect key="frame" x="149" y="0.0" width="210" height="60"/>
                     <constraints>
@@ -40,17 +41,17 @@
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
-                <constraint firstItem="Arb-mj-xt4" firstAttribute="leading" secondItem="j2g-G9-4Tx" secondAttribute="trailing" constant="8" id="BHq-Zz-cv5"/>
-                <constraint firstItem="iPX-Fa-tH3" firstAttribute="top" secondItem="j2g-G9-4Tx" secondAttribute="bottom" constant="8" id="Oje-7y-tAi"/>
+                <constraint firstItem="Arb-mj-xt4" firstAttribute="leading" secondItem="3rO-9J-GXf" secondAttribute="trailing" constant="8" id="BHq-Zz-cv5"/>
+                <constraint firstItem="3rO-9J-GXf" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="NTG-L6-EUp"/>
+                <constraint firstItem="iPX-Fa-tH3" firstAttribute="top" secondItem="3rO-9J-GXf" secondAttribute="bottom" constant="8" id="Oje-7y-tAi"/>
                 <constraint firstAttribute="trailingMargin" secondItem="iPX-Fa-tH3" secondAttribute="trailing" id="TvC-fu-1tM"/>
                 <constraint firstAttribute="trailingMargin" secondItem="Arb-mj-xt4" secondAttribute="trailing" id="WhT-tv-ylP"/>
-                <constraint firstItem="Arb-mj-xt4" firstAttribute="top" secondItem="j2g-G9-4Tx" secondAttribute="top" id="lKL-n3-1k8"/>
-                <constraint firstItem="j2g-G9-4Tx" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="qd9-8J-O5v"/>
-                <constraint firstItem="iPX-Fa-tH3" firstAttribute="leading" secondItem="j2g-G9-4Tx" secondAttribute="leading" id="wSc-js-aAJ"/>
-                <constraint firstItem="j2g-G9-4Tx" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="x2q-BN-MO2"/>
+                <constraint firstItem="3rO-9J-GXf" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="dKx-jD-XSI"/>
+                <constraint firstItem="Arb-mj-xt4" firstAttribute="top" secondItem="3rO-9J-GXf" secondAttribute="top" id="lKL-n3-1k8"/>
+                <constraint firstItem="iPX-Fa-tH3" firstAttribute="leading" secondItem="3rO-9J-GXf" secondAttribute="leading" id="wSc-js-aAJ"/>
             </constraints>
             <connections>
-                <outlet property="entityImage" destination="j2g-G9-4Tx" id="sB1-5e-bk1"/>
+                <outlet property="entityImage" destination="3rO-9J-GXf" id="YmA-Of-PFc"/>
                 <outlet property="infoLabel" destination="iPX-Fa-tH3" id="j5K-fE-JvF"/>
                 <outlet property="nameLabel" destination="Arb-mj-xt4" id="LqP-ig-30T"/>
             </connections>
@@ -65,6 +66,9 @@
     <resources>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

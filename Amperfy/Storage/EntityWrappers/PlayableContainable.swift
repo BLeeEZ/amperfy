@@ -16,6 +16,7 @@ protocol PlayableContainable {
     var duration: Int { get }
     var isRateable: Bool { get }
     var isDownloadAvailable: Bool { get }
+    var artworkCollection: ArtworkCollection { get }
     func cachePlayables(downloadManager: DownloadManageable)
     func fetchFromServer(inContext: NSManagedObjectContext, syncer: LibrarySyncer)
 }

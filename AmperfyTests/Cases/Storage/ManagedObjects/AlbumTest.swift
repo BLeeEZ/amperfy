@@ -28,7 +28,7 @@ class AlbumTest: XCTestCase {
         XCTAssertEqual(album.syncInfo, nil)
         XCTAssertEqual(album.songs.count, 0)
         XCTAssertNil(album.artwork)
-        XCTAssertEqual(album.image, Artwork.defaultImage)
+        XCTAssertEqual(album.image, UIImage.albumArtwork)
         XCTAssertFalse(album.playables.hasCachedItems)
         XCTAssertFalse(album.isOrphaned)
     }
@@ -64,15 +64,15 @@ class AlbumTest: XCTestCase {
     
     
     func testArtworkAndImage() {
-        let testData = Artwork.defaultImage.pngData()!
-        let testImg = Artwork.defaultImage
+        let testData = UIImage.albumArtwork.pngData()!
+        let testImg = UIImage.albumArtwork
         testAlbum.artwork = library.createArtwork()
         testAlbum.artwork?.setImage(fromData: testData)
-        XCTAssertEqual(testAlbum.artwork?.image, testImg)
+        XCTAssertNil(testAlbum.artwork?.image)
         XCTAssertEqual(testAlbum.image, testImg)
         library.saveContext()
         guard let albumFetched = library.getAlbum(id: testId) else { XCTFail(); return }
-        XCTAssertEqual(albumFetched.artwork?.image, testImg)
+        XCTAssertNil(albumFetched.artwork?.image)
         XCTAssertEqual(albumFetched.image, testImg)
     }
 

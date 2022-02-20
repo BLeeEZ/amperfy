@@ -75,15 +75,8 @@ public class Album: AbstractLibraryEntity {
     var isOrphaned: Bool {
         return identifier == "Unknown (Orphaned)"
     }
-    
-    override var image: UIImage {
-        if super.image != Artwork.defaultImage {
-            return super.image
-        }
-        if let artistArt = artist?.artwork?.image {
-            return artistArt
-        }
-        return Artwork.defaultImage
+    override var defaultImage: UIImage {
+        return UIImage.albumArtwork
     }
 
 }
@@ -118,6 +111,9 @@ extension Album: PlayableContainable  {
         let library = LibraryStorage(context: context)
         let albumAsync = Album(managedObject: context.object(with: managedObject.objectID) as! AlbumMO)
         syncer.sync(album: albumAsync, library: library)
+    }
+    var artworkCollection: ArtworkCollection {
+        return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
     }
 }
 

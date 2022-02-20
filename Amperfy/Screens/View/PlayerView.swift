@@ -350,10 +350,10 @@ class PlayerView: UIView {
         var buttonImg = UIImage()
         if player.isPlaying {
             title = FontAwesomeIcon.Pause.asString
-            buttonImg = UIImage(named: "pause")!
+            buttonImg = UIImage.pause
         } else {
             title = FontAwesomeIcon.Play.asString
-            buttonImg = UIImage(named: "play")!
+            buttonImg = UIImage.play
         }
         
         playButton.setTitle(title, for: UIControl.State.normal)
@@ -404,8 +404,8 @@ class PlayerView: UIView {
             artworkImage.image = playableInfo.image
             rootView?.popupItem.image = playableInfo.image
         } else {
-            artworkImage.image = Artwork.defaultImage
-            rootView?.popupItem.image = Artwork.defaultImage
+            artworkImage.image = UIImage.songArtwork
+            rootView?.popupItem.image = UIImage.songArtwork
         }
     }
 

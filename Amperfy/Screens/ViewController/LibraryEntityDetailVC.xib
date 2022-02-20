@@ -18,7 +18,6 @@
                 <outlet property="albumNameLabelHeightConstraint" destination="vcP-wu-wk4" id="GL7-uH-kwW"/>
                 <outlet property="artistLabel" destination="nTF-ts-4gP" id="Xxx-Zu-aO8"/>
                 <outlet property="artistNameLabelHeightConstraint" destination="fBa-4V-jjb" id="1CP-av-3AN"/>
-                <outlet property="artworkImage" destination="wrZ-NE-prP" id="fuv-rL-GXZ"/>
                 <outlet property="cancelButton" destination="jma-L5-peG" id="vQN-gZ-0h4"/>
                 <outlet property="cancelButtonHeightConstraint" destination="g1T-Hs-jmS" id="zug-NH-bTH"/>
                 <outlet property="clearPlayerButton" destination="pbs-jx-sT0" id="65v-4X-VXI"/>
@@ -30,6 +29,7 @@
                 <outlet property="detailLabelsClusterHeightConstraint" destination="ft1-Xj-zQi" id="Yfu-2D-bBu"/>
                 <outlet property="downloadButton" destination="XcM-qv-zHW" id="1jN-7g-KdT"/>
                 <outlet property="elementInfoStackView" destination="J91-VR-QdL" id="Enj-I7-XSw"/>
+                <outlet property="entityImage" destination="Q7J-Jx-tr6" id="bEe-vo-uzH"/>
                 <outlet property="infoLabel" destination="fUI-xV-Cyd" id="1bT-eh-Ick"/>
                 <outlet property="mainClusterStackView" destination="qzF-wh-zOU" id="0ca-o7-SkZ"/>
                 <outlet property="mainStackClusterHeightConstraint" destination="FlB-wv-mVd" id="xaO-2n-Ujf"/>
@@ -63,12 +63,13 @@
                         <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="J91-VR-QdL" userLabel="ElementInfo Stack View">
                             <rect key="frame" x="0.0" y="0.0" width="984" height="90"/>
                             <subviews>
-                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wrZ-NE-prP" userLabel="Artwork" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
+                                <view contentMode="scaleAspectFill" translatesAutoresizingMaskIntoConstraints="NO" id="Q7J-Jx-tr6" customClass="EntityImageView" customModule="Amperfy" customModuleProvider="target">
                                     <rect key="frame" x="0.0" y="0.0" width="90" height="90"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     <constraints>
-                                        <constraint firstAttribute="width" secondItem="wrZ-NE-prP" secondAttribute="height" multiplier="1:1" priority="999" id="B0C-cv-xrn"/>
+                                        <constraint firstAttribute="width" secondItem="Q7J-Jx-tr6" secondAttribute="height" multiplier="1:1" priority="999" id="CIn-dR-uQb"/>
                                     </constraints>
-                                </imageView>
+                                </view>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7yG-AI-SV8">
                                     <rect key="frame" x="100" y="0.0" width="884" height="90"/>
                                     <subviews>

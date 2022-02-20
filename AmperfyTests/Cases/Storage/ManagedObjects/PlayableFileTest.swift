@@ -24,7 +24,7 @@ class PlayableFileTest: XCTestCase {
     
     func testProperties() {
         let songId = cdHelper.seeder.songs[0].id
-        let testData = Artwork.defaultImage.pngData()!
+        let testData = UIImage.songArtwork.pngData()!
         guard let song = library.getSong(id: songId) else { XCTFail(); return }
         testPlayableFile.info = song
         testPlayableFile.data = testData
