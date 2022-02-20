@@ -6,6 +6,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     private var fetchedResultsController: PodcastEpisodesFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var detailOperationsView: GenericDetailTableHeader?
+    private var descriptionView: FullWidthDescriptionView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,11 +18,16 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         tableView.register(nibName: PodcastEpisodeTableCell.typeName)
         tableView.rowHeight = PodcastEpisodeTableCell.rowHeight
 
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight))
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight + FullWidthDescriptionView.frameHeight))
         if let genericDetailTableHeaderView = ViewBuilder<GenericDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight)) {
             genericDetailTableHeaderView.prepare(toWorkOn: podcast, rootView: self)
             tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
             detailOperationsView = genericDetailTableHeaderView
+        }
+        if let fullWidthDescriptionView = ViewBuilder<FullWidthDescriptionView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: FullWidthDescriptionView.frameHeight)) {
+            fullWidthDescriptionView.descriptionLabel.text = podcast.depiction
+            tableView.tableHeaderView?.addSubview(fullWidthDescriptionView)
+            descriptionView = fullWidthDescriptionView
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         

@@ -2,11 +2,11 @@ import UIKit
 
 class GenericDetailTableHeader: UIView {
     
-    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var titleLabel: MarqueeLabel!
     @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var infoLabel: MarqueeLabel!
     
-    static let frameHeight: CGFloat = 150.0 + margin.top + margin.bottom
+    static let frameHeight: CGFloat = 178.0
     static let margin = UIView.defaultMarginTopElement
     
     private var entityContainer: PlayableContainable?
@@ -28,10 +28,10 @@ class GenericDetailTableHeader: UIView {
         
     func refresh() {
         guard let entityContainer = entityContainer else { return }
-        nameLabel.text = entityContainer.name
-        nameLabel.lineBreakMode = .byWordWrapping
-        nameLabel.numberOfLines = 0
         entityImage.display(container: entityContainer)
+        titleLabel.applyAmperfyStyle()
+        titleLabel.text = entityContainer.name
+        infoLabel.applyAmperfyStyle()
         infoLabel.applyAmperfyStyle()
         infoLabel.text = entityContainer.info(for: appDelegate.backendProxy.selectedApi, type: .long)
     }

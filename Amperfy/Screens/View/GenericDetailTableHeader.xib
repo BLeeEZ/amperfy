@@ -12,53 +12,60 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB" userLabel="Genre Detail Table Header" customClass="GenericDetailTableHeader" customModule="Amperfy" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <rect key="frame" x="0.0" y="0.0" width="375" height="178"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3rO-9J-GXf" customClass="EntityImageView" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="16" y="0.0" width="125" height="125"/>
+                    <rect key="frame" x="125" y="0.0" width="125" height="125"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="125" id="IVQ-Ck-Py1"/>
                         <constraint firstAttribute="width" secondItem="3rO-9J-GXf" secondAttribute="height" multiplier="1:1" id="rFl-l0-KJV"/>
                     </constraints>
                 </view>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3 Artists 4 Albums 152 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iPX-Fa-tH3" userLabel="Info Label" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="16" y="133" width="343" height="17"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XhW-hw-pIz" userLabel="Title Label" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                    <rect key="frame" x="16" y="131" width="343" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="24" id="7mk-4H-HHr"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                    <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Arb-mj-xt4" userLabel="Name Label">
-                    <rect key="frame" x="149" y="0.0" width="210" height="60"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3 Artists 4 Albums 152 Songs" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iPX-Fa-tH3" userLabel="Info Label" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                    <rect key="frame" x="16" y="157" width="343" height="20"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="60" id="y0M-RG-zwo"/>
+                        <constraint firstAttribute="height" constant="20" id="aW3-c8-BT9"/>
                     </constraints>
-                    <fontDescription key="fontDescription" type="boldSystem" pointSize="19"/>
-                    <nil key="textColor"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="textColor" systemColor="secondaryLabelColor"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
-                <constraint firstItem="Arb-mj-xt4" firstAttribute="leading" secondItem="3rO-9J-GXf" secondAttribute="trailing" constant="8" id="BHq-Zz-cv5"/>
-                <constraint firstItem="3rO-9J-GXf" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="NTG-L6-EUp"/>
-                <constraint firstItem="iPX-Fa-tH3" firstAttribute="top" secondItem="3rO-9J-GXf" secondAttribute="bottom" constant="8" id="Oje-7y-tAi"/>
-                <constraint firstAttribute="trailingMargin" secondItem="iPX-Fa-tH3" secondAttribute="trailing" id="TvC-fu-1tM"/>
-                <constraint firstAttribute="trailingMargin" secondItem="Arb-mj-xt4" secondAttribute="trailing" id="WhT-tv-ylP"/>
-                <constraint firstItem="3rO-9J-GXf" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="dKx-jD-XSI"/>
-                <constraint firstItem="Arb-mj-xt4" firstAttribute="top" secondItem="3rO-9J-GXf" secondAttribute="top" id="lKL-n3-1k8"/>
-                <constraint firstItem="iPX-Fa-tH3" firstAttribute="leading" secondItem="3rO-9J-GXf" secondAttribute="leading" id="wSc-js-aAJ"/>
+                <constraint firstItem="3rO-9J-GXf" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="6CZ-g7-CR3"/>
+                <constraint firstItem="iPX-Fa-tH3" firstAttribute="top" secondItem="XhW-hw-pIz" secondAttribute="bottom" constant="2" id="JMt-Er-vnt"/>
+                <constraint firstItem="iPX-Fa-tH3" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="LCX-zs-jBS"/>
+                <constraint firstItem="XhW-hw-pIz" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="cTP-de-nI2"/>
+                <constraint firstItem="3rO-9J-GXf" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="gUQ-2I-DNM"/>
+                <constraint firstAttribute="trailingMargin" secondItem="XhW-hw-pIz" secondAttribute="trailing" id="ko8-Lc-hgz"/>
+                <constraint firstItem="XhW-hw-pIz" firstAttribute="top" secondItem="3rO-9J-GXf" secondAttribute="bottom" constant="6" id="sjw-vM-65a"/>
+                <constraint firstAttribute="trailingMargin" secondItem="iPX-Fa-tH3" secondAttribute="trailing" id="xgS-Kf-wTG"/>
             </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="entityImage" destination="3rO-9J-GXf" id="YmA-Of-PFc"/>
-                <outlet property="infoLabel" destination="iPX-Fa-tH3" id="j5K-fE-JvF"/>
-                <outlet property="nameLabel" destination="Arb-mj-xt4" id="LqP-ig-30T"/>
+                <outlet property="infoLabel" destination="iPX-Fa-tH3" id="j5o-NT-gP7"/>
+                <outlet property="titleLabel" destination="XhW-hw-pIz" id="ick-V4-fQl"/>
             </connections>
-            <point key="canvasLocation" x="-31.199999999999999" y="132.68365817091455"/>
+            <point key="canvasLocation" x="-31.199999999999999" y="-89.055472263868069"/>
         </view>
     </objects>
     <designables>
+        <designable name="XhW-hw-pIz">
+            <size key="intrinsicContentSize" width="46" height="23"/>
+        </designable>
         <designable name="iPX-Fa-tH3">
             <size key="intrinsicContentSize" width="191" height="17"/>
         </designable>

@@ -89,6 +89,8 @@
 		502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */; };
 		5040B2C4269CD19600911451 /* LocalNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5040B2C3269CD19600911451 /* LocalNotificationManager.swift */; };
 		5040B2C6269D947F00911451 /* BackgroundFetchTriggeredSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5040B2C5269D947F00911451 /* BackgroundFetchTriggeredSyncer.swift */; };
+		5043714E27C23BF4008358AC /* FullWidthDescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5043714C27C23BF4008358AC /* FullWidthDescriptionView.swift */; };
+		5043714F27C23C0C008358AC /* FullWidthDescriptionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5043714D27C23BF4008358AC /* FullWidthDescriptionView.xib */; };
 		5046DAF32689B97600B3C37E /* AbstractPlayableMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5046DAF12689B97600B3C37E /* AbstractPlayableMO+CoreDataClass.swift */; };
 		5046DAF42689B97600B3C37E /* AbstractPlayableMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5046DAF22689B97600B3C37E /* AbstractPlayableMO+CoreDataProperties.swift */; };
 		504AE7B227BECFDD00571BA5 /* EntityImageView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 504AE7B127BECFDD00571BA5 /* EntityImageView.xib */; };
@@ -460,6 +462,8 @@
 		5040B2C2269C451A00911451 /* Amperfy v12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v12.xcdatamodel"; sourceTree = "<group>"; };
 		5040B2C3269CD19600911451 /* LocalNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationManager.swift; sourceTree = "<group>"; };
 		5040B2C5269D947F00911451 /* BackgroundFetchTriggeredSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundFetchTriggeredSyncer.swift; sourceTree = "<group>"; };
+		5043714C27C23BF4008358AC /* FullWidthDescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullWidthDescriptionView.swift; sourceTree = "<group>"; };
+		5043714D27C23BF4008358AC /* FullWidthDescriptionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FullWidthDescriptionView.xib; sourceTree = "<group>"; };
 		5046DAF02689A66E00B3C37E /* Amperfy v11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v11.xcdatamodel"; sourceTree = "<group>"; };
 		5046DAF12689B97600B3C37E /* AbstractPlayableMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AbstractPlayableMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		5046DAF22689B97600B3C37E /* AbstractPlayableMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AbstractPlayableMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -1192,6 +1196,8 @@
 				500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */,
 				50AFA1482632E83100F198DD /* GenericDetailTableHeader.xib */,
 				50AFA1472632E83100F198DD /* GenericDetailTableHeader.swift */,
+				5043714D27C23BF4008358AC /* FullWidthDescriptionView.xib */,
+				5043714C27C23BF4008358AC /* FullWidthDescriptionView.swift */,
 				50DEEE06265E27070073FF20 /* DirectoryTableCell.xib */,
 				50DEEE05265E27070073FF20 /* DirectoryTableCell.swift */,
 				5000C1FB2799B00F00DD73BB /* AlbumSongTableCell.xib */,
@@ -1484,6 +1490,7 @@
 				50BA932121DA4D6D00E5901D /* Font Awesome 5 Free-Solid-900.otf in Resources */,
 				500631FF23A1747B000F75A3 /* PlayerView.xib in Resources */,
 				504AE7B227BECFDD00571BA5 /* EntityImageView.xib in Resources */,
+				5043714F27C23C0C008358AC /* FullWidthDescriptionView.xib in Resources */,
 				508FDE3821F1E14F005A0724 /* NewPlaylistTableHeader.xib in Resources */,
 				5007CE4521EF639200BC5CBA /* PlaylistTableCell.xib in Resources */,
 				508385EF21C5965E00C4BB32 /* Assets.xcassets in Resources */,
@@ -1674,6 +1681,7 @@
 				50A12F432739239800E7B2AA /* EmbeddedArtworkMO+CoreDataClass.swift in Sources */,
 				50DEEE1B265ED65B0073FF20 /* MusicFolder.swift in Sources */,
 				50BA930221D1019B00E5901D /* AmpacheLibrarySyncer.swift in Sources */,
+				5043714E27C23BF4008358AC /* FullWidthDescriptionView.swift in Sources */,
 				500B7D4321ECFCDD0083ED6F /* LibraryElementEnum.swift in Sources */,
 				501A7D492681C1700055A51B /* PodcastEpisode.swift in Sources */,
 				508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */,

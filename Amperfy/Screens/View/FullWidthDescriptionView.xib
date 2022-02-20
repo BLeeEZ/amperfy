@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" userLabel="Full Width Description" customClass="FullWidthDescriptionView" customModule="Amperfy" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="82"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="20" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iPX-Fa-tH3" userLabel="Description Label">
+                    <rect key="frame" x="16" y="0.0" width="343" height="82"/>
+                    <attributedString key="attributedText">
+                        <fragment>
+                            <string key="content">Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum.
+
+</string>
+                            <attributes>
+                                <color key="NSColor" systemColor="secondaryLabelColor"/>
+                                <font key="NSFont" metaFont="system" size="14"/>
+                                <paragraphStyle key="NSParagraphStyle" alignment="justified" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                            </attributes>
+                        </fragment>
+                        <fragment content="Lorem ipsum lorem ipsum lorem ipsum lorem ipsum">
+                            <attributes>
+                                <color key="NSColor" systemColor="secondaryLabelColor"/>
+                                <font key="NSFont" metaFont="system" size="14"/>
+                                <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                            </attributes>
+                        </fragment>
+                    </attributedString>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <constraints>
+                <constraint firstItem="iPX-Fa-tH3" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="LCX-zs-jBS"/>
+                <constraint firstAttribute="bottomMargin" secondItem="iPX-Fa-tH3" secondAttribute="bottom" id="n3G-ca-JD0"/>
+                <constraint firstItem="iPX-Fa-tH3" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="t5i-aN-UTq"/>
+                <constraint firstAttribute="trailingMargin" secondItem="iPX-Fa-tH3" secondAttribute="trailing" id="xgS-Kf-wTG"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="descriptionLabel" destination="iPX-Fa-tH3" id="5Qg-0N-vSk"/>
+            </connections>
+            <point key="canvasLocation" x="-31.199999999999999" y="-129.53523238380811"/>
+        </view>
+    </objects>
+    <designables>
+        <designable name="iPX-Fa-tH3">
+            <size key="intrinsicContentSize" width="833.5" height="50.5"/>
+        </designable>
+    </designables>
+    <resources>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>
