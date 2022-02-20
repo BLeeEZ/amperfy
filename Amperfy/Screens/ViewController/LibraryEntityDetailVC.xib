@@ -126,7 +126,6 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
-                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     <constraints>
                                         <constraint firstItem="KnP-8k-7qE" firstAttribute="top" secondItem="7yG-AI-SV8" secondAttribute="top" id="0sb-zJ-Plm"/>
                                         <constraint firstItem="RYw-hT-MnF" firstAttribute="bottom" secondItem="nTF-ts-4gP" secondAttribute="bottom" id="53V-5U-xG7"/>

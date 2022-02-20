@@ -84,6 +84,8 @@ class LibraryEntityDetailVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        
+        self.view.setBackgroundBlur(style: .prominent)
         titleLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()
         albumLabel.applyAmperfyStyle()

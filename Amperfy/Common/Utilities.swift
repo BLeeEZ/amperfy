@@ -372,6 +372,14 @@ extension UIView {
         layer.render(in: context)
         return UIGraphicsGetImageFromCurrentImageContext()
     }
+    
+    func setBackgroundBlur(style: UIBlurEffect.Style) {
+        self.backgroundColor = UIColor.clear
+        let blurEffect = UIBlurEffect(style: .prominent)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = self.frame
+        self.insertSubview(blurEffectView, at: 0)
+    }
 }
 
 extension UITableView {
