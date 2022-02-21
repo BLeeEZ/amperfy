@@ -5,8 +5,9 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     private var fetchedResultsController: PlaylistItemsFetchedResultsController!
     var playlist: Playlist!
     
-    var editButton: UIBarButtonItem!
-    var doneButton: UIBarButtonItem!
+    private var editButton: UIBarButtonItem!
+    private var doneButton: UIBarButtonItem!
+    private var optionsButton: UIBarButtonItem!
     var playlistOperationsView: PlaylistDetailTableHeader?
     
     override func viewDidLoad() {
@@ -20,6 +21,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(startEditing))
         doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(endEditing))
+        optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
         
         let playlistTableHeaderFrameHeight = PlaylistDetailTableHeader.frameHeight
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: playlistTableHeaderFrameHeight + LibraryElementDetailTableHeaderView.frameHeight))
@@ -48,17 +50,25 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            navigationItem.rightBarButtonItem = editButton
-            if playlist?.isSmartPlaylist ?? false {
-                navigationItem.rightBarButtonItem?.isEnabled = false
-            }
-        } else {
-            navigationItem.rightBarButtonItem = nil
-        }
+        refreshBarButtons()
         playlist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
             self.playlistOperationsView?.refresh()
         }
+    }
+    
+    func refreshBarButtons() {
+        var edititingBarButton: UIBarButtonItem? = nil
+        if !tableView.isEditing {
+            if appDelegate.persistentStorage.settings.isOnlineMode {
+                edititingBarButton = editButton
+                if playlist?.isSmartPlaylist ?? false {
+                    edititingBarButton?.isEnabled = false
+                }
+            }
+        } else {
+            edititingBarButton = doneButton
+        }
+        navigationItem.rightBarButtonItems = [edititingBarButton, optionsButton].compactMap{$0}
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
@@ -74,15 +84,15 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     }
 
     @objc private func startEditing() {
-        navigationItem.rightBarButtonItem = doneButton
         tableView.isEditing = true
         playlistOperationsView?.startEditing()
+        refreshBarButtons()
     }
     
     @objc private func endEditing() {
-        navigationItem.rightBarButtonItem = editButton
         tableView.isEditing = false
         playlistOperationsView?.endEditing()
+        refreshBarButtons()
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -137,6 +147,11 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         return true
     }
     
+    override func updateSearchResults(for searchController: UISearchController) {
+        fetchedResultsController.search(onlyCachedSongs: appDelegate.persistentStorage.settings.isOfflineMode)
+        tableView.reloadData()
+    }
+    
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let syncLibrary = LibraryStorage(context: context)
@@ -150,9 +165,13 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         }
     }
     
-    override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(onlyCachedSongs: appDelegate.persistentStorage.settings.isOfflineMode)
-        tableView.reloadData()
+    @objc private func optionsPressed() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let playlist = self.playlist, self.presentingViewController == nil else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(container: playlist, on: self)
+        present(detailVC, animated: true)
     }
-    
+
 }

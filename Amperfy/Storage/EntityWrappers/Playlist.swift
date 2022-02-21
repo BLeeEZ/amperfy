@@ -304,7 +304,10 @@ extension Playlist: PlayableContainable  {
             infoContent.append("Smart Playlist")
         }
         if type == .long {
-            infoContent.append("\(playables.reduce(0, {$0 + $1.duration}).asDurationString)")
+            let completeDuration = playables.reduce(0, {$0 + $1.duration})
+            if completeDuration > 0 {
+                infoContent.append("\(completeDuration.asDurationString)")
+            }
         }
         return infoContent
     }

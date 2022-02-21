@@ -82,7 +82,9 @@ public class Song: AbstractPlayable, Identifyable {
             if track > 0 {
                 infoContent.append("Track \(track)")
             }
-            infoContent.append("\(duration.asDurationString)")
+            if duration > 0 {
+                infoContent.append("\(duration.asDurationString)")
+            }
             if year > 0 {
                 infoContent.append("Year \(year)")
             } else if let albumYear = album?.year, albumYear > 0 {

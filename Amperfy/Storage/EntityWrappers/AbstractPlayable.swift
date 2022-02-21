@@ -170,7 +170,9 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
             if year > 0 {
                 infoContent.append("Year \(year)")
             }
-            infoContent.append("\(duration.asDurationString)")
+            if duration > 0 {
+                infoContent.append("\(duration.asDurationString)")
+            }
         }
         return infoContent
     }

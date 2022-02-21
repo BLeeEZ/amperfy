@@ -75,7 +75,10 @@ extension Genre: PlayableContainable  {
             infoContent.append("\(songs.count) Songs")
         }
         if type == .long {
-            infoContent.append("\(songs.reduce(0, {$0 + $1.duration}).asDurationString)")
+            let completeDuration = songs.reduce(0, {$0 + $1.duration})
+            if completeDuration > 0 {
+                infoContent.append("\(completeDuration.asDurationString)")
+            }
         }
         return infoContent
     }

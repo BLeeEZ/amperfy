@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -15,61 +15,80 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="178"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3rO-9J-GXf" customClass="EntityImageView" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="125" y="0.0" width="125" height="125"/>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="7J5-ll-b5d">
+                    <rect key="frame" x="16" y="0.0" width="343" height="178"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3rO-9J-GXf" customClass="EntityImageView" customModule="Amperfy" customModuleProvider="target">
+                            <rect key="frame" x="135.5" y="0.0" width="72" height="72"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="3rO-9J-GXf" secondAttribute="height" multiplier="1:1" id="rFl-l0-KJV"/>
+                            </constraints>
+                        </view>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XhW-hw-pIz" userLabel="Title Label">
+                            <rect key="frame" x="0.0" y="87" width="343" height="23"/>
+                            <attributedString key="attributedText">
+                                <fragment content="Title">
+                                    <attributes>
+                                        <font key="NSFont" metaFont="system" size="19"/>
+                                        <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                    </attributes>
+                                </fragment>
+                            </attributedString>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mie-tL-VVX" userLabel="Subtitle Label">
+                            <rect key="frame" x="142.5" y="125.5" width="58.5" height="20.5"/>
+                            <attributedString key="attributedText">
+                                <fragment content="Subtitle">
+                                    <attributes>
+                                        <color key="NSColor" systemColor="secondaryLabelColor"/>
+                                        <font key="NSFont" metaFont="system" size="17"/>
+                                        <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                    </attributes>
+                                </fragment>
+                            </attributedString>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iPX-Fa-tH3" userLabel="Info Label">
+                            <rect key="frame" x="0.0" y="161" width="343" height="17"/>
+                            <attributedString key="attributedText">
+                                <fragment content="3 Artists 4 Albums 152 Songs">
+                                    <attributes>
+                                        <color key="NSColor" systemColor="secondaryLabelColor"/>
+                                        <font key="NSFont" metaFont="system" size="14"/>
+                                        <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                    </attributes>
+                                </fragment>
+                            </attributedString>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
                     <constraints>
-                        <constraint firstAttribute="height" constant="125" id="IVQ-Ck-Py1"/>
-                        <constraint firstAttribute="width" secondItem="3rO-9J-GXf" secondAttribute="height" multiplier="1:1" id="rFl-l0-KJV"/>
+                        <constraint firstItem="iPX-Fa-tH3" firstAttribute="leading" secondItem="7J5-ll-b5d" secondAttribute="leading" id="EJI-cQ-XqV"/>
+                        <constraint firstItem="XhW-hw-pIz" firstAttribute="leading" secondItem="7J5-ll-b5d" secondAttribute="leading" id="lH0-XY-7iu"/>
+                        <constraint firstAttribute="trailing" secondItem="XhW-hw-pIz" secondAttribute="trailing" id="pLX-zj-fz0"/>
+                        <constraint firstAttribute="trailing" secondItem="iPX-Fa-tH3" secondAttribute="trailing" id="yVp-kg-Mie"/>
                     </constraints>
-                </view>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XhW-hw-pIz" userLabel="Title Label" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="16" y="131" width="343" height="24"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="24" id="7mk-4H-HHr"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="19"/>
-                    <nil key="textColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3 Artists 4 Albums 152 Songs" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iPX-Fa-tH3" userLabel="Info Label" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="16" y="157" width="343" height="20"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="20" id="aW3-c8-BT9"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                    <color key="textColor" systemColor="secondaryLabelColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
+                </stackView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
-                <constraint firstItem="3rO-9J-GXf" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="6CZ-g7-CR3"/>
-                <constraint firstItem="iPX-Fa-tH3" firstAttribute="top" secondItem="XhW-hw-pIz" secondAttribute="bottom" constant="2" id="JMt-Er-vnt"/>
-                <constraint firstItem="iPX-Fa-tH3" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="LCX-zs-jBS"/>
-                <constraint firstItem="XhW-hw-pIz" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="cTP-de-nI2"/>
-                <constraint firstItem="3rO-9J-GXf" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="gUQ-2I-DNM"/>
-                <constraint firstAttribute="trailingMargin" secondItem="XhW-hw-pIz" secondAttribute="trailing" id="ko8-Lc-hgz"/>
-                <constraint firstItem="XhW-hw-pIz" firstAttribute="top" secondItem="3rO-9J-GXf" secondAttribute="bottom" constant="6" id="sjw-vM-65a"/>
-                <constraint firstAttribute="trailingMargin" secondItem="iPX-Fa-tH3" secondAttribute="trailing" id="xgS-Kf-wTG"/>
+                <constraint firstItem="7J5-ll-b5d" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="dwr-wd-coX"/>
+                <constraint firstAttribute="bottomMargin" secondItem="7J5-ll-b5d" secondAttribute="bottom" id="sf1-MX-cxH"/>
+                <constraint firstAttribute="trailingMargin" secondItem="7J5-ll-b5d" secondAttribute="trailing" id="urX-VB-Va6"/>
+                <constraint firstItem="7J5-ll-b5d" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="wHF-Np-yYi"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="entityImage" destination="3rO-9J-GXf" id="YmA-Of-PFc"/>
                 <outlet property="infoLabel" destination="iPX-Fa-tH3" id="j5o-NT-gP7"/>
+                <outlet property="subtitleLabel" destination="Mie-tL-VVX" id="Uq3-yR-wnF"/>
                 <outlet property="titleLabel" destination="XhW-hw-pIz" id="ick-V4-fQl"/>
             </connections>
             <point key="canvasLocation" x="-31.199999999999999" y="-89.055472263868069"/>
         </view>
     </objects>
-    <designables>
-        <designable name="XhW-hw-pIz">
-            <size key="intrinsicContentSize" width="46" height="23"/>
-        </designable>
-        <designable name="iPX-Fa-tH3">
-            <size key="intrinsicContentSize" width="191" height="17"/>
-        </designable>
-    </designables>
     <resources>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>

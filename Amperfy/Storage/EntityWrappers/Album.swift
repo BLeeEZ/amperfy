@@ -102,7 +102,9 @@ extension Album: PlayableContainable  {
             if let genre = genre {
                 infoContent.append("Genre: \(genre.name)")
             }
-            infoContent.append("\(duration.asDurationString)")
+            if duration > 0 {
+                infoContent.append("\(duration.asDurationString)")
+            }
         }
         return infoContent
     }

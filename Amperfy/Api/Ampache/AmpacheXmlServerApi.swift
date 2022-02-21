@@ -424,6 +424,15 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
     }
     
+    func requestPlaylistEditOnlyName(playlist: Playlist) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "playlist_edit")
+        apiUrlComponent.addQueryItem(name: "filter", value: playlist.id)
+        apiUrlComponent.addQueryItem(name: "name", value: playlist.name)
+        let errorParser = AmpacheXmlParser()
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
+    }
+    
     func requestPlaylistEdit(playlist: Playlist) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "playlist_edit")

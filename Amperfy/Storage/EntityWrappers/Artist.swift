@@ -103,9 +103,11 @@ extension Artist: PlayableContainable  {
             infoContent.append("\(songCount) Songs")
         }
         if type == .long {
-            infoContent.append("\(duration.asDurationString)")
             if let genre = genre {
                 infoContent.append("Genre: \(genre.name)")
+            }
+            if duration > 0 {
+                infoContent.append("\(duration.asDurationString)")
             }
         }
         return infoContent

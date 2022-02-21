@@ -44,7 +44,10 @@ extension Podcast: PlayableContainable  {
             infoContent.append("\(episodes.count) Episodes")
         }
         if type == .long {
-            infoContent.append("\(episodes.reduce(0, {$0 + $1.duration}).asDurationString)")
+            let completeDuration = episodes.reduce(0, {$0 + $1.duration})
+            if completeDuration > 0 {
+                infoContent.append("\(completeDuration.asDurationString)")
+            }
         }
         return infoContent
     }

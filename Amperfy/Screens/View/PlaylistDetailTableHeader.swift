@@ -2,18 +2,12 @@ import UIKit
 
 class PlaylistDetailTableHeader: UIView {
 
+    @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var nameTextField: UITextField!
-    @IBOutlet weak var optionsButton: UIButton!
-    @IBOutlet weak var art1Image: LibraryEntityImage!
-    @IBOutlet weak var art2Image: LibraryEntityImage!
-    @IBOutlet weak var art3Image: LibraryEntityImage!
-    @IBOutlet weak var art4Image: LibraryEntityImage!
-    @IBOutlet weak var art5Image: LibraryEntityImage!
-    @IBOutlet weak var art6Image: LibraryEntityImage!
-    @IBOutlet weak var infoLabel: MarqueeLabel!
+    @IBOutlet weak var infoLabel: UILabel!
     
-    static let frameHeight: CGFloat = 109.0 + margin.top + margin.bottom
+    static let frameHeight: CGFloat = 200.0
     static let margin = UIView.defaultMarginTopElement
     
     private var playlist: Playlist?
@@ -29,54 +23,47 @@ class PlaylistDetailTableHeader: UIView {
     func prepare(toWorkOnPlaylist playlist: Playlist?, rootView: PlaylistDetailVC) {
         guard let playlist = playlist else { return }
         self.playlist = playlist
-        nameLabel.text = playlist.name
         self.rootView = rootView
+        nameLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        nameTextField.setContentCompressionResistancePriority(.required, for: .vertical)
+        infoLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         refresh()
     }
     
     func refresh() {
-        guard let playlist = playlist else { return }
-        nameTextField.text = playlist.name
+        guard let playlist = playlist, let rootView = rootView else { return }
+        entityImage.display(container: playlist)
         nameLabel.text = playlist.name
-        refreshArtworks(playlist: playlist)
-        infoLabel.applyAmperfyStyle()
+        nameTextField.text = playlist.name
         infoLabel.text = playlist.info(for: appDelegate.backendProxy.selectedApi, type: .long)
-    }
-    
-    func refreshArtworks(playlist: Playlist?) {
-        let images: [LibraryEntityImage] = [art1Image, art2Image, art3Image, art4Image, art5Image, art6Image]
-        images.forEach{ $0.image = UIImage.songArtwork }
-        
-        guard let playlist = playlist else { return }
-        let playables = playlist.playables
-        for (index, artImage) in images.enumerated() {
-            guard playables.count > index else { break }
-            artImage.displayAndUpdate(entity: playables[index])
+        if rootView.tableView.isEditing {
+            nameLabel.isHidden = true
+            nameTextField.isHidden = false
+            nameTextField.text = playlist.name
+        } else {
+            nameLabel.isHidden = false
+            nameTextField.isHidden = true
         }
     }
-    
+
     func startEditing() {
-        nameLabel.isHidden = true
-        nameTextField.text = playlist?.name
-        nameTextField.isHidden = false
+        refresh()
     }
     
     func endEditing() {
-        nameLabel.isHidden = false
-        nameTextField.isHidden = true
         if let nameText = nameTextField.text, let playlist = playlist, nameText != playlist.name {
             playlist.name = nameText
             nameLabel.text = nameText
+            if appDelegate.persistentStorage.settings.isOnlineMode {
+                appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                    let syncLibrary = LibraryStorage(context: context)
+                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                    let playlistAsync = playlist.getManagedObject(in: context, library: syncLibrary)
+                    syncer.syncUpload(playlistToUpdateName: playlistAsync, library: syncLibrary)
+                }
+            }
         }
-    }
-    
-    @IBAction func optionsButtonPressed(_ sender: Any) {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let playlist = playlist, let rootView = rootView, rootView.presentingViewController == nil else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: playlist, on: rootView)
-        rootView.present(detailVC, animated: true)
+        refresh()
     }
 
 }

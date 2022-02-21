@@ -152,7 +152,7 @@ public class PodcastEpisode: AbstractPlayable {
                 infoContent.append("Not Available")
             } else if let remainingTime = remainingTimeInSec {
                 infoContent.append("\(remainingTime.asDurationString) left")
-            } else {
+            } else if duration > 0 {
                 infoContent.append("\(duration.asDurationString)")
             }
         }

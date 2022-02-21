@@ -68,6 +68,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func syncLatestLibraryElements(library: LibraryStorage) {}
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {}
     func syncDown(playlist: Playlist, library: LibraryStorage) {}
+    func syncUpload(playlistToUpdateName playlist: Playlist, library: LibraryStorage) {}
     func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], library: LibraryStorage) {}
     func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage) {}
     func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage) {}

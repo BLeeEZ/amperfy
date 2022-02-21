@@ -293,6 +293,11 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         ampacheXmlServerApi.requestPlaylistDeleteItem(playlist: playlist, index: index)
     }
     
+    func syncUpload(playlistToUpdateName playlist: Playlist, library: LibraryStorage) {
+        os_log("Upload name on playlist to: \"%s\"", log: log, type: .info, playlist.name)
+        ampacheXmlServerApi.requestPlaylistEditOnlyName(playlist: playlist)
+    }
+    
     func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage) {
         os_log("Upload OrderChange on playlist \"%s\"", log: log, type: .info, playlist.name)
         ampacheXmlServerApi.requestPlaylistEdit(playlist: playlist)

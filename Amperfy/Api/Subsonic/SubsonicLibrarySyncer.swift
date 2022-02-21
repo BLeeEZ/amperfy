@@ -235,6 +235,20 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         library.saveContext()
     }
     
+    func syncUpload(playlistToUpdateName playlist: Playlist, library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        os_log("Upload name on playlist to: \"%s\"", log: log, type: .info, playlist.name)
+        if playlist.id == "" {
+            createPlaylistRemote(playlist: playlist, library: library, syncWave: syncWave)
+        }
+        guard playlist.id != "" else {
+            os_log("Playlist id could not be obtained", log: log, type: .info)
+            return
+        }
+        let updateResponseParser = SsPingParserDelegate()
+        subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: [], songIdsToAdd: [])
+    }
+    
     func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
         os_log("Upload SongsAdded on playlist \"%s\"", log: log, type: .info, playlist.name)
