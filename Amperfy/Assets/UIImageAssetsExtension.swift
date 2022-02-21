@@ -21,6 +21,7 @@ extension UIImage {
     static var artistArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.artist, iconSizeType: .big) }()
     static var album: UIImage = { return UIImage.create("album") }()
     static var albumArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.album, iconSizeType: .big) }()
+    static var albumCarplay: UIImage = { return UIImage.create("album_carplay") }()
     static var podcast: UIImage = { return UIImage.create("podcast") }()
     static var podcastArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .big) }()
     static var podcastCarplay: UIImage = { return UIImage.create("podcast_carplay") }()
@@ -31,7 +32,7 @@ extension UIImage {
     static var playlistCarplay: UIImage = { return UIImage.create("playlist_carplay") }()
     static var playlistBlack: UIImage = { return UIImage.create("playlist") }()
     static var musicalNotes: UIImage = { return UIImage.create("musical_notes_svg") }()
-    static var musicalNotesCarplay: UIImage = { return UIImage.create("musical_notes") }()
+    static var musicalNotesCarplay: UIImage = { return UIImage.create("musical_notes_carplay") }()
     
     static var userQueueInsert: UIImage = { return UIImage.create("user_queue_insert") }()
     static var userQueueAppend: UIImage = { return UIImage.create("user_queue_append") }()

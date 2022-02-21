@@ -135,23 +135,25 @@ class CarPlayHandler: NSObject {
     }
     
     func populate() {
-        let recentSongsData = CarPlayTabData(title: "Recent Songs", image: UIImage.musicalNotesCarplay) { completionHandler in
-            if self.persistentStorage.settings.isOnlineMode {
-                self.persistentStorage.context.performAndWait {
-                    let syncer = self.backendApi.createLibrarySyncer()
-                    syncer.syncLatestLibraryElements(library: self.library)
-                    let songs = self.library.getRecentSongsForCarPlay()
-                    var songItems = [CarPlayPlayableItem]()
-                    for song in songs {
-                        let item = CarPlayPlayableItem(element: song, image: song.image, fetchCB: nil)
-                        songItems.append(item)
-                    }
-                    completionHandler(songItems)
-                }
-            } else {
-                completionHandler([])
-            }
+        let playlistsData = CarPlayTabData(title: "Playlists", image: UIImage.playlistCarplay, fetchCB: nil)
+        let playlists = library.getPlaylistsForCarPlay()
+        var playlistItems = [CarPlayPlayableItem]()
+        for playlist in playlists {
+            let item = CarPlayPlayableItem(element: playlist, image: nil, fetchCB: nil)
+            playlistItems.append(item)
         }
+        playlistsData.playableItems = playlistItems
+
+        let recentAlbumsData = CarPlayTabData(title: "Recent Albums", image: UIImage.albumCarplay, fetchCB: nil)
+        let albums = library.getRecentAlbumsForCarPlay()
+        var albumItems = [CarPlayPlayableItem]()
+        for album in albums {
+            let item = CarPlayPlayableItem(element: album, image: album.image, fetchCB: nil)
+            albumItems.append(item)
+        }
+        recentAlbumsData.playableItems = albumItems
+
+        let recentSongsData = CarPlayTabData(title: "Recent Songs", image: UIImage.musicalNotesCarplay, fetchCB: nil)
         let songs = library.getRecentSongsForCarPlay()
         var songItems = [CarPlayPlayableItem]()
         for song in songs {
@@ -160,31 +162,16 @@ class CarPlayHandler: NSObject {
         }
         recentSongsData.playableItems = songItems
 
-        let playlistsData = CarPlayTabData(title: "Playlists", image: UIImage.playlistCarplay, fetchCB: nil)
-        let playlists = library.getPlaylistsForCarPlay()
-        var playlistItems = [CarPlayPlayableItem]()
-        for playlist in playlists {
-            let item = CarPlayPlayableItem(element: playlist, image: nil) { completionHandler in
-                playlist.fetchSync(storage: self.persistentStorage, backendApi: self.backendApi)
-                completionHandler()
-            }
-            playlistItems.append(item)
-        }
-        playlistsData.playableItems = playlistItems
-
         let podcastsData = CarPlayTabData(title: "Podcasts", image: UIImage.podcastCarplay, fetchCB: nil)
         let podcasts = library.getPodcastsForCarPlay()
         var podcastItems = [CarPlayPlayableItem]()
         for podcast in podcasts {
-            let item = CarPlayPlayableItem(element: podcast, image: podcast.image) { completionHandler in
-                podcast.fetchSync(storage: self.persistentStorage, backendApi: self.backendApi)
-                completionHandler()
-            }
+            let item = CarPlayPlayableItem(element: podcast, image: podcast.image, fetchCB: nil)
             podcastItems.append(item)
         }
         podcastsData.playableItems = podcastItems
 
-        tabData = [playlistsData, recentSongsData, podcastsData]
+        tabData = [playlistsData, recentAlbumsData, recentSongsData, podcastsData]
     }
 }
 
@@ -208,7 +195,8 @@ extension CarPlayHandler: MPPlayableContentDelegate {
             }
 
             if let containable = containable {
-                self.player.play(context: PlayContext(containable: containable))
+                let playContext = PlayContext(name: containable.name, playables: containable.playables.filterCached())
+                self.player.play(context: playContext)
             }
             completionHandler(nil)
             
@@ -295,24 +283,3 @@ extension CarPlayHandler: MPPlayableContentDataSource {
         }
     }
 }
-
-/*
-extension AppDelegate: CPApplicationDelegate {
-    func application(_ application: UIApplication, didConnectCarInterfaceController interfaceController: CPInterfaceController, to window: CPWindow) {
-        var sections = [CPListSection]()
-        sections.append(
-            CPListSection(items: [
-                CPListItem(text: "ListItemExamle", detailText: "OK GO")
-            ])
-        )
-        let listTemplate = CPListTemplate(title: "Blub", sections: sections)
-        interfaceController.setRootTemplate(listTemplate, animated: true)
-    }
-    
-    func application(_ application: UIApplication, didDisconnectCarInterfaceController interfaceController: CPInterfaceController, from window: CPWindow) {
-        
-    }
-    
-    
-}
-*/
