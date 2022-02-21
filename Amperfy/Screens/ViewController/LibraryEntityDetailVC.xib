@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="ipad12_9rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -28,6 +28,7 @@
                 <outlet property="deleteOnServerButton" destination="o9z-34-kMZ" id="P3Q-u6-ON7"/>
                 <outlet property="detailLabelsClusterHeightConstraint" destination="ft1-Xj-zQi" id="Yfu-2D-bBu"/>
                 <outlet property="downloadButton" destination="XcM-qv-zHW" id="1jN-7g-KdT"/>
+                <outlet property="elementInfoLabelsView" destination="7yG-AI-SV8" id="DMo-9u-FsK"/>
                 <outlet property="elementInfoStackView" destination="J91-VR-QdL" id="Enj-I7-XSw"/>
                 <outlet property="entityImage" destination="Q7J-Jx-tr6" id="bEe-vo-uzH"/>
                 <outlet property="infoLabel" destination="fUI-xV-Cyd" id="1bT-eh-Ick"/>
@@ -152,6 +153,9 @@
                                     </constraints>
                                 </view>
                             </subviews>
+                            <constraints>
+                                <constraint firstAttribute="height" relation="lessThanOrEqual" constant="200" id="C75-LB-9d6"/>
+                            </constraints>
                         </stackView>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ms2-ug-0W5" userLabel="RatingPlaceholder">
                             <rect key="frame" x="0.0" y="98" width="984" height="45"/>
@@ -430,7 +434,7 @@
             <size key="intrinsicContentSize" width="24.5" height="17"/>
         </designable>
         <designable name="nTF-ts-4gP">
-            <size key="intrinsicContentSize" width="35.5" height="17"/>
+            <size key="intrinsicContentSize" width="35" height="17"/>
         </designable>
     </designables>
     <resources>

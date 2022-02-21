@@ -9,6 +9,7 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var mainStackView: UIStackView!
     
     @IBOutlet weak var elementInfoStackView: UIStackView!
+    @IBOutlet weak var elementInfoLabelsView: UIView!
     @IBOutlet weak var titleLabel: MarqueeLabel!
     @IBOutlet weak var artistLabel: MarqueeLabel!
     @IBOutlet weak var showArtistButton: UIButton!
@@ -86,6 +87,7 @@ class LibraryEntityDetailVC: UIViewController {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         
         self.view.setBackgroundBlur(style: .prominent)
+        elementInfoLabelsView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         titleLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()
         albumLabel.applyAmperfyStyle()
