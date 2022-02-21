@@ -373,12 +373,16 @@ extension UIView {
         return UIGraphicsGetImageFromCurrentImageContext()
     }
     
-    func setBackgroundBlur(style: UIBlurEffect.Style) {
-        self.backgroundColor = UIColor.clear
-        let blurEffect = UIBlurEffect(style: .prominent)
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-        blurEffectView.frame = self.frame
-        self.insertSubview(blurEffectView, at: 0)
+    func setBackgroundBlur(style: UIBlurEffect.Style, backupBackgroundColor: UIColor = .backgroundColor) {
+        if #available(iOS 13.0, *) {
+            self.backgroundColor = UIColor.clear
+            let blurEffect = UIBlurEffect(style: .prominent)
+            let blurEffectView = UIVisualEffectView(effect: blurEffect)
+            blurEffectView.frame = self.frame
+            self.insertSubview(blurEffectView, at: 0)
+        } else {
+            self.backgroundColor = backupBackgroundColor
+        }
     }
 }
 
