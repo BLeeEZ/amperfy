@@ -18,7 +18,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
         
-        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
+        optionsButton = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: #selector(optionsPressed))
         navigationItem.rightBarButtonItem = optionsButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         

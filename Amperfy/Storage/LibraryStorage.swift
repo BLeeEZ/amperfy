@@ -314,13 +314,17 @@ class LibraryStorage: PlayableFileCachable {
         return NSPredicate(format: "%K == %@", #keyPath(PlaylistItemMO.playlist), playlist.managedObject.objectID)
     }
     
+    func getFetchPredicateForUserAvailableEpisodes() -> NSPredicate {
+        return NSCompoundPredicate(orPredicateWithSubpredicates: [
+            getFetchPredicate(onlyCachedPodcastEpisodes: true),
+            NSPredicate(format: "%K != %i", #keyPath(PodcastEpisodeMO.status), PodcastEpisodeRemoteStatus.deleted.rawValue)
+        ])
+    }
+    
     func getFetchPredicateForUserAvailableEpisodes(forPodcast podcast: Podcast) -> NSPredicate {
         return NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "%K == %@", #keyPath(PodcastEpisodeMO.podcast), podcast.managedObject.objectID),
-            NSCompoundPredicate(orPredicateWithSubpredicates: [
-                getFetchPredicate(onlyCachedPodcastEpisodes: true),
-                NSPredicate(format: "%K != %i", #keyPath(PodcastEpisodeMO.status), PodcastEpisodeRemoteStatus.deleted.rawValue)
-            ])
+            getFetchPredicateForUserAvailableEpisodes()
         ])
     }
     

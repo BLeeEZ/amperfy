@@ -36,6 +36,30 @@ class PodcastFetchedResultsController: CachedFetchedResultsController<PodcastMO>
 
 }
 
+class PodcastEpisodesReleaseDateFetchedResultsController: BasicFetchedResultsController<PodcastEpisodeMO> {
+    
+    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+        let fetchRequest = PodcastEpisodeMO.publishedDateSortedFetchRequest
+        let library = LibraryStorage(context: context)
+        fetchRequest.predicate = library.getFetchPredicateForUserAvailableEpisodes()
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+    
+    func search(searchText: String, onlyCachedSongs: Bool) {
+        if searchText.count > 0 || onlyCachedSongs {
+            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                library.getFetchPredicateForUserAvailableEpisodes(),
+                PodcastEpisodeMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                library.getFetchPredicate(onlyCachedPodcastEpisodes: onlyCachedSongs)
+            ])
+            search(predicate: predicate)
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
 class PodcastEpisodesFetchedResultsController: BasicFetchedResultsController<PodcastEpisodeMO> {
     
     let podcast: Podcast

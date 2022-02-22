@@ -13,6 +13,7 @@ class PersistentStorage {
         case SongActionOnTab = "songActionOnTab"
         case SwipeLeadingActionSettings = "swipeLeadingActionSettings"
         case SwipeTrailingActionSettings = "swipeTrailingActionSettings"
+        case PodcastsShowSetting = "podcastsShowSetting"
         case PlayerDisplayStyle = "playerDisplayStyle"
         case IsOfflineMode = "isOfflineMode"
         case LibrarySyncVersion = "librarySyncVersion"
@@ -36,6 +37,14 @@ class PersistentStorage {
                 UserDefaults.standard.set(newValue.leading.compactMap{ $0.rawValue }, forKey: UserDefaultsKey.SwipeLeadingActionSettings.rawValue)
                 UserDefaults.standard.set(newValue.trailing.compactMap{ $0.rawValue }, forKey: UserDefaultsKey.SwipeTrailingActionSettings.rawValue)
             }
+        }
+        
+        var podcastsShowSetting: PodcastsShowType {
+            get {
+                let podcastSortRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.PodcastsShowSetting.rawValue) as? Int ?? PodcastsShowType.defaultValue.rawValue
+                return PodcastsShowType(rawValue: podcastSortRaw) ?? PodcastsShowType.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.PodcastsShowSetting.rawValue) }
         }
         
         var playerDisplayStyle: PlayerDisplayStyle {
