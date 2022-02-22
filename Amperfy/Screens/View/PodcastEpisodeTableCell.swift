@@ -28,7 +28,6 @@ class PodcastEpisodeTableCell: BasicTableCell {
         podcastEpisodeLabel.text = episode.title
         entityImage.display(container: episode)
         
-        optionsButton.setTitle(CommonString.threeMiddleDots, for: .normal)
         if episode.isAvailableToUser {
             playEpisodeButton.setTitle(FontAwesomeIcon.Play.asString, for: .normal)
             playEpisodeButton.isEnabled = true

@@ -21,7 +21,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(startEditing))
         doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(endEditing))
-        optionsButton = UIBarButtonItem(title: "\(CommonString.threeMiddleDots)", style: .plain, target: self, action: #selector(optionsPressed))
+        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
         
         let playlistTableHeaderFrameHeight = PlaylistDetailTableHeader.frameHeight
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: playlistTableHeaderFrameHeight + LibraryElementDetailTableHeaderView.frameHeight))
@@ -68,7 +68,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         } else {
             edititingBarButton = doneButton
         }
-        navigationItem.rightBarButtonItems = [edititingBarButton, optionsButton].compactMap{$0}
+        navigationItem.rightBarButtonItems = [optionsButton, edititingBarButton].compactMap{$0}
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {

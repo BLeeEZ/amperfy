@@ -14,6 +14,8 @@ extension UIImage {
     static var amperfyMosaicArtwork: UIImage = { return UIImage.create("song") }()
     static var appIcon: UIImage = { return UIImage.create("Icon-1024") }()
     
+    static var ellipsis: UIImage = { return UIImage.create("ellipsis") }()
+    
     static var songArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small) }()
     static var genre: UIImage = { return UIImage.create("genre") }()
     static var genreArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.genre, iconSizeType: .big) }()

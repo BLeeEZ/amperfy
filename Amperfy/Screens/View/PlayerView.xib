@@ -218,14 +218,14 @@
                         <action selector="airplayButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YPY-8P-oS2"/>
                     </connections>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0xq-hb-FZa" userLabel="Options Button">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0xq-hb-FZa" userLabel="Options Button">
                     <rect key="frame" x="329" y="0.0" width="30" height="30"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="30" id="Ble-C9-owO"/>
                         <constraint firstAttribute="width" secondItem="0xq-hb-FZa" secondAttribute="height" multiplier="1:1" id="ND9-Bu-dGG"/>
                     </constraints>
-                    <fontDescription key="fontDescription" type="boldSystem" pointSize="26"/>
-                    <state key="normal" title="...">
+                    <color key="tintColor" systemColor="labelColor"/>
+                    <state key="normal" image="ellipsis">
                         <color key="titleColor" systemColor="labelColor"/>
                     </state>
                     <connections>
@@ -343,6 +343,7 @@
     </designables>
     <resources>
         <image name="airplay" width="20" height="20"/>
+        <image name="ellipsis" width="18.417999267578125" height="3.9160199165344238"/>
         <image name="playlist" width="89.666664123535156" height="90.333335876464844"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
