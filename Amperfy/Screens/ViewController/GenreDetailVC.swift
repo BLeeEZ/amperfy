@@ -232,7 +232,7 @@ class GenreDetailVC: BasicTableViewController {
     @objc private func optionsPressed() {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        guard let genre = self.genre, self.presentingViewController == nil else { return }
+        guard let genre = self.genre else { return }
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(container: genre, on: self)
         present(detailVC, animated: true)

@@ -69,7 +69,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
     @IBAction func optionsButtonPressed(_ sender: Any) {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        guard let episode = self.episode, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        guard let episode = self.episode, let rootView = rootView else { return }
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(
             container: episode,

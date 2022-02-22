@@ -75,7 +75,7 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     @objc private func optionsPressed() {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        guard let album = self.album, self.presentingViewController == nil else { return }
+        guard let album = self.album else { return }
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(container: album, on: self)
         present(detailVC, animated: true)

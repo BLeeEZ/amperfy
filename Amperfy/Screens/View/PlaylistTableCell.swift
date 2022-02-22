@@ -34,7 +34,7 @@ class PlaylistTableCell: BasicTableCell {
     func displayMenu() {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        guard let playlist = playlist, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        guard let playlist = playlist, let rootView = rootView else { return }
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(container: playlist, on: rootView)
         rootView.present(detailVC, animated: true)

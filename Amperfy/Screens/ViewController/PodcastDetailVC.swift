@@ -77,7 +77,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     @objc private func optionsPressed() {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        guard let podcast = self.podcast, self.presentingViewController == nil else { return }
+        guard let podcast = self.podcast else { return }
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(container: podcast, on: self)
         present(detailVC, animated: true)

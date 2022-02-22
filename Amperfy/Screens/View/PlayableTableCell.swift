@@ -100,7 +100,7 @@ class PlayableTableCell: BasicTableCell {
     func displayMenu() {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        guard let playable = playable, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        guard let playable = playable, let rootView = rootView else { return }
         isAlertPresented = true
         let detailVC = LibraryEntityDetailVC()
         let playContextLambda = {() in self.playContextCb?(self)}

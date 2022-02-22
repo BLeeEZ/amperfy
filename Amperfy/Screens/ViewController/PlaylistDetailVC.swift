@@ -168,7 +168,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     @objc private func optionsPressed() {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        guard let playlist = self.playlist, self.presentingViewController == nil else { return }
+        guard let playlist = self.playlist else { return }
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(container: playlist, on: self)
         present(detailVC, animated: true)

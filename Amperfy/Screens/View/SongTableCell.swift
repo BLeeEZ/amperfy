@@ -73,7 +73,7 @@ class SongTableCell: BasicTableCell {
     func displayMenu() {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        guard let song = song, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        guard let song = song, let rootView = rootView else { return }
         isAlertPresented = true
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(container: song, on: rootView, playContextCb: {() in self.playContextCb?(self)})

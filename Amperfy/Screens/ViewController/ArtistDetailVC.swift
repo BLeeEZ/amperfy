@@ -197,7 +197,7 @@ class ArtistDetailVC: BasicTableViewController {
     @objc private func optionsPressed() {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        guard let artist = self.artist, self.presentingViewController == nil else { return }
+        guard let artist = self.artist else { return }
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(container: artist, on: self)
         present(detailVC, animated: true)

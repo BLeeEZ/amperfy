@@ -40,7 +40,7 @@ class GenericTableCell: BasicTableCell {
     func displayMenu() {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
-        guard let container = container, let rootView = rootView, rootView.presentingViewController == nil else { return }
+        guard let container = container, let rootView = rootView else { return }
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(container: container, on: rootView)
         rootView.present(detailVC, animated: true)
