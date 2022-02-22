@@ -7,7 +7,6 @@ class AnimatedGradientLayer {
     var startCorner: Corners = .topLeft
     var endCorner: Corners = .bottomRight
     
-    var isAnimated = true
     var animationDuration: TimeInterval = 2
     var animationStyle: CAMediaTimingFunctionName = .linear
     
@@ -23,17 +22,11 @@ class AnimatedGradientLayer {
         gradientLayer.frame = CGRect(x: gradientLayer.frame.origin.x, y: gradientLayer.frame.origin.y, width: size.width, height: size.height)
     }
     
-    func setColors(_ newColors: [CGColor]) {
-        if !isAnimated {
-            gradientLayer.colors = newColors
-            colors = newColors
-            return
-        }
-        
+    func setColors(_ newColors: [CGColor], isAnimated: Bool) {
         let colorAnimation = CABasicAnimation(keyPath: "colors")
         colorAnimation.fromValue = colors
         colorAnimation.toValue = newColors
-        colorAnimation.duration = animationDuration
+        colorAnimation.duration = isAnimated ? animationDuration : TimeInterval(0.0)
         colorAnimation.isRemovedOnCompletion = false
         colorAnimation.fillMode = CAMediaTimingFillMode.forwards
         colorAnimation.timingFunction = CAMediaTimingFunction(name: animationStyle)
@@ -41,19 +34,11 @@ class AnimatedGradientLayer {
         colors = newColors
     }
     
-    func setCorners(startCorner newStartCorner: Corners, endCorner newEndCorner: Corners) {
-        if !isAnimated {
-            gradientLayer.startPoint = newStartCorner.asPoint()
-            gradientLayer.endPoint = newEndCorner.asPoint()
-            startCorner = newStartCorner
-            endCorner = newEndCorner
-            return
-        }
-        
+    func setCorners(startCorner newStartCorner: Corners, endCorner newEndCorner: Corners, isAnimated: Bool) {
         let startPointAnimation = CABasicAnimation(keyPath: "startPoint")
         startPointAnimation.fromValue = startCorner.asPoint()
         startPointAnimation.toValue = newStartCorner.asPoint()
-        startPointAnimation.duration = animationDuration
+        startPointAnimation.duration = isAnimated ? animationDuration : TimeInterval(0.0)
         startPointAnimation.isRemovedOnCompletion = false
         startPointAnimation.fillMode = CAMediaTimingFillMode.forwards
         startPointAnimation.timingFunction = CAMediaTimingFunction(name: animationStyle)
@@ -63,7 +48,7 @@ class AnimatedGradientLayer {
         let endPointAnimation = CABasicAnimation(keyPath: "endPoint")
         endPointAnimation.fromValue = endCorner.asPoint()
         endPointAnimation.toValue = newEndCorner.asPoint()
-        endPointAnimation.duration = animationDuration
+        endPointAnimation.duration = isAnimated ? animationDuration : TimeInterval(0.0)
         endPointAnimation.isRemovedOnCompletion = false
         endPointAnimation.fillMode = CAMediaTimingFillMode.forwards
         endPointAnimation.timingFunction = CAMediaTimingFunction(name: animationStyle)
@@ -122,12 +107,12 @@ class PopupAnimatedGradientLayer {
     private func applyChange(style: UIUserInterfaceStyle) {
         let firstCorner = gradientLayer.startCorner.rotateRandomly()
         let secondCorner = firstCorner.opposed()
-        gradientLayer.setColors(self.getGradientColors(inStyle: style))
-        gradientLayer.setCorners(startCorner: firstCorner, endCorner: secondCorner)
+        gradientLayer.setColors(self.getGradientColors(inStyle: style), isAnimated: true)
+        gradientLayer.setCorners(startCorner: firstCorner, endCorner: secondCorner, isAnimated: true)
     }
     
-    func applyStyleChange(_ newStyle: UIUserInterfaceStyle) {
-        gradientLayer.setColors(self.getGradientColors(inStyle: newStyle))
+    func applyStyleChange(_ newStyle: UIUserInterfaceStyle, isAnimated: Bool) {
+        gradientLayer.setColors(self.getGradientColors(inStyle: newStyle), isAnimated: isAnimated)
     }
     
 }

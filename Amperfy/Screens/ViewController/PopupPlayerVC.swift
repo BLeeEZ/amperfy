@@ -116,7 +116,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     // handle dark/light mode change
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        backgroundColorGradient?.applyStyleChange(traitCollection.userInterfaceStyle)
+        backgroundColorGradient?.applyStyleChange(traitCollection.userInterfaceStyle, isAnimated: false)
     }
     
     func scrollToNextPlayingRow() {

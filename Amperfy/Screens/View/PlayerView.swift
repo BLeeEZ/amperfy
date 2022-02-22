@@ -27,7 +27,7 @@ enum PlayerDisplayStyle: Int {
 
 class PlayerView: UIView {
   
-    static private let frameHeightCompact: CGFloat = 285 + margin.top + margin.bottom
+    static private let frameHeightCompact: CGFloat = 185 + margin.top + margin.bottom
     static private let margin = UIEdgeInsets(top: 0, left: UIView.defaultMarginX, bottom: 20, right: UIView.defaultMarginX)
     static private let defaultAnimationDuration = TimeInterval(0.50)
     
@@ -59,18 +59,23 @@ class PlayerView: UIView {
     @IBOutlet weak var elapsedTimeLabel: UILabel!
     @IBOutlet weak var remainingTimeLabel: UILabel!
     @IBOutlet weak var artworkImage: UIImageView!
+    @IBOutlet weak var artworkContainerView: UIView!
     
     // Animation constraints
     @IBOutlet weak var artistToTitleLargeDistanceConstraint: NSLayoutConstraint!
     @IBOutlet weak var bottomControlToProgressDistanceConstraint: NSLayoutConstraint!
-    @IBOutlet weak var playerOptionsControlGroupToPlayDistanceConstraint: NSLayoutConstraint!
     @IBOutlet weak var artworkWidthConstraint: NSLayoutConstraint!
     private var infoCompactToArtworkDistanceConstraint: NSLayoutConstraint?
     @IBOutlet weak var infoLargeToProgressDistanceConstraint: NSLayoutConstraint!
     private var artworkXPositionConstraint: NSLayoutConstraint?
     @IBOutlet weak var timeSliderToArtworkDistanceConstraint: NSLayoutConstraint!
+    @IBOutlet weak var elapsedTimeToArtworkDistanceConstraint: NSLayoutConstraint!
+    @IBOutlet weak var remainingTimeToArtworkDistanceConstraint: NSLayoutConstraint!
     @IBOutlet weak var ratingToBottomControlDistanceConstraint: NSLayoutConstraint!
     
+    static let sliderLabelToSliderDistance = 12.0
+    static let largeBottomMargin = 16.0
+
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
@@ -210,23 +215,25 @@ class PlayerView: UIView {
     
     private func renderAnimationSwitchToCompact(animationDuration: TimeInterval = defaultAnimationDuration) {
         guard let rootView = self.rootView else { return }
-        artworkWidthConstraint.constant = 100
+        artworkWidthConstraint.constant = 70
         infoLargeToProgressDistanceConstraint.constant = -30
         bottomControlToProgressDistanceConstraint.constant = -20
-        playerOptionsControlGroupToPlayDistanceConstraint.constant = -2
-        
+        timeSliderToArtworkDistanceConstraint.constant = 10
+        elapsedTimeToArtworkDistanceConstraint.constant = timeSliderToArtworkDistanceConstraint.constant + Self.sliderLabelToSliderDistance
+        remainingTimeToArtworkDistanceConstraint.constant = timeSliderToArtworkDistanceConstraint.constant + Self.sliderLabelToSliderDistance
+
         self.infoCompactToArtworkDistanceConstraint?.isActive = false
         self.infoCompactToArtworkDistanceConstraint = NSLayoutConstraint(item: self.titleCompactLabel!,
                            attribute: .leading,
                            relatedBy: .equal,
-                           toItem: self.artworkImage,
+                           toItem: self.artworkContainerView,
                            attribute: .trailing,
                            multiplier: 1.0,
                            constant: UIView.defaultMarginX)
         self.infoCompactToArtworkDistanceConstraint?.isActive = true
         
         self.artworkXPositionConstraint?.isActive = false
-        self.artworkXPositionConstraint = NSLayoutConstraint(item: artworkImage!,
+        self.artworkXPositionConstraint = NSLayoutConstraint(item: artworkContainerView!,
                            attribute: .leading,
                            relatedBy: .equal,
                            toItem: rootView.view,
@@ -235,15 +242,17 @@ class PlayerView: UIView {
                            constant: 0)
         self.artworkXPositionConstraint?.isActive = true
     
+        UIView.animate(withDuration: animationDuration/3, delay: animationDuration/2, options: .curveEaseIn, animations: ({
+            self.titleCompactLabel.alpha = 1
+            self.titleCompactButton.isHidden = false
+            self.artistNameCompactLabel.alpha = 1
+            self.artistNameCompactButton.isHidden = false
+        }), completion: nil)
         UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut, animations: ({
             self.ratingPlaceholderView.alpha = 0
             self.ratingPlaceholderView.isHidden = true
-            self.titleCompactLabel.alpha = 1
-            self.titleCompactButton.isHidden = false
             self.titleLargeLabel.alpha = 0
             self.titleLargeButton.isHidden = true
-            self.artistNameCompactLabel.alpha = 1
-            self.artistNameCompactButton.isHidden = false
             self.artistNameLargeLabel.alpha = 0
             self.artistNameLargeButton.isHidden = true
         }), completion: nil)
@@ -259,8 +268,10 @@ class PlayerView: UIView {
         guard let rootView = self.rootView else { return }
         infoLargeToProgressDistanceConstraint.constant = CGFloat(30.0)
         bottomControlToProgressDistanceConstraint.constant = titleLargeLabel.frame.height + artistNameLargeLabel.frame.height + artistToTitleLargeDistanceConstraint.constant + infoLargeToProgressDistanceConstraint.constant
-        playerOptionsControlGroupToPlayDistanceConstraint.constant = CGFloat(0.0)
-        
+        timeSliderToArtworkDistanceConstraint.constant = 18
+        elapsedTimeToArtworkDistanceConstraint.constant = timeSliderToArtworkDistanceConstraint.constant + Self.sliderLabelToSliderDistance
+        remainingTimeToArtworkDistanceConstraint.constant = timeSliderToArtworkDistanceConstraint.constant + Self.sliderLabelToSliderDistance
+
         let availableRootWidth = rootView.frameSizeWithRotationAdjusment.width - PlayerView.margin.left -  PlayerView.margin.right
         let availableRootHeight = rootView.availableFrameHeightForLargePlayer
         
@@ -271,12 +282,12 @@ class PlayerView: UIView {
         elementsBelowArtworkHeight += artistToTitleLargeDistanceConstraint.constant
         elementsBelowArtworkHeight += artistNameLargeLabel.frame.size.height
         elementsBelowArtworkHeight += playButton.frame.size.height
-        elementsBelowArtworkHeight += displayPlaylistButton.frame.size.height
         elementsBelowArtworkHeight += ratingToBottomControlDistanceConstraint.constant
         elementsBelowArtworkHeight += ratingPlaceholderView.frame.size.height
+        elementsBelowArtworkHeight += Self.largeBottomMargin
         
         let planedArtworkHeight = availableRootWidth
-        let fullLargeHeight = artworkImage.frame.origin.y + planedArtworkHeight + elementsBelowArtworkHeight +  PlayerView.margin.bottom
+        let fullLargeHeight = artworkContainerView.frame.origin.y + planedArtworkHeight + elementsBelowArtworkHeight +  PlayerView.margin.bottom
 
         // Set artwork size depending on device height
         if availableRootHeight < fullLargeHeight {
@@ -289,14 +300,14 @@ class PlayerView: UIView {
         self.infoCompactToArtworkDistanceConstraint = NSLayoutConstraint(item: titleCompactLabel!,
                            attribute: .leading,
                            relatedBy: .lessThanOrEqual,
-                           toItem: artworkImage,
+                           toItem: artworkContainerView,
                            attribute: .trailing,
                            multiplier: 1.0,
                            constant: 0)
         self.infoCompactToArtworkDistanceConstraint?.isActive = true
         
         self.artworkXPositionConstraint?.isActive = false
-        self.artworkXPositionConstraint = NSLayoutConstraint(item: artworkImage!,
+        self.artworkXPositionConstraint = NSLayoutConstraint(item: artworkContainerView!,
                            attribute: .centerX,
                            relatedBy: .equal,
                            toItem: rootView.view,
@@ -305,15 +316,16 @@ class PlayerView: UIView {
                            constant: 0)
         self.artworkXPositionConstraint?.isActive = true
 
+        self.titleCompactLabel.alpha = 0
+        self.titleCompactButton.isHidden = true
+        self.artistNameCompactLabel.alpha = 0
+        self.artistNameCompactButton.isHidden = true
+        
         UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseIn, animations: ({
             self.ratingPlaceholderView.alpha = 1
             self.ratingPlaceholderView.isHidden = false
-            self.titleCompactLabel.alpha = 0
-            self.titleCompactButton.isHidden = true
             self.titleLargeLabel.alpha = 1
             self.titleLargeButton.isHidden = false
-            self.artistNameCompactLabel.alpha = 0
-            self.artistNameCompactButton.isHidden = true
             self.artistNameLargeLabel.alpha = 1
             self.artistNameLargeButton.isHidden = false
         }), completion: nil)
