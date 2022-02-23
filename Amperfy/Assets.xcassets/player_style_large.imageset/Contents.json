@@ -1,0 +1,22 @@
+{
+  "images" : [
+    {
+      "filename" : "rectangle.portrait.inset.filled.svg",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "rectangle.portrait.inset.filled-1.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

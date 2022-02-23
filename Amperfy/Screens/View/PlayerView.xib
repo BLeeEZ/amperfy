@@ -167,8 +167,11 @@
                         <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="P7Y-F5-gln"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="tintColor" systemColor="labelColor"/>
                     <inset key="imageEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
-                    <state key="normal" image="playlist"/>
+                    <state key="normal" image="player_style_compact">
+                        <color key="titleColor" systemColor="labelColor"/>
+                    </state>
                     <connections>
                         <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
                     </connections>
@@ -344,7 +347,7 @@
     <resources>
         <image name="airplay" width="20" height="20"/>
         <image name="ellipsis" width="18.417999267578125" height="3.9160199165344238"/>
-        <image name="playlist" width="89.666664123535156" height="90.333335876464844"/>
+        <image name="player_style_compact" width="16.425800323486328" height="20.947299957275391"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

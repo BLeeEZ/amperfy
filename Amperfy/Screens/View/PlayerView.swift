@@ -476,9 +476,9 @@ class PlayerView: UIView {
     
     func refreshDisplayPlaylistButton() {
         if displayStyle == .compact {
-            displayPlaylistButton.tintColor = .defaultBlue
+            displayPlaylistButton.setImage(UIImage.playerStyleLarge, for: .normal)
         } else {
-            displayPlaylistButton.tintColor = .labelColor
+            displayPlaylistButton.setImage(UIImage.playerStyleCompact, for: .normal)
         }
     }
     

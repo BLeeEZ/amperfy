@@ -14,7 +14,9 @@ extension UIImage {
     static var amperfyMosaicArtwork: UIImage = { return UIImage.create("song") }()
     static var appIcon: UIImage = { return UIImage.create("Icon-1024") }()
     
-    static var ellipsis: UIImage = { return UIImage.create("ellipsis") }()
+    static var ellipsis: UIImage = { return UIImage.create("ellipsis") }() // SF-Symbols 3.2 Regular: ellipsis
+    static var playerStyleCompact: UIImage = { return UIImage.create("player_style_compact") }() // SF-Symbols 3.2 Regular: rectangle.portrait.inset.filled
+    static var playerStyleLarge: UIImage = { return UIImage.create("player_style_large") }() // SF-Symbols 3.2 Regular:  rectangle.portrait.topthird.inset.filled
     
     static var songArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small) }()
     static var genre: UIImage = { return UIImage.create("genre") }()
