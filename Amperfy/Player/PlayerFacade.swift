@@ -5,24 +5,35 @@ struct PlayContext {
     let index: Int
     let name: String
     let playables: [AbstractPlayable]
+    let type: PlayerMode
     var isKeepIndexDuringShuffle: Bool = false
     
     init() {
         self.name = ""
         self.index = 0
         self.playables = []
+        self.type = .music
     }
     
     init(containable: PlayableContainable) {
         self.name = containable.name
         self.index = 0
         self.playables = containable.playables
+        self.type = containable.playContextType
     }
 
     init(name: String, index: Int = 0, playables: [AbstractPlayable]) {
         self.name = name
         self.index = index
         self.playables = playables
+        self.type = .music
+    }
+    
+    init(name: String, type: PlayerMode, index: Int = 0, playables: [AbstractPlayable]) {
+        self.name = name
+        self.index = index
+        self.playables = playables
+        self.type = type
     }
 
     func getActivePlayable() -> AbstractPlayable? {
@@ -53,6 +64,9 @@ protocol PlayerFacade {
     func setRepeatMode(_: RepeatMode)
     var isOfflineMode: Bool { get set }
     var isAutoCachePlayedItems: Bool { get set }
+    var isPopupBarAllowedToHide: Bool { get }
+    var playerMode: PlayerMode { get }
+    func setPlayerMode(_ newValue: PlayerMode)
 
     func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler)
     func seek(toSecond: Double)
@@ -61,6 +75,8 @@ protocol PlayerFacade {
     func appendContextQueue(playables: [AbstractPlayable])
     func insertUserQueue(playables: [AbstractPlayable])
     func appendUserQueue(playables: [AbstractPlayable])
+    func insertPodcastQueue(playables: [AbstractPlayable])
+    func appendPodcastQueue(playables: [AbstractPlayable])
     func removePlayable(at: PlayerIndex)
     func movePlayable(from: PlayerIndex, to: PlayerIndex)
     func clearUserQueue()
@@ -76,8 +92,15 @@ protocol PlayerFacade {
     func stop()
     func playPreviousOrReplay()
     func playNext()
+    func skipForward()
+    func skipBackward()
     
     func addNotifier(notifier: MusicPlayable)
+}
+
+extension PlayerFacade {
+    var skipForwardInterval: Double { return 30.0 }
+    var skipBackwardInterval: Double { return 15.0 }
 }
 
 class PlayerFacadeImpl: PlayerFacade {
@@ -157,6 +180,19 @@ class PlayerFacadeImpl: PlayerFacade {
             backendAudioPlayer.isAutoCachePlayedItems = newValue
         }
     }
+    var isPopupBarAllowedToHide: Bool {
+        return playerStatus.isPopupBarAllowedToHide
+    }
+    var playerMode: PlayerMode {
+        return playerStatus.playerMode
+    }
+    func setPlayerMode(_ newValue: PlayerMode) {
+        pause()
+        playerStatus.playerMode = newValue
+        musicPlayer.play(forcePlayableReload: true)
+        pause()
+        musicPlayer.notifyPlaylistUpdated()
+    }
     
     func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler) {
         self.playerStatus = playerStatus
@@ -188,6 +224,16 @@ class PlayerFacadeImpl: PlayerFacade {
         queueHandler.appendUserQueue(playables: playables)
         musicPlayer.notifyPlaylistUpdated()
     }
+    
+    func insertPodcastQueue(playables: [AbstractPlayable]) {
+        queueHandler.insertPodcastQueue(playables: playables)
+        musicPlayer.notifyPlaylistUpdated()
+    }
+    
+    func appendPodcastQueue(playables: [AbstractPlayable]) {
+        queueHandler.appendPodcastQueue(playables: playables)
+        musicPlayer.notifyPlaylistUpdated()
+    }
 
     func removePlayable(at: PlayerIndex) {
         queueHandler.removePlayable(at: at)
@@ -214,8 +260,13 @@ class PlayerFacadeImpl: PlayerFacade {
     
     func clearQueues() {
         musicPlayer.stop()
-        clearContextQueue()
-        queueHandler.clearUserQueue()
+        queueHandler.clearActiveQueue()
+        switch playerStatus.playerMode {
+        case .music:
+            queueHandler.clearUserQueue()
+        case .podcast:
+            break
+        }
         musicPlayer.notifyPlayerStopped()
     }
 
@@ -224,11 +275,22 @@ class PlayerFacadeImpl: PlayerFacade {
     }
     
     func play(context: PlayContext) {
-        if playerStatus.isShuffle { playerStatus.isShuffle = false }
+        setPlayerModeForContextPlay(context.type)
+        if playerMode == .music, playerStatus.isShuffle {
+            playerStatus.isShuffle = false
+            musicPlayer.notifyShuffleUpdated()
+        }
         musicPlayer.play(context: context)
+        musicPlayer.notifyPlaylistUpdated()
+    }
+    
+    private func setPlayerModeForContextPlay(_ newValue: PlayerMode) {
+        musicPlayer.pause()
+        playerStatus.playerMode = newValue
     }
     
     func playShuffled(context: PlayContext) {
+        setPlayerModeForContextPlay(context.type)
         guard !context.playables.isEmpty else { return }
         if playerStatus.isShuffle { playerStatus.isShuffle = false }
         let shuffleContext = context.getWithShuffledIndex()
@@ -260,6 +322,14 @@ class PlayerFacadeImpl: PlayerFacade {
     
     func playNext() {
         musicPlayer.playNext()
+    }
+    
+    func skipForward() {
+        seek(toSecond: elapsedTime + self.skipForwardInterval)
+    }
+    
+    func skipBackward() {
+        seek(toSecond: elapsedTime - self.skipBackwardInterval)
     }
     
     func addNotifier(notifier: MusicPlayable) {

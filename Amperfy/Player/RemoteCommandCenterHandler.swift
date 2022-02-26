@@ -61,19 +61,15 @@ class RemoteCommandCenterHandler {
             return .success})
         
         remoteCommandCenter.skipBackwardCommand.isEnabled = true
-        remoteCommandCenter.skipBackwardCommand.preferredIntervals = [15]
+        remoteCommandCenter.skipBackwardCommand.preferredIntervals = [NSNumber(value: self.musicPlayer.skipBackwardInterval)]
         remoteCommandCenter.skipBackwardCommand.addTarget(handler: { (event) in
-            guard let command = event.command as? MPSkipIntervalCommand else { return .noSuchContent }
-            let interval = Double(truncating: command.preferredIntervals[0])
-            self.backendAudioPlayer.seek(toSecond: self.backendAudioPlayer.elapsedTime - interval)
+            self.musicPlayer.skipBackward()
             return .success})
         
         remoteCommandCenter.skipForwardCommand.isEnabled = true
-        remoteCommandCenter.skipForwardCommand.preferredIntervals = [30]
+        remoteCommandCenter.skipForwardCommand.preferredIntervals = [NSNumber(value:  self.musicPlayer.skipForwardInterval)]
         remoteCommandCenter.skipForwardCommand.addTarget(handler: { (event) in
-            guard let command = event.command as? MPSkipIntervalCommand else { return .noSuchContent }
-            let interval = Double(truncating: command.preferredIntervals[0])
-            self.backendAudioPlayer.seek(toSecond: self.backendAudioPlayer.elapsedTime + interval)
+            self.musicPlayer.skipForward()
             return .success})
     }
 
@@ -84,11 +80,15 @@ class RemoteCommandCenterHandler {
             remoteCommandCenter.nextTrackCommand.isEnabled = true
             remoteCommandCenter.skipBackwardCommand.isEnabled = false
             remoteCommandCenter.skipForwardCommand.isEnabled = false
+            remoteCommandCenter.changeShuffleModeCommand.isEnabled = true
+            remoteCommandCenter.changeRepeatModeCommand.isEnabled = true
         } else if currentItem.isPodcastEpisode {
             remoteCommandCenter.previousTrackCommand.isEnabled = false
             remoteCommandCenter.nextTrackCommand.isEnabled = false
             remoteCommandCenter.skipBackwardCommand.isEnabled = true
             remoteCommandCenter.skipForwardCommand.isEnabled = true
+            remoteCommandCenter.changeShuffleModeCommand.isEnabled = false
+            remoteCommandCenter.changeRepeatModeCommand.isEnabled = false
         }
         updateShuffle()
         updateRepeat()

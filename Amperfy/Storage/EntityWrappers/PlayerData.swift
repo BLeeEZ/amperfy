@@ -6,6 +6,8 @@ import UIKit
 protocol PlayerStatusPersistent {
     func stop()
     var isAutoCachePlayedItems: Bool { get set }
+    var isPopupBarAllowedToHide: Bool { get }
+    var playerMode: PlayerMode { get set }
     var isShuffle: Bool { get set }
     var repeatMode: RepeatMode { get set }
 }
@@ -13,21 +15,33 @@ protocol PlayerStatusPersistent {
 protocol PlayerQueuesPersistent {
     var isUserQueuePlaying: Bool { get set }
     var isUserQueueVisible: Bool { get }
-    
+
     var currentIndex: Int { get set }
     var currentItem: AbstractPlayable? { get }
+    var activeQueue: Playlist { get }
+    var inactiveQueue: Playlist { get }
     var contextQueue: Playlist { get }
+    var podcastQueue: Playlist { get }
     var contextName: String { get set }
-    var inactiveContextQueue: Playlist { get }
     var userQueuePlaylist: Playlist { get }
     
+    func insertActiveQueue(playables: [AbstractPlayable])
+    func appendActiveQueue(playables: [AbstractPlayable])
     func insertContextQueue(playables: [AbstractPlayable])
     func appendContextQueue(playables: [AbstractPlayable])
     func insertUserQueue(playables: [AbstractPlayable])
     func appendUserQueue(playables: [AbstractPlayable])
+    func insertPodcastQueue(playables: [AbstractPlayable])
+    func appendPodcastQueue(playables: [AbstractPlayable])
+    func clearActiveQueue()
     func clearUserQueue()
     func clearContextQueue()
     func removeAllItems()
+}
+
+enum PlayerMode: Int16 {
+    case music = 0
+    case podcast = 1
 }
 
 public class PlayerData: NSObject {
@@ -37,15 +51,17 @@ public class PlayerData: NSObject {
     private let managedObject: PlayerMO
     private let contextPlaylist: Playlist
     private let shuffledContextPlaylist: Playlist
+    private let podcastPlaylist: Playlist
     
     static let entityName: String = { return "Player" }()
     
-    init(library: LibraryStorage, managedObject: PlayerMO, userQueue: Playlist, contextQueue: Playlist, shuffledContextQueue: Playlist) {
+    init(library: LibraryStorage, managedObject: PlayerMO, userQueue: Playlist, contextQueue: Playlist, shuffledContextQueue: Playlist, podcastQueue: Playlist) {
         self.library = library
         self.managedObject = managedObject
         self.userQueuePlaylistInternal = userQueue
         self.contextPlaylist = contextQueue
         self.shuffledContextPlaylist = shuffledContextQueue
+        self.podcastPlaylist = podcastQueue
     }
 
     override public func isEqual(_ object: Any?) -> Bool {
@@ -59,14 +75,32 @@ extension PlayerData: PlayerStatusPersistent {
     
     func stop() {
         currentIndex = 0
-        isUserQueuePlaying = false
-        clearUserQueue()
+        switch playerMode {
+        case .music:
+            isUserQueuePlaying = false
+            clearUserQueue()
+        case .podcast:
+            break
+        }
     }
     
     var isAutoCachePlayedItems: Bool {
         get { return managedObject.autoCachePlayedItemSetting == 1 }
         set {
             managedObject.autoCachePlayedItemSetting = newValue ? 1 : 0
+            library.saveContext()
+        }
+    }
+    
+    var isPopupBarAllowedToHide: Bool {
+        return podcastPlaylist.songCount == 0 && contextPlaylist.songCount == 0 && userQueuePlaylistInternal.songCount == 0
+    }
+    
+    
+    var playerMode: PlayerMode {
+        get { return PlayerMode(rawValue: managedObject.playerMode) ?? .music }
+        set {
+            managedObject.playerMode = newValue.rawValue
             library.saveContext()
         }
     }
@@ -104,6 +138,25 @@ extension PlayerData: PlayerStatusPersistent {
 
 extension PlayerData: PlayerQueuesPersistent {
     var isUserQueuePlaying: Bool {
+        get {
+            switch playerMode {
+            case .music:
+                return isUserQueuPlayingInternal
+            case .podcast:
+                return false
+            }
+        }
+        set {
+            switch playerMode {
+            case .music:
+                isUserQueuPlayingInternal = newValue
+            case .podcast:
+                break
+            }
+        }
+    }
+    
+    private var isUserQueuPlayingInternal: Bool {
         get { return managedObject.isUserQueuePlaying }
         set {
             managedObject.isUserQueuePlaying = newValue
@@ -112,51 +165,112 @@ extension PlayerData: PlayerQueuesPersistent {
     }
     
     var isUserQueueVisible: Bool {
-        return userQueuePlaylistInternal.songCount > 0 && !(isUserQueuePlaying && userQueuePlaylistInternal.songCount == 1)
+        switch playerMode {
+        case .music:
+            return userQueuePlaylistInternal.songCount > 0 && !(isUserQueuPlayingInternal && userQueuePlaylistInternal.songCount == 1)
+        case .podcast:
+            return false
+        }
     }
     
-    var contextQueue: Playlist {
+    var activeQueue: Playlist {
         get {
-            if !isShuffle {
-                return contextPlaylist
-            } else {
-                return shuffledContextPlaylist
+            switch playerMode {
+            case .music:
+                if !isShuffle {
+                    return contextPlaylist
+                } else {
+                    return shuffledContextPlaylist
+                }
+            case .podcast:
+                return podcastPlaylist
             }
         }
     }
     
-    var inactiveContextQueue: Playlist {
+    var inactiveQueue: Playlist {
         get {
-            if !isShuffle {
-                return shuffledContextPlaylist
-            } else {
-                return contextPlaylist
+            switch playerMode {
+            case .music:
+                if !isShuffle {
+                    return shuffledContextPlaylist
+                } else {
+                    return contextPlaylist
+                }
+            case .podcast:
+                return podcastPlaylist
             }
         }
     }
+    var contextQueue: Playlist { return contextPlaylist }
+    var podcastQueue: Playlist { return podcastPlaylist }
     
     var contextName: String {
-        get { contextPlaylist.name }
+        get {
+            switch playerMode {
+            case .music:
+                return contextPlaylist.name
+            case .podcast:
+                return "Pocasts"
+            }
+        }
         set { contextPlaylist.name = newValue }
     }
     
     var currentIndex: Int {
         get {
-            if managedObject.currentIndex < 0, !isUserQueuePlaying {
-                managedObject.currentIndex = 0
+            switch playerMode {
+            case .music:
+                return currentMusicIndex
+            case .podcast:
+                return currentPodcastIndex
+            }
+        }
+        set {
+            switch playerMode {
+            case .music:
+                currentMusicIndex = newValue
+            case .podcast:
+                currentPodcastIndex = newValue
+            }
+        }
+    }
+    
+    private var currentMusicIndex: Int {
+        get {
+            if managedObject.musicIndex < 0, !isUserQueuPlayingInternal {
+                managedObject.musicIndex = 0
                 library.saveContext()
             }
-            if managedObject.currentIndex >= contextQueue.playables.count || managedObject.currentIndex < -1 {
-                managedObject.currentIndex = 0
+            if managedObject.musicIndex >= contextQueue.playables.count || managedObject.musicIndex < -1 {
+                managedObject.musicIndex = 0
                 library.saveContext()
             }
-            return Int(managedObject.currentIndex)
+            return Int(managedObject.musicIndex)
         }
         set {
             if newValue >= -1, newValue < contextQueue.playables.count {
-                managedObject.currentIndex = Int32(newValue)
+                managedObject.musicIndex = Int32(newValue)
             } else {
-                managedObject.currentIndex = isUserQueuePlaying ? -1 : 0
+                managedObject.musicIndex = isUserQueuPlayingInternal ? -1 : 0
+            }
+            library.saveContext()
+        }
+    }
+    
+    private var currentPodcastIndex: Int {
+        get {
+            if managedObject.podcastIndex < 0 || managedObject.podcastIndex >= podcastPlaylist.playables.count  {
+                managedObject.podcastIndex = 0
+                library.saveContext()
+            }
+            return Int(managedObject.podcastIndex)
+        }
+        set {
+            if newValue >= 0, newValue < podcastPlaylist.playables.count {
+                managedObject.podcastIndex = Int32(newValue)
+            } else {
+                managedObject.podcastIndex = 0
             }
             library.saveContext()
         }
@@ -164,26 +278,49 @@ extension PlayerData: PlayerQueuesPersistent {
     
     var currentItem: AbstractPlayable? {
         get {
-            if isUserQueuePlaying, userQueuePlaylistInternal.songCount > 0 {
-                return userQueuePlaylistInternal.playables.first
+            switch playerMode {
+            case .music:
+                if isUserQueuPlayingInternal, userQueuePlaylistInternal.songCount > 0 {
+                    return userQueuePlaylistInternal.playables.first
+                }
+                guard activeQueue.playables.count > 0 else { return nil }
+                guard currentMusicIndex >= 0, currentMusicIndex < activeQueue.playables.count else {
+                    return activeQueue.playables[0]
+                }
+                return activeQueue.playables[currentMusicIndex]
+            case .podcast:
+                return podcastPlaylist.playables.element(at: currentPodcastIndex)
             }
-            guard contextQueue.playables.count > 0 else { return nil }
-            guard currentIndex >= 0, currentIndex < contextQueue.playables.count else {
-                return contextQueue.playables[0]
-            }
-            return contextQueue.playables[currentIndex]
         }
     }
 
     var userQueuePlaylist: Playlist {
         get { return userQueuePlaylistInternal }
     }
+    
+    func insertActiveQueue(playables: [AbstractPlayable]) {
+        switch playerMode {
+        case .music:
+            insertContextQueue(playables: playables)
+        case .podcast:
+            insertPodcastQueue(playables: playables)
+        }
+    }
+
+    func appendActiveQueue(playables: [AbstractPlayable]) {
+        switch playerMode {
+        case .music:
+            appendContextQueue(playables: playables)
+        case .podcast:
+            appendPodcastQueue(playables: playables)
+        }
+    }
 
     func insertContextQueue(playables: [AbstractPlayable]) {
-        var targetIndex = currentIndex+1
+        var targetIndex = currentMusicIndex+1
         if contextPlaylist.songCount == 0 {
-            if isUserQueuePlaying {
-                currentIndex = -1
+            if isUserQueuPlayingInternal {
+                currentMusicIndex = -1
             }
             targetIndex = 0
         }
@@ -197,7 +334,7 @@ extension PlayerData: PlayerQueuesPersistent {
     }
     
     func insertUserQueue(playables: [AbstractPlayable]) {
-        let targetIndex = isUserQueuePlaying && userQueuePlaylistInternal.songCount > 0 ? 1 : 0
+        let targetIndex = isUserQueuPlayingInternal && userQueuePlaylistInternal.songCount > 0 ? 1 : 0
         userQueuePlaylistInternal.insert(playables: playables, index: targetIndex)
     }
     
@@ -205,14 +342,38 @@ extension PlayerData: PlayerQueuesPersistent {
         userQueuePlaylistInternal.append(playables: playables)
     }
     
+    func insertPodcastQueue(playables: [AbstractPlayable]) {
+        var targetIndex = currentPodcastIndex+1
+        if podcastPlaylist.songCount == 0 {
+            targetIndex = 0
+        }
+        podcastPlaylist.insert(playables: playables, index: targetIndex)
+    }
+    
+    func appendPodcastQueue(playables: [AbstractPlayable]) {
+        podcastPlaylist.append(playables: playables)
+    }
+    
+    func clearActiveQueue() {
+        switch playerMode {
+        case .music:
+            clearContextQueue()
+        case .podcast:
+            podcastPlaylist.removeAllItems()
+            currentIndex = 0
+        }
+
+    }
+    
     func clearContextQueue() {
+        contextName = ""
         contextPlaylist.removeAllItems()
         shuffledContextPlaylist.removeAllItems()
         if userQueuePlaylistInternal.songCount > 0 {
-            isUserQueuePlaying = true
-            currentIndex = -1
+            isUserQueuPlayingInternal = true
+            currentMusicIndex = -1
         } else {
-            currentIndex = 0
+            currentMusicIndex = 0
         }
     }
     
@@ -222,10 +383,11 @@ extension PlayerData: PlayerQueuesPersistent {
     
     func removeAllItems() {
         currentIndex = 0
-        isUserQueuePlaying = false
+        isUserQueuPlayingInternal = false
         contextPlaylist.removeAllItems()
         shuffledContextPlaylist.removeAllItems()
         userQueuePlaylistInternal.removeAllItems()
+        podcastPlaylist.removeAllItems()
     }
 }
     

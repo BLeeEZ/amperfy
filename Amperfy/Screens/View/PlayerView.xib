@@ -75,64 +75,97 @@
                 <stackView opaque="NO" contentMode="scaleToFill" distribution="equalCentering" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="SoI-ny-Hw0" userLabel="Control  Stack">
                     <rect key="frame" x="16" y="152" width="343" height="80"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zaZ-s9-erE" userLabel="Repeat Button">
-                            <rect key="frame" x="0.0" y="25" width="60" height="30"/>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="w3n-lC-0kw">
+                            <rect key="frame" x="0.0" y="15" width="60" height="50"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zaZ-s9-erE" userLabel="Repeat Button">
+                                    <rect key="frame" x="0.0" y="0.0" width="60" height="50"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="60" id="VJG-iL-rq6"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="18"/>
+                                    <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <state key="normal" title="">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                    </state>
+                                    <state key="selected" title=" all">
+                                        <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="repeatButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="t47-X3-Ber"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
-                                <constraint firstAttribute="width" constant="60" id="VJG-iL-rq6"/>
+                                <constraint firstItem="zaZ-s9-erE" firstAttribute="centerY" secondItem="w3n-lC-0kw" secondAttribute="centerY" id="4lO-ET-21s"/>
+                                <constraint firstItem="zaZ-s9-erE" firstAttribute="centerX" secondItem="w3n-lC-0kw" secondAttribute="centerX" id="doS-9u-ggK"/>
+                                <constraint firstItem="zaZ-s9-erE" firstAttribute="height" secondItem="w3n-lC-0kw" secondAttribute="height" id="rvU-fF-gB9"/>
+                                <constraint firstItem="zaZ-s9-erE" firstAttribute="width" secondItem="w3n-lC-0kw" secondAttribute="width" id="wZX-Us-rRT"/>
                             </constraints>
-                            <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="18"/>
-                            <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <state key="normal" title="">
-                                <color key="titleColor" systemColor="labelColor"/>
-                            </state>
-                            <state key="selected" title=" all">
-                                <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            </state>
-                            <connections>
-                                <action selector="repeatButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="t47-X3-Ber"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Previous Button">
-                            <rect key="frame" x="84.5" y="14" width="40" height="52"/>
-                            <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="40"/>
-                            <state key="normal" title=""/>
+                        </view>
+                        <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Previous Button">
+                            <rect key="frame" x="77" y="17.5" width="45" height="45"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="PZj-JS-NGq" secondAttribute="height" multiplier="1:1" id="ZRw-7y-r95"/>
+                                <constraint firstAttribute="width" constant="45" id="eKD-Lq-gH3"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <state key="normal" image="backward"/>
                             <connections>
                                 <action selector="previousButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Nbe-mz-kqt"/>
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Byk-rx-3Lv">
-                            <rect key="frame" x="158.5" y="11.5" width="40" height="57"/>
+                            <rect key="frame" x="148.5" y="11.5" width="40" height="57"/>
                             <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
                             <state key="normal" title=""/>
                             <connections>
                                 <action selector="playButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="x3u-6i-ytK"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E3q-DK-jgm" userLabel="Next Button">
-                            <rect key="frame" x="233" y="14" width="40" height="52"/>
-                            <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="40"/>
-                            <state key="normal" title=""/>
+                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E3q-DK-jgm" userLabel="Next Button">
+                            <rect key="frame" x="215.5" y="17.5" width="45" height="45"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="45" id="0wH-NC-0Wb"/>
+                                <constraint firstAttribute="width" secondItem="E3q-DK-jgm" secondAttribute="height" multiplier="1:1" id="Sqc-EY-2LH"/>
+                            </constraints>
+                            <state key="normal" image="forward">
+                                <color key="titleColor" systemColor="tintColor"/>
+                            </state>
                             <connections>
                                 <action selector="nextButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="aSu-T2-0y0"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhL-mu-zks" userLabel="Shuffle Button">
-                            <rect key="frame" x="311" y="24" width="32" height="32"/>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jwJ-pR-7DE">
+                            <rect key="frame" x="271" y="4" width="72" height="72"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhL-mu-zks" userLabel="Shuffle Button">
+                                    <rect key="frame" x="0.0" y="0.0" width="72" height="72"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="mhL-mu-zks" secondAttribute="height" multiplier="1:1" id="2P5-5Q-SoR"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="20"/>
+                                    <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <state key="normal" title="">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                    </state>
+                                    <state key="selected">
+                                        <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="shuffleButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="s11-0d-7rF"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
-                                <constraint firstAttribute="width" secondItem="mhL-mu-zks" secondAttribute="height" multiplier="1:1" id="2P5-5Q-SoR"/>
+                                <constraint firstItem="mhL-mu-zks" firstAttribute="width" secondItem="jwJ-pR-7DE" secondAttribute="width" id="7oz-Tf-3AU"/>
+                                <constraint firstItem="mhL-mu-zks" firstAttribute="centerX" secondItem="jwJ-pR-7DE" secondAttribute="centerX" id="7ua-xO-HaF"/>
+                                <constraint firstItem="mhL-mu-zks" firstAttribute="height" secondItem="jwJ-pR-7DE" secondAttribute="height" id="9kY-6Z-TqL"/>
+                                <constraint firstItem="mhL-mu-zks" firstAttribute="centerY" secondItem="jwJ-pR-7DE" secondAttribute="centerY" id="fHf-eB-IFU"/>
                             </constraints>
-                            <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="20"/>
-                            <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <state key="normal" title="">
-                                <color key="titleColor" systemColor="labelColor"/>
-                            </state>
-                            <state key="selected">
-                                <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            </state>
-                            <connections>
-                                <action selector="shuffleButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="s11-0d-7rF"/>
-                            </connections>
-                        </button>
+                        </view>
                     </subviews>
                     <constraints>
                         <constraint firstAttribute="width" relation="lessThanOrEqual" constant="500" id="VIl-zL-YGC"/>
@@ -160,22 +193,6 @@
                         <constraint firstItem="zQR-aF-4SD" firstAttribute="centerX" secondItem="sop-QK-f5X" secondAttribute="centerX" id="hCB-DH-Yaw"/>
                     </constraints>
                 </view>
-                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
-                    <rect key="frame" x="234" y="-7.5" width="45" height="45"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="45" id="5uL-80-PHj"/>
-                        <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="P7Y-F5-gln"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                    <color key="tintColor" systemColor="labelColor"/>
-                    <inset key="imageEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
-                    <state key="normal" image="player_style_compact">
-                        <color key="titleColor" systemColor="labelColor"/>
-                    </state>
-                    <connections>
-                        <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
-                    </connections>
-                </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fzn-VY-lpT" userLabel="Artist Name Large Button">
                     <rect key="frame" x="16" y="171.5" width="343" height="23"/>
                     <connections>
@@ -206,10 +223,25 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l5j-2I-Ltc" userLabel="Airplay Button">
-                    <rect key="frame" x="284" y="-5" width="40" height="40"/>
+                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
+                    <rect key="frame" x="16" y="5" width="20" height="20"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="40" id="4pS-66-grn"/>
+                        <constraint firstAttribute="width" constant="20" id="5uL-80-PHj"/>
+                        <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="P7Y-F5-gln"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="tintColor" systemColor="labelColor"/>
+                    <state key="normal" image="player_style_compact">
+                        <color key="titleColor" systemColor="labelColor"/>
+                    </state>
+                    <connections>
+                        <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
+                    </connections>
+                </button>
+                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l5j-2I-Ltc" userLabel="Airplay Button">
+                    <rect key="frame" x="257" y="5" width="20" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="20" id="4pS-66-grn"/>
                         <constraint firstAttribute="width" secondItem="l5j-2I-Ltc" secondAttribute="height" multiplier="1:1" id="NI7-38-OSx"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
@@ -242,6 +274,21 @@
                         <constraint firstAttribute="height" constant="35" id="pnm-AN-M7t"/>
                     </constraints>
                 </view>
+                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change" customClass="LNPopupButton">
+                    <rect key="frame" x="293" y="5" width="20" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="Iye-f4-Rd2"/>
+                        <constraint firstAttribute="width" constant="20" id="O0l-F2-ebZ"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="tintColor" systemColor="labelColor"/>
+                    <state key="normal" image="musical_notes">
+                        <color key="titleColor" systemColor="labelColor"/>
+                    </state>
+                    <connections>
+                        <action selector="playerModeChangePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="WMf-zb-HxJ"/>
+                    </connections>
+                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -252,16 +299,17 @@
                 <constraint firstItem="uqN-6M-JGc" firstAttribute="trailing" secondItem="6NT-8n-tg9" secondAttribute="trailing" id="5Qh-JN-9Zn"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="top" secondItem="2Oi-ys-XoJ" secondAttribute="top" id="678-gg-X1u"/>
                 <constraint firstItem="GST-UH-ejT" firstAttribute="trailing" secondItem="6NT-8n-tg9" secondAttribute="trailing" id="6HC-Ie-H8g"/>
-                <constraint firstItem="0xq-hb-FZa" firstAttribute="centerY" secondItem="l5j-2I-Ltc" secondAttribute="centerY" id="6do-Dz-WxO"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="trailing" secondItem="2Oi-ys-XoJ" secondAttribute="trailing" id="7B1-C7-dVr"/>
                 <constraint firstItem="4O4-sy-Ien" firstAttribute="trailing" secondItem="pOR-k2-6Vf" secondAttribute="trailing" id="8Ig-ny-bha"/>
                 <constraint firstAttribute="trailingMargin" secondItem="SoI-ny-Hw0" secondAttribute="trailing" priority="999" id="9wH-XK-zJU"/>
+                <constraint firstItem="ZVN-JG-VAA" firstAttribute="centerY" secondItem="0xq-hb-FZa" secondAttribute="centerY" id="AXX-7H-ArF"/>
+                <constraint firstItem="7xb-YR-9X6" firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="DpG-Q6-B6H"/>
                 <constraint firstItem="VVf-kL-Ei5" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="IHy-h6-9bV"/>
                 <constraint firstItem="Fzn-VY-lpT" firstAttribute="leading" secondItem="GST-UH-ejT" secondAttribute="leading" id="KAn-Lo-bQl"/>
                 <constraint firstItem="SoI-ny-Hw0" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="LbA-lo-e0d"/>
                 <constraint firstItem="Fzn-VY-lpT" firstAttribute="top" secondItem="GST-UH-ejT" secondAttribute="top" id="MVj-w8-wYH"/>
+                <constraint firstItem="0xq-hb-FZa" firstAttribute="centerY" secondItem="ZVN-JG-VAA" secondAttribute="centerY" id="Mdp-78-LLB"/>
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="top" secondItem="sop-QK-f5X" secondAttribute="bottom" constant="22" id="MnT-rV-Opr"/>
-                <constraint firstItem="ZVN-JG-VAA" firstAttribute="centerY" secondItem="l5j-2I-Ltc" secondAttribute="centerY" id="Msk-f3-yHP"/>
                 <constraint firstItem="okd-ac-nGY" firstAttribute="top" secondItem="sop-QK-f5X" secondAttribute="bottom" constant="22" id="O3m-h0-aj3"/>
                 <constraint firstAttribute="trailingMargin" secondItem="pOR-k2-6Vf" secondAttribute="trailing" id="QUO-oB-cc3"/>
                 <constraint firstAttribute="trailingMargin" secondItem="t1c-hF-UMw" secondAttribute="trailing" id="QUi-S2-Eme"/>
@@ -272,6 +320,7 @@
                 <constraint firstItem="uqN-6M-JGc" firstAttribute="leading" secondItem="6NT-8n-tg9" secondAttribute="leading" id="Suu-4x-GTB"/>
                 <constraint firstItem="4O4-sy-Ien" firstAttribute="bottom" secondItem="pOR-k2-6Vf" secondAttribute="bottom" id="UNn-87-JZ9"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="bottom" secondItem="2Oi-ys-XoJ" secondAttribute="bottom" id="V1E-8l-ETr"/>
+                <constraint firstItem="0xq-hb-FZa" firstAttribute="leading" secondItem="7xb-YR-9X6" secondAttribute="trailing" constant="16" id="VAS-FN-Qvk"/>
                 <constraint firstItem="SoI-ny-Hw0" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" priority="999" id="Xld-BO-cCE"/>
                 <constraint firstItem="uqN-6M-JGc" firstAttribute="bottom" secondItem="6NT-8n-tg9" secondAttribute="bottom" id="ZJp-b2-w7Y"/>
                 <constraint firstItem="4O4-sy-Ien" firstAttribute="top" secondItem="pOR-k2-6Vf" secondAttribute="top" id="a3u-K2-swP"/>
@@ -280,18 +329,21 @@
                 <constraint firstItem="sop-QK-f5X" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" placeholder="YES" id="b5S-5X-xP4"/>
                 <constraint firstItem="Fzn-VY-lpT" firstAttribute="trailing" secondItem="GST-UH-ejT" secondAttribute="trailing" id="bYb-V0-xVg"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="leading" secondItem="pOR-k2-6Vf" secondAttribute="leading" id="c3V-lE-hW9"/>
-                <constraint firstItem="ZVN-JG-VAA" firstAttribute="trailing" secondItem="l5j-2I-Ltc" secondAttribute="leading" constant="-5" id="d30-WX-xQT"/>
                 <constraint firstItem="VVf-kL-Ei5" firstAttribute="top" secondItem="SoI-ny-Hw0" secondAttribute="bottom" constant="10" id="fD8-gR-3On"/>
+                <constraint firstItem="0xq-hb-FZa" firstAttribute="centerY" secondItem="7xb-YR-9X6" secondAttribute="centerY" id="g94-fw-lgu"/>
                 <constraint firstItem="GST-UH-ejT" firstAttribute="leading" secondItem="6NT-8n-tg9" secondAttribute="leading" id="g9V-Mx-b5w"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="top" secondItem="pOR-k2-6Vf" secondAttribute="bottom" constant="3" id="ghg-6R-wWp"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="sop-QK-f5X" secondAttribute="bottom" constant="10" id="guh-i3-Npn"/>
-                <constraint firstItem="0xq-hb-FZa" firstAttribute="leading" secondItem="l5j-2I-Ltc" secondAttribute="trailing" constant="5" id="hkr-CO-HH5"/>
                 <constraint firstItem="pOR-k2-6Vf" firstAttribute="top" secondItem="sop-QK-f5X" secondAttribute="top" constant="4" id="i5C-U2-zOK"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="leading" secondItem="2Oi-ys-XoJ" secondAttribute="leading" id="mYv-de-lse"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="msH-gV-d4u"/>
+                <constraint firstAttribute="leadingMargin" secondItem="ZVN-JG-VAA" secondAttribute="leading" id="nVY-5i-Hey"/>
+                <constraint firstItem="l5j-2I-Ltc" firstAttribute="centerY" secondItem="0xq-hb-FZa" secondAttribute="centerY" id="p0d-su-MEF"/>
                 <constraint firstAttribute="trailingMargin" secondItem="6NT-8n-tg9" secondAttribute="trailing" id="ql5-mh-cpC"/>
+                <constraint firstItem="7xb-YR-9X6" firstAttribute="leading" secondItem="l5j-2I-Ltc" secondAttribute="trailing" constant="16" id="qwy-QH-8XT"/>
                 <constraint firstItem="uqN-6M-JGc" firstAttribute="top" secondItem="6NT-8n-tg9" secondAttribute="top" id="rwh-y6-AoU"/>
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" constant="-159" id="sAk-2J-JEK"/>
+                <constraint firstItem="l5j-2I-Ltc" firstAttribute="centerY" secondItem="ZVN-JG-VAA" secondAttribute="centerY" id="tIU-ZO-RLs"/>
                 <constraint firstItem="okd-ac-nGY" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="tbM-wh-ia0"/>
                 <constraint firstAttribute="leadingMargin" secondItem="okd-ac-nGY" secondAttribute="trailing" constant="-159" id="vQu-6h-oG4"/>
                 <constraint firstItem="4O4-sy-Ien" firstAttribute="leading" secondItem="pOR-k2-6Vf" secondAttribute="leading" id="w2X-uD-cdZ"/>
@@ -313,7 +365,10 @@
                 <outlet property="elapsedTimeLabel" destination="okd-ac-nGY" id="MFD-Qa-B7r"/>
                 <outlet property="elapsedTimeToArtworkDistanceConstraint" destination="O3m-h0-aj3" id="Gco-VB-KuA"/>
                 <outlet property="infoLargeToProgressDistanceConstraint" destination="Qu9-nI-cVh" id="iph-Qw-oog"/>
+                <outlet property="nextButton" destination="E3q-DK-jgm" id="MGI-Lm-8TL"/>
                 <outlet property="playButton" destination="Byk-rx-3Lv" id="03r-73-6Na"/>
+                <outlet property="playerModeButton" destination="7xb-YR-9X6" id="yNk-04-nkT"/>
+                <outlet property="previousButton" destination="PZj-JS-NGq" id="uue-oe-5FL"/>
                 <outlet property="ratingPlaceholderView" destination="VVf-kL-Ei5" id="cix-bZ-01K"/>
                 <outlet property="ratingToBottomControlDistanceConstraint" destination="fD8-gR-3On" id="nb2-tu-SRk"/>
                 <outlet property="remainingTimeLabel" destination="t1c-hF-UMw" id="hPl-lK-efe"/>
@@ -346,13 +401,19 @@
     </designables>
     <resources>
         <image name="airplay" width="20" height="20"/>
+        <image name="backward" width="121" height="69"/>
         <image name="ellipsis" width="18.417999267578125" height="3.9160199165344238"/>
+        <image name="forward" width="121" height="69"/>
+        <image name="musical_notes" width="30" height="30"/>
         <image name="player_style_compact" width="16.425800323486328" height="20.947299957275391"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="tintColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

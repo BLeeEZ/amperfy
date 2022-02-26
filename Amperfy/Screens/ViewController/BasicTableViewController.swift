@@ -34,11 +34,24 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
 typealias SwipeActionCallback = (IndexPath, _ completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void ) -> Void
 
 struct SwipeDisplaySettings {
-    var isAddToPlaylistAllowed = true
+    var playContextTypeOfElements: PlayerMode = .music
     
     func isAllowedToDisplay(actionType: SwipeActionType, isOfflineMode: Bool) -> Bool {
-        if actionType == .addToPlaylist, !isAddToPlaylistAllowed {
-            return false
+        switch playContextTypeOfElements {
+        case .music:
+            if actionType == .insertPodcastQueue ||
+               actionType == .appendPodcastQueue {
+                return false
+            }
+        case .podcast:
+            if actionType == .playShuffled ||
+               actionType == .addToPlaylist ||
+               actionType == .insertContextQueue ||
+               actionType == .appendContextQueue ||
+               actionType == .insertUserQueue ||
+               actionType == .appendUserQueue {
+                return false
+            }
         }
         if isOfflineMode, actionType == .addToPlaylist || actionType == .download {
             return false
@@ -82,6 +95,10 @@ extension BasicTableViewController {
                         playContext.isKeepIndexDuringShuffle = true
                     }
                     self.appDelegate.player.playShuffled(context: playContext)
+                case .insertPodcastQueue:
+                    self.appDelegate.player.insertPodcastQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                case .appendPodcastQueue:
+                    self.appDelegate.player.appendPodcastQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
                 }
             }
             completionHandler(true)
@@ -126,11 +143,13 @@ class BasicTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let swipeCB = swipeCallback else { return nil }
+        var createdActionsIndex = 0
         var actions = [UIContextualAction]()
-        for (index, actionType) in appDelegate.persistentStorage.settings.swipeActionSettings.leading.enumerated() {
+        for actionType in appDelegate.persistentStorage.settings.swipeActionSettings.leading {
             if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, isOfflineMode: appDelegate.persistentStorage.settings.isOfflineMode) { continue }
-            let buttonColor = Self.swipeButtonColors.element(at: index) ?? Self.swipeButtonColors.last!
+            let buttonColor = Self.swipeButtonColors.element(at: createdActionsIndex) ?? Self.swipeButtonColors.last!
             actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, actionCallback: swipeCB))
+            createdActionsIndex += 1
         }
         return UISwipeActionsConfiguration(actions: actions)
     }
@@ -138,11 +157,13 @@ class BasicTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard !tableView.isEditing else { return nil }
         guard let swipeCB = swipeCallback else { return nil }
+        var createdActionsIndex = 0
         var actions = [UIContextualAction]()
-        for (index, actionType) in appDelegate.persistentStorage.settings.swipeActionSettings.trailing.enumerated() {
+        for actionType in appDelegate.persistentStorage.settings.swipeActionSettings.trailing {
             if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, isOfflineMode: appDelegate.persistentStorage.settings.isOfflineMode) { continue }
-            let buttonColor = Self.swipeButtonColors.element(at: index) ?? Self.swipeButtonColors.last!
+            let buttonColor = Self.swipeButtonColors.element(at: createdActionsIndex) ?? Self.swipeButtonColors.last!
             actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, actionCallback: swipeCB))
+            createdActionsIndex += 1
         }
         return UISwipeActionsConfiguration(actions: actions)
     }

@@ -18,6 +18,10 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var infoLabel: MarqueeLabel!
     @IBOutlet weak var entityImage: EntityImageView!
     
+    @IBOutlet weak var podcastQueueContainerView: UIView!
+    @IBOutlet weak var podcastQueueInsertButton: BasicButton!
+    @IBOutlet weak var podcastQueueAppendButton: BasicButton!
+    
     @IBOutlet weak var queueContainerView: UIView!
     @IBOutlet weak var userQueueInsertButton: BasicButton!
     @IBOutlet weak var userQueueAppendButton: BasicButton!
@@ -65,6 +69,7 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var artistNameLabelHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var albumNameLabelHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var ratingHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var podcastQueueContainerHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var queueStackHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var mainStackClusterHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var playerStackClusterHeightConstraint: NSLayoutConstraint!
@@ -100,6 +105,9 @@ class LibraryEntityDetailVC: UIViewController {
         playerStackView.isHidden = true
         refresh()
 
+        Self.configureRoundQueueButton(button: podcastQueueInsertButton, corner: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
+        Self.configureRoundQueueButton(button: podcastQueueAppendButton, corner: [.layerMinXMaxYCorner, .layerMaxXMaxYCorner])
+
         Self.configureRoundQueueButton(button: contextQueueInsertButton, corner: .layerMinXMinYCorner)
         Self.configureRoundQueueButton(button: userQueueInsertButton, corner: .layerMaxXMinYCorner)
         Self.configureRoundQueueButton(button: contextQueueAppendButton, corner: .layerMinXMaxYCorner)
@@ -118,6 +126,9 @@ class LibraryEntityDetailVC: UIViewController {
         remainingSpace -= detailLabelsClusterHeightConstraint.constant
         if !ratingPlaceholderView.isHidden {
             remainingSpace -= ratingHeightConstraint.constant
+        }
+        if !podcastQueueContainerView.isHidden {
+            remainingSpace -= podcastQueueContainerHeightConstraint.constant
         }
         if !queueContainerView.isHidden {
             remainingSpace -= queueStackHeightConstraint.constant
@@ -223,10 +234,18 @@ class LibraryEntityDetailVC: UIViewController {
         
         infoLabel.text = entityContainer.info(for: appDelegate.backendProxy.selectedApi, type: .long)
 
-        playButton.isHidden =         !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
+        playButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
         playShuffledButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
+        podcastQueueContainerView.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
         queueContainerView.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
         addToPlaylistButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
+        
+        switch entityContainer.playContextType {
+        case .music:
+            podcastQueueContainerView.isHidden = true
+        case .podcast:
+            queueContainerView.isHidden = true
+        }
 
         downloadButton.isHidden = entityContainer.playables.isCachedCompletely ||
             appDelegate.persistentStorage.settings.isOfflineMode ||
@@ -263,6 +282,7 @@ class LibraryEntityDetailVC: UIViewController {
     
     private func configureFor(podcast: Podcast) {
         addToPlaylistButton.isHidden = true
+        playShuffledButton.isHidden = true
     }
     
     private func configureFor(artist: Artist) {
@@ -280,6 +300,9 @@ class LibraryEntityDetailVC: UIViewController {
             (playContextCb == nil) ||
             playerIndexCb != nil ||
             (!song.isCached && appDelegate.persistentStorage.settings.isOfflineMode)
+        
+        clearUserQueueButton.isHidden = appDelegate.player.userQueue.isEmpty
+        addContextQueueToPlaylistButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
         configurePlayerStack()
     }
     
@@ -288,12 +311,14 @@ class LibraryEntityDetailVC: UIViewController {
            (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
            (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode)
         playShuffledButton.isHidden = true
-        queueContainerView.isHidden = (playContextCb == nil) ||
+        podcastQueueContainerView.isHidden = (playContextCb == nil) ||
            (playerIndexCb != nil) ||
            (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
            (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode)
         addToPlaylistButton.isHidden = true
         deleteOnServerButton.isHidden = podcastEpisode.podcastStatus == .deleted || appDelegate.persistentStorage.settings.isOfflineMode
+        clearUserQueueButton.isHidden = true
+        addContextQueueToPlaylistButton.isHidden = true
         configurePlayerStack()
     }
     
@@ -305,9 +330,7 @@ class LibraryEntityDetailVC: UIViewController {
         
         playerStackView.isHidden = false
         clearPlayerButton.isHidden = false
-        clearUserQueueButton.isHidden = appDelegate.player.userQueue.isEmpty
-        addContextQueueToPlaylistButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
-        
+
         Self.configureRoundButtonCluster(buttons: playerControlButtons, containerView: playerStackView, hightConstraint: playerStackClusterHeightConstraint, buttonHeight: playButtonHeightConstraint.constant, offsetHeight: playerActionsLabelHeightConstraint.constant + 1.0)
     }
     

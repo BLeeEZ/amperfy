@@ -25,7 +25,12 @@ class CoreDataSeeder {
         (id: "54",    artistId: "93", albumId: "6BTR0", track: 1, isCached: true, title: "see", url: "www.blub.de/ddf"),
         (id: "55",    artistId: "93", albumId: "6BTR0", track: 2, isCached: true, title: "feel", url: "www.blub.de/654"),
         (id: "56",    artistId: "93", albumId: "6BTR0", track: 3, isCached: true, title: "house", url: "www.blub.de/trd"),
-        (id: "57",    artistId: "93", albumId: "6BTR0", track: 4, isCached: true, title: "car", url: "www.blub.de/jhrf")
+        (id: "57",    artistId: "93", albumId: "6BTR0", track: 4, isCached: true, title: "car", url: "www.blub.de/jhrf"),
+        (id: "59",    artistId: "asd", albumId: "6BTR0", track: 7, isCached: true, title: "vllll", url: "www.blub.de/jads324hrf"),
+        (id: "99",    artistId: "asd", albumId: "6BTR0", track: 8, isCached: true, title: "cllll", url: "www.blub.de/jds32s4hrf"),
+        (id: "5a9",    artistId: "asd", albumId: "6BTR0", track: 10, isCached: true, title: "allll", url: "www.blub.de/sjds324hrf"),
+        (id: "59e",    artistId: "asd", albumId: "6BTR0", track: 158, isCached: true, title: "3llll", url: "www.blub.de/gjds324hrf"),
+        (id: "5e9lll",    artistId: "asd", albumId: "6BTR0", track: 198, isCached: true, title: "3lldll", url: "www.blub.de/aajds324hrf")
     ]
     let playlists = [
         (id: "3",     name: "With One Cached", songIds: ["3", "5", "10T", "36", "19"]),

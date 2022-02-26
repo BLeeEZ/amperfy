@@ -42,10 +42,17 @@ extension UIImage {
     static var userQueueAppend: UIImage = { return UIImage.create("user_queue_append") }()
     static var contextQueueInsert: UIImage = { return UIImage.create("context_queue_insert") }()
     static var contextQueueAppend: UIImage = { return UIImage.create("context_queue_append") }()
+    static var podcastQueueInsert: UIImage = { return UIImage.create("podcast_queue_insert") }()
+    static var podcastQueueAppend: UIImage = { return UIImage.create("podcast_queue_append") }()
     static var download: UIImage = { return UIImage.create("download") }()
     static var trash: UIImage = { return UIImage.create("trash") }()
+    
     static var play: UIImage = { return UIImage.create("play") }()
     static var pause: UIImage = { return UIImage.create("pause") }()
+    static var forward: UIImage = { return UIImage.create("forward") }()  // SF-Symbols 3.2 Regular:  forward.filled
+    static var backward: UIImage = { return UIImage.create("backward") }()  // SF-Symbols 3.2 Regular:  backward.filled
+    static var skipForward30: UIImage = { return UIImage.create("skip_forward_30") }()  // SF-Symbols 3.2 Regular:  goforward.30
+    static var skipBackward15: UIImage = { return UIImage.create("skip_backward_15") }()  // SF-Symbols 3.2 Regular:  gobackward.30
     static var shuffle: UIImage = { return UIImage.create("shuffle") }()
     
     private static func create(_ named: String) -> UIImage {

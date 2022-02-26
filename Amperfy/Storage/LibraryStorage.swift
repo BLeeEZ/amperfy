@@ -600,10 +600,15 @@ class LibraryStorage: PlayableFileCachable {
             playerMO.shuffledContextPlaylist = PlaylistMO(context: context)
             saveContext()
         }
+        if playerMO.podcastPlaylist == nil {
+            playerMO.podcastPlaylist = PlaylistMO(context: context)
+            saveContext()
+        }
         
         let userQueuePlaylist = Playlist(library: self, managedObject: playerMO.userQueuePlaylist!)
         let contextPlaylist = Playlist(library: self, managedObject: playerMO.contextPlaylist!)
         let shuffledContextPlaylist = Playlist(library: self, managedObject: playerMO.shuffledContextPlaylist!)
+        let podcastPlaylist = Playlist(library: self, managedObject: playerMO.podcastPlaylist!)
         
         if shuffledContextPlaylist.items.count != contextPlaylist.items.count {
             shuffledContextPlaylist.removeAllItems()
@@ -611,7 +616,7 @@ class LibraryStorage: PlayableFileCachable {
             shuffledContextPlaylist.shuffle()
         }
         
-        playerData = PlayerData(library: self, managedObject: playerMO, userQueue: userQueuePlaylist, contextQueue: contextPlaylist, shuffledContextQueue: shuffledContextPlaylist)
+        playerData = PlayerData(library: self, managedObject: playerMO, userQueue: userQueuePlaylist, contextQueue: contextPlaylist, shuffledContextQueue: shuffledContextPlaylist, podcastQueue: podcastPlaylist)
         
         return playerData
     }

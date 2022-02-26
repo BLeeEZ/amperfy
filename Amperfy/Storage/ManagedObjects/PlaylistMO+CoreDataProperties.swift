@@ -15,6 +15,7 @@ extension PlaylistMO {
     @NSManaged public var playersContextPlaylist: PlayerMO?
     @NSManaged public var playersShuffledContextPlaylist: PlayerMO?
     @NSManaged public var playersUserQueuePlaylist: PlayerMO?
+    @NSManaged public var playersPodcastPlaylist: PlayerMO?
 
 }
 

@@ -38,8 +38,8 @@ class PlayerView: UIView {
     private var rootView: PopupPlayerVC?
     private var displayStyle: PlayerDisplayStyle!
     
-    @IBOutlet weak var ratingPlaceholderView: UIView!
-    @IBOutlet weak var ratingView: RatingView?
+    @IBOutlet weak var artworkImage: UIImageView!
+    @IBOutlet weak var artworkContainerView: UIView!
     
     @IBOutlet weak var titleCompactLabel: MarqueeLabel!
     @IBOutlet weak var titleCompactButton: UIButton!
@@ -52,15 +52,21 @@ class PlayerView: UIView {
     @IBOutlet weak var artistNameLargeButton: UIButton!
     
     @IBOutlet weak var playButton: UIButton!
+    @IBOutlet weak var previousButton: UIButton!
+    @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var repeatButton: UIButton!
     @IBOutlet weak var shuffleButton: UIButton!
-    @IBOutlet weak var displayPlaylistButton: UIButton!
+    
     @IBOutlet weak var timeSlider: UISlider!
     @IBOutlet weak var elapsedTimeLabel: UILabel!
     @IBOutlet weak var remainingTimeLabel: UILabel!
-    @IBOutlet weak var artworkImage: UIImageView!
-    @IBOutlet weak var artworkContainerView: UIView!
     
+    @IBOutlet weak var playerModeButton: UIButton!
+    @IBOutlet weak var displayPlaylistButton: UIButton!
+    
+    @IBOutlet weak var ratingPlaceholderView: UIView!
+    @IBOutlet weak var ratingView: RatingView?
+
     // Animation constraints
     @IBOutlet weak var artistToTitleLargeDistanceConstraint: NSLayoutConstraint!
     @IBOutlet weak var bottomControlToProgressDistanceConstraint: NSLayoutConstraint!
@@ -103,11 +109,21 @@ class PlayerView: UIView {
     }
     
     @IBAction func previousButtonPushed(_ sender: Any) {
-        player.playPreviousOrReplay()
+        switch player.playerMode {
+        case .music:
+            player.playPreviousOrReplay()
+        case .podcast:
+            player.skipBackward()
+        }
     }
     
     @IBAction func nextButtonPushed(_ sender: Any) {
-        player.playNext()
+        switch player.playerMode {
+        case .music:
+            player.playNext()
+        case .podcast:
+            player.skipForward()
+        }
     }
     
     @IBAction func repeatButtonPushed(_ sender: Any) {
@@ -161,6 +177,16 @@ class PlayerView: UIView {
         appDelegate.persistentStorage.settings.playerDisplayStyle = displayStyle
         refreshDisplayPlaylistButton()
         renderAnimation()
+    }
+    
+    @IBAction func playerModeChangePressed(_ sender: Any) {
+        switch player.playerMode {
+        case .music:
+            appDelegate.player.setPlayerMode(.podcast)
+        case .podcast:
+            appDelegate.player.setPlayerMode(.music)
+        }
+        refreshPlayerModeChangeButton()
     }
     
     @IBAction func titleCompactPressed(_ sender: Any) {
@@ -401,13 +427,30 @@ class PlayerView: UIView {
             rootView?.changeBackgroundGradient(forPlayable: playableInfo)
             lastDisplayedPlayable = playableInfo
         } else {
-            titleCompactLabel.text = "Not playing"
-            titleLargeLabel.text = "Not playing"
+            switch player.playerMode {
+            case .music:
+                titleCompactLabel.text = "No music playing"
+                titleLargeLabel.text = "No music playing"
+                rootView?.popupItem.title = "No music playing"
+            case .podcast:
+                titleCompactLabel.text = "No podcast playing"
+                titleLargeLabel.text = "No podcast playing"
+                rootView?.popupItem.title = "No podcast playing"
+            }
             artistNameCompactLabel.text = ""
             artistNameLargeLabel.text = ""
-            rootView?.popupItem.title = "Not playing"
             rootView?.popupItem.subtitle = ""
             lastDisplayedPlayable = nil
+        }
+        switch player.playerMode {
+        case .music:
+            ratingView?.isHidden = false
+            repeatButton.isHidden = false
+            shuffleButton.isHidden = false
+        case .podcast:
+            ratingView?.isHidden = true
+            repeatButton.isHidden = true
+            shuffleButton.isHidden = true
         }
     }
     
@@ -416,8 +459,14 @@ class PlayerView: UIView {
             artworkImage.image = playableInfo.image
             rootView?.popupItem.image = playableInfo.image
         } else {
-            artworkImage.image = UIImage.songArtwork
-            rootView?.popupItem.image = UIImage.songArtwork
+            switch player.playerMode {
+            case .music:
+                artworkImage.image = UIImage.songArtwork
+                rootView?.popupItem.image = UIImage.songArtwork
+            case .podcast:
+                artworkImage.image = UIImage.podcastArtwork
+                rootView?.popupItem.image = UIImage.podcastArtwork
+            }
         }
     }
 
@@ -447,9 +496,24 @@ class PlayerView: UIView {
         refreshCurrentlyPlayingInfo()
         refreshPlayButtonTitle()
         refreshTimeInfo()
+        refreshPrevNextButtons()
         refreshRepeatButton()
         refreshShuffleButton()
         refreshDisplayPlaylistButton()
+        refreshPlayerModeChangeButton()
+    }
+    
+    func refreshPrevNextButtons() {
+        previousButton.imageView?.contentMode = .scaleAspectFit
+        nextButton.imageView?.contentMode = .scaleAspectFit
+        switch player.playerMode {
+        case .music:
+            previousButton.setImage(UIImage.backward, for: .normal)
+            nextButton.setImage(UIImage.forward, for: .normal)
+        case .podcast:
+            previousButton.setImage(UIImage.skipBackward15, for: .normal)
+            nextButton.setImage(UIImage.skipForward30, for: .normal)
+        }
     }
     
     func refreshRepeatButton() {
@@ -476,9 +540,18 @@ class PlayerView: UIView {
     
     func refreshDisplayPlaylistButton() {
         if displayStyle == .compact {
-            displayPlaylistButton.setImage(UIImage.playerStyleLarge, for: .normal)
-        } else {
             displayPlaylistButton.setImage(UIImage.playerStyleCompact, for: .normal)
+        } else {
+            displayPlaylistButton.setImage(UIImage.playerStyleLarge, for: .normal)
+        }
+    }
+    
+    func refreshPlayerModeChangeButton() {
+        switch player.playerMode {
+        case .music:
+            playerModeButton.setImage(UIImage.musicalNotes, for: .normal)
+        case .podcast:
+            playerModeButton.setImage(UIImage.podcast, for: .normal)
         }
     }
     

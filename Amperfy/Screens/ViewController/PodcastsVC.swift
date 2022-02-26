@@ -31,7 +31,7 @@ class PodcastsVC: BasicTableViewController {
         sortButton = UIBarButtonItem(title: "Show", style: .plain, target: self, action: #selector(sortButtonPressed))
         navigationItem.rightBarButtonItem = sortButton
         
-        swipeDisplaySettings.isAddToPlaylistAllowed = false
+        swipeDisplaySettings.playContextTypeOfElements = .podcast
         swipeCallback = { (indexPath, completionHandler) in
             switch self.showType {
             case .podcasts:

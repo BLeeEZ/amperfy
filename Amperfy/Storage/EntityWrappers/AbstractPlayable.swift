@@ -189,6 +189,7 @@ extension AbstractPlayable: PlayableContainable  {
     var playables: [AbstractPlayable] {
         return [self]
     }
+    var playContextType: PlayerMode { return isSong ? .music : .podcast }
     func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
         guard let song = asSong else { return }
         let library = LibraryStorage(context: context)

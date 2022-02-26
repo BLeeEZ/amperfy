@@ -45,15 +45,15 @@ class TabBarVC: UITabBarController {
     }
     
     private func handlePopupBar() {
-        if appDelegate.player.currentlyPlaying != nil {
-            displayPopupBar()
-        } else {
+        if appDelegate.player.isPopupBarAllowedToHide {
             hidePopupPlayer()
+        } else {
+            displayPopupBar()
         }
     }
     
     private func displayPopupBar() {
-        guard let popupPlayer = popupPlayer, !isPopupBarDisplayed, appDelegate.player.currentlyPlaying != nil else { return }
+        guard let popupPlayer = popupPlayer, !isPopupBarDisplayed, !appDelegate.player.isPopupBarAllowedToHide else { return }
         isPopupBarDisplayed = true
         if isPopupPlayerInitialized {
             popupPlayer.reloadData()

@@ -82,6 +82,13 @@ class PlayQueueHandlerTest: XCTestCase {
             XCTAssertNil(testQueueHandler.currentlyPlaying)
         }
     }
+    var song9: AbstractPlayable { return library.getSong(id: cdHelper.seeder.songs[9].id)! }
+    var songA: AbstractPlayable { return library.getSong(id: cdHelper.seeder.songs[10].id)! }
+    var songB: AbstractPlayable { return library.getSong(id: cdHelper.seeder.songs[11].id)! }
+    var songC: AbstractPlayable { return library.getSong(id: cdHelper.seeder.songs[12].id)! }
+    var songD: AbstractPlayable { return library.getSong(id: cdHelper.seeder.songs[13].id)! }
+    var songE: AbstractPlayable { return library.getSong(id: cdHelper.seeder.songs[14].id)! }
+    var songF: AbstractPlayable { return library.getSong(id: cdHelper.seeder.songs[15].id)! }
     
     func testCreation() {
         XCTAssertEqual(testQueueHandler.prevQueue, [AbstractPlayable]())
@@ -1758,4 +1765,568 @@ class PlayQueueHandlerTest: XCTestCase {
         checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [0])
     }
     
+    func testInsertPodcastQueue_playerModeMusic_NoWaitingQueuePlaying() {
+        prepareNoWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+
+        testPlayer.insertPodcastQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9])
+        
+        testPlayer.insertPodcastQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 10])
+
+        testPlayer.insertPodcastQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 11, 10])
+        
+        testPlayer.insertPodcastQueue(playables: [songC])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 12, 11, 10])
+    }
+    func testAppendPodcastQueue_playerModeMusic_NoWaitingQueuePlaying() {
+        prepareNoWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+
+        testPlayer.appendPodcastQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9])
+        
+        testPlayer.appendPodcastQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 10])
+        
+        testPlayer.appendPodcastQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 10, 11])
+
+        testPlayer.appendPodcastQueue(playables: [songC])
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 10, 11, 12])
+    }
+    func testInsertContextQueue_playerModePodcast_NoWaitingQueuePlaying() {
+        prepareNoWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+        testPlayer.playerMode = .podcast
+        
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
+
+        testPlayer.insertContextQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 9, 3, 4])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [9, 3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+
+        testPlayer.insertContextQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 10, 9, 3, 4])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [10, 9, 3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+        
+        testPlayer.insertContextQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 11, 10, 9, 3, 4])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [11, 10, 9, 3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+    }
+    func testAppendContextQueue_playerModePodcast_NoWaitingQueuePlaying() {
+        prepareNoWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+        testPlayer.playerMode = .podcast
+        
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
+
+        testPlayer.appendContextQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4, 9])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4, 9])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+
+        testPlayer.appendContextQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4, 9, 10])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4, 9, 10])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+        
+        testPlayer.appendContextQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4, 9, 10, 11])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4, 9, 10, 11])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+    }
+    func testInsertUserQueue_playerModePodcast_NoWaitingQueuePlaying() {
+        prepareNoWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+        testPlayer.playerMode = .podcast
+        
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
+
+        testPlayer.insertUserQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [9, 5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+
+        testPlayer.insertUserQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [10, 9, 5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+        
+        testPlayer.insertUserQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [11, 10, 9, 5, 6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+    }
+    func testAppendUserQueue_playerModePodcast_NoWaitingQueuePlaying() {
+        prepareNoWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+        testPlayer.playerMode = .podcast
+        
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
+
+        testPlayer.appendUserQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8, 9])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+
+        testPlayer.appendUserQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8, 9, 10])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+        
+        testPlayer.appendUserQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: nil)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 2)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8, 9, 10, 11])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+        testPlayer.playerMode = .podcast
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    func testInsertPodcastQueue_playerModeMusic_WithWaitingQueuePlaying() {
+        prepareWithWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
+
+        testPlayer.insertPodcastQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9])
+        
+        testPlayer.insertPodcastQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 10])
+
+        testPlayer.insertPodcastQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 11, 10])
+        
+        testPlayer.insertPodcastQueue(playables: [songC])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 12, 11, 10])
+    }
+    func testAppendPodcastQueue_playerModeMusic_WithWaitingQueuePlaying() {
+        prepareWithWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+
+        testPlayer.appendPodcastQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9])
+        
+        testPlayer.appendPodcastQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 10])
+        
+        testPlayer.appendPodcastQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 10, 11])
+
+        testPlayer.appendPodcastQueue(playables: [songC])
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [9, 10, 11, 12])
+    }
+    func testInsertContextQueue_playerModePodcast_WithWaitingQueuePlaying() {
+        prepareWithWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+        
+        testPlayer.playerMode = .podcast
+        testPlayer.insertPodcastQueue(playables: [songD, songE, songF])
+        testPlayer.currentIndex = 1
+        
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+
+        testPlayer.insertContextQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [9, 3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        testPlayer.playerMode = .podcast
+
+        testPlayer.insertContextQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [10, 9, 3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        testPlayer.playerMode = .podcast
+        
+        testPlayer.insertContextQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 11, 10, 9, 3, 4])
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [11, 10, 9, 3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        testPlayer.playerMode = .podcast
+    }
+    func testAppendContextQueue_playerModePodcast_WithWaitingQueuePlaying() {
+        prepareWithWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+        
+        testPlayer.playerMode = .podcast
+        testPlayer.insertPodcastQueue(playables: [songD, songE, songF])
+        testPlayer.currentIndex = 1
+        
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+
+        testPlayer.appendContextQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4, 9])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        testPlayer.playerMode = .podcast
+
+        testPlayer.appendContextQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4, 9, 10])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        testPlayer.playerMode = .podcast
+        
+        testPlayer.appendContextQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4, 9, 10, 11])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        testPlayer.playerMode = .podcast
+    }
+    func testInsertUserQueue_playerModePodcast_WithWaitingQueuePlaying() {
+        prepareWithWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+        
+        testPlayer.playerMode = .podcast
+        testPlayer.insertPodcastQueue(playables: [songD, songE, songF])
+        testPlayer.currentIndex = 1
+        
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+
+        testPlayer.insertUserQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [9, 6, 7, 8])
+        testPlayer.playerMode = .podcast
+
+        testPlayer.insertUserQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [10, 9, 6, 7, 8])
+        testPlayer.playerMode = .podcast
+        
+        testPlayer.insertUserQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [11, 10, 9, 6, 7, 8])
+        testPlayer.playerMode = .podcast
+    }
+    func testAppendUserQueue_playerModePodcast_WithWaitingQueuePlaying() {
+        prepareWithWaitingQueuePlaying()
+        testPlayer.currentIndex = 2
+        
+        testPlayer.playerMode = .podcast
+        testPlayer.insertPodcastQueue(playables: [songD, songE, songF])
+        testPlayer.currentIndex = 1
+        
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+
+        testPlayer.appendUserQueue(playables: [song9])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8, 9])
+        testPlayer.playerMode = .podcast
+
+        testPlayer.appendUserQueue(playables: [songA])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8, 9, 10])
+        testPlayer.playerMode = .podcast
+        
+        testPlayer.appendUserQueue(playables: [songB])
+        checkCurrentlyPlaying(idToBe: 14)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [13])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [15])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        testPlayer.playerMode = .music
+        checkCurrentlyPlaying(idToBe: 5)
+        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8, 9, 10, 11])
+        testPlayer.playerMode = .podcast
+    }
 }

@@ -13,6 +13,7 @@ protocol PlayableContainable {
     func infoDetails(for api: BackenApiType, type: DetailType) -> [String]
     func info(for api: BackenApiType, type: DetailType) -> String
     var playables: [AbstractPlayable] { get }
+    var playContextType: PlayerMode { get }
     var duration: Int { get }
     var isRateable: Bool { get }
     var isDownloadAvailable: Bool { get }

@@ -54,6 +54,7 @@ extension Podcast: PlayableContainable  {
     var playables: [AbstractPlayable] {
         return episodes
     }
+    var playContextType: PlayerMode { return .podcast }
     func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
         let library = LibraryStorage(context: context)
         let podcastAsync = Podcast(managedObject: context.object(with: managedObject.objectID) as! PodcastMO)

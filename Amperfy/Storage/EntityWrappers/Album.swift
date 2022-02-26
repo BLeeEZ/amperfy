@@ -108,6 +108,7 @@ extension Album: PlayableContainable  {
         }
         return infoContent
     }
+    var playContextType: PlayerMode { return .music }
     var isRateable: Bool { return true }
     func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
         let library = LibraryStorage(context: context)

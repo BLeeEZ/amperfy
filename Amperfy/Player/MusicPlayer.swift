@@ -66,8 +66,8 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         }
     }
     
-    func play() {
-        if !backendAudioPlayer.canBeContinued {
+    func play(forcePlayableReload: Bool = false) {
+        if !backendAudioPlayer.canBeContinued || forcePlayableReload {
             if let currentPlayable = currentlyPlaying {
                 insertIntoPlayer(playable: currentPlayable)
             }
@@ -81,8 +81,8 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         guard let activePlayable = context.getActivePlayable() else { return }
         let topUserQueueItem = queueHandler.userQueue.first
         let wasUserQueuePlaying = queueHandler.isUserQueuePlaying
-        queueHandler.clearContextQueue()
-        queueHandler.appendContextQueue(playables: context.playables)
+        queueHandler.clearActiveQueue()
+        queueHandler.appendActiveQueue(playables: context.playables)
         queueHandler.contextName = context.name
         if !wasUserQueuePlaying {
             if context.index == 0 {

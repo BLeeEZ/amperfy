@@ -34,7 +34,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
         navigationItem.rightBarButtonItem = optionsButton
         
-        swipeDisplaySettings.isAddToPlaylistAllowed = false
+        swipeDisplaySettings.playContextTypeOfElements = .podcast
         swipeCallback = { (indexPath, completionHandler) in
             let episode = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             completionHandler(SwipeActionContext(containable: episode))

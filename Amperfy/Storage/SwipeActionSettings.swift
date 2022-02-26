@@ -11,6 +11,8 @@ enum SwipeActionType: Int, CaseIterable {
     case addToPlaylist = 6
     case play = 7
     case playShuffled = 8
+    case insertPodcastQueue = 9
+    case appendPodcastQueue = 10
 
     var displayName: String {
         switch self {
@@ -32,6 +34,10 @@ enum SwipeActionType: Int, CaseIterable {
             return "Play"
         case .playShuffled:
             return "Play shuffled"
+        case .insertPodcastQueue:
+            return "Insert Podcast Queue"
+        case .appendPodcastQueue:
+            return "Append Podcast Queue"
         }
     }
 
@@ -55,6 +61,10 @@ enum SwipeActionType: Int, CaseIterable {
             return "Play"
         case .playShuffled:
             return "Play shuffled"
+        case .insertPodcastQueue:
+            return "Insert in Podcast Queue"
+        case .appendPodcastQueue:
+            return "Append to Podcast Queue"
         }
     }
 
@@ -78,6 +88,10 @@ enum SwipeActionType: Int, CaseIterable {
             return UIImage.play
         case .playShuffled:
             return UIImage.shuffle
+        case .insertPodcastQueue:
+            return UIImage.podcastQueueInsert
+        case .appendPodcastQueue:
+            return UIImage.podcastQueueAppend
         }
     }
 }
@@ -109,6 +123,8 @@ struct SwipeActionSettings {
             ], trailing: [
                 .appendUserQueue,
                 .insertUserQueue,
+                .appendPodcastQueue,
+                .insertPodcastQueue,
                 .download
         ])
     }

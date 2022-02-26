@@ -8,6 +8,7 @@ class PlayerDataTest: XCTestCase {
     var testPlayer: PlayerData!
     var testNormalPlaylist: Playlist!
     var testShuffledPlaylist: Playlist!
+    var testPodcastPlaylist: Playlist!
     let fillCount = 5
 
     override func setUp() {
@@ -15,9 +16,10 @@ class PlayerDataTest: XCTestCase {
         library = cdHelper.createSeededStorage()
         testPlayer = library.getPlayerData()
         testPlayer.isShuffle = true
-        testShuffledPlaylist = testPlayer.contextQueue
+        testShuffledPlaylist = testPlayer.activeQueue
         testPlayer.isShuffle = false
-        testNormalPlaylist = testPlayer.contextQueue
+        testNormalPlaylist = testPlayer.activeQueue
+        testPodcastPlaylist = testPlayer.podcastQueue
     }
 
     override func tearDown() {
@@ -26,7 +28,7 @@ class PlayerDataTest: XCTestCase {
     func fillPlayerWithSomeSongs() {
         for i in 0...fillCount-1 {
             guard let song = library.getSong(id: cdHelper.seeder.songs[i].id) else { XCTFail(); return }
-            testPlayer.appendContextQueue(playables: [song])
+            testPlayer.appendActiveQueue(playables: [song])
         }
     }
     
@@ -38,12 +40,12 @@ class PlayerDataTest: XCTestCase {
     
     func checkPlaylistIndexEqualSeedIndex(playlistIndex: Int, seedIndex: Int) {
         guard let song = library.getSong(id: cdHelper.seeder.songs[seedIndex].id) else { XCTFail(); return }
-        XCTAssertEqual(testPlayer.contextQueue.playables[playlistIndex].id, song.id)
+        XCTAssertEqual(testPlayer.activeQueue.playables[playlistIndex].id, song.id)
     }
     
     func testCreation() {
         XCTAssertNotEqual(testNormalPlaylist, testShuffledPlaylist)
-        XCTAssertEqual(testPlayer.contextQueue, testNormalPlaylist)
+        XCTAssertEqual(testPlayer.activeQueue, testNormalPlaylist)
         XCTAssertEqual(testPlayer.currentItem, nil)
         XCTAssertFalse(testPlayer.isShuffle)
         XCTAssertEqual(testPlayer.repeatMode, RepeatMode.off)
@@ -54,7 +56,7 @@ class PlayerDataTest: XCTestCase {
     
     func testPlaylist() {
         fillPlayerWithSomeSongs()
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount)
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount)
         checkCorrectDefaultPlaylist()
     }
     
@@ -71,22 +73,22 @@ class PlayerDataTest: XCTestCase {
     func testShuffle() {
         testPlayer.isShuffle = true
         XCTAssertTrue(testPlayer.isShuffle)
-        XCTAssertEqual(testPlayer.contextQueue, testShuffledPlaylist)
+        XCTAssertEqual(testPlayer.activeQueue, testShuffledPlaylist)
         testPlayer.isShuffle = false
         XCTAssertFalse(testPlayer.isShuffle)
-        XCTAssertEqual(testPlayer.contextQueue, testNormalPlaylist)
+        XCTAssertEqual(testPlayer.activeQueue, testNormalPlaylist)
         testPlayer.isShuffle = true
-        XCTAssertEqual(testPlayer.contextQueue, testShuffledPlaylist)
+        XCTAssertEqual(testPlayer.activeQueue, testShuffledPlaylist)
         
         fillPlayerWithSomeSongs()
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount)
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount)
         testPlayer.isShuffle = false
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount)
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount)
         checkCorrectDefaultPlaylist()
         testPlayer.isShuffle = true
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount)
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount)
         testPlayer.isShuffle = false
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount)
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount)
         checkCorrectDefaultPlaylist()
         testPlayer.isShuffle = true
     }
@@ -129,16 +131,16 @@ class PlayerDataTest: XCTestCase {
         fillPlayerWithSomeSongs()
         guard let song1 = library.getSong(id: cdHelper.seeder.songs[6].id) else { XCTFail(); return }
         guard let song2 = library.getSong(id: cdHelper.seeder.songs[7].id) else { XCTFail(); return }
-        testPlayer.appendContextQueue(playables: [song1])
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount + 1)
+        testPlayer.appendActiveQueue(playables: [song1])
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount + 1)
         testPlayer.isShuffle = true
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount + 1)
-        testPlayer.appendContextQueue(playables: [song2])
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount + 2)
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount + 1)
+        testPlayer.appendActiveQueue(playables: [song2])
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount + 2)
         testPlayer.isShuffle = false
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount + 2)
-        XCTAssertEqual(testPlayer.contextQueue.playables[fillCount].id, song1.id)
-        XCTAssertEqual(testPlayer.contextQueue.playables[fillCount + 1].id, song2.id)
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount + 2)
+        XCTAssertEqual(testPlayer.activeQueue.playables[fillCount].id, song1.id)
+        XCTAssertEqual(testPlayer.activeQueue.playables[fillCount + 1].id, song2.id)
     }
     
     func testRemoveAllSongs() {
@@ -147,14 +149,14 @@ class PlayerDataTest: XCTestCase {
         XCTAssertEqual(testPlayer.currentIndex, 3)
         testPlayer.removeAllItems()
         XCTAssertEqual(testPlayer.currentIndex, 0)
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, 0)
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, 0)
         
         guard let song1 = library.getSong(id: cdHelper.seeder.songs[6].id) else { XCTFail(); return }
         guard let song2 = library.getSong(id: cdHelper.seeder.songs[7].id) else { XCTFail(); return }
-        testPlayer.appendContextQueue(playables: [song1])
-        testPlayer.appendContextQueue(playables: [song2])
+        testPlayer.appendActiveQueue(playables: [song1])
+        testPlayer.appendActiveQueue(playables: [song2])
         testPlayer.removeAllItems()
-        XCTAssertEqual(testPlayer.contextQueue.playables.count, 0)
+        XCTAssertEqual(testPlayer.activeQueue.playables.count, 0)
     }
-
+    
 }

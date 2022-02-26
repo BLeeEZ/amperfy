@@ -8,7 +8,8 @@ public final class PlaylistMO: NSManagedObject {
         return NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersContextPlaylist)),
             NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersShuffledContextPlaylist)),
-            NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersUserQueuePlaylist))
+            NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersUserQueuePlaylist)),
+            NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersPodcastPlaylist))
         ])
     }
 
