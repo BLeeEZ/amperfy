@@ -187,10 +187,8 @@ class PlayerFacadeImpl: PlayerFacade {
         return playerStatus.playerMode
     }
     func setPlayerMode(_ newValue: PlayerMode) {
-        pause()
+        musicPlayer.stopButRemainIndex()
         playerStatus.playerMode = newValue
-        musicPlayer.play(forcePlayableReload: true)
-        pause()
         musicPlayer.notifyPlaylistUpdated()
     }
     

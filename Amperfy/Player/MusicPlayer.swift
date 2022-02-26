@@ -66,8 +66,8 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         }
     }
     
-    func play(forcePlayableReload: Bool = false) {
-        if !backendAudioPlayer.canBeContinued || forcePlayableReload {
+    func play() {
+        if !backendAudioPlayer.canBeContinued {
             if let currentPlayable = currentlyPlaying {
                 insertIntoPlayer(playable: currentPlayable)
             }
@@ -151,6 +151,11 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
     func stop() {
         backendAudioPlayer.stop()
         playerStatus.stop()
+        notifyPlayerStopped()
+    }
+    
+    func stopButRemainIndex() {
+        backendAudioPlayer.stop()
         notifyPlayerStopped()
     }
     
