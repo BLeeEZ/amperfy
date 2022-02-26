@@ -101,11 +101,12 @@
                                 <constraint firstItem="zaZ-s9-erE" firstAttribute="centerY" secondItem="w3n-lC-0kw" secondAttribute="centerY" id="4lO-ET-21s"/>
                                 <constraint firstItem="zaZ-s9-erE" firstAttribute="centerX" secondItem="w3n-lC-0kw" secondAttribute="centerX" id="doS-9u-ggK"/>
                                 <constraint firstItem="zaZ-s9-erE" firstAttribute="height" secondItem="w3n-lC-0kw" secondAttribute="height" id="rvU-fF-gB9"/>
+                                <constraint firstAttribute="width" constant="60" id="tY4-Fn-zFK"/>
                                 <constraint firstItem="zaZ-s9-erE" firstAttribute="width" secondItem="w3n-lC-0kw" secondAttribute="width" id="wZX-Us-rRT"/>
                             </constraints>
                         </view>
                         <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Previous Button">
-                            <rect key="frame" x="77" y="17.5" width="45" height="45"/>
+                            <rect key="frame" x="79.5" y="17.5" width="45" height="45"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="PZj-JS-NGq" secondAttribute="height" multiplier="1:1" id="ZRw-7y-r95"/>
                                 <constraint firstAttribute="width" constant="45" id="eKD-Lq-gH3"/>
@@ -117,7 +118,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Byk-rx-3Lv">
-                            <rect key="frame" x="148.5" y="11.5" width="40" height="57"/>
+                            <rect key="frame" x="154" y="11.5" width="40" height="57"/>
                             <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
                             <state key="normal" title=""/>
                             <connections>
@@ -125,7 +126,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E3q-DK-jgm" userLabel="Next Button">
-                            <rect key="frame" x="215.5" y="17.5" width="45" height="45"/>
+                            <rect key="frame" x="223.5" y="17.5" width="45" height="45"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="45" id="0wH-NC-0Wb"/>
                                 <constraint firstAttribute="width" secondItem="E3q-DK-jgm" secondAttribute="height" multiplier="1:1" id="Sqc-EY-2LH"/>
@@ -138,16 +139,16 @@
                             </connections>
                         </button>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jwJ-pR-7DE">
-                            <rect key="frame" x="271" y="4" width="72" height="72"/>
+                            <rect key="frame" x="293" y="29" width="50" height="22"/>
                             <subviews>
-                                <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhL-mu-zks" userLabel="Shuffle Button">
-                                    <rect key="frame" x="0.0" y="0.0" width="72" height="72"/>
+                                <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhL-mu-zks" userLabel="Shuffle Button">
+                                    <rect key="frame" x="14" y="0.0" width="22" height="22"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="mhL-mu-zks" secondAttribute="height" multiplier="1:1" id="2P5-5Q-SoR"/>
+                                        <constraint firstAttribute="width" constant="22" id="Uch-8S-cDq"/>
                                     </constraints>
-                                    <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="20"/>
                                     <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    <state key="normal" title="">
+                                    <state key="normal" image="shuffle">
                                         <color key="titleColor" systemColor="labelColor"/>
                                     </state>
                                     <state key="selected">
@@ -160,9 +161,9 @@
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
-                                <constraint firstItem="mhL-mu-zks" firstAttribute="width" secondItem="jwJ-pR-7DE" secondAttribute="width" id="7oz-Tf-3AU"/>
                                 <constraint firstItem="mhL-mu-zks" firstAttribute="centerX" secondItem="jwJ-pR-7DE" secondAttribute="centerX" id="7ua-xO-HaF"/>
                                 <constraint firstItem="mhL-mu-zks" firstAttribute="height" secondItem="jwJ-pR-7DE" secondAttribute="height" id="9kY-6Z-TqL"/>
+                                <constraint firstAttribute="width" constant="50" id="Ucr-DK-qWr"/>
                                 <constraint firstItem="mhL-mu-zks" firstAttribute="centerY" secondItem="jwJ-pR-7DE" secondAttribute="centerY" id="fHf-eB-IFU"/>
                             </constraints>
                         </view>
@@ -406,6 +407,7 @@
         <image name="forward" width="121" height="69"/>
         <image name="musical_notes" width="30" height="30"/>
         <image name="player_style_compact" width="16.425800323486328" height="20.947299957275391"/>
+        <image name="shuffle" width="30" height="30"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

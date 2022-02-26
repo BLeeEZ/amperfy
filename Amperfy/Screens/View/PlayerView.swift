@@ -531,10 +531,13 @@ class PlayerView: UIView {
     }
     
     func refreshShuffleButton() {
+        shuffleButton.imageView?.contentMode = .scaleAspectFit
         if player.isShuffle {
-            shuffleButton.isSelected = true
+            shuffleButton.setImage(UIImage.shuffle.withRenderingMode(.alwaysTemplate), for: .normal)
+            shuffleButton.tintColor = .defaultBlue
         } else {
-            shuffleButton.isSelected = false
+            shuffleButton.setImage(UIImage.shuffleOff, for: .normal)
+            shuffleButton.tintColor = .labelColor
         }
     }
     

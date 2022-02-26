@@ -54,6 +54,7 @@ extension UIImage {
     static var skipForward30: UIImage = { return UIImage.create("skip_forward_30") }()  // SF-Symbols 3.2 Regular:  goforward.30
     static var skipBackward15: UIImage = { return UIImage.create("skip_backward_15") }()  // SF-Symbols 3.2 Regular:  gobackward.30
     static var shuffle: UIImage = { return UIImage.create("shuffle") }()
+    static var shuffleOff: UIImage = { return UIImage.create("shuffle_off") }() // custom mix of shuffle
     
     private static func create(_ named: String) -> UIImage {
         return UIImage(named: named) ?? UIImage()
