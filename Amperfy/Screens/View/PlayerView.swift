@@ -536,12 +536,13 @@ class PlayerView: UIView {
             shuffleButton.setImage(UIImage.shuffle.withRenderingMode(.alwaysTemplate), for: .normal)
             shuffleButton.tintColor = .defaultBlue
         } else {
-            shuffleButton.setImage(UIImage.shuffleOff, for: .normal)
+            shuffleButton.setImage(UIImage.shuffleOff.withRenderingMode(.alwaysTemplate), for: .normal)
             shuffleButton.tintColor = .labelColor
         }
     }
     
     func refreshDisplayPlaylistButton() {
+        displayPlaylistButton.imageView?.contentMode = .scaleAspectFit
         if displayStyle == .compact {
             displayPlaylistButton.setImage(UIImage.playerStyleCompact, for: .normal)
         } else {
@@ -550,6 +551,7 @@ class PlayerView: UIView {
     }
     
     func refreshPlayerModeChangeButton() {
+        playerModeButton.imageView?.contentMode = .scaleAspectFit
         switch player.playerMode {
         case .music:
             playerModeButton.setImage(UIImage.musicalNotes, for: .normal)
