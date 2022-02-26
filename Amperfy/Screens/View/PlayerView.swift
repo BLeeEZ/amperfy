@@ -243,7 +243,7 @@ class PlayerView: UIView {
         guard let rootView = self.rootView else { return }
         artworkWidthConstraint.constant = 70
         infoLargeToProgressDistanceConstraint.constant = -30
-        bottomControlToProgressDistanceConstraint.constant = -20
+        bottomControlToProgressDistanceConstraint.constant = 5
         timeSliderToArtworkDistanceConstraint.constant = 10
         elapsedTimeToArtworkDistanceConstraint.constant = timeSliderToArtworkDistanceConstraint.constant + Self.sliderLabelToSliderDistance
         remainingTimeToArtworkDistanceConstraint.constant = timeSliderToArtworkDistanceConstraint.constant + Self.sliderLabelToSliderDistance
@@ -292,8 +292,8 @@ class PlayerView: UIView {
     
     private func renderAnimationSwitchToLarge(animationDuration: TimeInterval = defaultAnimationDuration) {
         guard let rootView = self.rootView else { return }
-        infoLargeToProgressDistanceConstraint.constant = CGFloat(30.0)
-        bottomControlToProgressDistanceConstraint.constant = titleLargeLabel.frame.height + artistNameLargeLabel.frame.height + artistToTitleLargeDistanceConstraint.constant + infoLargeToProgressDistanceConstraint.constant
+        infoLargeToProgressDistanceConstraint.constant = 20.0
+        bottomControlToProgressDistanceConstraint.constant = titleLargeLabel.frame.height + artistNameLargeLabel.frame.height + artistToTitleLargeDistanceConstraint.constant + infoLargeToProgressDistanceConstraint.constant + 20.0
         timeSliderToArtworkDistanceConstraint.constant = 18
         elapsedTimeToArtworkDistanceConstraint.constant = timeSliderToArtworkDistanceConstraint.constant + Self.sliderLabelToSliderDistance
         remainingTimeToArtworkDistanceConstraint.constant = timeSliderToArtworkDistanceConstraint.constant + Self.sliderLabelToSliderDistance
