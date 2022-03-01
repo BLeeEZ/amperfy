@@ -11,8 +11,10 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var elementInfoStackView: UIStackView!
     @IBOutlet weak var elementInfoLabelsView: UIView!
     @IBOutlet weak var titleLabel: MarqueeLabel!
+    @IBOutlet weak var artistContainerView: UIView!
     @IBOutlet weak var artistLabel: MarqueeLabel!
     @IBOutlet weak var showArtistButton: UIButton!
+    @IBOutlet weak var albumContainerView: UIView!
     @IBOutlet weak var albumLabel: MarqueeLabel!
     @IBOutlet weak var showAlbumButton: UIButton!
     @IBOutlet weak var infoLabel: MarqueeLabel!
@@ -50,6 +52,7 @@ class LibraryEntityDetailVC: UIViewController {
     }
 
     @IBOutlet weak var playerStackView: UIStackView!
+    @IBOutlet weak var playerStackHeaderLabel: UILabel!
     @IBOutlet weak var clearPlayerButton: UIButton!
     @IBOutlet weak var clearUserQueueButton: UIButton!
     @IBOutlet weak var addContextQueueToPlaylistButton: UIButton!
@@ -65,6 +68,10 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var cancelButton: UIButton!
     
     static let detailLabelsClusterNormalHeight = 90.0
+    static let minEntityImageHeight = 30.0
+    static let compactMainStackSpacing = 5.0
+    static let largeMainStackSpacing = 20.0
+    
     @IBOutlet weak var detailLabelsClusterHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var artistNameLabelHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var albumNameLabelHeightConstraint: NSLayoutConstraint!
@@ -123,23 +130,30 @@ class LibraryEntityDetailVC: UIViewController {
     
     override func viewWillLayoutSubviews() {
         var remainingSpace = mainStackView.frame.size.height
+        remainingSpace -= Self.minEntityImageHeight
         remainingSpace -= detailLabelsClusterHeightConstraint.constant
         if !ratingPlaceholderView.isHidden {
             remainingSpace -= ratingHeightConstraint.constant
+            remainingSpace -= Self.compactMainStackSpacing
         }
         if !podcastQueueContainerView.isHidden {
             remainingSpace -= podcastQueueContainerHeightConstraint.constant
+            remainingSpace -= Self.compactMainStackSpacing
         }
         if !queueContainerView.isHidden {
             remainingSpace -= queueStackHeightConstraint.constant
+            remainingSpace -= Self.compactMainStackSpacing
         }
         remainingSpace -= mainStackClusterHeightConstraint.constant
         if !playerStackView.isHidden {
             remainingSpace -= playerStackClusterHeightConstraint.constant
+            remainingSpace -= Self.compactMainStackSpacing
         }
         remainingSpace -= cancelButtonHeightConstraint.constant
+        remainingSpace -= Self.compactMainStackSpacing
         // Big Artwork
         if remainingSpace > detailLabelsClusterHeightConstraint.constant {
+            mainStackView.spacing = Self.largeMainStackSpacing
             elementInfoStackView.axis = .vertical
             elementInfoStackView.alignment = .fill
             elementInfoStackView.distribution = .fill
@@ -148,14 +162,15 @@ class LibraryEntityDetailVC: UIViewController {
             albumLabel.textAlignment = .center
             infoLabel.textAlignment = .center
             var detailClusterHeight = Self.detailLabelsClusterNormalHeight
-            if artistLabel.isHidden {
+            if artistContainerView.isHidden {
                 detailClusterHeight -= artistNameLabelHeightConstraint.constant
             }
-            if albumLabel.isHidden {
+            if albumContainerView.isHidden {
                 detailClusterHeight -= albumNameLabelHeightConstraint.constant
             }
             detailLabelsClusterHeightConstraint.constant = detailClusterHeight
         } else {
+            mainStackView.spacing = Self.compactMainStackSpacing
             elementInfoStackView.axis = .horizontal
             elementInfoStackView.alignment = .fill
             elementInfoStackView.distribution = .fill
@@ -225,13 +240,11 @@ class LibraryEntityDetailVC: UIViewController {
         }
         titleLabel.text = entityContainer.name
         artistLabel.text = entityContainer.subtitle
-        artistLabel.isHidden = entityContainer.subtitle == nil
-        showArtistButton.isHidden = entityContainer.subtitle == nil
-        
+        artistContainerView.isHidden = entityContainer.subtitle == nil
+
         albumLabel.text = entityContainer.subsubtitle
-        albumLabel.isHidden = entityContainer.subsubtitle == nil
-        showAlbumButton.isHidden = entityContainer.subsubtitle == nil
-        
+        albumContainerView.isHidden = entityContainer.subsubtitle == nil
+
         infoLabel.text = entityContainer.info(for: appDelegate.backendProxy.selectedApi, type: .long)
 
         playButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
@@ -330,6 +343,14 @@ class LibraryEntityDetailVC: UIViewController {
         
         playerStackView.isHidden = false
         clearPlayerButton.isHidden = false
+        switch appDelegate.player.playerMode {
+        case .music:
+            playerStackHeaderLabel.text = "Music Player"
+            clearPlayerButton.setTitle("Clear Music Player", for: .normal)
+        case .podcast:
+            playerStackHeaderLabel.text = "Podcast Player"
+            clearPlayerButton.setTitle("Clear Podcast Player", for: .normal)
+        }
 
         Self.configureRoundButtonCluster(buttons: playerControlButtons, containerView: playerStackView, hightConstraint: playerStackClusterHeightConstraint, buttonHeight: playButtonHeightConstraint.constant, offsetHeight: playerActionsLabelHeightConstraint.constant + 1.0)
     }

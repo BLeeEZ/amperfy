@@ -14,10 +14,12 @@
             <connections>
                 <outlet property="addContextQueueToPlaylistButton" destination="KyE-9D-LUO" id="oYU-d6-O5e"/>
                 <outlet property="addToPlaylistButton" destination="QhC-Il-SGI" id="7eP-Ge-A8h"/>
+                <outlet property="albumContainerView" destination="pZO-gN-bvW" id="Jr0-Vd-TOM"/>
                 <outlet property="albumLabel" destination="91a-FO-77z" id="TXB-dU-Xvq"/>
-                <outlet property="albumNameLabelHeightConstraint" destination="vcP-wu-wk4" id="GL7-uH-kwW"/>
+                <outlet property="albumNameLabelHeightConstraint" destination="jcI-Ff-uEf" id="TVL-Nz-wdf"/>
+                <outlet property="artistContainerView" destination="LHL-MV-Tox" id="stH-gy-8vA"/>
                 <outlet property="artistLabel" destination="nTF-ts-4gP" id="Xxx-Zu-aO8"/>
-                <outlet property="artistNameLabelHeightConstraint" destination="fBa-4V-jjb" id="1CP-av-3AN"/>
+                <outlet property="artistNameLabelHeightConstraint" destination="9nJ-mB-Puh" id="0Wr-Ig-X8J"/>
                 <outlet property="cancelButton" destination="jma-L5-peG" id="vQN-gZ-0h4"/>
                 <outlet property="cancelButtonHeightConstraint" destination="g1T-Hs-jmS" id="zug-NH-bTH"/>
                 <outlet property="clearPlayerButton" destination="pbs-jx-sT0" id="65v-4X-VXI"/>
@@ -40,6 +42,7 @@
                 <outlet property="playShuffledButton" destination="SOj-o1-qLh" id="o2K-pA-jnp"/>
                 <outlet property="playerActionsLabelHeightConstraint" destination="pzl-Mh-bRO" id="WB6-TO-yYq"/>
                 <outlet property="playerStackClusterHeightConstraint" destination="9jR-kE-MjG" id="gOi-Dl-Ctz"/>
+                <outlet property="playerStackHeaderLabel" destination="5DK-wY-WrQ" id="u2F-ov-Dey"/>
                 <outlet property="playerStackView" destination="seo-iu-BAW" id="jlp-yz-xup"/>
                 <outlet property="podcastQueueAppendButton" destination="uza-oK-zdn" id="mWf-tb-ysh"/>
                 <outlet property="podcastQueueContainerHeightConstraint" destination="YNG-Ae-Ix7" id="HIo-mz-pu8"/>
@@ -78,87 +81,104 @@
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7yG-AI-SV8">
                                     <rect key="frame" x="100" y="0.0" width="884" height="90"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KnP-8k-7qE" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="884" height="24"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="24" id="WQo-dQ-sra"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="19"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nTF-ts-4gP" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="26" width="884" height="20"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="20" id="fBa-4V-jjb"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <color key="textColor" systemColor="secondaryLabelColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Album" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="91a-FO-77z" userLabel="Album" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="48" width="884" height="20"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="20" id="vcP-wu-wk4"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <color key="textColor" systemColor="secondaryLabelColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RYw-hT-MnF" userLabel="ShowArtistButton" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="26" width="884" height="20"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <connections>
-                                                <action selector="pressedShowArtist:" destination="-1" eventType="touchUpInside" id="Z6n-KS-HUQ"/>
-                                            </connections>
-                                        </button>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AeI-2x-Stq" userLabel="ShowAlbumButton" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="48" width="884" height="20"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <connections>
-                                                <action selector="pressedShowAlbum:" destination="-1" eventType="touchUpInside" id="fST-xC-D8l"/>
-                                            </connections>
-                                        </button>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fUI-xV-Cyd" userLabel="Info" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="70" width="884" height="20"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="20" id="fqZ-9I-3rG"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <color key="textColor" systemColor="secondaryLabelColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
+                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="ab9-J8-9Qy">
+                                            <rect key="frame" x="0.0" y="0.0" width="884" height="90"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KnP-8k-7qE" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="884" height="24"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="24" id="WQo-dQ-sra"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LHL-MV-Tox" userLabel="Artist Container View">
+                                                    <rect key="frame" x="0.0" y="26" width="884" height="20"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nTF-ts-4gP" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="884" height="20"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RYw-hT-MnF" userLabel="ShowArtistButton" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="884" height="20"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                            <connections>
+                                                                <action selector="pressedShowArtist:" destination="-1" eventType="touchUpInside" id="Z6n-KS-HUQ"/>
+                                                            </connections>
+                                                        </button>
+                                                    </subviews>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="bottom" secondItem="RYw-hT-MnF" secondAttribute="bottom" id="3jq-BY-Baf"/>
+                                                        <constraint firstAttribute="height" constant="20" id="9nJ-mB-Puh"/>
+                                                        <constraint firstItem="RYw-hT-MnF" firstAttribute="leading" secondItem="LHL-MV-Tox" secondAttribute="leading" id="Ie8-zs-njh"/>
+                                                        <constraint firstAttribute="bottom" secondItem="nTF-ts-4gP" secondAttribute="bottom" id="JLI-MG-4Fw"/>
+                                                        <constraint firstAttribute="trailing" secondItem="RYw-hT-MnF" secondAttribute="trailing" id="P4A-G1-s7z"/>
+                                                        <constraint firstAttribute="trailing" secondItem="nTF-ts-4gP" secondAttribute="trailing" id="YiR-6c-1Js"/>
+                                                        <constraint firstItem="nTF-ts-4gP" firstAttribute="leading" secondItem="LHL-MV-Tox" secondAttribute="leading" id="gj2-Hq-VH9"/>
+                                                        <constraint firstItem="nTF-ts-4gP" firstAttribute="top" secondItem="LHL-MV-Tox" secondAttribute="top" id="o3s-b5-6wz"/>
+                                                        <constraint firstItem="RYw-hT-MnF" firstAttribute="top" secondItem="nTF-ts-4gP" secondAttribute="top" id="vEY-1i-RGX"/>
+                                                    </constraints>
+                                                </view>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pZO-gN-bvW" userLabel="Album Container View">
+                                                    <rect key="frame" x="0.0" y="48" width="884" height="20"/>
+                                                    <subviews>
+                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AeI-2x-Stq" userLabel="ShowAlbumButton" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="884" height="20"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                            <connections>
+                                                                <action selector="pressedShowAlbum:" destination="-1" eventType="touchUpInside" id="fST-xC-D8l"/>
+                                                            </connections>
+                                                        </button>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Album" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="91a-FO-77z" userLabel="Album" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="884" height="20"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="bottom" secondItem="91a-FO-77z" secondAttribute="bottom" id="2bq-7M-jPV"/>
+                                                        <constraint firstItem="91a-FO-77z" firstAttribute="leading" secondItem="pZO-gN-bvW" secondAttribute="leading" id="6km-Wp-pwR"/>
+                                                        <constraint firstItem="91a-FO-77z" firstAttribute="top" secondItem="pZO-gN-bvW" secondAttribute="top" id="BKL-lJ-sxa"/>
+                                                        <constraint firstAttribute="trailing" secondItem="91a-FO-77z" secondAttribute="trailing" id="CNF-KJ-u6k"/>
+                                                        <constraint firstAttribute="trailing" secondItem="AeI-2x-Stq" secondAttribute="trailing" id="La4-de-jDn"/>
+                                                        <constraint firstItem="AeI-2x-Stq" firstAttribute="top" secondItem="pZO-gN-bvW" secondAttribute="top" id="SBO-y3-S2D"/>
+                                                        <constraint firstAttribute="bottom" secondItem="AeI-2x-Stq" secondAttribute="bottom" id="V67-ht-BXk"/>
+                                                        <constraint firstItem="AeI-2x-Stq" firstAttribute="leading" secondItem="pZO-gN-bvW" secondAttribute="leading" id="hOJ-SH-FYI"/>
+                                                        <constraint firstAttribute="height" constant="20" id="jcI-Ff-uEf"/>
+                                                    </constraints>
+                                                </view>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fUI-xV-Cyd" userLabel="Info" customClass="MarqueeLabel" customModule="Amperfy" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="70" width="884" height="20"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="20" id="fqZ-9I-3rG"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </stackView>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="KnP-8k-7qE" firstAttribute="top" secondItem="7yG-AI-SV8" secondAttribute="top" id="0sb-zJ-Plm"/>
-                                        <constraint firstItem="RYw-hT-MnF" firstAttribute="bottom" secondItem="nTF-ts-4gP" secondAttribute="bottom" id="53V-5U-xG7"/>
-                                        <constraint firstAttribute="trailing" secondItem="KnP-8k-7qE" secondAttribute="trailing" id="5qq-zt-0ql"/>
-                                        <constraint firstItem="nTF-ts-4gP" firstAttribute="top" secondItem="KnP-8k-7qE" secondAttribute="bottom" constant="2" id="7VC-3j-fpq"/>
-                                        <constraint firstItem="fUI-xV-Cyd" firstAttribute="leading" secondItem="KnP-8k-7qE" secondAttribute="leading" id="ATs-I3-iaR"/>
-                                        <constraint firstItem="nTF-ts-4gP" firstAttribute="leading" secondItem="KnP-8k-7qE" secondAttribute="leading" id="I7E-BQ-qCB"/>
-                                        <constraint firstItem="AeI-2x-Stq" firstAttribute="top" secondItem="91a-FO-77z" secondAttribute="top" id="Iyi-6g-VBW"/>
-                                        <constraint firstItem="AeI-2x-Stq" firstAttribute="bottom" secondItem="91a-FO-77z" secondAttribute="bottom" id="Jur-VQ-VMb"/>
-                                        <constraint firstItem="KnP-8k-7qE" firstAttribute="leading" secondItem="7yG-AI-SV8" secondAttribute="leading" id="Low-Zp-7Gb"/>
-                                        <constraint firstItem="91a-FO-77z" firstAttribute="trailing" secondItem="KnP-8k-7qE" secondAttribute="trailing" id="SsA-Jv-Ehz"/>
-                                        <constraint firstItem="fUI-xV-Cyd" firstAttribute="trailing" secondItem="KnP-8k-7qE" secondAttribute="trailing" id="XZ6-sd-FNf"/>
-                                        <constraint firstItem="AeI-2x-Stq" firstAttribute="leading" secondItem="91a-FO-77z" secondAttribute="leading" id="Xoj-I6-Fu3"/>
-                                        <constraint firstItem="nTF-ts-4gP" firstAttribute="trailing" secondItem="KnP-8k-7qE" secondAttribute="trailing" id="ba6-zE-clg"/>
-                                        <constraint firstItem="RYw-hT-MnF" firstAttribute="trailing" secondItem="nTF-ts-4gP" secondAttribute="trailing" id="eUQ-EQ-Rpv"/>
+                                        <constraint firstItem="ab9-J8-9Qy" firstAttribute="top" secondItem="7yG-AI-SV8" secondAttribute="top" id="CBM-sv-qXk"/>
+                                        <constraint firstAttribute="trailing" secondItem="ab9-J8-9Qy" secondAttribute="trailing" id="MTB-wq-fi8"/>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="170" id="eyt-rg-ejG"/>
-                                        <constraint firstItem="fUI-xV-Cyd" firstAttribute="bottom" secondItem="7yG-AI-SV8" secondAttribute="bottom" id="fZa-4O-ura"/>
                                         <constraint firstAttribute="height" constant="90" id="ft1-Xj-zQi"/>
-                                        <constraint firstItem="91a-FO-77z" firstAttribute="leading" secondItem="KnP-8k-7qE" secondAttribute="leading" id="gpb-uc-4bx"/>
-                                        <constraint firstItem="91a-FO-77z" firstAttribute="top" secondItem="nTF-ts-4gP" secondAttribute="bottom" constant="2" id="h11-r4-jf7"/>
-                                        <constraint firstItem="RYw-hT-MnF" firstAttribute="leading" secondItem="nTF-ts-4gP" secondAttribute="leading" id="kAp-cx-Ozl"/>
-                                        <constraint firstItem="RYw-hT-MnF" firstAttribute="top" secondItem="nTF-ts-4gP" secondAttribute="top" id="tO1-xS-Rzb"/>
-                                        <constraint firstItem="AeI-2x-Stq" firstAttribute="trailing" secondItem="91a-FO-77z" secondAttribute="trailing" id="vBP-8l-hyf"/>
+                                        <constraint firstAttribute="bottom" secondItem="ab9-J8-9Qy" secondAttribute="bottom" id="ohx-K2-VFf"/>
+                                        <constraint firstItem="ab9-J8-9Qy" firstAttribute="leading" secondItem="7yG-AI-SV8" secondAttribute="leading" id="wNE-HU-ehU"/>
                                     </constraints>
                                 </view>
                             </subviews>
                             <constraints>
-                                <constraint firstAttribute="height" relation="lessThanOrEqual" constant="200" id="C75-LB-9d6"/>
+                                <constraint firstAttribute="height" relation="lessThanOrEqual" constant="300" id="C75-LB-9d6"/>
                             </constraints>
                         </stackView>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ms2-ug-0W5" userLabel="RatingPlaceholder">
