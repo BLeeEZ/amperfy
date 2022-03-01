@@ -106,7 +106,14 @@ extension PlayerData: PlayerStatusPersistent {
     }
     
     var isShuffle: Bool {
-        get { return managedObject.shuffleSetting == 1 }
+        get {
+            switch playerMode {
+            case .music:
+                return managedObject.shuffleSetting == 1
+            case .podcast:
+                return false
+            }
+        }
         set {
             if newValue {
                 shuffledContextPlaylist.shuffle()
@@ -126,7 +133,12 @@ extension PlayerData: PlayerStatusPersistent {
     
     var repeatMode: RepeatMode {
         get {
-            return RepeatMode(rawValue: managedObject.repeatSetting) ?? .off
+            switch playerMode {
+            case .music:
+                return RepeatMode(rawValue: managedObject.repeatSetting) ?? .off
+            case .podcast:
+                return .off
+            }
         }
         set {
             managedObject.repeatSetting = newValue.rawValue
