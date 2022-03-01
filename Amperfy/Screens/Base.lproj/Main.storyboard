@@ -1807,16 +1807,16 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v1N-2v-U0b">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v1N-2v-U0b" userLabel="ManageServerURLs">
                                                     <rect key="frame" x="20" y="5" width="394" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="hGD-JA-KPm"/>
                                                     </constraints>
-                                                    <state key="normal" title="Update Password">
+                                                    <state key="normal" title="Manage server URLs">
                                                         <color key="titleColor" systemColor="labelColor"/>
                                                     </state>
                                                     <connections>
-                                                        <action selector="updatePasswordPressed:" destination="3j9-EZ-8oG" eventType="touchUpInside" id="i1b-eh-akc"/>
+                                                        <segue destination="TOj-a8-sj0" kind="show" id="euH-s8-nQz"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&gt;" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SSQ-Pw-jiq" userLabel="Select Label">
@@ -1833,6 +1833,46 @@
                                                 <constraint firstItem="v1N-2v-U0b" firstAttribute="centerY" secondItem="cLz-Cc-qOE" secondAttribute="centerY" id="GLC-hr-eT7"/>
                                                 <constraint firstAttribute="trailing" secondItem="SSQ-Pw-jiq" secondAttribute="trailing" constant="16" id="Oxt-z3-aMq"/>
                                                 <constraint firstItem="SSQ-Pw-jiq" firstAttribute="leading" secondItem="cLz-Cc-qOE" secondAttribute="trailing" constant="-100" id="kJp-2e-WOJ"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection id="MN9-kW-b3O">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="40" id="LRZ-mt-HD8">
+                                        <rect key="frame" x="0.0" y="380" width="414" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="LRZ-mt-HD8" id="kdB-DY-Hvx">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="83Q-Ji-yQw">
+                                                    <rect key="frame" x="20" y="5" width="394" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="V8n-PT-Cno"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Update Password">
+                                                        <color key="titleColor" systemColor="labelColor"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="updatePasswordPressed:" destination="3j9-EZ-8oG" eventType="touchUpInside" id="uef-CC-PPg"/>
+                                                    </connections>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&gt;" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lHd-mx-4Xr" userLabel="Select Label">
+                                                    <rect key="frame" x="314" y="10" width="84" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="lHd-mx-4Xr" secondAttribute="trailing" constant="16" id="4A4-WZ-uhP"/>
+                                                <constraint firstAttribute="trailing" secondItem="83Q-Ji-yQw" secondAttribute="trailing" id="GQt-bK-sbT"/>
+                                                <constraint firstItem="83Q-Ji-yQw" firstAttribute="centerY" secondItem="kdB-DY-Hvx" secondAttribute="centerY" id="XiL-bN-uzg"/>
+                                                <constraint firstItem="lHd-mx-4Xr" firstAttribute="centerY" secondItem="kdB-DY-Hvx" secondAttribute="centerY" id="rRz-0v-HM9"/>
+                                                <constraint firstItem="83Q-Ji-yQw" firstAttribute="leading" secondItem="kdB-DY-Hvx" secondAttribute="leadingMargin" id="vZI-L9-joc"/>
+                                                <constraint firstItem="lHd-mx-4Xr" firstAttribute="leading" secondItem="kdB-DY-Hvx" secondAttribute="trailing" constant="-100" id="z5Y-PI-YEv"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -2625,6 +2665,68 @@
             </objects>
             <point key="canvasLocation" x="4706" y="-4156"/>
         </scene>
+        <!--Server URLs-->
+        <scene sceneID="MwU-Lf-3P7">
+            <objects>
+                <tableViewController title="Server URLs" id="TOj-a8-sj0" customClass="SettingsServerURLsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="mvX-Ym-Fg5">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <gestureRecognizers/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ServerURLTableCell" rowHeight="50" id="P4H-Q2-ZEZ" customClass="ServerURLTableCell" customModule="Amperfy" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="44.5" width="414" height="50"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="P4H-Q2-ZEZ" id="dtY-DK-Fy5">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="https://example.com/" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ULf-CQ-1zz">
+                                            <rect key="frame" x="20" y="14.5" width="345" height="21"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="21" id="3b3-Jh-HLU"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="=" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sLQ-eI-MPJ" userLabel="Status Label">
+                                            <rect key="frame" x="373" y="14.5" width="21" height="21"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="21" id="Jzo-O1-JXK"/>
+                                                <constraint firstAttribute="height" constant="21" id="K3f-Pm-bOO"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailingMargin" secondItem="sLQ-eI-MPJ" secondAttribute="trailing" id="4l6-9R-1jo"/>
+                                        <constraint firstItem="ULf-CQ-1zz" firstAttribute="centerY" secondItem="dtY-DK-Fy5" secondAttribute="centerY" id="52K-ra-sIb"/>
+                                        <constraint firstItem="ULf-CQ-1zz" firstAttribute="leading" secondItem="dtY-DK-Fy5" secondAttribute="leadingMargin" id="D7B-gt-lIT"/>
+                                        <constraint firstItem="sLQ-eI-MPJ" firstAttribute="centerY" secondItem="dtY-DK-Fy5" secondAttribute="centerY" id="Ru7-Nu-RZc"/>
+                                        <constraint firstItem="sLQ-eI-MPJ" firstAttribute="leadingMargin" secondItem="ULf-CQ-1zz" secondAttribute="trailing" constant="16" id="dt1-PA-Et3"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="statusLabel" destination="sLQ-eI-MPJ" id="Ex5-hq-ehY"/>
+                                    <outlet property="urlLabel" destination="ULf-CQ-1zz" id="InL-gF-2ji"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="TOj-a8-sj0" id="FGq-lc-f5X"/>
+                            <outlet property="delegate" destination="TOj-a8-sj0" id="zkt-Ph-0TD"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Server URLs" id="e9L-bF-5Na" userLabel="Event Log"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yCy-TU-lyM" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1198.5507246376812" y="3189.5089285714284"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="kw4-13-m0t"/>
@@ -2633,11 +2735,11 @@
     </inferredMetricsTieBreakers>
     <resources>
         <image name="music_library" width="30" height="30"/>
-        <image name="playlist" width="89.666664123535156" height="90.333335876464844"/>
+        <image name="playlist" width="30" height="30"/>
         <image name="search" width="30" height="30"/>
         <image name="settings" width="30" height="30"/>
         <namedColor name="PopupRootOverlayColor">
-            <color red="0.36048244201030932" green="0.36048244201030932" blue="0.36048244201030932" alpha="0.8030399659863946" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.36000001430511475" green="0.36000001430511475" blue="0.36000001430511475" alpha="0.80299997329711914" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="darkTextColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

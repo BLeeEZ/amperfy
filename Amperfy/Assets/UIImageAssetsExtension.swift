@@ -46,7 +46,8 @@ extension UIImage {
     static var podcastQueueAppend: UIImage = { return UIImage.create("podcast_queue_append") }()
     static var download: UIImage = { return UIImage.create("download") }()
     static var trash: UIImage = { return UIImage.create("trash") }()
-    
+    static var plus: UIImage = { return UIImage.create("plus") }()  // SF-Symbols 3.2 Regular:  plus
+
     static var play: UIImage = { return UIImage.create("play") }()
     static var pause: UIImage = { return UIImage.create("pause") }()
     static var forward: UIImage = { return UIImage.create("forward") }()  // SF-Symbols 3.2 Regular:  forward.filled

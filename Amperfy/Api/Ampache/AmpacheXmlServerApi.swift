@@ -33,6 +33,7 @@ class AmpacheXmlServerApi {
     }
     
     static let maxItemCountToPollAtOnce: Int = 500
+    static let apiPathComponents = ["server", "xml.server.php"]
     
     var serverApiVersion: String?
     let clientApiVersion = "500000"
@@ -124,8 +125,7 @@ class AmpacheXmlServerApi {
         let localCredentials = providedCredentials != nil ? providedCredentials : self.credentials
         guard let hostname = localCredentials?.serverUrl else { return nil }
         var apiUrl = URL(string: hostname)
-        apiUrl?.appendPathComponent("server")
-        apiUrl?.appendPathComponent("xml.server.php")
+        Self.apiPathComponents.forEach{ apiUrl?.appendPathComponent($0) }
         return apiUrl
     }
 
@@ -567,22 +567,26 @@ class AmpacheXmlServerApi {
     
     func updateUrlToken(urlString: inout String) {
         reauthenticateIfNeccessary()
-        guard 
-        let auth = authHandshake,
-        var urlComp = URLComponents(string: urlString),
-        let queryItems = urlComp.queryItems
+        guard
+            let auth = authHandshake,
+            let inputUrlComp = URLComponents(string: urlString),
+            let inputUrl = URL(string: urlString),
+            var outputUrlComp = createAuthenticatedApiUrlComponent(),
+            let queryItems = inputUrlComp.queryItems
         else { return }
 
-        var newItems = [URLQueryItem]()
+        var outputItems = [URLQueryItem]()
         for queryItem in queryItems {
             if queryItem.name.isContainedIn(["ssid", "auth"]) {
-                newItems.append(URLQueryItem(name: queryItem.name, value: auth.token))
+                outputItems.append(URLQueryItem(name: queryItem.name, value: auth.token))
             } else {
-                newItems.append(queryItem)
+                outputItems.append(queryItem)
             }
         }
-        urlComp.queryItems = newItems
-        urlString = urlComp.string!
+        
+        outputUrlComp.queryItems = outputItems
+        outputUrlComp.path = inputUrl.path
+        urlString = outputUrlComp.string!
     }
     
 }

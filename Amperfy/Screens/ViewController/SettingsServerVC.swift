@@ -4,18 +4,20 @@ import UIKit
 class SettingsServerVC: UITableViewController {
     
     var appDelegate: AppDelegate!
-    
+
     @IBOutlet weak var serverUrlTF: UITextField!
     @IBOutlet weak var usernameTF: UITextField!
     @IBOutlet weak var backendApiLabel: UILabel!
     @IBOutlet weak var serverApiVersionLabel: UILabel!
     @IBOutlet weak var clientApiVersionLabel: UILabel!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.settingsServer)
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
         if let loginCredentials = self.appDelegate.persistentStorage.loginCredentials {
             serverUrlTF.text = loginCredentials.serverUrl
             usernameTF.text = loginCredentials.username
@@ -54,5 +56,5 @@ class SettingsServerVC: UITableViewController {
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         self.present(alert, animated: true)
     }
-    
+
 }

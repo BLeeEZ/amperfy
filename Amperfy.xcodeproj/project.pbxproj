@@ -52,6 +52,7 @@
 		50120A2526281C1900B037B1 /* BasicTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50120A2426281C1900B037B1 /* BasicTableViewController.swift */; };
 		501267B7264C058500E13F08 /* SsXmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501267B6264C058500E13F08 /* SsXmlParser.swift */; };
 		501267B9264C187600E13F08 /* AmpacheXmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501267B8264C187600E13F08 /* AmpacheXmlParser.swift */; };
+		5017996027CCE110002554E5 /* SettingsServerURLsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5017995F27CCE110002554E5 /* SettingsServerURLsVC.swift */; };
 		501858F8265F779C00F2E13A /* Directory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501858F7265F779B00F2E13A /* Directory.swift */; };
 		501999DC26806B8600F72D37 /* NotificationBannerCustomization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */; };
 		501A7D2026808A9D0055A51B /* podcast_episodes.xml in Resources */ = {isa = PBXBuildFile; fileRef = 501A7D1E26808A9D0055A51B /* podcast_episodes.xml */; };
@@ -422,6 +423,7 @@
 		50120A2426281C1900B037B1 /* BasicTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableViewController.swift; sourceTree = "<group>"; };
 		501267B6264C058500E13F08 /* SsXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsXmlParser.swift; sourceTree = "<group>"; };
 		501267B8264C187600E13F08 /* AmpacheXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheXmlParser.swift; sourceTree = "<group>"; };
+		5017995F27CCE110002554E5 /* SettingsServerURLsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsServerURLsVC.swift; sourceTree = "<group>"; };
 		501858F7265F779B00F2E13A /* Directory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Directory.swift; sourceTree = "<group>"; };
 		501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationBannerCustomization.swift; sourceTree = "<group>"; };
 		501A7D1E26808A9D0055A51B /* podcast_episodes.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = podcast_episodes.xml; sourceTree = "<group>"; };
@@ -1164,6 +1166,7 @@
 				5077F935221E6D0E0099CA91 /* DownloadsVC.swift */,
 				5077F93D222489510099CA91 /* SettingsVC.swift */,
 				506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */,
+				5017995F27CCE110002554E5 /* SettingsServerURLsVC.swift */,
 				502928842656448000DA3A8F /* SupportVC.swift */,
 				506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */,
 				50ADCD472660E70D007FE3BD /* SettingsPlayerVC.swift */,
@@ -1701,6 +1704,7 @@
 				501A7D3D2680A9AE0055A51B /* Podcast.swift in Sources */,
 				50FE808F26A55CEA00CB434D /* DownloadMO+CoreDataProperties.swift in Sources */,
 				5029288726564C6800DA3A8F /* LogData.swift in Sources */,
+				5017996027CCE110002554E5 /* SettingsServerURLsVC.swift in Sources */,
 				5077F95122279DF40099CA91 /* PlaytimeSlider.swift in Sources */,
 				5086F87F22399D1900546F5A /* SubsonicServerApi.swift in Sources */,
 				5086F887223BD68C00546F5A /* SsArtistParserDelegate.swift in Sources */,

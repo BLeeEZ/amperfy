@@ -1,5 +1,11 @@
 import UIKit
 
+extension String {
+    var isHyperTextProtocolProvided: Bool {
+        return hasPrefix("https://") || hasPrefix("http://")
+    }
+}
+
 class LoginVC: UIViewController {
 
     var appDelegate: AppDelegate!
@@ -53,11 +59,11 @@ class LoginVC: UIViewController {
     }
     
     func login() {
-        guard let serverUrl = serverUrlTF.text, !serverUrl.isEmpty else {
+        guard let serverUrl = serverUrlTF.text?.trimmingCharacters(in: .whitespacesAndNewlines), !serverUrl.isEmpty else {
             showErrorMsg(message: "No server url given!")
             return
         }
-        guard serverUrl.hasPrefix("https://") || serverUrl.hasPrefix("http://") else {
+        guard serverUrl.isHyperTextProtocolProvided else {
             showErrorMsg(message: "Please provide either 'https://' or 'http://' in your server url.")
             return
         }

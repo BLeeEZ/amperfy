@@ -5,6 +5,7 @@ class PersistentStorage {
 
     private enum UserDefaultsKey: String {
         case ServerUrl = "serverUrl"
+        case AlternativeServerUrls = "alternativeServerUrls"
         case Username = "username"
         case Password = "password"
         case BackendApi = "backendApi"
@@ -89,6 +90,15 @@ class PersistentStorage {
                 UserDefaults.standard.removeObject(forKey: UserDefaultsKey.Password.rawValue)
                 UserDefaults.standard.removeObject(forKey: UserDefaultsKey.BackendApi.rawValue)
             }
+        }
+    }
+    
+    var alternativeServerURLs: [String] {
+        get {
+            return UserDefaults.standard.object(forKey: UserDefaultsKey.AlternativeServerUrls.rawValue) as? [String] ?? [String]()
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.AlternativeServerUrls.rawValue)
         }
     }
     
