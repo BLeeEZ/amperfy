@@ -70,7 +70,7 @@ class CarPlayTabData {
     let image: UIImage
     var containerItems = [CarPlayContainerItem]()
     var playableItems = [CarPlayPlayableItem]()
-    let fetchCB: CarPlayTabFetchCallback?
+    var fetchCB: CarPlayTabFetchCallback?
     
     init(title: String, image: UIImage, fetchCB: CarPlayTabFetchCallback?) {
         self.title = title
@@ -136,40 +136,56 @@ class CarPlayHandler: NSObject {
     
     func populate() {
         let playlistsData = CarPlayTabData(title: "Playlists", image: UIImage.playlistCarplay, fetchCB: nil)
-        let playlists = library.getPlaylistsForCarPlay(sortType: persistentStorage.settings.playlistsSortSetting)
-        var playlistItems = [CarPlayPlayableItem]()
-        for playlist in playlists {
-            let item = CarPlayPlayableItem(element: playlist, image: nil, fetchCB: nil)
-            playlistItems.append(item)
+        playlistsData.fetchCB = { completionHandler in
+            self.persistentStorage.context.performAndWait {
+                let playlists = self.library.getPlaylistsForCarPlay(sortType: self.persistentStorage.settings.playlistsSortSetting)
+                var playlistItems = [CarPlayPlayableItem]()
+                for playlist in playlists {
+                    let item = CarPlayPlayableItem(element: playlist, image: nil, fetchCB: nil)
+                    playlistItems.append(item)
+                }
+                completionHandler(playlistItems)
+            }
         }
-        playlistsData.playableItems = playlistItems
 
         let recentAlbumsData = CarPlayTabData(title: "Recent Albums", image: UIImage.albumCarplay, fetchCB: nil)
-        let albums = library.getRecentAlbumsForCarPlay()
-        var albumItems = [CarPlayPlayableItem]()
-        for album in albums {
-            let item = CarPlayPlayableItem(element: album, image: album.image, fetchCB: nil)
-            albumItems.append(item)
+        recentAlbumsData.fetchCB = { completionHandler in
+            self.persistentStorage.context.performAndWait {
+                let albums = self.library.getRecentAlbumsForCarPlay()
+                var albumItems = [CarPlayPlayableItem]()
+                for album in albums {
+                    let item = CarPlayPlayableItem(element: album, image: album.image, fetchCB: nil)
+                    albumItems.append(item)
+                }
+                completionHandler(albumItems)
+            }
         }
-        recentAlbumsData.playableItems = albumItems
 
         let recentSongsData = CarPlayTabData(title: "Recent Songs", image: UIImage.musicalNotesCarplay, fetchCB: nil)
-        let songs = library.getRecentSongsForCarPlay()
-        var songItems = [CarPlayPlayableItem]()
-        for song in songs {
-            let item = CarPlayPlayableItem(element: song, image: song.image, fetchCB: nil)
-            songItems.append(item)
+        recentSongsData.fetchCB = { completionHandler in
+            self.persistentStorage.context.performAndWait {
+                let songs = self.library.getRecentSongsForCarPlay()
+                var songItems = [CarPlayPlayableItem]()
+                for song in songs {
+                    let item = CarPlayPlayableItem(element: song, image: song.image, fetchCB: nil)
+                    songItems.append(item)
+                }
+                completionHandler(songItems)
+            }
         }
-        recentSongsData.playableItems = songItems
 
         let podcastsData = CarPlayTabData(title: "Podcasts", image: UIImage.podcastCarplay, fetchCB: nil)
-        let podcasts = library.getPodcastsForCarPlay()
-        var podcastItems = [CarPlayPlayableItem]()
-        for podcast in podcasts {
-            let item = CarPlayPlayableItem(element: podcast, image: podcast.image, fetchCB: nil)
-            podcastItems.append(item)
+        podcastsData.fetchCB = { completionHandler in
+            self.persistentStorage.context.performAndWait {
+                let podcasts = self.library.getPodcastsForCarPlay()
+                var podcastItems = [CarPlayPlayableItem]()
+                for podcast in podcasts {
+                    let item = CarPlayPlayableItem(element: podcast, image: podcast.image, fetchCB: nil)
+                    podcastItems.append(item)
+                }
+                completionHandler(podcastItems)
+            }
         }
-        podcastsData.playableItems = podcastItems
 
         tabData = [playlistsData, recentAlbumsData, recentSongsData, podcastsData]
     }
