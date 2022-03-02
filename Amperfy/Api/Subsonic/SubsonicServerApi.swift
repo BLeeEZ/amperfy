@@ -153,7 +153,7 @@ class SubsonicServerApi {
     func isAuthenticationValid(credentials: LoginCredentials) -> Bool {
         guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "ping", credentials: credentials),
               let url = urlComp.url else {
-            os_log("Subsonic server url invalid", log: log, type: .error)
+            os_log("Subsonic server URL invalid", log: log, type: .error)
             return false
         }
 

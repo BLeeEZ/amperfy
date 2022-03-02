@@ -143,7 +143,7 @@ class SettingsServerURLsVC: UITableViewController {
             else { return }
             
             guard newAltUrl.isHyperTextProtocolProvided else {
-                let alert = UIAlertController(title: "Failed", message: "Please provide either 'https://' or 'http://' in your server url.", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Failed", message: "Please provide either 'https://' or 'http://' in your server URL.", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "Close", style: .default))
                 alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
                 self.present(alert, animated: true)
@@ -151,24 +151,30 @@ class SettingsServerURLsVC: UITableViewController {
             }
             
             let credentials = LoginCredentials(serverUrl: newAltUrl, username: username, password: password, backendApi: activeApi)
-            if self.appDelegate.backendProxy.isAuthenticationValid(credentials: credentials) {
-                if let activeUrl = self.appDelegate.persistentStorage.loginCredentials?.serverUrl {
-                    var currentAltUrls = self.appDelegate.persistentStorage.alternativeServerURLs
-                    currentAltUrls.append(activeUrl)
-                    self.appDelegate.persistentStorage.alternativeServerURLs = currentAltUrls
+
+            DispatchQueue.global().async {
+                let isValid = self.appDelegate.backendProxy.isAuthenticationValid(credentials: credentials)
+                DispatchQueue.main.async {
+                    if isValid {
+                        if let activeUrl = self.appDelegate.persistentStorage.loginCredentials?.serverUrl {
+                            var currentAltUrls = self.appDelegate.persistentStorage.alternativeServerURLs
+                            currentAltUrls.append(activeUrl)
+                            self.appDelegate.persistentStorage.alternativeServerURLs = currentAltUrls
+                        }
+                        self.appDelegate.persistentStorage.loginCredentials = credentials
+                        self.reload()
+    
+                        let alert = UIAlertController(title: "Successful", message: "Alternative URL added.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "Close", style: .default))
+                        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+                        self.present(alert, animated: true)
+                    } else {
+                        let alert = UIAlertController(title: "Failed", message: "Alternative URL could not be verified! Authentication failed! Alternative URL has not been added.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "Close", style: .default))
+                        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+                        self.present(alert, animated: true)
+                    }
                 }
-                self.appDelegate.persistentStorage.loginCredentials = credentials
-                self.reload()
-                
-                let alert = UIAlertController(title: "Successful", message: "Alternative URL added.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Close", style: .default))
-                alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-                self.present(alert, animated: true)
-            } else {
-                let alert = UIAlertController(title: "Failed", message: "Authentication failed!", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Close", style: .default))
-                alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-                self.present(alert, animated: true)
             }
         }))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()

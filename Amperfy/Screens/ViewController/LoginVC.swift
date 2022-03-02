@@ -60,11 +60,11 @@ class LoginVC: UIViewController {
     
     func login() {
         guard let serverUrl = serverUrlTF.text?.trimmingCharacters(in: .whitespacesAndNewlines), !serverUrl.isEmpty else {
-            showErrorMsg(message: "No server url given!")
+            showErrorMsg(message: "No server URL given!")
             return
         }
         guard serverUrl.isHyperTextProtocolProvided else {
-            showErrorMsg(message: "Please provide either 'https://' or 'http://' in your server url.")
+            showErrorMsg(message: "Please provide either 'https://' or 'http://' in your server URL.")
             return
         }
         guard let username = usernameTF.text, !username.isEmpty else {
@@ -87,9 +87,9 @@ class LoginVC: UIViewController {
             case .notAbleToLogin:
                 showErrorMsg(message: "Not able to login, please check credentials!")
             case .invalidUrl:
-                showErrorMsg(message: "Server url is invalid!")
+                showErrorMsg(message: "Server URL is invalid!")
             case .requestStatusError:
-                showErrorMsg(message: "Requesting server url finished with status response error code '\(e.message)'!")
+                showErrorMsg(message: "Requesting server URL finished with status response error code '\(e.message)'!")
             case .downloadError:
                 showErrorMsg(message: e.message)
             }
