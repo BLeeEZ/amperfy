@@ -28,7 +28,9 @@ class PodcastsVC: BasicTableViewController {
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: PodcastEpisodeTableCell.typeName)
 
-        sortButton = UIBarButtonItem(title: "Show", style: .plain, target: self, action: #selector(sortButtonPressed))
+        sortButton = UIBarButtonItem(title: FontAwesomeIcon.Sort.asString, style: .plain, target: self, action: #selector(sortButtonPressed))
+        sortButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .normal)
+        sortButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .selected)
         navigationItem.rightBarButtonItem = sortButton
         
         swipeDisplaySettings.playContextTypeOfElements = .podcast
@@ -141,7 +143,7 @@ class PodcastsVC: BasicTableViewController {
     }
     
     @objc private func sortButtonPressed() {
-        let alert = UIAlertController(title: "Podcasts", message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Podcasts sorting", message: nil, preferredStyle: .actionSheet)
 
         if showType == .podcasts {
             alert.addAction(UIAlertAction(title: "Episodes sorted by release date", style: .default, handler: { _ in
@@ -151,7 +153,7 @@ class PodcastsVC: BasicTableViewController {
                 self.updateSearchResults(for: self.searchController)
             }))
         } else {
-            alert.addAction(UIAlertAction(title: "Grouped by Podcast", style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: "Podcasts sorted by name", style: .default, handler: { _ in
                 self.showType = .podcasts
                 self.appDelegate.persistentStorage.settings.podcastsShowSetting = .podcasts
                 self.syncFromServer()

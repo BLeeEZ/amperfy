@@ -8,6 +8,8 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
     private var sortType: PlaylistSortType = .name
     
+    @IBOutlet weak var sortBarButton: UIBarButtonItem!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.playlistSelector)
@@ -19,6 +21,10 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         configureSearchController(placeholder: "Search in \"Playlists\"", showSearchBarAtEnter: true)
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
+        
+        sortBarButton.title = FontAwesomeIcon.Sort.asString
+        sortBarButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .normal)
+        sortBarButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .selected)
         
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight))
         if let newPlaylistTableHeaderView = ViewBuilder<NewPlaylistTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight)) {
@@ -47,7 +53,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
     }
     
-    @IBAction func sortButtonPressed(_ sender: Any) {
+    @IBAction func sortBarButtonPressed(_ sender: Any) {
         let alert = UIAlertController(title: "Playlists sorting", message: nil, preferredStyle: .actionSheet)
         if sortType != .name {
             alert.addAction(UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
@@ -73,7 +79,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         present(alert, animated: true, completion: nil)
     }
     
-    @IBAction func cancelButtonPressed(_ sender: UIBarButtonItem) {
+    @IBAction func cancelBarButtonPressed(_ sender: UIBarButtonItem) {
         dismiss()
     }
     

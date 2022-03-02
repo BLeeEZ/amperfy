@@ -5,12 +5,14 @@ class LibraryVC: UITableViewController {
     
     @IBOutlet weak var genreTableViewCell: UITableViewCell!
     @IBOutlet weak var directoriesTableViewCell: UITableViewCell!
+    @IBOutlet weak var genreImageButton: UIButton!
     
     var appDelegate: AppDelegate!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        genreImageButton.imageView?.contentMode = .scaleAspectFit
     }
     
     override func viewWillAppear(_ animated: Bool) {

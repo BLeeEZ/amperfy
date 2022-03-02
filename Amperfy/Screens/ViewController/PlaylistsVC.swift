@@ -23,7 +23,9 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         
-        optionsButton = UIBarButtonItem(title: "Sort", style: .plain, target: self, action: #selector(optionsPressed))
+        optionsButton = UIBarButtonItem(title: FontAwesomeIcon.Sort.asString, style: .plain, target: self, action: #selector(optionsPressed))
+        optionsButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .normal)
+        optionsButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .selected)
         navigationItem.rightBarButtonItem = optionsButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         

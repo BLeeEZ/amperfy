@@ -243,18 +243,21 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Add to playlist" id="Pg3-E2-61S">
                         <rightBarButtonItems>
-                            <barButtonItem title="Cancel" id="gTQ-0E-9Gk">
+                            <barButtonItem systemItem="cancel" id="gTQ-0E-9Gk">
                                 <connections>
-                                    <action selector="cancelButtonPressed:" destination="4rB-Ko-4wo" id="tYQ-7b-awB"/>
+                                    <action selector="cancelBarButtonPressed:" destination="4rB-Ko-4wo" id="ZWF-SU-5xR"/>
                                 </connections>
                             </barButtonItem>
                             <barButtonItem title="Sort" id="JE3-ch-0t4">
                                 <connections>
-                                    <action selector="sortButtonPressed:" destination="4rB-Ko-4wo" id="ZNv-Gz-Jzv"/>
+                                    <action selector="sortBarButtonPressed:" destination="4rB-Ko-4wo" id="0TV-D3-iKv"/>
                                 </connections>
                             </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
+                    <connections>
+                        <outlet property="sortBarButton" destination="JE3-ch-0t4" id="AOl-DV-Blu"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1s6-dv-ao6" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -867,26 +870,27 @@
                                                     <color key="textColor" systemColor="secondaryLabelColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="krX-BX-3Nf" userLabel="Icon">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4cp-Ls-XN9">
                                                     <rect key="frame" x="20" y="15" width="30" height="30"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="2QV-qV-Cej"/>
-                                                        <constraint firstAttribute="width" secondItem="krX-BX-3Nf" secondAttribute="height" multiplier="1:1" id="jWb-rZ-DgG"/>
+                                                        <constraint firstAttribute="height" constant="30" id="Cft-hu-k4Z"/>
+                                                        <constraint firstAttribute="width" secondItem="4cp-Ls-XN9" secondAttribute="height" multiplier="1:1" id="h1O-sR-cgo"/>
                                                     </constraints>
-                                                    <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="20"/>
-                                                    <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
+                                                    <inset key="contentEdgeInsets" minX="1" minY="1" maxX="1" maxY="1"/>
+                                                    <state key="normal" image="genre">
+                                                        <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </state>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="XVh-QQ-a9E" firstAttribute="centerY" secondItem="u8E-5C-z9O" secondAttribute="centerY" id="61X-Lx-pS3"/>
+                                                <constraint firstItem="XVh-QQ-a9E" firstAttribute="leading" secondItem="4cp-Ls-XN9" secondAttribute="trailing" constant="16" id="88H-mi-g7m"/>
                                                 <constraint firstItem="kUb-oG-0cG" firstAttribute="centerY" secondItem="u8E-5C-z9O" secondAttribute="centerY" id="BSN-bb-wTS"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="kUb-oG-0cG" secondAttribute="trailing" id="Jfk-BQ-t2M"/>
-                                                <constraint firstItem="krX-BX-3Nf" firstAttribute="leading" secondItem="u8E-5C-z9O" secondAttribute="leadingMargin" id="Vu3-it-i44"/>
+                                                <constraint firstItem="4cp-Ls-XN9" firstAttribute="centerY" secondItem="u8E-5C-z9O" secondAttribute="centerY" id="Rka-1f-rdF"/>
                                                 <constraint firstItem="kUb-oG-0cG" firstAttribute="leading" secondItem="u8E-5C-z9O" secondAttribute="trailingMargin" constant="-50" id="XbN-6Y-AxK"/>
-                                                <constraint firstItem="krX-BX-3Nf" firstAttribute="centerY" secondItem="u8E-5C-z9O" secondAttribute="centerY" id="bT8-Tj-wUw"/>
-                                                <constraint firstItem="XVh-QQ-a9E" firstAttribute="leading" secondItem="krX-BX-3Nf" secondAttribute="trailing" constant="16" id="cXJ-dW-P2m"/>
-                                                <constraint firstItem="krX-BX-3Nf" firstAttribute="width" secondItem="krX-BX-3Nf" secondAttribute="height" multiplier="1:1" id="f9M-kM-jJM"/>
+                                                <constraint firstItem="4cp-Ls-XN9" firstAttribute="leading" secondItem="u8E-5C-z9O" secondAttribute="leadingMargin" id="h4T-4R-cew"/>
+                                                <constraint firstItem="4cp-Ls-XN9" firstAttribute="width" secondItem="4cp-Ls-XN9" secondAttribute="height" multiplier="1:1" id="hEo-5L-Fqq"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="XVh-QQ-a9E" secondAttribute="trailing" id="rbL-jc-Vxk"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -973,6 +977,7 @@
                                                         <constraint firstAttribute="height" constant="30" id="Fj8-q6-bB0"/>
                                                         <constraint firstAttribute="width" secondItem="YNv-7R-ynG" secondAttribute="height" multiplier="1:1" id="FzU-a0-aPq"/>
                                                     </constraints>
+                                                    <inset key="contentEdgeInsets" minX="3" minY="3" maxX="3" maxY="3"/>
                                                     <state key="normal" image="playlist">
                                                         <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </state>
@@ -1111,6 +1116,7 @@
                     <navigationItem key="navigationItem" title="Library" largeTitleDisplayMode="always" id="Vhe-33-MAT"/>
                     <connections>
                         <outlet property="directoriesTableViewCell" destination="eDc-Q7-zDy" id="3kV-xt-7B9"/>
+                        <outlet property="genreImageButton" destination="4cp-Ls-XN9" id="i8b-Nm-vvm"/>
                         <outlet property="genreTableViewCell" destination="2jM-Rh-bzF" id="w3O-yd-1lm"/>
                     </connections>
                 </tableViewController>
@@ -2741,6 +2747,7 @@
         <segue reference="qYo-eV-9nj"/>
     </inferredMetricsTieBreakers>
     <resources>
+        <image name="genre" width="112.31199645996094" height="93.2958984375"/>
         <image name="music_library" width="30" height="30"/>
         <image name="playlist" width="30" height="30"/>
         <image name="search" width="30" height="30"/>

@@ -19,7 +19,7 @@ extension UIImage {
     static var playerStyleLarge: UIImage = { return UIImage.create("player_style_large") }() // SF-Symbols 3.2 Regular:  rectangle.portrait.topthird.inset.filled
     
     static var songArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small) }()
-    static var genre: UIImage = { return UIImage.create("genre") }()
+    static var genre: UIImage = { return UIImage.create("genre") }()  // SF-Symbols 3.2 Regular:  guitars.fill
     static var genreArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.genre, iconSizeType: .big) }()
     static var artist: UIImage = { return UIImage.create("artist") }()
     static var artistArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.artist, iconSizeType: .big) }()
