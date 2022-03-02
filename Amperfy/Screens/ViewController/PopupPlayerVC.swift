@@ -229,7 +229,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         cell.backgroundColor = UIColor.clear
         cell.display(
             playable: playable,
-            playContextCb: {(_) in PlayContext(name: "", playables: [])},
+            playContextCb: {(_) in PlayContext()},
             rootView: self,
             playerIndexCb: convertCellViewToPlayerIndex)
         return cell

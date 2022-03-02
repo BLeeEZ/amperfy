@@ -51,7 +51,6 @@ class SettingsVC: UITableViewController {
         ArtistFetchedResultsController.deleteCache()
         AlbumFetchedResultsController.deleteCache()
         SongsFetchedResultsController.deleteCache()
-        PlaylistFetchedResultsController.deleteCache()
         GenreFetchedResultsController.deleteCache()
         PlaylistSelectorFetchedResultsController.deleteCache()
         MusicFolderFetchedResultsController.deleteCache()

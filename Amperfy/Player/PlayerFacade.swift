@@ -20,8 +20,9 @@ struct PlayContext {
         self.index = 0
         self.playables = containable.playables
         self.type = containable.playContextType
+        containable.playedViaContext()
     }
-
+    
     init(name: String, index: Int = 0, playables: [AbstractPlayable]) {
         self.name = name
         self.index = index
@@ -29,13 +30,14 @@ struct PlayContext {
         self.type = .music
     }
     
-    init(name: String, type: PlayerMode, index: Int = 0, playables: [AbstractPlayable]) {
-        self.name = name
+    init(containable: PlayableContainable, index: Int = 0, playables: [AbstractPlayable]) {
+        self.name = containable.name
         self.index = index
         self.playables = playables
-        self.type = type
+        self.type = containable.playContextType
+        containable.playedViaContext()
     }
-
+    
     func getActivePlayable() -> AbstractPlayable? {
         guard playables.count > 0, index < playables.count else { return nil }
         return playables[index]

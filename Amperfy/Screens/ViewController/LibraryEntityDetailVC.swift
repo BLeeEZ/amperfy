@@ -363,7 +363,7 @@ class LibraryEntityDetailVC: UIViewController {
         } else if let context = playContextCb?() {
             self.appDelegate.player.play(context: context)
         } else {
-            self.appDelegate.player.play(context: PlayContext(name: entityContainer.name, playables: entityPlayables))
+            self.appDelegate.player.play(context: PlayContext(containable: entityContainer, playables: entityPlayables))
         }
     }
     
@@ -373,7 +373,7 @@ class LibraryEntityDetailVC: UIViewController {
         if let context = playContextCb?() {
             self.appDelegate.player.playShuffled(context: context)
         } else {
-            self.appDelegate.player.playShuffled(context: PlayContext(name: entityContainer.name, playables: entityPlayables))
+            self.appDelegate.player.playShuffled(context: PlayContext(containable: entityContainer, playables: entityPlayables))
         }
     }
     

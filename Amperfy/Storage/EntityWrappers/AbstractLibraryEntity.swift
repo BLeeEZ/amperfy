@@ -38,6 +38,17 @@ public class AbstractLibraryEntity {
             managedObject.remoteStatus = Int16(newValue.rawValue)
         }
     }
+    var playCount: Int {
+        get { return Int(managedObject.playCount) }
+        set {
+            guard Int32.isValid(value: newValue), managedObject.playCount != Int32(newValue) else { return }
+            managedObject.playCount = Int32(newValue)
+        }
+    }
+    var lastTimePlayed: Date? {
+        get { return managedObject.lastPlayedDate }
+        set { if managedObject.lastPlayedDate != newValue { managedObject.lastPlayedDate = newValue } }
+    }
     var artwork: Artwork? {
         get {
             guard let artworkMO = managedObject.artwork else { return nil }
@@ -58,6 +69,11 @@ public class AbstractLibraryEntity {
     }
     func isEqual(_ other: AbstractLibraryEntity) -> Bool {
         return managedObject == other.managedObject
+    }
+    
+    func playedViaContext() {
+        lastTimePlayed = Date()
+        playCount += 1
     }
 
 }

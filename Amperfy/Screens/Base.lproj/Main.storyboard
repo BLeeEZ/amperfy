@@ -242,11 +242,18 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Add to playlist" id="Pg3-E2-61S">
-                        <barButtonItem key="rightBarButtonItem" title="Cancel" id="gTQ-0E-9Gk">
-                            <connections>
-                                <action selector="cancelButtonPressed:" destination="4rB-Ko-4wo" id="tYQ-7b-awB"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem title="Cancel" id="gTQ-0E-9Gk">
+                                <connections>
+                                    <action selector="cancelButtonPressed:" destination="4rB-Ko-4wo" id="tYQ-7b-awB"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Sort" id="JE3-ch-0t4">
+                                <connections>
+                                    <action selector="sortButtonPressed:" destination="4rB-Ko-4wo" id="ZNv-Gz-Jzv"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1s6-dv-ao6" userLabel="First Responder" sceneMemberID="firstResponder"/>

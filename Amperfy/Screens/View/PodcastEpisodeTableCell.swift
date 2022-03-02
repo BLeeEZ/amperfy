@@ -73,7 +73,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
         detailVC.display(
             container: episode,
             on: rootView,
-            playContextCb: {() in PlayContext(name: episode.title, playables: [episode])})
+            playContextCb: {() in PlayContext(containable: episode)})
         rootView.present(detailVC, animated: true)
     }
 

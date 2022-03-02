@@ -20,6 +20,7 @@ protocol PlayableContainable {
     var artworkCollection: ArtworkCollection { get }
     func cachePlayables(downloadManager: DownloadManageable)
     func fetchFromServer(inContext: NSManagedObjectContext, syncer: LibrarySyncer)
+    func playedViaContext()
 }
 
 extension PlayableContainable {

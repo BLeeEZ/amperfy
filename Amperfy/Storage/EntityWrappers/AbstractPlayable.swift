@@ -179,6 +179,15 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     override var defaultImage: UIImage {
         return isPodcastEpisode ? UIImage.podcastEpisodeArtwork : UIImage.songArtwork
     }
+    
+    override func playedViaContext() {
+        // keep empty to ignore context based play
+    }
+    
+    func countPlayed() {
+        lastTimePlayed = Date()
+        playCount += 1
+    }
 
 }
 

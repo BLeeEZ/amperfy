@@ -43,6 +43,9 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
                 item?.order = order
                 playlist.add(item: item!)
             }
+            if item?.playable?.id != songBuffer?.id {
+                playlist.updateChangeDate()
+            }
             item?.playable = songBuffer
         }
     }

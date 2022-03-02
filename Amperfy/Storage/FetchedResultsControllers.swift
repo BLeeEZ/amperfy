@@ -1,6 +1,14 @@
 import Foundation
 import CoreData
 
+enum PlaylistSortType: Int {
+    case name = 0
+    case lastPlayed = 1
+    case lastChanged = 2
+    
+    static let defaultValue: PlaylistSortType = .name
+}
+
 enum DisplayCategoryFilter {
     case all
     case recentlyAdded
@@ -433,10 +441,21 @@ class PlaylistItemsFetchedResultsController: BasicFetchedResultsController<Playl
 
 }
 
-class PlaylistFetchedResultsController: CachedFetchedResultsController<PlaylistMO> {
+class PlaylistFetchedResultsController: BasicFetchedResultsController<PlaylistMO> {
 
-    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
-        let fetchRequest = PlaylistMO.identifierSortedFetchRequest
+    var sortType: PlaylistSortType
+    
+    init(managedObjectContext context: NSManagedObjectContext, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool) {
+        self.sortType = sortType
+        var fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        switch sortType {
+        case .name:
+            fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        case .lastPlayed:
+            fetchRequest = PlaylistMO.lastPlayedDateFetchRequest
+        case .lastChanged:
+            fetchRequest = PlaylistMO.lastChangedDateFetchRequest
+        }
         fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
@@ -458,9 +477,20 @@ class PlaylistFetchedResultsController: CachedFetchedResultsController<PlaylistM
 
 class PlaylistSelectorFetchedResultsController: CachedFetchedResultsController<PlaylistMO> {
 
-    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    var sortType: PlaylistSortType
+    
+    init(managedObjectContext context: NSManagedObjectContext, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool) {
+        self.sortType = sortType
+        var fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        switch sortType {
+        case .name:
+            fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        case .lastPlayed:
+            fetchRequest = PlaylistMO.lastPlayedDateFetchRequest
+        case .lastChanged:
+            fetchRequest = PlaylistMO.lastChangedDateFetchRequest
+        }
         let library = LibraryStorage(context: context)
-        let fetchRequest = PlaylistMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             PlaylistMO.excludeSystemPlaylistsFetchPredicate,
             library.getFetchPredicate(forPlaylistSearchCategory: .userOnly)

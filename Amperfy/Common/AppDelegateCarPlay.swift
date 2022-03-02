@@ -136,7 +136,7 @@ class CarPlayHandler: NSObject {
     
     func populate() {
         let playlistsData = CarPlayTabData(title: "Playlists", image: UIImage.playlistCarplay, fetchCB: nil)
-        let playlists = library.getPlaylistsForCarPlay()
+        let playlists = library.getPlaylistsForCarPlay(sortType: persistentStorage.settings.playlistsSortSetting)
         var playlistItems = [CarPlayPlayableItem]()
         for playlist in playlists {
             let item = CarPlayPlayableItem(element: playlist, image: nil, fetchCB: nil)
@@ -195,7 +195,7 @@ extension CarPlayHandler: MPPlayableContentDelegate {
             }
 
             if let containable = containable {
-                let playContext = PlayContext(name: containable.name, playables: containable.playables.filterCached())
+                let playContext = PlayContext(containable: containable, playables: containable.playables.filterCached())
                 self.player.play(context: playContext)
             }
             completionHandler(nil)

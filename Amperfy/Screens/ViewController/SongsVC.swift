@@ -38,7 +38,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
         let song = fetchedResultsController.getWrappedEntity(at: songIndexPath)
-        return PlayContext(name: song.title, playables: [song])
+        return PlayContext(containable: song)
     }
     
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {

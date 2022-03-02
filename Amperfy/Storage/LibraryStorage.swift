@@ -548,8 +548,16 @@ class LibraryStorage: PlayableFileCachable {
         return playlists ?? [Playlist]()
     }
     
-    func getPlaylistsForCarPlay() -> [Playlist] {
-        let fetchRequest = PlaylistMO.identifierSortedFetchRequest
+    func getPlaylistsForCarPlay(sortType: PlaylistSortType) -> [Playlist] {
+        var fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        switch sortType {
+        case .name:
+            fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        case .lastPlayed:
+            fetchRequest = PlaylistMO.lastPlayedDateFetchRequest
+        case .lastChanged:
+            fetchRequest = PlaylistMO.lastChangedDateFetchRequest
+        }
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             PlaylistMO.excludeSystemPlaylistsFetchPredicate,
             getFetchPredicate(forPlaylistSearchCategory: .cached)

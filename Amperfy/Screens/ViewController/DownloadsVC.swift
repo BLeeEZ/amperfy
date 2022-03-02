@@ -54,7 +54,7 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
         guard let indexPath = tableView.indexPath(for: cell) else { return nil }
         let downdload = fetchedResultsController.getWrappedEntity(at: indexPath)
         guard let playable = downdload.element as? AbstractPlayable else { return nil }
-        return PlayContext(name: playable.title, playables: [playable])
+        return PlayContext(containable: playable)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

@@ -87,9 +87,25 @@ public class Playlist: Identifyable {
         set {
             if managedObject.name != newValue {
                 managedObject.name = newValue
+                updateChangeDate()
                 library.saveContext()
             }
         }
+    }
+    var playCount: Int {
+        get { return Int(managedObject.playCount) }
+        set {
+            guard Int32.isValid(value: newValue), managedObject.playCount != Int32(newValue) else { return }
+            managedObject.playCount = Int32(newValue)
+        }
+    }
+    var lastTimePlayed: Date? {
+        get { return managedObject.lastPlayedDate }
+        set { if managedObject.lastPlayedDate != newValue { managedObject.lastPlayedDate = newValue } }
+    }
+    var changeDate: Date? {
+        get { return managedObject.changeDate }
+        set { if managedObject.changeDate != newValue { managedObject.changeDate = newValue } }
     }
     var isSmartPlaylist: Bool {
         return id.hasPrefix(Self.smartPlaylistIdPrefix)
@@ -166,12 +182,14 @@ public class Playlist: Identifyable {
             createPlaylistItem(for: playable, customOrder: index + insertIndex)
         }
         songCount += playablesToInsert.count
+        updateChangeDate()
         library.saveContext()
     }
 
     func append(playable: AbstractPlayable) {
         createPlaylistItem(for: playable)
         songCount += 1
+        updateChangeDate()
         library.saveContext()
     }
 
@@ -192,6 +210,7 @@ public class Playlist: Identifyable {
 
     func add(item: PlaylistItem) {
         songCount += 1
+        updateChangeDate()
         managedObject.addToItems(item.managedObject)
     }
     
@@ -211,6 +230,7 @@ public class Playlist: Identifyable {
         }
         localSortedPlaylistItems[fromIndex].order = targetOrder
         
+        updateChangeDate()
         library.saveContext()
     }
     
@@ -224,6 +244,7 @@ public class Playlist: Identifyable {
             }
             library.deletePlaylistItem(item: itemToBeRemoved)
             songCount -= 1
+            updateChangeDate()
             library.saveContext()
         }
     }
@@ -252,6 +273,7 @@ public class Playlist: Identifyable {
             library.deletePlaylistItem(item: item)
         }
         songCount = 0
+        updateChangeDate()
         library.saveContext()
     }
     
@@ -268,6 +290,10 @@ public class Playlist: Identifyable {
             localSortedPlaylistItems[i].order = shuffeldIndexes[i]
         }
         library.saveContext()
+    }
+    
+    func updateChangeDate() {
+        changeDate = Date()
     }
 
     func ensureConsistentItemOrder() {
@@ -331,6 +357,10 @@ extension Playlist: PlayableContainable  {
         } else {
             return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: nil)
         }
+    }
+    func playedViaContext() {
+        lastTimePlayed = Date()
+        playCount += 1
     }
 }
 

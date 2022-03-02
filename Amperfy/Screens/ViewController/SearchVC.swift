@@ -11,7 +11,7 @@ class SearchVC: BasicTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        playlistFetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        playlistFetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
         playlistFetchedResultsController.delegate = self
         artistFetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
         artistFetchedResultsController.delegate = self
@@ -67,7 +67,7 @@ class SearchVC: BasicTableViewController {
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
         guard let indexPath = tableView.indexPath(for: cell), indexPath.section == LibraryElement.Song.rawValue else { return nil }
         let song = songFetchedResultsController.getWrappedEntity(at: indexPath)
-        return PlayContext(name: song.title, playables: [song])
+        return PlayContext(containable: song)
     }
 
     // MARK: - Table view data source

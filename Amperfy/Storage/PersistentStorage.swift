@@ -14,6 +14,7 @@ class PersistentStorage {
         case SongActionOnTab = "songActionOnTab"
         case SwipeLeadingActionSettings = "swipeLeadingActionSettings"
         case SwipeTrailingActionSettings = "swipeTrailingActionSettings"
+        case PlaylistsSortSetting = "playlistsSortSetting"
         case PodcastsShowSetting = "podcastsShowSetting"
         case PlayerDisplayStyle = "playerDisplayStyle"
         case IsOfflineMode = "isOfflineMode"
@@ -23,6 +24,14 @@ class PersistentStorage {
     }
     
     class Settings {
+        var playlistsSortSetting: PlaylistSortType {
+            get {
+                let playlistsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.PlaylistsSortSetting.rawValue) as? Int ?? PlaylistSortType.defaultValue.rawValue
+                return PlaylistSortType(rawValue: playlistsSortSettingRaw) ?? PlaylistSortType.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.PlaylistsSortSetting.rawValue) }
+        }
+        
         var swipeActionSettings: SwipeActionSettings {
             get {
                 guard let swipeLeadingActionsRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SwipeLeadingActionSettings.rawValue) as? [Int],

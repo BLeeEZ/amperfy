@@ -29,6 +29,9 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
                 item?.order = order
                 playlist.add(item: item!)
             }
+            if item?.playable?.id != songBuffer?.id {
+                playlist.updateChangeDate()
+            }
             item?.playable = songBuffer
         case "root":
             if items.count > parsedCount {

@@ -6,12 +6,14 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     var itemsToAdd: [AbstractPlayable]?
     
     private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
+    private var sortType: PlaylistSortType = .name
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.playlistSelector)
         
-        fetchedResultsController = PlaylistSelectorFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
+        change(sortType: appDelegate.persistentStorage.settings.playlistsSortSetting)
+        fetchedResultsController = PlaylistSelectorFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: appDelegate.persistentStorage.settings.playlistsSortSetting, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Playlists\"", showSearchBarAtEnter: true)
@@ -24,6 +26,16 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
     }
     
+    func change(sortType: PlaylistSortType) {
+        self.sortType = sortType
+        // sortType will not be saved permanently. This behaviour differs from PlaylistsVC
+        singleFetchedResultsController?.clearResults()
+        tableView.reloadData()
+        fetchedResultsController = PlaylistSelectorFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: sortType, isGroupedInAlphabeticSections: true)
+        singleFetchedResultsController = fetchedResultsController
+        tableView.reloadData()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if appDelegate.persistentStorage.settings.isOnlineMode {
@@ -33,6 +45,32 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
                 syncer.syncDownPlaylistsWithoutSongs(library: syncLibrary)
             }
         }
+    }
+    
+    @IBAction func sortButtonPressed(_ sender: Any) {
+        let alert = UIAlertController(title: "Playlists sorting", message: nil, preferredStyle: .actionSheet)
+        if sortType != .name {
+            alert.addAction(UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+                self.change(sortType: .name)
+                self.updateSearchResults(for: self.searchController)
+            }))
+        }
+        if sortType != .lastPlayed {
+            alert.addAction(UIAlertAction(title: "Sort by last time played", style: .default, handler: { _ in
+                self.change(sortType: .lastPlayed)
+                self.updateSearchResults(for: self.searchController)
+            }))
+        }
+        if sortType != .lastChanged {
+            alert.addAction(UIAlertAction(title: "Sort by last time changed", style: .default, handler: { _ in
+                self.change(sortType: .lastChanged)
+                self.updateSearchResults(for: self.searchController)
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
+        present(alert, animated: true, completion: nil)
     }
     
     @IBAction func cancelButtonPressed(_ sender: UIBarButtonItem) {

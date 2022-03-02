@@ -33,7 +33,7 @@ class GenreDetailVC: BasicTableViewController {
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
-                playContextCb: {() in PlayContext(name: self.genre.name, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
+                playContextCb: {() in PlayContext(containable: self.genre, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
@@ -76,7 +76,7 @@ class GenreDetailVC: BasicTableViewController {
         else { return nil }
         let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
         guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
-        return PlayContext(name: genre.name, index: playContextIndex, playables: songs)
+        return PlayContext(containable: genre, index: playContextIndex, playables: songs)
     }
     
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
