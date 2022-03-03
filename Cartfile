@@ -1,3 +1,4 @@
 github "LeoNatan/LNPopupController" == 2.10.37
 github "cbpowell/MarqueeLabel" == 4.1.0
 github "Daltron/NotificationBanner" == 3.0.6
+github "chicio/ID3TagEditor" == 4.2.1

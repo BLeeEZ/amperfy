@@ -44,8 +44,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(playerStatus: playerData, queueHandler: queueHandler, playableDownloadManager: playableDownloadManager)
         curPlayer.addNotifier(notifier:  playerDownloadPreparationHandler)
-        let embeddedArtworkExtractor = EmbeddedArtworkExtractor(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, library: library)
-        curPlayer.addNotifier(notifier: embeddedArtworkExtractor)
         let songPlayedSyncer = SongPlayedSyncer(persistentStorage: persistentStorage, musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, backendApi: backendApi)
         curPlayer.addNotifier(notifier: songPlayedSyncer)
 
@@ -65,7 +63,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return facadeImpl
     }()
     lazy var playableDownloadManager: DownloadManageable = {
-        let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi)
+        let artworkExtractor = EmbeddedArtworkExtractor()
+        let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi, artworkExtractor: artworkExtractor)
         let requestManager = DownloadRequestManager(persistentStorage: persistentStorage, downloadDelegate: dlDelegate)
         let dlManager = DownloadManager(name: "PlayableDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
         

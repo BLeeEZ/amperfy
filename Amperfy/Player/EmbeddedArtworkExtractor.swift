@@ -1,54 +1,29 @@
-import Foundation
 import UIKit
+import ID3TagEditor
 
 class EmbeddedArtworkExtractor  {
-    
-    private static let waitTimeTillCheckAgainIfPlayableIsLoadedInSec: UInt32 = 3
-    
-    private let musicPlayer: MusicPlayer
-    private let backendAudioPlayer: BackendAudioPlayer
-    private let library: LibraryStorage
 
-    init(musicPlayer: MusicPlayer, backendAudioPlayer: BackendAudioPlayer, library: LibraryStorage) {
-        self.musicPlayer = musicPlayer
-        self.backendAudioPlayer = backendAudioPlayer
-        self.library = library
-    }
+    let id3TagEditor = ID3TagEditor()
     
-    private func extractEmbeddedArtwork() {
-        guard let playable = musicPlayer.currentlyPlaying, playable.embeddedArtwork == nil else { return }
-        // Wait some time till the playable is loaded and the embedded arwork if existing, can be extracted
-        DispatchQueue.global().async {
-            sleep(Self.waitTimeTillCheckAgainIfPlayableIsLoadedInSec)
-            DispatchQueue.main.async {
-                guard playable == self.musicPlayer.currentlyPlaying,
-                      self.backendAudioPlayer.isPlayableLoaded,
-                      let embeddedImage = self.backendAudioPlayer.getEmbeddedArtworkFromID3Tag() else {
-                    return
-                }
-                self.saveEmbeddedImageInLibrary(playable: playable, embeddedImage: embeddedImage)
-            }
+    func extractEmbeddedArtwork(library: LibraryStorage, playable: AbstractPlayable, fileData: Data) {
+        guard let id3Tag = try? id3TagEditor.read(mp3: fileData) else { return }
+        let tagContentReader = ID3TagContentReader(id3Tag: id3Tag)
+        let artworks = tagContentReader.attachedPictures()
+        // if there is a frontCover artwork take this as embedded artwork
+        if let frontCoverArtwork = artworks.lazy.filter({ $0.type == .frontCover }).first,
+           let artworkImage = UIImage(data: frontCoverArtwork.picture) {
+            saveEmbeddedImageInLibrary(library: library, playable: playable, embeddedImage: artworkImage)
+        // take the first other available artwork
+        } else if let artworkImage = artworks.lazy.compactMap({ UIImage(data: $0.picture) }).first {
+            saveEmbeddedImageInLibrary(library: library, playable: playable, embeddedImage: artworkImage)
         }
     }
-    
-    private func saveEmbeddedImageInLibrary(playable: AbstractPlayable, embeddedImage: UIImage) {
+
+    private func saveEmbeddedImageInLibrary(library: LibraryStorage, playable: AbstractPlayable, embeddedImage: UIImage) {
         let embeddedArtwork = library.createEmbeddedArtwork()
         embeddedArtwork.setImage(fromData: embeddedImage.pngData())
         embeddedArtwork.owner = playable
         library.saveContext()
-        musicPlayer.notifyArtworkChanged()
-    }
-
-}
-
-extension EmbeddedArtworkExtractor: MusicPlayable {
-    func didStartPlaying() {
-        extractEmbeddedArtwork()
     }
     
-    func didPause() { }
-    func didStopPlaying() { }
-    func didElapsedTimeChange() { }
-    func didPlaylistChange() { }
-    func didArtworkChange() { }
 }

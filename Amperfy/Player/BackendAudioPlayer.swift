@@ -153,16 +153,5 @@ class BackendAudioPlayer {
         player.replaceCurrentItem(with: item)
         NotificationCenter.default.addObserver(self, selector: #selector(itemFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
     }
-    
-    func getEmbeddedArtworkFromID3Tag() -> UIImage? {
-        guard isPlayableLoaded, let item = player.currentItem else { return nil }
-        let metadataList = item.asset.metadata
-        guard let artworkAsset = metadataList.filter({ $0.commonKey == .commonKeyArtwork }).first,
-              let artworkData = artworkAsset.dataValue,
-              let artworkImage = UIImage(data: artworkData) else {
-            return nil
-        }
-        return artworkImage
-    }
-    
+
 }

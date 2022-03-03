@@ -38,7 +38,7 @@ class PlayerView: UIView {
     private var rootView: PopupPlayerVC?
     private var displayStyle: PlayerDisplayStyle!
     
-    @IBOutlet weak var artworkImage: UIImageView!
+    @IBOutlet weak var artworkImage: LibraryEntityImage!
     @IBOutlet weak var artworkContainerView: UIView!
     
     @IBOutlet weak var titleCompactLabel: MarqueeLabel!
@@ -456,15 +456,15 @@ class PlayerView: UIView {
     
     func refreshArtwork() {
         if let playableInfo = player.currentlyPlaying {
-            artworkImage.image = playableInfo.image
+            artworkImage.display(entity: playableInfo)
             rootView?.popupItem.image = playableInfo.image
         } else {
             switch player.playerMode {
             case .music:
-                artworkImage.image = UIImage.songArtwork
+                artworkImage.display(image: UIImage.songArtwork)
                 rootView?.popupItem.image = UIImage.songArtwork
             case .podcast:
-                artworkImage.image = UIImage.podcastArtwork
+                artworkImage.display(image: UIImage.podcastArtwork)
                 rootView?.popupItem.image = UIImage.podcastArtwork
             }
         }

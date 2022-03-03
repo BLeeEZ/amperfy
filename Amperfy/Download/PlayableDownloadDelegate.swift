@@ -4,9 +4,11 @@ import CoreData
 class PlayableDownloadDelegate: DownloadManagerDelegate {
 
     private let backendApi: BackendApi
+    private let artworkExtractor: EmbeddedArtworkExtractor
 
-    init(backendApi: BackendApi) {
+    init(backendApi: BackendApi, artworkExtractor: EmbeddedArtworkExtractor) {
         self.backendApi = backendApi
+        self.artworkExtractor = artworkExtractor
     }
     
     var requestPredicate: NSPredicate {
@@ -44,10 +46,12 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
 		let library = LibraryStorage(context: context)
         if let playableMO = try? context.existingObject(with: download.element.objectID) as? AbstractPlayableMO {
             let playableFile = library.createPlayableFile()
-            playableFile.info = AbstractPlayable(managedObject: playableMO)
+            let owner = AbstractPlayable(managedObject: playableMO)
+            playableFile.info = owner
             playableFile.data = data
+            artworkExtractor.extractEmbeddedArtwork(library: library, playable: owner, fileData: data)
             library.saveContext()
         }
     }
-
+    
 }

@@ -131,6 +131,8 @@
 		5077F95122279DF40099CA91 /* PlaytimeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F95022279DF40099CA91 /* PlaytimeSlider.swift */; };
 		5077F95322283FED0099CA91 /* RoundedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F95222283FED0099CA91 /* RoundedImage.swift */; };
 		5077F955222C58A10099CA91 /* GenericXmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F954222C58A10099CA91 /* GenericXmlParser.swift */; };
+		50814C9827D2550D0072738F /* ID3TagEditor.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50814C9727D2550D0072738F /* ID3TagEditor.xcframework */; };
+		50814C9927D255200072738F /* ID3TagEditor.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 50814C9727D2550D0072738F /* ID3TagEditor.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E721C5965B00C4BB32 /* AppDelegate.swift */; };
 		508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E921C5965B00C4BB32 /* LoginVC.swift */; };
 		508385ED21C5965B00C4BB32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 508385EB21C5965B00C4BB32 /* Main.storyboard */; };
@@ -365,6 +367,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				50814C9927D255200072738F /* ID3TagEditor.xcframework in Embed Frameworks */,
 				5055AA5C268365DD00096B8D /* SnapKit.xcframework in Embed Frameworks */,
 				5055AA5A268365DA00096B8D /* NotificationBanner.xcframework in Embed Frameworks */,
 				5054689D2625CD95008005EC /* LNPopupController.xcframework in Embed Frameworks */,
@@ -504,6 +507,7 @@
 		5077F95022279DF40099CA91 /* PlaytimeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaytimeSlider.swift; sourceTree = "<group>"; };
 		5077F95222283FED0099CA91 /* RoundedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedImage.swift; sourceTree = "<group>"; };
 		5077F954222C58A10099CA91 /* GenericXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericXmlParser.swift; sourceTree = "<group>"; };
+		50814C9727D2550D0072738F /* ID3TagEditor.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ID3TagEditor.xcframework; path = Carthage/Build/ID3TagEditor.xcframework; sourceTree = "<group>"; };
 		508385E421C5965B00C4BB32 /* Amperfy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Amperfy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		508385E721C5965B00C4BB32 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		508385E921C5965B00C4BB32 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
@@ -740,6 +744,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5055AA5B268365DD00096B8D /* SnapKit.xcframework in Frameworks */,
+				50814C9827D2550D0072738F /* ID3TagEditor.xcframework in Frameworks */,
 				5054689C2625CD95008005EC /* LNPopupController.xcframework in Frameworks */,
 				5055AA59268365DA00096B8D /* NotificationBanner.xcframework in Frameworks */,
 				506007232625E8BD00F9891D /* MarqueeLabel.xcframework in Frameworks */,
@@ -978,6 +983,7 @@
 				5054686C2625C457008005EC /* LNPopupController.xcframework */,
 				50EF2CB3267F65960011C42F /* NotificationBanner.xcframework */,
 				50EF2CB1267F658B0011C42F /* SnapKit.xcframework */,
+				50814C9727D2550D0072738F /* ID3TagEditor.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
