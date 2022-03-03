@@ -95,6 +95,7 @@
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <color key="tintColor" systemColor="labelColor"/>
+                    <inset key="contentEdgeInsets" minX="-23" minY="0.0" maxX="0.0" maxY="0.0"/>
                     <state key="normal" image="player_style_compact">
                         <color key="titleColor" systemColor="labelColor"/>
                     </state>
