@@ -7,10 +7,6 @@ enum ImageStatus: Int16 {
     case NotChecked = 1
     case CustomImage = 2
     case FetchError = 3
-    
-    var isDownloadRecommended: Bool {
-        return self == .NotChecked
-    }
 }
 
 public struct ArtworkRemoteInfo {

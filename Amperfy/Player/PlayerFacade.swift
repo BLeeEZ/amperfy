@@ -30,6 +30,13 @@ struct PlayContext {
         self.type = .music
     }
     
+    init(name: String, type: PlayerMode, index: Int = 0, playables: [AbstractPlayable]) {
+        self.name = name
+        self.index = index
+        self.playables = playables
+        self.type = type
+    }
+    
     init(containable: PlayableContainable, index: Int = 0, playables: [AbstractPlayable]) {
         self.name = containable.name
         self.index = index

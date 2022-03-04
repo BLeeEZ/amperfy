@@ -15,11 +15,14 @@ struct NotificationUserInfo {
 class LocalNotificationManager {
     
     private static let notificationTimeInterval = 1.0 // time interval in seconds
+    
     private let userStatistics: UserStatistics
+    private let persistentStorage: PersistentStorage
     private let log = OSLog(subsystem: AppDelegate.name, category: "LocalNotificationManager")
     
-    init(userStatistics: UserStatistics) {
+    init(userStatistics: UserStatistics, persistentStorage: PersistentStorage) {
         self.userStatistics = userStatistics
+        self.persistentStorage = persistentStorage
     }
     
     func executeIfAuthorizationHasNotBeenAskedYet(askForAuthorizationCallback: @escaping () -> Void) {
@@ -51,7 +54,7 @@ class LocalNotificationManager {
         let identifier = "podcast-\(podcastEpisode.podcast?.id ?? "0")-episode-\(podcastEpisode.id)"
         do {
             let fileIdentifier = identifier + ".png"
-            let artworkUrl = createLocalUrl(forImage: podcastEpisode.image, fileIdentifier: fileIdentifier)
+            let artworkUrl = createLocalUrl(forImage: podcastEpisode.image(setting: persistentStorage.settings.artworkDisplayStyle), fileIdentifier: fileIdentifier)
             let attachment = try UNNotificationAttachment(identifier: fileIdentifier, url: artworkUrl, options: nil)
             content.attachments = [attachment]
         } catch {

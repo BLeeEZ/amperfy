@@ -135,6 +135,7 @@ class CarPlayHandler: NSObject {
     }
     
     func populate() {
+        let artworkDisplayStyle = persistentStorage.settings.artworkDisplayStyle
         let playlistsData = CarPlayTabData(title: "Playlists", image: UIImage.playlistCarplay, fetchCB: nil)
         playlistsData.fetchCB = { completionHandler in
             self.persistentStorage.context.performAndWait {
@@ -154,7 +155,7 @@ class CarPlayHandler: NSObject {
                 let albums = self.library.getRecentAlbumsForCarPlay()
                 var albumItems = [CarPlayPlayableItem]()
                 for album in albums {
-                    let item = CarPlayPlayableItem(element: album, image: album.image, fetchCB: nil)
+                    let item = CarPlayPlayableItem(element: album, image: album.image(setting: artworkDisplayStyle), fetchCB: nil)
                     albumItems.append(item)
                 }
                 completionHandler(albumItems)
@@ -167,7 +168,7 @@ class CarPlayHandler: NSObject {
                 let songs = self.library.getRecentSongsForCarPlay()
                 var songItems = [CarPlayPlayableItem]()
                 for song in songs {
-                    let item = CarPlayPlayableItem(element: song, image: song.image, fetchCB: nil)
+                    let item = CarPlayPlayableItem(element: song, image: song.image(setting: artworkDisplayStyle), fetchCB: nil)
                     songItems.append(item)
                 }
                 completionHandler(songItems)
@@ -180,7 +181,7 @@ class CarPlayHandler: NSObject {
                 let podcasts = self.library.getPodcastsForCarPlay()
                 var podcastItems = [CarPlayPlayableItem]()
                 for podcast in podcasts {
-                    let item = CarPlayPlayableItem(element: podcast, image: podcast.image, fetchCB: nil)
+                    let item = CarPlayPlayableItem(element: podcast, image: podcast.image(setting: artworkDisplayStyle), fetchCB: nil)
                     podcastItems.append(item)
                 }
                 completionHandler(podcastItems)

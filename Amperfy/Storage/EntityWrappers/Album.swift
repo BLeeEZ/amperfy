@@ -10,7 +10,25 @@ public class Album: AbstractLibraryEntity {
         self.managedObject = managedObject
         super.init(managedObject: managedObject)
     }
-    
+    override func image(setting: ArtworkDisplayStyle) -> UIImage {
+        switch setting {
+        case .id3TagOnly:
+            return embeddedArtworkImage ?? defaultImage
+        case .serverArtworkOnly:
+            return super.image(setting: setting)
+        case .preferServerArtwork:
+            return artwork?.image ?? embeddedArtworkImage ?? defaultImage
+        case .preferId3Tag:
+            return embeddedArtworkImage ?? artwork?.image ?? defaultImage
+        }
+    }
+    private var embeddedArtworkImage: UIImage? {
+        let embeddedArtworks = Set(songs.compactMap({ $0.embeddedArtwork?.image?.pngData() }))
+        if embeddedArtworks.count == 1, let imageData = embeddedArtworks.first {
+            return UIImage(data: imageData)
+        }
+        return nil
+    }
     var identifier: String {
         return name
     }

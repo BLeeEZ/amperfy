@@ -5,12 +5,14 @@ class NowPlayingInfoCenterHandler {
     
     private let musicPlayer: MusicPlayer
     private let backendAudioPlayer: BackendAudioPlayer
-    var nowPlayingInfoCenter: MPNowPlayingInfoCenter
+    private let persistentStorage: PersistentStorage
+    private var nowPlayingInfoCenter: MPNowPlayingInfoCenter
 
-    init(musicPlayer: MusicPlayer, backendAudioPlayer: BackendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter) {
+    init(musicPlayer: MusicPlayer, backendAudioPlayer: BackendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter, persistentStorage: PersistentStorage) {
         self.musicPlayer = musicPlayer
         self.backendAudioPlayer = backendAudioPlayer
         self.nowPlayingInfoCenter = nowPlayingInfoCenter
+        self.persistentStorage = persistentStorage
     }
 
     func updateNowPlayingInfo(playable: AbstractPlayable) {
@@ -22,8 +24,8 @@ class NowPlayingInfoCenterHandler {
             MPMediaItemPropertyArtist: playable.creatorName,
             MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
-            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: playable.image.size, requestHandler: { (size) -> UIImage in
-                return playable.image
+            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: playable.image(setting: persistentStorage.settings.artworkDisplayStyle).size, requestHandler: { (size) -> UIImage in
+                return playable.image(setting: self.persistentStorage.settings.artworkDisplayStyle)
             })
         ]
     }

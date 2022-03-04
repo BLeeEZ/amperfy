@@ -1,6 +1,47 @@
 import Foundation
 import CoreData
 
+enum ArtworkDownloadSetting: Int, CaseIterable {
+    case updateOncePerSession = 0
+    case onlyOnce = 1
+    case never = 2
+    
+    static let defaultValue: ArtworkDownloadSetting = .updateOncePerSession
+    
+    var description: String {
+        switch self {
+        case .updateOncePerSession:
+            return "Download once per session (change detection)"
+        case .onlyOnce:
+            return "Download only once"
+        case .never:
+            return "Never"
+        }
+    }
+}
+
+enum ArtworkDisplayStyle: Int, CaseIterable {
+    case id3TagOnly = 0
+    case serverArtworkOnly = 1
+    case preferServerArtwork = 2
+    case preferId3Tag = 3
+    
+    static let defaultValue: ArtworkDisplayStyle = .preferId3Tag
+    
+    var description: String {
+        switch self {
+        case .id3TagOnly:
+            return "Only ID3 tag artworks"
+        case .serverArtworkOnly:
+            return "Only server artworks"
+        case .preferServerArtwork:
+            return "Prefer server artwork over ID3 tag"
+        case .preferId3Tag:
+            return "Prefer ID3 tag over server artwork"
+        }
+    }
+}
+
 class PersistentStorage {
 
     private enum UserDefaultsKey: String {
@@ -10,6 +51,8 @@ class PersistentStorage {
         case Password = "password"
         case BackendApi = "backendApi"
         case LibraryIsSynced = "libraryIsSynced"
+        case ArtworkDownloadSetting = "artworkDownloadSetting"
+        case ArtworkDisplayStyle = "artworkDisplayStyle"
         
         case SongActionOnTab = "songActionOnTab"
         case SwipeLeadingActionSettings = "swipeLeadingActionSettings"
@@ -24,6 +67,22 @@ class PersistentStorage {
     }
     
     class Settings {
+        var artworkDownloadSetting: ArtworkDownloadSetting {
+            get {
+                let artworkDownloadSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ArtworkDownloadSetting.rawValue) as? Int ?? ArtworkDownloadSetting.defaultValue.rawValue
+                return ArtworkDownloadSetting(rawValue: artworkDownloadSettingRaw) ?? ArtworkDownloadSetting.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtworkDownloadSetting.rawValue) }
+        }
+        
+        var artworkDisplayStyle: ArtworkDisplayStyle {
+            get {
+                let artworkDisplayStyleRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ArtworkDisplayStyle.rawValue) as? Int ?? ArtworkDisplayStyle.defaultValue.rawValue
+                return ArtworkDisplayStyle(rawValue: artworkDisplayStyleRaw) ?? ArtworkDisplayStyle.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtworkDisplayStyle.rawValue) }
+        }
+        
         var playlistsSortSetting: PlaylistSortType {
             get {
                 let playlistsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.PlaylistsSortSetting.rawValue) as? Int ?? PlaylistSortType.defaultValue.rawValue

@@ -58,12 +58,14 @@ public class AbstractLibraryEntity {
             if managedObject.artwork != newValue?.managedObject { managedObject.artwork = newValue?.managedObject }
         }
     }
-    var image: UIImage {
+    
+    func image(setting: ArtworkDisplayStyle) -> UIImage {
         guard let img = artwork?.image else {
             return defaultImage
         }
         return img
     }
+    
     var defaultImage: UIImage {
         return UIImage.songArtwork
     }

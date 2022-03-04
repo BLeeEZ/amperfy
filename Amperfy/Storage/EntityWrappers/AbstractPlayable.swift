@@ -17,13 +17,17 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         super.init(managedObject: managedObject)
     }
 
-    override var image: UIImage {
-        guard let embeddedArtwork = playableManagedObject.embeddedArtwork,
-              let embeddedArtworkImageData = embeddedArtwork.imageData,
-              let embeddedArtworkImage = UIImage(data: embeddedArtworkImageData) else {
-            return super.image
+    override func image(setting: ArtworkDisplayStyle) -> UIImage {
+        switch setting {
+        case .id3TagOnly:
+            return embeddedArtwork?.image ?? defaultImage
+        case .serverArtworkOnly:
+            return super.image(setting: setting)
+        case .preferServerArtwork:
+            return artwork?.image ?? embeddedArtwork?.image ?? defaultImage
+        case .preferId3Tag:
+            return embeddedArtwork?.image ?? artwork?.image ?? defaultImage
         }
-        return embeddedArtworkImage
     }
     var embeddedArtwork: EmbeddedArtwork? {
         get {

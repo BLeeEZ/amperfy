@@ -133,6 +133,8 @@
 		5077F955222C58A10099CA91 /* GenericXmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F954222C58A10099CA91 /* GenericXmlParser.swift */; };
 		50814C9827D2550D0072738F /* ID3TagEditor.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50814C9727D2550D0072738F /* ID3TagEditor.xcframework */; };
 		50814C9927D255200072738F /* ID3TagEditor.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 50814C9727D2550D0072738F /* ID3TagEditor.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		50814C9B27D8A3EC0072738F /* SettingsArtworkDisplayStyleVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50814C9A27D8A3EB0072738F /* SettingsArtworkDisplayStyleVC.swift */; };
+		50814C9D27D8A8190072738F /* SettingsArtworkDownloadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50814C9C27D8A8190072738F /* SettingsArtworkDownloadVC.swift */; };
 		508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E721C5965B00C4BB32 /* AppDelegate.swift */; };
 		508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E921C5965B00C4BB32 /* LoginVC.swift */; };
 		508385ED21C5965B00C4BB32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 508385EB21C5965B00C4BB32 /* Main.storyboard */; };
@@ -508,6 +510,8 @@
 		5077F95222283FED0099CA91 /* RoundedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedImage.swift; sourceTree = "<group>"; };
 		5077F954222C58A10099CA91 /* GenericXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericXmlParser.swift; sourceTree = "<group>"; };
 		50814C9727D2550D0072738F /* ID3TagEditor.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ID3TagEditor.xcframework; path = Carthage/Build/ID3TagEditor.xcframework; sourceTree = "<group>"; };
+		50814C9A27D8A3EB0072738F /* SettingsArtworkDisplayStyleVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsArtworkDisplayStyleVC.swift; sourceTree = "<group>"; };
+		50814C9C27D8A8190072738F /* SettingsArtworkDownloadVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsArtworkDownloadVC.swift; sourceTree = "<group>"; };
 		508385E421C5965B00C4BB32 /* Amperfy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Amperfy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		508385E721C5965B00C4BB32 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		508385E921C5965B00C4BB32 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
@@ -1174,10 +1178,12 @@
 				5077F93D222489510099CA91 /* SettingsVC.swift */,
 				506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */,
 				5017995F27CCE110002554E5 /* SettingsServerURLsVC.swift */,
-				502928842656448000DA3A8F /* SupportVC.swift */,
+				50814C9A27D8A3EB0072738F /* SettingsArtworkDisplayStyleVC.swift */,
+				50814C9C27D8A8190072738F /* SettingsArtworkDownloadVC.swift */,
 				506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */,
 				50ADCD472660E70D007FE3BD /* SettingsPlayerVC.swift */,
 				50ACAF0B27B10E270039913C /* SettingsSwipeVC.swift */,
+				502928842656448000DA3A8F /* SupportVC.swift */,
 				50CDF20D264BEF5500F83EF6 /* EventLogVC.swift */,
 				500ECAE322B26B9500A3CF84 /* LicenseVC.swift */,
 				50C16C1F21E7A37000F086F0 /* Segues.swift */,
@@ -1659,6 +1665,7 @@
 				50C16C2021E7A37000F086F0 /* Segues.swift in Sources */,
 				5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */,
 				50DEEE17265ED5790073FF20 /* DirectoryMO+CoreDataProperties.swift in Sources */,
+				50814C9B27D8A3EC0072738F /* SettingsArtworkDisplayStyleVC.swift in Sources */,
 				5002565725E69DC800674CE1 /* SpinnerViewController.swift in Sources */,
 				5086F8832239A2B700546F5A /* GenericLibraryBackgroundSyncer.swift in Sources */,
 				50A85F05268A4B8D00FB3E31 /* CoreDataMigrationVersion.swift in Sources */,
@@ -1714,6 +1721,7 @@
 				5017996027CCE110002554E5 /* SettingsServerURLsVC.swift in Sources */,
 				5077F95122279DF40099CA91 /* PlaytimeSlider.swift in Sources */,
 				5086F87F22399D1900546F5A /* SubsonicServerApi.swift in Sources */,
+				50814C9D27D8A8190072738F /* SettingsArtworkDownloadVC.swift in Sources */,
 				5086F887223BD68C00546F5A /* SsArtistParserDelegate.swift in Sources */,
 				50F81EDE23BF6B1E00EAAC3E /* PlaylistMO+CoreDataClass.swift in Sources */,
 				501999DC26806B8600F72D37 /* NotificationBannerCustomization.swift in Sources */,

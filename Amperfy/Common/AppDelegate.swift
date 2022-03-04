@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         audioSessionHandler.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
         audioSessionHandler.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
         UIApplication.shared.beginReceivingRemoteControlEvents()
-        let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter.default())
+        let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(), persistentStorage: persistentStorage)
         curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
         let remoteCommandCenterHandler = RemoteCommandCenterHandler(musicPlayer: facadeImpl, backendAudioPlayer: backendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter.shared())
         remoteCommandCenterHandler.configureRemoteCommands()
@@ -81,6 +81,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let dlManager = DownloadManager(name: "ArtworkDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
         dlManager.isFailWithPopupError = false
         
+        dlManager.preDownloadIsValidCheck = { object in
+            guard let artwork = object as? Artwork else { return false }
+            switch self.persistentStorage.settings.artworkDownloadSetting {
+            case .updateOncePerSession:
+                return true
+            case .onlyOnce:
+                switch artwork.status {
+                case .NotChecked, .FetchError:
+                    return true
+                case .IsDefaultImage, .CustomImage:
+                    return false
+                }
+            case .never:
+                return false
+            }
+        }
+        
         let configuration = URLSessionConfiguration.default
         var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
         dlManager.urlSession = urlSession
@@ -94,7 +111,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return library.getUserStatistics(appVersion: Self.version)
     }()
     lazy var localNotificationManager = {
-        return LocalNotificationManager(userStatistics: userStatistics)
+        return LocalNotificationManager(userStatistics: userStatistics, persistentStorage: persistentStorage)
     }()
     lazy var backgroundFetchTriggeredSyncer = {
         return BackgroundFetchTriggeredSyncer(persistentStorage: persistentStorage, backendApi: backendApi, notificationManager: localNotificationManager)

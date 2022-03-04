@@ -12,6 +12,7 @@ class DownloadManager: NSObject, DownloadManageable {
     var backgroundFetchCompletionHandler: CompleteHandlerBlock?
     let log: OSLog
     var isFailWithPopupError: Bool = true
+    var preDownloadIsValidCheck: ((_ object: Downloadable) -> Bool)?
     
     
     private let eventLogger: EventLogger
@@ -32,6 +33,7 @@ class DownloadManager: NSObject, DownloadManageable {
     
     func download(object: Downloadable) {
         guard !object.isCached, persistentStorage.settings.isOnlineMode else { return }
+        if let isValidCheck = preDownloadIsValidCheck, !isValidCheck(object) { return }
         self.requestManager.add(object: object)
     }
     

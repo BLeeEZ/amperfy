@@ -457,7 +457,7 @@ class PlayerView: UIView {
     func refreshArtwork() {
         if let playableInfo = player.currentlyPlaying {
             artworkImage.display(entity: playableInfo)
-            rootView?.popupItem.image = playableInfo.image
+            rootView?.popupItem.image = playableInfo.image(setting: appDelegate.persistentStorage.settings.artworkDisplayStyle)
         } else {
             switch player.playerMode {
             case .music:
