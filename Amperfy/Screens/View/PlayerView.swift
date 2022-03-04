@@ -27,7 +27,7 @@ enum PlayerDisplayStyle: Int {
 
 class PlayerView: UIView {
   
-    static private let frameHeightCompact: CGFloat = 185 + margin.top + margin.bottom
+    static private let frameHeightCompact: CGFloat = 190 + margin.top + margin.bottom
     static private let margin = UIEdgeInsets(top: 0, left: UIView.defaultMarginX, bottom: 20, right: UIView.defaultMarginX)
     static private let defaultAnimationDuration = TimeInterval(0.50)
     
@@ -517,16 +517,19 @@ class PlayerView: UIView {
     }
     
     func refreshRepeatButton() {
-        switch player.repeatMode {
-        case .off:
-            repeatButton.setTitle(FontAwesomeIcon.Redo.asString, for: UIControl.State.normal)
-            repeatButton.isSelected = false
-        case .all:
-            repeatButton.setTitle(FontAwesomeIcon.Redo.asString + " all", for: UIControl.State.selected)
-            repeatButton.isSelected = true
-        case .single:
-            repeatButton.setTitle(FontAwesomeIcon.Redo.asString + " 1", for: UIControl.State.selected)
-            repeatButton.isSelected = true
+        UIView.performWithoutAnimation {
+            switch player.repeatMode {
+            case .off:
+                repeatButton.setTitle(FontAwesomeIcon.Redo.asString, for: UIControl.State.normal)
+                repeatButton.isSelected = false
+            case .all:
+                repeatButton.setTitle(FontAwesomeIcon.Redo.asString + " all", for: UIControl.State.selected)
+                repeatButton.isSelected = true
+            case .single:
+                repeatButton.setTitle(FontAwesomeIcon.Redo.asString + " 1", for: UIControl.State.selected)
+                repeatButton.isSelected = true
+            }
+            repeatButton.layoutIfNeeded()
         }
     }
     

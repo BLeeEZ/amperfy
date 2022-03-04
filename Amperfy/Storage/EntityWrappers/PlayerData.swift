@@ -226,7 +226,14 @@ extension PlayerData: PlayerQueuesPersistent {
                 return "Pocasts"
             }
         }
-        set { contextPlaylist.name = newValue }
+        set {
+            switch playerMode {
+            case .music:
+                contextPlaylist.name = newValue
+            case .podcast:
+                break
+            }
+        }
     }
     
     var currentIndex: Int {
