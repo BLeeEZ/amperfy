@@ -39,7 +39,7 @@ class DownloadManager: NSObject, DownloadManageable {
     
     func download(objects: [Downloadable]) {
         guard persistentStorage.settings.isOnlineMode else { return }
-        let downloadObjects = objects.filter{ !$0.isCached }
+        let downloadObjects = objects.filter{ !$0.isCached }.filter{ preDownloadIsValidCheck?($0) ?? true }
         if !downloadObjects.isEmpty {
             self.requestManager.add(objects: downloadObjects)
         }
