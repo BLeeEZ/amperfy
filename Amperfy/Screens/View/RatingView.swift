@@ -66,18 +66,21 @@ class RatingView: UIView {
     }
     
     private func refresh() {
-        let rating = ratingSong?.rating ?? ratingAlbum?.rating ?? ratingArtist?.rating ?? 0
-        for (index, button) in stars.enumerated() {
-            if index < rating {
-                button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameSolid, size: 30)!]), for: .normal)
-            } else {
-                button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameRegular, size: 30)!]), for: .normal)
+        UIView.performWithoutAnimation {
+            let rating = ratingSong?.rating ?? ratingAlbum?.rating ?? ratingArtist?.rating ?? 0
+            for (index, button) in stars.enumerated() {
+                if index < rating {
+                    button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameSolid, size: 30)!]), for: .normal)
+                } else {
+                    button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameRegular, size: 30)!]), for: .normal)
+                }
+                button.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
+                button.setTitleColor(self.appDelegate.persistentStorage.settings.isOnlineMode ? activeStarColor : inactiveStarColor, for: .normal)
+                button.tintColor = self.appDelegate.persistentStorage.settings.isOnlineMode ? activeStarColor : inactiveStarColor
+                button.layoutIfNeeded()
             }
-            button.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
-            button.setTitleColor(self.appDelegate.persistentStorage.settings.isOnlineMode ? activeStarColor : inactiveStarColor, for: .normal)
-            button.tintColor = self.appDelegate.persistentStorage.settings.isOnlineMode ? activeStarColor : inactiveStarColor
+            clearRatingButton.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
         }
-        clearRatingButton.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
     }
     
     private func setRating(rating: Int) {

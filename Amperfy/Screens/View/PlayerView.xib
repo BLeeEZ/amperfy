@@ -87,15 +87,16 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
-                    <rect key="frame" x="16" y="-5" width="40" height="40"/>
+                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
+                    <rect key="frame" x="0.0" y="-5" width="50" height="40"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="40" id="5uL-80-PHj"/>
-                        <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="P7Y-F5-gln"/>
+                        <constraint firstAttribute="width" constant="50" id="5uL-80-PHj"/>
+                        <constraint firstAttribute="height" constant="40" id="dOb-nc-wBt"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <color key="tintColor" systemColor="labelColor"/>
-                    <inset key="contentEdgeInsets" minX="-23" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    <inset key="contentEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
                     <state key="normal" image="player_style_compact">
                         <color key="titleColor" systemColor="labelColor"/>
                     </state>
@@ -340,7 +341,7 @@
                 <constraint firstItem="pOR-k2-6Vf" firstAttribute="top" secondItem="sop-QK-f5X" secondAttribute="top" constant="4" id="i5C-U2-zOK"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="leading" secondItem="2Oi-ys-XoJ" secondAttribute="leading" id="mYv-de-lse"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="msH-gV-d4u"/>
-                <constraint firstAttribute="leadingMargin" secondItem="ZVN-JG-VAA" secondAttribute="leading" id="nVY-5i-Hey"/>
+                <constraint firstAttribute="leading" secondItem="ZVN-JG-VAA" secondAttribute="leading" id="nVY-5i-Hey"/>
                 <constraint firstItem="l5j-2I-Ltc" firstAttribute="centerY" secondItem="0xq-hb-FZa" secondAttribute="centerY" id="p0d-su-MEF"/>
                 <constraint firstAttribute="trailingMargin" secondItem="6NT-8n-tg9" secondAttribute="trailing" id="ql5-mh-cpC"/>
                 <constraint firstItem="7xb-YR-9X6" firstAttribute="leading" secondItem="l5j-2I-Ltc" secondAttribute="trailing" constant="8" id="qwy-QH-8XT"/>

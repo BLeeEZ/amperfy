@@ -260,12 +260,12 @@ class PlayerView: UIView {
         
         self.artworkXPositionConstraint?.isActive = false
         self.artworkXPositionConstraint = NSLayoutConstraint(item: artworkContainerView!,
-                           attribute: .leading,
+                           attribute: .left,
                            relatedBy: .equal,
-                           toItem: rootView.view,
-                           attribute: .leadingMargin,
+                           toItem: displayPlaylistButton,
+                           attribute: .left,
                            multiplier: 1.0,
-                           constant: 0)
+                           constant: 16)
         self.artworkXPositionConstraint?.isActive = true
     
         UIView.animate(withDuration: animationDuration/3, delay: animationDuration/2, options: .curveEaseIn, animations: ({
