@@ -22,10 +22,8 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         
-        sortBarButton.title = FontAwesomeIcon.Sort.asString
-        sortBarButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .normal)
-        sortBarButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .selected)
-        
+        sortBarButton.image = UIImage.sort
+
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight))
         if let newPlaylistTableHeaderView = ViewBuilder<NewPlaylistTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight)) {
             tableView.tableHeaderView?.addSubview(newPlaylistTableHeaderView)

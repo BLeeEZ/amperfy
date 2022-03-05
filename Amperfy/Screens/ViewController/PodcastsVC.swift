@@ -28,9 +28,7 @@ class PodcastsVC: BasicTableViewController {
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: PodcastEpisodeTableCell.typeName)
 
-        sortButton = UIBarButtonItem(title: FontAwesomeIcon.Sort.asString, style: .plain, target: self, action: #selector(sortButtonPressed))
-        sortButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .normal)
-        sortButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .selected)
+        sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
         navigationItem.rightBarButtonItem = sortButton
         
         swipeDisplaySettings.playContextTypeOfElements = .podcast

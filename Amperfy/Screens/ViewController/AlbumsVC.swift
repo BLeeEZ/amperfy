@@ -18,9 +18,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
         
-        optionsButton = UIBarButtonItem(title: FontAwesomeIcon.Filter.asString, style: .plain, target: self, action: #selector(optionsPressed))
-        optionsButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .normal)
-        optionsButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: UIFont.buttonFontSize)!], for: .selected)
+        optionsButton = UIBarButtonItem(image: UIImage.filter, style: .plain, target: self, action: #selector(optionsPressed))
         navigationItem.rightBarButtonItem = optionsButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
@@ -67,8 +65,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     
     
     @objc private func optionsPressed() {
-        let alert = UIAlertController(title: "Albums", message: nil, preferredStyle: .actionSheet)
-
+        let alert = UIAlertController(title: "Albums filter", message: nil, preferredStyle: .actionSheet)
+        
         if displayFilter == .recentlyAdded {
             alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
                 self.displayFilter = .all
