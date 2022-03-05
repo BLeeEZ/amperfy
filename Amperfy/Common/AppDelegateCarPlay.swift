@@ -135,7 +135,7 @@ class CarPlayHandler: NSObject {
     }
     
     func populate() {
-        let artworkDisplayStyle = persistentStorage.settings.artworkDisplayStyle
+        let artworkDisplayStyle = persistentStorage.settings.artworkDisplayPreference
         let playlistsData = CarPlayTabData(title: "Playlists", image: UIImage.playlistCarplay, fetchCB: nil)
         playlistsData.fetchCB = { completionHandler in
             self.persistentStorage.context.performAndWait {

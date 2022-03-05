@@ -54,7 +54,7 @@ class LocalNotificationManager {
         let identifier = "podcast-\(podcastEpisode.podcast?.id ?? "0")-episode-\(podcastEpisode.id)"
         do {
             let fileIdentifier = identifier + ".png"
-            let artworkUrl = createLocalUrl(forImage: podcastEpisode.image(setting: persistentStorage.settings.artworkDisplayStyle), fileIdentifier: fileIdentifier)
+            let artworkUrl = createLocalUrl(forImage: podcastEpisode.image(setting: persistentStorage.settings.artworkDisplayPreference), fileIdentifier: fileIdentifier)
             let attachment = try UNNotificationAttachment(identifier: fileIdentifier, url: artworkUrl, options: nil)
             content.attachments = [attachment]
         } catch {

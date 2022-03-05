@@ -24,8 +24,8 @@ class NowPlayingInfoCenterHandler {
             MPMediaItemPropertyArtist: playable.creatorName,
             MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
-            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: playable.image(setting: persistentStorage.settings.artworkDisplayStyle).size, requestHandler: { (size) -> UIImage in
-                return playable.image(setting: self.persistentStorage.settings.artworkDisplayStyle)
+            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: playable.image(setting: persistentStorage.settings.artworkDisplayPreference).size, requestHandler: { (size) -> UIImage in
+                return playable.image(setting: self.persistentStorage.settings.artworkDisplayPreference)
             })
         ]
     }

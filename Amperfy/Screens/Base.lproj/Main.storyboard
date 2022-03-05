@@ -2833,7 +2833,7 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="1OR-vf-bKx"/>
                                                     </constraints>
-                                                    <state key="normal" title="Artwork display style">
+                                                    <state key="normal" title="Artwork display preference">
                                                         <color key="titleColor" systemColor="labelColor"/>
                                                     </state>
                                                     <connections>

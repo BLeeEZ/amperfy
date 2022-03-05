@@ -19,12 +19,12 @@ class SettingsArtworkDisplayStyleTableCell: UITableViewCell {
 class SettingsArtworkDisplayStyleVC: UITableViewController {
     
     var appDelegate: AppDelegate!
-    var settingOptions = [ArtworkDisplayStyle]()
+    var settingOptions = [ArtworkDisplayPreference]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        settingOptions = ArtworkDisplayStyle.allCases
+        settingOptions = ArtworkDisplayPreference.allCases
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -46,12 +46,12 @@ class SettingsArtworkDisplayStyleVC: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SettingsArtworkDisplayStyleTableCell = dequeueCell(for: tableView, at: indexPath)
         cell.settingLabel.text = settingOptions[indexPath.row].description
-        cell.setStatusLabel(isActive: settingOptions[indexPath.row] == appDelegate.persistentStorage.settings.artworkDisplayStyle)
+        cell.setStatusLabel(isActive: settingOptions[indexPath.row] == appDelegate.persistentStorage.settings.artworkDisplayPreference)
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        appDelegate.persistentStorage.settings.artworkDisplayStyle = settingOptions[indexPath.row]
+        appDelegate.persistentStorage.settings.artworkDisplayPreference = settingOptions[indexPath.row]
         reload()
     }
     

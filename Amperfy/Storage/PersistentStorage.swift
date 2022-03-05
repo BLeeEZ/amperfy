@@ -20,13 +20,13 @@ enum ArtworkDownloadSetting: Int, CaseIterable {
     }
 }
 
-enum ArtworkDisplayStyle: Int, CaseIterable {
+enum ArtworkDisplayPreference: Int, CaseIterable {
     case id3TagOnly = 0
     case serverArtworkOnly = 1
     case preferServerArtwork = 2
     case preferId3Tag = 3
     
-    static let defaultValue: ArtworkDisplayStyle = .preferId3Tag
+    static let defaultValue: ArtworkDisplayPreference = .preferId3Tag
     
     var description: String {
         switch self {
@@ -52,7 +52,7 @@ class PersistentStorage {
         case BackendApi = "backendApi"
         case LibraryIsSynced = "libraryIsSynced"
         case ArtworkDownloadSetting = "artworkDownloadSetting"
-        case ArtworkDisplayStyle = "artworkDisplayStyle"
+        case ArtworkDisplayPreference = "artworkDisplayPreference"
         
         case SongActionOnTab = "songActionOnTab"
         case SwipeLeadingActionSettings = "swipeLeadingActionSettings"
@@ -75,12 +75,12 @@ class PersistentStorage {
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtworkDownloadSetting.rawValue) }
         }
         
-        var artworkDisplayStyle: ArtworkDisplayStyle {
+        var artworkDisplayPreference: ArtworkDisplayPreference {
             get {
-                let artworkDisplayStyleRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ArtworkDisplayStyle.rawValue) as? Int ?? ArtworkDisplayStyle.defaultValue.rawValue
-                return ArtworkDisplayStyle(rawValue: artworkDisplayStyleRaw) ?? ArtworkDisplayStyle.defaultValue
+                let artworkDisplayStyleRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ArtworkDisplayPreference.rawValue) as? Int ?? ArtworkDisplayPreference.defaultValue.rawValue
+                return ArtworkDisplayPreference(rawValue: artworkDisplayStyleRaw) ?? ArtworkDisplayPreference.defaultValue
             }
-            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtworkDisplayStyle.rawValue) }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtworkDisplayPreference.rawValue) }
         }
         
         var playlistsSortSetting: PlaylistSortType {

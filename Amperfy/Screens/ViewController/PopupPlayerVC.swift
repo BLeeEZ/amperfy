@@ -91,7 +91,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func changeBackgroundGradient(forPlayable playable: AbstractPlayable) {
         var customColor: UIColor?
         let defaultArtwork = playable.defaultImage
-        let artwork = playable.image(setting: appDelegate.persistentStorage.settings.artworkDisplayStyle)
+        let artwork = playable.image(setting: appDelegate.persistentStorage.settings.artworkDisplayPreference)
 
         guard let playerView = playerView else { return }
         if playerView.lastDisplayedPlayable != playable {

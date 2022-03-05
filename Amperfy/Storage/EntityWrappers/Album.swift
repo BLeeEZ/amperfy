@@ -10,7 +10,7 @@ public class Album: AbstractLibraryEntity {
         self.managedObject = managedObject
         super.init(managedObject: managedObject)
     }
-    override func image(setting: ArtworkDisplayStyle) -> UIImage {
+    override func image(setting: ArtworkDisplayPreference) -> UIImage {
         switch setting {
         case .id3TagOnly:
             return embeddedArtworkImage ?? defaultImage

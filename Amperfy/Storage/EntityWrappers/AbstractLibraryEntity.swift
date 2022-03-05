@@ -59,7 +59,7 @@ public class AbstractLibraryEntity {
         }
     }
     
-    func image(setting: ArtworkDisplayStyle) -> UIImage {
+    func image(setting: ArtworkDisplayPreference) -> UIImage {
         guard let img = artwork?.image else {
             return defaultImage
         }
