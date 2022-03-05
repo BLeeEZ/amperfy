@@ -49,7 +49,7 @@ protocol LibrarySyncer {
     func sync(directory: Directory, library: LibraryStorage)
     func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage)
     func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode)
-    func recordPlay(song: Song)
+    func scrobble(song: Song, date: Date?)
     func setRating(song: Song, rating: Int)
     func setRating(album: Album, rating: Int)
     func setRating(artist: Artist, rating: Int)

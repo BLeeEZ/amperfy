@@ -4,16 +4,14 @@ class SongPlayedSyncer  {
     
     private static let minimumPlaytimeTillSyncedAsPlayedToServerInSec: UInt32 = 5
     
-    private let persistentStorage: PersistentStorage
     private let musicPlayer: MusicPlayer
     private let backendAudioPlayer: BackendAudioPlayer
-    private let backendApi: BackendApi
+    private let scrobbleSyncer: ScrobbleSyncer
 
-    init(persistentStorage: PersistentStorage, musicPlayer: MusicPlayer, backendAudioPlayer: BackendAudioPlayer, backendApi: BackendApi) {
-        self.persistentStorage = persistentStorage
+    init(musicPlayer: MusicPlayer, backendAudioPlayer: BackendAudioPlayer, scrobbleSyncer: ScrobbleSyncer) {
         self.musicPlayer = musicPlayer
         self.backendAudioPlayer = backendAudioPlayer
-        self.backendApi = backendApi
+        self.scrobbleSyncer = scrobbleSyncer
     }
     
     private func syncSongPlayed() {
@@ -21,22 +19,12 @@ class SongPlayedSyncer  {
         DispatchQueue.global().async {
             sleep(Self.minimumPlaytimeTillSyncedAsPlayedToServerInSec)
             DispatchQueue.main.async {
-                guard curPlaying == self.musicPlayer.currentlyPlaying, self.backendAudioPlayer.playType == .cache else { return }
-                self.syncSongPlayedToServer(playedSong: curPlayingSong)
+                guard self.backendAudioPlayer.isPlaying, curPlaying == self.musicPlayer.currentlyPlaying, self.backendAudioPlayer.playType == .cache else { return }
+                self.scrobbleSyncer.scrobble(playedSong: curPlayingSong)
             }
         }
     }
-    
-    private func syncSongPlayedToServer(playedSong: Song) {
-        guard persistentStorage.settings.isOnlineMode else { return }
-        persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncer = self.backendApi.createLibrarySyncer()
-            let songMO = try! context.existingObject(with: playedSong.managedObject.objectID) as! SongMO
-            let song = Song(managedObject: songMO)
-            syncer.recordPlay(song: song)
-        }
-    }
-    
+
 }
 
 extension SongPlayedSyncer: MusicPlayable {

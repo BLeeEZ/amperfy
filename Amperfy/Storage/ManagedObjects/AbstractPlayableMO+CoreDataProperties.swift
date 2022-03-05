@@ -21,9 +21,10 @@ extension AbstractPlayableMO {
     @NSManaged public var url: String?
     @NSManaged public var year: Int16
     @NSManaged public var download: DownloadMO?
+    @NSManaged public var embeddedArtwork: EmbeddedArtworkMO?
     @NSManaged public var file: PlayableFileMO?
     @NSManaged public var playlistItems: NSOrderedSet?
-    @NSManaged public var embeddedArtwork: EmbeddedArtworkMO?
+    @NSManaged public var scrobbleEntries: NSOrderedSet?
 
 }
 
@@ -59,5 +60,40 @@ extension AbstractPlayableMO {
 
     @objc(removePlaylistItems:)
     @NSManaged public func removeFromPlaylistItems(_ values: NSOrderedSet)
+
+}
+
+// MARK: Generated accessors for scrobbleEntries
+extension AbstractPlayableMO {
+
+    @objc(insertObject:inScrobbleEntriesAtIndex:)
+    @NSManaged public func insertIntoScrobbleEntries(_ value: ScrobbleEntryMO, at idx: Int)
+
+    @objc(removeObjectFromScrobbleEntriesAtIndex:)
+    @NSManaged public func removeFromScrobbleEntries(at idx: Int)
+
+    @objc(insertScrobbleEntries:atIndexes:)
+    @NSManaged public func insertIntoScrobbleEntries(_ values: [ScrobbleEntryMO], at indexes: NSIndexSet)
+
+    @objc(removeScrobbleEntriesAtIndexes:)
+    @NSManaged public func removeFromScrobbleEntries(at indexes: NSIndexSet)
+
+    @objc(replaceObjectInScrobbleEntriesAtIndex:withObject:)
+    @NSManaged public func replaceScrobbleEntries(at idx: Int, with value: ScrobbleEntryMO)
+
+    @objc(replaceScrobbleEntriesAtIndexes:withScrobbleEntries:)
+    @NSManaged public func replaceScrobbleEntries(at indexes: NSIndexSet, with values: [ScrobbleEntryMO])
+
+    @objc(addScrobbleEntriesObject:)
+    @NSManaged public func addToScrobbleEntries(_ value: ScrobbleEntryMO)
+
+    @objc(removeScrobbleEntriesObject:)
+    @NSManaged public func removeFromScrobbleEntries(_ value: ScrobbleEntryMO)
+
+    @objc(addScrobbleEntries:)
+    @NSManaged public func addToScrobbleEntries(_ values: NSOrderedSet)
+
+    @objc(removeScrobbleEntries:)
+    @NSManaged public func removeFromScrobbleEntries(_ values: NSOrderedSet)
 
 }

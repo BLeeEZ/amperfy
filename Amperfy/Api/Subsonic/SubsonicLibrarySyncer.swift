@@ -311,10 +311,14 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         library.saveContext()
     }
     
-    func recordPlay(song: Song) {
-        os_log("Record play: %s", log: log, type: .info, song.displayString)
+    func scrobble(song: Song, date: Date?) {
+        if let date = date {
+            os_log("Scrobbled at %s: %s", log: log, type: .info, date.description, song.displayString)
+        } else {
+            os_log("Scrobble now: %s", log: log, type: .info, song.displayString)
+        }
         let parser = SsXmlParser()
-        subsonicServerApi.requestRecordSongPlay(parserDelegate: parser, id: song.id)
+        subsonicServerApi.requestRecordSongPlay(parserDelegate: parser, id: song.id, date: date)
     }
     
     func setRating(song: Song, rating: Int) {

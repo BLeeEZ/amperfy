@@ -459,11 +459,14 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    func requestRecordPlay(parserDelegate: AmpacheXmlParser, song: Song) {
+    func requestRecordPlay(parserDelegate: AmpacheXmlParser, song: Song, date: Date?) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "record_play")
         if let username = credentials?.username {
             apiUrlComponent.addQueryItem(name: "user", value: username)
+        }
+        if let date = date {
+            apiUrlComponent.addQueryItem(name: "date", value: Int(date.timeIntervalSince1970))
         }
         apiUrlComponent.addQueryItem(name: "id", value: song.id)
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)

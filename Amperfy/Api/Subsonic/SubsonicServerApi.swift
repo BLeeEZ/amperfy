@@ -380,8 +380,11 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
 
-    func requestRecordSongPlay(parserDelegate: SsXmlParser, id: String) {
+    func requestRecordSongPlay(parserDelegate: SsXmlParser, id: String, date: Date?) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "scrobble") else { return }
+        if let date = date {
+            urlComp.addQueryItem(name: "date", value: Int(date.timeIntervalSince1970))
+        }
         urlComp.addQueryItem(name: "id", value: id)
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }

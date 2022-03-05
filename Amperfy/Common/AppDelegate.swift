@@ -44,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(playerStatus: playerData, queueHandler: queueHandler, playableDownloadManager: playableDownloadManager)
         curPlayer.addNotifier(notifier:  playerDownloadPreparationHandler)
-        let songPlayedSyncer = SongPlayedSyncer(persistentStorage: persistentStorage, musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, backendApi: backendApi)
+        let songPlayedSyncer = SongPlayedSyncer(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, scrobbleSyncer: scrobbleSyncer)
         curPlayer.addNotifier(notifier: songPlayedSyncer)
 
         let facadeImpl = PlayerFacadeImpl(playerStatus: playerData, queueHandler: queueHandler, musicPlayer: curPlayer, library: library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
@@ -103,6 +103,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dlManager.urlSession = urlSession
         
         return dlManager
+    }()
+    lazy var scrobbleSyncer = {
+        return ScrobbleSyncer(persistentStorage: persistentStorage, backendApi: backendApi)
     }()
     lazy var libraryUpdater = {
         return LibraryUpdater(persistentStorage: persistentStorage, backendApi: backendApi)
@@ -173,6 +176,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         libraryUpdater.performBlockingLibraryUpdatesIfNeeded()
         artworkDownloadManager.start()
         playableDownloadManager.start()
+        scrobbleSyncer.start()
         userStatistics.sessionStarted()
         carPlayHandler.initialize()
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()

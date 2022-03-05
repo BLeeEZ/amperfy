@@ -25,12 +25,16 @@ class SettingsVC: UITableViewController {
     @IBAction func triggeredOfflineModeSwitch(_ sender: Any) {
         appDelegate.persistentStorage.settings.isOfflineMode = offlineModeSwitch.isOn
         appDelegate.player.isOfflineMode = offlineModeSwitch.isOn
+        if !offlineModeSwitch.isOn {
+            appDelegate.scrobbleSyncer.start()
+        }
     }
     
     @IBAction func resetAppPressed(_ sender: Any) {
         let alert = UIAlertController(title: "Reset app data", message: "Are you sure to reset app data?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in
             self.appDelegate.player.stop()
+            self.appDelegate.scrobbleSyncer.stopAndWait()
             self.appDelegate.artworkDownloadManager.stopAndWait()
             self.appDelegate.playableDownloadManager.stopAndWait()
             self.appDelegate.persistentStorage.context.reset()

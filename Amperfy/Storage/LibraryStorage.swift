@@ -17,7 +17,7 @@ enum PlaylistSearchCategory: Int {
 
 class LibraryStorage: PlayableFileCachable {
     
-    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName]
+    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName, ScrobbleEntry.typeName]
     static var carPlayMaxElements = 12
 
     private let log = OSLog(subsystem: AppDelegate.name, category: "LibraryStorage")
@@ -59,6 +59,12 @@ class LibraryStorage: PlayableFileCachable {
     
     var songCount: Int {
         return (try? context.count(for: SongMO.fetchRequest())) ?? 0
+    }
+    
+    var uploadableScrobbleEntryCount: Int {
+        let fetchRequest = ScrobbleEntryMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == FALSE", #keyPath(ScrobbleEntryMO.isUploaded))
+        return (try? context.count(for: fetchRequest)) ?? 0
     }
     
     var syncWaveCount: Int {
@@ -162,6 +168,15 @@ class LibraryStorage: PlayableFileCachable {
     func createPlayableFile() -> PlayableFile {
         let playableFileMO = PlayableFileMO(context: context)
         return PlayableFile(managedObject: playableFileMO)
+    }
+    
+    func createScrobbleEntry() -> ScrobbleEntry {
+        let scrobbleEntryMO = ScrobbleEntryMO(context: context)
+        return ScrobbleEntry(managedObject: scrobbleEntryMO)
+    }
+    
+    func deleteScrobbleEntry(_ scrobbleEntry: ScrobbleEntry) {
+        context.delete(scrobbleEntry.managedObject)
     }
     
     func createMusicFolder() -> MusicFolder {
@@ -538,6 +553,17 @@ class LibraryStorage: PlayableFileCachable {
         let foundSongs = try? context.fetch(fetchRequest)
         let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
         return songs ?? [Song]()
+    }
+    
+    func getFirstUploadableScrobbleEntry() -> ScrobbleEntry? {
+        let fetchRequest = ScrobbleEntryMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(ScrobbleEntryMO.date), ascending: true) // oldest first
+        ]
+        fetchRequest.predicate = NSPredicate(format: "%K == FALSE", #keyPath(ScrobbleEntryMO.isUploaded))
+        fetchRequest.fetchLimit = 1
+        let entries = try? context.fetch(fetchRequest)
+        return entries?.lazy.compactMap{ ScrobbleEntry(managedObject: $0) }.first
     }
     
     func getPlaylists() -> [Playlist] {
