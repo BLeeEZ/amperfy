@@ -14,7 +14,7 @@ class RatingView: UIView {
     private var appDelegate: AppDelegate!
     private var libraryEntity: AbstractLibraryEntity?
     
-    var activeStarColor: UIColor = .backgroundColor
+    var activeStarColor: UIColor = .yellow
     var inactiveStarColor: UIColor = .secondaryLabelColor
     
     lazy var stars: [UIButton] = {

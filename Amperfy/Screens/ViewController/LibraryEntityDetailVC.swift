@@ -232,12 +232,6 @@ class LibraryEntityDetailVC: UIViewController {
 
     func refresh() {
         entityImage.display(container: entityContainer)
-        if let libraryEntity = entityContainer as? AbstractLibraryEntity, entityContainer.isRateable {
-            ratingView?.display(entity: libraryEntity)
-            ratingPlaceholderView.isHidden = false
-        } else {
-            ratingPlaceholderView.isHidden = true
-        }
         titleLabel.text = entityContainer.name
         artistLabel.text = entityContainer.subtitle
         artistContainerView.isHidden = entityContainer.subtitle == nil
@@ -285,6 +279,13 @@ class LibraryEntityDetailVC: UIViewController {
             configureFor(podcast: podcast)
         }
         Self.configureRoundButtonCluster(buttons: buttonsOfMainCluster, containerView: mainClusterStackView, hightConstraint: mainStackClusterHeightConstraint, buttonHeight: playButtonHeightConstraint.constant)
+        
+        if let libraryEntity = entityContainer as? AbstractLibraryEntity, entityContainer.isRateable {
+            ratingView?.display(entity: libraryEntity)
+            ratingPlaceholderView.isHidden = false
+        } else {
+            ratingPlaceholderView.isHidden = true
+        }
     }
 
     private func configureFor(playlist: Playlist) {
