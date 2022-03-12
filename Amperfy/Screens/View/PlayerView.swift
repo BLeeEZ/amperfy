@@ -79,8 +79,9 @@ class PlayerView: UIView {
     @IBOutlet weak var remainingTimeToArtworkDistanceConstraint: NSLayoutConstraint!
     @IBOutlet weak var ratingToBottomControlDistanceConstraint: NSLayoutConstraint!
     
+    private var bottomSpaceHeight: CGFloat = 0.0
+    
     static let sliderLabelToSliderDistance = 12.0
-    static let largeBottomMargin = 16.0
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -290,17 +291,24 @@ class PlayerView: UIView {
         }
     }
     
+    static let minInfoLargeToProgressHeight = 10.0
+    static let minBottomControlToProgressHeight = 20.0
+    static let minRatingToBottomControlHeight = 20.0
+    static let minLargeBottomMargin = 16.0
+    
     private func renderAnimationSwitchToLarge(animationDuration: TimeInterval = defaultAnimationDuration) {
         guard let rootView = self.rootView else { return }
-        infoLargeToProgressDistanceConstraint.constant = 20.0
-        bottomControlToProgressDistanceConstraint.constant = titleLargeLabel.frame.height + artistNameLargeLabel.frame.height + artistToTitleLargeDistanceConstraint.constant + infoLargeToProgressDistanceConstraint.constant + 20.0
+        infoLargeToProgressDistanceConstraint.constant = Self.minInfoLargeToProgressHeight
+        bottomControlToProgressDistanceConstraint.constant = titleLargeLabel.frame.height + artistNameLargeLabel.frame.height + artistToTitleLargeDistanceConstraint.constant + infoLargeToProgressDistanceConstraint.constant + Self.minBottomControlToProgressHeight
+        ratingToBottomControlDistanceConstraint.constant = Self.minRatingToBottomControlHeight
         timeSliderToArtworkDistanceConstraint.constant = 18
         elapsedTimeToArtworkDistanceConstraint.constant = timeSliderToArtworkDistanceConstraint.constant + Self.sliderLabelToSliderDistance
         remainingTimeToArtworkDistanceConstraint.constant = timeSliderToArtworkDistanceConstraint.constant + Self.sliderLabelToSliderDistance
+        bottomSpaceHeight = Self.minLargeBottomMargin
 
         let availableRootWidth = rootView.frameSizeWithRotationAdjusment.width - PlayerView.margin.left -  PlayerView.margin.right
         let availableRootHeight = rootView.availableFrameHeightForLargePlayer
-        
+
         var elementsBelowArtworkHeight = timeSliderToArtworkDistanceConstraint.constant
         elementsBelowArtworkHeight += timeSlider.frame.size.height
         elementsBelowArtworkHeight += infoLargeToProgressDistanceConstraint.constant
@@ -310,16 +318,21 @@ class PlayerView: UIView {
         elementsBelowArtworkHeight += playButton.frame.size.height
         elementsBelowArtworkHeight += ratingToBottomControlDistanceConstraint.constant
         elementsBelowArtworkHeight += ratingPlaceholderView.frame.size.height
-        elementsBelowArtworkHeight += Self.largeBottomMargin
+        elementsBelowArtworkHeight += bottomSpaceHeight
         
         let planedArtworkHeight = availableRootWidth
-        let fullLargeHeight = artworkContainerView.frame.origin.y + planedArtworkHeight + elementsBelowArtworkHeight +  PlayerView.margin.bottom
+        let fullLargeHeight = artworkContainerView.frame.origin.y + planedArtworkHeight + elementsBelowArtworkHeight + bottomSpaceHeight + PlayerView.margin.bottom
 
         // Set artwork size depending on device height
         if availableRootHeight < fullLargeHeight {
             artworkWidthConstraint.constant = availableRootHeight - (fullLargeHeight-planedArtworkHeight)
         } else {
-            artworkWidthConstraint.constant = availableRootWidth
+            artworkWidthConstraint.constant = planedArtworkHeight
+            let availableBottomLeftOverSpace = availableRootHeight - fullLargeHeight
+            infoLargeToProgressDistanceConstraint.constant += availableBottomLeftOverSpace / 4
+            bottomControlToProgressDistanceConstraint.constant += availableBottomLeftOverSpace / 2
+            ratingToBottomControlDistanceConstraint.constant += availableBottomLeftOverSpace / 4
+            bottomSpaceHeight += availableBottomLeftOverSpace / 4
         }
         
         self.infoCompactToArtworkDistanceConstraint?.isActive = false

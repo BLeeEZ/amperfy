@@ -42,8 +42,8 @@
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zQR-aF-4SD" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
                             <constraints>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="450" id="T9w-1q-nDG"/>
                                 <constraint firstAttribute="width" secondItem="zQR-aF-4SD" secondAttribute="height" multiplier="1:1" id="e6F-Wc-jET"/>
-                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="300" id="mqC-xb-C7r"/>
                             </constraints>
                         </imageView>
                     </subviews>
