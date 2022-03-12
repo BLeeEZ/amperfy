@@ -84,7 +84,9 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         let wasUserQueuePlaying = queueHandler.isUserQueuePlaying
         queueHandler.clearActiveQueue()
         queueHandler.appendActiveQueue(playables: context.playables)
-        queueHandler.contextName = context.name
+        if context.type == .music {
+            queueHandler.contextName = context.name
+        }
         if !wasUserQueuePlaying {
             if context.index == 0 {
                 insertIntoPlayer(playable: activePlayable)

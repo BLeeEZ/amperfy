@@ -223,16 +223,11 @@ extension PlayerData: PlayerQueuesPersistent {
             case .music:
                 return contextPlaylist.name
             case .podcast:
-                return "Pocasts"
+                return "Podcasts"
             }
         }
         set {
-            switch playerMode {
-            case .music:
-                contextPlaylist.name = newValue
-            case .podcast:
-                break
-            }
+            contextPlaylist.name = newValue
         }
     }
     

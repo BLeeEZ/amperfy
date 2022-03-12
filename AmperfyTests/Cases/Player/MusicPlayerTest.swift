@@ -896,6 +896,42 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertEqual(testPlayer.nextQueue[0].id, songId5.id)
     }
     
+    func testPlay_ContextNameChanges() {
+        playerData.removeAllItems()
+        guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+        guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+        
+        testPlayer.play(context: PlayContext(name: "Blub", playables: [songId0, songId1]))
+        XCTAssertEqual(testPlayer.contextName, "Blub")
+        testPlayer.setPlayerMode(.podcast)
+        XCTAssertEqual(testPlayer.contextName, "Podcasts")
+        testPlayer.appendContextQueue(playables: [songId0])
+        XCTAssertEqual(testPlayer.contextName, "Podcasts")
+        testPlayer.setPlayerMode(.music)
+        XCTAssertEqual(testPlayer.contextName, "Mixed Context")
+        
+        testPlayer.play(context: PlayContext(name: "YYYY", playables: [songId0, songId1]))
+        XCTAssertEqual(testPlayer.contextName, "YYYY")
+        testPlayer.play(context: PlayContext(name: "GoGo Podcasts", type: .podcast, playables: [songId0, songId1]))
+        XCTAssertEqual(testPlayer.contextName, "Podcasts")
+        testPlayer.setPlayerMode(.music)
+        XCTAssertEqual(testPlayer.contextName, "YYYY")
+        
+        testPlayer.play(context: PlayContext(name: "BBBB", playables: [songId0, songId1]))
+        XCTAssertEqual(testPlayer.contextName, "BBBB")
+        testPlayer.appendPodcastQueue(playables: [songId0])
+        XCTAssertEqual(testPlayer.contextName, "BBBB")
+        testPlayer.setPlayerMode(.podcast)
+        XCTAssertEqual(testPlayer.contextName, "Podcasts")
+        testPlayer.insertPodcastQueue(playables: [songId0])
+        testPlayer.setPlayerMode(.music)
+        XCTAssertEqual(testPlayer.contextName, "BBBB")
+
+        testPlayer.setPlayerMode(.music)
+        testPlayer.insertContextQueue(playables: [songId0])
+        XCTAssertEqual(testPlayer.contextName, "Mixed Context")
+    }
+    
     func testSeek_EmptyPlaylist() {
         testPlayer.seek(toSecond: 3.0)
         XCTAssertEqual(testPlayer.elapsedTime, 0.0)
