@@ -42,6 +42,9 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
             artistBuffer?.name = buffer
 		case "rating":
             rating = Int(buffer) ?? 0
+        case "flag":
+            let flag = Int(buffer) ?? 0
+            artistBuffer?.isFavorite = flag == 1 ? true : false
         case "albumcount":
             artistBuffer?.albumCount = Int(buffer) ?? 0
         case "genre":

@@ -31,7 +31,8 @@ class SsArtistParserDelegate: SsXmlLibWithArtworkParser {
                 artistBuffer?.artwork = parseArtwork(id: attributeCoverArtId)
             }
             artistBuffer?.rating = Int(attributeDict["userRating"] ?? "0") ?? 0
-		}    
+            artistBuffer?.isFavorite = attributeDict["starred"] != nil
+		}
     }
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {

@@ -342,6 +342,24 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         subsonicServerApi.requestRating(parserDelegate: parser, id: artist.id, rating: rating)
     }
     
+    func setFavorite(song: Song, isFavorite: Bool) {
+        os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", song.displayString)
+        let parser = SsXmlParser()
+        subsonicServerApi.requestSetFavorite(parserDelegate: parser, songId: song.id, isFavorite: isFavorite)
+    }
+    
+    func setFavorite(album: Album, isFavorite: Bool) {
+        os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", album.name)
+        let parser = SsXmlParser()
+        subsonicServerApi.requestSetFavorite(parserDelegate: parser, albumId: album.id, isFavorite: isFavorite)
+    }
+    
+    func setFavorite(artist: Artist, isFavorite: Bool) {
+        os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", artist.name)
+        let parser = SsXmlParser()
+        subsonicServerApi.requestSetFavorite(parserDelegate: parser, artistId: artist.id, isFavorite: isFavorite)
+    }
+    
     func searchArtists(searchText: String, library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
         os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)

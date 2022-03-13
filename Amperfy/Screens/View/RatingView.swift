@@ -8,14 +8,16 @@ class RatingView: UIView {
     @IBOutlet weak var starThree: UIButton!
     @IBOutlet weak var starFour: UIButton!
     @IBOutlet weak var starFive: UIButton!
-
+    @IBOutlet weak var favorite: UIButton!
+    
     static let frameHeight: CGFloat = 35.0
 
     private var appDelegate: AppDelegate!
     private var libraryEntity: AbstractLibraryEntity?
     
-    var activeStarColor: UIColor = .yellow
+    var activeStarColor: UIColor = .gold
     var inactiveStarColor: UIColor = .secondaryLabelColor
+    var activeFavoriteColor: UIColor = .systemRed
     
     lazy var stars: [UIButton] = {
         var stars = [UIButton]()
@@ -68,6 +70,7 @@ class RatingView: UIView {
     private func refresh() {
         UIView.performWithoutAnimation {
             let rating = ratingSong?.rating ?? ratingAlbum?.rating ?? ratingArtist?.rating ?? 0
+            let isFavorite = ratingSong?.isFavorite ?? ratingAlbum?.isFavorite ?? ratingArtist?.isFavorite ?? false
             for (index, button) in stars.enumerated() {
                 if index < rating {
                     button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameSolid, size: 30)!]), for: .normal)
@@ -80,6 +83,13 @@ class RatingView: UIView {
                 button.layoutIfNeeded()
             }
             clearRatingButton.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
+            
+            let favoriteActiveFontName = isFavorite ? FontAwesomeIcon.fontNameSolid : FontAwesomeIcon.fontNameRegular
+            favorite.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Heart.asString, attributes: [NSAttributedString.Key.font: UIFont(name: favoriteActiveFontName, size: 30)!]), for: .normal)
+            favorite.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
+            favorite.setTitleColor(self.appDelegate.persistentStorage.settings.isOnlineMode ? activeFavoriteColor : inactiveStarColor, for: .normal)
+            favorite.tintColor = self.appDelegate.persistentStorage.settings.isOnlineMode ? activeFavoriteColor : inactiveStarColor
+            favorite.layoutIfNeeded()
         }
     }
     
@@ -100,6 +110,31 @@ class RatingView: UIView {
                 let artistAsync = Artist(managedObject: context.object(with: artist.managedObject.objectID) as! ArtistMO)
                 syncer.setRating(artist: artistAsync, rating: rating)
                 artistAsync.rating = rating
+            }
+            syncLibrary.saveContext()
+            DispatchQueue.main.async {
+                self.refresh()
+            }
+        }
+    }
+    
+    func setFavorit(isFavorite: Bool) {
+        guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+            let syncLibrary = LibraryStorage(context: context)
+            let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
+            if let song = self.ratingSong {
+                let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
+                syncer.setFavorite(song: songAsync, isFavorite: isFavorite)
+                songAsync.isFavorite = isFavorite
+            } else if let album = self.ratingAlbum {
+                let albumAsync = Album(managedObject: context.object(with: album.managedObject.objectID) as! AlbumMO)
+                syncer.setFavorite(album: albumAsync, isFavorite: isFavorite)
+                albumAsync.isFavorite = isFavorite
+            } else if let artist = self.ratingArtist {
+                let artistAsync = Artist(managedObject: context.object(with: artist.managedObject.objectID) as! ArtistMO)
+                syncer.setFavorite(artist: artistAsync, isFavorite: isFavorite)
+                artistAsync.isFavorite = isFavorite
             }
             syncLibrary.saveContext()
             DispatchQueue.main.async {
@@ -131,4 +166,10 @@ class RatingView: UIView {
     @IBAction func starFivePressed(_ sender: Any) {
         setRating(rating: 5)
     }
+    
+    @IBAction func favoritePressed(_ sender: Any) {
+        let isFavorite = ratingSong?.isFavorite ?? ratingAlbum?.isFavorite ?? ratingArtist?.isFavorite ?? false
+        setFavorit(isFavorite: !isFavorite)
+    }
+    
 }

@@ -69,6 +69,9 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
             albumBuffer = nil
         case "rating":
             rating = Int(buffer) ?? 0
+        case "flag":
+            let flag = Int(buffer) ?? 0
+            albumBuffer?.isFavorite = flag == 1 ? true : false
 		case "year":
             albumBuffer?.year = Int(buffer) ?? 0
         case "songcount":

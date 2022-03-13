@@ -183,7 +183,7 @@
                         </stackView>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ms2-ug-0W5" userLabel="RatingPlaceholder">
                             <rect key="frame" x="0.0" y="98" width="984" height="45"/>
-                            <color key="backgroundColor" systemColor="systemFillColor"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="45" id="0f6-ht-NEA"/>
                             </constraints>

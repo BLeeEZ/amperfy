@@ -53,6 +53,9 @@ protocol LibrarySyncer {
     func setRating(song: Song, rating: Int)
     func setRating(album: Album, rating: Int)
     func setRating(artist: Artist, rating: Int)
+    func setFavorite(song: Song, isFavorite: Bool)
+    func setFavorite(album: Album, isFavorite: Bool)
+    func setFavorite(artist: Artist, isFavorite: Bool)
 }
 
 protocol AbstractBackgroundLibrarySyncer {

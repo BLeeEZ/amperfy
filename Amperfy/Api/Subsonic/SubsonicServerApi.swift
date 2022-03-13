@@ -397,6 +397,27 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
+    func requestSetFavorite(parserDelegate: SsXmlParser, songId: String, isFavorite: Bool) {
+        let apiFavoriteAction = isFavorite ? "star" : "unstar"
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: apiFavoriteAction) else { return }
+        urlComp.addQueryItem(name: "id", value: songId)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
+    func requestSetFavorite(parserDelegate: SsXmlParser, albumId: String, isFavorite: Bool) {
+        let apiFavoriteAction = isFavorite ? "star" : "unstar"
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: apiFavoriteAction) else { return }
+        urlComp.addQueryItem(name: "albumId", value: albumId)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
+    func requestSetFavorite(parserDelegate: SsXmlParser, artistId: String, isFavorite: Bool) {
+        let apiFavoriteAction = isFavorite ? "star" : "unstar"
+        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: apiFavoriteAction) else { return }
+        urlComp.addQueryItem(name: "artistId", value: artistId)
+        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    }
+    
     private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: SsXmlParser, ignoreErrorResponse: Bool = false) {
         guard let url = fromUrlComponent.url else {
             os_log("URL could not be created: %s", log: log, type: .error, fromUrlComponent.description)

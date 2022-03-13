@@ -24,6 +24,10 @@ public class AbstractLibraryEntity {
             if managedObject.id != newValue { managedObject.id = newValue }
         }
     }
+    var isFavorite: Bool {
+        get { return managedObject.isFavorite }
+        set { managedObject.isFavorite = newValue }
+    }
     var rating: Int {
         get { return Int(managedObject.rating) }
         set {

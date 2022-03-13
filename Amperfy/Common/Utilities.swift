@@ -198,6 +198,10 @@ extension UIColor {
         return UIView().tintColor
     }
     
+    static var gold: UIColor {
+        return UIColor(displayP3Red: 241/255, green: 194/255, blue: 66/255, alpha: 1.0)
+    }
+    
     static var labelColor: UIColor {
         if #available(iOS 13.0, *) {
             return UIColor.label

@@ -501,6 +501,36 @@ class AmpacheXmlServerApi {
         let errorParser = AmpacheXmlParser()
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
     }
+
+    func requestSetFavorite(song: Song, isFavorite: Bool) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "flag")
+        apiUrlComponent.addQueryItem(name: "type", value: "song")
+        apiUrlComponent.addQueryItem(name: "id", value: song.id)
+        apiUrlComponent.addQueryItem(name: "flag", value: isFavorite ? 1 : 0)
+        let errorParser = AmpacheXmlParser()
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
+    }
+    
+    func requestSetFavorite(album: Album, isFavorite: Bool) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "flag")
+        apiUrlComponent.addQueryItem(name: "type", value: "album")
+        apiUrlComponent.addQueryItem(name: "id", value: album.id)
+        apiUrlComponent.addQueryItem(name: "flag", value: isFavorite ? 1 : 0)
+        let errorParser = AmpacheXmlParser()
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
+    }
+    
+    func requestSetFavorite(artist: Artist, isFavorite: Bool) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "flag")
+        apiUrlComponent.addQueryItem(name: "type", value: "artist")
+        apiUrlComponent.addQueryItem(name: "id", value: artist.id)
+        apiUrlComponent.addQueryItem(name: "flag", value: isFavorite ? 1 : 0)
+        let errorParser = AmpacheXmlParser()
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: errorParser)
+    }
     
     func requestSearchArtists(parserDelegate: AmpacheXmlParser, searchText: String) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }

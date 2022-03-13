@@ -372,6 +372,21 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         ampacheXmlServerApi.requestRate(artist: artist, rating: rating)
     }
     
+    func setFavorite(song: Song, isFavorite: Bool) {
+        os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", song.displayString)
+        ampacheXmlServerApi.requestSetFavorite(song: song, isFavorite: isFavorite)
+    }
+    
+    func setFavorite(album: Album, isFavorite: Bool) {
+        os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", album.name)
+        ampacheXmlServerApi.requestSetFavorite(album: album, isFavorite: isFavorite)
+    }
+    
+    func setFavorite(artist: Artist, isFavorite: Bool) {
+        os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", artist.name)
+        ampacheXmlServerApi.requestSetFavorite(artist: artist, isFavorite: isFavorite)
+    }
+    
     func searchArtists(searchText: String, library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
         os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)

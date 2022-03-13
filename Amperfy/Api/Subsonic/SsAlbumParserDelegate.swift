@@ -31,6 +31,7 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
                 albumBuffer?.artwork = parseArtwork(id: attributeCoverArt)
             }
             albumBuffer?.rating = Int(attributeDict["userRating"] ?? "0") ?? 0
+            albumBuffer?.isFavorite = attributeDict["starred"] != nil
             if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
                 albumBuffer?.year = year
             }
