@@ -253,6 +253,11 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
+    func requestFavoriteElements() -> Data? {
+        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getStarred2") else { return nil }
+        return requestData(fromUrlComponent: urlComp)
+    }
+    
     func requestLatestAlbums(parserDelegate: SsXmlParser) {
         guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getAlbumList2") else { return }
         urlComp.addQueryItem(name: "type", value: "newest")
@@ -418,12 +423,17 @@ class SubsonicServerApi {
         request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
-    private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: SsXmlParser, ignoreErrorResponse: Bool = false) {
+    private func requestData(fromUrlComponent: URLComponents) -> Data? {
         guard let url = fromUrlComponent.url else {
             os_log("URL could not be created: %s", log: log, type: .error, fromUrlComponent.description)
-            return
+            return nil
         }
-        let parser = XMLParser(contentsOf: url)!
+        return try? Data(contentsOf: url)
+    }
+    
+    private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: SsXmlParser, ignoreErrorResponse: Bool = false) {
+        guard let requestedData = requestData(fromUrlComponent: fromUrlComponent) else { return }
+        let parser = XMLParser(data: requestedData)
         parser.delegate = parserDelegate
         parser.parse()
         if !ignoreErrorResponse, let error = parserDelegate.error, let subsonicError = error.asSubsonicError {

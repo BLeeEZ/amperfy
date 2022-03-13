@@ -5,6 +5,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
     private var fetchedResultsController: SongsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
+    private var filterButton: UIBarButtonItem!
     private var displayFilter: DisplayCategoryFilter = .all
     
     override func viewDidLoad() {
@@ -19,13 +20,22 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.rowHeight = SongTableCell.rowHeight
         
         optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
-        navigationItem.rightBarButtonItem = optionsButton
+        filterButton = UIBarButtonItem(image: UIImage.filter, style: .plain, target: self, action: #selector(filterButtonPressed))
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         swipeCallback = { (indexPath, completionHandler) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
             completionHandler(SwipeActionContext(containable: song, playContext: playContext))
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if appDelegate.persistentStorage.settings.isOnlineMode {
+            navigationItem.rightBarButtonItems = [optionsButton, filterButton]
+        } else {
+            navigationItem.rightBarButtonItems = [filterButton]
         }
     }
 
@@ -65,17 +75,29 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.reloadData()
     }
     
-    @objc private func optionsPressed() {
-        let alert = UIAlertController(title: "Songs", message: nil, preferredStyle: .actionSheet)
-
-        if displayFilter == .recentlyAdded {
-            alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
-                self.displayFilter = .all
+    @objc private func filterButtonPressed() {
+        let alert = UIAlertController(title: "Songs filter", message: nil, preferredStyle: .actionSheet)
+        
+        if displayFilter != .favorites {
+            alert.addAction(UIAlertAction(title: "Show favorites", style: .default, handler: { _ in
+                self.displayFilter = .favorites
                 self.updateSearchResults(for: self.searchController)
+                if self.appDelegate.persistentStorage.settings.isOnlineMode {
+                    self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                        let syncLibrary = LibraryStorage(context: context)
+                        let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                        syncer.syncFavoriteLibraryElements(library: syncLibrary)
+                        DispatchQueue.main.async {
+                            self.updateSearchResults(for: self.searchController)
+                        }
+                    }
+                }
             }))
-        } else {
+        }
+        if displayFilter != .recentlyAdded {
             alert.addAction(UIAlertAction(title: "Show recently added", style: .default, handler: { _ in
                 self.displayFilter = .recentlyAdded
+                self.updateSearchResults(for: self.searchController)
                 if self.appDelegate.persistentStorage.settings.isOnlineMode {
                     self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                         let syncLibrary = LibraryStorage(context: context)
@@ -85,13 +107,24 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                             self.updateSearchResults(for: self.searchController)
                         }
                     }
-                } else {
-                    DispatchQueue.main.async {
-                        self.updateSearchResults(for: self.searchController)
-                    }
                 }
             }))
         }
+        if displayFilter != .all {
+            alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
+                self.displayFilter = .all
+                self.updateSearchResults(for: self.searchController)
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
+        present(alert, animated: true, completion: nil)
+    }
+     
+    @objc private func optionsPressed() {
+        let alert = UIAlertController(title: "Songs", message: nil, preferredStyle: .actionSheet)
+
         if self.appDelegate.persistentStorage.settings.isOnlineMode {
             alert.addAction(UIAlertAction(title: "Play random songs", style: .default, handler: { _ in
                 self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in

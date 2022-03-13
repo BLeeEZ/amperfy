@@ -66,6 +66,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func sync(album: Album, library: LibraryStorage) {}
     func sync(song: Song, library: LibraryStorage) {}
     func syncLatestLibraryElements(library: LibraryStorage) {}
+    func syncFavoriteLibraryElements(library: LibraryStorage) {}
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {}
     func syncDown(playlist: Playlist, library: LibraryStorage) {}
     func syncUpload(playlistToUpdateName playlist: Playlist, library: LibraryStorage) {}
@@ -87,6 +88,9 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func setRating(song: Song, rating: Int) {}
     func setRating(album: Album, rating: Int) {}
     func setRating(artist: Artist, rating: Int) {}
+    func setFavorite(song: Song, isFavorite: Bool) {}
+    func setFavorite(album: Album, isFavorite: Bool) {}
+    func setFavorite(artist: Artist, isFavorite: Bool) {}
 }
 
 class MOCK_BackgroundLibrarySyncer: BackgroundLibrarySyncer {

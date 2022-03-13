@@ -360,6 +360,36 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
+    func requestFavoriteArtists(parserDelegate: AmpacheXmlParser) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "advanced_search")
+        apiUrlComponent.addQueryItem(name: "rule_1", value: "favorite")
+        apiUrlComponent.addQueryItem(name: "rule_1_operator", value: 0)
+        apiUrlComponent.addQueryItem(name: "rule_1_input", value: "")
+        apiUrlComponent.addQueryItem(name: "type", value: "artist")
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
+    func requestFavoriteAlbums(parserDelegate: AmpacheXmlParser) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "advanced_search")
+        apiUrlComponent.addQueryItem(name: "rule_1", value: "favorite")
+        apiUrlComponent.addQueryItem(name: "rule_1_operator", value: 0)
+        apiUrlComponent.addQueryItem(name: "rule_1_input", value: "")
+        apiUrlComponent.addQueryItem(name: "type", value: "album")
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
+    func requestFavoriteSongs(parserDelegate: AmpacheXmlParser) {
+        guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
+        apiUrlComponent.addQueryItem(name: "action", value: "advanced_search")
+        apiUrlComponent.addQueryItem(name: "rule_1", value: "favorite")
+        apiUrlComponent.addQueryItem(name: "rule_1_operator", value: 0)
+        apiUrlComponent.addQueryItem(name: "rule_1_input", value: "")
+        apiUrlComponent.addQueryItem(name: "type", value: "song")
+        request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
+    }
+    
     func requestRecentSongs(parserDelegate: AmpacheXmlParser, count: Int) {
         guard var apiUrlComponent = createAuthenticatedApiUrlComponent() else { return }
         apiUrlComponent.addQueryItem(name: "action", value: "advanced_search")
@@ -556,12 +586,17 @@ class AmpacheXmlServerApi {
         request(fromUrlComponent: apiUrlComponent, viaXmlParser: parserDelegate)
     }
     
-    private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: AmpacheXmlParser) {
+    private func requestData(fromUrlComponent: URLComponents) -> Data? {
         guard let url = fromUrlComponent.url else {
             os_log("URL could not be created: %s", log: log, type: .error, fromUrlComponent.description)
-            return
+            return nil
         }
-        let parser = XMLParser(contentsOf: url)!
+        return try? Data(contentsOf: url)
+    }
+    
+    private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: AmpacheXmlParser) {
+        guard let requestedData = requestData(fromUrlComponent: fromUrlComponent) else { return }
+        let parser = XMLParser(data: requestedData)
         parser.delegate = parserDelegate
         parser.parse()
         if let error = parserDelegate.error, let ampacheError = error.asAmpacheError, ampacheError != .empty {

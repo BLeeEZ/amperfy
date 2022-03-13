@@ -216,13 +216,13 @@ class SearchVC: BasicTableViewController {
                 syncer.searchSongs(searchText: searchText, library: syncLibrary)
             }
             playlistFetchedResultsController.search(searchText: searchText, playlistSearchCategory: .all)
-            artistFetchedResultsController.search(searchText: searchText, onlyCached: false)
+            artistFetchedResultsController.search(searchText: searchText, onlyCached: false, displayFilter: .all)
             albumFetchedResultsController.search(searchText: searchText, onlyCached: false, displayFilter: .all)
             songFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false, displayFilter: .all)
             tableView.separatorStyle = .singleLine
         } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
             playlistFetchedResultsController.search(searchText: searchText, playlistSearchCategory: .cached)
-            artistFetchedResultsController.search(searchText: searchText, onlyCached: true)
+            artistFetchedResultsController.search(searchText: searchText, onlyCached: true, displayFilter: .all)
             albumFetchedResultsController.search(searchText: searchText, onlyCached: true, displayFilter: .all)
             songFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true, displayFilter: .all)
             tableView.separatorStyle = .singleLine

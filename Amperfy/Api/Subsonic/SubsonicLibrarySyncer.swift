@@ -184,6 +184,41 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         library.saveContext()
     }
     
+    func syncFavoriteLibraryElements(library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        os_log("Sync favorite artists/albums/songs", log: log, type: .info)
+        let oldFavoriteArtists = Set(library.getFavoriteArtists())
+        let oldFavoriteAlbums = Set(library.getFavoriteAlbums())
+        let oldFavoriteSongs = Set(library.getFavoriteSongs())
+
+        guard let favoritesData = subsonicServerApi.requestFavoriteElements() else { return }
+
+        os_log("Parse favorite artists", log: log, type: .info)
+        let artistParser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        let artistXmlParser = XMLParser(data: favoritesData)
+        artistXmlParser.delegate = artistParser
+        artistXmlParser.parse()
+        let notFavoriteArtistsAnymore = oldFavoriteArtists.subtracting(artistParser.parsedArtists)
+        notFavoriteArtistsAnymore.forEach { $0.isFavorite = false }
+
+        os_log("Parse favorite albums", log: log, type: .info)
+        let albumParser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        let albumXmlParser = XMLParser(data: favoritesData)
+        albumXmlParser.delegate = albumParser
+        albumXmlParser.parse()
+        let notFavoriteAlbumsAnymore = oldFavoriteAlbums.subtracting(albumParser.parsedAlbums)
+        notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false }
+        
+        os_log("Parse favorite songs", log: log, type: .info)
+        let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
+        let songXmlParser = XMLParser(data: favoritesData)
+        songXmlParser.delegate = songParser
+        songXmlParser.parse()
+        let notFavoriteSongsAnymore = oldFavoriteSongs.subtracting(songParser.parsedSongs)
+        notFavoriteSongsAnymore.forEach { $0.isFavorite = false }
+        library.saveContext()
+    }
+
     func syncMusicFolders(library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
         let musicFolderParser = SsMusicFolderParserDelegate(library: library, syncWave: syncWave)

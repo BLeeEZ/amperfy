@@ -32,6 +32,7 @@ protocol LibrarySyncer {
     func sync(album: Album, library: LibraryStorage)
     func sync(song: Song, library: LibraryStorage)
     func syncLatestLibraryElements(library: LibraryStorage)
+    func syncFavoriteLibraryElements(library: LibraryStorage)
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage)
     func syncDown(playlist: Playlist, library: LibraryStorage)
     func syncUpload(playlistToUpdateName playlist: Playlist, library: LibraryStorage)

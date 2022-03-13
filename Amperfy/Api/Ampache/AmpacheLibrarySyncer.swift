@@ -247,6 +247,31 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         syncRecentSongs(library: library)
     }
     
+    func syncFavoriteLibraryElements(library: LibraryStorage) {
+        guard let syncWave = library.getLatestSyncWave() else { return }
+        os_log("Sync favorite artists", log: log, type: .info)
+        let oldFavoriteArtists = Set(library.getFavoriteArtists())
+        let artistParser = ArtistParserDelegate(library: library, syncWave: syncWave)
+        ampacheXmlServerApi.requestFavoriteArtists(parserDelegate: artistParser)
+        let notFavoriteArtistsAnymore = oldFavoriteArtists.subtracting(artistParser.artistsParsed)
+        notFavoriteArtistsAnymore.forEach { $0.isFavorite = false }
+
+        os_log("Sync favorite albums", log: log, type: .info)
+        let oldFavoriteAlbums = Set(library.getFavoriteAlbums())
+        let albumParser = AlbumParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+        ampacheXmlServerApi.requestFavoriteAlbums(parserDelegate: albumParser)
+        let notFavoriteAlbumsAnymore = oldFavoriteAlbums.subtracting(albumParser.albumsParsed)
+        notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false }
+        
+        os_log("Sync favorite songs", log: log, type: .info)
+        let oldFavoriteSongs = Set(library.getFavoriteSongs())
+        let songParser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+        ampacheXmlServerApi.requestFavoriteSongs(parserDelegate: songParser)
+        let notFavoriteSongsAnymore = oldFavoriteSongs.subtracting(songParser.parsedSongs)
+        notFavoriteSongsAnymore.forEach { $0.isFavorite = false }
+        library.saveContext()
+    }
+    
     func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {
         guard let syncWave = library.getLatestSyncWave() else { return }
         let parser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)

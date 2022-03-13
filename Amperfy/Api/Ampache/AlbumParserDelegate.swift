@@ -6,6 +6,7 @@ import os.log
 class AlbumParserDelegate: AmpacheXmlLibParser {
     
     var albumBuffer: Album?
+    var albumsParsed = Set<Album>()
     var artistIdToCreate: String?
     var genreIdToCreate: String?
     var rating: Int = 0
@@ -65,6 +66,9 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
             parsedCount += 1
             albumBuffer?.rating = rating
             rating = 0
+            if let parsedAlbum = albumBuffer {
+                albumsParsed.insert(parsedAlbum)
+            }
             parseNotifier?.notifyParsedObject(ofType: .album)
             albumBuffer = nil
         case "rating":

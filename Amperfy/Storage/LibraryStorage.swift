@@ -429,19 +429,32 @@ class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(songsDisplayFilter: DisplayCategoryFilter) -> NSPredicate {
         switch songsDisplayFilter {
-        case .recentlyAdded:
-            return NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isRecentlyAdded))
         case .all:
             return NSPredicate.alwaysTrue
+        case .recentlyAdded:
+            return NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isRecentlyAdded))
+        case .favorites:
+            return NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isFavorite))
         }
     }
     
     func getFetchPredicate(albumsDisplayFilter: DisplayCategoryFilter) -> NSPredicate {
         switch albumsDisplayFilter {
-        case .recentlyAdded:
-            return NSPredicate(format: "SUBQUERY(songs, $song, $song.isRecentlyAdded == TRUE) .@count > 0")
         case .all:
             return NSPredicate.alwaysTrue
+        case .recentlyAdded:
+            return NSPredicate(format: "SUBQUERY(songs, $song, $song.isRecentlyAdded == TRUE) .@count > 0")
+        case .favorites:
+            return NSPredicate(format: "%K == TRUE", #keyPath(AlbumMO.isFavorite))
+        }
+    }
+
+    func getFetchPredicate(artistsDisplayFilter: DisplayCategoryFilter) -> NSPredicate {
+        switch artistsDisplayFilter {
+        case .all, .recentlyAdded:
+            return NSPredicate.alwaysTrue
+        case .favorites:
+            return NSPredicate(format: "%K == TRUE", #keyPath(ArtistMO.isFavorite))
         }
     }
     
@@ -465,6 +478,16 @@ class LibraryStorage: PlayableFileCachable {
         return artists ?? [Artist]()
     }
     
+    func getFavoriteArtists() -> [Artist] {
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == TRUE", #keyPath(ArtistMO.isFavorite))
+        ])
+        let foundArtists = try? context.fetch(fetchRequest)
+        let artists = foundArtists?.compactMap{ Artist(managedObject: $0) }
+        return artists ?? [Artist]()
+    }
+    
     func getAlbums() -> [Album] {
         let fetchRequest = AlbumMO.identifierSortedFetchRequest
         let foundAlbums = try? context.fetch(fetchRequest)
@@ -477,6 +500,16 @@ class LibraryStorage: PlayableFileCachable {
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             self.getFetchPredicate(forArtist: artist),
             AlbumMO.getFetchPredicateForAlbumsWhoseSongsHave(artist: artist)
+        ])
+        let foundAlbums = try? context.fetch(fetchRequest)
+        let albums = foundAlbums?.compactMap{ Album(managedObject: $0) }
+        return albums ?? [Album]()
+    }
+    
+    func getFavoriteAlbums() -> [Album] {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == TRUE", #keyPath(AlbumMO.isFavorite))
         ])
         let foundAlbums = try? context.fetch(fetchRequest)
         let albums = foundAlbums?.compactMap{ Album(managedObject: $0) }
@@ -526,6 +559,17 @@ class LibraryStorage: PlayableFileCachable {
 
     func getSongs() -> [Song] {
         let fetchRequest = SongMO.identifierSortedFetchRequest
+        let foundSongs = try? context.fetch(fetchRequest)
+        let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
+        return songs ?? [Song]()
+    }
+    
+    func getFavoriteSongs() -> [Song] {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+            NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isFavorite))
+        ])
         let foundSongs = try? context.fetch(fetchRequest)
         let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
         return songs ?? [Song]()

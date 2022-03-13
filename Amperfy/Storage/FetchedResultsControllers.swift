@@ -12,6 +12,7 @@ enum PlaylistSortType: Int {
 enum DisplayCategoryFilter {
     case all
     case recentlyAdded
+    case favorites
 }
 
 class PodcastFetchedResultsController: CachedFetchedResultsController<PodcastMO> {
@@ -237,15 +238,16 @@ class ArtistFetchedResultsController: CachedFetchedResultsController<ArtistMO> {
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
-    func search(searchText: String, onlyCached: Bool) {
-        if searchText.count > 0 || onlyCached {
+    func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
+        if searchText.count > 0 || onlyCached || displayFilter != .all {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
                     AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
                     library.getFetchPredicate(onlyCachedArtists: true)
                 ]),
                 ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedArtists: onlyCached)
+                library.getFetchPredicate(onlyCachedArtists: onlyCached),
+                library.getFetchPredicate(artistsDisplayFilter: displayFilter)
             ])
             search(predicate: predicate)
         } else {

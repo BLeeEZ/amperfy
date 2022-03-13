@@ -4,6 +4,8 @@ import CoreData
 class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
 
     private var fetchedResultsController: ArtistFetchedResultsController!
+    private var filterButton: UIBarButtonItem!
+    private var displayFilter: DisplayCategoryFilter = .all
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -15,6 +17,9 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         configureSearchController(placeholder: "Search in \"Artists\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
+
+        filterButton = UIBarButtonItem(image: UIImage.filter, style: .plain, target: self, action: #selector(filterButtonPressed))
+        navigationItem.rightBarButtonItem = filterButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         swipeCallback = { (indexPath, completionHandler) in
@@ -54,8 +59,39 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
                 syncer.searchArtists(searchText: searchText, library: backgroundLibrary)
             }
         }
-        fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1)
+        fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1, displayFilter: displayFilter)
         tableView.reloadData()
+    }
+    
+    @objc private func filterButtonPressed() {
+        let alert = UIAlertController(title: "Artists filter", message: nil, preferredStyle: .actionSheet)
+        
+        if displayFilter != .favorites {
+            alert.addAction(UIAlertAction(title: "Show favorites", style: .default, handler: { _ in
+                self.displayFilter = .favorites
+                self.updateSearchResults(for: self.searchController)
+                if self.appDelegate.persistentStorage.settings.isOnlineMode {
+                    self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                        let syncLibrary = LibraryStorage(context: context)
+                        let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                        syncer.syncFavoriteLibraryElements(library: syncLibrary)
+                        DispatchQueue.main.async {
+                            self.updateSearchResults(for: self.searchController)
+                        }
+                    }
+                }
+            }))
+        }
+        if displayFilter != .all {
+            alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
+                self.displayFilter = .all
+                self.updateSearchResults(for: self.searchController)
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
+        present(alert, animated: true, completion: nil)
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {

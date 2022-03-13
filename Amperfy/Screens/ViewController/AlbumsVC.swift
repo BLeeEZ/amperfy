@@ -62,19 +62,30 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1, displayFilter: displayFilter)
         tableView.reloadData()
     }
-    
-    
+
     @objc private func optionsPressed() {
         let alert = UIAlertController(title: "Albums filter", message: nil, preferredStyle: .actionSheet)
         
-        if displayFilter == .recentlyAdded {
-            alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
-                self.displayFilter = .all
+        if displayFilter != .favorites {
+            alert.addAction(UIAlertAction(title: "Show favorites", style: .default, handler: { _ in
+                self.displayFilter = .favorites
                 self.updateSearchResults(for: self.searchController)
+                if self.appDelegate.persistentStorage.settings.isOnlineMode {
+                    self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
+                        let syncLibrary = LibraryStorage(context: context)
+                        let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                        syncer.syncFavoriteLibraryElements(library: syncLibrary)
+                        DispatchQueue.main.async {
+                            self.updateSearchResults(for: self.searchController)
+                        }
+                    }
+                }
             }))
-        } else {
+        }
+        if displayFilter != .recentlyAdded {
             alert.addAction(UIAlertAction(title: "Show recently added", style: .default, handler: { _ in
                 self.displayFilter = .recentlyAdded
+                self.updateSearchResults(for: self.searchController)
                 if self.appDelegate.persistentStorage.settings.isOnlineMode {
                     self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                         let syncLibrary = LibraryStorage(context: context)
@@ -84,11 +95,13 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
                             self.updateSearchResults(for: self.searchController)
                         }
                     }
-                } else {
-                    DispatchQueue.main.async {
-                        self.updateSearchResults(for: self.searchController)
-                    }
                 }
+            }))
+        }
+        if displayFilter != .all {
+            alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
+                self.displayFilter = .all
+                self.updateSearchResults(for: self.searchController)
             }))
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
