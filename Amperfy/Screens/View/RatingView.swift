@@ -118,25 +118,13 @@ class RatingView: UIView {
         }
     }
     
-    func setFavorit(isFavorite: Bool) {
+    func toggleFavorite() {
         guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncLibrary = LibraryStorage(context: context)
             let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
-            if let song = self.ratingSong {
-                let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
-                syncer.setFavorite(song: songAsync, isFavorite: isFavorite)
-                songAsync.isFavorite = isFavorite
-            } else if let album = self.ratingAlbum {
-                let albumAsync = Album(managedObject: context.object(with: album.managedObject.objectID) as! AlbumMO)
-                syncer.setFavorite(album: albumAsync, isFavorite: isFavorite)
-                albumAsync.isFavorite = isFavorite
-            } else if let artist = self.ratingArtist {
-                let artistAsync = Artist(managedObject: context.object(with: artist.managedObject.objectID) as! ArtistMO)
-                syncer.setFavorite(artist: artistAsync, isFavorite: isFavorite)
-                artistAsync.isFavorite = isFavorite
+            if let containable: PlayableContainable = self.ratingSong ?? self.ratingAlbum ?? self.ratingArtist {
+                containable.remoteToggleFavorite(inContext: context, syncer: syncer)
             }
-            syncLibrary.saveContext()
             DispatchQueue.main.async {
                 self.refresh()
             }
@@ -168,8 +156,7 @@ class RatingView: UIView {
     }
     
     @IBAction func favoritePressed(_ sender: Any) {
-        let isFavorite = ratingSong?.isFavorite ?? ratingAlbum?.isFavorite ?? ratingArtist?.isFavorite ?? false
-        setFavorit(isFavorite: !isFavorite)
+        toggleFavorite()
     }
     
 }

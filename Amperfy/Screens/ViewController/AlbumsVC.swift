@@ -22,6 +22,9 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         navigationItem.rightBarButtonItem = optionsButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
+        containableAtIndexPathCallback = { (indexPath) in
+            return self.fetchedResultsController.getWrappedEntity(at: indexPath)
+        }
         swipeCallback = { (indexPath, completionHandler) in
             let album = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {

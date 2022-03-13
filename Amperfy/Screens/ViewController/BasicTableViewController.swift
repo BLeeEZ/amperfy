@@ -31,12 +31,13 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
 
 }
 
+typealias ContainableAtIndexPathCallback = (IndexPath) -> PlayableContainable?
 typealias SwipeActionCallback = (IndexPath, _ completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void ) -> Void
 
 struct SwipeDisplaySettings {
     var playContextTypeOfElements: PlayerMode = .music
     
-    func isAllowedToDisplay(actionType: SwipeActionType, isOfflineMode: Bool) -> Bool {
+    func isAllowedToDisplay(actionType: SwipeActionType, containable: PlayableContainable, isOfflineMode: Bool) -> Bool {
         switch playContextTypeOfElements {
         case .music:
             if actionType == .insertPodcastQueue ||
@@ -53,7 +54,10 @@ struct SwipeDisplaySettings {
                 return false
             }
         }
-        if isOfflineMode, actionType == .addToPlaylist || actionType == .download {
+        if isOfflineMode, actionType == .addToPlaylist || actionType == .download || actionType == .favorite {
+            return false
+        }
+        if !containable.isFavoritable, actionType == .favorite {
             return false
         }
         return true
@@ -61,7 +65,7 @@ struct SwipeDisplaySettings {
 }
 
 extension BasicTableViewController {
-    func createSwipeAction(for actionType: SwipeActionType, buttonColor: UIColor, indexPath: IndexPath, actionCallback: @escaping SwipeActionCallback) -> UIContextualAction {
+    func createSwipeAction(for actionType: SwipeActionType, buttonColor: UIColor, indexPath: IndexPath, preCbContainable: PlayableContainable, actionCallback: @escaping SwipeActionCallback) -> UIContextualAction {
         let action = UIContextualAction(style: .normal, title: actionType.displayName) { (action, view, completionHandler) in
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
@@ -99,12 +103,21 @@ extension BasicTableViewController {
                     self.appDelegate.player.insertPodcastQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
                 case .appendPodcastQueue:
                     self.appDelegate.player.appendPodcastQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                case .favorite:
+                    self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask { context in
+                        let syncer = self.appDelegate.backendApi.createLibrarySyncer()
+                        actionContext.containable.remoteToggleFavorite(inContext: context, syncer: syncer)
+                    }
                 }
             }
             completionHandler(true)
         }
         action.backgroundColor = buttonColor
-        action.image = actionType.image.invertedImage()
+        if actionType == .favorite {
+            action.image = preCbContainable.isFavorite ? UIImage.heartFill : UIImage.heartEmpty
+        } else {
+            action.image = actionType.image.invertedImage()
+        }
         return action
     }
 }
@@ -123,6 +136,7 @@ class BasicTableViewController: UITableViewController {
     var rowsToDelete = [IndexPath]()
     var rowsToUpdate = [IndexPath]()
     var swipeDisplaySettings = SwipeDisplaySettings()
+    var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
     var swipeCallback: SwipeActionCallback?
 
     override func viewDidLoad() {
@@ -142,13 +156,17 @@ class BasicTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let swipeCB = swipeCallback else { return nil }
+        guard let swipeCB = swipeCallback,
+              let containableCB = containableAtIndexPathCallback,
+              let containable = containableCB(indexPath)
+        else { return nil }
+        
         var createdActionsIndex = 0
         var actions = [UIContextualAction]()
         for actionType in appDelegate.persistentStorage.settings.swipeActionSettings.leading {
-            if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, isOfflineMode: appDelegate.persistentStorage.settings.isOfflineMode) { continue }
+            if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, containable: containable, isOfflineMode: appDelegate.persistentStorage.settings.isOfflineMode) { continue }
             let buttonColor = Self.swipeButtonColors.element(at: createdActionsIndex) ?? Self.swipeButtonColors.last!
-            actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, actionCallback: swipeCB))
+            actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, preCbContainable: containable, actionCallback: swipeCB))
             createdActionsIndex += 1
         }
         return UISwipeActionsConfiguration(actions: actions)
@@ -156,13 +174,16 @@ class BasicTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard !tableView.isEditing else { return nil }
-        guard let swipeCB = swipeCallback else { return nil }
+        guard let swipeCB = swipeCallback,
+              let containableCB = containableAtIndexPathCallback,
+              let containable = containableCB(indexPath)
+        else { return nil }
         var createdActionsIndex = 0
         var actions = [UIContextualAction]()
         for actionType in appDelegate.persistentStorage.settings.swipeActionSettings.trailing {
-            if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, isOfflineMode: appDelegate.persistentStorage.settings.isOfflineMode) { continue }
+            if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, containable: containable, isOfflineMode: appDelegate.persistentStorage.settings.isOfflineMode) { continue }
             let buttonColor = Self.swipeButtonColors.element(at: createdActionsIndex) ?? Self.swipeButtonColors.last!
-            actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, actionCallback: swipeCB))
+            actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, preCbContainable: containable, actionCallback: swipeCB))
             createdActionsIndex += 1
         }
         return UISwipeActionsConfiguration(actions: actions)

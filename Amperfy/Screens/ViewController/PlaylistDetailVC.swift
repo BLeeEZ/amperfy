@@ -39,6 +39,9 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
+        containableAtIndexPathCallback = { (indexPath) in
+            return self.fetchedResultsController.getWrappedEntity(at: indexPath).playable
+        }
         swipeCallback = { (indexPath, completionHandler) in
             let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             if let song = playlistItem.playable {

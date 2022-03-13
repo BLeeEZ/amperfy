@@ -33,6 +33,9 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
         navigationItem.rightBarButtonItem = optionsButton
         
+        containableAtIndexPathCallback = { (indexPath) in
+            return self.fetchedResultsController.getWrappedEntity(at: indexPath)
+        }
         swipeCallback = { (indexPath, completionHandler) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)

@@ -17,6 +17,9 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         tableView.rowHeight = GenericTableCell.rowHeightWithoutImage
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
+        containableAtIndexPathCallback = { (indexPath) in
+            return self.fetchedResultsController.getWrappedEntity(at: indexPath)
+        }
         swipeCallback = { (indexPath, completionHandler) in
             let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             genre.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {

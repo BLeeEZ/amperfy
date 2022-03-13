@@ -32,6 +32,14 @@ class PodcastsVC: BasicTableViewController {
         navigationItem.rightBarButtonItem = sortButton
         
         swipeDisplaySettings.playContextTypeOfElements = .podcast
+        containableAtIndexPathCallback = { (indexPath) in
+            switch self.showType {
+            case .podcasts:
+                return self.podcastsFetchedResultsController.getWrappedEntity(at: indexPath)
+            case .episodesSortedByReleaseDate:
+                return self.episodesFetchedResultsController.getWrappedEntity(at: indexPath)
+            }
+        }
         swipeCallback = { (indexPath, completionHandler) in
             switch self.showType {
             case .podcasts:

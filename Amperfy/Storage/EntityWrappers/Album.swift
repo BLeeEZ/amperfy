@@ -128,6 +128,14 @@ extension Album: PlayableContainable  {
     }
     var playContextType: PlayerMode { return .music }
     var isRateable: Bool { return true }
+    var isFavoritable: Bool { return true }
+    func remoteToggleFavorite(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+        let library = LibraryStorage(context: context)
+        let albumAsync = Album(managedObject: context.object(with: managedObject.objectID) as! AlbumMO)
+        albumAsync.isFavorite.toggle()
+        library.saveContext()
+        syncer.setFavorite(album: albumAsync, isFavorite: albumAsync.isFavorite)
+    }
     func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
         let library = LibraryStorage(context: context)
         let albumAsync = Album(managedObject: context.object(with: managedObject.objectID) as! AlbumMO)

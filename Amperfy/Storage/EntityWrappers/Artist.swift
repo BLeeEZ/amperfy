@@ -114,6 +114,14 @@ extension Artist: PlayableContainable  {
     }
     var playContextType: PlayerMode { return .music }
     var isRateable: Bool { return true }
+    var isFavoritable: Bool { return true }
+    func remoteToggleFavorite(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+        let library = LibraryStorage(context: context)
+        let artistAsync = Artist(managedObject: context.object(with: managedObject.objectID) as! ArtistMO)
+        artistAsync.isFavorite.toggle()
+        library.saveContext()
+        syncer.setFavorite(artist: artistAsync, isFavorite: artistAsync.isFavorite)
+    }
     func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
         let library = LibraryStorage(context: context)
         let artistAsync = Artist(managedObject: context.object(with: managedObject.objectID) as! ArtistMO)

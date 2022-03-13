@@ -58,6 +58,8 @@ extension UIImage {
     static var shuffleOff: UIImage = { return UIImage.create("shuffle_off") }() // custom mix of shuffle
     static var sort: UIImage = { return UIImage.create("sort") }()  // SF-Symbols 3.2 Regular:  arrow.up.arrow.down
     static var filter: UIImage = { return UIImage.create("filter") }()  // SF-Symbols 3.2 Regular:  line.3.horizontal.decrease.circle
+    static var heartFill: UIImage = { return UIImage.create("heart_fill") }()  // SF-Symbols 3.2 Regular:  heart.fill
+    static var heartEmpty: UIImage = { return UIImage.create("heart_empty") }()  // SF-Symbols 3.2 Regular:  heart
     
     private static func create(_ named: String) -> UIImage {
         return UIImage(named: named) ?? UIImage()

@@ -27,6 +27,9 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         navigationItem.rightBarButtonItem = optionsButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
+        containableAtIndexPathCallback = { (indexPath) in
+            return self.fetchedResultsController.getWrappedEntity(at: indexPath)
+        }
         swipeCallback = { (indexPath, completionHandler) in
             let playlist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             playlist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {

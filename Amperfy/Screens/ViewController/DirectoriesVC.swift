@@ -21,6 +21,15 @@ class DirectoriesVC: BasicTableViewController {
         configureSearchController(placeholder: "Directories and Songs", scopeButtonTitles: ["All", "Cached"])
         navigationItem.title = directory.name
         
+        containableAtIndexPathCallback = { (indexPath) in
+            switch indexPath.section {
+            case 1:
+                let songIndexPath = IndexPath(row: indexPath.row, section: 0)
+                return self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
+            default:
+                return nil
+            }
+        }
         swipeCallback = { (indexPath, completionHandler) in
             switch indexPath.section {
             case 1:

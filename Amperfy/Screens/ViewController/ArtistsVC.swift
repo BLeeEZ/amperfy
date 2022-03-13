@@ -22,6 +22,9 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         navigationItem.rightBarButtonItem = filterButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
+        containableAtIndexPathCallback = { (indexPath) in
+            return self.fetchedResultsController.getWrappedEntity(at: indexPath)
+        }
         swipeCallback = { (indexPath, completionHandler) in
             let artist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             artist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {

@@ -210,6 +210,15 @@ extension AbstractPlayable: PlayableContainable  {
         syncer.sync(song: songAsync, library: library)
     }
     var isRateable: Bool { return isSong }
+    var isFavoritable: Bool { return isSong }
+    func remoteToggleFavorite(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+        guard let song = asSong else { return }
+        let library = LibraryStorage(context: context)
+        let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
+        songAsync.isFavorite.toggle()
+        library.saveContext()
+        syncer.setFavorite(song: songAsync, isFavorite: songAsync.isFavorite)
+    }
     var isDownloadAvailable: Bool { return asPodcastEpisode?.isAvailableToUser ?? true }
     var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)

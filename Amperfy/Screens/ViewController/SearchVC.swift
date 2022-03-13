@@ -27,6 +27,20 @@ class SearchVC: BasicTableViewController {
         tableView.register(nibName: SongTableCell.typeName)
         tableView.separatorStyle = .none
         
+        containableAtIndexPathCallback = { (indexPath) in
+            switch indexPath.section {
+            case LibraryElement.Playlist.rawValue:
+                return self.playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            case LibraryElement.Artist.rawValue:
+                return self.artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            case LibraryElement.Album.rawValue:
+                return self.albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            case LibraryElement.Song.rawValue:
+                return self.songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            default:
+                return nil
+            }
+        }
         swipeCallback = { (indexPath, completionHandler) in
             self.determSwipeActionContext(at: indexPath) { actionContext in
                 completionHandler(actionContext)

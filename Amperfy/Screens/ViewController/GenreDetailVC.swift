@@ -41,6 +41,18 @@ class GenreDetailVC: BasicTableViewController {
         optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
         navigationItem.rightBarButtonItem = optionsButton
         
+        containableAtIndexPathCallback = { (indexPath) in
+            switch indexPath.section+1 {
+            case LibraryElement.Artist.rawValue:
+                return self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            case LibraryElement.Album.rawValue:
+                return self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            case LibraryElement.Song.rawValue:
+                return self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            default:
+                return nil
+            }
+        }
         swipeCallback = { (indexPath, completionHandler) in
             switch indexPath.section+1 {
             case LibraryElement.Artist.rawValue:

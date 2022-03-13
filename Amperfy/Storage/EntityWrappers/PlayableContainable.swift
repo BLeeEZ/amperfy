@@ -20,6 +20,9 @@ protocol PlayableContainable {
     var artworkCollection: ArtworkCollection { get }
     func cachePlayables(downloadManager: DownloadManageable)
     func fetchFromServer(inContext: NSManagedObjectContext, syncer: LibrarySyncer)
+    var isFavoritable: Bool { get }
+    var isFavorite: Bool { get }
+    func remoteToggleFavorite(inContext: NSManagedObjectContext, syncer: LibrarySyncer)
     func playedViaContext()
 }
 
@@ -63,6 +66,9 @@ extension PlayableContainable {
         }
     }
     var isRateable: Bool { return false }
+    var isFavoritable: Bool { return false }
+    var isFavorite: Bool { return false }
+    func remoteToggleFavorite(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) { }
     
     var isDownloadAvailable: Bool { return true }
 }
