@@ -109,6 +109,9 @@ class LibraryEntityDetailVC: UIViewController {
             ratingPlaceholderView.addSubview(ratingView)
         }
         ratingPlaceholderView.layer.cornerRadius = BasicButton.cornerRadius
+        ratingPlaceholderView.backgroundColor = .clear
+        ratingPlaceholderView.layer.borderColor = UIColor.fillColor.cgColor
+        ratingPlaceholderView.layer.borderWidth = 2.5
         playerStackView.isHidden = true
         refresh()
 

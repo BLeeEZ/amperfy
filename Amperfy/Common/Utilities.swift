@@ -210,6 +210,14 @@ extension UIColor {
         }
     }
     
+    static var fillColor: UIColor {
+        if #available(iOS 13.0, *) {
+            return UIColor.systemFill
+        } else {
+            return UIColor(displayP3Red: 217/255, green: 214/255, blue: 209/255, alpha: 1.0)
+        }
+    }
+
     static var secondaryLabelColor: UIColor {
         if #available(iOS 13.0, *) {
             return UIColor.secondaryLabel
