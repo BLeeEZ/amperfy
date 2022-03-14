@@ -23,11 +23,7 @@ public class Album: AbstractLibraryEntity {
         }
     }
     private var embeddedArtworkImage: UIImage? {
-        let embeddedArtworks = Set(songs.compactMap({ $0.embeddedArtwork?.image?.pngData() }))
-        if embeddedArtworks.count == 1, let imageData = embeddedArtworks.first {
-            return UIImage(data: imageData)
-        }
-        return nil
+        return songs.lazy.compactMap{ $0.embeddedArtwork }.first?.image
     }
     var identifier: String {
         return name
