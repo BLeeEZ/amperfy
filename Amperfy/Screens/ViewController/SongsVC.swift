@@ -35,6 +35,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        updateFilterButton()
         if appDelegate.persistentStorage.settings.isOnlineMode {
             navigationItem.rightBarButtonItems = [optionsButton, filterButton]
         } else {
@@ -42,6 +43,10 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         }
     }
 
+    func updateFilterButton() {
+        filterButton.image = displayFilter == .all ? UIImage.filter : UIImage.filterActive
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
         let song = fetchedResultsController.getWrappedEntity(at: indexPath)
@@ -84,6 +89,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         if displayFilter != .favorites {
             alert.addAction(UIAlertAction(title: "Show favorites", style: .default, handler: { _ in
                 self.displayFilter = .favorites
+                self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
                 if self.appDelegate.persistentStorage.settings.isOnlineMode {
                     self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
@@ -100,6 +106,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         if displayFilter != .recentlyAdded {
             alert.addAction(UIAlertAction(title: "Show recently added", style: .default, handler: { _ in
                 self.displayFilter = .recentlyAdded
+                self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
                 if self.appDelegate.persistentStorage.settings.isOnlineMode {
                     self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
@@ -116,6 +123,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         if displayFilter != .all {
             alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
                 self.displayFilter = .all
+                self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
             }))
         }

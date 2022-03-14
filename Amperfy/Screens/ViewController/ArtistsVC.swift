@@ -33,6 +33,15 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateFilterButton()
+    }
+    
+    func updateFilterButton() {
+        filterButton.image = displayFilter == .all ? UIImage.filter : UIImage.filterActive
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
         let artist = fetchedResultsController.getWrappedEntity(at: indexPath)
@@ -72,6 +81,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         if displayFilter != .favorites {
             alert.addAction(UIAlertAction(title: "Show favorites", style: .default, handler: { _ in
                 self.displayFilter = .favorites
+                self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
                 if self.appDelegate.persistentStorage.settings.isOnlineMode {
                     self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
@@ -88,6 +98,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         if displayFilter != .all {
             alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
                 self.displayFilter = .all
+                self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
             }))
         }

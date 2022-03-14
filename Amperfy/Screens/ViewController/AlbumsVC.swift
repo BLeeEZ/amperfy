@@ -4,7 +4,7 @@ import CoreData
 class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
 
     private var fetchedResultsController: AlbumFetchedResultsController!
-    private var optionsButton: UIBarButtonItem!
+    private var filterButton: UIBarButtonItem!
     private var displayFilter: DisplayCategoryFilter = .all
     
     override func viewDidLoad() {
@@ -18,8 +18,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
         
-        optionsButton = UIBarButtonItem(image: UIImage.filter, style: .plain, target: self, action: #selector(optionsPressed))
-        navigationItem.rightBarButtonItem = optionsButton
+        filterButton = UIBarButtonItem(image: UIImage.filter, style: .plain, target: self, action: #selector(filterButtonPressed))
+        navigationItem.rightBarButtonItem = filterButton
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -31,6 +31,15 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
                 completionHandler(SwipeActionContext(containable: album))
             }
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateFilterButton()
+    }
+    
+    func updateFilterButton() {
+        filterButton.image = displayFilter == .all ? UIImage.filter : UIImage.filterActive
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -66,12 +75,13 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         tableView.reloadData()
     }
 
-    @objc private func optionsPressed() {
+    @objc private func filterButtonPressed() {
         let alert = UIAlertController(title: "Albums filter", message: nil, preferredStyle: .actionSheet)
         
         if displayFilter != .favorites {
             alert.addAction(UIAlertAction(title: "Show favorites", style: .default, handler: { _ in
                 self.displayFilter = .favorites
+                self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
                 if self.appDelegate.persistentStorage.settings.isOnlineMode {
                     self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
@@ -88,6 +98,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         if displayFilter != .recentlyAdded {
             alert.addAction(UIAlertAction(title: "Show recently added", style: .default, handler: { _ in
                 self.displayFilter = .recentlyAdded
+                self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
                 if self.appDelegate.persistentStorage.settings.isOnlineMode {
                     self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
@@ -104,6 +115,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         if displayFilter != .all {
             alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
                 self.displayFilter = .all
+                self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
             }))
         }
