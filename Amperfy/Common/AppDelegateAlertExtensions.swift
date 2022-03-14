@@ -37,6 +37,9 @@ extension AppDelegate: AlertDisplayable {
         banner.onTap = {
             self.display(popup: popupVC)
         }
+        banner.onSwipeUp = {
+            NotificationBannerQueue.default.removeAll()
+        }
         
         banner.show(queuePosition: .back, bannerPosition: .top, on: topView, cornerRadius: 20, shadowBlurRadius: 10)
         if let keyWindow = UIApplication.shared.keyWindow {

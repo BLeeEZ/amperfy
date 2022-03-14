@@ -86,7 +86,7 @@ class EventLogger {
             guard !self.supressAlerts else { return }
             let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
             popupVC.setContent(topic: topic, message: message, type: logType)
-            popupVC.useOptionalButton(text: "Suppress for \(Self.errorReportOneDaySilentTimeInSec.asDayString)", onPressed: { _ in
+            popupVC.useOptionalButton(text: "Suppress for one day", onPressed: { _ in
                 self.updateSuppressionTimeInterval(logEntry: logEntry, suppressionTimeInterval: Self.errorReportOneDaySilentTimeInSec)
             })
             self.alertDisplayer.display(notificationBanner: popupVC)
