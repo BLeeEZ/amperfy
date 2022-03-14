@@ -470,6 +470,18 @@ extension UIAlertController {
     }
 }
 
+extension UIAlertAction {
+    convenience init(title: String?, image: UIImage, style: Style, handler: ((UIAlertAction) -> Void)? = nil) {
+        self.init(title: title, style: style, handler: handler)
+        self.actionImage = image
+    }
+
+    var actionImage: UIImage {
+        get { return self.value(forKey: "image") as? UIImage ?? UIImage() }
+        set(image) { self.setValue(image, forKey: "image") }
+    }
+}
+
 extension UISlider {
     func setUnicolorThumbImage(thumbSize: CGFloat, color: UIColor, for state: UIControl.State){
         let thumbImage = createThumbImage(size: thumbSize, color: color)

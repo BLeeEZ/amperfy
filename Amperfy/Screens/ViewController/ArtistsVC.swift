@@ -79,7 +79,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         let alert = UIAlertController(title: "Artists filter", message: nil, preferredStyle: .actionSheet)
         
         if displayFilter != .favorites {
-            alert.addAction(UIAlertAction(title: "Show favorites", style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: "Show favorites", image: UIImage.heartFill, style: .default, handler: { _ in
                 self.displayFilter = .favorites
                 self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)

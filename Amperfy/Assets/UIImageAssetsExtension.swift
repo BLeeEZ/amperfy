@@ -61,6 +61,7 @@ extension UIImage {
     static var filterActive: UIImage = { return UIImage.create("filter_active") }()  // SF-Symbols 3.2 Regular:  line.3.horizontal.decrease.circle.fill
     static var heartFill: UIImage = { return UIImage.create("heart_fill") }()  // SF-Symbols 3.2 Regular:  heart.fill
     static var heartEmpty: UIImage = { return UIImage.create("heart_empty") }()  // SF-Symbols 3.2 Regular:  heart
+    static var clock: UIImage = { return UIImage.create("clock") }()  // SF-Symbols 3.2 Regular:  clock
     
     private static func create(_ named: String) -> UIImage {
         return UIImage(named: named) ?? UIImage()

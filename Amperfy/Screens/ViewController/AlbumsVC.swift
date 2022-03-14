@@ -79,7 +79,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         let alert = UIAlertController(title: "Albums filter", message: nil, preferredStyle: .actionSheet)
         
         if displayFilter != .favorites {
-            alert.addAction(UIAlertAction(title: "Show favorites", style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: "Show favorites", image: UIImage.heartFill, style: .default, handler: { _ in
                 self.displayFilter = .favorites
                 self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
@@ -96,7 +96,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             }))
         }
         if displayFilter != .recentlyAdded {
-            alert.addAction(UIAlertAction(title: "Show recently added", style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: "Show recently added", image: UIImage.clock, style: .default, handler: { _ in
                 self.displayFilter = .recentlyAdded
                 self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
