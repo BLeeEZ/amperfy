@@ -58,22 +58,11 @@ extension Genre: PlayableContainable  {
     func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
         var infoContent = [String]()
         if api == .ampache {
-            if artists.count == 1 {
-                infoContent.append("1 Artist")
-            } else if artists.count > 1 {
-                infoContent.append("\(artists.count) Artists")
-            }
+            infoContent.append("\(artists.count) Artist\(artists.count > 1 ? "s" : "")")
         }
-        if albums.count == 1 {
-            infoContent.append("1 Album")
-        } else if albums.count > 1 {
-            infoContent.append("\(albums.count) Albums")
-        }
-        if songs.count == 1 {
-            infoContent.append("1 Song")
-        } else if songs.count > 1 {
-            infoContent.append("\(songs.count) Songs")
-        }
+        infoContent.append("\(albums.count) Album\(albums.count > 1 ? "s" : "")")
+        infoContent.append("\(songs.count) Songs\(songs.count > 1 ? "s" : "")")
+
         if type == .long {
             let completeDuration = songs.reduce(0, {$0 + $1.duration})
             if completeDuration > 0 {
