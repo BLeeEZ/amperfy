@@ -6,6 +6,7 @@ typealias GetPlayerIndexCallback = () -> PlayerIndex?
 
 class LibraryEntityDetailVC: UIViewController {
     
+    @IBOutlet var superView: UIView!
     @IBOutlet weak var mainStackView: UIStackView!
     
     @IBOutlet weak var elementInfoStackView: UIStackView!
@@ -72,6 +73,7 @@ class LibraryEntityDetailVC: UIViewController {
     static let compactMainStackSpacing = 5.0
     static let largeMainStackSpacing = 20.0
     
+    @IBOutlet weak var topMarginSpaceConstraint: NSLayoutConstraint!
     @IBOutlet weak var detailLabelsClusterHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var artistNameLabelHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var albumNameLabelHeightConstraint: NSLayoutConstraint!
@@ -132,7 +134,8 @@ class LibraryEntityDetailVC: UIViewController {
     }
     
     override func viewWillLayoutSubviews() {
-        var remainingSpace = mainStackView.frame.size.height
+        var remainingSpace = superView.frame.size.height
+        remainingSpace -= topMarginSpaceConstraint.constant
         remainingSpace -= Self.minEntityImageHeight
         remainingSpace -= detailLabelsClusterHeightConstraint.constant
         if !ratingPlaceholderView.isHidden {
