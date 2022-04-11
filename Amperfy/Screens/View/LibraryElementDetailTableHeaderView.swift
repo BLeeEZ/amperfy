@@ -5,7 +5,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     @IBOutlet weak var playAllButton: UIButton!
     @IBOutlet weak var playShuffledButton: UIButton!
     
-    static let frameHeight: CGFloat = 30.0 + margin.top + margin.bottom
+    static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginMiddleElement
     
     private var appDelegate: AppDelegate!
