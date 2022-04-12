@@ -65,10 +65,6 @@ protocol AbstractBackgroundLibrarySyncer {
     func stopAndWait()
 }
 
-protocol BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
-    func syncInBackground(library: LibraryStorage)
-}
-
 protocol BackgroundLibraryVersionResyncer: AbstractBackgroundLibrarySyncer {
     func resyncDueToNewLibraryVersionInBackground(library: LibraryStorage, libraryVersion: LibrarySyncVersion)
 }

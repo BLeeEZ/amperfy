@@ -93,13 +93,6 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func setFavorite(artist: Artist, isFavorite: Bool) {}
 }
 
-class MOCK_BackgroundLibrarySyncer: BackgroundLibrarySyncer {
-    func syncInBackground(library: LibraryStorage) {}
-    var isActive: Bool = false
-    func stop() {}
-    func stopAndWait() {}
-}
-
 class MOCK_BackgroundLibraryVersionResyncer: BackgroundLibraryVersionResyncer {
     func resyncDueToNewLibraryVersionInBackground(library: LibraryStorage, libraryVersion: LibrarySyncVersion) {}
     var isActive: Bool = false

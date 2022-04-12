@@ -104,6 +104,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return dlManager
     }()
+    lazy var backgroundLibrarySyncer = {
+        return BackgroundLibrarySyncer(persistentStorage: persistentStorage, backendApi: backendApi)
+    }()
     lazy var scrobbleSyncer = {
         return ScrobbleSyncer(persistentStorage: persistentStorage, backendApi: backendApi)
     }()
@@ -176,6 +179,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         libraryUpdater.performBlockingLibraryUpdatesIfNeeded()
         artworkDownloadManager.start()
         playableDownloadManager.start()
+        backgroundLibrarySyncer.start()
         scrobbleSyncer.start()
         userStatistics.sessionStarted()
         carPlayHandler.initialize()
@@ -210,6 +214,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         os_log("applicationWillTerminate", log: self.log, type: .info)
+        backgroundLibrarySyncer.stopAndWait()
         library.saveContext()
     }
     

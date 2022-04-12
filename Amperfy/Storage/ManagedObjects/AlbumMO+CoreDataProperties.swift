@@ -9,6 +9,7 @@ extension AlbumMO {
     }
 
     @NSManaged public var name: String?
+    @NSManaged public var isSongsMetaDataSynced: Bool
     @NSManaged public var year: Int16
     @NSManaged public var songCount: Int16
     @NSManaged public var artist: ArtistMO?

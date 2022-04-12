@@ -150,6 +150,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         } else {
             let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
             subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+            album.isSongsMetaDataSynced = true
         }
         library.saveContext()
     }
@@ -175,6 +176,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         for album in albumDelegate.parsedAlbums {
             let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
             subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
+            album.isSongsMetaDataSynced = true
             recentlyAddedSongs = recentlyAddedSongs.union(Set(songParser.parsedSongs))
         }
         os_log("%i newest Albums synced", log: log, type: .info, albumDelegate.parsedAlbums.count)

@@ -12,6 +12,8 @@ class SettingsLibraryVC: UITableViewController {
     @IBOutlet weak var podcastsCountLabel: UILabel!
     @IBOutlet weak var podcastEpisodesCountLabel: UILabel!
     
+    @IBOutlet weak var autoSyncProgressLabel: UILabel!
+
     @IBOutlet weak var cachedSongsCountLabel: UILabel!
     @IBOutlet weak var cachedPodcastEpisodesCountLabel: UILabel!
     @IBOutlet weak var cachedCompleteSizeLabel: UILabel!
@@ -58,6 +60,17 @@ class SettingsLibraryVC: UITableViewController {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.songsCountLabel.text = String(songCount)
+            }
+            
+            let albumWithSyncedSongsCount = library.albumWithSyncedSongsCount
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                if albumCount < 1 {
+                    self.autoSyncProgressLabel.text = String(format: "%.1f", 0.0) + "%"
+                } else {
+                    let progress = Float(albumWithSyncedSongsCount) * 100.0 / Float(albumCount)
+                    self.autoSyncProgressLabel.text = String(format: "%.1f", progress) + "%"
+                }
             }
             
             let cachedSongCount = library.cachedSongCount

@@ -137,6 +137,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         } else {
             let songParser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
             self.ampacheXmlServerApi.requestAlbumSongs(of: album, parserDelegate: songParser)
+            album.isSongsMetaDataSynced = true
         }
         library.saveContext()
     }

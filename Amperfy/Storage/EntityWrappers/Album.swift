@@ -66,6 +66,10 @@ public class Album: AbstractLibraryEntity {
             if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
         }
     }
+    var isSongsMetaDataSynced: Bool {
+        get { return managedObject.isSongsMetaDataSynced }
+        set { managedObject.isSongsMetaDataSynced = newValue }
+    }
     var songCount: Int {
         get {
             let moSongCount = Int(managedObject.songCount)

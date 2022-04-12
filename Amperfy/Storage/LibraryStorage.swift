@@ -54,7 +54,29 @@ class LibraryStorage: PlayableFileCachable {
     }
     
     var albumCount: Int {
-        return (try? context.count(for: AlbumMO.fetchRequest())) ?? 0
+        let request: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == %i", #keyPath(AlbumMO.remoteStatus), RemoteStatus.available.rawValue)
+        ])
+        return (try? context.count(for: request)) ?? 0
+    }
+    
+    var albumWithSyncedSongsCount: Int {
+        let request: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == %i", #keyPath(AlbumMO.remoteStatus), RemoteStatus.available.rawValue),
+            NSPredicate(format: "%K == TRUE", #keyPath(AlbumMO.isSongsMetaDataSynced))
+        ])
+        return (try? context.count(for: request)) ?? 0
+    }
+    
+    var albumWithoutSyncedSongsCount: Int {
+        let request: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == %i", #keyPath(AlbumMO.remoteStatus), RemoteStatus.available.rawValue),
+            NSPredicate(format: "%K == FALSE", #keyPath(AlbumMO.isSongsMetaDataSynced))
+        ])
+        return (try? context.count(for: request)) ?? 0
     }
     
     var songCount: Int {
@@ -742,6 +764,17 @@ class LibraryStorage: PlayableFileCachable {
         return albums?.lazy.compactMap{ Album(managedObject: $0) }.first
     }
     
+    func getAlbumWithoutSyncedSongs() -> Album? {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == %i", #keyPath(AlbumMO.remoteStatus), RemoteStatus.available.rawValue),
+            NSPredicate(format: "%K == FALSE", #keyPath(AlbumMO.isSongsMetaDataSynced))
+        ])
+        fetchRequest.fetchLimit = 1
+        let albums = try? context.fetch(fetchRequest)
+        return albums?.lazy.compactMap{ Album(managedObject: $0) }.first
+    }
+
     func getPodcast(id: String) -> Podcast? {
         let fetchRequest: NSFetchRequest<PodcastMO> = PodcastMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PodcastMO.id), NSString(string: id))

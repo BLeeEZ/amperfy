@@ -26,7 +26,10 @@ class SettingsVC: UITableViewController {
         appDelegate.persistentStorage.settings.isOfflineMode = offlineModeSwitch.isOn
         appDelegate.player.isOfflineMode = offlineModeSwitch.isOn
         if !offlineModeSwitch.isOn {
+            appDelegate.backgroundLibrarySyncer.start()
             appDelegate.scrobbleSyncer.start()
+        } else {
+            appDelegate.backgroundLibrarySyncer.stop()
         }
     }
     
