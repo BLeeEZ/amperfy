@@ -136,7 +136,8 @@ extension Album: PlayableContainable  {
         library.saveContext()
         syncer.setFavorite(album: albumAsync, isFavorite: albumAsync.isFavorite)
     }
-    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+    func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
+        let syncer = backendApi.createLibrarySyncer()
         let library = LibraryStorage(context: context)
         let albumAsync = Album(managedObject: context.object(with: managedObject.objectID) as! AlbumMO)
         syncer.sync(album: albumAsync, library: library)

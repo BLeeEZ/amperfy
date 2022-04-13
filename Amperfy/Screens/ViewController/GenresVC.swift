@@ -22,7 +22,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         }
         swipeCallback = { (indexPath, completionHandler) in
             let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            genre.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
+            genre.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
                 completionHandler(SwipeActionContext(containable: genre))
             }
         }
@@ -58,7 +58,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             if self.appDelegate.persistentStorage.settings.isOnlineMode {
-                let autoDownloadSyncer = AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: self.appDelegate.persistentStorage.settings, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 autoDownloadSyncer.syncLatestLibraryElements(context: context)
                 DispatchQueue.main.async {
                     self.refreshControl?.endRefreshing()

@@ -57,12 +57,12 @@ class GenreDetailVC: BasicTableViewController {
             switch indexPath.section+1 {
             case LibraryElement.Artist.rawValue:
                 let artist = self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                artist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
+                artist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
                     completionHandler(SwipeActionContext(containable: artist))
                 }
             case LibraryElement.Album.rawValue:
                 let album = self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
+                album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
                     completionHandler(SwipeActionContext(containable: album))
                 }
             case LibraryElement.Song.rawValue:
@@ -78,7 +78,7 @@ class GenreDetailVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        genre.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
+        genre.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
             self.detailOperationsView?.refresh()
         }
     }

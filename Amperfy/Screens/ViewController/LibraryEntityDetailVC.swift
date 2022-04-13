@@ -191,7 +191,7 @@ class LibraryEntityDetailVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
         guard let container = entityContainer else { return }
-        container.fetchAsync(storage: appDelegate.persistentStorage, backendApi: appDelegate.backendApi) {
+        container.fetchAsync(storage: appDelegate.persistentStorage, backendApi: appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
             self.refresh()
         }
     }

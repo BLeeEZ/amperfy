@@ -2213,15 +2213,19 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Auto Cache" id="hv8-FM-sKx" userLabel="Auto Download">
+                                <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="nz1-xH-09g">
-                                        <rect key="frame" x="0.0" y="379.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="429.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="nz1-xH-09g" id="M5u-AB-PuS">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Auto download latest songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ygl-nS-hok" userLabel="Description">
-                                                    <rect key="frame" x="20" y="5" width="200" height="30"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Latest Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ygl-nS-hok" userLabel="Description">
+                                                    <rect key="frame" x="20" y="5" width="150" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="ZK3-eK-NRi"/>
                                                     </constraints>
@@ -2237,11 +2241,43 @@
                                                 </switch>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="leadingMargin" secondItem="ygl-nS-hok" secondAttribute="trailing" constant="-200" id="GWq-JR-270"/>
+                                                <constraint firstAttribute="leadingMargin" secondItem="ygl-nS-hok" secondAttribute="trailing" constant="-150" id="GWq-JR-270"/>
                                                 <constraint firstItem="ygl-nS-hok" firstAttribute="leading" secondItem="M5u-AB-PuS" secondAttribute="leadingMargin" id="d5e-u7-Xo7"/>
                                                 <constraint firstItem="rJe-Nk-B4a" firstAttribute="centerY" secondItem="ygl-nS-hok" secondAttribute="centerY" id="sbX-Oq-az1"/>
                                                 <constraint firstItem="ygl-nS-hok" firstAttribute="centerY" secondItem="M5u-AB-PuS" secondAttribute="centerY" id="try-YS-vgY"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="rJe-Nk-B4a" secondAttribute="trailing" id="u6t-z2-w20"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="TSV-WB-vCl">
+                                        <rect key="frame" x="0.0" y="469.5" width="414" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="TSV-WB-vCl" id="GXM-Nf-gJf">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Latest Podcast Episodes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HoR-Ze-Aar" userLabel="Description">
+                                                    <rect key="frame" x="20" y="5" width="200" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="tXR-vj-aii"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qxq-7a-VUA">
+                                                    <rect key="frame" x="345" y="4.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="autoDownloadLastestPodcastEpisodesSwitchPressed:" destination="w7U-tM-ml9" eventType="primaryActionTriggered" id="zpe-ew-uXc"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailingMargin" secondItem="Qxq-7a-VUA" secondAttribute="trailing" id="MI2-Az-5Ud"/>
+                                                <constraint firstAttribute="leadingMargin" secondItem="HoR-Ze-Aar" secondAttribute="trailing" constant="-200" id="Ro1-0T-cDq"/>
+                                                <constraint firstItem="HoR-Ze-Aar" firstAttribute="leading" secondItem="GXM-Nf-gJf" secondAttribute="leadingMargin" id="ZiB-s6-Lnv"/>
+                                                <constraint firstItem="Qxq-7a-VUA" firstAttribute="centerY" secondItem="HoR-Ze-Aar" secondAttribute="centerY" id="qM3-c9-0V4"/>
+                                                <constraint firstItem="HoR-Ze-Aar" firstAttribute="centerY" secondItem="GXM-Nf-gJf" secondAttribute="centerY" id="rc6-Gv-uU8"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -2250,7 +2286,7 @@
                             <tableViewSection headerTitle="Cache" id="HhZ-Z2-Suf">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="mft-E5-dJA">
-                                        <rect key="frame" x="0.0" y="469.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="559.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="mft-E5-dJA" id="J3G-B9-FrX">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -2286,7 +2322,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="EM1-Bb-OC4">
-                                        <rect key="frame" x="0.0" y="509.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="599.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="EM1-Bb-OC4" id="az7-Xd-QB4">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -2322,7 +2358,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="ek2-ne-eEe">
-                                        <rect key="frame" x="0.0" y="549.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="639.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ek2-ne-eEe" id="cld-lf-Bzf">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -2358,7 +2394,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="1DU-lI-3fD">
-                                        <rect key="frame" x="0.0" y="589.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="679.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="1DU-lI-3fD" id="wYG-YA-imj">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -2396,6 +2432,7 @@
                     <connections>
                         <outlet property="albumsCountLabel" destination="KgV-m6-5E6" id="bRO-2g-ob0"/>
                         <outlet property="artistsCountLabel" destination="Thx-6G-fSC" id="HSr-Ci-J1L"/>
+                        <outlet property="autoDownloadLastestPodcastEpisodesSwitch" destination="Qxq-7a-VUA" id="dea-Nf-Z5g"/>
                         <outlet property="autoDownloadLastestSongsSwitch" destination="rJe-Nk-B4a" id="wjg-bo-aGF"/>
                         <outlet property="autoSyncProgressLabel" destination="IDq-Rn-c12" id="xnC-OR-s9K"/>
                         <outlet property="cachedCompleteSizeLabel" destination="Xa3-5S-5jr" id="Mac-Hv-7ZW"/>

@@ -46,7 +46,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        podcast.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
+        podcast.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
             self.detailOperationsView?.refresh()
         }
     }

@@ -27,7 +27,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         }
         swipeCallback = { (indexPath, completionHandler) in
             let artist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            artist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
+            artist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
                 completionHandler(SwipeActionContext(containable: artist))
             }
         }
@@ -111,7 +111,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             if self.appDelegate.persistentStorage.settings.isOnlineMode {
-                let autoDownloadSyncer = AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: self.appDelegate.persistentStorage.settings, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 autoDownloadSyncer.syncLatestLibraryElements(context: context)
                 DispatchQueue.main.async {
                     self.refreshControl?.endRefreshing()

@@ -46,7 +46,7 @@ class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
             if self.isRunning, self.persistentStorage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
                 self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                     defer { self.syncSemaphore.signal() }
-                    let autoDownloadSyncer = AutoDownloadLibrarySyncer(persistentStorage: self.persistentStorage, backendApi: self.backendApi, playableDownloadManager: self.playableDownloadManager)
+                    let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: self.persistentStorage.settings, backendApi: self.backendApi, playableDownloadManager: self.playableDownloadManager)
                     autoDownloadSyncer.syncLatestLibraryElements(context: context)
                 }
                 self.syncSemaphore.wait()
@@ -61,8 +61,7 @@ class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
                         self.isRunning = false
                         return
                     }
-                    let syncer = self.backendApi.createLibrarySyncer()
-                    albumToSync.fetchFromServer(inContext: context, syncer: syncer)
+                    albumToSync.fetchFromServer(inContext: context, backendApi: self.backendApi, settings: self.persistentStorage.settings, playableDownloadManager: self.playableDownloadManager)
                 }
                 self.syncSemaphore.wait()
             }

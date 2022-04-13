@@ -13,7 +13,9 @@ class SettingsLibraryVC: UITableViewController {
     @IBOutlet weak var podcastEpisodesCountLabel: UILabel!
     
     @IBOutlet weak var autoSyncProgressLabel: UILabel!
+    
     @IBOutlet weak var autoDownloadLastestSongsSwitch: UISwitch!
+    @IBOutlet weak var autoDownloadLastestPodcastEpisodesSwitch: UISwitch!
     
     @IBOutlet weak var cachedSongsCountLabel: UILabel!
     @IBOutlet weak var cachedPodcastEpisodesCountLabel: UILabel!
@@ -25,6 +27,7 @@ class SettingsLibraryVC: UITableViewController {
         appDelegate.userStatistics.visited(.settingsLibrary)
         
         autoDownloadLastestSongsSwitch.isOn = appDelegate.persistentStorage.settings.isAutoDownloadLatestSongsActive
+        autoDownloadLastestPodcastEpisodesSwitch.isOn = appDelegate.persistentStorage.settings.isAutoDownloadLatestPodcastEpisodesActive
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let library = LibraryStorage(context: context)
 
@@ -111,6 +114,10 @@ class SettingsLibraryVC: UITableViewController {
     
     @IBAction func autoDownloadLastestSongsSwitchPressed(_ sender: Any) {
         appDelegate.persistentStorage.settings.isAutoDownloadLatestSongsActive = autoDownloadLastestSongsSwitch.isOn
+    }
+    
+    @IBAction func autoDownloadLastestPodcastEpisodesSwitchPressed(_ sender: Any) {
+        appDelegate.persistentStorage.settings.isAutoDownloadLatestPodcastEpisodesActive = autoDownloadLastestPodcastEpisodesSwitch.isOn
     }
     
 }

@@ -55,10 +55,10 @@ extension Podcast: PlayableContainable  {
         return episodes
     }
     var playContextType: PlayerMode { return .podcast }
-    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
-        let library = LibraryStorage(context: context)
+    func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
         let podcastAsync = Podcast(managedObject: context.object(with: managedObject.objectID) as! PodcastMO)
-        syncer.sync(podcast: podcastAsync, library: library)
+        let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: settings, backendApi: backendApi, playableDownloadManager: playableDownloadManager)
+        _ = autoDownloadSyncer.syncLatestPodcastEpisodes(podcast: podcastAsync, context: context)
     }
     var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)

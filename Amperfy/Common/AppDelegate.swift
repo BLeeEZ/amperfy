@@ -120,7 +120,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return LocalNotificationManager(userStatistics: userStatistics, persistentStorage: persistentStorage)
     }()
     lazy var backgroundFetchTriggeredSyncer = {
-        return BackgroundFetchTriggeredSyncer(persistentStorage: persistentStorage, backendApi: backendApi, notificationManager: localNotificationManager)
+        return BackgroundFetchTriggeredSyncer(persistentStorage: persistentStorage, backendApi: backendApi, notificationManager: localNotificationManager, playableDownloadManager: playableDownloadManager)
     }()
     lazy var popupDisplaySemaphore = {
         return DispatchSemaphore(value: 1)

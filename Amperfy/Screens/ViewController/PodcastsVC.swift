@@ -44,7 +44,7 @@ class PodcastsVC: BasicTableViewController {
             switch self.showType {
             case .podcasts:
                 let podcast = self.podcastsFetchedResultsController.getWrappedEntity(at: indexPath)
-                podcast.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
+                podcast.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
                     completionHandler(SwipeActionContext(containable: podcast))
                 }
             case .episodesSortedByReleaseDate:
@@ -77,7 +77,7 @@ class PodcastsVC: BasicTableViewController {
                     syncer.syncDownPodcastsWithoutEpisodes(library: syncLibrary)
                     let podcasts = syncLibrary.getPodcasts().filter{$0.remoteStatus == .available}
                     for podcast in podcasts {
-                        podcast.fetchFromServer(inContext: context, syncer: syncer)
+                        podcast.fetchFromServer(inContext: context, backendApi: self.appDelegate.backendApi, settings: self.appDelegate.persistentStorage.settings, playableDownloadManager: self.appDelegate.playableDownloadManager)
                     }
                 }
             }

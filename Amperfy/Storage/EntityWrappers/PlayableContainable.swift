@@ -19,7 +19,7 @@ protocol PlayableContainable {
     var isDownloadAvailable: Bool { get }
     var artworkCollection: ArtworkCollection { get }
     func cachePlayables(downloadManager: DownloadManageable)
-    func fetchFromServer(inContext: NSManagedObjectContext, syncer: LibrarySyncer)
+    func fetchFromServer(inContext: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable)
     var isFavoritable: Bool { get }
     var isFavorite: Bool { get }
     func remoteToggleFavorite(inContext: NSManagedObjectContext, syncer: LibrarySyncer)
@@ -43,20 +43,18 @@ extension PlayableContainable {
         return infoDetails(for: api, type: type).joined(separator: " \(CommonString.oneMiddleDot) ")
     }
     
-    func fetchSync(storage: PersistentStorage, backendApi: BackendApi) {
+    func fetchSync(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) {
         if storage.settings.isOnlineMode {
             storage.context.performAndWait {
-                let syncer = backendApi.createLibrarySyncer()
-                fetchFromServer(inContext: storage.context, syncer: syncer)
+                fetchFromServer(inContext: storage.context, backendApi: backendApi, settings: storage.settings, playableDownloadManager: playableDownloadManager)
             }
         }
     }
     
-    func fetchAsync(storage: PersistentStorage, backendApi: BackendApi, completionHandler: @escaping () -> Void) {
+    func fetchAsync(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable, completionHandler: @escaping () -> Void) {
         if storage.settings.isOnlineMode {
             storage.persistentContainer.performBackgroundTask() { (context) in
-                let syncer = backendApi.createLibrarySyncer()
-                fetchFromServer(inContext: context, syncer: syncer)
+                fetchFromServer(inContext: context, backendApi: backendApi, settings: storage.settings, playableDownloadManager: playableDownloadManager)
                 DispatchQueue.main.async {
                     completionHandler()
                 }

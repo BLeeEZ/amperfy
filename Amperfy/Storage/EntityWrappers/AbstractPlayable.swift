@@ -203,8 +203,9 @@ extension AbstractPlayable: PlayableContainable  {
         return [self]
     }
     var playContextType: PlayerMode { return isSong ? .music : .podcast }
-    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+    func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
         guard let song = asSong else { return }
+        let syncer = backendApi.createLibrarySyncer()
         let library = LibraryStorage(context: context)
         let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
         syncer.sync(song: songAsync, library: library)

@@ -110,7 +110,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                 self.updateSearchResults(for: self.searchController)
                 if self.appDelegate.persistentStorage.settings.isOnlineMode {
                     self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                        let autoDownloadSyncer = AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                        let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: self.appDelegate.persistentStorage.settings, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
                         autoDownloadSyncer.syncLatestLibraryElements(context: context)
                         DispatchQueue.main.async {
                             self.updateSearchResults(for: self.searchController)
@@ -162,7 +162,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             if self.appDelegate.persistentStorage.settings.isOnlineMode {
-                let autoDownloadSyncer = AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: self.appDelegate.persistentStorage.settings, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 autoDownloadSyncer.syncLatestLibraryElements(context: context)
                 DispatchQueue.main.async {
                     self.refreshControl?.endRefreshing()

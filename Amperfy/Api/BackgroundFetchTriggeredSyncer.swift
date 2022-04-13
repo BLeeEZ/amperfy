@@ -7,12 +7,14 @@ class BackgroundFetchTriggeredSyncer {
     private let persistentStorage: PersistentStorage
     private let backendApi: BackendApi
     private let notificationManager: LocalNotificationManager
+    private let playableDownloadManager: DownloadManageable
     private let log = OSLog(subsystem: AppDelegate.name, category: "BackgroundFetchTriggeredSyncer")
     
-    init(persistentStorage: PersistentStorage, backendApi: BackendApi, notificationManager: LocalNotificationManager) {
+    init(persistentStorage: PersistentStorage, backendApi: BackendApi, notificationManager: LocalNotificationManager, playableDownloadManager: DownloadManageable) {
         self.persistentStorage = persistentStorage
         self.backendApi = backendApi
         self.notificationManager = notificationManager
+        self.playableDownloadManager = playableDownloadManager
     }
     
     func syncAndNotifyPodcastEpisodes(completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
@@ -26,11 +28,10 @@ class BackgroundFetchTriggeredSyncer {
             var episodesToNotify = [PodcastEpisode]()
             for podcast in syncLibrary.getPodcasts() {
                 let oldEpisodes = Set(podcast.episodes)
-                syncer.sync(podcast: podcast, library: syncLibrary)
-                let currentEpisodes = Set(podcast.episodes)
+                let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: self.persistentStorage.settings, backendApi: self.backendApi, playableDownloadManager: self.playableDownloadManager)
+                let newAddedRecentEpisodes = autoDownloadSyncer.syncLatestPodcastEpisodes(podcast: podcast, context: context)
                 if oldEpisodes.count > 0 {
-                    let newEpisodes = currentEpisodes.subtracting(oldEpisodes)
-                    for newEpisode in newEpisodes {
+                    for newEpisode in newAddedRecentEpisodes {
                         os_log("Podcast: %s, New Episode: %s", log: self.log, type: .info, podcast.title, newEpisode.title)
                         episodesToNotify.append(newEpisode)
                         backgroundFetchResult = .newData

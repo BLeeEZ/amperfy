@@ -45,7 +45,7 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
+        album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
             self.detailOperationsView?.refresh()
         }
     }

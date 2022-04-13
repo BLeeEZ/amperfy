@@ -122,7 +122,8 @@ extension Artist: PlayableContainable  {
         library.saveContext()
         syncer.setFavorite(artist: artistAsync, isFavorite: artistAsync.isFavorite)
     }
-    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+    func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
+        let syncer = backendApi.createLibrarySyncer()
         let library = LibraryStorage(context: context)
         let artistAsync = Artist(managedObject: context.object(with: managedObject.objectID) as! ArtistMO)
         syncer.sync(artist: artistAsync, library: library)

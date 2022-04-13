@@ -338,7 +338,8 @@ extension Playlist: PlayableContainable  {
         return infoContent
     }
     var playContextType: PlayerMode { return .music }
-    func fetchFromServer(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+    func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
+        let syncer = backendApi.createLibrarySyncer()
         let library = LibraryStorage(context: context)
         let playlistAsync = getManagedObject(in: context, library: library)
         syncer.syncDown(playlist: playlistAsync, library: library)

@@ -54,7 +54,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         refreshBarButtons()
-        playlist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi) {
+        playlist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
             self.playlistOperationsView?.refresh()
         }
     }
