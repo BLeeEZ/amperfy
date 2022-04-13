@@ -111,9 +111,8 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             if self.appDelegate.persistentStorage.settings.isOnlineMode {
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.syncLatestLibraryElements(library: syncLibrary)
+                let autoDownloadSyncer = AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                autoDownloadSyncer.syncLatestLibraryElements(context: context)
                 DispatchQueue.main.async {
                     self.refreshControl?.endRefreshing()
                 }

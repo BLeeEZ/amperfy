@@ -105,7 +105,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return dlManager
     }()
     lazy var backgroundLibrarySyncer = {
-        return BackgroundLibrarySyncer(persistentStorage: persistentStorage, backendApi: backendApi)
+        return BackgroundLibrarySyncer(persistentStorage: persistentStorage, backendApi: backendApi, playableDownloadManager: playableDownloadManager)
     }()
     lazy var scrobbleSyncer = {
         return ScrobbleSyncer(persistentStorage: persistentStorage, backendApi: backendApi)

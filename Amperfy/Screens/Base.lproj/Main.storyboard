@@ -2213,12 +2213,44 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="nz1-xH-09g">
+                                        <rect key="frame" x="0.0" y="379.5" width="414" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="nz1-xH-09g" id="M5u-AB-PuS">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Auto download latest songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ygl-nS-hok" userLabel="Description">
+                                                    <rect key="frame" x="20" y="5" width="200" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="ZK3-eK-NRi"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rJe-Nk-B4a">
+                                                    <rect key="frame" x="345" y="4.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="autoDownloadLastestSongsSwitchPressed:" destination="w7U-tM-ml9" eventType="primaryActionTriggered" id="d1B-SL-bGJ"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="leadingMargin" secondItem="ygl-nS-hok" secondAttribute="trailing" constant="-200" id="GWq-JR-270"/>
+                                                <constraint firstItem="ygl-nS-hok" firstAttribute="leading" secondItem="M5u-AB-PuS" secondAttribute="leadingMargin" id="d5e-u7-Xo7"/>
+                                                <constraint firstItem="rJe-Nk-B4a" firstAttribute="centerY" secondItem="ygl-nS-hok" secondAttribute="centerY" id="sbX-Oq-az1"/>
+                                                <constraint firstItem="ygl-nS-hok" firstAttribute="centerY" secondItem="M5u-AB-PuS" secondAttribute="centerY" id="try-YS-vgY"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="rJe-Nk-B4a" secondAttribute="trailing" id="u6t-z2-w20"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="Cache" id="HhZ-Z2-Suf">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="mft-E5-dJA">
-                                        <rect key="frame" x="0.0" y="429.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="469.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="mft-E5-dJA" id="J3G-B9-FrX">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -2254,7 +2286,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="EM1-Bb-OC4">
-                                        <rect key="frame" x="0.0" y="469.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="509.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="EM1-Bb-OC4" id="az7-Xd-QB4">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -2290,7 +2322,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="ek2-ne-eEe">
-                                        <rect key="frame" x="0.0" y="509.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="549.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ek2-ne-eEe" id="cld-lf-Bzf">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -2326,7 +2358,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="1DU-lI-3fD">
-                                        <rect key="frame" x="0.0" y="549.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="589.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="1DU-lI-3fD" id="wYG-YA-imj">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -2364,6 +2396,7 @@
                     <connections>
                         <outlet property="albumsCountLabel" destination="KgV-m6-5E6" id="bRO-2g-ob0"/>
                         <outlet property="artistsCountLabel" destination="Thx-6G-fSC" id="HSr-Ci-J1L"/>
+                        <outlet property="autoDownloadLastestSongsSwitch" destination="rJe-Nk-B4a" id="wjg-bo-aGF"/>
                         <outlet property="autoSyncProgressLabel" destination="IDq-Rn-c12" id="xnC-OR-s9K"/>
                         <outlet property="cachedCompleteSizeLabel" destination="Xa3-5S-5jr" id="Mac-Hv-7ZW"/>
                         <outlet property="cachedPodcastEpisodesCountLabel" destination="Rs7-WB-xxv" id="Clu-oa-4R2"/>

@@ -3,17 +3,20 @@ import os.log
 
 class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     
-    private let log = OSLog(subsystem: AppDelegate.name, category: "BackgroundLibrarySyncer")
     private let persistentStorage: PersistentStorage
     private let backendApi: BackendApi
+    private let playableDownloadManager: DownloadManageable
+    
+    private let log = OSLog(subsystem: AppDelegate.name, category: "BackgroundLibrarySyncer")
     private let activeDispatchGroup = DispatchGroup()
     private let syncSemaphore = DispatchSemaphore(value: 0)
     private var isRunning = false
     private var isCurrentlyActive = false
     
-    init(persistentStorage: PersistentStorage, backendApi: BackendApi) {
+    init(persistentStorage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) {
         self.persistentStorage = persistentStorage
         self.backendApi = backendApi
+        self.playableDownloadManager = playableDownloadManager
     }
     
     var isActive: Bool { return isCurrentlyActive }
@@ -43,9 +46,8 @@ class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
             if self.isRunning, self.persistentStorage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
                 self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                     defer { self.syncSemaphore.signal() }
-                    let syncLibrary = LibraryStorage(context: context)
-                    let syncer = self.backendApi.createLibrarySyncer()
-                    syncer.syncLatestLibraryElements(library: syncLibrary)
+                    let autoDownloadSyncer = AutoDownloadLibrarySyncer(persistentStorage: self.persistentStorage, backendApi: self.backendApi, playableDownloadManager: self.playableDownloadManager)
+                    autoDownloadSyncer.syncLatestLibraryElements(context: context)
                 }
                 self.syncSemaphore.wait()
             }
