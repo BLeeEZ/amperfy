@@ -26,7 +26,7 @@
                             </constraints>
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XhW-hw-pIz" userLabel="Title Label">
-                            <rect key="frame" x="0.0" y="87" width="343" height="23"/>
+                            <rect key="frame" x="0.0" y="80" width="343" height="23"/>
                             <attributedString key="attributedText">
                                 <fragment content="Title">
                                     <attributes>
@@ -37,19 +37,42 @@
                             </attributedString>
                             <nil key="highlightedColor"/>
                         </label>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mie-tL-VVX" userLabel="Subtitle Label">
-                            <rect key="frame" x="142.5" y="125.5" width="58.5" height="20.5"/>
-                            <attributedString key="attributedText">
-                                <fragment content="Subtitle">
-                                    <attributes>
-                                        <color key="NSColor" systemColor="secondaryLabelColor"/>
-                                        <font key="NSFont" metaFont="system" size="17"/>
-                                        <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                    </attributes>
-                                </fragment>
-                            </attributedString>
-                            <nil key="highlightedColor"/>
-                        </label>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qob-Cu-9TI" userLabel="Subtitle View">
+                            <rect key="frame" x="138" y="111" width="67" height="42"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mie-tL-VVX" userLabel="Subtitle Label">
+                                    <rect key="frame" x="0.0" y="0.0" width="67" height="42"/>
+                                    <attributedString key="attributedText">
+                                        <fragment content="Subtitle">
+                                            <attributes>
+                                                <color key="NSColor" systemColor="secondaryLabelColor"/>
+                                                <font key="NSFont" metaFont="system" size="17"/>
+                                                <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="875-8v-N94">
+                                    <rect key="frame" x="0.0" y="0.0" width="67" height="42"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <connections>
+                                        <action selector="subtitleButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="QLk-th-AbQ"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstAttribute="bottom" secondItem="875-8v-N94" secondAttribute="bottom" id="3Td-y8-Mq1"/>
+                                <constraint firstAttribute="bottom" secondItem="Mie-tL-VVX" secondAttribute="bottom" id="4Ln-vG-XDg"/>
+                                <constraint firstItem="Mie-tL-VVX" firstAttribute="top" secondItem="Qob-Cu-9TI" secondAttribute="top" id="660-Q8-VaM"/>
+                                <constraint firstItem="875-8v-N94" firstAttribute="leading" secondItem="Qob-Cu-9TI" secondAttribute="leading" id="NDZ-WW-ofZ"/>
+                                <constraint firstAttribute="trailing" secondItem="Mie-tL-VVX" secondAttribute="trailing" id="NKA-H3-aq4"/>
+                                <constraint firstItem="Mie-tL-VVX" firstAttribute="leading" secondItem="Qob-Cu-9TI" secondAttribute="leading" id="Q46-8q-KdM"/>
+                                <constraint firstItem="875-8v-N94" firstAttribute="top" secondItem="Qob-Cu-9TI" secondAttribute="top" id="epv-9K-0E7"/>
+                                <constraint firstAttribute="trailing" secondItem="875-8v-N94" secondAttribute="trailing" id="tW5-8a-6Rg"/>
+                            </constraints>
+                        </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iPX-Fa-tH3" userLabel="Info Label">
                             <rect key="frame" x="0.0" y="161" width="343" height="17"/>
                             <attributedString key="attributedText">
@@ -84,6 +107,7 @@
                 <outlet property="entityImage" destination="3rO-9J-GXf" id="YmA-Of-PFc"/>
                 <outlet property="infoLabel" destination="iPX-Fa-tH3" id="j5o-NT-gP7"/>
                 <outlet property="subtitleLabel" destination="Mie-tL-VVX" id="Uq3-yR-wnF"/>
+                <outlet property="subtitleView" destination="Qob-Cu-9TI" id="2aq-o8-Oaf"/>
                 <outlet property="titleLabel" destination="XhW-hw-pIz" id="ick-V4-fQl"/>
             </connections>
             <point key="canvasLocation" x="-31.199999999999999" y="-89.055472263868069"/>

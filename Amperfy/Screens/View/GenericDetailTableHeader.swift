@@ -4,6 +4,7 @@ class GenericDetailTableHeader: UIView {
     
     @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var subtitleView: UIView!
     @IBOutlet weak var subtitleLabel: UILabel!
     @IBOutlet weak var infoLabel: UILabel!
     
@@ -34,11 +35,22 @@ class GenericDetailTableHeader: UIView {
         guard let entityContainer = entityContainer else { return }
         entityImage.display(container: entityContainer)
         titleLabel.text = entityContainer.name
-        subtitleLabel.isHidden = entityContainer.subtitle == nil
+        subtitleView.isHidden = entityContainer.subtitle == nil
         subtitleLabel.text = entityContainer.subtitle
         let infoText = entityContainer.info(for: appDelegate.backendProxy.selectedApi, type: .long)
         infoLabel.isHidden = infoText.isEmpty
         infoLabel.text = infoText
     }
-
+    
+    @IBAction func subtitleButtonPressed(_ sender: Any) {
+        guard let album = entityContainer as? Album,
+              let artist = album.artist,
+              let navController = self.rootView?.navigationController
+        else { return }
+        self.appDelegate.userStatistics.usedAction(.alertGoToAlbum)
+        let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
+        artistDetailVC.artist = artist
+        navController.pushViewController(artistDetailVC, animated: true)
+    }
+    
 }
