@@ -2405,11 +2405,11 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="cb2-Xz-1N3"/>
                                                     </constraints>
-                                                    <state key="normal" title="Delete Cache">
-                                                        <color key="titleColor" systemColor="systemRedColor"/>
+                                                    <state key="normal" title="Download all songs in library">
+                                                        <color key="titleColor" systemColor="tintColor"/>
                                                     </state>
                                                     <connections>
-                                                        <action selector="deleteSongCachePressed:" destination="w7U-tM-ml9" eventType="touchUpInside" id="h0l-f9-iMy"/>
+                                                        <action selector="downloadAllSongsInLibraryPressed:" destination="w7U-tM-ml9" eventType="touchUpInside" id="9jg-LM-Clu"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -2417,6 +2417,33 @@
                                                 <constraint firstItem="cDs-mB-2Gm" firstAttribute="leading" secondItem="wYG-YA-imj" secondAttribute="leadingMargin" id="aE8-aD-UeW"/>
                                                 <constraint firstItem="cDs-mB-2Gm" firstAttribute="centerY" secondItem="wYG-YA-imj" secondAttribute="centerY" id="sWS-xL-hRh"/>
                                                 <constraint firstItem="cDs-mB-2Gm" firstAttribute="trailing" secondItem="wYG-YA-imj" secondAttribute="trailingMargin" id="vUM-LT-twX"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="3RZ-xd-XId">
+                                        <rect key="frame" x="0.0" y="719.5" width="414" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="3RZ-xd-XId" id="qgz-Kq-gKu">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sIx-Xi-AtL">
+                                                    <rect key="frame" x="20" y="5" width="374" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="nL7-aP-qyZ"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Delete Cache">
+                                                        <color key="titleColor" systemColor="systemRedColor"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="deleteSongCachePressed:" destination="w7U-tM-ml9" eventType="touchUpInside" id="yFi-B3-gr7"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="sIx-Xi-AtL" firstAttribute="centerY" secondItem="qgz-Kq-gKu" secondAttribute="centerY" id="Gkq-Ne-5u2"/>
+                                                <constraint firstItem="sIx-Xi-AtL" firstAttribute="leading" secondItem="qgz-Kq-gKu" secondAttribute="leadingMargin" id="Q57-h1-0R6"/>
+                                                <constraint firstItem="sIx-Xi-AtL" firstAttribute="trailing" secondItem="qgz-Kq-gKu" secondAttribute="trailingMargin" id="XzA-mt-lC2"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -3143,6 +3170,9 @@
         </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="tintColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

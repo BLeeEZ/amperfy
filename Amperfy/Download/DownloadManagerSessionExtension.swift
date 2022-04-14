@@ -57,9 +57,11 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
                     totalBytesExpectedToWrite: Int64) {
         guard let requestUrl = downloadTask.originalRequest?.url?.absoluteString else { return }
         
-        self.persistentStorage.context.performAndWait {
-            let library = LibraryStorage(context: self.persistentStorage.context)
+        self.persistentStorage.persistentContainer.performBackgroundTask() { context in
+            let library = LibraryStorage(context: context)
             guard let download = library.getDownload(url: requestUrl) else { return }
+            let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+            guard progress > download.progress, (download.progress == 0.0) || (progress > download.progress + 0.1) else { return }
             download.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
             download.totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
             library.saveContext()

@@ -72,14 +72,10 @@ class DownloadManager: NSObject, DownloadManageable {
     }
     
     func cancelDownloads() {
-        let sync = DispatchGroup()
-        sync.enter()
         requestManager.cancelDownloads()
         urlSession.getAllTasks { tasks in
             tasks.forEach{ $0.cancel() }
-            sync.leave()
         }
-        sync.wait()
     }
     
     func clearFinishedDownloads() {

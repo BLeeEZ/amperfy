@@ -98,6 +98,17 @@ class SettingsLibraryVC: UITableViewController {
         }
     }
     
+    @IBAction func downloadAllSongsInLibraryPressed(_ sender: Any) {
+        let alert = UIAlertController(title: "Download all songs in library", message: "This action will add all uncached songs in \"Library -> Songs\" to the download queue. With this action a lot network traffic can be generated and device storage capacity will be taken. Continue?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Yes", style: .default , handler: { _ in
+            let allSongsToDownload = self.appDelegate.library.getSongsForCompleteLibraryDownload()
+            self.appDelegate.playableDownloadManager.download(objects: allSongsToDownload)
+        }))
+        alert.addAction(UIAlertAction(title: "No", style: .default , handler: nil))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        self.present(alert, animated: true)
+    }
+    
     @IBAction func deleteSongCachePressed(_ sender: Any) {
         let alert = UIAlertController(title: "Delete Cache", message: "Are you sure to delete all downloaded files from cache?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in

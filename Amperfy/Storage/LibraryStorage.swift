@@ -586,6 +586,18 @@ class LibraryStorage: PlayableFileCachable {
         return songs ?? [Song]()
     }
     
+    func getSongsForCompleteLibraryDownload() -> [Song] {
+        let fetchRequest = SongMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+            NSPredicate(format: "%K == nil", #keyPath(SongMO.file)),
+            NSPredicate(format: "%K == nil", #keyPath(SongMO.download))
+        ])
+        let foundSongs = try? context.fetch(fetchRequest)
+        let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
+        return songs ?? [Song]()
+    }
+    
     func getFavoriteSongs() -> [Song] {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [

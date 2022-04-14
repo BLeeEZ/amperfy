@@ -20,10 +20,13 @@ class DownloadRequestManager {
     }
     
     func add(objects: [Downloadable]) {
-        persistentStorage.context.perform {
-            let library = LibraryStorage(context: self.persistentStorage.context)
-            for object in objects {
+        persistentStorage.persistentContainer.performBackgroundTask{ context in
+            let library = LibraryStorage(context: context)
+            for (n,object) in objects.enumerated() {
                 self.addLowPrio(object: object, library: library)
+                if (n % 500) == 0 {
+                    library.saveContext()
+                }
             }
             library.saveContext()
         }
