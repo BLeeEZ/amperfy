@@ -175,6 +175,7 @@
 		50973ADD2636E4C4005497CA /* SsGenreParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50973ADC2636E4C4005497CA /* SsGenreParserDelegate.swift */; };
 		509A7D8228059A0D009791D1 /* BackgroundLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509A7D8128059A0D009791D1 /* BackgroundLibrarySyncer.swift */; };
 		509A7D842806A232009791D1 /* AutoDownloadLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509A7D832806A232009791D1 /* AutoDownloadLibrarySyncer.swift */; };
+		509A7D862808191E009791D1 /* SettingsArtworkVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509A7D852808191E009791D1 /* SettingsArtworkVC.swift */; };
 		50A12F432739239800E7B2AA /* EmbeddedArtworkMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A12F412739239800E7B2AA /* EmbeddedArtworkMO+CoreDataClass.swift */; };
 		50A12F442739239800E7B2AA /* EmbeddedArtworkMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A12F422739239800E7B2AA /* EmbeddedArtworkMO+CoreDataProperties.swift */; };
 		50A12F4627392B2400E7B2AA /* EmbeddedArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A12F4527392B2400E7B2AA /* EmbeddedArtwork.swift */; };
@@ -569,6 +570,7 @@
 		509A7D80280594D5009791D1 /* Amperfy v25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v25.xcdatamodel"; sourceTree = "<group>"; };
 		509A7D8128059A0D009791D1 /* BackgroundLibrarySyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundLibrarySyncer.swift; sourceTree = "<group>"; };
 		509A7D832806A232009791D1 /* AutoDownloadLibrarySyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoDownloadLibrarySyncer.swift; sourceTree = "<group>"; };
+		509A7D852808191E009791D1 /* SettingsArtworkVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsArtworkVC.swift; sourceTree = "<group>"; };
 		50A01FBD27BCD4BD000368EF /* Amperfy v20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v20.xcdatamodel"; sourceTree = "<group>"; };
 		50A12F402739203E00E7B2AA /* Amperfy v15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v15.xcdatamodel"; sourceTree = "<group>"; };
 		50A12F412739239800E7B2AA /* EmbeddedArtworkMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmbeddedArtworkMO+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -1196,6 +1198,7 @@
 				5077F93D222489510099CA91 /* SettingsVC.swift */,
 				506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */,
 				5017995F27CCE110002554E5 /* SettingsServerURLsVC.swift */,
+				509A7D852808191E009791D1 /* SettingsArtworkVC.swift */,
 				50814C9A27D8A3EB0072738F /* SettingsArtworkDisplayStyleVC.swift */,
 				50814C9C27D8A8190072738F /* SettingsArtworkDownloadVC.swift */,
 				506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */,
@@ -1590,6 +1593,7 @@
 				509A7D842806A232009791D1 /* AutoDownloadLibrarySyncer.swift in Sources */,
 				50C16C3421EB454100F086F0 /* LibraryUpdater.swift in Sources */,
 				50D92CCF25E3FE560017E91D /* MigrationPolicyV4toV5.swift in Sources */,
+				509A7D862808191E009791D1 /* SettingsArtworkVC.swift in Sources */,
 				50C16C1E21E7A35C00F086F0 /* GenericTableCell.swift in Sources */,
 				50120A2526281C1900B037B1 /* BasicTableViewController.swift in Sources */,
 				509001C327182A4700A8056D /* CatalogParserDelegate.swift in Sources */,

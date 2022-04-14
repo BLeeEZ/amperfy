@@ -96,6 +96,22 @@ class LibraryStorage: PlayableFileCachable {
     var artworkCount: Int {
         return (try? context.count(for: ArtworkMO.fetchRequest())) ?? 0
     }
+
+    var artworkNotCheckedCount: Int {
+        let request: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.status), NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue))),
+        ])
+        return (try? context.count(for: request)) ?? 0
+    }
+
+    var cachedArtworkCount: Int {
+        let request: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K != nil", #keyPath(ArtworkMO.imageData))
+        ])
+        return (try? context.count(for: request)) ?? 0
+    }
     
     var musicFolderCount: Int {
         return (try? context.count(for: MusicFolderMO.fetchRequest())) ?? 0
@@ -855,6 +871,18 @@ class LibraryStorage: PlayableFileCachable {
         let fetchRequest: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.status), NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue)))
         fetchRequest.fetchLimit = fetchCount
+        let foundArtworks = try? context.fetch(fetchRequest)
+        let artworks = foundArtworks?.compactMap{ Artwork(managedObject: $0) }
+        return artworks ?? [Artwork]()
+    }
+    
+    func getArtworksForCompleteLibraryDownload() -> [Artwork] {
+        let fetchRequest = ArtworkMO.fetchRequest()
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == nil", #keyPath(ArtworkMO.imageData)),
+            NSPredicate(format: "%K == nil", #keyPath(ArtworkMO.download)),
+            NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.status), NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue)))
+        ])
         let foundArtworks = try? context.fetch(fetchRequest)
         let artworks = foundArtworks?.compactMap{ Artwork(managedObject: $0) }
         return artworks ?? [Artwork]()

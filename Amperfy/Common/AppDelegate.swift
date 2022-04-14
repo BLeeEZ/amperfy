@@ -77,7 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var artworkDownloadManager: DownloadManageable = {
         let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
         let requestManager = DownloadRequestManager(persistentStorage: persistentStorage, downloadDelegate: dlDelegate)
-        requestManager.clearAllDownloads()
+        requestManager.clearAllDownloadsIfAllHaveFinished()
         let dlManager = DownloadManager(name: "ArtworkDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
         dlManager.isFailWithPopupError = false
         

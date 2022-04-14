@@ -101,6 +101,21 @@ class DownloadRequestManager {
         library.saveContext()
     }
     
+    var notStartedDownloadCount: Int {
+        let request: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            self.downloadDelegate.requestPredicate,
+            NSPredicate(format: "%K == nil", #keyPath(DownloadMO.startDate)),
+        ])
+        return (try? persistentStorage.context.count(for: request)) ?? 0
+    }
+    
+    func clearAllDownloadsIfAllHaveFinished() {
+        if notStartedDownloadCount == 0 {
+            clearAllDownloads()
+        }
+    }
+    
     func clearAllDownloads() {
         let library = LibraryStorage(context: persistentStorage.context)
         let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
