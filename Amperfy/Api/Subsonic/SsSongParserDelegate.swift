@@ -18,6 +18,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
             
             if let fetchedSong = library.getSong(id: songId)  {
                 songBuffer = fetchedSong
+                songBuffer?.remoteStatus = .available
             } else {
                 songBuffer = library.createSong()
                 songBuffer?.id = songId

@@ -96,17 +96,8 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func sync(genre: Genre, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
         for album in genre.albums {
-            let albumParser = AlbumParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
-            self.ampacheXmlServerApi.requestAlbumInfo(of: album, parserDelegate: albumParser)
-            if let error = albumParser.error?.asAmpacheError, !error.isRemoteAvailable {
-                os_log("Album <%s> is remote deleted", log: log, type: .info, album.name)
-                album.remoteStatus = .deleted
-            } else {
-                let songParser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
-                self.ampacheXmlServerApi.requestAlbumSongs(of: album, parserDelegate: songParser)
-            }
+            sync(album: album, library: library)
         }
         library.saveContext()
     }
@@ -119,10 +110,27 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             os_log("Artist <%s> is remote deleted", log: log, type: .info, artist.name)
             artist.remoteStatus = .deleted
         } else {
+            let oldAlbums = Set(artist.albums)
             let albumParser = AlbumParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
             self.ampacheXmlServerApi.requestArtistAlbums(of: artist, parserDelegate: albumParser)
+            let removedAlbums = oldAlbums.subtracting(albumParser.albumsParsed)
+            for album in removedAlbums {
+                os_log("Album <%s> is remote deleted", log: log, type: .info, album.name)
+                album.remoteStatus = .deleted
+                album.songs.forEach{
+                    os_log("Song <%s> is remote deleted", log: log, type: .info, $0.displayString)
+                    $0.remoteStatus = .deleted
+                }
+            }
+
+            let oldSongs = Set(artist.songs)
             let songParser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
             self.ampacheXmlServerApi.requestArtistSongs(of: artist, parserDelegate: songParser)
+            let removedSongs = oldSongs.subtracting(songParser.parsedSongs)
+            removedSongs.lazy.compactMap{$0.asSong}.forEach{
+                os_log("Song <%s> is remote deleted", log: log, type: .info, $0.displayString)
+                $0.remoteStatus = .deleted
+            }
         }
         library.saveContext()
     }
@@ -134,9 +142,20 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         if let error = albumParser.error?.asAmpacheError, !error.isRemoteAvailable {
             os_log("Album <%s> is remote deleted", log: log, type: .info, album.name)
             album.remoteStatus = .deleted
+            album.songs.forEach{
+                os_log("Song <%s> is remote deleted", log: log, type: .info, $0.displayString)
+                $0.remoteStatus = .deleted
+            }
         } else {
+            let oldSongs = Set(album.songs)
             let songParser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
             self.ampacheXmlServerApi.requestAlbumSongs(of: album, parserDelegate: songParser)
+            let removedSongs = oldSongs.subtracting(songParser.parsedSongs)
+            removedSongs.lazy.compactMap{$0.asSong}.forEach{
+                os_log("Song <%s> is remote deleted", log: log, type: .info, $0.displayString)
+                $0.remoteStatus = .deleted
+                album.managedObject.removeFromSongs($0.managedObject)
+            }
             album.isSongsMetaDataSynced = true
         }
         library.saveContext()
