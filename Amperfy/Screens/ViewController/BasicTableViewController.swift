@@ -138,7 +138,8 @@ class BasicTableViewController: UITableViewController {
     var swipeDisplaySettings = SwipeDisplaySettings()
     var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
     var swipeCallback: SwipeActionCallback?
-
+    private var isEditLockedDueToActiveSwipe = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
@@ -155,6 +156,14 @@ class BasicTableViewController: UITableViewController {
         updateSearchResults(for: searchController)
     }
     
+    override func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {
+        isEditLockedDueToActiveSwipe = true
+    }
+    
+    override func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
+        isEditLockedDueToActiveSwipe = false
+    }
+
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let swipeCB = swipeCallback,
               let containableCB = containableAtIndexPathCallback,
@@ -234,17 +243,17 @@ extension BasicTableViewController: NSFetchedResultsControllerDelegate {
             tableView.reloadData()
             noAnimationAtNextDataChange = false
         } else {
-            tableView.beginUpdates()
-            if !rowsToInsert.isEmpty {
-                tableView.insertRows(at: rowsToInsert, with: .bottom)
-            }
-            if !rowsToDelete.isEmpty {
-                tableView.deleteRows(at: rowsToDelete, with: .left)
-            }
-            if !rowsToUpdate.isEmpty {
-                tableView.reloadRows(at: rowsToUpdate, with: .none)
-            }
-            tableView.endUpdates()
+            tableView.performBatchUpdates({
+                if !rowsToInsert.isEmpty {
+                    tableView.insertRows(at: rowsToInsert, with: .bottom)
+                }
+                if !rowsToDelete.isEmpty {
+                    tableView.deleteRows(at: rowsToDelete, with: .left)
+                }
+                if !rowsToUpdate.isEmpty, !isEditLockedDueToActiveSwipe {
+                    tableView.reloadRows(at: rowsToUpdate, with: .none)
+                }
+            }, completion: nil)
         }
     }
     
