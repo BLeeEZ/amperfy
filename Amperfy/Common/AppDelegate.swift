@@ -177,6 +177,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return true
         }
         libraryUpdater.performBlockingLibraryUpdatesIfNeeded()
+        library.resolveDuplicates()
         artworkDownloadManager.start()
         playableDownloadManager.start()
         backgroundLibrarySyncer.start()

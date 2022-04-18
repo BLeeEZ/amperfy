@@ -41,4 +41,7 @@ extension PlaylistMO: CoreDataIdentifyable {
         return \PlaylistMO.name
     }
     
+    func passOwnership(to targetPlaylist: PlaylistMO) {
+    }
+    
 }

@@ -15,6 +15,11 @@ enum PlaylistSearchCategory: Int {
     static let defaultValue: PlaylistSearchCategory = .all
 }
 
+struct LibraryDuplicateInfo {
+    let id: String
+    let count: Int
+}
+
 class LibraryStorage: PlayableFileCachable {
     
     static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName, ScrobbleEntry.typeName]
@@ -25,6 +30,146 @@ class LibraryStorage: PlayableFileCachable {
     
     init(context: NSManagedObjectContext) {
         self.context = context
+    }
+    
+    func resolveDuplicates() {
+        var isDuplicateFound = false
+        
+        let allGenreDuplicates = findDuplicates(for: Genre.typeName)
+        allGenreDuplicates.forEach {
+            var genreDuplicates = getGenres(id: $0.id)
+            if genreDuplicates.count > 1 {
+                isDuplicateFound = true
+                let leadGenre = genreDuplicates.removeFirst()
+                os_log("Duplicated Genre (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadGenre.name)
+                for genre in genreDuplicates {
+                    genre.managedObject.passOwnership(to: leadGenre.managedObject)
+                    context.delete(genre.managedObject)
+                }
+            }
+            saveContext()
+        }
+        
+        let allArtistDuplicates = findDuplicates(for: Artist.typeName)
+        allArtistDuplicates.forEach {
+            isDuplicateFound = true
+            var artistDuplicates = getArtists(id: $0.id)
+            let leadArtist = artistDuplicates.removeFirst()
+            os_log("Duplicated Artist (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadArtist.name)
+            for artist in artistDuplicates {
+                artist.managedObject.passOwnership(to: leadArtist.managedObject)
+                context.delete(artist.managedObject)
+            }
+            saveContext()
+        }
+        
+        let allAlbumDuplicates = findDuplicates(for: Album.typeName)
+        allAlbumDuplicates.forEach {
+            isDuplicateFound = true
+            var albumDuplicates = getAlbums(id: $0.id)
+            let leadAlbum = albumDuplicates.removeFirst()
+            os_log("Duplicated Album (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadAlbum.name)
+            for album in albumDuplicates {
+                album.managedObject.passOwnership(to: leadAlbum.managedObject)
+                context.delete(album.managedObject)
+            }
+            saveContext()
+        }
+        
+        let allSongDuplicates = findDuplicates(for: Song.typeName)
+        allSongDuplicates.forEach {
+            isDuplicateFound = true
+            var songDuplicates = getSongs(id: $0.id)
+            let leadSong = songDuplicates.removeFirst()
+            os_log("Duplicated Song (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadSong.displayString)
+            for song in songDuplicates {
+                song.managedObject.passOwnership(to: leadSong.managedObject)
+                deleteCache(ofPlayable: leadSong)
+                if let embeddedArtwork = song.managedObject.embeddedArtwork {
+                    context.delete(embeddedArtwork)
+                }
+                if let download = song.managedObject.download {
+                    context.delete(download)
+                }
+                context.delete(song.managedObject)
+            }
+            saveContext()
+        }
+        
+        let allPodcastEpisodesDuplicates = findDuplicates(for: PodcastEpisode.typeName)
+        allPodcastEpisodesDuplicates.forEach {
+            isDuplicateFound = true
+            var podcastEpisodesDuplicates = getPodcastEpisodes(id: $0.id)
+            let leadPodcastEpisodes = podcastEpisodesDuplicates.removeFirst()
+            os_log("Duplicated Podcast Episode (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadPodcastEpisodes.displayString)
+            for podcastEpisode in podcastEpisodesDuplicates {
+                podcastEpisode.managedObject.passOwnership(to: leadPodcastEpisodes.managedObject)
+                deleteCache(ofPlayable: leadPodcastEpisodes)
+                if let embeddedArtwork = podcastEpisode.managedObject.embeddedArtwork {
+                    context.delete(embeddedArtwork)
+                }
+                if let download = podcastEpisode.managedObject.download {
+                    context.delete(download)
+                }
+                context.delete(podcastEpisode.managedObject)
+            }
+            saveContext()
+        }
+        
+        let allPodcastDuplicates = findDuplicates(for: Podcast.typeName)
+        allPodcastDuplicates.forEach {
+            isDuplicateFound = true
+            var podcastDuplicates = getPodcasts(id: $0.id)
+            let leadPodcast = podcastDuplicates.removeFirst()
+            os_log("Duplicated Podcast (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadPodcast.name)
+            for podcast in podcastDuplicates {
+                podcast.managedObject.passOwnership(to: leadPodcast.managedObject)
+                context.delete(podcast.managedObject)
+            }
+            saveContext()
+        }
+        
+        let allPlaylistDuplicates = findDuplicates(for: Playlist.typeName).filter{ $0.id != "" }
+        allPlaylistDuplicates.forEach {
+            isDuplicateFound = true
+            var playlistDuplicates = getPlaylists(id: $0.id)
+            let leadPlaylist = playlistDuplicates.removeFirst()
+            os_log("Duplicated Playlist (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadPlaylist.name)
+            for playlist in playlistDuplicates {
+                playlist.managedObject.passOwnership(to: leadPlaylist.managedObject)
+                deletePlaylist(playlist)
+            }
+            saveContext()
+        }
+        
+        if isDuplicateFound {
+            os_log("Duplicate Scan: Some duplicates have been found", log: log, type: .info)
+        } else {
+            os_log("Duplicate Scan: No duplicates have been found", log: log, type: .info)
+        }
+    }
+    
+    func findDuplicates(for entityName: String) -> [LibraryDuplicateInfo] {
+        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: entityName)
+        let idExpr = NSExpression(forKeyPath: "id")
+        let countExpr = NSExpressionDescription()
+        let countVariableExpr = NSExpression(forVariable: "count")
+
+        countExpr.name = "count"
+        countExpr.expression = NSExpression(forFunction: "count:", arguments: [ idExpr ])
+        countExpr.expressionResultType = .integer64AttributeType
+
+        fetchRequest.resultType = .dictionaryResultType
+        fetchRequest.sortDescriptors = [ NSSortDescriptor(key: "id", ascending: true) ]
+        fetchRequest.propertiesToGroupBy = [ #keyPath(AbstractLibraryEntityMO.id) ]
+        fetchRequest.propertiesToFetch = [ #keyPath(AbstractLibraryEntityMO.id), countExpr ]
+        fetchRequest.havingPredicate = NSPredicate(format: "%@ > 1", countVariableExpr)
+
+        let results = (try? context.fetch(fetchRequest)) ?? [NSDictionary]()
+        return results.compactMap{
+            guard let id = $0["id"] as? String, let count = $0["count"] as? Int else { return nil }
+            return LibraryDuplicateInfo(id: id, count: count)
+        }
     }
     
     func getInfo() -> LibraryInfo {
@@ -300,6 +445,10 @@ class LibraryStorage: PlayableFileCachable {
     }
     
     func deletePlaylist(_ playlist: Playlist) {
+        let playlistEntries = playlist.managedObject.items
+        playlistEntries?.compactMap{ $0 as? PlaylistItemMO }.forEach{
+            context.delete($0)
+        }
         context.delete(playlist.managedObject)
     }
     
@@ -757,6 +906,13 @@ class LibraryStorage: PlayableFileCachable {
         return genres?.lazy.compactMap{ Genre(managedObject: $0) }.first
     }
     
+    private func getGenres(id: String) -> [Genre] {
+        let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(GenreMO.id), NSString(string: id))
+        let genres = try? context.fetch(fetchRequest)
+        return genres?.compactMap{ Genre(managedObject: $0) } ?? [Genre]()
+    }
+    
     func getGenre(name: String) -> Genre? {
         let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(GenreMO.name), NSString(string: name))
@@ -771,6 +927,13 @@ class LibraryStorage: PlayableFileCachable {
         fetchRequest.fetchLimit = 1
         let artists = try? context.fetch(fetchRequest)
         return artists?.lazy.compactMap{ Artist(managedObject: $0) }.first
+    }
+    
+    private func getArtists(id: String) -> [Artist] {
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(ArtistMO.id), NSString(string: id))
+        let artists = try? context.fetch(fetchRequest)
+        return artists?.compactMap{ Artist(managedObject: $0) } ?? [Artist]()
     }
     
     func getArtistLocal(name: String) -> Artist? {
@@ -792,6 +955,13 @@ class LibraryStorage: PlayableFileCachable {
         return albums?.lazy.compactMap{ Album(managedObject: $0) }.first
     }
     
+    private func getAlbums(id: String) -> [Album] {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(AlbumMO.id), NSString(string: id))
+        let albums = try? context.fetch(fetchRequest)
+        return albums?.compactMap{ Album(managedObject: $0) } ?? [Album]()
+    }
+    
     func getAlbumWithoutSyncedSongs() -> Album? {
         let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -807,16 +977,30 @@ class LibraryStorage: PlayableFileCachable {
         let fetchRequest: NSFetchRequest<PodcastMO> = PodcastMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PodcastMO.id), NSString(string: id))
         fetchRequest.fetchLimit = 1
-        let albums = try? context.fetch(fetchRequest)
-        return albums?.lazy.compactMap{ Podcast(managedObject: $0) }.first
+        let podcasts = try? context.fetch(fetchRequest)
+        return podcasts?.lazy.compactMap{ Podcast(managedObject: $0) }.first
+    }
+   
+    private func getPodcasts(id: String) -> [Podcast] {
+        let fetchRequest: NSFetchRequest<PodcastMO> = PodcastMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PodcastMO.id), NSString(string: id))
+        let podcasts = try? context.fetch(fetchRequest)
+        return podcasts?.compactMap{ Podcast(managedObject: $0) } ?? [Podcast]()
     }
     
     func getPodcastEpisode(id: String) -> PodcastEpisode? {
         let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PodcastEpisodeMO.id), NSString(string: id))
         fetchRequest.fetchLimit = 1
-        let songs = try? context.fetch(fetchRequest)
-        return songs?.lazy.compactMap{ PodcastEpisode(managedObject: $0) }.first
+        let podcastEpisodes = try? context.fetch(fetchRequest)
+        return podcastEpisodes?.lazy.compactMap{ PodcastEpisode(managedObject: $0) }.first
+    }
+    
+    private func getPodcastEpisodes(id: String) -> [PodcastEpisode] {
+        let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PodcastEpisodeMO.id), NSString(string: id))
+        let podcastEpisodes = try? context.fetch(fetchRequest)
+        return podcastEpisodes?.compactMap{ PodcastEpisode(managedObject: $0) } ?? [PodcastEpisode]()
     }
     
     func getSong(id: String) -> Song? {
@@ -825,6 +1009,13 @@ class LibraryStorage: PlayableFileCachable {
         fetchRequest.fetchLimit = 1
         let songs = try? context.fetch(fetchRequest)
         return songs?.lazy.compactMap{ Song(managedObject: $0) }.first
+    }
+    
+    private func getSongs(id: String) -> [Song] {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(SongMO.id), NSString(string: id))
+        let songs = try? context.fetch(fetchRequest)
+        return songs?.compactMap{ Song(managedObject: $0) } ?? [Song]()
     }
     
     func getFile(forPlayable playable: AbstractPlayable) -> PlayableFile? {
@@ -844,6 +1035,13 @@ class LibraryStorage: PlayableFileCachable {
         return playlists?.lazy.compactMap{ Playlist(library: self, managedObject: $0) }.first
     }
 
+    private func getPlaylists(id: String) -> [Playlist] {
+        let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PlaylistMO.id), NSString(string: id))
+        let playlists = try? context.fetch(fetchRequest)
+        return playlists?.compactMap{ Playlist(library: self, managedObject: $0) } ?? [Playlist]()
+    }
+    
     func getPlaylist(viaPlaylistFromOtherContext: Playlist) -> Playlist? {
         guard let foundManagedPlaylist = context.object(with: viaPlaylistFromOtherContext.managedObject.objectID) as? PlaylistMO else { return nil }
         return Playlist(library: self, managedObject: foundManagedPlaylist)

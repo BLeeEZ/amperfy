@@ -25,4 +25,11 @@ extension AlbumMO: CoreDataIdentifyable {
         return \AlbumMO.name
     }
     
+    func passOwnership(to targetAlbum: AlbumMO) {
+        let songsCopy = songs?.compactMap{ $0 as? SongMO }
+        songsCopy?.forEach{
+            $0.album = targetAlbum
+        }
+    }
+    
 }
