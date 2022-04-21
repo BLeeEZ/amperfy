@@ -12,6 +12,7 @@ class SongTableCell: BasicTableCell {
     var song: Song?
     var rootView: UITableViewController?
     var playContextCb: GetPlayContextFromTableCellCallback?
+    var playIndicator: PlayIndicator!
     private var isAlertPresented = false
 
     override func awakeFromNib() {
@@ -22,6 +23,9 @@ class SongTableCell: BasicTableCell {
     }
     
     func display(song: Song, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UITableViewController) {
+        if playIndicator == nil {
+            playIndicator = PlayIndicator(rootViewTypeName: rootView.typeName)
+        }
         self.song = song
         self.playContextCb = playContextCb
         self.rootView = rootView
@@ -30,6 +34,7 @@ class SongTableCell: BasicTableCell {
     
     func refresh() {
         guard let song = song else { return }
+        playIndicator.display(playable: song, rootView: self.entityImage, isOnImage: true)
         titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         artistLabel.text = song.creatorName
         
@@ -40,6 +45,11 @@ class SongTableCell: BasicTableCell {
         } else {
             artistLabel.textColor = UIColor.secondaryLabelColor
         }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        playIndicator.reset()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -78,6 +88,10 @@ class SongTableCell: BasicTableCell {
         let detailVC = LibraryEntityDetailVC()
         detailVC.display(container: song, on: rootView, playContextCb: {() in self.playContextCb?(self)})
         rootView.present(detailVC, animated: true)
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        playIndicator.applyStyle()
     }
 
 }

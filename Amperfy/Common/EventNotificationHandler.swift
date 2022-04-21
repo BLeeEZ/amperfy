@@ -2,6 +2,9 @@ import Foundation
 
 extension Notification.Name {
     static var downloadFinishedSuccess = Notification.Name(rawValue: "de.amperfy.download.finished.success")
+    static var playerPlay = Notification.Name(rawValue: "de.amperfy.player.play")
+    static var playerPause = Notification.Name(rawValue: "de.amperfy.player.pause")
+    static var playerStop = Notification.Name(rawValue: "de.amperfy.player.stop")
 }
 
 struct DownloadNotification {
@@ -28,14 +31,14 @@ class EventNotificationHandler {
         NotificationCenter.default.addObserver(
             observer,
             selector: aSelector,
-            name: .downloadFinishedSuccess,
+            name: aName,
             object: anObject)
     }
     
     func remove(_ observer: Any,
                     name aName: NSNotification.Name,
                   object anObject: Any?) {
-        NotificationCenter.default.removeObserver(observer, name: .downloadFinishedSuccess, object: anObject)
+        NotificationCenter.default.removeObserver(observer, name: aName, object: anObject)
     }
     
     func post(name aName: NSNotification.Name, object anObject: Any?, userInfo: [AnyHashable : Any]?) {

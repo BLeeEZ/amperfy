@@ -176,6 +176,10 @@
 		509A7D8228059A0D009791D1 /* BackgroundLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509A7D8128059A0D009791D1 /* BackgroundLibrarySyncer.swift */; };
 		509A7D842806A232009791D1 /* AutoDownloadLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509A7D832806A232009791D1 /* AutoDownloadLibrarySyncer.swift */; };
 		509A7D862808191E009791D1 /* SettingsArtworkVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509A7D852808191E009791D1 /* SettingsArtworkVC.swift */; };
+		509D55E7280FD5E000E0E0B5 /* PlayIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */; };
+		509D55E9280FDAE100E0E0B5 /* PlayerNotificationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509D55E8280FDAE100E0E0B5 /* PlayerNotificationAdapter.swift */; };
+		509D55EB2810086E00E0E0B5 /* UIColorAssetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509D55EA2810086E00E0E0B5 /* UIColorAssetsExtension.swift */; };
+		509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */ = {isa = PBXBuildFile; productRef = 509D55F7281274F500E0E0B5 /* VYPlayIndicator */; };
 		50A12F432739239800E7B2AA /* EmbeddedArtworkMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A12F412739239800E7B2AA /* EmbeddedArtworkMO+CoreDataClass.swift */; };
 		50A12F442739239800E7B2AA /* EmbeddedArtworkMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A12F422739239800E7B2AA /* EmbeddedArtworkMO+CoreDataProperties.swift */; };
 		50A12F4627392B2400E7B2AA /* EmbeddedArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A12F4527392B2400E7B2AA /* EmbeddedArtwork.swift */; };
@@ -571,6 +575,9 @@
 		509A7D8128059A0D009791D1 /* BackgroundLibrarySyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundLibrarySyncer.swift; sourceTree = "<group>"; };
 		509A7D832806A232009791D1 /* AutoDownloadLibrarySyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoDownloadLibrarySyncer.swift; sourceTree = "<group>"; };
 		509A7D852808191E009791D1 /* SettingsArtworkVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsArtworkVC.swift; sourceTree = "<group>"; };
+		509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayIndicator.swift; sourceTree = "<group>"; };
+		509D55E8280FDAE100E0E0B5 /* PlayerNotificationAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNotificationAdapter.swift; sourceTree = "<group>"; };
+		509D55EA2810086E00E0E0B5 /* UIColorAssetsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorAssetsExtension.swift; sourceTree = "<group>"; };
 		50A01FBD27BCD4BD000368EF /* Amperfy v20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v20.xcdatamodel"; sourceTree = "<group>"; };
 		50A12F402739203E00E7B2AA /* Amperfy v15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v15.xcdatamodel"; sourceTree = "<group>"; };
 		50A12F412739239800E7B2AA /* EmbeddedArtworkMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmbeddedArtworkMO+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -765,6 +772,7 @@
 				5055AA5B268365DD00096B8D /* SnapKit.xcframework in Frameworks */,
 				50814C9827D2550D0072738F /* ID3TagEditor.xcframework in Frameworks */,
 				5054689C2625CD95008005EC /* LNPopupController.xcframework in Frameworks */,
+				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
 				5055AA59268365DA00096B8D /* NotificationBanner.xcframework in Frameworks */,
 				506007232625E8BD00F9891D /* MarqueeLabel.xcframework in Frameworks */,
 			);
@@ -814,6 +822,7 @@
 				500EB36725F8B3EB00B4B998 /* Corners.swift */,
 				500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */,
 				501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */,
+				509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */,
 			);
 			path = Basics;
 			sourceTree = "<group>";
@@ -1168,6 +1177,7 @@
 				5006BCB327959FD000D3C961 /* fa-regular-400.ttf */,
 				50BA932221DA6AFA00E5901D /* FontAwesomeIcon.swift */,
 				50B053AC27BFADB200D9C1ED /* UIImageAssetsExtension.swift */,
+				509D55EA2810086E00E0E0B5 /* UIColorAssetsExtension.swift */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -1389,6 +1399,7 @@
 				50048F9427590FAD0087EDFB /* PlayerDownloadPreparationHandler.swift */,
 				50048F962759186A0087EDFB /* EmbeddedArtworkExtractor.swift */,
 				50048F98275954A30087EDFB /* SongPlayedSyncer.swift */,
+				509D55E8280FDAE100E0E0B5 /* PlayerNotificationAdapter.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -1410,6 +1421,9 @@
 			dependencies = (
 			);
 			name = Amperfy;
+			packageProductDependencies = (
+				509D55F7281274F500E0E0B5 /* VYPlayIndicator */,
+			);
 			productName = Amperfy;
 			productReference = 508385E421C5965B00C4BB32 /* Amperfy.app */;
 			productType = "com.apple.product-type.application";
@@ -1489,6 +1503,9 @@
 				Base,
 			);
 			mainGroup = 508385DB21C5965B00C4BB32;
+			packageReferences = (
+				509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */,
+			);
 			productRefGroup = 508385E521C5965B00C4BB32 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1657,6 +1674,7 @@
 				50F81EEB23BF6B1E00EAAC3E /* PlaylistItemMO+CoreDataProperties.swift in Sources */,
 				5011712C2744FDD700B7C08D /* PlayQueueHandler.swift in Sources */,
 				50A85EF22689E8DC00FB3E31 /* PlayableTableCell.swift in Sources */,
+				509D55EB2810086E00E0E0B5 /* UIColorAssetsExtension.swift in Sources */,
 				50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */,
 				501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */,
 				5009863C2208CB650057A1A6 /* OptionsButton.swift in Sources */,
@@ -1676,6 +1694,8 @@
 				50D92CCB25E3ED700017E91D /* MappingModelV4toV5.xcmappingmodel in Sources */,
 				50E964AA25E8E20E00E3210F /* SubsonicVersion.swift in Sources */,
 				50CDF202264BB1C000F83EF6 /* EventLogger.swift in Sources */,
+				509D55E7280FD5E000E0E0B5 /* PlayIndicator.swift in Sources */,
+				509D55E9280FDAE100E0E0B5 /* PlayerNotificationAdapter.swift in Sources */,
 				50048F99275954A40087EDFB /* SongPlayedSyncer.swift in Sources */,
 				5000C1FD2799B00F00DD73BB /* AlbumSongTableCell.swift in Sources */,
 				50AFA1492632E83100F198DD /* GenericDetailTableHeader.swift in Sources */,
@@ -2193,6 +2213,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/obrhoff/VYPlayIndicator";
+			requirement = {
+				kind = exactVersion;
+				version = 1.5.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		509D55F7281274F500E0E0B5 /* VYPlayIndicator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */;
+			productName = VYPlayIndicator;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {

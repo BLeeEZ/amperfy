@@ -59,6 +59,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let remoteCommandCenterHandler = RemoteCommandCenterHandler(musicPlayer: facadeImpl, backendAudioPlayer: backendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter.shared())
         remoteCommandCenterHandler.configureRemoteCommands()
         curPlayer.addNotifier(notifier: remoteCommandCenterHandler)
+        let notificationAdapter = PlayerNotificationAdapter(notificationHandler: notificationHandler)
+        curPlayer.addNotifier(notifier: notificationAdapter)
 
         return facadeImpl
     }()

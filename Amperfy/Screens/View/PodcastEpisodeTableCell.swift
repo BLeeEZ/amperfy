@@ -16,8 +16,12 @@ class PodcastEpisodeTableCell: BasicTableCell {
     
     private var episode: PodcastEpisode!
     private var rootView: UIViewController?
+    private var playIndicator: PlayIndicator!
     
     func display(episode: PodcastEpisode, rootView: UIViewController) {
+        if playIndicator == nil {
+            playIndicator = PlayIndicator(rootViewTypeName: rootView.typeName)
+        }
         self.episode = episode
         self.rootView = rootView
         refresh()
@@ -25,16 +29,19 @@ class PodcastEpisodeTableCell: BasicTableCell {
 
     func refresh() {
         guard let episode = self.episode else { return }
+        configurePlayEpisodeButton()
+        playIndicator.display(playable: episode, rootView: playEpisodeButton)
+        playIndicator.willDisplayIndicatorCB = { [weak self] () in
+            guard let self = self else { return }
+            self.configurePlayEpisodeButton()
+        }
+        playIndicator.willHideIndicatorCB = { [weak self] () in
+            guard let self = self else { return }
+            self.configurePlayEpisodeButton()
+        }
         podcastEpisodeLabel.text = episode.title
         entityImage.display(container: episode)
         
-        if episode.isAvailableToUser {
-            playEpisodeButton.setTitle(FontAwesomeIcon.Play.asString, for: .normal)
-            playEpisodeButton.isEnabled = true
-        } else {
-            playEpisodeButton.setTitle(FontAwesomeIcon.Ban.asString, for: .normal)
-            playEpisodeButton.isEnabled = false
-        }
         infoLabel.text = "\(episode.publishDate.asShortDayMonthString)"
         descriptionLabel.text = episode.depiction ?? ""
         
@@ -59,7 +66,27 @@ class PodcastEpisodeTableCell: BasicTableCell {
             playProgressLabel.textColor = .secondaryLabelColor
         }
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        playIndicator.reset()
+    }
 
+    private func configurePlayEpisodeButton() {
+        guard let episode = self.episode else { return }
+        if episode == appDelegate.player.currentlyPlaying {
+            playEpisodeButton.setTitle("", for: .normal)
+            playEpisodeButton.isEnabled = false
+        } else if episode.isAvailableToUser {
+            playEpisodeButton.setTitle(FontAwesomeIcon.Play.asString, for: .normal)
+            playEpisodeButton.isEnabled = true
+        } else {
+            playEpisodeButton.setTitle(FontAwesomeIcon.Ban.asString, for: .normal)
+            playEpisodeButton.isEnabled = false
+        }
+        
+    }
+    
     @IBAction func playEpisodeButtonPressed(_ sender: Any) {
         guard let episode = self.episode else { return }
         appDelegate.player.play(context: PlayContext(containable: episode))

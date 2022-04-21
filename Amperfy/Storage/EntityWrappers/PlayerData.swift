@@ -253,12 +253,10 @@ extension PlayerData: PlayerQueuesPersistent {
     private var currentMusicIndex: Int {
         get {
             if managedObject.musicIndex < 0, !isUserQueuPlayingInternal {
-                managedObject.musicIndex = 0
-                library.saveContext()
+                return 0
             }
             if managedObject.musicIndex >= contextQueue.playables.count || managedObject.musicIndex < -1 {
-                managedObject.musicIndex = 0
-                library.saveContext()
+                return 0
             }
             return Int(managedObject.musicIndex)
         }
@@ -274,9 +272,8 @@ extension PlayerData: PlayerQueuesPersistent {
     
     private var currentPodcastIndex: Int {
         get {
-            if managedObject.podcastIndex < 0 || managedObject.podcastIndex >= podcastPlaylist.playables.count  {
-                managedObject.podcastIndex = 0
-                library.saveContext()
+            if managedObject.podcastIndex < 0 || (managedObject.podcastIndex >= podcastPlaylist.playables.count && podcastPlaylist.playables.count > 0)  {
+                return 0
             }
             return Int(managedObject.podcastIndex)
         }

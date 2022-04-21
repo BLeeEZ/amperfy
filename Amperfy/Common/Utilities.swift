@@ -2,6 +2,8 @@ import Foundation
 import UIKit
 import os.log
 
+typealias VoidFunctionCallback = () -> Void
+
 protocol CustomEquatable {
     func isEqualTo(_ other: CustomEquatable) -> Bool
 }
@@ -399,6 +401,10 @@ extension UIView {
 }
 
 extension UITableView {
+    func register(nibName: String) {
+        self.register(UINib(nibName: nibName, bundle: nil), forCellReuseIdentifier: nibName)
+    }
+    
     func dequeueCell<CellType: UITableViewCell>(for tableView: UITableView, at indexPath: IndexPath) -> CellType {
         guard let cell = self.dequeueReusableCell(withIdentifier: CellType.typeName, for: indexPath) as? CellType else {
             os_log(.error, "The dequeued cell is not an instance of %s", CellType.typeName)
@@ -414,9 +420,9 @@ extension UITableViewController {
     }
 }
 
-extension UITableView {
-    func register(nibName: String) {
-        self.register(UINib(nibName: nibName, bundle: nil), forCellReuseIdentifier: nibName)
+extension UIViewController {
+    var typeName: String {
+        return Self.typeName
     }
 }
 
