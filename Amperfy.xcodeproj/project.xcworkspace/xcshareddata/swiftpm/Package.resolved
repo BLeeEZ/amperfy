@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "AudioStreaming",
+        "repositoryURL": "https://github.com/dimitris-c/AudioStreaming",
+        "state": {
+          "branch": null,
+          "revision": "578bbcdbe840a06c9c0cd07640d4ffd616b6b208",
+          "version": "0.9.0"
+        }
+      },
+      {
         "package": "VYPlayIndicator",
         "repositoryURL": "https://github.com/obrhoff/VYPlayIndicator",
         "state": {

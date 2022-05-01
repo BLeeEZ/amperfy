@@ -113,20 +113,6 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
             if playableManagedObject.contentType != newValue { playableManagedObject.contentType = newValue }
         }
     }
-    var iOsCompatibleContentType: String? {
-        guard isPlayableOniOS, let originalContenType = contentType else { return nil }
-        if originalContenType == "audio/x-flac" {
-            return "audio/flac"
-        }
-        return originalContenType
-    }
-    var isPlayableOniOS: Bool {
-        guard let originalContenType = contentType else { return true }
-        if originalContenType == "audio/x-ms-wma" {
-            return false
-        }
-        return true
-    }
     var disk: String? {
         get { return playableManagedObject.disk }
         set {

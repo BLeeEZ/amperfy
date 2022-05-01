@@ -118,6 +118,7 @@
 		5067E372278C1DCA00807A78 /* album_multidisc_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5067E371278C1DC900807A78 /* album_multidisc_example_1.xml */; };
 		5067E374278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5067E373278C26F300807A78 /* SsAlbumMultidiscExample1ParserTest.swift */; };
 		5068D38026A85C2D0006710D /* DownloadError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5068D37F26A85C2D0006710D /* DownloadError.swift */; };
+		5069A052281682BC00AA452E /* AudioStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = 5069A051281682BC00AA452E /* AudioStreaming */; };
 		506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */; };
 		506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */; };
 		507361C82632AB09005F151D /* GenreParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507361C72632AB08005F151D /* GenreParserDelegate.swift */; };
@@ -773,6 +774,7 @@
 				50814C9827D2550D0072738F /* ID3TagEditor.xcframework in Frameworks */,
 				5054689C2625CD95008005EC /* LNPopupController.xcframework in Frameworks */,
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
+				5069A052281682BC00AA452E /* AudioStreaming in Frameworks */,
 				5055AA59268365DA00096B8D /* NotificationBanner.xcframework in Frameworks */,
 				506007232625E8BD00F9891D /* MarqueeLabel.xcframework in Frameworks */,
 			);
@@ -1423,6 +1425,7 @@
 			name = Amperfy;
 			packageProductDependencies = (
 				509D55F7281274F500E0E0B5 /* VYPlayIndicator */,
+				5069A051281682BC00AA452E /* AudioStreaming */,
 			);
 			productName = Amperfy;
 			productReference = 508385E421C5965B00C4BB32 /* Amperfy.app */;
@@ -1505,6 +1508,7 @@
 			mainGroup = 508385DB21C5965B00C4BB32;
 			packageReferences = (
 				509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */,
+				5069A050281682BC00AA452E /* XCRemoteSwiftPackageReference "AudioStreaming" */,
 			);
 			productRefGroup = 508385E521C5965B00C4BB32 /* Products */;
 			projectDirPath = "";
@@ -2215,6 +2219,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		5069A050281682BC00AA452E /* XCRemoteSwiftPackageReference "AudioStreaming" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dimitris-c/AudioStreaming";
+			requirement = {
+				kind = exactVersion;
+				version = 0.9.0;
+			};
+		};
 		509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/obrhoff/VYPlayIndicator";
@@ -2226,6 +2238,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5069A051281682BC00AA452E /* AudioStreaming */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5069A050281682BC00AA452E /* XCRemoteSwiftPackageReference "AudioStreaming" */;
+			productName = AudioStreaming;
+		};
 		509D55F7281274F500E0E0B5 /* VYPlayIndicator */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */;

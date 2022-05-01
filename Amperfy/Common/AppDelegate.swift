@@ -1,5 +1,6 @@
 import UIKit
 import MediaPlayer
+import AudioStreaming
 import os.log
 
 @UIApplicationMain
@@ -37,7 +38,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return EventNotificationHandler()
     }()
     lazy var player: PlayerFacade = {
-        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
+        let audioPlayer = AudioPlayer()
+        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: audioPlayer, eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
         let playerData = library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
         let curPlayer = MusicPlayer(coreData: playerData, queueHandler: queueHandler, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
@@ -188,7 +190,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         carPlayHandler.initialize()
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()
         self.window?.rootViewController = initialViewController
-        self.window?.makeKeyAndVisible()        
+        self.window?.makeKeyAndVisible()
         return true
     }
 
