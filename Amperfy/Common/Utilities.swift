@@ -117,6 +117,10 @@ extension String {
         return (components[0] * 60 * 24) + (components[1] * 60) + components[2]
     }
     
+    static var uppercaseAsciiLetters: String {
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    }
+    
     static func generateRandomString(ofLength length: Int) -> String {
         let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return String((0..<length).map{ _ in letters.randomElement()! })

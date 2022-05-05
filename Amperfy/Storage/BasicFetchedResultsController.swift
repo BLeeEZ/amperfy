@@ -1,111 +1,6 @@
 import Foundation
 import CoreData
 
-class FetchedResultsControllerSectioner {
-    static func getSectionIdentifier(element: String?) -> String {
-        let initial = String(element?.prefix(1).lowercased() ?? "")
-        var section = ""
-        if initial < "a" {
-            section = "#"
-        } else if initial > "z" {
-            section = "?"
-        } else {
-            section = initial
-        }
-        return section
-    }
-}
-
-extension GenreMO {
-    @objc public var section: String {
-        self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.name)
-        self.didAccessValue(forKey: "section")
-        return section
-    }
-}
-
-extension ArtistMO {
-    @objc public var section: String {
-        self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.name)
-        self.didAccessValue(forKey: "section")
-        return section
-    }
-}
-
-extension AlbumMO {
-    @objc public var section: String {
-        self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.name)
-        self.didAccessValue(forKey: "section")
-        return section
-    }
-}
-
-extension SongMO {
-    @objc public var section: String {
-        self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.title)
-        self.didAccessValue(forKey: "section")
-        return section
-    }
-}
-
-extension PlaylistMO {
-    @objc public var section: String {
-        self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.name)
-        self.didAccessValue(forKey: "section")
-        return section
-    }
-}
-
-extension MusicFolderMO {
-    @objc public var section: String {
-        self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.name)
-        self.didAccessValue(forKey: "section")
-        return section
-    }
-}
-
-extension DirectoryMO {
-    @objc public var section: String {
-        self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.name)
-        self.didAccessValue(forKey: "section")
-        return section
-    }
-}
-
-extension PodcastMO {
-    @objc public var section: String {
-        self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.title)
-        self.didAccessValue(forKey: "section")
-        return section
-    }
-}
-
-extension PodcastEpisodeMO {
-    @objc public var section: String {
-        self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.title)
-        self.didAccessValue(forKey: "section")
-        return section
-    }
-}
-
-extension DownloadMO {
-    @objc public var section: String {
-        self.willAccessValue(forKey: "section")
-        let section = FetchedResultsControllerSectioner.getSectionIdentifier(element: self.urlString)
-        self.didAccessValue(forKey: "section")
-        return section
-    }
-}
-
 extension NSFetchedResultsController {
     @objc func fetch() {
         do {
@@ -123,9 +18,31 @@ extension NSFetchedResultsController {
     }
 }
 
+class CustomSectionIndexFetchedResultsController<ResultType: NSFetchRequestResult>: NSFetchedResultsController<NSFetchRequestResult> {
+ 
+    public init(fetchRequest: NSFetchRequest<ResultType>, managedObjectContext context: NSManagedObjectContext, sectionNameKeyPath: String?, cacheName name: String?) {
+        super.init(fetchRequest: fetchRequest as! NSFetchRequest<NSFetchRequestResult>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: name)
+    }
+    
+    override func sectionIndexTitle(forSectionName sectionName: String) -> String? {
+        guard sectionName.count > 0 else { return "?" }
+        let initial = String(sectionName.prefix(1).folding(options: .diacriticInsensitive, locale: nil).uppercased())
+        if let _ = initial.rangeOfCharacter(from: CharacterSet.decimalDigits) {
+            return "#"
+        } else if let _ = initial.rangeOfCharacter(from: CharacterSet(charactersIn: String.uppercaseAsciiLetters)) {
+            return initial
+        } else if let _ = initial.rangeOfCharacter(from: CharacterSet.letters) {
+            return "&"
+        } else {
+            return "?"
+        }
+    }
+
+}
+
 class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSFetchRequestResult  {
   
-    var fetchResultsController: NSFetchedResultsController<ResultType>
+    var fetchResultsController: CustomSectionIndexFetchedResultsController<ResultType>
     let managedObjectContext: NSManagedObjectContext
     let defaultPredicate: NSPredicate?
     let library: LibraryStorage
@@ -142,8 +59,8 @@ class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSF
         managedObjectContext = context
         library = LibraryStorage(context: context)
         defaultPredicate = fetchRequest.predicate?.copy() as? NSPredicate
-        let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? "section" : nil
-        fetchResultsController = NSFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
+        let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? fetchRequest.sortDescriptors![0].key : nil
+        fetchResultsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
     }
     
     func search(predicate: NSPredicate?) {
@@ -165,7 +82,7 @@ class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSF
     }
     
     var fetchedObjects: [ResultType]? {
-        return fetchResultsController.fetchedObjects
+        return fetchResultsController.fetchedObjects as? [ResultType]
     }
     
     var sections: [NSFetchedResultsSectionInfo]? {
@@ -188,32 +105,36 @@ class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSF
         return fetchResultsController.sectionIndexTitles
     }
     
+    func section(forSectionIndexTitle title: String, at index: Int) -> Int {
+        return fetchResultsController.section(forSectionIndexTitle: title, at: index)
+    }
+    
 }
 
 extension BasicFetchedResultsController where ResultType == GenreMO {
     func getWrappedEntity(at indexPath: IndexPath) -> Genre {
-        let genreMO = fetchResultsController.object(at: indexPath)
+        let genreMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Genre(managedObject: genreMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == ArtistMO {
     func getWrappedEntity(at indexPath: IndexPath) -> Artist {
-        let artistMO = fetchResultsController.object(at: indexPath)
+        let artistMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Artist(managedObject: artistMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == AlbumMO {
     func getWrappedEntity(at indexPath: IndexPath) -> Album {
-        let albumMO = fetchResultsController.object(at: indexPath)
+        let albumMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Album(managedObject: albumMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == SongMO {
     func getWrappedEntity(at indexPath: IndexPath) -> Song {
-        let songMO = fetchResultsController.object(at: indexPath)
+        let songMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Song(managedObject: songMO)
     }
     
@@ -232,14 +153,14 @@ extension BasicFetchedResultsController where ResultType == SongMO {
 
 extension BasicFetchedResultsController where ResultType == PlaylistMO {
     func getWrappedEntity(at indexPath: IndexPath) -> Playlist {
-        let playlistMO = fetchResultsController.object(at: indexPath)
+        let playlistMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Playlist(library: LibraryStorage(context: self.managedObjectContext), managedObject: playlistMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == PlaylistItemMO {
     func getWrappedEntity(at indexPath: IndexPath) -> PlaylistItem {
-        let itemMO = fetchResultsController.object(at: indexPath)
+        let itemMO = fetchResultsController.object(at: indexPath) as! ResultType
         return PlaylistItem(library: library, managedObject: itemMO)
     }
     
@@ -258,42 +179,42 @@ extension BasicFetchedResultsController where ResultType == PlaylistItemMO {
 
 extension BasicFetchedResultsController where ResultType == LogEntryMO {
     func getWrappedEntity(at indexPath: IndexPath) -> LogEntry {
-        let itemMO = fetchResultsController.object(at: indexPath)
+        let itemMO = fetchResultsController.object(at: indexPath) as! ResultType
         return LogEntry(managedObject: itemMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == MusicFolderMO {
     func getWrappedEntity(at indexPath: IndexPath) -> MusicFolder {
-        let musicFolderMO = fetchResultsController.object(at: indexPath)
+        let musicFolderMO = fetchResultsController.object(at: indexPath) as! ResultType
         return MusicFolder(managedObject: musicFolderMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == DirectoryMO {
     func getWrappedEntity(at indexPath: IndexPath) -> Directory {
-        let directoryMO = fetchResultsController.object(at: indexPath)
+        let directoryMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Directory(managedObject: directoryMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == PodcastMO {
     func getWrappedEntity(at indexPath: IndexPath) -> Podcast {
-        let podcastMO = fetchResultsController.object(at: indexPath)
+        let podcastMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Podcast(managedObject: podcastMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == PodcastEpisodeMO {
     func getWrappedEntity(at indexPath: IndexPath) -> PodcastEpisode {
-        let podcastEpisodeMO = fetchResultsController.object(at: indexPath)
+        let podcastEpisodeMO = fetchResultsController.object(at: indexPath) as! ResultType
         return PodcastEpisode(managedObject: podcastEpisodeMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == DownloadMO {
     func getWrappedEntity(at indexPath: IndexPath) -> Download {
-        let downloadMO = fetchResultsController.object(at: indexPath)
+        let downloadMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Download(managedObject: downloadMO)
     }
 }
@@ -301,8 +222,8 @@ extension BasicFetchedResultsController where ResultType == DownloadMO {
 
 class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<ResultType> where ResultType : NSFetchRequestResult  {
     
-    private let allFetchResulsController: NSFetchedResultsController<ResultType>
-    private let searchFetchResulsController: NSFetchedResultsController<ResultType>
+    private let allFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
+    private let searchFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
     
     private var isSearchActiveInternal = false
     var isSearchActive: Bool {
@@ -320,9 +241,9 @@ class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<
     }
     
     override init(managedObjectContext context: NSManagedObjectContext, fetchRequest: NSFetchRequest<ResultType>, isGroupedInAlphabeticSections: Bool) {
-        let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? "section" : nil
-        allFetchResulsController = NSFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: Self.typeName)
-        searchFetchResulsController = NSFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
+        let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? fetchRequest.sortDescriptors![0].key : nil
+        allFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: Self.typeName)
+        searchFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         fetchResultsController = allFetchResulsController
     }
