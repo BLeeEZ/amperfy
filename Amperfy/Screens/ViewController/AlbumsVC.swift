@@ -13,6 +13,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         
         fetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
+        singleFetchedResultsController?.delegate = nil
         
         configureSearchController(placeholder: "Search in \"Albums\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: GenericTableCell.typeName)

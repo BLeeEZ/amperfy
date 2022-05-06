@@ -272,4 +272,10 @@ class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<
         searchFetchResulsController.clearResults()
     }
     
+    func hideResults() {
+        isSearchActive = true
+        searchFetchResulsController.fetchRequest.predicate = NSPredicate(format: "id == nil")
+        searchFetchResulsController.fetch()
+    }
+    
 }

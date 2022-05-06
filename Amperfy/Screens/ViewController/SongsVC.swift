@@ -14,6 +14,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         
         fetchedResultsController = SongsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
+        singleFetchedResultsController?.delegate = nil
         
         configureSearchController(placeholder: "Search in \"Songs\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: SongTableCell.typeName)

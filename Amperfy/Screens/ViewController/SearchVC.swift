@@ -242,9 +242,9 @@ class SearchVC: BasicTableViewController {
             tableView.separatorStyle = .singleLine
         } else {
             playlistFetchedResultsController.clearResults()
-            artistFetchedResultsController.clearResults()
-            albumFetchedResultsController.clearResults()
-            songFetchedResultsController.clearResults()
+            artistFetchedResultsController.hideResults()
+            albumFetchedResultsController.hideResults()
+            songFetchedResultsController.hideResults()
             tableView.separatorStyle = .none
         }
         tableView.reloadData()

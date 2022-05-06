@@ -13,6 +13,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         
         fetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
+        singleFetchedResultsController?.delegate = nil
         
         configureSearchController(placeholder: "Search in \"Artists\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: GenericTableCell.typeName)
