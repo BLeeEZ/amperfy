@@ -11,7 +11,6 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         
         fetchedResultsController = GenreFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
-        singleFetchedResultsController?.delegate = nil
         
         configureSearchController(placeholder: "Search in \"Genres\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: GenericTableCell.typeName)

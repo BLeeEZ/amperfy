@@ -46,13 +46,9 @@ class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSF
     let managedObjectContext: NSManagedObjectContext
     let defaultPredicate: NSPredicate?
     let library: LibraryStorage
-    var delegateInternal: NSFetchedResultsControllerDelegate?
     var delegate: NSFetchedResultsControllerDelegate? {
-        set {
-            delegateInternal = newValue
-            fetchResultsController.delegate = newValue
-        }
-        get { return delegateInternal }
+        set { fetchResultsController.delegate = newValue }
+        get { return fetchResultsController.delegate }
     }
     
     init(managedObjectContext context: NSManagedObjectContext, fetchRequest: NSFetchRequest<ResultType>, isGroupedInAlphabeticSections: Bool) {
@@ -222,20 +218,23 @@ extension BasicFetchedResultsController where ResultType == DownloadMO {
 
 class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<ResultType> where ResultType : NSFetchRequestResult  {
     
+    var keepAllResultsUpdated = true
     private let allFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
     private let searchFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
     
+    private var delegateInternal: NSFetchedResultsControllerDelegate?
+    override var delegate: NSFetchedResultsControllerDelegate? {
+        set {
+            delegateInternal = newValue
+            updateFetchResultsControllerDelegate()
+        }
+        get { return delegateInternal }
+    }
     private var isSearchActiveInternal = false
     var isSearchActive: Bool {
         set {
             isSearchActiveInternal = newValue
-            fetchResultsController.delegate = nil
-            if isSearchActiveInternal {
-                fetchResultsController = searchFetchResulsController
-            } else {
-                fetchResultsController = allFetchResulsController
-            }
-            fetchResultsController.delegate = delegateInternal
+            updateFetchResultsControllerDelegate()
         }
         get { return isSearchActiveInternal }
     }
@@ -270,6 +269,18 @@ class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<
     override func clearResults() {
         isSearchActive = true
         searchFetchResulsController.clearResults()
+    }
+    
+    private func updateFetchResultsControllerDelegate() {
+        fetchResultsController.delegate = nil
+        if isSearchActiveInternal {
+            fetchResultsController = searchFetchResulsController
+        } else {
+            fetchResultsController = allFetchResulsController
+        }
+        if isSearchActiveInternal || (!isSearchActiveInternal && keepAllResultsUpdated) {
+            fetchResultsController.delegate = delegateInternal
+        }
     }
     
     func hideResults() {

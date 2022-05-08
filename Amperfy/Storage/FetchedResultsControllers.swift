@@ -368,6 +368,7 @@ class SongsFetchedResultsController: CachedFetchedResultsController<SongMO> {
         let fetchRequest = SongMO.identifierSortedFetchRequest
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        keepAllResultsUpdated = false
     }
     
     func search(searchText: String, onlyCachedSongs: Bool, displayFilter: DisplayCategoryFilter) {
