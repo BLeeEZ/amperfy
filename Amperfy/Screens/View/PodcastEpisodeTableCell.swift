@@ -8,6 +8,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var playEpisodeButton: UIButton!
     @IBOutlet weak var optionsButton: UIButton!
+    @IBOutlet weak var cacheIconImage: UIImageView!
     @IBOutlet weak var playProgressBar: UIProgressView!
     @IBOutlet weak var playProgressLabel: UILabel!
     @IBOutlet weak var playProgressLabelPlayButtonDistance: NSLayoutConstraint!
@@ -61,8 +62,10 @@ class PodcastEpisodeTableCell: BasicTableCell {
         }
         playProgressLabel.text = progressText
         if episode.isCached {
+            cacheIconImage.isHidden = false
             playProgressLabel.textColor = .defaultBlue
         } else {
+            cacheIconImage.isHidden = true
             playProgressLabel.textColor = .secondaryLabelColor
         }
     }

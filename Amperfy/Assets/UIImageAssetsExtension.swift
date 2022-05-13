@@ -50,6 +50,7 @@ extension UIImage {
 
     static var play: UIImage = { return UIImage.create("play") }()
     static var pause: UIImage = { return UIImage.create("pause") }()
+    static var cache: UIImage = { return UIImage.create("cache") }() // Font Awesome 6.1.1 Solid: cloud-arrow-down
     static var forward: UIImage = { return UIImage.create("forward") }()  // SF-Symbols 3.2 Regular:  forward.filled
     static var backward: UIImage = { return UIImage.create("backward") }()  // SF-Symbols 3.2 Regular:  backward.filled
     static var skipForward30: UIImage = { return UIImage.create("skip_forward_30") }()  // SF-Symbols 3.2 Regular:  goforward.30

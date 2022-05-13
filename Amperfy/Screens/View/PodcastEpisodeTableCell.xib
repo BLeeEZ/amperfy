@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -86,7 +86,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1h 30m 19s left" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wFl-mR-cDH" userLabel="Play Progress Label">
-                        <rect key="frame" x="137" y="135.5" width="189" height="16"/>
+                        <rect key="frame" x="137" y="135.5" width="166" height="16"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="16" id="bAn-R3-YQV"/>
                         </constraints>
@@ -94,13 +94,21 @@
                         <color key="textColor" systemColor="secondaryLabelColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cache" translatesAutoresizingMaskIntoConstraints="NO" id="iVr-ga-N6L" userLabel="Cache Icon">
+                        <rect key="frame" x="311" y="136" width="15" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="iVr-ga-N6L" secondAttribute="height" multiplier="1:1" id="KsA-iR-iOB"/>
+                            <constraint firstAttribute="height" constant="15" id="xwG-Wj-Yzy"/>
+                        </constraints>
+                    </imageView>
                 </subviews>
                 <constraints>
                     <constraint firstItem="g7h-Ca-aH3" firstAttribute="top" secondItem="4aT-Z7-2jl" secondAttribute="topMargin" constant="2" id="2as-tc-g9Z"/>
                     <constraint firstItem="ulS-LU-PlW" firstAttribute="centerY" secondItem="Eiy-n7-Hlt" secondAttribute="centerY" id="5jk-KG-qhy"/>
-                    <constraint firstItem="ulS-LU-PlW" firstAttribute="leading" secondItem="wFl-mR-cDH" secondAttribute="trailing" constant="8" id="8AH-it-afb"/>
+                    <constraint firstItem="iVr-ga-N6L" firstAttribute="leading" secondItem="wFl-mR-cDH" secondAttribute="trailing" constant="8" id="8AH-it-afb"/>
                     <constraint firstItem="eg7-pd-DMm" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="8kN-IT-JYH"/>
                     <constraint firstItem="eg7-pd-DMm" firstAttribute="top" secondItem="4aT-Z7-2jl" secondAttribute="topMargin" id="9ce-c5-l3u"/>
+                    <constraint firstItem="ulS-LU-PlW" firstAttribute="centerY" secondItem="iVr-ga-N6L" secondAttribute="centerY" id="9kH-kY-Ybv"/>
                     <constraint firstAttribute="trailingMargin" secondItem="ZWe-re-U6e" secondAttribute="trailing" id="9tO-1D-PDW"/>
                     <constraint firstAttribute="trailingMargin" secondItem="ulS-LU-PlW" secondAttribute="trailing" id="BS7-SJ-YW4"/>
                     <constraint firstItem="GdC-Xn-gpu" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="BfQ-y0-Yeh"/>
@@ -109,16 +117,19 @@
                     <constraint firstItem="ulS-LU-PlW" firstAttribute="width" secondItem="Eiy-n7-Hlt" secondAttribute="width" id="IzF-ng-qvH"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="leading" secondItem="eg7-pd-DMm" secondAttribute="trailing" constant="8" id="LuL-b5-m52"/>
                     <constraint firstAttribute="trailingMargin" secondItem="GdC-Xn-gpu" secondAttribute="trailing" id="NhM-JY-DGW"/>
+                    <constraint firstItem="iVr-ga-N6L" firstAttribute="width" secondItem="iVr-ga-N6L" secondAttribute="height" multiplier="1:1" id="Nw7-GZ-mvu"/>
                     <constraint firstItem="Eiy-n7-Hlt" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="PEc-3D-EOs"/>
                     <constraint firstItem="JqZ-Gw-nZk" firstAttribute="leading" secondItem="Eiy-n7-Hlt" secondAttribute="trailing" constant="8" id="Sem-h3-7qU"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="top" secondItem="g7h-Ca-aH3" secondAttribute="bottom" id="ZXs-eS-5vO"/>
                     <constraint firstItem="Eiy-n7-Hlt" firstAttribute="centerY" secondItem="wFl-mR-cDH" secondAttribute="centerY" id="Zck-Kj-YzB"/>
                     <constraint firstItem="wFl-mR-cDH" firstAttribute="leading" secondItem="Eiy-n7-Hlt" secondAttribute="trailing" constant="96" id="cXb-o7-oqW"/>
+                    <constraint firstItem="ulS-LU-PlW" firstAttribute="leading" secondItem="iVr-ga-N6L" secondAttribute="trailing" constant="8" id="cht-Fl-O9T"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="leading" secondItem="g7h-Ca-aH3" secondAttribute="leading" id="sNC-OG-0am"/>
                     <constraint firstItem="JqZ-Gw-nZk" firstAttribute="centerY" secondItem="Eiy-n7-Hlt" secondAttribute="centerY" id="vML-RP-SG7"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="cacheIconImage" destination="iVr-ga-N6L" id="LNt-ao-Qx5"/>
                 <outlet property="descriptionLabel" destination="GdC-Xn-gpu" id="nAu-Sq-alT"/>
                 <outlet property="entityImage" destination="eg7-pd-DMm" id="x2x-zC-PJi"/>
                 <outlet property="infoLabel" destination="g7h-Ca-aH3" id="qfA-wN-xBY"/>
@@ -133,6 +144,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="cache" width="640" height="512"/>
         <image name="ellipsis" width="18.417999267578125" height="3.9160199165344238"/>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
