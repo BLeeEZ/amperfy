@@ -80,7 +80,7 @@ class SearchVC: BasicTableViewController {
 
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
         guard let indexPath = tableView.indexPath(for: cell), indexPath.section == LibraryElement.Song.rawValue else { return nil }
-        let song = songFetchedResultsController.getWrappedEntity(at: indexPath)
+        let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
         return PlayContext(containable: song)
     }
 
