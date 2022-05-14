@@ -14,6 +14,10 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     public private(set) var playlistCount: Int = 1
     public private(set) var podcastCount: Int = 1
     
+    var isSyncAllowed: Bool {
+        return Reachability.isConnectedToNetwork()
+    }
+    
     init(subsonicServerApi: SubsonicServerApi) {
         self.subsonicServerApi = subsonicServerApi
     }
@@ -108,9 +112,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func sync(artist: Artist, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave(),
-              !artist.id.isEmpty
-        else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), !artist.id.isEmpty else { return }
         let artistParser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestArtist(parserDelegate: artistParser, id: artist.id)
         if let error = artistParser.error?.asSubsonicError, !error.isRemoteAvailable {
@@ -124,7 +126,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func sync(album: Album, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let albumParser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestAlbum(parserDelegate: albumParser, id: album.id)
         if let error = albumParser.error?.asSubsonicError, !error.isRemoteAvailable {
@@ -150,14 +152,14 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func sync(song: Song, library: LibraryStorage) {
-        guard let syncWave = song.syncInfo ?? library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = song.syncInfo ?? library.getLatestSyncWave() else { return }
         let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestSong(parserDelegate: songParser, id: song.id)
         library.saveContext()
     }
     
     func syncLatestLibraryElements(library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let oldRecentSongs = Set(library.getRecentSongs())
         
         os_log("Sync newest albums", log: log, type: .info)
@@ -181,7 +183,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func syncFavoriteLibraryElements(library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         os_log("Sync favorite artists/albums/songs", log: log, type: .info)
         let oldFavoriteArtists = Set(library.getFavoriteArtists())
         let oldFavoriteAlbums = Set(library.getFavoriteAlbums())
@@ -216,28 +218,28 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
 
     func syncMusicFolders(library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let musicFolderParser = SsMusicFolderParserDelegate(library: library, syncWave: syncWave)
         subsonicServerApi.requestMusicFolders(parserDelegate: musicFolderParser)
         library.saveContext()
     }
     
     func syncIndexes(musicFolder: MusicFolder, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let musicDirectoryParser = SsDirectoryParserDelegate(musicFolder: musicFolder, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestIndexes(parserDelegate: musicDirectoryParser, musicFolderId: musicFolder.id)
         library.saveContext()
     }
     
     func sync(directory: Directory, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let musicDirectoryParser = SsDirectoryParserDelegate(directory: directory, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestMusicDirectory(parserDelegate: musicDirectoryParser, id: directory.id)
         library.saveContext()
     }
     
     func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestRandomSongs(parserDelegate: songParser, count: count)
         playlist.append(playables: songParser.parsedSongs)
@@ -245,18 +247,20 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) {
+        guard isSyncAllowed else { return }
         let songParser = SsXmlParser()
         subsonicServerApi.requestPodcastEpisodeDelete(parserDelegate: songParser, id: podcastEpisode.id)
     }
     
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {
+        guard isSyncAllowed else { return }
         let playlistParser = SsPlaylistParserDelegate(library: library)
         subsonicServerApi.requestPlaylists(parserDelegate: playlistParser)
         library.saveContext()
     }
     
     func syncDown(playlist: Playlist, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         os_log("Download playlist \"%s\" from server", log: log, type: .info, playlist.name)
         guard playlist.id != "" else { return }
         os_log("Sync songs of playlist \"%s\"", log: log, type: .info, playlist.name)
@@ -267,7 +271,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func syncUpload(playlistToUpdateName playlist: Playlist, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         os_log("Upload name on playlist to: \"%s\"", log: log, type: .info, playlist.name)
         if playlist.id == "" {
             createPlaylistRemote(playlist: playlist, library: library, syncWave: syncWave)
@@ -281,7 +285,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         os_log("Upload SongsAdded on playlist \"%s\"", log: log, type: .info, playlist.name)
         if playlist.id == "" {
             createPlaylistRemote(playlist: playlist, library: library, syncWave: syncWave)
@@ -297,12 +301,14 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage) {
+        guard isSyncAllowed else { return }
         os_log("Upload SongDelete on playlist \"%s\"", log: log, type: .info, playlist.name)
         let updateResponseParser = SsPingParserDelegate()
         subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: [index], songIdsToAdd: [])
     }
     
     func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage) {
+        guard isSyncAllowed else { return }
         os_log("Upload OrderChange on playlist \"%s\"", log: log, type: .info, playlist.name)
         let songIndicesToRemove = Array(0...playlist.songCount-1)
         let songIdsToAdd = playlist.playables.compactMap{ $0.id }
@@ -311,13 +317,14 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func syncUpload(playlistToDelete playlist: Playlist) {
+        guard isSyncAllowed else { return }
         os_log("Upload Delete playlist \"%s\"", log: log, type: .info, playlist.name)
         let updateResponseParser = SsPingParserDelegate()
         subsonicServerApi.requestPlaylistDelete(parserDelegate: updateResponseParser, playlist: playlist)
     }
     
     func syncDownPodcastsWithoutEpisodes(library: LibraryStorage) {
-        guard subsonicServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, subsonicServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
         let oldPodcasts = Set(library.getRemoteAvailablePodcasts())
         
         let podcastParser = SsPodcastParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
@@ -330,7 +337,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func sync(podcast: Podcast, library: LibraryStorage) {
-        guard subsonicServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, subsonicServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
         let oldEpisodes = Set(podcast.episodes)
         
         let podcastEpisodeParser = SsPodcastEpisodeParserDelegate(podcast: podcast, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
@@ -343,6 +350,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func scrobble(song: Song, date: Date?) {
+        guard isSyncAllowed else { return }
         if let date = date {
             os_log("Scrobbled at %s: %s", log: log, type: .info, date.description, song.displayString)
         } else {
@@ -353,46 +361,49 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func setRating(song: Song, rating: Int) {
-        guard rating >= 0 && rating <= 5 else { return }
+        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, song.displayString)
         let parser = SsXmlParser()
         subsonicServerApi.requestRating(parserDelegate: parser, id: song.id, rating: rating)
     }
     
     func setRating(album: Album, rating: Int) {
-        guard rating >= 0 && rating <= 5 else { return }
+        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, album.name)
         let parser = SsXmlParser()
         subsonicServerApi.requestRating(parserDelegate: parser, id: album.id, rating: rating)
     }
     
     func setRating(artist: Artist, rating: Int) {
-        guard rating >= 0 && rating <= 5 else { return }
+        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, artist.name)
         let parser = SsXmlParser()
         subsonicServerApi.requestRating(parserDelegate: parser, id: artist.id, rating: rating)
     }
     
     func setFavorite(song: Song, isFavorite: Bool) {
+        guard isSyncAllowed else { return }
         os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", song.displayString)
         let parser = SsXmlParser()
         subsonicServerApi.requestSetFavorite(parserDelegate: parser, songId: song.id, isFavorite: isFavorite)
     }
     
     func setFavorite(album: Album, isFavorite: Bool) {
+        guard isSyncAllowed else { return }
         os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", album.name)
         let parser = SsXmlParser()
         subsonicServerApi.requestSetFavorite(parserDelegate: parser, albumId: album.id, isFavorite: isFavorite)
     }
     
     func setFavorite(artist: Artist, isFavorite: Bool) {
+        guard isSyncAllowed else { return }
         os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", artist.name)
         let parser = SsXmlParser()
         subsonicServerApi.requestSetFavorite(parserDelegate: parser, artistId: artist.id, isFavorite: isFavorite)
     }
     
     func searchArtists(searchText: String, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
         os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
         let parser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestSearchArtists(parserDelegate: parser, searchText: searchText)
@@ -400,7 +411,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func searchAlbums(searchText: String, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
         os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
         let parser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestSearchAlbums(parserDelegate: parser, searchText: searchText)
@@ -408,7 +419,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func searchSongs(searchText: String, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
         os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
         let parser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
         subsonicServerApi.requestSearchSongs(parserDelegate: parser, searchText: searchText)

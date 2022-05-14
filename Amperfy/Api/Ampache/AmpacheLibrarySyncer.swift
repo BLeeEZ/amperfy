@@ -26,6 +26,9 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     var podcastCount: Int {
         return ampacheXmlServerApi.podcastCount
     }
+    var isSyncAllowed: Bool {
+        return Reachability.isConnectedToNetwork()
+    }
     
     init(ampacheXmlServerApi: AmpacheXmlServerApi) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
@@ -103,7 +106,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func sync(artist: Artist, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let artistParser = ArtistParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
         self.ampacheXmlServerApi.requestArtistInfo(of: artist, parserDelegate: artistParser)
         if let error = artistParser.error?.asAmpacheError, !error.isRemoteAvailable {
@@ -136,7 +139,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func sync(album: Album, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let albumParser = AlbumParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
         self.ampacheXmlServerApi.requestAlbumInfo(of: album, parserDelegate: albumParser)
         if let error = albumParser.error?.asAmpacheError, !error.isRemoteAvailable {
@@ -162,21 +165,21 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func sync(song: Song, library: LibraryStorage) {
-        guard let syncWave = song.syncInfo ?? library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = song.syncInfo ?? library.getLatestSyncWave() else { return }
         let songParser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
         self.ampacheXmlServerApi.requestSongInfo(of: song, parserDelegate: songParser)
         library.saveContext()
     }
     
     func syncMusicFolders(library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let catalogParser = CatalogParserDelegate(library: library, syncWave: syncWave)
         self.ampacheXmlServerApi.requestCatalogs(parserDelegate: catalogParser)
         library.saveContext()
     }
     
     func syncIndexes(musicFolder: MusicFolder, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let artistParser = ArtistParserDelegate(library: library, syncWave: syncWave)
         self.ampacheXmlServerApi.requestArtistWithinCatalog(of: musicFolder, parserDelegate: artistParser)
         
@@ -203,6 +206,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func sync(directory: Directory, library: LibraryStorage) {
+        guard isSyncAllowed else { return }
         if directory.id.starts(with: "album-") {
             let albumId = String(directory.id.dropFirst("album-".count))
             guard let album = library.getAlbum(id: albumId) else { return }
@@ -249,7 +253,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func syncRecentSongs(library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let oldRecentSongs = Set(library.getRecentSongs())
         
         os_log("Sync recently added songs", log: log, type: .info)
@@ -268,7 +272,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func syncFavoriteLibraryElements(library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         os_log("Sync favorite artists", log: log, type: .info)
         let oldFavoriteArtists = Set(library.getFavoriteArtists())
         let artistParser = ArtistParserDelegate(library: library, syncWave: syncWave)
@@ -293,7 +297,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         let parser = SongParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
         ampacheXmlServerApi.requestRandomSongs(parserDelegate: parser, count: count)
         playlist.append(playables: parser.parsedSongs)
@@ -301,18 +305,20 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) {
+        guard isSyncAllowed else { return }
         let parser = AmpacheXmlParser()
         ampacheXmlServerApi.requestPodcastEpisodeDelete(parserDelegate: parser, id: podcastEpisode.id)
     }
 
     func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {
+        guard isSyncAllowed else { return }
         let playlistParser = PlaylistParserDelegate(library: library, parseNotifier: nil)
         ampacheXmlServerApi.requestPlaylists(parserDelegate: playlistParser)
         library.saveContext()
     }
     
     func syncDown(playlist: Playlist, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
         os_log("Download playlist \"%s\" from server", log: log, type: .info, playlist.name)
         guard playlist.id != "" else { return }
         validatePlaylistId(playlist: playlist, library: library)
@@ -326,6 +332,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], library: LibraryStorage) {
+        guard isSyncAllowed else { return }
         os_log("Upload SongsAdded on playlist \"%s\"", log: log, type: .info, playlist.name)
         validatePlaylistId(playlist: playlist, library: library)
         for song in songs {
@@ -334,21 +341,25 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage) {
+        guard isSyncAllowed else { return }
         os_log("Upload SongDelete on playlist \"%s\"", log: log, type: .info, playlist.name)
         ampacheXmlServerApi.requestPlaylistDeleteItem(playlist: playlist, index: index)
     }
     
     func syncUpload(playlistToUpdateName playlist: Playlist, library: LibraryStorage) {
+        guard isSyncAllowed else { return }
         os_log("Upload name on playlist to: \"%s\"", log: log, type: .info, playlist.name)
         ampacheXmlServerApi.requestPlaylistEditOnlyName(playlist: playlist)
     }
     
     func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage) {
+        guard isSyncAllowed else { return }
         os_log("Upload OrderChange on playlist \"%s\"", log: log, type: .info, playlist.name)
         ampacheXmlServerApi.requestPlaylistEdit(playlist: playlist)
     }
     
     func syncUpload(playlistToDelete playlist: Playlist) {
+        guard isSyncAllowed else { return }
         os_log("Upload Delete playlist \"%s\"", log: log, type: .info, playlist.name)
         ampacheXmlServerApi.requestPlaylistDelete(playlist: playlist)
     }
@@ -364,7 +375,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func syncDownPodcastsWithoutEpisodes(library: LibraryStorage) {
-        guard ampacheXmlServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, ampacheXmlServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
         let oldPodcasts = Set(library.getRemoteAvailablePodcasts())
         
         let podcastParser = PodcastParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
@@ -377,7 +388,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func sync(podcast: Podcast, library: LibraryStorage) {
-        guard ampacheXmlServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
+        guard isSyncAllowed, ampacheXmlServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
         let oldEpisodes = Set(podcast.episodes)
         
         let podcastEpisodeParser = PodcastEpisodeParserDelegate(podcast: podcast, library: library, syncWave: syncWave)
@@ -390,6 +401,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func scrobble(song: Song, date: Date?) {
+        guard isSyncAllowed else { return }
         if let date = date {
             os_log("Scrobbled at %s: %s", log: log, type: .info, date.description, song.displayString)
         } else {
@@ -400,40 +412,43 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func setRating(song: Song, rating: Int) {
-        guard rating >= 0 && rating <= 5 else { return }
+        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, song.displayString)
         ampacheXmlServerApi.requestRate(song: song, rating: rating)
     }
     
     func setRating(album: Album, rating: Int) {
-        guard rating >= 0 && rating <= 5 else { return }
+        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, album.name)
         ampacheXmlServerApi.requestRate(album: album, rating: rating)
     }
     
     func setRating(artist: Artist, rating: Int) {
-        guard rating >= 0 && rating <= 5 else { return }
+        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, artist.name)
         ampacheXmlServerApi.requestRate(artist: artist, rating: rating)
     }
     
     func setFavorite(song: Song, isFavorite: Bool) {
+        guard isSyncAllowed else { return }
         os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", song.displayString)
         ampacheXmlServerApi.requestSetFavorite(song: song, isFavorite: isFavorite)
     }
     
     func setFavorite(album: Album, isFavorite: Bool) {
+        guard isSyncAllowed else { return }
         os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", album.name)
         ampacheXmlServerApi.requestSetFavorite(album: album, isFavorite: isFavorite)
     }
     
     func setFavorite(artist: Artist, isFavorite: Bool) {
+        guard isSyncAllowed else { return }
         os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", artist.name)
         ampacheXmlServerApi.requestSetFavorite(artist: artist, isFavorite: isFavorite)
     }
     
     func searchArtists(searchText: String, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
         os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
         let parser = ArtistParserDelegate(library: library, syncWave: syncWave)
         ampacheXmlServerApi.requestSearchArtists(parserDelegate: parser, searchText: searchText)
@@ -441,7 +456,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func searchAlbums(searchText: String, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
         os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
         let parser = AlbumParserDelegate(library: library, syncWave: syncWave)
         ampacheXmlServerApi.requestSearchAlbums(parserDelegate: parser, searchText: searchText)
@@ -449,7 +464,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     }
     
     func searchSongs(searchText: String, library: LibraryStorage) {
-        guard let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
         os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
         let parser = SongParserDelegate(library: library, syncWave: syncWave)
         ampacheXmlServerApi.requestSearchSongs(parserDelegate: parser, searchText: searchText)
