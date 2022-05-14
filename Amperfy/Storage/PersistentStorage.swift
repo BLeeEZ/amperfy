@@ -6,7 +6,7 @@ enum ArtworkDownloadSetting: Int, CaseIterable {
     case onlyOnce = 1
     case never = 2
     
-    static let defaultValue: ArtworkDownloadSetting = .updateOncePerSession
+    static let defaultValue: ArtworkDownloadSetting = .onlyOnce
     
     var description: String {
         switch self {
