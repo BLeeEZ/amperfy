@@ -135,6 +135,12 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     @objc private func optionsPressed() {
         let alert = UIAlertController(title: "Songs", message: nil, preferredStyle: .actionSheet)
 
+        alert.addAction(UIAlertAction(title: "Play all displayed songs", style: .default, handler: { _ in
+            guard let displayedSongsMO = self.fetchedResultsController.fetchedObjects else { return }
+            let displayedSongs = displayedSongsMO.compactMap{ Song(managedObject: $0) }
+            guard displayedSongs.count > 0 else { return }
+            self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: displayedSongs))
+        }))
         if self.appDelegate.persistentStorage.settings.isOnlineMode {
             alert.addAction(UIAlertAction(title: "Play random songs", style: .default, handler: { _ in
                 self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
