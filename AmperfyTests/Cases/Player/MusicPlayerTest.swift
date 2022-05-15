@@ -553,8 +553,8 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 3)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
+        XCTAssertEqual(testPlayer.nextQueue.count, 2)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying8() {
@@ -569,9 +569,9 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(context: PlayContext(name: "", playables: [songId1, songId2, songId3]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 3)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
+        XCTAssertEqual(testPlayer.userQueue.count, 1)
+        XCTAssertEqual(testPlayer.nextQueue.count, 2)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
     func testPlaySong_WaitingQueuePlaying8() {
@@ -584,9 +584,9 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
+        XCTAssertEqual(testPlayer.userQueue.count, 1)
+        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
     func testPlaySong_WaitingQueuePlaying9() {
@@ -605,8 +605,8 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 2)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
+        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId3)
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying3() {
@@ -625,8 +625,8 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 2)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
+        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId3)
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying4() {
@@ -641,8 +641,8 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
+        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying5() {
@@ -657,8 +657,8 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
-        XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
+        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying6() {
@@ -686,8 +686,8 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId0.id)
+        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId1.id)
     }
 
     func testPlayMulitpleSongs_userQueueHasElements_notUserQueuePlaying2() {
@@ -703,8 +703,8 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 3)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId0.id)
+        XCTAssertEqual(testPlayer.nextQueue.count, 2)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId1.id)
     }
     
     func testPlayMulitpleSongs_userQueueHasElements_notUserQueuePlaying3() {
@@ -720,8 +720,8 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 1)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 2)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId0.id)
+        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId2.id)
     }
     
     func testPlayMulitpleSongs_userQueueHasElements_notUserQueuePlaying4() {
@@ -739,8 +739,8 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 2)
         XCTAssertEqual(testPlayer.userQueue.count, 2)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
-        XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId0.id)
+        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId3.id)
         XCTAssertEqual(testPlayer.userQueue[0].id, songId4.id)
         XCTAssertEqual(testPlayer.userQueue[1].id, songId5.id)
     }
