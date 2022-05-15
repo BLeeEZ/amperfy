@@ -18,13 +18,33 @@ extension NSFetchedResultsController {
     }
 }
 
+enum SectionIndexType: Int {
+    case alphabet = 0
+    case rating = 1
+    
+    static let defaultValue: SectionIndexType = .alphabet
+    static let noRatingIndexSymbol = "#"
+}
+
 class CustomSectionIndexFetchedResultsController<ResultType: NSFetchRequestResult>: NSFetchedResultsController<NSFetchRequestResult> {
  
-    public init(fetchRequest: NSFetchRequest<ResultType>, managedObjectContext context: NSManagedObjectContext, sectionNameKeyPath: String?, cacheName name: String?) {
+    var sectionIndexType: SectionIndexType
+    
+    public init(fetchRequest: NSFetchRequest<ResultType>, managedObjectContext context: NSManagedObjectContext, sectionNameKeyPath: String?, cacheName name: String?, sectionIndexType: SectionIndexType = .defaultValue) {
+        self.sectionIndexType = sectionIndexType
         super.init(fetchRequest: fetchRequest as! NSFetchRequest<NSFetchRequestResult>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: name)
     }
     
     override func sectionIndexTitle(forSectionName sectionName: String) -> String? {
+        switch sectionIndexType {
+        case .alphabet:
+            return sortByAlphabet(forSectionName: sectionName)
+        case .rating:
+            return sortByRating(forSectionName: sectionName)
+        }
+    }
+    
+    private func sortByAlphabet(forSectionName sectionName: String) -> String? {
         guard sectionName.count > 0 else { return "?" }
         let initial = String(sectionName.prefix(1).folding(options: .diacriticInsensitive, locale: nil).uppercased())
         if let _ = initial.rangeOfCharacter(from: CharacterSet.decimalDigits) {
@@ -37,7 +57,20 @@ class CustomSectionIndexFetchedResultsController<ResultType: NSFetchRequestResul
             return "?"
         }
     }
-
+    
+    private func sortByRating(forSectionName sectionName: String) -> String? {
+        guard sectionName.count > 0 else { return SectionIndexType.noRatingIndexSymbol }
+        let initial = String(sectionName.prefix(1))
+        switch initial {
+        case "5": return "5"
+        case "4": return "4"
+        case "3": return "3"
+        case "2": return "2"
+        case "1": return "1"
+        default: return SectionIndexType.noRatingIndexSymbol
+        }
+    }
+    
 }
 
 class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSFetchRequestResult  {
@@ -221,6 +254,7 @@ class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<
     var keepAllResultsUpdated = true
     private let allFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
     private let searchFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
+    private var sortType: ElementSortType
     
     private var delegateInternal: NSFetchedResultsControllerDelegate?
     override var delegate: NSFetchedResultsControllerDelegate? {
@@ -239,10 +273,13 @@ class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<
         get { return isSearchActiveInternal }
     }
     
-    override init(managedObjectContext context: NSManagedObjectContext, fetchRequest: NSFetchRequest<ResultType>, isGroupedInAlphabeticSections: Bool) {
+    init(managedObjectContext context: NSManagedObjectContext, fetchRequest: NSFetchRequest<ResultType>, sortType: ElementSortType = .defaultValue, isGroupedInAlphabeticSections: Bool) {
+        self.sortType = sortType
         let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? fetchRequest.sortDescriptors![0].key : nil
         allFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: Self.typeName)
+        allFetchResulsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
         searchFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
+        searchFetchResulsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
         super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         fetchResultsController = allFetchResulsController
     }

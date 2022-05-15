@@ -16,6 +16,16 @@ public final class AlbumMO: AbstractLibraryEntityMO {
         ]
         return fetchRequest
     }
+    
+    static var ratingSortedFetchRequest: NSFetchRequest<AlbumMO> {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(AlbumMO.rating), ascending: false),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)),
+            NSSortDescriptor(key: #keyPath(AlbumMO.id), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+        ]
+        return fetchRequest
+    }
 
 }
 

@@ -13,11 +13,11 @@ class SearchVC: BasicTableViewController {
         
         playlistFetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
         playlistFetchedResultsController.delegate = self
-        artistFetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        artistFetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
         artistFetchedResultsController.delegate = self
-        albumFetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        albumFetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
         albumFetchedResultsController.delegate = self
-        songFetchedResultsController = SongsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        songFetchedResultsController = SongsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
         songFetchedResultsController.delegate = self
         
         configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"])
