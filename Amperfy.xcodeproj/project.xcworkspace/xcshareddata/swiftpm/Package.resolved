@@ -1,16 +1,14 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "VYPlayIndicator",
-        "repositoryURL": "https://github.com/obrhoff/VYPlayIndicator",
-        "state": {
-          "branch": null,
-          "revision": "3d84d6ecd3bd95dd5e50177beea4c2ca3d53f9bc",
-          "version": "1.5.4"
-        }
+  "pins" : [
+    {
+      "identity" : "vyplayindicator",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/obrhoff/VYPlayIndicator",
+      "state" : {
+        "revision" : "3d84d6ecd3bd95dd5e50177beea4c2ca3d53f9bc",
+        "version" : "1.5.4"
       }
-    ]
-  },
-  "version": 1
+    }
+  ],
+  "version" : 2
 }

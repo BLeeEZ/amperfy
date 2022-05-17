@@ -65,7 +65,6 @@ class PlayerView: UIView {
     @IBOutlet weak var displayPlaylistButton: UIButton!
     
     @IBOutlet weak var ratingPlaceholderView: UIView!
-    @IBOutlet weak var ratingView: RatingView?
 
     // Animation constraints
     @IBOutlet weak var artistToTitleLargeDistanceConstraint: NSLayoutConstraint!
@@ -94,11 +93,6 @@ class PlayerView: UIView {
     
     func prepare(toWorkOnRootView: PopupPlayerVC? ) {
         self.rootView = toWorkOnRootView
-        if let ratingView = ViewBuilder<RatingView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: ratingPlaceholderView.bounds.size.width, height: RatingView.frameHeight)) {
-            self.ratingView = ratingView
-            self.ratingView?.activeStarColor = .defaultBlue
-            ratingPlaceholderView.addSubview(ratingView)
-        }
         ratingPlaceholderView.backgroundColor = .clear
         fetchSongInfoAndUpdateViews()
         refreshPlayer()
@@ -429,7 +423,6 @@ class PlayerView: UIView {
     
     func refreshCurrentlyPlayingInfo() {
         refreshArtwork()
-        refreshRatingInfo()
         if let playableInfo = player.currentlyPlaying {
             titleCompactLabel.text = playableInfo.title
             titleLargeLabel.text = playableInfo.title
@@ -457,11 +450,9 @@ class PlayerView: UIView {
         }
         switch player.playerMode {
         case .music:
-            ratingView?.isHidden = false
             repeatButton.isHidden = false
             shuffleButton.isHidden = false
         case .podcast:
-            ratingView?.isHidden = true
             repeatButton.isHidden = true
             shuffleButton.isHidden = true
         }
@@ -574,10 +565,6 @@ class PlayerView: UIView {
         case .podcast:
             playerModeButton.setImage(UIImage.podcast, for: .normal)
         }
-    }
-    
-    func refreshRatingInfo() {
-        ratingView?.display(entity: player.currentlyPlaying)
     }
     
 }
