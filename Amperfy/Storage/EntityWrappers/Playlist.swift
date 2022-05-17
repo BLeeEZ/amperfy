@@ -12,10 +12,19 @@ public class Playlist: Identifyable {
     
     let managedObject: PlaylistMO
     private let library: LibraryStorage
+    private var kvoToken: NSKeyValueObservation?
+    private var isInternalArrayUpdateNeeded = false
     
     init(library: LibraryStorage, managedObject: PlaylistMO) {
         self.library = library
         self.managedObject = managedObject
+        kvoToken = self.managedObject.observe(\.items, options: .new) { (playlist, change) in
+            self.isInternalArrayUpdateNeeded = true
+        }
+    }
+    
+    deinit {
+        kvoToken?.invalidate()
     }
     
     var identifier: String {
@@ -27,27 +36,46 @@ public class Playlist: Identifyable {
         return Playlist(library: library, managedObject: playlistMO)
     }
     
-    private var sortedPlaylistItems: [PlaylistItem] {
-        var sortedItems = [PlaylistItem]()
-        guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else {
-            return sortedItems
-        }
-        sortedItems = itemsMO.lazy
+    private var internalSortedPlaylistItems: [PlaylistItem]?
+    private func updateSortedPlaylistItems() {
+        guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else { return }
+        internalSortedPlaylistItems = itemsMO
             .sorted(by: { $0.order < $1.order })
             .compactMap{ PlaylistItem(library: library, managedObject: $0) }
-        return sortedItems
+    }
+    private var sortedPlaylistItems: [PlaylistItem] {
+        if internalSortedPlaylistItems == nil || isInternalArrayUpdateNeeded { updateInternalArrays() }
+        return internalSortedPlaylistItems ?? [PlaylistItem]()
     }
     
+    private var internalSortedCachedPlaylistItems: [PlaylistItem]?
+    private func updateSortedCachedPlaylistItems() {
+        internalSortedCachedPlaylistItems = sortedPlaylistItems.filter{ return $0.playable?.isCached ?? false }
+    }
     private var sortedCachedPlaylistItems: [PlaylistItem] {
-        var sortedCachedItems = [PlaylistItem]()
-        guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else {
-            return sortedCachedItems
-        }
-        sortedCachedItems = itemsMO.lazy
-            .filter{ return $0.playable?.file != nil }
-            .sorted(by: { $0.order < $1.order })
-            .compactMap{ PlaylistItem(library: library, managedObject: $0) }
-        return sortedCachedItems
+        if internalSortedCachedPlaylistItems == nil || isInternalArrayUpdateNeeded { updateInternalArrays() }
+        return internalSortedCachedPlaylistItems ?? [PlaylistItem]()
+    }
+    var items: [PlaylistItem] {
+        return sortedPlaylistItems
+    }
+    
+
+    private var internalPlayables: [AbstractPlayable]?
+    private func updateInternalPlayables() {
+        internalPlayables = sortedPlaylistItems.compactMap{ $0.playable }
+    }
+    var playables: [AbstractPlayable] {
+        if internalPlayables == nil || isInternalArrayUpdateNeeded { updateInternalArrays() }
+        updateInternalPlayables()
+        return internalPlayables ?? [AbstractPlayable]()
+    }
+    
+    private func updateInternalArrays() {
+        isInternalArrayUpdateNeeded = false
+        updateSortedPlaylistItems()
+        updateSortedCachedPlaylistItems()
+        updateInternalPlayables()
     }
     
     var songCount: Int {
@@ -57,20 +85,7 @@ public class Playlist: Identifyable {
             managedObject.songCount = Int16(newValue)
         }
     }
-    var playables: [AbstractPlayable] {
-        var sortedPlayables = [AbstractPlayable]()
-        guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else {
-            return sortedPlayables
-        }
-        sortedPlayables = itemsMO.lazy
-            .sorted(by: { $0.order < $1.order })
-            .compactMap{ $0.playable }
-            .compactMap{ AbstractPlayable(managedObject: $0) }
-        return sortedPlayables
-    }
-    var items: [PlaylistItem] {
-        return sortedPlaylistItems
-    }
+
     var id: String {
         get {
             return managedObject.id
@@ -184,6 +199,7 @@ public class Playlist: Identifyable {
         songCount += playablesToInsert.count
         updateChangeDate()
         library.saveContext()
+        isInternalArrayUpdateNeeded = true
     }
 
     func append(playable: AbstractPlayable) {
@@ -191,6 +207,7 @@ public class Playlist: Identifyable {
         songCount += 1
         updateChangeDate()
         library.saveContext()
+        isInternalArrayUpdateNeeded = true
     }
 
     func append(playables playablesToAppend: [AbstractPlayable]) {
@@ -199,6 +216,7 @@ public class Playlist: Identifyable {
         }
         songCount += playablesToAppend.count
         library.saveContext()
+        isInternalArrayUpdateNeeded = true
     }
 
     private func createPlaylistItem(for playable: AbstractPlayable, customOrder: Int? = nil) {
@@ -212,6 +230,7 @@ public class Playlist: Identifyable {
         songCount += 1
         updateChangeDate()
         managedObject.addToItems(item.managedObject)
+        isInternalArrayUpdateNeeded = true
     }
     
     func movePlaylistItem(fromIndex: Int, to: Int) {
@@ -232,6 +251,7 @@ public class Playlist: Identifyable {
         
         updateChangeDate()
         library.saveContext()
+        isInternalArrayUpdateNeeded = true
     }
     
     func remove(at index: Int) {
@@ -246,6 +266,7 @@ public class Playlist: Identifyable {
             songCount -= 1
             updateChangeDate()
             library.saveContext()
+            isInternalArrayUpdateNeeded = true
         }
     }
     
@@ -257,6 +278,7 @@ public class Playlist: Identifyable {
                 break
             }
         }
+        isInternalArrayUpdateNeeded = true
     }
     
     func getFirstIndex(playable: AbstractPlayable) -> Int? {
@@ -275,6 +297,7 @@ public class Playlist: Identifyable {
         songCount = 0
         updateChangeDate()
         library.saveContext()
+        isInternalArrayUpdateNeeded = true
     }
     
     func shuffle() {
@@ -290,6 +313,7 @@ public class Playlist: Identifyable {
             localSortedPlaylistItems[i].order = shuffeldIndexes[i]
         }
         library.saveContext()
+        isInternalArrayUpdateNeeded = true
     }
     
     func updateChangeDate() {
@@ -307,6 +331,7 @@ public class Playlist: Identifyable {
         if hasInconsistencyDetected {
             os_log(.debug, "Playlist inconsistency detected and fixed!")
             library.saveContext()
+            isInternalArrayUpdateNeeded = true
         }
     }
     

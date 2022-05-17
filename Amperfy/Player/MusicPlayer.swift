@@ -91,22 +91,17 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         if context.type == .music {
             queueHandler.contextName = context.name
         }
-        if !wasUserQueuePlaying {
-            if context.index == 0 {
-                insertIntoPlayer(playable: activePlayable)
-            } else {
-                play(playerIndex: PlayerIndex(queueType: .next, index: context.index-1))
-            }
-            if let topUserQueueItem = topUserQueueItem {
+        
+        if queueHandler.isUserQueuePlaying {
+            play(playerIndex: PlayerIndex(queueType: .next, index: context.index))
+            if !wasUserQueuePlaying, let topUserQueueItem = topUserQueueItem {
                 queueHandler.insertUserQueue(playables: [topUserQueueItem])
-                play(playerIndex: PlayerIndex(queueType: .user, index: 0))
             }
-        } else if context.index > 0, let currentlyPlayingElement = currentlyPlaying {
-            _ = queueHandler.markAndGetPlayableAsPlaying(at: PlayerIndex(queueType: .next, index: context.index-1))
-            queueHandler.insertUserQueue(playables: [currentlyPlayingElement])
-            _ = queueHandler.markAndGetPlayableAsPlaying(at: PlayerIndex(queueType: .user, index: 0))
+        } else if context.index == 0 {
+            insertIntoPlayer(playable: activePlayable)
+        } else {
+            play(playerIndex: PlayerIndex(queueType: .next, index: context.index-1))
         }
-        play()
     }
     
     func play(playerIndex: PlayerIndex) {

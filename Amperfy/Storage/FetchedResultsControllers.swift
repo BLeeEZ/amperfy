@@ -1,6 +1,13 @@
 import Foundation
 import CoreData
 
+enum ElementSortType: Int {
+    case name = 0
+    case rating = 1
+    
+    static let defaultValue: ElementSortType = .name
+}
+
 enum PlaylistSortType: Int {
     case name = 0
     case lastPlayed = 1
@@ -228,14 +235,20 @@ class GenreSongsFetchedResultsController: BasicFetchedResultsController<SongMO> 
 
 class ArtistFetchedResultsController: CachedFetchedResultsController<ArtistMO> {
     
-    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    init(managedObjectContext context: NSManagedObjectContext, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
         let library = LibraryStorage(context: context)
-        let fetchRequest = ArtistMO.identifierSortedFetchRequest
+        var fetchRequest = ArtistMO.identifierSortedFetchRequest
+        switch sortType {
+        case .name:
+            fetchRequest = ArtistMO.identifierSortedFetchRequest
+        case .rating:
+            fetchRequest = ArtistMO.ratingSortedFetchRequest
+        }
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
             library.getFetchPredicate(onlyCachedArtists: true)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
@@ -333,14 +346,20 @@ class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsController<So
 
 class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
     
-    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    init(managedObjectContext context: NSManagedObjectContext, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
         let library = LibraryStorage(context: context)
-        let fetchRequest = AlbumMO.identifierSortedFetchRequest
+        var fetchRequest = AlbumMO.identifierSortedFetchRequest
+        switch sortType {
+        case .name:
+            fetchRequest = AlbumMO.identifierSortedFetchRequest
+        case .rating:
+            fetchRequest = AlbumMO.ratingSortedFetchRequest
+        }
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
             library.getFetchPredicate(onlyCachedAlbums: true)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
@@ -364,10 +383,17 @@ class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
 
 class SongsFetchedResultsController: CachedFetchedResultsController<SongMO> {
     
-    init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
-        let fetchRequest = SongMO.identifierSortedFetchRequest
+    init(managedObjectContext context: NSManagedObjectContext, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
+        var fetchRequest = SongMO.identifierSortedFetchRequest
+        switch sortType {
+        case .name:
+            fetchRequest = SongMO.identifierSortedFetchRequest
+        case .rating:
+            fetchRequest = SongMO.ratingSortedFetchRequest
+        }
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(managedObjectContext: context, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        keepAllResultsUpdated = false
     }
     
     func search(searchText: String, onlyCachedSongs: Bool, displayFilter: DisplayCategoryFilter) {

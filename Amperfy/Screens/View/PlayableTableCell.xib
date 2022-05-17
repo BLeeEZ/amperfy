@@ -56,11 +56,19 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cache" translatesAutoresizingMaskIntoConstraints="NO" id="EMS-3K-XAV" userLabel="Cache Icon">
+                        <rect key="frame" x="72" y="38.5" width="15" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="15" id="oYf-1p-Yfi"/>
+                            <constraint firstAttribute="width" secondItem="EMS-3K-XAV" secondAttribute="height" multiplier="1:1" id="vaM-EW-tAR"/>
+                        </constraints>
+                    </imageView>
                 </subviews>
                 <constraints>
                     <constraint firstItem="4OZ-v0-bY2" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="trailing" constant="8" id="AUO-iE-pDI"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="top" secondItem="hPr-VQ-rTt" secondAttribute="bottom" constant="2" id="E4f-kL-YK1"/>
                     <constraint firstAttribute="trailingMargin" secondItem="4OZ-v0-bY2" secondAttribute="trailing" id="GoY-7G-GF0"/>
+                    <constraint firstItem="EMS-3K-XAV" firstAttribute="centerY" secondItem="nJe-7h-3tU" secondAttribute="centerY" id="HyA-VX-ORe"/>
                     <constraint firstAttribute="bottomMargin" secondItem="moK-d1-lj1" secondAttribute="bottom" id="Ldd-iy-NFu"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" constant="3" id="PbZ-KR-6Uu"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="Pwh-zQ-8MT"/>
@@ -72,11 +80,14 @@
                     <constraint firstItem="4OZ-v0-bY2" firstAttribute="leading" secondItem="nJe-7h-3tU" secondAttribute="trailing" constant="8" id="mcC-ks-bMI"/>
                     <constraint firstItem="Kod-kR-xnX" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="pDd-vi-W7i"/>
                     <constraint firstItem="4OZ-v0-bY2" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="uVM-f4-TFi"/>
+                    <constraint firstItem="EMS-3K-XAV" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="vCv-sz-21V"/>
                     <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="nJe-7h-3tU" secondAttribute="trailing" id="ybP-eq-wcE"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="artistLabel" destination="nJe-7h-3tU" id="SlX-ew-mVM"/>
+                <outlet property="artistLabelLeadingConstraint" destination="Pwh-zQ-8MT" id="dvC-i3-lJg"/>
+                <outlet property="cacheIconImage" destination="EMS-3K-XAV" id="iht-Wf-bpc"/>
                 <outlet property="downloadProgress" destination="moK-d1-lj1" id="Jof-Zl-a7H"/>
                 <outlet property="entityImage" destination="Kod-kR-xnX" id="Ovk-jM-HNG"/>
                 <outlet property="reorderLabel" destination="4OZ-v0-bY2" id="5zb-zm-AcA"/>
@@ -86,6 +97,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="cache" width="640" height="512"/>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

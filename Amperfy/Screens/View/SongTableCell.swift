@@ -6,6 +6,8 @@ class SongTableCell: BasicTableCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
     @IBOutlet weak var entityImage: EntityImageView!
+    @IBOutlet weak var cacheIconImage: UIImageView!
+    @IBOutlet weak var artistLabelLeadingConstraint: NSLayoutConstraint!
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     
@@ -41,8 +43,12 @@ class SongTableCell: BasicTableCell {
         entityImage.display(container: song)
 
         if song.isCached {
+            cacheIconImage.isHidden = false
+            artistLabelLeadingConstraint.constant = 20
             artistLabel.textColor = UIColor.defaultBlue
         } else {
+            cacheIconImage.isHidden = true
+            artistLabelLeadingConstraint.constant = 0
             artistLabel.textColor = UIColor.secondaryLabelColor
         }
     }

@@ -11,6 +11,8 @@ class PlayableTableCell: BasicTableCell {
     @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var downloadProgress: UIProgressView!
     @IBOutlet weak var reorderLabel: UILabel?
+    @IBOutlet weak var cacheIconImage: UIImageView!
+    @IBOutlet weak var artistLabelLeadingConstraint: NSLayoutConstraint!
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     
@@ -57,12 +59,20 @@ class PlayableTableCell: BasicTableCell {
         }
         
         if download?.error != nil {
+            cacheIconImage.isHidden = true
+            artistLabelLeadingConstraint.constant = 0
             artistLabel.textColor = .systemRed
         } else if playable.isCached || download?.isFinishedSuccessfully ?? false {
+            cacheIconImage.isHidden = false
+            artistLabelLeadingConstraint.constant = 20
             artistLabel.textColor = UIColor.defaultBlue
         } else if playerIndexCb != nil {
+            cacheIconImage.isHidden = true
+            artistLabelLeadingConstraint.constant = 0
             artistLabel.textColor = UIColor.labelColor
         } else {
+            cacheIconImage.isHidden = true
+            artistLabelLeadingConstraint.constant = 0
             artistLabel.textColor = UIColor.secondaryLabelColor
         }
         

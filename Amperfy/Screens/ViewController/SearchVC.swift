@@ -13,11 +13,11 @@ class SearchVC: BasicTableViewController {
         
         playlistFetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
         playlistFetchedResultsController.delegate = self
-        artistFetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        artistFetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
         artistFetchedResultsController.delegate = self
-        albumFetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        albumFetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
         albumFetchedResultsController.delegate = self
-        songFetchedResultsController = SongsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        songFetchedResultsController = SongsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
         songFetchedResultsController.delegate = self
         
         configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"])
@@ -80,7 +80,7 @@ class SearchVC: BasicTableViewController {
 
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
         guard let indexPath = tableView.indexPath(for: cell), indexPath.section == LibraryElement.Song.rawValue else { return nil }
-        let song = songFetchedResultsController.getWrappedEntity(at: indexPath)
+        let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
         return PlayContext(containable: song)
     }
 
@@ -242,9 +242,9 @@ class SearchVC: BasicTableViewController {
             tableView.separatorStyle = .singleLine
         } else {
             playlistFetchedResultsController.clearResults()
-            artistFetchedResultsController.clearResults()
-            albumFetchedResultsController.clearResults()
-            songFetchedResultsController.clearResults()
+            artistFetchedResultsController.hideResults()
+            albumFetchedResultsController.hideResults()
+            songFetchedResultsController.hideResults()
             tableView.separatorStyle = .none
         }
         tableView.reloadData()
@@ -265,7 +265,7 @@ class SearchVC: BasicTableViewController {
             return
         }
         
-        super.applyChangesOfMultiRowType(determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
+        super.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
     }
     
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {

@@ -5,21 +5,23 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
 
     private var fetchedResultsController: ArtistFetchedResultsController!
     private var filterButton: UIBarButtonItem!
+    private var sortButton: UIBarButtonItem!
     private var displayFilter: DisplayCategoryFilter = .all
+    private var sortType: ElementSortType = .name
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.artists)
         
-        fetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
-        singleFetchedResultsController = fetchedResultsController
+        change(sortType: appDelegate.persistentStorage.settings.artistsSortSetting)
         
         configureSearchController(placeholder: "Search in \"Artists\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
 
         filterButton = UIBarButtonItem(image: UIImage.filter, style: .plain, target: self, action: #selector(filterButtonPressed))
-        navigationItem.rightBarButtonItem = filterButton
+        sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
+        navigationItem.rightBarButtonItems = [filterButton, sortButton]
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -31,6 +33,17 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
                 completionHandler(SwipeActionContext(containable: artist))
             }
         }
+    }
+    
+    func change(sortType: ElementSortType) {
+        self.sortType = sortType
+        appDelegate.persistentStorage.settings.artistsSortSetting = sortType
+        singleFetchedResultsController?.clearResults()
+        tableView.reloadData()
+        fetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: sortType, isGroupedInAlphabeticSections: true)
+        fetchedResultsController.fetchResultsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
+        singleFetchedResultsController = fetchedResultsController
+        tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -47,6 +60,28 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         let artist = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(container: artist, rootView: self)
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        switch sortType {
+        case .name:
+            return 0.0
+        case .rating:
+            return CommonScreenOperations.tableSectionHeightLarge
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch sortType {
+        case .name:
+            return super.tableView(tableView, titleForHeaderInSection: section)
+        case .rating:
+            if let sectionNameInitial = super.tableView(tableView, titleForHeaderInSection: section), sectionNameInitial != SectionIndexType.noRatingIndexSymbol {
+                return "\(sectionNameInitial) Star\(sectionNameInitial != "1" ? "s" : "")"
+            } else {
+                return "Not rated"
+            }
+        }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -73,6 +108,26 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         }
         fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1, displayFilter: displayFilter)
         tableView.reloadData()
+    }
+    
+    @objc private func sortButtonPressed() {
+        let alert = UIAlertController(title: "Artists sorting", message: nil, preferredStyle: .actionSheet)
+        if sortType != .name {
+            alert.addAction(UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+                self.change(sortType: .name)
+                self.updateSearchResults(for: self.searchController)
+            }))
+        }
+        if sortType != .rating {
+            alert.addAction(UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
+                self.change(sortType: .rating)
+                self.updateSearchResults(for: self.searchController)
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
+        present(alert, animated: true, completion: nil)
     }
     
     @objc private func filterButtonPressed() {

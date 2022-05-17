@@ -28,6 +28,10 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
     override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
         return singleFetchController?.sectionIndexTitles
     }
+    
+    override func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
+        return singleFetchController?.section(forSectionIndexTitle: title, at: index) ?? 0
+    }
 
 }
 
@@ -125,16 +129,11 @@ extension BasicTableViewController {
 class BasicTableViewController: UITableViewController {
     
     private static let swipeButtonColors: [UIColor] = [.defaultBlue, .systemOrange, .systemGreen, .systemGray]
-    private static let changeCountToPerformeDataReload = 30
     
     var appDelegate: AppDelegate!
     let searchController = UISearchController(searchResultsController: nil)
     
-    var sectionChanges = false
     var noAnimationAtNextDataChange = false
-    var rowsToInsert = [IndexPath]()
-    var rowsToDelete = [IndexPath]()
-    var rowsToUpdate = [IndexPath]()
     var swipeDisplaySettings = SwipeDisplaySettings()
     var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
     var swipeCallback: SwipeActionCallback?
@@ -228,77 +227,57 @@ class BasicTableViewController: UITableViewController {
 extension BasicTableViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        sectionChanges = false
-        rowsToInsert = [IndexPath]()
-        rowsToDelete = [IndexPath]()
-        rowsToUpdate = [IndexPath]()
+        tableView.beginUpdates()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        let changeCount = rowsToInsert.count +
-            rowsToDelete.count +
-            rowsToUpdate.count
-        
-        if noAnimationAtNextDataChange || sectionChanges || (changeCount > Self.changeCountToPerformeDataReload) {
-            tableView.reloadData()
-            noAnimationAtNextDataChange = false
-        } else {
-            tableView.performBatchUpdates({
-                if !rowsToInsert.isEmpty {
-                    tableView.insertRows(at: rowsToInsert, with: .bottom)
-                }
-                if !rowsToDelete.isEmpty {
-                    tableView.deleteRows(at: rowsToDelete, with: .left)
-                }
-                if !rowsToUpdate.isEmpty, !isEditLockedDueToActiveSwipe {
-                    tableView.reloadRows(at: rowsToUpdate, with: .none)
-                }
-            }, completion: nil)
-        }
+        tableView.endUpdates()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch type {
-        case .insert:
-            rowsToInsert.append(newIndexPath!)
-        case .delete:
-            rowsToDelete.append(indexPath!)
-        case .move:
-            if indexPath! != newIndexPath! {
-                rowsToInsert.append(newIndexPath!)
-                rowsToDelete.append(indexPath!)
-            } else {
-                rowsToUpdate.append(indexPath!)
-            }
-        case .update:
-            rowsToUpdate.append(indexPath!)
-        @unknown default:
-            break
+        self.applyChangesFromFetchedResultsController(at: indexPath, for: type, newIndexPath: newIndexPath)
+    }
+
+    func applyChangesOfMultiRowType(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, determinedSection section: Int, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        var adjustedIndexPath: IndexPath?
+        if let indexPath = indexPath {
+            adjustedIndexPath = IndexPath(row: indexPath.row, section: section)
         }
+        var adjustedNewIndexPath: IndexPath?
+        if let newIndexPath = newIndexPath {
+            adjustedNewIndexPath = IndexPath(row: newIndexPath.row, section: section)
+        }
+        self.applyChangesFromFetchedResultsController(at: adjustedIndexPath, for: type, newIndexPath: adjustedNewIndexPath)
     }
     
-    func applyChangesOfMultiRowType(determinedSection section: Int, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+    private func applyChangesFromFetchedResultsController(at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .insert:
-            rowsToInsert.append(IndexPath(row: newIndexPath!.row, section: section))
+            tableView.insertRows(at: [newIndexPath!], with: .bottom)
         case .delete:
-            rowsToDelete.append(IndexPath(row: indexPath!.row, section: section))
+            tableView.deleteRows(at: [indexPath!], with: .left)
         case .move:
-            if indexPath! != newIndexPath! {
-                rowsToInsert.append(IndexPath(row: newIndexPath!.row, section: section))
-                rowsToDelete.append(IndexPath(row: indexPath!.row, section: section))
-            } else {
-                rowsToUpdate.append(IndexPath(row: indexPath!.row, section: section))
-            }
+            tableView.insertRows(at: [newIndexPath!], with: .bottom)
+            tableView.deleteRows(at: [indexPath!], with: .left)
         case .update:
-            rowsToUpdate.append(IndexPath(row: indexPath!.row, section: section))
+            if !isEditLockedDueToActiveSwipe {
+                tableView.reloadRows(at: [indexPath!], with: .none)
+            }
         @unknown default:
             break
         }
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        sectionChanges = true
+        let indexSet = IndexSet(integer: sectionIndex)
+        switch type {
+        case .insert:
+            tableView.insertSections(indexSet, with: .automatic)
+        case .delete:
+            tableView.deleteSections(indexSet, with: .automatic)
+        default:
+            break
+        }
     }
     
 }

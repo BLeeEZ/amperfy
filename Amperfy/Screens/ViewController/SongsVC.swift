@@ -6,14 +6,15 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     private var fetchedResultsController: SongsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var filterButton: UIBarButtonItem!
+    private var sortButton: UIBarButtonItem!
     private var displayFilter: DisplayCategoryFilter = .all
+    private var sortType: ElementSortType = .name
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.songs)
         
-        fetchedResultsController = SongsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
-        singleFetchedResultsController = fetchedResultsController
+        change(sortType: appDelegate.persistentStorage.settings.songsSortSetting)
         
         configureSearchController(placeholder: "Search in \"Songs\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: SongTableCell.typeName)
@@ -21,6 +22,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         
         optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
         filterButton = UIBarButtonItem(image: UIImage.filter, style: .plain, target: self, action: #selector(filterButtonPressed))
+        sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -33,13 +35,24 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         }
     }
     
+    func change(sortType: ElementSortType) {
+        self.sortType = sortType
+        appDelegate.persistentStorage.settings.songsSortSetting = sortType
+        singleFetchedResultsController?.clearResults()
+        tableView.reloadData()
+        fetchedResultsController = SongsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: sortType, isGroupedInAlphabeticSections: true)
+        fetchedResultsController.fetchResultsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
+        singleFetchedResultsController = fetchedResultsController
+        tableView.reloadData()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateFilterButton()
         if appDelegate.persistentStorage.settings.isOnlineMode {
-            navigationItem.rightBarButtonItems = [optionsButton, filterButton]
+            navigationItem.rightBarButtonItems = [optionsButton, filterButton, sortButton]
         } else {
-            navigationItem.rightBarButtonItems = [filterButton]
+            navigationItem.rightBarButtonItems = [filterButton, sortButton]
         }
     }
 
@@ -52,6 +65,28 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         let song = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        switch sortType {
+        case .name:
+            return 0.0
+        case .rating:
+            return CommonScreenOperations.tableSectionHeightLarge
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch sortType {
+        case .name:
+            return super.tableView(tableView, titleForHeaderInSection: section)
+        case .rating:
+            if let sectionNameInitial = super.tableView(tableView, titleForHeaderInSection: section), sectionNameInitial != SectionIndexType.noRatingIndexSymbol {
+                return "\(sectionNameInitial) Star\(sectionNameInitial != "1" ? "s" : "")"
+            } else {
+                return "Not rated"
+            }
+        }
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
@@ -81,6 +116,26 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             fetchedResultsController.showAllResults()
         }
         tableView.reloadData()
+    }
+    
+    @objc private func sortButtonPressed() {
+        let alert = UIAlertController(title: "Songs sorting", message: nil, preferredStyle: .actionSheet)
+        if sortType != .name {
+            alert.addAction(UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+                self.change(sortType: .name)
+                self.updateSearchResults(for: self.searchController)
+            }))
+        }
+        if sortType != .rating {
+            alert.addAction(UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
+                self.change(sortType: .rating)
+                self.updateSearchResults(for: self.searchController)
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
+        present(alert, animated: true, completion: nil)
     }
     
     @objc private func filterButtonPressed() {
@@ -135,6 +190,12 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     @objc private func optionsPressed() {
         let alert = UIAlertController(title: "Songs", message: nil, preferredStyle: .actionSheet)
 
+        alert.addAction(UIAlertAction(title: "Play all displayed songs", style: .default, handler: { _ in
+            guard let displayedSongsMO = self.fetchedResultsController.fetchedObjects else { return }
+            let displayedSongs = displayedSongsMO.compactMap{ Song(managedObject: $0) }
+            guard displayedSongs.count > 0 else { return }
+            self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: displayedSongs))
+        }))
         if self.appDelegate.persistentStorage.settings.isOnlineMode {
             alert.addAction(UIAlertAction(title: "Play random songs", style: .default, handler: { _ in
                 self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in

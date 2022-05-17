@@ -31,7 +31,7 @@ extension CoreDataIdentifyable {
     static var identifierSortedFetchRequest: NSFetchRequest<Self> {
         let fetchRequest: NSFetchRequest<Self> = Self.fetchRequest()
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)),
             NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
         ]
         return fetchRequest

@@ -6,7 +6,7 @@ enum ArtworkDownloadSetting: Int, CaseIterable {
     case onlyOnce = 1
     case never = 2
     
-    static let defaultValue: ArtworkDownloadSetting = .updateOncePerSession
+    static let defaultValue: ArtworkDownloadSetting = .onlyOnce
     
     var description: String {
         switch self {
@@ -58,6 +58,9 @@ class PersistentStorage {
         case SwipeLeadingActionSettings = "swipeLeadingActionSettings"
         case SwipeTrailingActionSettings = "swipeTrailingActionSettings"
         case PlaylistsSortSetting = "playlistsSortSetting"
+        case ArtistsSortSetting = "artistsSortSetting"
+        case AlbumsSortSetting = "albumsSortSetting"
+        case SongsSortSetting = "songsSortSetting"
         case PodcastsShowSetting = "podcastsShowSetting"
         case PlayerDisplayStyle = "playerDisplayStyle"
         case IsOfflineMode = "isOfflineMode"
@@ -91,6 +94,31 @@ class PersistentStorage {
                 return PlaylistSortType(rawValue: playlistsSortSettingRaw) ?? PlaylistSortType.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.PlaylistsSortSetting.rawValue) }
+        }
+        
+        var artistsSortSetting: ElementSortType {
+            get {
+                let artistsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ArtistsSortSetting.rawValue) as? Int ?? ElementSortType.defaultValue.rawValue
+                return ElementSortType(rawValue: artistsSortSettingRaw) ?? ElementSortType.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtistsSortSetting.rawValue) }
+        }
+        
+        
+        var albumsSortSetting: ElementSortType {
+            get {
+                let albumsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.AlbumsSortSetting.rawValue) as? Int ?? ElementSortType.defaultValue.rawValue
+                return ElementSortType(rawValue: albumsSortSettingRaw) ?? ElementSortType.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.AlbumsSortSetting.rawValue) }
+        }
+        
+        var songsSortSetting: ElementSortType {
+            get {
+                let songsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongsSortSetting.rawValue) as? Int ?? ElementSortType.defaultValue.rawValue
+                return ElementSortType(rawValue: songsSortSettingRaw) ?? ElementSortType.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.SongsSortSetting.rawValue) }
         }
         
         var swipeActionSettings: SwipeActionSettings {
