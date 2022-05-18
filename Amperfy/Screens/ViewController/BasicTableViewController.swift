@@ -257,8 +257,13 @@ extension BasicTableViewController: NSFetchedResultsControllerDelegate {
         case .delete:
             tableView.deleteRows(at: [indexPath!], with: .left)
         case .move:
-            tableView.insertRows(at: [newIndexPath!], with: .bottom)
-            tableView.deleteRows(at: [indexPath!], with: .left)
+            if indexPath! != newIndexPath! {
+                tableView.insertRows(at: [newIndexPath!], with: .bottom)
+                tableView.deleteRows(at: [indexPath!], with: .left)
+            } else {
+                tableView.insertRows(at: [newIndexPath!], with: .none)
+                tableView.deleteRows(at: [indexPath!], with: .none)
+            }
         case .update:
             if !isEditLockedDueToActiveSwipe {
                 tableView.reloadRows(at: [indexPath!], with: .none)
