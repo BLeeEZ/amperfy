@@ -1,15 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "streamingkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/BLeeEZ/StreamingKit",
-      "state" : {
-        "branch" : "master",
-        "revision" : "9a86f8101d4a388b35e40eef38108dc3072d9861"
-      }
-    },
-    {
       "identity" : "vyplayindicator",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/obrhoff/VYPlayIndicator",

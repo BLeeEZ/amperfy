@@ -1,6 +1,5 @@
 import Foundation
 import AVFoundation
-import StreamingKit
 import UIKit
 import os.log
 
@@ -25,19 +24,23 @@ enum BackendAudioQueueType {
 
 typealias NextPlayablePreloadCallback = () -> AbstractPlayable?
 
+struct PlayerItem {
+let playable: AbstractPlayable
+let url: URL
+}
+
 class BackendAudioPlayer: NSObject {
 
     private let playableDownloader: DownloadManageable
     private let cacheProxy: PlayableFileCachable
     private let backendApi: BackendApi
     private let userStatistics: UserStatistics
-    private let player: STKAudioPlayer
+    private let player: HysteriaPlayer
     private let eventLogger: EventLogger
     private let updateElapsedTimeInterval = 0.5
     private var elapsedTimeTimer: Timer?
     private let semaphore = DispatchSemaphore(value: 1)
-    private var currentPlayable: AbstractPlayable?
-    private var nextPreloadedPlayable: AbstractPlayable?
+    private var playables = [PlayerItem]()
     
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
@@ -50,17 +53,18 @@ class BackendAudioPlayer: NSObject {
         return playType == nil
     }
     var elapsedTime: Double {
-        return player.progress
+        return Double(player.playingItemCurrentTime())
     }
     var duration: Double {
-        return player.duration
+        return Double(player.playingItemDurationTime())
     }
     var canBeContinued: Bool {
-        return player.state == .paused
+        return !playables.isEmpty
     }
     
     init(eventLogger: EventLogger, backendApi: BackendApi, playableDownloader: DownloadManageable, cacheProxy: PlayableFileCachable, userStatistics: UserStatistics) {
-        self.player = STKAudioPlayer()
+        self.player = HysteriaPlayer.sharedInstance()
+        self.player.skipEmptySoundPlaying = false
         self.backendApi = backendApi
         self.eventLogger = eventLogger
         self.playableDownloader = playableDownloader
@@ -68,6 +72,7 @@ class BackendAudioPlayer: NSObject {
         self.userStatistics = userStatistics
         super.init()
         self.player.delegate = self
+        self.player.datasource = self
         startElapsedTimeTimer()
     }
     
@@ -81,7 +86,7 @@ class BackendAudioPlayer: NSObject {
     
     func continuePlay() {
         isPlaying = true
-        player.resume()
+        player.play()
     }
     
     func pause() {
@@ -100,11 +105,9 @@ class BackendAudioPlayer: NSObject {
     
     func requestToPlay(playable: AbstractPlayable) {
         semaphore.wait()
-        if let nextPreloadedPlayable = nextPreloadedPlayable, nextPreloadedPlayable == playable {
+        if playables.count > 1, let nextPreloadedPlayable = playables.last?.playable, nextPreloadedPlayable == playables[playables.count-2].playable {
             // Do nothing next preloaded playable has already been queued to player
             os_log(.default, "Play preloaded: %s", nextPreloadedPlayable.displayString)
-            currentPlayable = nextPreloadedPlayable
-            self.nextPreloadedPlayable = nil
         } else {
             if playable.isCached {
                 insertCachedPlayable(playable: playable)
@@ -116,7 +119,7 @@ class BackendAudioPlayer: NSObject {
             } else {
                 clearPlayer()
             }
-            self.continuePlay()
+            //self.continuePlay()
         }
         self.responder?.notifyItemPreparationFinished()
         semaphore.signal()
@@ -124,8 +127,9 @@ class BackendAudioPlayer: NSObject {
     
     private func clearPlayer() {
         playType = nil
-        player.stop()
-        currentPlayable = nil
+        player.pause()
+        //player.removeAllItems()
+        playables.removeAll()
     }
     
     private func insertCachedPlayable(playable: AbstractPlayable, queueType: BackendAudioQueueType = .play) {
@@ -158,10 +162,11 @@ class BackendAudioPlayer: NSObject {
     private func insert(playable: AbstractPlayable, withUrl url: URL, queueType: BackendAudioQueueType) {
         switch queueType {
         case .play:
-            currentPlayable = playable
-            player.play(url, withQueueItemID: playable.uniqueID as NSObject)
+            playables.removeAll()
+            playables.append(PlayerItem(playable: playable, url: url))
+            player.fetchAndPlayPlayerItem(0)
         case .queue:
-            player.queue(url, withQueueItemId: playable.uniqueID as NSObject)
+            playables.append(PlayerItem(playable: playable, url: url))
         }
     }
     
@@ -184,6 +189,71 @@ class BackendAudioPlayer: NSObject {
 
 }
 
+extension BackendAudioPlayer: HysteriaPlayerDelegate {
+
+    
+    func hysteriaPlayer(_ hysteriaPlayer: HysteriaPlayer, didReadyToPlayWithIdentifier identifier: HysteriaPlayerReadyToPlay) {
+        print("didReadyToPlayWithIdentifier")
+        switch identifier {
+        case .currentItem:
+            hysteriaPlayer.play()
+        default:
+            break
+        }
+    }
+    func hysteriaPlayer(_ hysteriaPlayer: HysteriaPlayer, willChangePlayerItemAt index: Int) {
+        print("willChangePlayerItemAt")
+    }
+    
+    func hysteriaPlayer(_ hysteriaPlayer: HysteriaPlayer, didChangeCurrentItem item: AVPlayerItem) {
+        print("didChangeCurrentItem")
+    }
+    
+    func hysteriaPlayer(_ hysteriaPlayer: HysteriaPlayer, didEvictCurrentItem item: AVPlayerItem) {
+        print("didEvictCurrentItem")
+    }
+    
+    func hysteriaPlayer(_ hysteriaPlayer: HysteriaPlayer, rateDidChange rate: Float) {
+        print("rateDidChange")
+    }
+    
+    func hysteriaPlayerDidReachEnd(_ hysteriaPlayer: HysteriaPlayer) {
+        print("hysteriaPlayerDidReachEnd")
+    }
+    
+    func hysteriaPlayer(_ hysteriaPlayer: HysteriaPlayer, didPreloadCurrentItemWith time: CMTime) {
+        print("didPreloadCurrentItemWith")
+    }
+    
+    func hysteriaPlayer(_ hysteriaPlayer: HysteriaPlayer, didFailWithIdentifier identifier: HysteriaPlayerFailed, error: Error) {
+        print("didFailWithIdentifier")
+    }
+    
+
+    
+    func hysteriaPlayer(_ hysteriaPlayer: HysteriaPlayer, didFailedWith item: AVPlayerItem?, toPlayToEndTimeWithError error: Error) {
+        print("didFailedWith")
+    }
+    
+    func hysteriaPlayer(_ hysteriaPlayer: HysteriaPlayer, didStallWith item: AVPlayerItem?) {
+        print("didStallWith")
+    }
+    
+
+}
+
+extension BackendAudioPlayer: HysteriaPlayerDataSource {
+    func numberOfItems(in hysteriaPlayer: HysteriaPlayer) -> Int {
+        print("numberOfItems")
+        return playables.count
+    }
+    
+    func hysteriaPlayer(_ hysteriaPlayer: HysteriaPlayer, urlForItemAt index: Int, preBuffer: Bool) -> URL {
+        print("urlForItemAt")
+        return playables[index].url
+    }
+}
+/*
 extension BackendAudioPlayer: STKAudioPlayerDelegate {
     func audioPlayer(_ audioPlayer: STKAudioPlayer, didStartPlayingQueueItemId queueItemId: NSObject) {
         print("didStartPlayingQueueItemId")
@@ -221,3 +291,4 @@ extension BackendAudioPlayer: STKAudioPlayerDelegate {
     }
     
 }
+*/

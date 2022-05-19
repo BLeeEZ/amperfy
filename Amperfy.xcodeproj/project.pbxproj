@@ -84,7 +84,7 @@
 		5029288E2657B78B00DA3A8F /* UserStatisticsMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288C2657B78B00DA3A8F /* UserStatisticsMO+CoreDataClass.swift */; };
 		5029288F2657B78B00DA3A8F /* UserStatisticsMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288D2657B78B00DA3A8F /* UserStatisticsMO+CoreDataProperties.swift */; };
 		5029E0392235A8EC0027F96F /* CommonString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E0382235A8EC0027F96F /* CommonString.swift */; };
-		502AEEA92833DCF000729524 /* StreamingKit in Frameworks */ = {isa = PBXBuildFile; productRef = 502AEEA82833DCF000729524 /* StreamingKit */; };
+		502AEEAC28364D9700729524 /* HysteriaPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 502AEEAB28364D9700729524 /* HysteriaPlayer.m */; };
 		502C0045224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502C0044224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift */; };
 		502E56BC27561AD900638BD2 /* PopupPlayerSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */; };
 		502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */; };
@@ -472,6 +472,8 @@
 		5029288C2657B78B00DA3A8F /* UserStatisticsMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserStatisticsMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		5029288D2657B78B00DA3A8F /* UserStatisticsMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserStatisticsMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		5029E0382235A8EC0027F96F /* CommonString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonString.swift; sourceTree = "<group>"; };
+		502AEEAA28364D6200729524 /* HysteriaPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HysteriaPlayer.h; sourceTree = "<group>"; };
+		502AEEAB28364D9700729524 /* HysteriaPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HysteriaPlayer.m; sourceTree = "<group>"; };
 		502C0044224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubsonicArtworkDownloadDelegate.swift; sourceTree = "<group>"; };
 		502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PopupPlayerSectionHeader.xib; sourceTree = "<group>"; };
 		502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupPlayerSectionHeader.swift; sourceTree = "<group>"; };
@@ -775,7 +777,6 @@
 				5054689C2625CD95008005EC /* LNPopupController.xcframework in Frameworks */,
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
 				5055AA59268365DA00096B8D /* NotificationBanner.xcframework in Frameworks */,
-				502AEEA92833DCF000729524 /* StreamingKit in Frameworks */,
 				506007232625E8BD00F9891D /* MarqueeLabel.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1402,6 +1403,8 @@
 				50048F962759186A0087EDFB /* EmbeddedArtworkExtractor.swift */,
 				50048F98275954A30087EDFB /* SongPlayedSyncer.swift */,
 				509D55E8280FDAE100E0E0B5 /* PlayerNotificationAdapter.swift */,
+				502AEEAA28364D6200729524 /* HysteriaPlayer.h */,
+				502AEEAB28364D9700729524 /* HysteriaPlayer.m */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -1425,7 +1428,6 @@
 			name = Amperfy;
 			packageProductDependencies = (
 				509D55F7281274F500E0E0B5 /* VYPlayIndicator */,
-				502AEEA82833DCF000729524 /* StreamingKit */,
 			);
 			productName = Amperfy;
 			productReference = 508385E421C5965B00C4BB32 /* Amperfy.app */;
@@ -1508,7 +1510,6 @@
 			mainGroup = 508385DB21C5965B00C4BB32;
 			packageReferences = (
 				509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */,
-				50BE23C22833D8A0002350FD /* XCRemoteSwiftPackageReference "StreamingKit" */,
 			);
 			productRefGroup = 508385E521C5965B00C4BB32 /* Products */;
 			projectDirPath = "";
@@ -1740,6 +1741,7 @@
 				50A85F07268A4BA800FB3E31 /* CoreDataMigrationStep.swift in Sources */,
 				50F81EE323BF6B1E00EAAC3E /* PlayableFileMO+CoreDataProperties.swift in Sources */,
 				5086F87D22397B9A00546F5A /* AmpacheApi.swift in Sources */,
+				502AEEAC28364D9700729524 /* HysteriaPlayer.m in Sources */,
 				5088A8A526A955AD00B4C8C6 /* DownloadProtocols.swift in Sources */,
 				5083861A21C827E600C4BB32 /* AuthParserDelegate.swift in Sources */,
 				50A12F432739239800E7B2AA /* EmbeddedArtworkMO+CoreDataClass.swift in Sources */,
@@ -2227,22 +2229,9 @@
 				version = 1.5.4;
 			};
 		};
-		50BE23C22833D8A0002350FD /* XCRemoteSwiftPackageReference "StreamingKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/BLeeEZ/StreamingKit";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		502AEEA82833DCF000729524 /* StreamingKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 50BE23C22833D8A0002350FD /* XCRemoteSwiftPackageReference "StreamingKit" */;
-			productName = StreamingKit;
-		};
 		509D55F7281274F500E0E0B5 /* VYPlayIndicator */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */;

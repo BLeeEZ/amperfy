@@ -11,10 +11,12 @@ class AudioSessionHandler {
     }
     
     func configureObserverForAudioSessionInterruption(audioSession: AVAudioSession) {
+        return
         NotificationCenter.default.addObserver(self, selector: #selector(handleAudioSessionInterruption), name: AVAudioSession.interruptionNotification, object: audioSession)
     }
     
     @objc private func handleAudioSessionInterruption(notification: NSNotification) {
+        return
         guard let interruptionTypeRaw: NSNumber = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? NSNumber,
             let interruptionType = AVAudioSession.InterruptionType(rawValue: interruptionTypeRaw.uintValue) else {
                 os_log(.error, "Audio interruption type invalid")
@@ -45,6 +47,7 @@ class AudioSessionHandler {
     }
 
     func configureBackgroundPlayback(audioSession: AVAudioSession) {
+        return
         do {
             try audioSession.setCategory(AVAudioSession.Category.playback, mode: AVAudioSession.Mode.default, options: AVAudioSession.CategoryOptions.defaultToSpeaker)
             try audioSession.setActive(true)

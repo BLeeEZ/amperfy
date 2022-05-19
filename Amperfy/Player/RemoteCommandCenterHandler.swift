@@ -14,6 +14,7 @@ class RemoteCommandCenterHandler {
     }
     
     func configureRemoteCommands() {
+        return
         remoteCommandCenter.playCommand.isEnabled = true
         remoteCommandCenter.playCommand.addTarget(handler: { (event) in
             self.musicPlayer.play()
@@ -106,6 +107,7 @@ class RemoteCommandCenterHandler {
 
 extension RemoteCommandCenterHandler: MusicPlayable {
     func didStartPlaying() {
+        return
         changeRemoteCommandCenterControlsBasedOnCurrentPlayableType()
     }
     
