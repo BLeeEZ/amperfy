@@ -28,6 +28,7 @@ class MusicPlayer: NSObject, BackendAudioPlayerNotifiable  {
         super.init()
         self.backendAudioPlayer.responder = self
         self.backendAudioPlayer.nextPlayablePreloadCB = { () in
+            if self.playerStatus.repeatMode == .single { return self.currentlyPlaying }
             guard let nextPlayerIndex = self.nextPlayerIndex else { return nil }
             return self.queueHandler.getPlayable(at: nextPlayerIndex)
         }

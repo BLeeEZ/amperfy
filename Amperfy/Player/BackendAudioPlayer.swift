@@ -1,6 +1,6 @@
 import Foundation
 import AVFoundation
-import AudioStreaming
+import StreamingKit
 import UIKit
 import os.log
 
@@ -25,17 +25,18 @@ enum BackendAudioQueueType {
 
 typealias NextPlayablePreloadCallback = () -> AbstractPlayable?
 
-class BackendAudioPlayer {
+class BackendAudioPlayer: NSObject {
 
     private let playableDownloader: DownloadManageable
     private let cacheProxy: PlayableFileCachable
     private let backendApi: BackendApi
     private let userStatistics: UserStatistics
-    private let player: AudioPlayer
+    private let player: STKAudioPlayer
     private let eventLogger: EventLogger
     private let updateElapsedTimeInterval = 0.5
     private var elapsedTimeTimer: Timer?
     private let semaphore = DispatchSemaphore(value: 1)
+    private var currentPlayable: AbstractPlayable?
     private var nextPreloadedPlayable: AbstractPlayable?
     
     public var isOfflineMode: Bool = false
@@ -52,22 +53,26 @@ class BackendAudioPlayer {
         return player.progress
     }
     var duration: Double {
-        let duration = player.duration
-        guard duration.isFinite else { return 0.0 }
-        return duration
+        return player.duration
     }
     var canBeContinued: Bool {
         return player.state == .paused
     }
     
-    init(mediaPlayer: AudioPlayer, eventLogger: EventLogger, backendApi: BackendApi, playableDownloader: DownloadManageable, cacheProxy: PlayableFileCachable, userStatistics: UserStatistics) {
-        self.player = mediaPlayer
+    init(eventLogger: EventLogger, backendApi: BackendApi, playableDownloader: DownloadManageable, cacheProxy: PlayableFileCachable, userStatistics: UserStatistics) {
+        self.player = STKAudioPlayer()
         self.backendApi = backendApi
         self.eventLogger = eventLogger
         self.playableDownloader = playableDownloader
         self.cacheProxy = cacheProxy
         self.userStatistics = userStatistics
+        super.init()
         self.player.delegate = self
+        startElapsedTimeTimer()
+    }
+    
+    deinit {
+        stopElapsedTimeTimer()
     }
     
     @objc private func itemFinishedPlaying() {
@@ -76,31 +81,29 @@ class BackendAudioPlayer {
     
     func continuePlay() {
         isPlaying = true
-        startElapsedTimeTimer()
         player.resume()
     }
     
     func pause() {
         isPlaying = false
-        stopElapsedTimeTimer()
         player.pause()
     }
     
     func stop() {
         isPlaying = false
-        stopElapsedTimeTimer()
         clearPlayer()
     }
     
     func seek(toSecond: Double) {
-        player.seek(to: toSecond)
+        player.seek(toTime: toSecond)
     }
     
     func requestToPlay(playable: AbstractPlayable) {
         semaphore.wait()
         if let nextPreloadedPlayable = nextPreloadedPlayable, nextPreloadedPlayable == playable {
             // Do nothing next preloaded playable has already been queued to player
-            os_log(.default, "Preloaded: %s", nextPreloadedPlayable.displayString)
+            os_log(.default, "Play preloaded: %s", nextPreloadedPlayable.displayString)
+            currentPlayable = nextPreloadedPlayable
             self.nextPreloadedPlayable = nil
         } else {
             if playable.isCached {
@@ -116,19 +119,23 @@ class BackendAudioPlayer {
             self.continuePlay()
         }
         self.responder?.notifyItemPreparationFinished()
-        startElapsedTimeTimer()
         semaphore.signal()
     }
     
     private func clearPlayer() {
         playType = nil
         player.stop()
-        stopElapsedTimeTimer()
+        currentPlayable = nil
     }
     
     private func insertCachedPlayable(playable: AbstractPlayable, queueType: BackendAudioQueueType = .play) {
         guard let playableData = cacheProxy.getFile(forPlayable: playable)?.data else { return }
-        os_log(.default, "Play item: %s", playable.displayString)
+        switch queueType {
+        case .play:
+            os_log(.default, "Play local: %s", playable.displayString)
+        case .queue:
+            os_log(.default, "Queue local: %s", playable.displayString)
+        }
         playType = .cache
         if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
         let itemUrl = playableData.createLocalUrl(fileName: UUID().uuidString + ".mp3")
@@ -137,7 +144,12 @@ class BackendAudioPlayer {
     
     private func insertStreamPlayable(playable: AbstractPlayable, queueType: BackendAudioQueueType = .play) {
         guard let streamUrl = backendApi.generateUrl(forStreamingPlayable: playable) else { return }
-        os_log(.default, "Stream item: %s", playable.displayString)
+        switch queueType {
+        case .play:
+            os_log(.default, "Play stream: %s", playable.displayString)
+        case .queue:
+            os_log(.default, "Queue stream: %s", playable.displayString)
+        }
         playType = .stream
         if playable.isSong { userStatistics.playedSong(isPlayedFromCache: false) }
         insert(playable: playable, withUrl: streamUrl, queueType: queueType)
@@ -146,84 +158,66 @@ class BackendAudioPlayer {
     private func insert(playable: AbstractPlayable, withUrl url: URL, queueType: BackendAudioQueueType) {
         switch queueType {
         case .play:
-            player.play(url: url)
+            currentPlayable = playable
+            player.play(url, withQueueItemID: playable.uniqueID as NSObject)
         case .queue:
-            player.queue(url: url)
+            player.queue(url, withQueueItemId: playable.uniqueID as NSObject)
         }
     }
     
     private func startElapsedTimeTimer() {
-        if elapsedTimeTimer == nil {
-            os_log(.default, "Player elapsed time start")
-            elapsedTimeTimer = Timer.scheduledTimer(timeInterval: updateElapsedTimeInterval, target: self, selector: #selector(elapsedTimeTimerTicked), userInfo: nil, repeats: true)
-        }
+        guard elapsedTimeTimer == nil else { return }
+        os_log(.default, "Player elapsed time start")
+        elapsedTimeTimer = Timer.scheduledTimer(timeInterval: updateElapsedTimeInterval, target: self, selector: #selector(elapsedTimeTimerTicked), userInfo: nil, repeats: true)
     }
     
     private func stopElapsedTimeTimer() {
-        if let timer = elapsedTimeTimer {
-            os_log(.default, "Player elapsed time stop")
-            timer.invalidate()
-            elapsedTimeTimer = nil
-        }
+        guard let timer = elapsedTimeTimer else { return }
+        os_log(.default, "Player elapsed time stop")
+        timer.invalidate()
+        elapsedTimeTimer = nil
     }
     
     @objc func elapsedTimeTimerTicked() {
         self.responder?.didElapsedTimeChange()
-        if nextPreloadedPlayable == nil, elapsedTime.isFinite, elapsedTime > 0, duration.isFinite, duration > 0 {
-            let remainingTime = duration - elapsedTime
-            if remainingTime > 0, remainingTime < 10 {
-                semaphore.wait()
-                defer { semaphore.signal() }
-                nextPreloadedPlayable = nextPlayablePreloadCB?()
-                guard let nextPreloadedPlayable = nextPreloadedPlayable else { return }
-                print("Next preload song is: \(nextPreloadedPlayable.displayString)")
-                if nextPreloadedPlayable.isCached {
-                    insertCachedPlayable(playable: nextPreloadedPlayable, queueType: .queue)
-                } else if !isOfflineMode{
-                    insertStreamPlayable(playable: nextPreloadedPlayable, queueType: .queue)
-                    if isAutoCachePlayedItems {
-                        playableDownloader.download(object: nextPreloadedPlayable)
-                    }
-                }
-            }
-        }
     }
 
 }
 
-extension BackendAudioPlayer: AudioPlayerDelegate {
-    func audioPlayerDidStartPlaying(player: AudioPlayer, with entryId: AudioEntryId) {
-        print("audioPlayerDidStartPlaying")
+extension BackendAudioPlayer: STKAudioPlayerDelegate {
+    func audioPlayer(_ audioPlayer: STKAudioPlayer, didStartPlayingQueueItemId queueItemId: NSObject) {
+        print("didStartPlayingQueueItemId")
     }
     
-    func audioPlayerDidFinishBuffering(player: AudioPlayer, with entryId: AudioEntryId) {
-        print("audioPlayerDidFinishBuffering")
-    }
-    
-    func audioPlayerStateChanged(player: AudioPlayer, with newState: AudioPlayerState, previous: AudioPlayerState) {
-        print("audioPlayerStateChanged \(previous) \(newState)")
-        if newState == .stopped {
-            itemFinishedPlaying()
+    func audioPlayer(_ audioPlayer: STKAudioPlayer, didFinishBufferingSourceWithQueueItemId queueItemId: NSObject) {
+        guard nextPreloadedPlayable == nil else { return }
+        semaphore.wait()
+        defer { semaphore.signal() }
+        nextPreloadedPlayable = nextPlayablePreloadCB?()
+        guard let nextPreloadedPlayable = nextPreloadedPlayable else { return }
+        if nextPreloadedPlayable.isCached {
+            insertCachedPlayable(playable: nextPreloadedPlayable, queueType: .queue)
+        } else if !isOfflineMode{
+            insertStreamPlayable(playable: nextPreloadedPlayable, queueType: .queue)
+            if isAutoCachePlayedItems {
+                playableDownloader.download(object: nextPreloadedPlayable)
+            }
         }
     }
     
-    func audioPlayerDidFinishPlaying(player: AudioPlayer, entryId: AudioEntryId, stopReason: AudioPlayerStopReason, progress: Double, duration: Double) {
-        print("audioPlayerDidFinishPlaying")
-        if nextPreloadedPlayable != nil {
+    func audioPlayer(_ audioPlayer: STKAudioPlayer, stateChanged state: STKAudioPlayerState, previousState: STKAudioPlayerState) {
+    }
+    
+    func audioPlayer(_ audioPlayer: STKAudioPlayer, didFinishPlayingQueueItemId queueItemId: NSObject, with stopReason: STKAudioPlayerStopReason, andProgress progress: Double, andDuration duration: Double) {
+        print("didFinishPlayingQueueItemId    \(stopReason)")
+        if let currentPlayable = currentPlayable, let objectID = queueItemId as? String, currentPlayable.uniqueID == objectID {
             itemFinishedPlaying()
+            self.currentPlayable = nil
         }
     }
     
-    func audioPlayerUnexpectedError(player: AudioPlayer, error: AudioPlayerError) {
-        print("audioPlayerUnexpectedError")
-    }
-    
-    func audioPlayerDidCancel(player: AudioPlayer, queuedItems: [AudioEntryId]) {
-        print("audioPlayerDidCancel")
-    }
-    
-    func audioPlayerDidReadMetadata(player: AudioPlayer, metadata: [String : String]) {
-        print("audioPlayerDidReadMetadata")
+    func audioPlayer(_ audioPlayer: STKAudioPlayer, unexpectedError errorCode: STKAudioPlayerErrorCode) {
+        itemFinishedPlaying()
     }
     
 }

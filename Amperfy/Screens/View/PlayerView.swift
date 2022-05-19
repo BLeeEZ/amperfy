@@ -148,7 +148,7 @@ class PlayerView: UIView {
         if let timeSliderValue = timeSlider?.value {
             let elapsedClockTime = ClockTime(timeInSeconds: Int(timeSliderValue))
             elapsedTimeLabel.text = elapsedClockTime.asShortString()
-            let remainingTime = ClockTime(timeInSeconds: Int(Double(timeSliderValue) - ceil(player.duration)))
+            let remainingTime = ClockTime(timeInSeconds: Int(Double(timeSliderValue) - ceil(Double(timeSlider.maximumValue))))
             remainingTimeLabel.text = remainingTime.asShortString()
         }
     }

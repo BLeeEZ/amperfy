@@ -1,25 +1,23 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "AudioStreaming",
-        "repositoryURL": "https://github.com/dimitris-c/AudioStreaming",
-        "state": {
-          "branch": null,
-          "revision": "578bbcdbe840a06c9c0cd07640d4ffd616b6b208",
-          "version": "0.9.0"
-        }
-      },
-      {
-        "package": "VYPlayIndicator",
-        "repositoryURL": "https://github.com/obrhoff/VYPlayIndicator",
-        "state": {
-          "branch": null,
-          "revision": "3d84d6ecd3bd95dd5e50177beea4c2ca3d53f9bc",
-          "version": "1.5.4"
-        }
+  "pins" : [
+    {
+      "identity" : "streamingkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/BLeeEZ/StreamingKit",
+      "state" : {
+        "branch" : "master",
+        "revision" : "9a86f8101d4a388b35e40eef38108dc3072d9861"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "vyplayindicator",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/obrhoff/VYPlayIndicator",
+      "state" : {
+        "revision" : "3d84d6ecd3bd95dd5e50177beea4c2ca3d53f9bc",
+        "version" : "1.5.4"
+      }
+    }
+  ],
+  "version" : 2
 }

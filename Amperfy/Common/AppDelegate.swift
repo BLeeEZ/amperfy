@@ -1,6 +1,5 @@
 import UIKit
 import MediaPlayer
-import AudioStreaming
 import os.log
 
 @UIApplicationMain
@@ -38,8 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return EventNotificationHandler()
     }()
     lazy var player: PlayerFacade = {
-        let audioPlayer = AudioPlayer()
-        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: audioPlayer, eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
+        let backendAudioPlayer = BackendAudioPlayer(eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
         let playerData = library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
         let curPlayer = MusicPlayer(coreData: playerData, queueHandler: queueHandler, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
