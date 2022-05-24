@@ -58,22 +58,20 @@ class PlayableTableCell: BasicTableCell {
             self.reorderLabel?.isHidden = true
         }
         
-        if download?.error != nil {
-            cacheIconImage.isHidden = true
-            artistLabelLeadingConstraint.constant = 0
-            artistLabel.textColor = .systemRed
-        } else if playable.isCached || download?.isFinishedSuccessfully ?? false {
+        if playerIndexCb != nil {
+            cacheIconImage.tintColor = UIColor.labelColor
+            artistLabel.textColor = UIColor.labelColor
+        } else {
+            cacheIconImage.tintColor = UIColor.secondaryLabelColor
+            artistLabel.textColor = UIColor.secondaryLabelColor
+        }
+        
+        if playable.isCached {
             cacheIconImage.isHidden = false
             artistLabelLeadingConstraint.constant = 20
-            artistLabel.textColor = UIColor.defaultBlue
-        } else if playerIndexCb != nil {
-            cacheIconImage.isHidden = true
-            artistLabelLeadingConstraint.constant = 0
-            artistLabel.textColor = UIColor.labelColor
         } else {
             cacheIconImage.isHidden = true
             artistLabelLeadingConstraint.constant = 0
-            artistLabel.textColor = UIColor.secondaryLabelColor
         }
         
         if let download = download, download.isDownloading {

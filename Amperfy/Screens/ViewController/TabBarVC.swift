@@ -32,7 +32,6 @@ class TabBarVC: UITabBarController {
             NSAttributedString.Key.paragraphStyle: paragraph
         ]
         self.popupBar.subtitleTextAttributes = [
-            NSAttributedString.Key.foregroundColor: UIColor.defaultBlue,
             NSAttributedString.Key.paragraphStyle: paragraph
         ]
         self.popupContentView.popupCloseButtonStyle = .chevron

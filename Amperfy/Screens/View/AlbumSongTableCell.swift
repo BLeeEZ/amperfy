@@ -6,6 +6,8 @@ class AlbumSongTableCell: SongTableCell {
     static let albumSongRowHeight: CGFloat = 55
     
     @IBOutlet weak var trackNumberLabel: UILabel!
+    @IBOutlet weak var cacheIndicatorImage: UIImageView!
+    @IBOutlet weak var artistLabelLeadConstraint: NSLayoutConstraint!
     
     override func refresh() {
         guard let song = song else { return }
@@ -22,9 +24,11 @@ class AlbumSongTableCell: SongTableCell {
         artistLabel.text = song.creatorName
 
         if song.isCached {
-            artistLabel.textColor = UIColor.defaultBlue
+            cacheIndicatorImage.isHidden = false
+            artistLabelLeadConstraint.constant = 20
         } else {
-            artistLabel.textColor = UIColor.secondaryLabelColor
+            cacheIndicatorImage.isHidden = true
+            artistLabelLeadConstraint.constant = 0
         }
     }
     

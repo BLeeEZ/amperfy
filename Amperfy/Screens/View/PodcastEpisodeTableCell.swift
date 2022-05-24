@@ -63,7 +63,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
         playProgressLabel.text = progressText
         if episode.isCached {
             cacheIconImage.isHidden = false
-            playProgressLabel.textColor = .defaultBlue
+            playProgressLabel.textColor = .secondaryLabelColor
         } else {
             cacheIconImage.isHidden = true
             playProgressLabel.textColor = .secondaryLabelColor
