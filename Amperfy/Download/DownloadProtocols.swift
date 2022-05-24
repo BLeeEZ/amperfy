@@ -21,6 +21,7 @@ protocol DownloadManagerDelegate {
     func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL
     func validateDownloadedData(download: Download) -> ResponseError?
     func completedDownload(download: Download, context: NSManagedObjectContext)
+    func failedDownload(download: Download, context: NSManagedObjectContext)
 }
 
 protocol Downloadable: CustomEquatable {

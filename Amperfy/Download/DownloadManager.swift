@@ -147,6 +147,7 @@ class DownloadManager: NSObject, DownloadManageable {
                 os_log("Fetching %s FAILED: %s", log: self.log, type: .info, download.title, error.description)
                 eventLogger.error(topic: "Download Error", statusCode: .downloadError, message: "Error \"\(error.description)\" occured while downloading object \"\(download.title)\".", displayPopup: isFailWithPopupError)
             }
+            downloadDelegate.failedDownload(download: download, context: context)
         }
         download.isDownloading = false
         library.saveContext()

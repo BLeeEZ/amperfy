@@ -54,4 +54,7 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
         }
     }
     
+    func failedDownload(download: Download, context: NSManagedObjectContext) {
+    }
+    
 }

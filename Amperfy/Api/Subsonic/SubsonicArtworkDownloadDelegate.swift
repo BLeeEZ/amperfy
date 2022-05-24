@@ -40,5 +40,13 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
             library.saveContext()
         }
     }
+    
+    func failedDownload(download: Download, context: NSManagedObjectContext) {
+        guard let artworkMO = try? context.existingObject(with: download.element.objectID) as? ArtworkMO else { return }
+        let artwork = Artwork(managedObject: artworkMO)
+        artwork.status = .FetchError
+        let library = LibraryStorage(context: context)
+        library.saveContext()
+    }
 
 }
