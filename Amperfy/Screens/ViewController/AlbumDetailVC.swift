@@ -3,6 +3,7 @@ import UIKit
 class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
 
     var album: Album!
+    var songToScrollTo: Song?
     private var fetchedResultsController: AlbumSongsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var detailOperationsView: GenericDetailTableHeader?
@@ -48,6 +49,15 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
             self.detailOperationsView?.refresh()
         }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        defer { songToScrollTo = nil }
+        guard let songToScrollTo = songToScrollTo,
+              let indexPath = fetchedResultsController.fetchResultsController.indexPath(forObject: songToScrollTo.managedObject)
+        else { return }
+        tableView.scrollToRow(at: indexPath, at: .top, animated: true)
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {

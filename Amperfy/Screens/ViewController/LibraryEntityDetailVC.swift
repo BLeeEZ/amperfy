@@ -444,6 +444,7 @@ class LibraryEntityDetailVC: UIViewController {
                 self.appDelegate.userStatistics.usedAction(.alertGoToPodcast)
                 let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
                 podcastDetailVC.podcast = podcast
+                podcastDetailVC.episodeToScrollTo = playable?.asPodcastEpisode
                 if let popupPlayer = self.rootView as? PopupPlayerVC {
                     popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
                 } else if let navController = self.rootView?.navigationController {
@@ -461,6 +462,7 @@ class LibraryEntityDetailVC: UIViewController {
             self.appDelegate.userStatistics.usedAction(.alertGoToAlbum)
             let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
             albumDetailVC.album = album
+            albumDetailVC.songToScrollTo = playable?.asSong
             if let popupPlayer = self.rootView as? PopupPlayerVC {
                 popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
             } else if let navController = self.rootView?.navigationController {

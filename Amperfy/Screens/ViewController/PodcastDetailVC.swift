@@ -3,6 +3,7 @@ import UIKit
 class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO> {
 
     var podcast: Podcast!
+    var episodeToScrollTo: PodcastEpisode?
     private var fetchedResultsController: PodcastEpisodesFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var detailOperationsView: GenericDetailTableHeader?
@@ -49,6 +50,15 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         podcast.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
             self.detailOperationsView?.refresh()
         }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        defer { episodeToScrollTo = nil }
+        guard let episodeToScrollTo = episodeToScrollTo,
+              let indexPath = fetchedResultsController.fetchResultsController.indexPath(forObject: episodeToScrollTo.managedObject)
+        else { return }
+        tableView.scrollToRow(at: indexPath, at: .top, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

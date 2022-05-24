@@ -213,6 +213,7 @@ class PlayerView: UIView {
         if let song = lastDisplayedPlayable?.asSong, let album = song.album {
             let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
             albumDetailVC.album = album
+            albumDetailVC.songToScrollTo = song
             rootView?.closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
         }
     }
@@ -221,6 +222,7 @@ class PlayerView: UIView {
         if let podcastEpisode = lastDisplayedPlayable?.asPodcastEpisode, let podcast = podcastEpisode.podcast {
             let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
             podcastDetailVC.podcast = podcast
+            podcastDetailVC.episodeToScrollTo = podcastEpisode
             rootView?.closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
         }
     }
