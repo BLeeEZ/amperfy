@@ -435,6 +435,7 @@ class LibraryEntityDetailVC: UIViewController {
                 self.appDelegate.userStatistics.usedAction(.alertGoToArtist)
                 let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
                 artistDetailVC.artist = artist
+                artistDetailVC.albumToScrollTo = album
                 if let popupPlayer = self.rootView as? PopupPlayerVC {
                     popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
                 } else if let navController = self.rootView?.navigationController {

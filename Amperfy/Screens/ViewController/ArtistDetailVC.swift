@@ -4,6 +4,7 @@ import CoreData
 class ArtistDetailVC: BasicTableViewController {
 
     var artist: Artist!
+    var albumToScrollTo: Album?
     private var albumsFetchedResultsController: ArtistAlbumsItemsFetchedResultsController!
     private var songsFetchedResultsController: ArtistSongsItemsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
@@ -71,7 +72,17 @@ class ArtistDetailVC: BasicTableViewController {
             self.detailOperationsView?.refresh()
         }
     }
-
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        defer { albumToScrollTo = nil }
+        guard let albumToScrollTo = albumToScrollTo,
+              let indexPath = albumsFetchedResultsController.fetchResultsController.indexPath(forObject: albumToScrollTo.managedObject)
+        else { return }
+        let adjustedIndexPath = IndexPath(row: indexPath.row, section: 0)
+        tableView.scrollToRow(at: adjustedIndexPath, at: .top, animated: true)
+    }
+    
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
         guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
         else { return nil }
