@@ -496,6 +496,18 @@ class LibraryEntityDetailVC: UIViewController {
         self.appDelegate.player.appendContextQueue(playables: entityPlayables)
     }
     
+    @IBAction func pressedInsertPodcastQueue(_ sender: Any) {
+        dismiss(animated: true)
+        guard !entityPlayables.isEmpty else { return }
+        self.appDelegate.player.insertPodcastQueue(playables: entityPlayables)
+    }
+    
+    @IBAction func pressedAppendPodcastQueue(_ sender: Any) {
+        dismiss(animated: true)
+        guard !entityPlayables.isEmpty else { return }
+        self.appDelegate.player.appendPodcastQueue(playables: entityPlayables)
+    }
+    
     @IBAction func pressedClearPlayer(_ sender: Any) {
         dismiss(animated: true)
         self.appDelegate.player.clearQueues()

@@ -279,12 +279,18 @@
                                                     <color key="backgroundColor" systemColor="systemFillColor"/>
                                                     <inset key="imageEdgeInsets" minX="0.0" minY="8" maxX="24" maxY="8"/>
                                                     <state key="normal" title="Insert Podcast Queue" image="podcast_queue_insert"/>
+                                                    <connections>
+                                                        <action selector="pressedInsertPodcastQueue:" destination="-1" eventType="touchUpInside" id="ZZG-cG-Poc"/>
+                                                    </connections>
                                                 </button>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uza-oK-zdn" userLabel="PodcastQueueAppend" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="51" width="984" height="50"/>
                                                     <color key="backgroundColor" systemColor="systemFillColor"/>
                                                     <inset key="imageEdgeInsets" minX="0.0" minY="8" maxX="10" maxY="8"/>
                                                     <state key="normal" title="Append Podcast Queue" image="podcast_queue_append"/>
+                                                    <connections>
+                                                        <action selector="pressedAppendPodcastQueue:" destination="-1" eventType="touchUpInside" id="gOQ-tT-W17"/>
+                                                    </connections>
                                                 </button>
                                             </subviews>
                                         </stackView>
