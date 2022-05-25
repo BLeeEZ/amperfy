@@ -2,6 +2,8 @@ import UIKit
 import CoreData
 
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
+    
+    static let maxPlayAllSongsCount = 2000
 
     private var fetchedResultsController: SongsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
@@ -186,7 +188,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
         present(alert, animated: true, completion: nil)
     }
-     
+    
     @objc private func optionsPressed() {
         let alert = UIAlertController(title: "Songs", message: nil, preferredStyle: .actionSheet)
 
@@ -194,7 +196,25 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             guard let displayedSongsMO = self.fetchedResultsController.fetchedObjects else { return }
             let displayedSongs = displayedSongsMO.compactMap{ Song(managedObject: $0) }
             guard displayedSongs.count > 0 else { return }
-            self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: displayedSongs))
+            if displayedSongs.count > Self.maxPlayAllSongsCount {
+                let toManySongsAlert = UIAlertController(title: "To many songs", message: nil, preferredStyle: .actionSheet)
+                toManySongsAlert.addAction(UIAlertAction(title: "Play the first \(Self.maxPlayAllSongsCount) songs", style: .default, handler: { _ in
+                    self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: Array(displayedSongs.prefix(Self.maxPlayAllSongsCount))))
+                }))
+                toManySongsAlert.addAction(UIAlertAction(title: "Play the last \(Self.maxPlayAllSongsCount) songs", style: .default, handler: { _ in
+                    self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: Array(displayedSongs[(displayedSongs.count-Self.maxPlayAllSongsCount)...])))
+                }))
+                toManySongsAlert.addAction(UIAlertAction(title: "Play \(Self.maxPlayAllSongsCount) random songs from collection", style: .default, handler: { _ in
+                    self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: displayedSongs[randomPick: Self.maxPlayAllSongsCount]))
+                }))
+                toManySongsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                toManySongsAlert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+                toManySongsAlert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
+                self.present(toManySongsAlert, animated: true, completion: nil)
+                
+            } else {
+                self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: displayedSongs))
+            }
         }))
         if self.appDelegate.persistentStorage.settings.isOnlineMode {
             alert.addAction(UIAlertAction(title: "Play random songs", style: .default, handler: { _ in
