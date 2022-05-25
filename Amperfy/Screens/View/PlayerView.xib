@@ -69,6 +69,7 @@
                         <constraint firstAttribute="height" constant="23" id="yJg-88-RGh"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                    <color key="textColor" systemColor="tintColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uqN-6M-JGc" userLabel="Title Large Button">
@@ -176,6 +177,7 @@
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8F1-fg-8m2" userLabel="Artist Name Compact Label" customClass="MarqueeLabel" customModule="Amperfy">
                     <rect key="frame" x="84" y="71" width="275" height="30"/>
                     <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                    <color key="textColor" systemColor="tintColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4O4-sy-Ien" userLabel="Title Compact Button">
