@@ -404,8 +404,15 @@ class PlayerView: UIView {
         }
         
         playButton.setTitle(title, for: UIControl.State.normal)
-        let barButtonItem = UIBarButtonItem(image: buttonImg, style: .plain, target: self, action: #selector(PlayerView.playButtonPushed))
-        rootView?.popupItem.trailingBarButtonItems = [ barButtonItem ]
+        let barPlayPauseButtonItem = UIBarButtonItem(image: buttonImg, style: .plain, target: self, action: #selector(PlayerView.playButtonPushed))
+        let targetSideRatio = ((buttonImg.size.height - 8.0) / UIImage.forward.size.height)
+        let targetSize = CGSize(width: UIImage.forward.size.width * targetSideRatio, height: buttonImg.size.height - 8.0)
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: targetSize.width + 10.0, height: targetSize.height))
+        let nextButtonImage = renderer.image { _ in
+            UIImage.forward.draw(in: CGRect(origin: CGPoint(x: 10, y: 0), size: targetSize))
+        }
+        let barNextButtonItem = UIBarButtonItem(image: nextButtonImage, style: .plain, target: self, action: #selector(PlayerView.nextButtonPushed))
+        rootView?.popupItem.trailingBarButtonItems = [ barPlayPauseButtonItem, barNextButtonItem ]
     }
     
     func fetchSongInfoAndUpdateViews() {

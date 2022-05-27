@@ -26,8 +26,6 @@ class TabBarVC: UITabBarController {
         self.popupBar.barStyle = .compact
         self.popupBar.marqueeScrollEnabled = true
         let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = .center
-        paragraph.firstLineHeadIndent = 40.0
         self.popupBar.titleTextAttributes = [
             NSAttributedString.Key.paragraphStyle: paragraph
         ]
