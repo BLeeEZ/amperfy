@@ -197,7 +197,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             let displayedSongs = displayedSongsMO.compactMap{ Song(managedObject: $0) }
             guard displayedSongs.count > 0 else { return }
             if displayedSongs.count > Self.maxPlayAllSongsCount {
-                let toManySongsAlert = UIAlertController(title: "To many songs", message: nil, preferredStyle: .actionSheet)
+                let toManySongsAlert = UIAlertController(title: "Too many songs", message: nil, preferredStyle: .actionSheet)
                 toManySongsAlert.addAction(UIAlertAction(title: "Play the first \(Self.maxPlayAllSongsCount) songs", style: .default, handler: { _ in
                     self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: Array(displayedSongs.prefix(Self.maxPlayAllSongsCount))))
                 }))
