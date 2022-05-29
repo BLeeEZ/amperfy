@@ -16,7 +16,10 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     }
 
     func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL {
-        let playableMO = try context.existingObject(with: download.element.objectID) as! AbstractPlayableMO
+        guard let downloadElement = download.element else {
+            throw DownloadError.fetchFailed
+        }
+        let playableMO = try context.existingObject(with: downloadElement.objectID) as! AbstractPlayableMO
         let playable = AbstractPlayable(managedObject: playableMO)
         guard !playable.isCached else {
             throw DownloadError.alreadyDownloaded 
@@ -42,16 +45,18 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     }
 
     func completedDownload(download: Download, context: NSManagedObjectContext) {
-        guard let data = download.resumeData else { return }
-		let library = LibraryStorage(context: context)
-        if let playableMO = try? context.existingObject(with: download.element.objectID) as? AbstractPlayableMO {
-            let playableFile = library.createPlayableFile()
-            let owner = AbstractPlayable(managedObject: playableMO)
-            playableFile.info = owner
-            playableFile.data = data
-            artworkExtractor.extractEmbeddedArtwork(library: library, playable: owner, fileData: data)
-            library.saveContext()
+        guard let data = download.resumeData,
+              let downloadElement = download.element,
+              let playableMO = try? context.existingObject(with: downloadElement.objectID) as? AbstractPlayableMO else {
+            return
         }
+		let library = LibraryStorage(context: context)
+        let playableFile = library.createPlayableFile()
+        let owner = AbstractPlayable(managedObject: playableMO)
+        playableFile.info = owner
+        playableFile.data = data
+        artworkExtractor.extractEmbeddedArtwork(library: library, playable: owner, fileData: data)
+        library.saveContext()
     }
     
     func failedDownload(download: Download, context: NSManagedObjectContext) {

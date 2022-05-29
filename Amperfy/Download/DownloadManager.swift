@@ -167,7 +167,9 @@ class DownloadManager: NSObject, DownloadManageable {
         download.resumeData = nil
         download.isDownloading = false
         library.saveContext()
-        notificationHandler.post(name: .downloadFinishedSuccess, object: self, userInfo: DownloadNotification(id: download.element.uniqueID).asNotificationUserInfo)
+        if let downloadElement = download.element {
+            notificationHandler.post(name: .downloadFinishedSuccess, object: self, userInfo: DownloadNotification(id: downloadElement.uniqueID).asNotificationUserInfo)
+        }
     }
     
 }

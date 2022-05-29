@@ -16,7 +16,7 @@ class Download: NSObject {
     var resumeData: Data? // Will not be saved in CoreData
     
     var title: String {
-        return element.displayString
+        return element?.displayString ?? ""
     }
     
     var isFinishedSuccessfully: Bool {
@@ -105,14 +105,14 @@ class Download: NSObject {
         get { return managedObject.totalSize ?? "" }
         set { if managedObject.totalSize != newValue { managedObject.totalSize = totalSize } }
     }
-    var element: Downloadable {
+    var element: Downloadable? {
         get {
             if let artwork = artwork {
                 return artwork
             } else if let playable = playable {
                 return playable
             } else {
-                fatalError("Download does not contain a valid target element!")
+                return nil
             }
         }
         set {
