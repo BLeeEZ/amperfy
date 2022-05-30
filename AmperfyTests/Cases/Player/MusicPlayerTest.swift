@@ -105,6 +105,7 @@ class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
     func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL { throw DownloadError.urlInvalid }
     func validateDownloadedData(download: Download) -> ResponseError? { return nil }
     func completedDownload(download: Download, context: NSManagedObjectContext) {}
+    func failedDownload(download: Download, context: NSManagedObjectContext) {}
 }
 
 class MOCK_BackendApi: BackendApi {
