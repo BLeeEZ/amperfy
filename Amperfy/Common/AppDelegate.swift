@@ -24,6 +24,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var library = {
         return LibraryStorage(context: persistentStorage.context)
     }()
+    lazy var duplicateEntitiesResolver = {
+        return DuplicateEntitiesResolver(persistentStorage: persistentStorage)
+    }()
     lazy var eventLogger = {
         return EventLogger(alertDisplayer: self, persistentContainer: persistentStorage.persistentContainer)
     }()
@@ -179,7 +182,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return true
         }
         libraryUpdater.performBlockingLibraryUpdatesIfNeeded()
-        library.resolveDuplicates()
+        duplicateEntitiesResolver.start()
         artworkDownloadManager.start()
         playableDownloadManager.start()
         backgroundLibrarySyncer.start()

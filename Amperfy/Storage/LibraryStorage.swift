@@ -32,14 +32,10 @@ class LibraryStorage: PlayableFileCachable {
         self.context = context
     }
     
-    func resolveDuplicates() {
-        var isDuplicateFound = false
-        
-        let allGenreDuplicates = findDuplicates(for: Genre.typeName)
-        allGenreDuplicates.forEach {
+    func resolveGenresDuplicates(duplicates: [LibraryDuplicateInfo]) {
+        duplicates.forEach {
             var genreDuplicates = getGenres(id: $0.id)
             if genreDuplicates.count > 1 {
-                isDuplicateFound = true
                 let leadGenre = genreDuplicates.removeFirst()
                 os_log("Duplicated Genre (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadGenre.name)
                 for genre in genreDuplicates {
@@ -47,12 +43,11 @@ class LibraryStorage: PlayableFileCachable {
                     context.delete(genre.managedObject)
                 }
             }
-            saveContext()
         }
-        
-        let allArtistDuplicates = findDuplicates(for: Artist.typeName)
-        allArtistDuplicates.forEach {
-            isDuplicateFound = true
+    }
+    
+    func resolveArtistsDuplicates(duplicates: [LibraryDuplicateInfo]) {
+        duplicates.forEach {
             var artistDuplicates = getArtists(id: $0.id)
             let leadArtist = artistDuplicates.removeFirst()
             os_log("Duplicated Artist (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadArtist.name)
@@ -60,12 +55,12 @@ class LibraryStorage: PlayableFileCachable {
                 artist.managedObject.passOwnership(to: leadArtist.managedObject)
                 context.delete(artist.managedObject)
             }
-            saveContext()
         }
-        
-        let allAlbumDuplicates = findDuplicates(for: Album.typeName)
-        allAlbumDuplicates.forEach {
-            isDuplicateFound = true
+    }
+    
+    
+    func resolveAlbumsDuplicates(duplicates: [LibraryDuplicateInfo]) {
+        duplicates.forEach {
             var albumDuplicates = getAlbums(id: $0.id)
             let leadAlbum = albumDuplicates.removeFirst()
             os_log("Duplicated Album (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadAlbum.name)
@@ -73,18 +68,17 @@ class LibraryStorage: PlayableFileCachable {
                 album.managedObject.passOwnership(to: leadAlbum.managedObject)
                 context.delete(album.managedObject)
             }
-            saveContext()
         }
-        
-        let allSongDuplicates = findDuplicates(for: Song.typeName)
-        allSongDuplicates.forEach {
-            isDuplicateFound = true
+    }
+    
+    func resolveSongsDuplicates(duplicates: [LibraryDuplicateInfo]) {
+        duplicates.forEach {
             var songDuplicates = getSongs(id: $0.id)
             let leadSong = songDuplicates.removeFirst()
             os_log("Duplicated Song (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadSong.displayString)
             for song in songDuplicates {
                 song.managedObject.passOwnership(to: leadSong.managedObject)
-                deleteCache(ofPlayable: leadSong)
+                deleteCache(ofPlayable: song)
                 if let embeddedArtwork = song.managedObject.embeddedArtwork {
                     context.delete(embeddedArtwork)
                 }
@@ -93,12 +87,11 @@ class LibraryStorage: PlayableFileCachable {
                 }
                 context.delete(song.managedObject)
             }
-            saveContext()
         }
-        
-        let allPodcastEpisodesDuplicates = findDuplicates(for: PodcastEpisode.typeName)
-        allPodcastEpisodesDuplicates.forEach {
-            isDuplicateFound = true
+    }
+    
+    func resolvePodcastEpisodesDuplicates(duplicates: [LibraryDuplicateInfo]) {
+        duplicates.forEach {
             var podcastEpisodesDuplicates = getPodcastEpisodes(id: $0.id)
             let leadPodcastEpisodes = podcastEpisodesDuplicates.removeFirst()
             os_log("Duplicated Podcast Episode (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadPodcastEpisodes.displayString)
@@ -113,12 +106,11 @@ class LibraryStorage: PlayableFileCachable {
                 }
                 context.delete(podcastEpisode.managedObject)
             }
-            saveContext()
         }
-        
-        let allPodcastDuplicates = findDuplicates(for: Podcast.typeName)
-        allPodcastDuplicates.forEach {
-            isDuplicateFound = true
+    }
+    
+    func resolvePodcastsDuplicates(duplicates: [LibraryDuplicateInfo]) {
+        duplicates.forEach {
             var podcastDuplicates = getPodcasts(id: $0.id)
             let leadPodcast = podcastDuplicates.removeFirst()
             os_log("Duplicated Podcast (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadPodcast.name)
@@ -126,12 +118,11 @@ class LibraryStorage: PlayableFileCachable {
                 podcast.managedObject.passOwnership(to: leadPodcast.managedObject)
                 context.delete(podcast.managedObject)
             }
-            saveContext()
         }
-        
-        let allPlaylistDuplicates = findDuplicates(for: Playlist.typeName).filter{ $0.id != "" }
-        allPlaylistDuplicates.forEach {
-            isDuplicateFound = true
+    }
+    
+    func resolvePlaylistsDuplicates(duplicates: [LibraryDuplicateInfo]) {
+        duplicates.forEach {
             var playlistDuplicates = getPlaylists(id: $0.id)
             let leadPlaylist = playlistDuplicates.removeFirst()
             os_log("Duplicated Playlist (count %i) (id: %s): %s", log: log, type: .info, $0.count, $0.id, leadPlaylist.name)
@@ -139,13 +130,6 @@ class LibraryStorage: PlayableFileCachable {
                 playlist.managedObject.passOwnership(to: leadPlaylist.managedObject)
                 deletePlaylist(playlist)
             }
-            saveContext()
-        }
-        
-        if isDuplicateFound {
-            os_log("Duplicate Scan: Some duplicates have been found", log: log, type: .info)
-        } else {
-            os_log("Duplicate Scan: No duplicates have been found", log: log, type: .info)
         }
     }
     
