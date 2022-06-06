@@ -1,0 +1,145 @@
+import Foundation
+import CoreData
+
+public class Download: NSObject {
+    
+    public let managedObject: DownloadMO
+    
+    public init(managedObject: DownloadMO) {
+        self.managedObject = managedObject
+        super.init()
+        if creationDate == nil {
+            creationDate = Date()
+        }
+    }
+    
+    public var resumeData: Data? // Will not be saved in CoreData
+    
+    public var title: String {
+        return element?.displayString ?? ""
+    }
+    
+    public var isFinishedSuccessfully: Bool {
+        return finishDate != nil && errorDate == nil
+    }
+    
+    public var isCanceled: Bool {
+        get {
+            guard let error = error else { return false }
+            return error == .canceled
+        }
+        set { if newValue { error = .canceled } }
+    }
+    
+    public func reset() {
+        startDate = nil
+        finishDate = nil
+        error = nil
+        errorDate = nil
+        progress = 0.0
+        totalSize = ""
+    }
+
+    public var id: String {
+        get { return managedObject.id }
+        set { if managedObject.id != newValue { managedObject.id = newValue } }
+    }
+    public var isDownloading: Bool {
+        get { return startDate != nil && finishDate == nil && errorDate == nil}
+        set { newValue ? (startDate = Date()) : (finishDate = Date()) }
+    }
+    public var url: URL {
+        get { return URL(string: urlString)! }
+        set { if managedObject.urlString != newValue.absoluteString { managedObject.urlString = newValue.absoluteString } }
+    }
+    public var urlString: String {
+        get { return managedObject.urlString }
+        set { if managedObject.urlString != newValue { managedObject.urlString = newValue } }
+    }
+    public var creationDate: Date? {
+        get { return managedObject.creationDate }
+        set { if managedObject.creationDate != newValue { managedObject.creationDate = newValue } }
+    }
+    public var errorDate: Date? {
+        get { return managedObject.errorDate }
+        set { if managedObject.errorDate != newValue { managedObject.errorDate = newValue } }
+    }
+    private var errorType: Int? {
+        get {
+            guard errorDate != nil else { return nil }
+            return Int(managedObject.errorType)
+        }
+        set {
+            guard let newValue = newValue, Int16.isValid(value: newValue), managedObject.errorType != Int16(newValue) else { return }
+            managedObject.errorType = Int16(newValue)
+        }
+    }
+    public var error: DownloadError? {
+        get {
+            guard let errorType = errorType else { return nil }
+            return DownloadError.create(rawValue: errorType)
+        }
+        set {
+            if let newError = newValue {
+                errorDate = Date()
+                errorType = newError.rawValue
+            } else {
+                errorDate = nil
+                errorType = 0
+            }
+        }
+    }
+    public var finishDate: Date? {
+        get { return managedObject.finishDate }
+        set { if managedObject.finishDate != newValue { managedObject.finishDate = newValue } }
+    }
+    public var progress: Float {
+        get { return managedObject.progressPercent }
+        set { if managedObject.progressPercent != newValue { managedObject.progressPercent = newValue } }
+    }
+    public var startDate: Date? {
+        get { return managedObject.startDate }
+        set { if managedObject.startDate != newValue { managedObject.startDate = newValue } }
+    }
+    public var totalSize: String {
+        get { return managedObject.totalSize ?? "" }
+        set { if managedObject.totalSize != newValue { managedObject.totalSize = totalSize } }
+    }
+    public var element: Downloadable? {
+        get {
+            if let artwork = artwork {
+                return artwork
+            } else if let playable = playable {
+                return playable
+            } else {
+                return nil
+            }
+        }
+        set {
+            if let context = managedObject.managedObjectContext {
+                if let downloadable = newValue as? AbstractPlayable {
+                    playable = AbstractPlayable(managedObject: context.object(with: downloadable.objectID) as! AbstractPlayableMO)
+                } else if let downloadable = newValue as? Artwork {
+                    artwork = Artwork(managedObject: context.object(with: downloadable.objectID) as! ArtworkMO)
+                }
+            }
+        }
+    }
+    private var artwork: Artwork? {
+        get {
+            guard let artworkMO = managedObject.artwork else { return nil }
+            return Artwork(managedObject: artworkMO) }
+        set {
+            if managedObject.artwork != newValue?.managedObject { managedObject.artwork = newValue?.managedObject }
+        }
+    }
+    private var playable: AbstractPlayable? {
+        get {
+            guard let playableMO = managedObject.playable else { return nil }
+            return AbstractPlayable(managedObject: playableMO) }
+        set {
+            if managedObject.playable != newValue?.playableManagedObject { managedObject.playable = newValue?.playableManagedObject }
+        }
+    }
+    
+}

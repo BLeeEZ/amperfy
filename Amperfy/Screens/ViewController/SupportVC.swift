@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 import MessageUI
+import AmperfyKit
 
 class SupportVC: UITableViewController, MFMailComposeViewControllerDelegate {
     
@@ -30,7 +31,7 @@ class SupportVC: UITableViewController, MFMailComposeViewControllerDelegate {
             messageBody += "--- Please don't remove the attachment ---"
             mailComposer.setMessageBody(messageBody, isHTML: false)
             mailComposer.setToRecipients(["amperfy@familie-zimba.de"])
-            if let attachmentData = LogData.collectInformation(appDelegate: appDelegate).asJSONData() {
+            if let attachmentData = LogData.collectInformation(amperfyData: AmperKit.shared).asJSONData() {
                 mailComposer.addAttachmentData(attachmentData, mimeType: "application/json", fileName: "AmperfyLog.json")
             }
             mailComposer.mailComposeDelegate = self

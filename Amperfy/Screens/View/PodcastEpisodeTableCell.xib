@@ -22,7 +22,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="375" height="162"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eg7-pd-DMm" customClass="EntityImageView" customModule="Amperfy" customModuleProvider="target">
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eg7-pd-DMm" customClass="EntityImageView" customModule="AmperfyKit">
                         <rect key="frame" x="16" y="11" width="60" height="60"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>

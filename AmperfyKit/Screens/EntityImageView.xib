@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="EntityImageView" customModule="AmperfyKit" customModuleProvider="target">
+            <connections>
+                <outlet property="quadImage1" destination="vKx-V3-3Oe" id="XpO-WC-fnY"/>
+                <outlet property="quadImage2" destination="6Yw-eq-dMr" id="Osq-T2-uqF"/>
+                <outlet property="quadImage3" destination="I31-Jf-S7g" id="4Tc-w0-Wjy"/>
+                <outlet property="quadImage4" destination="BdD-Im-e5K" id="24E-aN-CuP"/>
+                <outlet property="singleImage" destination="L2a-k6-g8X" id="hyb-nE-ByY"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="518" height="379"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="L2a-k6-g8X" userLabel="Single" customClass="LibraryEntityImage" customModule="AmperfyKit" customModuleProvider="target">
+                    <rect key="frame" x="113.5" y="44" width="291" height="291"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="L2a-k6-g8X" secondAttribute="height" multiplier="1:1" id="1xB-u6-yjz"/>
+                    </constraints>
+                </imageView>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="kC8-f5-qD9">
+                    <rect key="frame" x="69.5" y="0.0" width="379" height="379"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="So1-5P-vey">
+                            <rect key="frame" x="0.0" y="0.0" width="379" height="189.5"/>
+                            <subviews>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vKx-V3-3Oe" customClass="LibraryEntityImage" customModule="AmperfyKit" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="189.5" height="189.5"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="vKx-V3-3Oe" secondAttribute="height" multiplier="1:1" id="fux-HR-Knr"/>
+                                    </constraints>
+                                </imageView>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="6Yw-eq-dMr" customClass="LibraryEntityImage" customModule="AmperfyKit" customModuleProvider="target">
+                                    <rect key="frame" x="189.5" y="0.0" width="189.5" height="189.5"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="6Yw-eq-dMr" secondAttribute="height" multiplier="1:1" id="CCz-KH-54K"/>
+                                    </constraints>
+                                </imageView>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="6Yw-eq-dMr" firstAttribute="width" secondItem="6Yw-eq-dMr" secondAttribute="height" multiplier="1:1" id="R10-e2-q34"/>
+                            </constraints>
+                        </stackView>
+                        <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4lh-dP-UIC">
+                            <rect key="frame" x="0.0" y="189.5" width="379" height="189.5"/>
+                            <subviews>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="I31-Jf-S7g" customClass="LibraryEntityImage" customModule="AmperfyKit" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="189.5" height="189.5"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="I31-Jf-S7g" secondAttribute="height" multiplier="1:1" id="C3j-xh-UT7"/>
+                                    </constraints>
+                                </imageView>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="BdD-Im-e5K" customClass="LibraryEntityImage" customModule="AmperfyKit" customModuleProvider="target">
+                                    <rect key="frame" x="189.5" y="0.0" width="189.5" height="189.5"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="BdD-Im-e5K" secondAttribute="height" multiplier="1:1" id="tQq-0v-DSm"/>
+                                    </constraints>
+                                </imageView>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="BdD-Im-e5K" firstAttribute="width" secondItem="BdD-Im-e5K" secondAttribute="height" multiplier="1:1" id="hLN-Ye-aoT"/>
+                            </constraints>
+                        </stackView>
+                    </subviews>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <constraints>
+                <constraint firstItem="kC8-f5-qD9" firstAttribute="top" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="top" id="2VL-Ww-4te"/>
+                <constraint firstItem="kC8-f5-qD9" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="3aN-eg-758"/>
+                <constraint firstItem="kC8-f5-qD9" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="3jB-5Z-KzB"/>
+                <constraint firstAttribute="trailingMargin" secondItem="L2a-k6-g8X" secondAttribute="trailing" priority="999" id="64K-YD-E3K"/>
+                <constraint firstItem="L2a-k6-g8X" firstAttribute="top" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="9Ek-qR-0rl"/>
+                <constraint firstItem="L2a-k6-g8X" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="BDT-22-7bK"/>
+                <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="L2a-k6-g8X" secondAttribute="trailing" id="HHS-oZ-iti"/>
+                <constraint firstItem="kC8-f5-qD9" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" priority="999" id="Hbm-zs-cSG"/>
+                <constraint firstItem="L2a-k6-g8X" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="XHV-R3-DF9"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="kC8-f5-qD9" secondAttribute="trailing" id="iKp-s3-Np4"/>
+                <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="L2a-k6-g8X" secondAttribute="bottom" id="igg-W6-QWn"/>
+                <constraint firstAttribute="trailing" secondItem="kC8-f5-qD9" secondAttribute="trailing" priority="999" id="kvY-g9-Rp9"/>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="kC8-f5-qD9" secondAttribute="bottom" id="n9J-rJ-Xbe"/>
+                <constraint firstItem="kC8-f5-qD9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" id="oHh-PG-Skn"/>
+                <constraint firstItem="L2a-k6-g8X" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" priority="999" id="pqD-TM-Uh1"/>
+                <constraint firstItem="L2a-k6-g8X" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="uIy-UE-xm7"/>
+            </constraints>
+            <nil key="simulatedTopBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="105.79710144927537" y="-79.352678571428569"/>
+        </view>
+    </objects>
+</document>

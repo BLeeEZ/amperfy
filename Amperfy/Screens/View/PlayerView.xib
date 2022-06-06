@@ -39,7 +39,7 @@
                 <view clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="sop-QK-f5X" userLabel="Artwork Container">
                     <rect key="frame" x="16" y="34" width="60" height="60"/>
                     <subviews>
-                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zQR-aF-4SD" customClass="LibraryEntityImage" customModule="Amperfy" customModuleProvider="target">
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zQR-aF-4SD" customClass="LibraryEntityImage" customModule="AmperfyKit">
                             <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="450" id="T9w-1q-nDG"/>

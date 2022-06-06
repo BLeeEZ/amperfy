@@ -1,4 +1,5 @@
 import UIKit
+import AmperfyKit
 
 extension String {
     var isHyperTextProtocolProvided: Bool {

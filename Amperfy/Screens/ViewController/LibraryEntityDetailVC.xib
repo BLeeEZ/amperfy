@@ -76,7 +76,7 @@
                                 <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="J91-VR-QdL" userLabel="ElementInfo Stack View">
                                     <rect key="frame" x="0.0" y="0.0" width="984" height="90"/>
                                     <subviews>
-                                        <view contentMode="scaleAspectFill" translatesAutoresizingMaskIntoConstraints="NO" id="Q7J-Jx-tr6" customClass="EntityImageView" customModule="Amperfy" customModuleProvider="target">
+                                        <view contentMode="scaleAspectFill" translatesAutoresizingMaskIntoConstraints="NO" id="Q7J-Jx-tr6" customClass="EntityImageView" customModule="AmperfyKit">
                                             <rect key="frame" x="0.0" y="0.0" width="90" height="90"/>
                                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                             <constraints>

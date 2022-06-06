@@ -1,4 +1,5 @@
 import UIKit
+import AmperfyKit
 
 class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate, UITableViewDragDelegate, UITableViewDropDelegate {
 
@@ -323,6 +324,12 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 }
 
 extension PopupPlayerVC: MusicPlayable {
+    func didShuffleChange() {
+    }
+    
+    func didRepeatChange() {
+    }
+    
 
     func didStartPlaying() {
         self.reloadData()

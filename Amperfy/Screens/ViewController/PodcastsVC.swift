@@ -1,12 +1,6 @@
 import UIKit
 import CoreData
-
-enum PodcastsShowType: Int {
-    case podcasts = 0
-    case episodesSortedByReleaseDate = 1
-    
-    static let defaultValue: PodcastsShowType = .podcasts
-}
+import AmperfyKit
 
 class PodcastsVC: BasicTableViewController {
 

@@ -1,6 +1,7 @@
 import UIKit
 import Foundation
 import CoreData
+import AmperfyKit
 
 class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewController where ResultType : NSFetchRequestResult {
     
@@ -35,8 +36,8 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
 
 }
 
-typealias ContainableAtIndexPathCallback = (IndexPath) -> PlayableContainable?
-typealias SwipeActionCallback = (IndexPath, _ completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void ) -> Void
+public typealias ContainableAtIndexPathCallback = (IndexPath) -> PlayableContainable?
+public typealias SwipeActionCallback = (IndexPath, _ completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void ) -> Void
 
 struct SwipeDisplaySettings {
     var playContextTypeOfElements: PlayerMode = .music

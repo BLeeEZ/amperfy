@@ -1,5 +1,6 @@
 import UIKit
 import CoreData
+import AmperfyKit
 
 class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
 

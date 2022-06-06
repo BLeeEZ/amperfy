@@ -1,4 +1,5 @@
 import NotificationBanner
+import AmperfyKit
 
 class AmperfyBannerColors: BannerColorsProtocol {
 

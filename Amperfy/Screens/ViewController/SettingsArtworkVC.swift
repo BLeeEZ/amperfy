@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import AmperfyKit
 
 class SettingsArtworkVC: UITableViewController {
     

@@ -1,4 +1,5 @@
 import UIKit
+import AmperfyKit
 
 class GenericDetailTableHeader: UIView {
     
