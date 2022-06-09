@@ -5,6 +5,7 @@ import AmperfyKit
 class SettingsLibraryVC: UITableViewController {
     
     var appDelegate: AppDelegate!
+    var timer: Timer?
     
     @IBOutlet weak var artistsCountLabel: UILabel!
     @IBOutlet weak var albumsCountLabel: UILabel!
@@ -29,6 +30,20 @@ class SettingsLibraryVC: UITableViewController {
         
         autoDownloadLastestSongsSwitch.isOn = appDelegate.persistentStorage.settings.isAutoDownloadLatestSongsActive
         autoDownloadLastestPodcastEpisodesSwitch.isOn = appDelegate.persistentStorage.settings.isAutoDownloadLatestPodcastEpisodesActive
+        updateValues()
+    }
+    
+    
+    override func viewWillAppear(_ animated: Bool) {
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateValues), userInfo: nil, repeats: true)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    @objc func updateValues() {
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let library = LibraryStorage(context: context)
 

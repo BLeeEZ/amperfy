@@ -5,6 +5,7 @@ import AmperfyKit
 class SettingsArtworkVC: UITableViewController {
     
     var appDelegate: AppDelegate!
+    var timer: Timer?
     
     @IBOutlet weak var artworksCountLabel: UILabel!
     @IBOutlet weak var artworkNotCheckedCountLabel: UILabel!
@@ -13,7 +14,19 @@ class SettingsArtworkVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-
+        updateValues()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateValues), userInfo: nil, repeats: true)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    @objc func updateValues() {
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let library = LibraryStorage(context: context)
 
