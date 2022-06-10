@@ -14,6 +14,10 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     var requestPredicate: NSPredicate {
         return DownloadMO.onlyPlayablesPredicate
     }
+    
+    var parallelDownloadsCount: Int {
+        return 4
+    }
 
     func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL {
         guard let downloadElement = download.element else {

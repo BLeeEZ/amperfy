@@ -18,6 +18,7 @@ public protocol DownloadManageable {
 
 public protocol DownloadManagerDelegate {
     var requestPredicate: NSPredicate { get }
+    var parallelDownloadsCount: Int { get }
     func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL
     func validateDownloadedData(download: Download) -> ResponseError?
     func completedDownload(download: Download, context: NSManagedObjectContext)

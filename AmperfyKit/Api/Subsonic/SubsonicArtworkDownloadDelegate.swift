@@ -14,6 +14,10 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     var requestPredicate: NSPredicate {
         return DownloadMO.onlyArtworksPredicate
     }
+    
+    var parallelDownloadsCount: Int {
+        return 2
+    }
 
     func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL {
         guard let downloadElement = download.element else {

@@ -14,9 +14,8 @@ class DownloadManager: NSObject, DownloadManageable {
     var isFailWithPopupError: Bool = true
     var preDownloadIsValidCheck: ((_ object: Downloadable) -> Bool)?
     
-    
+    private let downloadSlotCount: Int
     private let eventLogger: EventLogger
-    private let downloadSlotCount = 4
     private let activeDispatchGroup = DispatchGroup()
     private let downloadPreperationSemaphore = DispatchSemaphore(value: 1)
     private var isRunning = false
@@ -29,6 +28,7 @@ class DownloadManager: NSObject, DownloadManageable {
         self.downloadDelegate = downloadDelegate
         self.notificationHandler = notificationHandler
         self.eventLogger = eventLogger
+        self.downloadSlotCount = downloadDelegate.parallelDownloadsCount
     }
     
     func download(object: Downloadable) {

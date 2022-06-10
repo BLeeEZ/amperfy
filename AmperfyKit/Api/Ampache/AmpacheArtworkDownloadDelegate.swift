@@ -15,6 +15,10 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     var requestPredicate: NSPredicate {
         return DownloadMO.onlyArtworksPredicate
     }
+    
+    var parallelDownloadsCount: Int {
+        return 2
+    }
 
     func getDefaultImageData() -> Data {
         if defaultImageData == nil, let url = URL(string: ampacheXmlServerApi.defaultArtworkUrl) {
