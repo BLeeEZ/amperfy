@@ -41,7 +41,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
                     os_log("Artist <%s> with id %s has been created", log: log, type: .error, artistName, artistId)
                     songBuffer?.artist = artist
                 }
-            } else if let songBuffer = songBuffer, songBuffer.artist == nil, let artistName = attributeDict["artist"] {
+            } else if let songBuffer = songBuffer, let artistName = attributeDict["artist"] {
                 if let existingLocalArtist = library.getArtistLocal(name: artistName) {
                     songBuffer.artist = existingLocalArtist
                 } else {

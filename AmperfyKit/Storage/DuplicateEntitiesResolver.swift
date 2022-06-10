@@ -48,7 +48,7 @@ public class DuplicateEntitiesResolver {
                 self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                     defer { self.mainFlowSemaphore.signal() }
                     let library = LibraryStorage(context: context)
-                    let duplicates = library.findDuplicates(for: Artist.typeName)
+                    let duplicates = library.findDuplicates(for: Artist.typeName).filter{ $0.id != "" }
                     library.resolveArtistsDuplicates(duplicates: duplicates)
                     library.saveContext()
                  }
