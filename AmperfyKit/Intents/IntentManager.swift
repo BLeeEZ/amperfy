@@ -21,40 +21,51 @@ public class IntentManager {
            let searchCategoryRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.searchCategory.rawValue] as? Int,
            let searchCategory = PlayableContainerType(rawValue: searchCategoryRaw) {
             
+            var playableContainer: PlayableContainable?
+            var shuffleOption = false
+            var repeatOption = RepeatMode.off
+            
+            if let shuffleUserRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.shuffleOption.rawValue] as? Int,
+               let shuffleUser = ShuffleType(rawValue: shuffleUserRaw) {
+                shuffleOption = shuffleUser == .on
+            }
+            if let repeatUserRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.repeatOption.rawValue] as? Int,
+               let repeatUser = RepeatType(rawValue: repeatUserRaw) {
+                repeatOption = RepeatMode.fromIntent(type: repeatUser)
+            }
+            
             switch searchCategory {
             case .unknown:
                 fallthrough
-            case .artist:
-                let artist = library.getArtists().lazy.first(where: { $0.name.contains(searchTerm) })
-                guard let artist = artist else { return false }
-                player.play(context: PlayContext(containable: artist))
             case .song:
-                let song = library.getSongs().lazy.first(where: { $0.name.contains(searchTerm) })
-                guard let song = song else { return false }
-                player.play(context: PlayContext(containable: song))
+                playableContainer = library.getSongs().lazy.first(where: { $0.name.contains(searchTerm) })
+            case .artist:
+                playableContainer = library.getArtists().lazy.first(where: { $0.name.contains(searchTerm) })
             case .podcastEpisode:
-                let podcastEpisode = library.getPodcastEpisodes().lazy.first(where: { $0.name.contains(searchTerm) })
-                guard let podcastEpisode = podcastEpisode else { return false }
-                player.play(context: PlayContext(containable: podcastEpisode))
+                playableContainer = library.getPodcastEpisodes().lazy.first(where: { $0.name.contains(searchTerm) })
             case .playlist:
-                let playlist = library.getPlaylists().lazy.first(where: { $0.name.contains(searchTerm) })
-                guard let playlist = playlist else { return false }
-                player.play(context: PlayContext(containable: playlist))
+                playableContainer = library.getPlaylists().lazy.first(where: { $0.name.contains(searchTerm) })
             case .album:
-                let album = library.getAlbums().lazy.first(where: { $0.name.contains(searchTerm) })
-                guard let album = album else { return false }
-                player.play(context: PlayContext(containable: album))
+                playableContainer = library.getAlbums().lazy.first(where: { $0.name.contains(searchTerm) })
             case .genre:
-                let genre = library.getGenres().lazy.first(where: { $0.name.contains(searchTerm) })
-                guard let genre = genre else { return false }
-                player.play(context: PlayContext(containable: genre))
+                playableContainer = library.getGenres().lazy.first(where: { $0.name.contains(searchTerm) })
             case .podcast:
-                let podcast = library.getPodcasts().lazy.first(where: { $0.name.contains(searchTerm) })
-                guard let podcast = podcast else { return false }
-                player.play(context: PlayContext(containable: podcast))
+                playableContainer = library.getPodcasts().lazy.first(where: { $0.name.contains(searchTerm) })
             }
+            
+            play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
         }
         return true
+    }
+    
+    private func play(container: PlayableContainable?, shuffleOption: Bool, repeatOption: RepeatMode) {
+        guard let container = container else { return }
+        if shuffleOption {
+            player.playShuffled(context: PlayContext(containable: container))
+        } else {
+            player.play(context: PlayContext(containable: container))
+        }
+        player.setRepeatMode(repeatOption)
     }
     
 }

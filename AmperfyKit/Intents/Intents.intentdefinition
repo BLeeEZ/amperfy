@@ -97,6 +97,102 @@
 				</dict>
 			</array>
 		</dict>
+		<dict>
+			<key>INEnumDisplayName</key>
+			<string>Repeat Type</string>
+			<key>INEnumDisplayNameID</key>
+			<string>8omIYQ</string>
+			<key>INEnumGeneratesHeader</key>
+			<true/>
+			<key>INEnumName</key>
+			<string>RepeatType</string>
+			<key>INEnumType</key>
+			<string>Regular</string>
+			<key>INEnumValues</key>
+			<array>
+				<dict>
+					<key>INEnumValueDisplayName</key>
+					<string>unknown</string>
+					<key>INEnumValueDisplayNameID</key>
+					<string>Su1aiq</string>
+					<key>INEnumValueName</key>
+					<string>unknown</string>
+				</dict>
+				<dict>
+					<key>INEnumValueDisplayName</key>
+					<string>Single</string>
+					<key>INEnumValueDisplayNameID</key>
+					<string>wV7aDq</string>
+					<key>INEnumValueIndex</key>
+					<integer>3</integer>
+					<key>INEnumValueName</key>
+					<string>single</string>
+				</dict>
+				<dict>
+					<key>INEnumValueDisplayName</key>
+					<string>All</string>
+					<key>INEnumValueDisplayNameID</key>
+					<string>8o9fvs</string>
+					<key>INEnumValueIndex</key>
+					<integer>2</integer>
+					<key>INEnumValueName</key>
+					<string>all</string>
+				</dict>
+				<dict>
+					<key>INEnumValueDisplayName</key>
+					<string>Off</string>
+					<key>INEnumValueDisplayNameID</key>
+					<string>8wLqtr</string>
+					<key>INEnumValueIndex</key>
+					<integer>1</integer>
+					<key>INEnumValueName</key>
+					<string>off</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>INEnumDisplayName</key>
+			<string>Shuffle Type</string>
+			<key>INEnumDisplayNameID</key>
+			<string>IK4Vx4</string>
+			<key>INEnumGeneratesHeader</key>
+			<true/>
+			<key>INEnumName</key>
+			<string>ShuffleType</string>
+			<key>INEnumType</key>
+			<string>Regular</string>
+			<key>INEnumValues</key>
+			<array>
+				<dict>
+					<key>INEnumValueDisplayName</key>
+					<string>unknown</string>
+					<key>INEnumValueDisplayNameID</key>
+					<string>421HxB</string>
+					<key>INEnumValueName</key>
+					<string>unknown</string>
+				</dict>
+				<dict>
+					<key>INEnumValueDisplayName</key>
+					<string>On</string>
+					<key>INEnumValueDisplayNameID</key>
+					<string>PTr12k</string>
+					<key>INEnumValueIndex</key>
+					<integer>1</integer>
+					<key>INEnumValueName</key>
+					<string>on</string>
+				</dict>
+				<dict>
+					<key>INEnumValueDisplayName</key>
+					<string>Off</string>
+					<key>INEnumValueDisplayNameID</key>
+					<string>xtTnvq</string>
+					<key>INEnumValueIndex</key>
+					<integer>2</integer>
+					<key>INEnumValueName</key>
+					<string>off</string>
+				</dict>
+			</array>
+		</dict>
 	</array>
 	<key>INIntentDefinitionModelVersion</key>
 	<string>1.2</string>
@@ -120,15 +216,15 @@
 			<key>INIntentDescriptionID</key>
 			<string>41BCti</string>
 			<key>INIntentLastParameterTag</key>
-			<integer>5</integer>
+			<integer>11</integer>
 			<key>INIntentManagedParameterCombinations</key>
 			<dict>
-				<key>searchTerm,searchCategory</key>
+				<key>searchTerm,searchCategory,shuffleOption,repeatOption</key>
 				<dict>
 					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
 					<true/>
 					<key>INIntentParameterCombinationTitle</key>
-					<string>Play music</string>
+					<string>Search And Play</string>
 					<key>INIntentParameterCombinationTitleID</key>
 					<string>vvrrC7</string>
 					<key>INIntentParameterCombinationUpdatesLinked</key>
@@ -139,16 +235,16 @@
 			<string>SearchAndPlay</string>
 			<key>INIntentParameterCombinations</key>
 			<dict>
-				<key>searchTerm,searchCategory</key>
+				<key>searchTerm,searchCategory,shuffleOption,repeatOption</key>
 				<dict>
 					<key>INIntentParameterCombinationIsLinked</key>
 					<true/>
 					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
 					<true/>
 					<key>INIntentParameterCombinationTitle</key>
-					<string>Play music</string>
+					<string>Search And Play</string>
 					<key>INIntentParameterCombinationTitleID</key>
-					<string>GtQLVV</string>
+					<string>XeqXXs</string>
 				</dict>
 			</dict>
 			<key>INIntentParameters</key>
@@ -254,6 +350,154 @@
 					<true/>
 					<key>INIntentParameterTag</key>
 					<integer>5</integer>
+					<key>INIntentParameterType</key>
+					<string>Integer</string>
+				</dict>
+				<dict>
+					<key>INIntentParameterConfigurable</key>
+					<true/>
+					<key>INIntentParameterCustomDisambiguation</key>
+					<true/>
+					<key>INIntentParameterDisplayName</key>
+					<string>Shuffle</string>
+					<key>INIntentParameterDisplayNameID</key>
+					<string>l9OttY</string>
+					<key>INIntentParameterDisplayPriority</key>
+					<integer>3</integer>
+					<key>INIntentParameterEnumType</key>
+					<string>ShuffleType</string>
+					<key>INIntentParameterEnumTypeNamespace</key>
+					<string>1o3qqV</string>
+					<key>INIntentParameterMetadata</key>
+					<dict>
+						<key>INIntentParameterMetadataDefaultValue</key>
+						<string>off</string>
+					</dict>
+					<key>INIntentParameterName</key>
+					<string>shuffleOption</string>
+					<key>INIntentParameterPromptDialogs</key>
+					<array>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Configuration</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Primary</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>There are ${count} options matching ‘${shuffleOption}’.</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>3sLbqT</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>DisambiguationIntroduction</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>Shuffled?</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>k6ZPpB</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>DisambiguationSelection</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>Just to confirm, you wanted ‘${shuffleOption}’?</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>alG1pS</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Confirmation</string>
+						</dict>
+					</array>
+					<key>INIntentParameterSupportsResolution</key>
+					<true/>
+					<key>INIntentParameterTag</key>
+					<integer>11</integer>
+					<key>INIntentParameterType</key>
+					<string>Integer</string>
+				</dict>
+				<dict>
+					<key>INIntentParameterConfigurable</key>
+					<true/>
+					<key>INIntentParameterCustomDisambiguation</key>
+					<true/>
+					<key>INIntentParameterDisplayName</key>
+					<string>Repeat</string>
+					<key>INIntentParameterDisplayNameID</key>
+					<string>JIi3sK</string>
+					<key>INIntentParameterDisplayPriority</key>
+					<integer>4</integer>
+					<key>INIntentParameterEnumType</key>
+					<string>RepeatType</string>
+					<key>INIntentParameterEnumTypeNamespace</key>
+					<string>1o3qqV</string>
+					<key>INIntentParameterMetadata</key>
+					<dict>
+						<key>INIntentParameterMetadataDefaultValue</key>
+						<string>off</string>
+					</dict>
+					<key>INIntentParameterName</key>
+					<string>repeatOption</string>
+					<key>INIntentParameterPromptDialogs</key>
+					<array>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Configuration</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Primary</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>There are ${count} options matching ‘${repeatOption}’.</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>1Xep2W</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>DisambiguationIntroduction</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>Repeat?</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>N8qyY3</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>DisambiguationSelection</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>Just to confirm, you wanted ‘${repeatOption}’?</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>rhamlk</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Confirmation</string>
+						</dict>
+					</array>
+					<key>INIntentParameterSupportsResolution</key>
+					<true/>
+					<key>INIntentParameterTag</key>
+					<integer>10</integer>
 					<key>INIntentParameterType</key>
 					<string>Integer</string>
 				</dict>
