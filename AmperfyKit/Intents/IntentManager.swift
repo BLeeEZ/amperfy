@@ -49,7 +49,7 @@ public class IntentManager {
         // SearchAndPlay
         // url example: amperfy://x-callback-url/searchAndPlay?searchTerm=Good&searchCategory=playlist&shuffleOption=1&repeatOption=2
         // action: searchAndPlay
-        // parameter mandetory: searchTerm: String
+        // parameter mandatory: searchTerm: String
         //                      searchCategory: Sting (lower case type: artist, song, playlist, ...)
         // parameter optional:  shuffleOption: 0 or 1
         //                      repeatOption: 0 (off), 1 (all), 2 (single)
@@ -81,6 +81,87 @@ public class IntentManager {
             }
             let playableContainer = self.getPlayableContainer(searchTerm: searchTerm, searchCategory: searchCategory)
             self.play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            success(nil)
+        }
+        
+        // Play
+        // url example: amperfy://x-callback-url/play
+        // action: play
+        CallbackURLKit.register(action: "play") { parameters, success, failure, cancel in
+            self.player.play()
+            success(nil)
+        }
+        
+        // Pause
+        // url example: amperfy://x-callback-url/pause
+        // action: pause
+        CallbackURLKit.register(action: "pause") { parameters, success, failure, cancel in
+            self.player.pause()
+            success(nil)
+        }
+        
+        // TogglePlayPause
+        // url example: amperfy://x-callback-url/togglePlayPause
+        // action: togglePlayPause
+        CallbackURLKit.register(action: "togglePlayPause") { parameters, success, failure, cancel in
+            self.player.togglePlayPause()
+            success(nil)
+        }
+        
+        // PlayNext
+        // url example: amperfy://x-callback-url/playNext
+        // action: playNext
+        CallbackURLKit.register(action: "playNext") { parameters, success, failure, cancel in
+            self.player.playNext()
+            success(nil)
+        }
+        
+        // PlayPreviousOrReplay
+        // url example: amperfy://x-callback-url/playPreviousOrReplay
+        // action: playPreviousOrReplay
+        CallbackURLKit.register(action: "playPreviousOrReplay") { parameters, success, failure, cancel in
+            self.player.playPreviousOrReplay()
+            success(nil)
+        }
+        
+        // SetShuffle
+        // url example: amperfy://x-callback-url/setShuffle?shuffleOption=1
+        // action: setShuffle
+        // parameter mandatory: shuffleOption: 0 or 1
+        CallbackURLKit.register(action: "setShuffle") { parameters, success, failure, cancel in
+            guard let shuffleStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.shuffleOption.rawValue} )?.value else {
+                failure(NSError.error(code: .missingParameter, failureReason: "shuffleOption not provided."))
+                return
+            }
+            guard let shuffleRaw = Int(shuffleStringRaw),
+                  shuffleRaw >= 0,
+                  shuffleRaw <= 1 else {
+                failure(NSError.error(code: .missingParameter, failureReason: "shuffleOption is not valid."))
+                return
+            }
+            if self.player.isShuffle, shuffleRaw == 0 {
+                self.player.toggleShuffle()
+            } else if !self.player.isShuffle, shuffleRaw == 1 {
+                self.player.toggleShuffle()
+            }
+            success(nil)
+        }
+        
+        // SetRepeat
+        // url example: amperfy://x-callback-url/setRepeat?repeatOption=2
+        // action: setRepeat
+        // parameter mandatory: repeatOption: 0 (off), 1 (all), 2 (single)
+        CallbackURLKit.register(action: "setRepeat") { parameters, success, failure, cancel in
+            guard let repeatStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.repeatOption.rawValue} )?.value else {
+                failure(NSError.error(code: .missingParameter, failureReason: "repeatOption not provided."))
+                return
+            }
+            guard let repeatRaw = Int16(repeatStringRaw),
+                  let repeatInput = RepeatMode(rawValue: repeatRaw) else {
+                failure(NSError.error(code: .missingParameter, failureReason: "repeatOption is not valid."))
+                return
+            }
+            self.player.setRepeatMode(repeatInput)
             success(nil)
         }
     }
