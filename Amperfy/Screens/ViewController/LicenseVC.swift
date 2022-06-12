@@ -1,10 +1,8 @@
 import Foundation
 import UIKit
 
-class LicenseVC: UIViewController {
-    
-    var appDelegate: AppDelegate!
-    var license = """
+extension UIViewController {
+    public static let htmlDisplayContentStart = """
          <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -40,6 +38,16 @@ class LicenseVC: UIViewController {
              color: #888;
              line-height: 2.6em;
          }
+    
+         h4 {
+             font-size: 12px;
+             color: #888;
+         }
+    
+         h5 {
+             font-size: 12px;
+             color: #888;
+         }
 
          p, ul, li {
              color: #888;
@@ -48,7 +56,18 @@ class LicenseVC: UIViewController {
          </head>
 
          <body>
+    """
+    
+    public static let htmlDisplayContentEnd = """
+         </body>
+         </html>
+    """
+}
 
+class LicenseVC: UIViewController {
+    
+    var appDelegate: AppDelegate!
+    var license = """
          <h1>Copyright © 2019-2022 Maximilian Bauer<br />
          All rights reserved.</h1>
          <p>GPLv3 Licensed</p>
@@ -284,12 +303,6 @@ class LicenseVC: UIViewController {
              <li>No touching with unwashed hands</li>
              <li>No exchanging for drugs.</li>
          </ul>
-
-
-
-         </body>
-
-         </html>
         """
 
     @IBOutlet weak var licenseTextView: UITextView!
@@ -299,10 +312,11 @@ class LicenseVC: UIViewController {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.license)
         
-        let licenseHtml = NSString(string: license).data(using: String.Encoding.utf8.rawValue)
+        let licenseRaw = Self.htmlDisplayContentStart + license + Self.htmlDisplayContentEnd
+        let licenseHtml = NSString(string: licenseRaw).data(using: String.Encoding.utf8.rawValue)
         let options = [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html]
-        let licendeAttributedString = try! NSAttributedString(data: licenseHtml!, options: options, documentAttributes: nil)
-        licenseTextView.attributedText = licendeAttributedString
+        let licenseAttributedString = try! NSAttributedString(data: licenseHtml!, options: options, documentAttributes: nil)
+        licenseTextView.attributedText = licenseAttributedString
     }
     
 }

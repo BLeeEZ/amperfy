@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -1526,12 +1526,48 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="40" id="zeg-fh-VKW">
+                                        <rect key="frame" x="0.0" y="567.5" width="414" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zeg-fh-VKW" id="Vds-u0-HwT">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b3f-pF-a5O" userLabel="X-Callback-URL Docu">
+                                                    <rect key="frame" x="20" y="5" width="394" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="ZyA-Xu-3p4"/>
+                                                    </constraints>
+                                                    <state key="normal" title="X-Callback-URL Documentation">
+                                                        <color key="titleColor" systemColor="labelColor"/>
+                                                    </state>
+                                                    <connections>
+                                                        <segue destination="Cxf-pS-pFd" kind="show" id="C81-FV-8mS"/>
+                                                    </connections>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&gt;" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dzi-Gf-rvr" userLabel="Select Label">
+                                                    <rect key="frame" x="344" y="10" width="50" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Dzi-Gf-rvr" firstAttribute="centerY" secondItem="Vds-u0-HwT" secondAttribute="centerY" id="3j1-Vw-NHr"/>
+                                                <constraint firstItem="b3f-pF-a5O" firstAttribute="centerY" secondItem="Vds-u0-HwT" secondAttribute="centerY" id="EHU-Sx-1i5"/>
+                                                <constraint firstItem="Dzi-Gf-rvr" firstAttribute="leading" secondItem="Vds-u0-HwT" secondAttribute="trailingMargin" constant="-50" id="Jj1-Il-mHw"/>
+                                                <constraint firstItem="b3f-pF-a5O" firstAttribute="leading" secondItem="Vds-u0-HwT" secondAttribute="leadingMargin" id="Vec-AJ-DlT"/>
+                                                <constraint firstAttribute="trailing" secondItem="b3f-pF-a5O" secondAttribute="trailing" id="ck9-jI-uH3"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="Dzi-Gf-rvr" secondAttribute="trailing" id="kla-CH-F8v"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection id="nqc-W9-qKK">
                                 <cells>
                                     <tableViewCell hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="40" id="6Cx-Vn-wFV">
-                                        <rect key="frame" x="0.0" y="603.5" width="414" height="40"/>
+                                        <rect key="frame" x="0.0" y="643.5" width="414" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="6Cx-Vn-wFV" id="cqD-So-7R4">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
@@ -3275,6 +3311,47 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xC4-O0-Er5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="4064" y="3190"/>
+        </scene>
+        <!--X-Callback-URL Documentation-->
+        <scene sceneID="AUw-1Z-y4c">
+            <objects>
+                <viewController title="X-Callback-URL Documentation" id="Cxf-pS-pFd" customClass="SettingsXCallbackURLsVC" customModule="Amperfy" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="iUZ-yN-M16">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G1P-mE-qB6" userLabel="Docu Text View">
+                                <rect key="frame" x="0.0" y="88" width="414" height="725"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <attributedString key="attributedText">
+                                    <fragment content="License text will be set in view controller">
+                                        <attributes>
+                                            <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <font key="NSFont" metaFont="menu" size="14"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="St5-tX-Y17"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="G1P-mE-qB6" firstAttribute="trailing" secondItem="St5-tX-Y17" secondAttribute="trailing" id="BRb-xc-pT0"/>
+                            <constraint firstItem="G1P-mE-qB6" firstAttribute="leading" secondItem="St5-tX-Y17" secondAttribute="leading" id="L6g-Lp-WTq"/>
+                            <constraint firstItem="G1P-mE-qB6" firstAttribute="top" secondItem="St5-tX-Y17" secondAttribute="top" id="d55-nB-5wR"/>
+                            <constraint firstItem="G1P-mE-qB6" firstAttribute="bottom" secondItem="St5-tX-Y17" secondAttribute="bottom" id="xHf-JI-r1b"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="X-Callback-URL Documentation" id="kCf-ZN-W7I"/>
+                    <connections>
+                        <outlet property="docuTextView" destination="G1P-mE-qB6" id="11D-v8-mPJ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="KIe-Sg-B2N" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4783" y="2500"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>

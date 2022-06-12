@@ -5,6 +5,7 @@ import os.log
 
 class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     
+    public static let replayInsteadPlayPreviousTimeInSec = 5.0
     static let progressTimeStartThreshold: Double = 15.0
     static let progressTimeEndThreshold: Double = 15.0
     
@@ -17,7 +18,6 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     private let backendAudioPlayer: BackendAudioPlayer
     private let userStatistics: UserStatistics
     private var notifierList = [MusicPlayable]()
-    private let replayInsteadPlayPreviousTimeInSec = 5.0
 
     init(coreData: PlayerStatusPersistent, queueHandler: PlayQueueHandler, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
         self.playerStatus = coreData
@@ -38,7 +38,7 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         if !backendAudioPlayer.canBeContinued {
             return false
         }
-        return backendAudioPlayer.elapsedTime >= replayInsteadPlayPreviousTimeInSec
+        return backendAudioPlayer.elapsedTime >= Self.replayInsteadPlayPreviousTimeInSec
     }
 
     private func replayCurrentItem() {

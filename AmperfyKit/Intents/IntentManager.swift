@@ -23,16 +23,38 @@ extension PlayableContainerType {
             return nil
         }
     }
+    
+    public static var allCasesDescription: String {
+        return "artist, song, podcastEpisode, playlist, album, genre, podcast"
+    }
+}
+
+public struct XCallbackActionParameterDocu {
+    public var name: String
+    public var type: String
+    public var isMandatory: Bool
+    public var description: String
+    public var defaultIfNotGiven: String?
+}
+
+public struct XCallbackActionDocu {
+    public var name: String
+    public var description: String
+    public var exampleURLs: [String]
+    public var action: String
+    public var parameters: [XCallbackActionParameterDocu]
 }
 
 public class IntentManager {
     
+    public private(set) var documentation: [XCallbackActionDocu]
     private let library: LibraryStorage
     private let player: PlayerFacade
     
     init(library: LibraryStorage, player: PlayerFacade) {
         self.library = library
         self.player = player
+        self.documentation = [XCallbackActionDocu]()
     }
     
     /// URLs to handle need to define in Project -> Targerts: Amperfy -> Info -> URL Types
@@ -46,13 +68,43 @@ public class IntentManager {
         
         // [url-scheme]://x-callback-url/[action]?[x-callback parameters]&[action parameters]
         
-        // SearchAndPlay
-        // url example: amperfy://x-callback-url/searchAndPlay?searchTerm=Good&searchCategory=playlist&shuffleOption=1&repeatOption=2
-        // action: searchAndPlay
-        // parameter mandatory: searchTerm: String
-        //                      searchCategory: Sting (lower case type: artist, song, playlist, ...)
-        // parameter optional:  shuffleOption: 0 or 1
-        //                      repeatOption: 0 (off), 1 (all), 2 (single)
+        documentation.append(XCallbackActionDocu(
+            name: "SearchAndPlay",
+            description: "Plays the first search result for searchTerm in searchCategory with the given player options",
+            exampleURLs: [
+                "amperfy://x-callback-url/searchAndPlay?searchTerm=Awesome&searchCategory=playlist",
+                "amperfy://x-callback-url/searchAndPlay?searchTerm=Example&searchCategory=artist&shuffleOption=1&repeatOption=2"
+            ],
+            action: "searchAndPlay",
+            parameters: [
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.searchTerm.rawValue,
+                    type: "String",
+                    isMandatory: true,
+                    description: "Query term to search for"
+                ),
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.searchCategory.rawValue,
+                    type: "String",
+                    isMandatory: true,
+                    description: PlayableContainerType.allCasesDescription
+                ),
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.shuffleOption.rawValue,
+                    type: "Int",
+                    isMandatory: false,
+                    description: "0 (false) or 1 (true)",
+                    defaultIfNotGiven: "false"
+                ),
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.repeatOption.rawValue,
+                    type: "Int",
+                    isMandatory: false,
+                    description: "0 (off), 1 (all), 2 (single)",
+                    defaultIfNotGiven: "off"
+                ),
+            ])
+        )
         CallbackURLKit.register(action: "searchAndPlay") { parameters, success, failure, cancel in
             var shuffleOption = false
             var repeatOption = RepeatMode.off
@@ -84,50 +136,97 @@ public class IntentManager {
             success(nil)
         }
         
-        // Play
-        // url example: amperfy://x-callback-url/play
-        // action: play
+        documentation.append(XCallbackActionDocu(
+            name: "Play",
+            description: "Changes the play state of the player to play",
+            exampleURLs: [
+                "amperfy://x-callback-url/play"
+            ],
+            action: "play",
+            parameters: [
+            ])
+        )
         CallbackURLKit.register(action: "play") { parameters, success, failure, cancel in
             self.player.play()
             success(nil)
         }
         
-        // Pause
-        // url example: amperfy://x-callback-url/pause
-        // action: pause
+        documentation.append(XCallbackActionDocu(
+            name: "Pause",
+            description: "Changes the play state of the player to pause",
+            exampleURLs: [
+                "amperfy://x-callback-url/pause"
+            ],
+            action: "pause",
+            parameters: [
+            ])
+        )
         CallbackURLKit.register(action: "pause") { parameters, success, failure, cancel in
             self.player.pause()
             success(nil)
         }
         
-        // TogglePlayPause
-        // url example: amperfy://x-callback-url/togglePlayPause
-        // action: togglePlayPause
+        documentation.append(XCallbackActionDocu(
+            name: "TogglePlayPause",
+            description: "Toggles the play state of the player (play/pause)",
+            exampleURLs: [
+                "amperfy://x-callback-url/togglePlayPause"
+            ],
+            action: "togglePlayPause",
+            parameters: [
+            ])
+        )
         CallbackURLKit.register(action: "togglePlayPause") { parameters, success, failure, cancel in
             self.player.togglePlayPause()
             success(nil)
         }
         
-        // PlayNext
-        // url example: amperfy://x-callback-url/playNext
-        // action: playNext
+        documentation.append(XCallbackActionDocu(
+            name: "PlayNext",
+            description: "The next track will be played",
+            exampleURLs: [
+                "amperfy://x-callback-url/playNext"
+            ],
+            action: "playNext",
+            parameters: [
+            ])
+        )
         CallbackURLKit.register(action: "playNext") { parameters, success, failure, cancel in
             self.player.playNext()
             success(nil)
         }
         
-        // PlayPreviousOrReplay
-        // url example: amperfy://x-callback-url/playPreviousOrReplay
-        // action: playPreviousOrReplay
+        documentation.append(XCallbackActionDocu(
+            name: "PlayPreviousOrReplay",
+            description: "The previous track will be played (if the tracked plays longer than \(AudioPlayer.replayInsteadPlayPreviousTimeInSec) seconds the track starts from the beginning)",
+            exampleURLs: [
+                "amperfy://x-callback-url/playPreviousOrReplay"
+            ],
+            action: "playPreviousOrReplay",
+            parameters: [
+            ])
+        )
         CallbackURLKit.register(action: "playPreviousOrReplay") { parameters, success, failure, cancel in
             self.player.playPreviousOrReplay()
             success(nil)
         }
         
-        // SetShuffle
-        // url example: amperfy://x-callback-url/setShuffle?shuffleOption=1
-        // action: setShuffle
-        // parameter mandatory: shuffleOption: 0 or 1
+        documentation.append(XCallbackActionDocu(
+            name: "SetShuffle",
+            description: "Sets the shuffle state of the player",
+            exampleURLs: [
+                "amperfy://x-callback-url/setShuffle?shuffleOption=1"
+            ],
+            action: "setShuffle",
+            parameters: [
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.shuffleOption.rawValue,
+                    type: "Int",
+                    isMandatory: true,
+                    description: "0 (false) or 1 (true)"
+                )
+            ])
+        )
         CallbackURLKit.register(action: "setShuffle") { parameters, success, failure, cancel in
             guard let shuffleStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.shuffleOption.rawValue} )?.value else {
                 failure(NSError.error(code: .missingParameter, failureReason: "shuffleOption not provided."))
@@ -147,10 +246,22 @@ public class IntentManager {
             success(nil)
         }
         
-        // SetRepeat
-        // url example: amperfy://x-callback-url/setRepeat?repeatOption=2
-        // action: setRepeat
-        // parameter mandatory: repeatOption: 0 (off), 1 (all), 2 (single)
+        documentation.append(XCallbackActionDocu(
+            name: "SetRepeat",
+            description: "Sets the shuffle state of the player",
+            exampleURLs: [
+                "amperfy://x-callback-url/setRepeat?repeatOption=2"
+            ],
+            action: "setRepeat",
+            parameters: [
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.repeatOption.rawValue,
+                    type: "Int",
+                    isMandatory: true,
+                    description: "0 (off), 1 (all), 2 (single)"
+                ),
+            ])
+        )
         CallbackURLKit.register(action: "setRepeat") { parameters, success, failure, cancel in
             guard let repeatStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.repeatOption.rawValue} )?.value else {
                 failure(NSError.error(code: .missingParameter, failureReason: "repeatOption not provided."))
