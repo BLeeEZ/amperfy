@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "callbackurlkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/phimage/CallbackURLKit",
+      "state" : {
+        "revision" : "5411bfc17cd0787ac80c46f312c7235783ff9421",
+        "version" : "3.0.0"
+      }
+    },
+    {
       "identity" : "vyplayindicator",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/obrhoff/VYPlayIndicator",

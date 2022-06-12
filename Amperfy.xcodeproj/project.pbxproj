@@ -173,6 +173,7 @@
 		50BE5D9E2851D5DE00156FC6 /* IntentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BE5D9D2851D5DE00156FC6 /* IntentManager.swift */; };
 		50BE5D9F2853427800156FC6 /* ID3TagEditor.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50814C9727D2550D0072738F /* ID3TagEditor.xcframework */; };
 		50BE5DA02853427800156FC6 /* ID3TagEditor.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 50814C9727D2550D0072738F /* ID3TagEditor.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		50BE5DA7285714A200156FC6 /* CallbackURLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 50BE5DA6285714A200156FC6 /* CallbackURLKit */; };
 		50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C0521E241B200F086F0 /* SearchVC.swift */; };
 		50C16C0C21E52BBB00F086F0 /* SongTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50C16C0B21E52BBB00F086F0 /* SongTableCell.xib */; };
 		50C16C1021E5463E00F086F0 /* ArtistsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C0F21E5463E00F086F0 /* ArtistsVC.swift */; };
@@ -875,6 +876,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50BE5DA7285714A200156FC6 /* CallbackURLKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1607,6 +1609,9 @@
 			dependencies = (
 			);
 			name = AmperfyKit;
+			packageProductDependencies = (
+				50BE5DA6285714A200156FC6 /* CallbackURLKit */,
+			);
 			productName = AmpertyKit;
 			productReference = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */;
 			productType = "com.apple.product-type.framework";
@@ -1672,6 +1677,7 @@
 			mainGroup = 508385DB21C5965B00C4BB32;
 			packageReferences = (
 				509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */,
+				50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */,
 			);
 			productRefGroup = 508385E521C5965B00C4BB32 /* Products */;
 			projectDirPath = "";
@@ -2537,6 +2543,14 @@
 				version = 1.5.4;
 			};
 		};
+		50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/phimage/CallbackURLKit";
+			requirement = {
+				kind = exactVersion;
+				version = 3.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2544,6 +2558,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */;
 			productName = VYPlayIndicator;
+		};
+		50BE5DA6285714A200156FC6 /* CallbackURLKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */;
+			productName = CallbackURLKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 

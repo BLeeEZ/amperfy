@@ -104,6 +104,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return intentManager.handleIncomingIntent(userActivity: userActivity)
     }
 
+    /// Open the app when opened via URL scheme
+    func application(_ application: UIApplication,
+                     open url: URL,
+                     options: [UIApplication.OpenURLOptionsKey : Any] = [:] ) -> Bool {
+        return intentManager.handleIncoming(url: url)
+    }
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if let options = launchOptions {
             os_log("application launch with options:", log: self.log, type: .info)
@@ -116,6 +123,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         configureBackgroundFetch()
         configureNotificationHandling()
         initEventLogger()
+        intentManager.registerXCallbackURLs()
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
         guard let credentials = persistentStorage.loginCredentials else {
