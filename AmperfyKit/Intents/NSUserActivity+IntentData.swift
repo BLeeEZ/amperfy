@@ -7,6 +7,7 @@ extension NSUserActivity {
         case searchCategory
         case shuffleOption
         case repeatOption
+        case offlineMode
     }
     
     public static let searchAndPlayActivityType = "de.familie-zimba.Amperfy.SearchAndPlay"

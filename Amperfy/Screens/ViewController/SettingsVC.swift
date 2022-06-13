@@ -16,11 +16,11 @@ class SettingsVC: UITableViewController {
         
         versionLabel.text = AppDelegate.version
         buildNumberLabel.text = AppDelegate.buildNumber
-        offlineModeSwitch.isOn = appDelegate.persistentStorage.settings.isOfflineMode
     }
     
     override func viewWillAppear(_ animated: Bool) {
         appDelegate.userStatistics.visited(.settings)
+        offlineModeSwitch.isOn = appDelegate.persistentStorage.settings.isOfflineMode
     }
     
     @IBAction func triggeredOfflineModeSwitch(_ sender: Any) {

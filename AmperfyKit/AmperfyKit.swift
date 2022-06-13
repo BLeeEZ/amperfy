@@ -136,7 +136,7 @@ public class AmperKit {
         return CarPlayHandler(persistentStorage: self.persistentStorage, library: self.library, backendApi: self.backendApi, player: self.player, playableContentManager: MPPlayableContentManager.shared())
     }()
     public lazy var intentManager = {
-        return IntentManager(library: self.library, player: self.player)
+        return IntentManager(persistentStorage: self.persistentStorage, library: self.library, player: self.player)
     }()
 
     public func reinit() {

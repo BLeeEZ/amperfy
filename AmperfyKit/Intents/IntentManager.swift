@@ -48,10 +48,12 @@ public struct XCallbackActionDocu {
 public class IntentManager {
     
     public private(set) var documentation: [XCallbackActionDocu]
+    private let persistentStorage: PersistentStorage
     private let library: LibraryStorage
     private let player: PlayerFacade
     
-    init(library: LibraryStorage, player: PlayerFacade) {
+    init(persistentStorage: PersistentStorage, library: LibraryStorage, player: PlayerFacade) {
+        self.persistentStorage = persistentStorage
         self.library = library
         self.player = player
         self.documentation = [XCallbackActionDocu]()
@@ -273,6 +275,37 @@ public class IntentManager {
                 return
             }
             self.player.setRepeatMode(repeatInput)
+            success(nil)
+        }
+        
+        documentation.append(XCallbackActionDocu(
+            name: "SetOfflineMode",
+            description: "Sets the Amperfy offline mode to active/inactive",
+            exampleURLs: [
+                "amperfy://x-callback-url/setOfflineMode?offlineMode=1"
+            ],
+            action: "setOfflineMode",
+            parameters: [
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.offlineMode.rawValue,
+                    type: "Int",
+                    isMandatory: true,
+                    description: "0 (inactive) or 1 (active)"
+                ),
+            ])
+        )
+        CallbackURLKit.register(action: "setOfflineMode") { parameters, success, failure, cancel in
+            guard let offlineModeStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.offlineMode.rawValue} )?.value else {
+                failure(NSError.error(code: .missingParameter, failureReason: "offlineMode not provided."))
+                return
+            }
+            guard let offlineMode = Int(offlineModeStringRaw),
+                  offlineMode >= 0,
+                  offlineMode <= 1 else {
+                failure(NSError.error(code: .missingParameter, failureReason: "offlineMode is not valid."))
+                return
+            }
+            self.persistentStorage.settings.isOfflineMode = offlineMode == 1
             success(nil)
         }
     }
