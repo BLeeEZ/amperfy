@@ -32,12 +32,13 @@ public class DuplicateEntitiesResolver {
             self.activeDispatchGroup.enter()
             os_log("start", log: self.log, type: .info)
             
-            if self.isRunning {
+            // only check for duplicates on Ampache API, Subsonic does not have genre ids
+            if self.isRunning, self.persistentStorage.loginCredentials?.backendApi == .ampache {
                 self.mainFlowSemaphore.wait()
                 self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                     defer { self.mainFlowSemaphore.signal() }
                     let library = LibraryStorage(context: context)
-                    let duplicates = library.findDuplicates(for: Genre.typeName)
+                    let duplicates = library.findDuplicates(for: Genre.typeName).filter{ $0.id != "" }
                     library.resolveGenresDuplicates(duplicates: duplicates)
                     library.saveContext()
                  }
@@ -59,7 +60,7 @@ public class DuplicateEntitiesResolver {
                 self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                     defer { self.mainFlowSemaphore.signal() }
                     let library = LibraryStorage(context: context)
-                    let duplicates = library.findDuplicates(for: Album.typeName)
+                    let duplicates = library.findDuplicates(for: Album.typeName).filter{ $0.id != "" }
                     library.resolveAlbumsDuplicates(duplicates: duplicates)
                     library.saveContext()
                  }
@@ -70,7 +71,7 @@ public class DuplicateEntitiesResolver {
                 self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                     defer { self.mainFlowSemaphore.signal() }
                     let library = LibraryStorage(context: context)
-                    let duplicates = library.findDuplicates(for: Song.typeName)
+                    let duplicates = library.findDuplicates(for: Song.typeName).filter{ $0.id != "" }
                     library.resolveSongsDuplicates(duplicates: duplicates)
                     library.saveContext()
                  }
@@ -81,7 +82,7 @@ public class DuplicateEntitiesResolver {
                 self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                     defer { self.mainFlowSemaphore.signal() }
                     let library = LibraryStorage(context: context)
-                    let duplicates = library.findDuplicates(for: PodcastEpisode.typeName)
+                    let duplicates = library.findDuplicates(for: PodcastEpisode.typeName).filter{ $0.id != "" }
                     library.resolvePodcastEpisodesDuplicates(duplicates: duplicates)
                     library.saveContext()
                  }
@@ -92,7 +93,7 @@ public class DuplicateEntitiesResolver {
                 self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
                     defer { self.mainFlowSemaphore.signal() }
                     let library = LibraryStorage(context: context)
-                    let duplicates = library.findDuplicates(for: Podcast.typeName)
+                    let duplicates = library.findDuplicates(for: Podcast.typeName).filter{ $0.id != "" }
                     library.resolvePodcastsDuplicates(duplicates: duplicates)
                     library.saveContext()
                  }
