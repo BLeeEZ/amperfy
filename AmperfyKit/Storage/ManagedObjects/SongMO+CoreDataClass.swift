@@ -25,9 +25,9 @@ extension SongMO: CoreDataIdentifyable {
     static var trackNumberSortedFetchRequest: NSFetchRequest<SongMO> {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "disk", ascending: true, selector: #selector(NSString.caseInsensitiveCompare)),
+            NSSortDescriptor(key: "disk", ascending: true, selector: #selector(NSString.localizedStandardCompare)),
             NSSortDescriptor(key: "track", ascending: true),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
         ]
         return fetchRequest
     }
@@ -36,8 +36,8 @@ extension SongMO: CoreDataIdentifyable {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(SongMO.rating), ascending: false),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)),
-            NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
         ]
         return fetchRequest
     }

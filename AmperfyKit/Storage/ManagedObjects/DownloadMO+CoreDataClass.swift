@@ -12,7 +12,7 @@ extension DownloadMO {
         let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(DownloadMO.creationDate), ascending: true),
-            NSSortDescriptor(key: #keyPath(DownloadMO.id), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: #keyPath(DownloadMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
         ]
         return fetchRequest
     }

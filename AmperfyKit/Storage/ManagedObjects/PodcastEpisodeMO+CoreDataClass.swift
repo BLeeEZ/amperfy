@@ -16,7 +16,7 @@ extension PodcastEpisodeMO: CoreDataIdentifyable {
         let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(PodcastEpisodeMO.publishDate), ascending: false),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
         ]
         return fetchRequest
     }

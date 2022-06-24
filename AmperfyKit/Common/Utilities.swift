@@ -345,10 +345,10 @@ extension Array where Element: Equatable {
 
 extension Array where Element == String {
     public func sortAlphabeticallyAscending() -> [String] {
-        return self.sorted{ $0.localizedCaseInsensitiveCompare($1) == ComparisonResult.orderedAscending }
+        return self.sorted{ $0.localizedStandardCompare($1) == ComparisonResult.orderedAscending }
     }
     public func sortAlphabeticallyDescending() -> [String] {
-        return self.sorted{ $0.localizedCaseInsensitiveCompare($1) == ComparisonResult.orderedDescending }
+        return self.sorted{ $0.localizedStandardCompare($1) == ComparisonResult.orderedDescending }
     }
 }
 

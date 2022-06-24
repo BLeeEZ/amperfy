@@ -17,8 +17,8 @@ public final class PlaylistMO: NSManagedObject {
         let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(PlaylistMO.lastPlayedDate), ascending: false),
-            NSSortDescriptor(key: #keyPath(PlaylistMO.name), ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)),
-            NSSortDescriptor(key: #keyPath(PlaylistMO.id), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: #keyPath(PlaylistMO.name), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(PlaylistMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
         ]
         return fetchRequest
     }
@@ -27,8 +27,8 @@ public final class PlaylistMO: NSManagedObject {
         let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(PlaylistMO.changeDate), ascending: false),
-            NSSortDescriptor(key: #keyPath(PlaylistMO.name), ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)),
-            NSSortDescriptor(key: #keyPath(PlaylistMO.id), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            NSSortDescriptor(key: #keyPath(PlaylistMO.name), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(PlaylistMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
         ]
         return fetchRequest
     }
