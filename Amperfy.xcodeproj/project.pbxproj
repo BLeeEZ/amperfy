@@ -49,6 +49,7 @@
 		506007242625E8BD00F9891D /* MarqueeLabel.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 505468712625C47D008005EC /* MarqueeLabel.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */; };
 		506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */; };
+		50722747286794FC00910574 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50722746286794FC00910574 /* MainWindow.swift */; };
 		507361E02632BA3B005F151D /* GenresVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507361DF2632BA3B005F151D /* GenresVC.swift */; };
 		5077F936221E6D0E0099CA91 /* DownloadsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F935221E6D0E0099CA91 /* DownloadsVC.swift */; };
 		5077F93E222489510099CA91 /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F93D222489510099CA91 /* SettingsVC.swift */; };
@@ -584,6 +585,7 @@
 		506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v2.xcdatamodel"; sourceTree = "<group>"; };
 		506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsServerVC.swift; sourceTree = "<group>"; };
 		506B7AF225DD0243006CD6F9 /* SettingsLibraryVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLibraryVC.swift; sourceTree = "<group>"; };
+		50722746286794FC00910574 /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		507361C72632AB08005F151D /* GenreParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreParserDelegate.swift; sourceTree = "<group>"; };
 		507361CB2632AB91005F151D /* Genre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Genre.swift; sourceTree = "<group>"; };
 		507361DF2632BA3B005F151D /* GenresVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenresVC.swift; sourceTree = "<group>"; };
@@ -1258,6 +1260,7 @@
 				43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */,
 				508385EB21C5965B00C4BB32 /* Main.storyboard */,
 				508FDE4B21F58AFC005A0724 /* AppStoryboard.swift */,
+				50722746286794FC00910574 /* MainWindow.swift */,
 				5009863A2208CB170057A1A6 /* Basics */,
 				50C16C0E21E533E800F086F0 /* View */,
 				50C16C0D21E533B600F086F0 /* ViewController */,
@@ -1833,6 +1836,7 @@
 				50C9D7152850759B007F18D0 /* AnimatedGradientLayer.swift in Sources */,
 				508EBB252850A4270053D9F0 /* MarqueeLabel.swift in Sources */,
 				508FDE3621F1E130005A0724 /* NewPlaylistTableHeader.swift in Sources */,
+				50722747286794FC00910574 /* MainWindow.swift in Sources */,
 				5017996027CCE110002554E5 /* SettingsServerURLsVC.swift in Sources */,
 				50814C9D27D8A8190072738F /* SettingsArtworkDownloadVC.swift in Sources */,
 				50C9D7102850759B007F18D0 /* OptionsButton.swift in Sources */,

@@ -124,7 +124,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         configureNotificationHandling()
         initEventLogger()
         intentManager.registerXCallbackURLs()
-        self.window = UIWindow(frame: UIScreen.main.bounds)
+        self.window = MainWindow(frame: UIScreen.main.bounds)
         
         guard let credentials = persistentStorage.loginCredentials else {
             let initialViewController = LoginVC.instantiateFromAppStoryboard()
