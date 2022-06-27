@@ -1068,7 +1068,10 @@ public class LibraryStorage: PlayableFileCachable {
         let fetchRequest = ArtworkMO.fetchRequest()
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "%K == nil", #keyPath(ArtworkMO.imageData)),
-            NSPredicate(format: "%K == nil", #keyPath(ArtworkMO.download)),
+            NSCompoundPredicate(orPredicateWithSubpredicates: [
+                NSPredicate(format: "%K == nil", #keyPath(ArtworkMO.download)),
+                NSPredicate(format: "%K != nil", #keyPath(ArtworkMO.download.errorDate)),
+            ]),
             NSCompoundPredicate(orPredicateWithSubpredicates: [
                 NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.status), NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue))),
                 NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.status), NSNumber(integerLiteral: Int(ImageStatus.FetchError.rawValue))),

@@ -4,10 +4,11 @@ import AmperfyKit
 
 class SettingsArtworkVC: UITableViewController {
     
+    static let artworkNotCheckedThreshold = 10
+    
     var appDelegate: AppDelegate!
     var timer: Timer?
     
-    @IBOutlet weak var artworksCountLabel: UILabel!
     @IBOutlet weak var artworkNotCheckedCountLabel: UILabel!
     @IBOutlet weak var cachedArtworksCountLabel: UILabel!
 
@@ -30,16 +31,11 @@ class SettingsArtworkVC: UITableViewController {
         appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
             let library = LibraryStorage(context: context)
 
-            let artworkCount = library.artworkCount
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.artworksCountLabel.text = String(artworkCount)
-            }
-
             let artworkNotCheckedCount = library.artworkNotCheckedCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.artworkNotCheckedCountLabel.text = String(artworkNotCheckedCount)
+                let artworkNotCheckedDisplayCount = artworkNotCheckedCount > Self.artworkNotCheckedThreshold ? artworkNotCheckedCount : 0
+                self.artworkNotCheckedCountLabel.text = String(artworkNotCheckedDisplayCount)
             }
             let cachedArtworkCount = library.cachedArtworkCount
             DispatchQueue.main.async { [weak self] in
