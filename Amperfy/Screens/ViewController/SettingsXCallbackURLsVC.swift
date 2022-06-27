@@ -12,13 +12,22 @@ class SettingsXCallbackURLsVC: UIViewController {
         """
 
     @IBOutlet weak var docuTextView: UITextView!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.license)
-        
-        let docuRaw = Self.htmlDisplayContentStart + docuHeader + appDelegate.intentManager.documentation.map( {self.createHtmlString(actionDocu: $0)}
+        updateView()
+    }
+
+    // handle dark/light mode change
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateView()
+    }
+    
+    func updateView() {
+        let docuRaw = Self.htmlDisplayContentStart(userInterfaceStyle: traitCollection.userInterfaceStyle) + docuHeader + appDelegate.intentManager.documentation.map( {self.createHtmlString(actionDocu: $0)}
         ).joined() + Self.htmlDisplayContentEnd
         let docuHtml = NSString(string: docuRaw).data(using: String.Encoding.utf8.rawValue)
         let options = [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html]

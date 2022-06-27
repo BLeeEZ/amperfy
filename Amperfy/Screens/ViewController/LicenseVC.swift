@@ -2,17 +2,11 @@ import Foundation
 import UIKit
 
 extension UIViewController {
-    public static let htmlDisplayContentStart = """
-         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-         <html xmlns="http://www.w3.org/1999/xhtml">
-         <head>
-         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-         <title>Licenses</title>
-
+    
+    public static func getHtmlCSS(userInterfaceStyle: UIUserInterfaceStyle) -> String {
+        let fontColor = userInterfaceStyle == .dark ? "#FFF" : "#000"
+        
+        return """
          <style type="text/css">
          body {
              font-family: Helvetica, Arial, sans-serif;
@@ -24,39 +18,55 @@ extension UIViewController {
 
          h1 {
              font-size: 14px;
-             color: #888;
+             color: \(fontColor);
              line-height: 1.3em;
          }
 
          h2 {
              font-size: 13px;
-             color: #888;
+             color: \(fontColor);
          }
 
          h3 {
              font-size: 13px;
-             color: #888;
+             color: \(fontColor);
              line-height: 2.6em;
          }
     
          h4 {
              font-size: 12px;
-             color: #888;
+             color: \(fontColor);
          }
     
          h5 {
              font-size: 12px;
-             color: #888;
+             color: \(fontColor);
          }
 
          p, ul, li {
-             color: #888;
+             color: \(fontColor);
          }
          </style>
+    """
+    }
+    
+    public static func htmlDisplayContentStart(userInterfaceStyle: UIUserInterfaceStyle) -> String {
+        return  """
+         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+         <html xmlns="http://www.w3.org/1999/xhtml">
+         <head>
+         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+         <title>Licenses</title>
+         \(getHtmlCSS(userInterfaceStyle: userInterfaceStyle))
          </head>
 
          <body>
     """
+    }
     
     public static let htmlDisplayContentEnd = """
          </body>
@@ -307,16 +317,26 @@ class LicenseVC: UIViewController {
 
     @IBOutlet weak var licenseTextView: UITextView!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        appDelegate.userStatistics.visited(.license)
-        
-        let licenseRaw = Self.htmlDisplayContentStart + license + Self.htmlDisplayContentEnd
+    func updateView() {
+        let licenseRaw = Self.htmlDisplayContentStart(userInterfaceStyle: traitCollection.userInterfaceStyle) + license + Self.htmlDisplayContentEnd
         let licenseHtml = NSString(string: licenseRaw).data(using: String.Encoding.utf8.rawValue)
         let options = [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html]
         let licenseAttributedString = try! NSAttributedString(data: licenseHtml!, options: options, documentAttributes: nil)
         licenseTextView.attributedText = licenseAttributedString
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        appDelegate.userStatistics.visited(.license)
+
+        updateView()
+    }
+    
+    // handle dark/light mode change
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateView()
     }
     
 }
