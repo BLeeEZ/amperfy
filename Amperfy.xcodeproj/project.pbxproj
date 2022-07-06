@@ -64,7 +64,6 @@
 		508EBB322850C9460053D9F0 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508EBB312850C9460053D9F0 /* IntentHandler.swift */; };
 		508EBB462850C9460053D9F0 /* AmperfyIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 508EBB2E2850C9460053D9F0 /* AmperfyIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		508EBB4D2850C9BA0053D9F0 /* AmperfyKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */; platformFilter = ios; };
-		508EBB4E2850C9BA0053D9F0 /* AmperfyKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		508EBB532850CB2B0053D9F0 /* Intents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 50253F7A284A566700BCCFB2 /* Intents.intentdefinition */; settings = {ATTRIBUTES = (no_codegen, ); }; };
 		508EBB562850CB2D0053D9F0 /* Intents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 50253F7A284A566700BCCFB2 /* Intents.intentdefinition */; settings = {ATTRIBUTES = (no_codegen, ); }; };
 		508EBB582850CB2E0053D9F0 /* Intents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 50253F7A284A566700BCCFB2 /* Intents.intentdefinition */; settings = {ATTRIBUTES = (no_codegen, ); }; };
@@ -446,17 +445,6 @@
 				5054689D2625CD95008005EC /* LNPopupController.xcframework in Embed Frameworks */,
 				50C9D61B284FA847007F18D0 /* AmperfyKit.framework in Embed Frameworks */,
 				506007242625E8BD00F9891D /* MarqueeLabel.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		508EBB512850C9BA0053D9F0 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				508EBB4E2850C9BA0053D9F0 /* AmperfyKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1589,7 +1577,6 @@
 				508EBB2A2850C9460053D9F0 /* Sources */,
 				508EBB2B2850C9460053D9F0 /* Frameworks */,
 				508EBB2C2850C9460053D9F0 /* Resources */,
-				508EBB512850C9BA0053D9F0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
