@@ -336,7 +336,9 @@ class LicenseVC: UIViewController {
     // handle dark/light mode change
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        updateView()
+        DispatchQueue.main.async {
+            self.updateView()
+        }
     }
     
 }
