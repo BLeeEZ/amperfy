@@ -153,8 +153,9 @@ extension Array {
     }
     
     /// Picks `n` random elements (partial Fisher-Yates shuffle approach)
-    public subscript (randomPick n: Int) -> [Element] {
+    public subscript (randomPick pickCount: Int) -> [Element] {
         var copy = self
+        let n = Swift.min(pickCount, count)
         for i in stride(from: count - 1, to: count - n - 1, by: -1) {
             copy.swapAt(i, Int(arc4random_uniform(UInt32(i + 1))))
         }

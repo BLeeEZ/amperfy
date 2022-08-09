@@ -5,6 +5,7 @@ import AmperfyKit
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     static let maxPlayAllSongsCount = 2000
+    static let maxPlayRandomSongsCount = 500
 
     private var fetchedResultsController: SongsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
@@ -52,11 +53,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateFilterButton()
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            navigationItem.rightBarButtonItems = [optionsButton, filterButton, sortButton]
-        } else {
-            navigationItem.rightBarButtonItems = [filterButton, sortButton]
-        }
+        navigationItem.rightBarButtonItems = [optionsButton, filterButton, sortButton]
     }
 
     func updateFilterButton() {
@@ -217,24 +214,10 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                 self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: displayedSongs))
             }
         }))
-        if self.appDelegate.persistentStorage.settings.isOnlineMode {
-            alert.addAction(UIAlertAction(title: "Play random songs", style: .default, handler: { _ in
-                self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                    let syncLibrary = LibraryStorage(context: context)
-                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                    let randomSongsPlaylist = syncLibrary.createPlaylist()
-                    syncer.requestRandomSongs(playlist: randomSongsPlaylist, count: 100, library: syncLibrary)
-                    DispatchQueue.main.async {
-                        let playlistMain = randomSongsPlaylist.getManagedObject(in: self.appDelegate.persistentStorage.context, library: self.appDelegate.library)
-                        self.appDelegate.player.clearContextQueue()
-                        self.appDelegate.player.appendContextQueue(playables: playlistMain.playables)
-                        self.appDelegate.player.play()
-                        self.appDelegate.library.deletePlaylist(playlistMain)
-                        self.appDelegate.library.saveContext()
-                    }
-                }
-            }))
-        }
+        alert.addAction(UIAlertAction(title: "Play random songs", style: .default, handler: { _ in
+            let songs = self.appDelegate.library.getSongs().filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode)
+            self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: songs[randomPick: Self.maxPlayRandomSongsCount]))
+        }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
