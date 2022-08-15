@@ -68,6 +68,17 @@ public class LocalNotificationManager {
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         notify(request: request)
     }
+    
+    /// Must be called from main thread
+    public func notifyDebug(title: String, body: String) {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: Self.notificationTimeInterval, repeats: false)
+        let request = UNNotificationRequest(identifier: String.generateRandomString(ofLength: 15), content: content, trigger: trigger)
+        notify(request: request)
+    }
 
     public func listPendingNotifications() {
         UNUserNotificationCenter.current().getPendingNotificationRequests { notifications in

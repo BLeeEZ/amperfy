@@ -51,7 +51,7 @@ extension UIView {
     }
     
     func forceTouchCapability() -> UIForceTouchCapability {
-        return UIApplication.shared.keyWindow?.rootViewController?.traitCollection.forceTouchCapability ?? .unknown
+        return UIApplication.shared.mainWindow?.rootViewController?.traitCollection.forceTouchCapability ?? .unknown
     }
     
     public func setBackgroundBlur(style: UIBlurEffect.Style, backupBackgroundColor: UIColor = .backgroundColor) {
@@ -90,5 +90,11 @@ extension UITableViewController {
 extension UIViewController {
     var typeName: String {
         return Self.typeName
+    }
+}
+
+extension UIApplication {
+    var mainWindow: UIWindow? {
+        return windows.first(where: \.isKeyWindow)
     }
 }

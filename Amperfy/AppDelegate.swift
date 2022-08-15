@@ -1,5 +1,6 @@
 import UIKit
 import MediaPlayer
+import BackgroundTasks
 import os.log
 import AmperfyKit
 
@@ -13,6 +14,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static var buildNumber: String {
         return (Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String) ?? ""
     }
+    /// Task IDs need to be added to the array in Info.list under: <key>BGTaskSchedulerPermittedIdentifiers</key>
+    static let refreshTaskId = "de.familie-zimba.Amperfy.RefreshTask"
     
     var window: UIWindow?
     
@@ -88,7 +91,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func configureBackgroundFetch() {
-        UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: Self.refreshTaskId, using: nil) { task in
+            os_log("Perform task: %s", log: self.log, type: .info, Self.refreshTaskId)
+            self.backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes() { fetchResult in
+                self.userStatistics.backgroundFetchPerformed(result: fetchResult)
+                task.setTaskCompleted(success: true)
+                self.scheduleAppRefresh()
+            }
+        }
+    }
+    
+    func scheduleAppRefresh() {
+        let request = BGAppRefreshTaskRequest(identifier: Self.refreshTaskId)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 45 * 60) // Refresh after 45 minutes.
+        do {
+            // Submit only succeeds on real devices. On simulator it will always throw an error.
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            os_log("Could not schedule app refresh task (%s) with error: %s", log: self.log, type: .error, Self.refreshTaskId, error.localizedDescription)
+        }
     }
     
     func initEventLogger() {
@@ -151,7 +172,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         carPlayHandler.initialize()
         let initialViewController = TabBarVC.instantiateFromAppStoryboard()
         self.window?.rootViewController = initialViewController
-        self.window?.makeKeyAndVisible()        
+        self.window?.makeKeyAndVisible()
         return true
     }
 
@@ -165,6 +186,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         os_log("applicationDidEnterBackground", log: self.log, type: .info)
+        self.scheduleAppRefresh()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -182,14 +204,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         os_log("applicationWillTerminate", log: self.log, type: .info)
         backgroundLibrarySyncer.stopAndWait()
         library.saveContext()
-    }
-    
-    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        os_log("performFetchWithCompletionHandler", log: self.log, type: .info)
-        backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes() { fetchResult in
-            self.userStatistics.backgroundFetchPerformed(result: fetchResult)
-            completionHandler(fetchResult)
-        }
     }
     
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {

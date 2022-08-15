@@ -15,5 +15,4 @@ FOUNDATION_EXPORT double AmperfyKitVersionNumber;
 FOUNDATION_EXPORT const unsigned char AmperfyKitVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <AmpertyKit/PublicHeader.h>
-#import <CommonCrypto/CommonHMAC.h>
 

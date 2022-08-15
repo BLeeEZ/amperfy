@@ -374,6 +374,7 @@
 		50CDF20E264BEF5500F83EF6 /* EventLogVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF20D264BEF5500F83EF6 /* EventLogVC.swift */; };
 		50CDF211264BF0FB00F83EF6 /* LogEntryTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF210264BF0FB00F83EF6 /* LogEntryTableCell.swift */; };
 		50CDF212264BF11800F83EF6 /* LogEntryTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50CDF20F264BF0FB00F83EF6 /* LogEntryTableCell.xib */; };
+		50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50CF3CEE28A4F83100263F7C /* CryptoKit.framework */; };
 		50DEEE04265E25A40073FF20 /* MusicFoldersVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE03265E25A40073FF20 /* MusicFoldersVC.swift */; };
 		50DEEE07265E27070073FF20 /* DirectoryTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE05265E27070073FF20 /* DirectoryTableCell.swift */; };
 		50DEEE08265E27300073FF20 /* DirectoryTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50DEEE06265E27070073FF20 /* DirectoryTableCell.xib */; };
@@ -753,6 +754,7 @@
 		50CDF20D264BEF5500F83EF6 /* EventLogVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventLogVC.swift; sourceTree = "<group>"; };
 		50CDF20F264BF0FB00F83EF6 /* LogEntryTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LogEntryTableCell.xib; sourceTree = "<group>"; };
 		50CDF210264BF0FB00F83EF6 /* LogEntryTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntryTableCell.swift; sourceTree = "<group>"; };
+		50CF3CEE28A4F83100263F7C /* CryptoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoKit.framework; path = System/Library/Frameworks/CryptoKit.framework; sourceTree = SDKROOT; };
 		50D92CCA25E3ED700017E91D /* MappingModelV4toV5.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = MappingModelV4toV5.xcmappingmodel; sourceTree = "<group>"; };
 		50D92CCE25E3FE560017E91D /* MigrationPolicyV4toV5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationPolicyV4toV5.swift; sourceTree = "<group>"; };
 		50DB1181266502100033BFFA /* ArtistParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistParserTest.swift; sourceTree = "<group>"; };
@@ -868,6 +870,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */,
 				50BE5DA7285714A200156FC6 /* CallbackURLKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1092,6 +1095,7 @@
 		5091857E23A753C800A8891E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				50CF3CEE28A4F83100263F7C /* CryptoKit.framework */,
 				505468712625C47D008005EC /* MarqueeLabel.xcframework */,
 				5054686C2625C457008005EC /* LNPopupController.xcframework */,
 				50EF2CB3267F65960011C42F /* NotificationBanner.xcframework */,
@@ -2195,7 +2199,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -2251,7 +2255,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -2272,6 +2276,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QD5Q6U7T6N;
 				INFOPLIST_FILE = Amperfy/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2297,6 +2302,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QD5Q6U7T6N;
 				INFOPLIST_FILE = Amperfy/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2323,7 +2329,7 @@
 				INFOPLIST_FILE = AmperfyIntents/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AmperfyIntents;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Maximilian Bauer. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2351,7 +2357,7 @@
 				INFOPLIST_FILE = AmperfyIntents/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AmperfyIntents;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Maximilian Bauer. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2383,7 +2389,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Maximilian Bauer. All rights reserved.";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2419,7 +2425,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Maximilian Bauer. All rights reserved.";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

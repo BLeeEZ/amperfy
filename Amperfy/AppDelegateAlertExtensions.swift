@@ -39,7 +39,7 @@ extension AppDelegate: AlertDisplayable {
         }
         
         banner.show(queuePosition: QueuePosition.back, bannerPosition: BannerPosition.top, on: topView, cornerRadius: 20, shadowBlurRadius: 10)
-        if let keyWindow = UIApplication.shared.keyWindow {
+        if let keyWindow = UIApplication.shared.mainWindow {
             keyWindow.addSubview(banner)
             keyWindow.bringSubviewToFront(banner)
         }
