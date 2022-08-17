@@ -132,9 +132,6 @@ public class AmperKit {
     public lazy var popupDisplaySemaphore = {
         return DispatchSemaphore(value: 1)
     }()
-    public lazy var carPlayHandler = {
-        return CarPlayHandler(persistentStorage: self.persistentStorage, library: self.library, backendApi: self.backendApi, player: self.player, playableContentManager: MPPlayableContentManager.shared())
-    }()
     public lazy var intentManager = {
         return IntentManager(persistentStorage: self.persistentStorage, library: self.library, player: self.player)
     }()

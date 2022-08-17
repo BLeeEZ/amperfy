@@ -74,9 +74,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public lazy var popupDisplaySemaphore = {
         return AmperKit.shared.popupDisplaySemaphore
     }()
-    public lazy var carPlayHandler = {
-        return AmperKit.shared.carPlayHandler
-    }()
     public lazy var intentManager = {
         return AmperKit.shared.intentManager
     }()
@@ -119,19 +116,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func reinit() {
         AmperKit.shared.reinit()
     }
-    
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        os_log("application launch via userActivity: %s", log: self.log, type: .info, userActivity.activityType)
-        return intentManager.handleIncomingIntent(userActivity: userActivity)
-    }
 
-    /// Open the app when opened via URL scheme
-    func application(_ application: UIApplication,
-                     open url: URL,
-                     options: [UIApplication.OpenURLOptionsKey : Any] = [:] ) -> Bool {
-        return intentManager.handleIncoming(url: url)
-    }
-    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if let options = launchOptions {
             os_log("application launch with options:", log: self.log, type: .info)
@@ -148,18 +133,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = MainWindow(frame: UIScreen.main.bounds)
         
         guard let credentials = persistentStorage.loginCredentials else {
-            let initialViewController = LoginVC.instantiateFromAppStoryboard()
-            self.window?.rootViewController = initialViewController
-            self.window?.makeKeyAndVisible()
             return true
         }
         backendProxy.selectedApi = credentials.backendApi
         backendApi.provideCredentials(credentials: credentials)
         
         guard AmperKit.shared.persistentStorage.isLibrarySynced else {
-            let initialViewController = SyncVC.instantiateFromAppStoryboard()
-            self.window?.rootViewController = initialViewController
-            self.window?.makeKeyAndVisible()
             return true
         }
         libraryUpdater.performBlockingLibraryUpdatesIfNeeded()
@@ -169,10 +148,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         backgroundLibrarySyncer.start()
         scrobbleSyncer.start()
         userStatistics.sessionStarted()
-        carPlayHandler.initialize()
-        let initialViewController = TabBarVC.instantiateFromAppStoryboard()
-        self.window?.rootViewController = initialViewController
-        self.window?.makeKeyAndVisible()
         return true
     }
 
@@ -186,7 +161,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         os_log("applicationDidEnterBackground", log: self.log, type: .info)
-        self.scheduleAppRefresh()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -209,6 +183,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
         os_log("handleEventsForBackgroundURLSession: %s", log: self.log, type: .info, identifier)
         playableDownloadManager.backgroundFetchCompletionHandler = completionHandler
+    }
+    
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        guard connectingSceneSession.role != .carTemplateApplication else {
+            let config = UISceneConfiguration(name: "CarPlay Configuration", sessionRole: .carTemplateApplication)
+            config.delegateClass = CarPlaySceneDelegate.self
+            return config
+        }
+        let config = UISceneConfiguration(name: "Default Configuration", sessionRole: .windowApplication)
+        config.delegateClass = SceneDelegate.self
+        return config
+    }
+
+    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
+        os_log("didDiscardSceneSessions", log: self.log, type: .info)
     }
     
 }

@@ -98,3 +98,41 @@ extension UIApplication {
         return windows.first(where: \.isKeyWindow)
     }
 }
+
+extension UIImage {
+    private static func createEmptyImage(with size: CGSize) -> UIImage?
+    {
+        UIGraphicsBeginImageContext(size)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
+    }
+    
+    static func numberToImage(number: Int) -> UIImage {
+        let fontSize = 40.0
+        let textFont = UIFont(name: "Helvetica Bold", size: fontSize)!
+
+        let image = createEmptyImage(with: CGSize(width: 100.0, height: 100.0)) ?? UIImage()
+        let scale = UIScreen.main.scale
+        UIGraphicsBeginImageContextWithOptions(image.size, false, scale)
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        
+        let textFontAttributes = [
+            NSAttributedString.Key.font: textFont,
+            NSAttributedString.Key.paragraphStyle: paragraphStyle,
+            NSAttributedString.Key.foregroundColor: UIColor.lightGray,
+        ] as [NSAttributedString.Key : Any]
+        image.draw(in: CGRect(origin: CGPoint.zero, size: image.size))
+
+        let textPoint = CGPoint(x: 0.0, y: 50.0-(fontSize/2))
+        let rect = CGRect(origin: textPoint, size: image.size)
+        number.description.draw(in: rect, withAttributes: textFontAttributes)
+
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage!
+    }
+}

@@ -45,6 +45,8 @@
 		5055AA5B268365DD00096B8D /* SnapKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50EF2CB1267F658B0011C42F /* SnapKit.xcframework */; };
 		5055AA5C268365DD00096B8D /* SnapKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 50EF2CB1267F658B0011C42F /* SnapKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */; };
+		5059A31C28A9ED680068E4D2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5059A31B28A9ED680068E4D2 /* SceneDelegate.swift */; };
+		5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5059A31D28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift */; };
 		506007232625E8BD00F9891D /* MarqueeLabel.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 505468712625C47D008005EC /* MarqueeLabel.xcframework */; };
 		506007242625E8BD00F9891D /* MarqueeLabel.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 505468712625C47D008005EC /* MarqueeLabel.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		506B7AEF25DCF5ED006CD6F9 /* SettingsServerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506B7AEE25DCF5ED006CD6F9 /* SettingsServerVC.swift */; };
@@ -354,7 +356,6 @@
 		50C9D6EB284FAD51007F18D0 /* PodcastsShowType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6EA284FAD51007F18D0 /* PodcastsShowType.swift */; };
 		50C9D6ED284FADB8007F18D0 /* PlayerDisplayStyleType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6EC284FADB8007F18D0 /* PlayerDisplayStyleType.swift */; };
 		50C9D6F028506EBC007F18D0 /* AmperfyKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6EF28506EBC007F18D0 /* AmperfyKit.swift */; };
-		50C9D6F128507186007F18D0 /* AppDelegateCarPlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ACAF1527B283940039913C /* AppDelegateCarPlay.swift */; };
 		50C9D70628507573007F18D0 /* ClockTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C2321E7A3AC00F086F0 /* ClockTime.swift */; };
 		50C9D7082850759B007F18D0 /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5002565625E69DC700674CE1 /* SpinnerViewController.swift */; };
 		50C9D7092850759B007F18D0 /* PlaytimeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F95022279DF40099CA91 /* PlaytimeSlider.swift */; };
@@ -561,6 +562,8 @@
 		5055AA5626835A9000096B8D /* PodcastEpisodeTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastEpisodeTableCell.swift; sourceTree = "<group>"; };
 		5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupPlayerVC.swift; sourceTree = "<group>"; };
 		505905BB261D980C007C34CB /* PlayableContainable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayableContainable.swift; sourceTree = "<group>"; };
+		5059A31B28A9ED680068E4D2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		5059A31D28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlaySceneDelegate.swift; sourceTree = "<group>"; };
 		505A45F3268B53D30031B08B /* MappingModelV10toV11.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = MappingModelV10toV11.xcmappingmodel; sourceTree = "<group>"; };
 		505AD8712615B4D8001319B6 /* Amperfy v7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v7.xcdatamodel"; sourceTree = "<group>"; };
 		505AD87A2615C834001319B6 /* GenreMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenreMO+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -689,7 +692,6 @@
 		50ACAF0E27B112A10039913C /* SwipeActionTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SwipeActionTableCell.xib; sourceTree = "<group>"; };
 		50ACAF1127B144040039913C /* SwipeActionSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActionSettings.swift; sourceTree = "<group>"; };
 		50ACAF1327B277B50039913C /* Entitlements.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
-		50ACAF1527B283940039913C /* AppDelegateCarPlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateCarPlay.swift; sourceTree = "<group>"; };
 		50ADCD472660E70D007FE3BD /* SettingsPlayerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPlayerVC.swift; sourceTree = "<group>"; };
 		50AFA1472632E83100F198DD /* GenericDetailTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericDetailTableHeader.swift; sourceTree = "<group>"; };
 		50AFA1482632E83100F198DD /* GenericDetailTableHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericDetailTableHeader.xib; sourceTree = "<group>"; };
@@ -971,7 +973,6 @@
 			isa = PBXGroup;
 			children = (
 				50BA92FD21CED4AF00E5901D /* Utilities.swift */,
-				50ACAF1527B283940039913C /* AppDelegateCarPlay.swift */,
 				50F8CA2C21FAD5400084F8D8 /* Reachabilty.swift */,
 				5086F87822397B2900546F5A /* StringHasher.swift */,
 				5029288826564F3600DA3A8F /* JSONConverter.swift */,
@@ -1011,6 +1012,8 @@
 			isa = PBXGroup;
 			children = (
 				508385E721C5965B00C4BB32 /* AppDelegate.swift */,
+				5059A31B28A9ED680068E4D2 /* SceneDelegate.swift */,
+				5059A31D28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift */,
 				509001B72716C8F400A8056D /* AppDelegateNotificationExtensions.swift */,
 				509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */,
 				50C9D716285075E3007F18D0 /* UtilitiesExtensions.swift */,
@@ -1794,6 +1797,7 @@
 				50DEEE04265E25A40073FF20 /* MusicFoldersVC.swift in Sources */,
 				50DEEE0A265E392C0073FF20 /* IndexesVC.swift in Sources */,
 				50ACAF0C27B10E270039913C /* SettingsSwipeVC.swift in Sources */,
+				5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */,
 				500B7D4721EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift in Sources */,
 				509001B82716C8F400A8056D /* AppDelegateNotificationExtensions.swift in Sources */,
 				506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */,
@@ -1808,6 +1812,7 @@
 				50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */,
 				501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */,
 				5077F93E222489510099CA91 /* SettingsVC.swift in Sources */,
+				5059A31C28A9ED680068E4D2 /* SceneDelegate.swift in Sources */,
 				508FDE5021F64ED6005A0724 /* TabBarVC.swift in Sources */,
 				50C16C2821E8680A00F086F0 /* CommonScreenOperations.swift in Sources */,
 				5000C1FD2799B00F00DD73BB /* AlbumSongTableCell.swift in Sources */,
@@ -2010,7 +2015,6 @@
 				50C9D6E6284FABCB007F18D0 /* AudioPlayer.swift in Sources */,
 				50C9D695284FAA6C007F18D0 /* PlayableFileMO+CoreDataClass.swift in Sources */,
 				50C9D659284FAA0B007F18D0 /* SongParserDelegate.swift in Sources */,
-				50C9D6F128507186007F18D0 /* AppDelegateCarPlay.swift in Sources */,
 				50C9D688284FAA6C007F18D0 /* SongMO+CoreDataClass.swift in Sources */,
 				50C9D67D284FAA6C007F18D0 /* AbstractPlayableMO+CoreDataProperties.swift in Sources */,
 				50C9D668284FAA0B007F18D0 /* AmpacheApi.swift in Sources */,
@@ -2199,7 +2203,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -2255,7 +2259,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -2276,7 +2280,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QD5Q6U7T6N;
 				INFOPLIST_FILE = Amperfy/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2302,7 +2306,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QD5Q6U7T6N;
 				INFOPLIST_FILE = Amperfy/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2329,7 +2333,7 @@
 				INFOPLIST_FILE = AmperfyIntents/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AmperfyIntents;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Maximilian Bauer. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2357,7 +2361,7 @@
 				INFOPLIST_FILE = AmperfyIntents/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AmperfyIntents;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Maximilian Bauer. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2389,7 +2393,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Maximilian Bauer. All rights reserved.";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2425,7 +2429,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Maximilian Bauer. All rights reserved.";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

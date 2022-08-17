@@ -35,6 +35,7 @@ extension UIImage {
     public static var playlistArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, switchColors: true) }()
     public static var playlistCarplay: UIImage = { return UIImage.create("playlist_carplay") }()
     public static var playlistBlack: UIImage = { return UIImage.create("playlist") }()
+    public static var musicLibrary: UIImage = { return UIImage.create("music_library") }()
     public static var musicalNotes: UIImage = { return UIImage.create("musical_notes_svg") }()
     public static var musicalNotesCarplay: UIImage = { return UIImage.create("musical_notes_carplay") }()
     
@@ -68,7 +69,7 @@ extension UIImage {
         return UIImage(named: named) ?? UIImage()
     }
     
-    private static func createArtwork(with image: UIImage, iconSizeType: ArtworkIconSizeType, switchColors: Bool = false) -> UIImage {
+    public static func createArtwork(with image: UIImage, iconSizeType: ArtworkIconSizeType, switchColors: Bool = false) -> UIImage {
         let frame = CGRect(x: 0, y: 0, width: ArtworkIconSizeType.defaultSize, height: ArtworkIconSizeType.defaultSize)
         let buildView = EntityImageView(frame: frame)
         let grayScale = 0.92
