@@ -25,7 +25,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         tableView.rowHeight = PlaylistTableCell.rowHeight
         
         optionsButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(optionsPressed))
-        navigationItem.rightBarButtonItem = optionsButton
+        navigationItem.rightBarButtonItems = [optionsButton, editButtonItem]
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in

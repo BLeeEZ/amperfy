@@ -21,7 +21,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         tableView.rowHeight = SongTableCell.rowHeight
         
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(startEditing))
-        doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(endEditing))
+        doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(endEditing))
         optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
         
         let playlistTableHeaderFrameHeight = PlaylistDetailTableHeader.frameHeight
