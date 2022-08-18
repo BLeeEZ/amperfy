@@ -1,9 +1,9 @@
 //
-//  ArtworkMO+CoreDataClass.swift
-//  AmperfyKit
+//  THEFILENAME
+//  THEMODULENAME
 //
-//  Created by Maximilian Bauer on 01.01.20.
-//  Copyright (c) 2020 Maximilian Bauer. All rights reserved.
+//  Created by Maximilian Bauer on THEDATE.
+//  Copyright (c) THEYEAR Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,10 +19,3 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
-import CoreData
-
-@objc(ArtworkMO)
-public class ArtworkMO: NSManagedObject {
-
-}
