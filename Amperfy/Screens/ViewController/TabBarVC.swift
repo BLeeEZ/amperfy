@@ -20,24 +20,24 @@ class TabBarVC: UITabBarController {
         super.viewDidAppear(animated)
         self.popupPlayer = PopupPlayerVC.instantiateFromAppStoryboard()
         popupPlayer?.hostingTabBarVC = self
-        displayPopupBar()
         self.popupBar.tintColor = UIColor.defaultBlue
         self.popupBar.imageView.layer.cornerRadius = 5
         self.popupBar.progressViewStyle = .bottom
         self.popupBar.barStyle = .compact
-        self.popupBar.marqueeScrollEnabled = true
+        self.popupBar.standardAppearance.marqueeScrollEnabled = true
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = .center
         paragraph.firstLineHeadIndent = 40.0
-        self.popupBar.titleTextAttributes = [
+        self.popupBar.standardAppearance.titleTextAttributes = [
             NSAttributedString.Key.paragraphStyle: paragraph
         ]
-        self.popupBar.subtitleTextAttributes = [
+        self.popupBar.standardAppearance.subtitleTextAttributes = [
             NSAttributedString.Key.foregroundColor: UIColor.defaultBlue,
             NSAttributedString.Key.paragraphStyle: paragraph
         ]
         self.popupContentView.popupCloseButtonStyle = .chevron
         self.popupInteractionStyle = .snap
+        displayPopupBar()
         
         if !appDelegate.persistentStorage.isLibrarySyncInfoReadByUser {
             displaySyncInfo()
