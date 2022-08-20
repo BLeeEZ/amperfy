@@ -45,7 +45,7 @@ public class Artist: AbstractLibraryEntity {
         for songMO in songsMO {
           returnSongs.append(Song(managedObject: songMO))
         }
-        return returnSongs
+        return returnSongs.sortByAlbum()
     }
     public var playables: [AbstractPlayable] { return songs }
     

@@ -52,8 +52,11 @@ class ArtistDetailVC: BasicTableViewController {
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
-                playContextCb: {() in PlayContext(containable: self.artist, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
-                with: appDelegate.player)
+                playContextCb: {() in
+                    PlayContext(containable: self.artist, playables: self.artist.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                },
+                with: appDelegate.player
+            )
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         
