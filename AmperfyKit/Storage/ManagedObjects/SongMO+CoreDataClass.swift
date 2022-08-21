@@ -34,6 +34,7 @@ extension SongMO: CoreDataIdentifyable {
     }
     
     static var excludeServerDeleteUncachedSongsFetchPredicate: NSPredicate {
+        // see also Song Array extension [Song].filterServerDeleteUncachedSongs()
         return NSCompoundPredicate(orPredicateWithSubpredicates: [
             NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSPredicate(format: "%K > 0", #keyPath(SongMO.size)),

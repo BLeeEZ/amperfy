@@ -126,6 +126,11 @@ public class Song: AbstractPlayable, Identifyable {
 
 extension Array where Element: Song {
     
+    public func filterServerDeleteUncachedSongs() -> [Element] {
+        // See also SongMO.excludeServerDeleteUncachedSongsFetchPredicate()
+        return self.filter{ (($0.size > 0) && ($0.album?.remoteStatus == .available)) || ($0.isCached) }
+    }
+    
     public func filterCached() -> [Element] {
         return self.filter{ $0.isCached }
     }
@@ -148,6 +153,8 @@ extension Array where Element: Song {
                 return $0.album?.year ?? 0 < $1.album?.year ?? 0
             } else if $0.album?.id != $1.album?.id {
                 return $0.album?.id ?? "" < $1.album?.id ?? ""
+            } else if $0.disk != $1.disk {
+                return $0.disk ?? "" < $1.disk ?? ""
             } else if $0.track != $1.track {
                 return $0.track < $1.track
             } else if $0.title != $1.title {

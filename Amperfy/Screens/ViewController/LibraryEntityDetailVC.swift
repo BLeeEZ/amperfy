@@ -115,7 +115,13 @@ class LibraryEntityDetailVC: UIViewController {
     private var entityContainer: PlayableContainable!
 
     private var entityPlayables: [AbstractPlayable] {
-        return entityContainer?.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode) ?? [AbstractPlayable]()
+        let playables = entityContainer?.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode) ?? [AbstractPlayable]()
+        switch(entityContainer.playContextType) {
+        case .music:
+            return playables.compactMap{ $0.asSong }.filterServerDeleteUncachedSongs()
+        case .podcast:
+            return playables
+        }
     }
     
     override func viewDidLoad() {

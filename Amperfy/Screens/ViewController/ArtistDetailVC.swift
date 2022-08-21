@@ -53,7 +53,9 @@ class ArtistDetailVC: BasicTableViewController {
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
                 playContextCb: {() in
-                    PlayContext(containable: self.artist, playables: self.artist.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? []
+                    let sortedSongs = songs.compactMap{ $0.asSong }.sortByAlbum()
+                    return PlayContext(containable: self.artist, playables: sortedSongs)
                 },
                 with: appDelegate.player
             )
