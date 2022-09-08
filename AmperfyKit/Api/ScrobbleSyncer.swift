@@ -21,20 +21,25 @@
 
 import Foundation
 import os.log
+import PromiseKit
 
 public class ScrobbleSyncer {
     
     private let log = OSLog(subsystem: "Amperfy", category: "ScrobbleSyncer")
     private let persistentStorage: PersistentStorage
+    private let library: LibraryStorage
     private let backendApi: BackendApi
+    private let eventLogger: EventLogger
     private let activeDispatchGroup = DispatchGroup()
     private let uploadSemaphore = DispatchSemaphore(value: 1)
     private var isRunning = false
     private var isActive = false
     
-    init(persistentStorage: PersistentStorage, backendApi: BackendApi) {
+    init(persistentStorage: PersistentStorage, backendApi: BackendApi, eventLogger: EventLogger) {
         self.persistentStorage = persistentStorage
+        self.library = LibraryStorage(context: self.persistentStorage.context)
         self.backendApi = backendApi
+        self.eventLogger = eventLogger
     }
     
     public func start() {
@@ -70,18 +75,26 @@ public class ScrobbleSyncer {
             
             while self.isRunning, self.persistentStorage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
                 self.uploadSemaphore.wait()
-                self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                    defer { self.uploadSemaphore.signal() }
-                    let library = LibraryStorage(context: context)
-                    let scobbleEntry = library.getFirstUploadableScrobbleEntry()
-                    defer { scobbleEntry?.isUploaded = true; library.saveContext() }
-                    guard let entry = scobbleEntry, let song = entry.playable?.asSong, let date = entry.date else {
+                firstly {
+                    self.getNextScrobbleEntry()
+                }.then { scobbleEntry -> Promise<Void> in
+                    guard let entry = scobbleEntry else {
                         self.isRunning = false
-                        return
+                        return Promise.value
                     }
-                    let syncer = self.backendApi.createLibrarySyncer()
-                    syncer.scrobble(song: song, date: date)
-                 }
+                    defer {
+                        entry.isUploaded = true;
+                        self.library.saveContext()
+                    }
+                    guard let song = entry.playable?.asSong, let date = entry.date else {
+                        return Promise.value
+                    }
+                    return self.backendApi.createLibrarySyncer().scrobble(song: song, date: date)
+                }.catch { error in
+                    self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
+                }.finally {
+                    self.uploadSemaphore.signal()
+                }
             }
             
             os_log("stopped", log: self.log, type: .info)
@@ -90,12 +103,23 @@ public class ScrobbleSyncer {
         }
     }
     
+    private func getNextScrobbleEntry() -> Promise<ScrobbleEntry?> {
+        return Promise<ScrobbleEntry?> { seal in
+            _ = self.persistentStorage.persistentContainer.performAsync { companion in
+                guard let scobbleEntry = companion.library.getFirstUploadableScrobbleEntry() else {
+                    return seal.fulfill(nil)
+                }
+                let scobbleEntryMain = ScrobbleEntry(managedObject: try! self.persistentStorage.context.existingObject(with: scobbleEntry.managedObject.objectID) as! ScrobbleEntryMO)
+                return seal.fulfill(scobbleEntryMain)
+            }
+        }
+    }
+    
     private func scrobbleToServerAsync(playedSong: Song) {
-        persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncer = self.backendApi.createLibrarySyncer()
-            let songMO = try! context.existingObject(with: playedSong.managedObject.objectID) as! SongMO
-            let song = Song(managedObject: songMO)
-            syncer.scrobble(song: song, date: nil)
+        firstly {
+            self.backendApi.createLibrarySyncer().scrobble(song: playedSong, date: nil)
+        }.catch { error in
+            self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
         }
     }
     

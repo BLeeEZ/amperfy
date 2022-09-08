@@ -22,18 +22,12 @@
 import Foundation
 import CoreData
 import os.log
+import PromiseKit
 
 class SubsonicLibrarySyncer: LibrarySyncer {
 
     private let subsonicServerApi: SubsonicServerApi
     private let log = OSLog(subsystem: "Amperfy", category: "SubsonicLibSyncer")
-    
-    public private(set) var artistCount: Int = 0
-    public private(set) var albumCount: Int = 1
-    public private(set) var songCount: Int = 1
-    public private(set) var genreCount: Int = 1
-    public private(set) var playlistCount: Int = 1
-    public private(set) var podcastCount: Int = 1
     
     var isSyncAllowed: Bool {
         return Reachability.isConnectedToNetwork()
@@ -43,433 +37,658 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         self.subsonicServerApi = subsonicServerApi
     }
     
-    func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?) {
-        let taskGroup = ConcurrentTaskGroup(taskSlotsCount: 5)
-        let syncLibrary = LibraryStorage(context: currentContext)
+    func syncInitial(persistentStorage: PersistentStorage, statusNotifyier: SyncCallbacks?) -> Promise<Void> {
+        let library = LibraryStorage(context: persistentStorage.context)
 
-        let syncWave = syncLibrary.createSyncWave()
+        let syncWave = library.createSyncWave()
         syncWave.setMetaData(fromLibraryChangeDates: LibraryChangeDates())
-        syncLibrary.saveContext()
-
-        statusNotifyier?.notifySyncStarted(ofType: .genre)
-        let genreParser = SsGenreParserDelegate(library: syncLibrary, syncWave: syncWave, parseNotifier: statusNotifyier)
-        subsonicServerApi.requestGenres(parserDelegate: genreParser)
-        syncLibrary.saveContext()
+        library.saveContext()
         
-        statusNotifyier?.notifySyncStarted(ofType: .artist)
-        let artistParser = SsArtistParserDelegate(library: syncLibrary, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
-        subsonicServerApi.requestArtists(parserDelegate: artistParser)
-        syncLibrary.saveContext()
-         
-        let artists = syncLibrary.getArtists().filter{ !$0.id.isEmpty }
-        albumCount = artists.count
-        statusNotifyier?.notifySyncStarted(ofType: .album)
-        let artistBatches = artists.chunked(intoSubarrayCount: taskGroup.maxTaskSlots)
-        for artistBatch in artistBatches {
-            taskGroup.waitForSlot()
-            persistentContainer.performBackgroundTask() { (context) in
-                let batchLibrary = LibraryStorage(context: context)
-                for artist in artistBatch {
-                    let artistMO = try! context.existingObject(with: artist.managedObject.objectID) as! ArtistMO
-                    let artistContext = Artist(managedObject: artistMO)
-                    let syncWaveMO = try! context.existingObject(with: syncWave.managedObject.objectID) as! SyncWaveMO
-                    let syncWaveContext = SyncWave(managedObject: syncWaveMO)
-                    let albumDelegate = SsAlbumParserDelegate(library: batchLibrary, syncWave: syncWaveContext, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
-                    albumDelegate.guessedArtist = artistContext
-                    self.subsonicServerApi.requestArtist(parserDelegate: albumDelegate, id: artistContext.id)
+        return firstly { () -> Promise<Data> in
+            statusNotifyier?.notifySyncStarted(ofType: .genre, totalCount: 0)
+            return self.subsonicServerApi.requestGenres()
+        }.then { data in
+            persistentStorage.persistentContainer.performAsync { companion in
+                let parserDelegate = SsGenreParserDelegate(library: companion.library, syncWave: companion.syncWave, parseNotifier: statusNotifyier)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }.then { () -> Promise<Data> in
+            statusNotifyier?.notifySyncStarted(ofType: .artist, totalCount: 0)
+            return self.subsonicServerApi.requestArtists()
+        }.then { data in
+            persistentStorage.persistentContainer.performAsync { companion in
+                let parserDelegate = SsArtistParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }.then { auth -> Promise<Void> in
+            let artists = library.getArtists().filter{ !$0.id.isEmpty }
+            statusNotifyier?.notifySyncStarted(ofType: .album, totalCount: artists.count)
+            
+            let artistPromises: [() -> Promise<Void>] = artists.compactMap { artist in return {
+                return firstly {
+                    self.subsonicServerApi.requestArtist(id: artist.id)
+                }.then { data in
+                    persistentStorage.persistentContainer.performAsync { companion in
+                        let parserDelegate = SsAlbumParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
+                        try self.parse(data: data, delegate: parserDelegate)
+                    }
+                }.get {
                     statusNotifyier?.notifyParsedObject(ofType: .album)
                 }
-                batchLibrary.saveContext()
-                taskGroup.taskFinished()
+            }}
+            return artistPromises.resolveSequentially()
+        }.then { data in
+            persistentStorage.persistentContainer.performAsync { companion in
+                // Delete duplicated artists due to concurrence
+                let allArtists = companion.library.getArtists()
+                var uniqueArtists: [String: Artist] = [:]
+                for artist in allArtists {
+                    if uniqueArtists[artist.id] != nil {
+                        let artistAlbums = artist.albums
+                        artistAlbums.forEach{ $0.artist = uniqueArtists[artist.id] }
+                        os_log("Delete multiple Artist <%s> with id %s", log: self.log, type: .info, artist.name, artist.id)
+                        companion.library.deleteArtist(artist: artist)
+                    } else {
+                        uniqueArtists[artist.id] = artist
+                    }
+                }
+                // Delete duplicated albums due to concurrence
+                let albums = companion.library.getAlbums()
+                var uniqueAlbums: [String: Album] = [:]
+                for album in albums {
+                    if uniqueAlbums[album.id] != nil {
+                        companion.library.deleteAlbum(album: album)
+                    } else {
+                        uniqueAlbums[album.id] = album
+                    }
+                }
             }
-        }
-        taskGroup.waitTillAllTasksFinished()
-        // Delete duplicated artists due to concurrence
-        let allArtists = syncLibrary.getArtists()
-        var uniqueArtists: [String: Artist] = [:]
-        for artist in allArtists {
-            if uniqueArtists[artist.id] != nil {
-                let artistAlbums = artist.albums
-                artistAlbums.forEach{ $0.artist = uniqueArtists[artist.id] }
-                os_log("Delete multiple Artist <%s> with id %s", log: log, type: .info, artist.name, artist.id)
-                syncLibrary.deleteArtist(artist: artist)
+        }.get {
+            statusNotifyier?.notifySyncStarted(ofType: .playlist, totalCount: 0)
+        }.then {
+            self.subsonicServerApi.requestPlaylists()
+        }.then { data in
+            persistentStorage.persistentContainer.performAsync { companion in
+                let parserDelegate = SsPlaylistParserDelegate(library: companion.library)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }.then {
+            self.subsonicServerApi.requestServerPodcastSupport()
+        }.then { isSupported -> Promise<Void> in
+            if isSupported {
+                statusNotifyier?.notifySyncStarted(ofType: .podcast, totalCount: 0)
+                return firstly {
+                    self.subsonicServerApi.requestPodcasts()
+                }.then { data in
+                    persistentStorage.persistentContainer.performAsync { companion in
+                        let parserDelegate = SsPodcastParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
+                        try self.parse(data: data, delegate: parserDelegate)
+                    }
+                }.then { data in
+                    persistentStorage.persistentContainer.performAsync { companion in
+                        companion.syncWave.syncState = .Done
+                    }
+                }
             } else {
-                uniqueArtists[artist.id] = artist
+                return persistentStorage.persistentContainer.performAsync { companion in
+                    companion.syncWave.syncState = .Done
+                }
             }
         }
-        // Delete duplicated albums due to concurrence
-        let albums = syncLibrary.getAlbums()
-        var uniqueAlbums: [String: Album] = [:]
-        for album in albums {
-            if uniqueAlbums[album.id] != nil {
-                syncLibrary.deleteAlbum(album: album)
-            } else {
-                uniqueAlbums[album.id] = album
+    }
+    
+    func sync(genre: Genre, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        let albumSyncPromises = genre.albums.compactMap { album in return {
+            self.sync(album: album, persistentContainer: persistentContainer)
+        }}
+        return albumSyncPromises.resolveSequentially()
+    }
+    
+    func sync(artist: Artist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            subsonicServerApi.requestArtist(id: artist.id)
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let parserDelegate = SsArtistParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                do {
+                    try self.parse(data: data, delegate: parserDelegate)
+                } catch {
+                    if let responseError = error as? ResponseError, let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
+                        let artistAsync = Artist(managedObject: companion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
+                        os_log("Artist <%s> is remote deleted", log: self.log, type: .info, artistAsync.name)
+                        artistAsync.remoteStatus = .deleted
+                    } else {
+                        throw error
+                    }
+                }
+            }
+        }.then { () -> Promise<Void> in
+            guard artist.remoteStatus == .available else { return Promise.value }
+            let albumSyncPromises = artist.albums.compactMap { album in return {
+                self.sync(album: album, persistentContainer: persistentContainer)
+            }}
+            return albumSyncPromises.resolveSequentially()
+        }
+    }
+    
+    func sync(album: Album, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            subsonicServerApi.requestAlbum(id: album.id)
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let parserDelegate = SsAlbumParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                do {
+                    try self.parse(data: data, delegate: parserDelegate)
+                } catch {
+                    if let responseError = error as? ResponseError, let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
+                        let albumAsync = Album(managedObject: companion.context.object(with: album.managedObject.objectID) as! AlbumMO)
+                        os_log("Album <%s> is remote deleted", log: self.log, type: .info, albumAsync.name)
+                        albumAsync.markAsRemoteDeleted()
+                    } else {
+                        throw error
+                    }
+                }
+            }
+        }.then { () -> Promise<Void> in
+            guard album.remoteStatus == .available else { return Promise.value }
+            return firstly {
+                self.subsonicServerApi.requestAlbum(id: album.id)
+            }.then { data in
+                persistentContainer.performAsync { companion in
+                    let albumAsync = Album(managedObject: companion.context.object(with: album.managedObject.objectID) as! AlbumMO)
+                    let oldSongs = Set(albumAsync.songs)
+                    let parserDelegate = SsSongParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                    try self.parse(data: data, delegate: parserDelegate)
+                    let removedSongs = oldSongs.subtracting(parserDelegate.parsedSongs)
+                    removedSongs.lazy.compactMap{$0.asSong}.forEach {
+                        os_log("Song <%s> is remote deleted", log: self.log, type: .info, $0.displayString)
+                        $0.remoteStatus = .deleted
+                        albumAsync.managedObject.removeFromSongs($0.managedObject)
+                    }
+                    albumAsync.isSongsMetaDataSynced = true
+                }
             }
         }
-        
-        statusNotifyier?.notifySyncStarted(ofType: .playlist)
-        let playlistParser = SsPlaylistParserDelegate(library: syncLibrary)
-        subsonicServerApi.requestPlaylists(parserDelegate: playlistParser)
-        syncLibrary.saveContext()
-        
-        if subsonicServerApi.isPodcastSupported {
-            statusNotifyier?.notifySyncStarted(ofType: .podcast)
-            let podcastParser = SsPodcastParserDelegate(library: syncLibrary, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi, parseNotifier: statusNotifyier)
-            subsonicServerApi.requestPodcasts(parserDelegate: podcastParser)
-            syncLibrary.saveContext()
-        }
-
-        syncWave.syncState = .Done
-        syncLibrary.saveContext()
-        statusNotifyier?.notifySyncFinished()
     }
     
-    func sync(genre: Genre, library: LibraryStorage) {
-        for album in genre.albums {
-            sync(album: album, library: library)
-        }
-        library.saveContext()
-    }
-    
-    func sync(artist: Artist, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), !artist.id.isEmpty else { return }
-        let artistParser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestArtist(parserDelegate: artistParser, id: artist.id)
-        if let error = artistParser.error?.asSubsonicError, !error.isRemoteAvailable {
-            os_log("Artist <%s> is remote deleted", log: log, type: .info, artist.name)
-            artist.remoteStatus = .deleted
-        }
-        for album in artist.albums {
-            sync(album: album, library: library)
-        }
-        library.saveContext()
-    }
-    
-    func sync(album: Album, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
-        let albumParser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestAlbum(parserDelegate: albumParser, id: album.id)
-        if let error = albumParser.error?.asSubsonicError, !error.isRemoteAvailable {
-            os_log("Album <%s> is remote deleted", log: log, type: .info, album.name)
-            album.remoteStatus = .deleted
-            album.songs.forEach{
-                os_log("Song <%s> is remote deleted", log: log, type: .info, $0.displayString)
-                $0.remoteStatus = .deleted
+    func sync(song: Song, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            subsonicServerApi.requestSongInfo(id: song.id)
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let parserDelegate = SsSongParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegate)
             }
-        } else {
-            let oldSongs = Set(album.songs)
-            let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-            subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
-            let removedSongs = oldSongs.subtracting(songParser.parsedSongs)
-            removedSongs.lazy.compactMap{$0.asSong}.forEach{
-                os_log("Song <%s> is remote deleted", log: log, type: .info, $0.displayString)
-                $0.remoteStatus = .deleted
-                album.managedObject.removeFromSongs($0.managedObject)
-            }
-            album.isSongsMetaDataSynced = true
         }
-        library.saveContext()
     }
     
-    func sync(song: Song, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = song.syncInfo ?? library.getLatestSyncWave() else { return }
-        let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestSong(parserDelegate: songParser, id: song.id)
-        library.saveContext()
+    func sync(podcast: Podcast, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            subsonicServerApi.requestServerPodcastSupport()
+        }.then { isSupported -> Promise<Void> in
+            guard isSupported else { return Promise.value }
+            return firstly {
+                self.subsonicServerApi.requestPodcastEpisodes(id: podcast.id)
+            }.then { data in
+                persistentContainer.performAsync { companion in
+                    let podcastAsync = Podcast(managedObject: companion.context.object(with: podcast.managedObject.objectID) as! PodcastMO)
+                    let oldEpisodes = Set(podcastAsync.episodes)
+                    
+                    let parserDelegate = SsPodcastEpisodeParserDelegate(podcast: podcastAsync, library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                    try self.parse(data: data, delegate: parserDelegate)
+                    
+                    let deletedEpisodes = oldEpisodes.subtracting(parserDelegate.parsedEpisodes)
+                    deletedEpisodes.forEach {
+                        os_log("Podcast Episode <%s> is remote deleted", log: self.log, type: .info, $0.displayString)
+                        $0.podcastStatus = .deleted
+                    }
+                }
+            }
+        }
     }
     
-    func syncLatestLibraryElements(library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
-        let oldRecentSongs = Set(library.getRecentSongs())
-        
+    func syncLatestLibraryElements(persistentStorage: PersistentStorage) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
         os_log("Sync newest albums", log: log, type: .info)
-        let albumDelegate = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestLatestAlbums(parserDelegate: albumDelegate)
-        library.saveContext()
-        os_log("Sync songs of newest albums", log: log, type: .info)
+        let library = LibraryStorage(context: persistentStorage.context)
+        let oldRecentSongsMain = Set(library.getRecentSongs())
+        var parsedAlbumsMain = [Album]()
+        var recentlyAddedSongsMain: Set<Song> = Set()
         
-        var recentlyAddedSongs: Set<Song> = Set()
-        for album in albumDelegate.parsedAlbums {
-            let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-            subsonicServerApi.requestAlbum(parserDelegate: songParser, id: album.id)
-            album.isSongsMetaDataSynced = true
-            recentlyAddedSongs = recentlyAddedSongs.union(Set(songParser.parsedSongs))
+        return firstly {
+            subsonicServerApi.requestLatestAlbums()
+        }.then { data in
+            persistentStorage.persistentContainer.performAsync { companion in
+                let parserDelegate = SsAlbumParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegate)
+                parsedAlbumsMain = parserDelegate.parsedAlbums.compactMap {
+                    Album(managedObject: persistentStorage.context.object(with: $0.managedObject.objectID) as! AlbumMO)
+                }
+            }
+        }.then { () -> Promise<Void> in
+            os_log("Sync songs of newest albums", log: self.log, type: .info)
+            let albumPromises = parsedAlbumsMain.compactMap { album in return {
+                return firstly {
+                    self.subsonicServerApi.requestAlbum(id: album.id)
+                }.then { data in
+                    persistentStorage.persistentContainer.performAsync { companion in
+                        let parserDelegate = SsSongParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                        try self.parse(data: data, delegate: parserDelegate)
+                        let parsedSongsMain = parserDelegate.parsedSongs.compactMap {
+                            Song(managedObject: persistentStorage.context.object(with: $0.managedObject.objectID) as! SongMO)
+                        }
+                        recentlyAddedSongsMain = recentlyAddedSongsMain.union(Set(parsedSongsMain))
+                    }
+                }.then { () -> Promise<Void> in
+                    album.isSongsMetaDataSynced = true
+                    library.saveContext()
+                    return Promise.value
+                }
+            }}
+            return albumPromises.resolveSequentially()
+        }.get {
+            os_log("%i newest Albums synced", log: self.log, type: .info, parsedAlbumsMain.count)
+            let notRecentSongsAnymore = oldRecentSongsMain.subtracting(recentlyAddedSongsMain)
+            notRecentSongsAnymore.filter{ !$0.id.isEmpty }.forEach { $0.isRecentlyAdded = false }
+            recentlyAddedSongsMain.filter{ !$0.id.isEmpty }.forEach { $0.isRecentlyAdded = true }
+            library.saveContext()
         }
-        os_log("%i newest Albums synced", log: log, type: .info, albumDelegate.parsedAlbums.count)
-        let notRecentSongsAnymore = oldRecentSongs.subtracting(recentlyAddedSongs)
-        notRecentSongsAnymore.forEach { $0.isRecentlyAdded = false }
-        recentlyAddedSongs.forEach { $0.isRecentlyAdded = true }
-        library.saveContext()
     }
     
-    func syncFavoriteLibraryElements(library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
-        os_log("Sync favorite artists/albums/songs", log: log, type: .info)
-        let oldFavoriteArtists = Set(library.getFavoriteArtists())
-        let oldFavoriteAlbums = Set(library.getFavoriteAlbums())
-        let oldFavoriteSongs = Set(library.getFavoriteSongs())
+    func syncFavoriteLibraryElements(persistentStorage: PersistentStorage) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            self.subsonicServerApi.requestFavoriteElements()
+        }.then { data in
+            persistentStorage.persistentContainer.performAsync { companion in
+                os_log("Sync favorite artists", log: self.log, type: .info)
+                let oldFavoriteArtists = Set(companion.library.getFavoriteArtists())
+                let parserDelegateArtist = SsArtistParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegateArtist)
+                let notFavoriteArtistsAnymore = oldFavoriteArtists.subtracting(parserDelegateArtist.parsedArtists)
+                notFavoriteArtistsAnymore.forEach { $0.isFavorite = false }
 
-        guard let favoritesData = subsonicServerApi.requestFavoriteElements() else { return }
-
-        os_log("Parse favorite artists", log: log, type: .info)
-        let artistParser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        let artistXmlParser = XMLParser(data: favoritesData)
-        artistXmlParser.delegate = artistParser
-        artistXmlParser.parse()
-        let notFavoriteArtistsAnymore = oldFavoriteArtists.subtracting(artistParser.parsedArtists)
-        notFavoriteArtistsAnymore.forEach { $0.isFavorite = false }
-
-        os_log("Parse favorite albums", log: log, type: .info)
-        let albumParser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        let albumXmlParser = XMLParser(data: favoritesData)
-        albumXmlParser.delegate = albumParser
-        albumXmlParser.parse()
-        let notFavoriteAlbumsAnymore = oldFavoriteAlbums.subtracting(albumParser.parsedAlbums)
-        notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false }
-        
-        os_log("Parse favorite songs", log: log, type: .info)
-        let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        let songXmlParser = XMLParser(data: favoritesData)
-        songXmlParser.delegate = songParser
-        songXmlParser.parse()
-        let notFavoriteSongsAnymore = oldFavoriteSongs.subtracting(songParser.parsedSongs)
-        notFavoriteSongsAnymore.forEach { $0.isFavorite = false }
-        library.saveContext()
+                os_log("Sync favorite albums", log: self.log, type: .info)
+                let oldFavoriteAlbums = Set(companion.library.getFavoriteAlbums())
+                let parserDelegateAlbum = SsAlbumParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegateAlbum)
+                let notFavoriteAlbumsAnymore = oldFavoriteAlbums.subtracting(parserDelegateAlbum.parsedAlbums)
+                notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false }
+            
+                os_log("Sync favorite songs", log: self.log, type: .info)
+                let oldFavoriteSongs = Set(companion.library.getFavoriteSongs())
+                let parserDelegateSong = SsSongParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegateSong)
+                let notFavoriteSongsAnymore = oldFavoriteSongs.subtracting(parserDelegateSong.parsedSongs)
+                notFavoriteSongsAnymore.forEach { $0.isFavorite = false }
+            }
+        }
     }
 
-    func syncMusicFolders(library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
-        let musicFolderParser = SsMusicFolderParserDelegate(library: library, syncWave: syncWave)
-        subsonicServerApi.requestMusicFolders(parserDelegate: musicFolderParser)
-        library.saveContext()
+    func syncMusicFolders(persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            self.subsonicServerApi.requestMusicFolders()
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let parserDelegate = SsMusicFolderParserDelegate(library: companion.library, syncWave: companion.syncWave)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }
     }
     
-    func syncIndexes(musicFolder: MusicFolder, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
-        let musicDirectoryParser = SsDirectoryParserDelegate(musicFolder: musicFolder, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestIndexes(parserDelegate: musicDirectoryParser, musicFolderId: musicFolder.id)
-        library.saveContext()
+    func syncIndexes(musicFolder: MusicFolder, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            self.subsonicServerApi.requestIndexes(musicFolderId: musicFolder.id)
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let musicFolderAsync = MusicFolder(managedObject: companion.context.object(with: musicFolder.managedObject.objectID) as! MusicFolderMO)
+                let parserDelegate = SsDirectoryParserDelegate(musicFolder: musicFolderAsync, library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }
     }
     
-    func sync(directory: Directory, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
-        let musicDirectoryParser = SsDirectoryParserDelegate(directory: directory, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestMusicDirectory(parserDelegate: musicDirectoryParser, id: directory.id)
-        library.saveContext()
+    func sync(directory: Directory, persistentStorage: PersistentStorage) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            self.subsonicServerApi.requestMusicDirectory(id: directory.id)
+        }.then { data in
+            persistentStorage.persistentContainer.performAsync { companion in
+                let directoryAsync = Directory(managedObject: companion.context.object(with: directory.managedObject.objectID) as! DirectoryMO)
+                let parserDelegate = SsDirectoryParserDelegate(directory: directoryAsync, library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }
     }
     
-    func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
-        let songParser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestRandomSongs(parserDelegate: songParser, count: count)
-        playlist.append(playables: songParser.parsedSongs)
-        library.saveContext()
+    func requestRandomSongs(playlist: Playlist, count: Int, persistentStorage: PersistentStorage) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            self.subsonicServerApi.requestRandomSongs(count: count)
+        }.then { data in
+            persistentStorage.persistentContainer.performAsync { companion in
+                let parserDelegate = SsSongParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegate)
+                playlist.getManagedObject(in: companion.context, library: companion.library).append(playables: parserDelegate.parsedSongs)
+            }
+        }
     }
     
-    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) {
-        guard isSyncAllowed else { return }
-        let songParser = SsXmlParser()
-        subsonicServerApi.requestPodcastEpisodeDelete(parserDelegate: songParser, id: podcastEpisode.id)
+    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            self.subsonicServerApi.requestPodcastEpisodeDelete(id: podcastEpisode.id)
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {
-        guard isSyncAllowed else { return }
-        let playlistParser = SsPlaylistParserDelegate(library: library)
-        subsonicServerApi.requestPlaylists(parserDelegate: playlistParser)
-        library.saveContext()
+    func syncDownPlaylistsWithoutSongs(persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            subsonicServerApi.requestPlaylists()
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let parserDelegate = SsPlaylistParserDelegate(library: companion.library)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }
     }
     
-    func syncDown(playlist: Playlist, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
+    func syncDown(playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed, playlist.id != "" else { return Promise.value }
         os_log("Download playlist \"%s\" from server", log: log, type: .info, playlist.name)
-        guard playlist.id != "" else { return }
-        os_log("Sync songs of playlist \"%s\"", log: log, type: .info, playlist.name)
-        let parser = SsPlaylistSongsParserDelegate(playlist: playlist, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestPlaylistSongs(parserDelegate: parser, id: playlist.id)
-        playlist.ensureConsistentItemOrder()
-        library.saveContext()
+        return firstly {
+            subsonicServerApi.requestPlaylistSongs(id: playlist.id)
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let playlistAsync = playlist.getManagedObject(in: companion.context, library: companion.library)
+                let parserDelegate = SsPlaylistSongsParserDelegate(playlist: playlistAsync, library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegate)
+                playlistAsync.ensureConsistentItemOrder()
+            }
+        }
     }
     
-    func syncUpload(playlistToUpdateName playlist: Playlist, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
+    private func validatePlaylistId(playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        return firstly { () -> Promise<Void> in
+            if playlist.id == "" {
+                return createPlaylistRemote(playlist: playlist, persistentContainer: persistentContainer)
+            } else {
+                return Promise.value
+            }
+        }.then { () -> Promise<Void> in
+            if playlist.id == "" {
+                os_log("Playlist id was not assigned after creation", log: self.log, type: .info)
+                return Promise(error: BackendError.incorrectServerBehavior(message: "Playlist id was not assigned after creation"))
+            } else {
+                return Promise.value
+            }
+        }
+    }
+    
+    func syncUpload(playlistToUpdateName playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
         os_log("Upload name on playlist to: \"%s\"", log: log, type: .info, playlist.name)
-        if playlist.id == "" {
-            createPlaylistRemote(playlist: playlist, library: library, syncWave: syncWave)
+        return firstly {
+            self.validatePlaylistId(playlist: playlist, persistentContainer: persistentContainer)
+        }.then {
+            self.subsonicServerApi.requestPlaylistUpdate(id: playlist.id, name: playlist.name, songIndicesToRemove: [], songIdsToAdd: [])
+        }.then { data in
+            self.parseForError(data: data)
         }
-        guard playlist.id != "" else {
-            os_log("Playlist id could not be obtained", log: log, type: .info)
-            return
-        }
-        let updateResponseParser = SsPingParserDelegate()
-        subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: [], songIdsToAdd: [])
     }
     
-    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave() else { return }
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed, !songs.isEmpty else { return Promise.value }
         os_log("Upload SongsAdded on playlist \"%s\"", log: log, type: .info, playlist.name)
-        if playlist.id == "" {
-            createPlaylistRemote(playlist: playlist, library: library, syncWave: syncWave)
+        return firstly {
+            self.validatePlaylistId(playlist: playlist, persistentContainer: persistentContainer)
+        }.then {
+            self.subsonicServerApi.requestPlaylistUpdate(id: playlist.id, name: playlist.name, songIndicesToRemove: [], songIdsToAdd: songs.compactMap{ $0.id })
+        }.then { data in
+            self.parseForError(data: data)
         }
-        guard playlist.id != "" else {
-            os_log("Playlist id could not be obtained", log: log, type: .info)
-            return
-        }
-        
-        let songIdsToAdd = songs.compactMap{ $0.id }
-        let updateResponseParser = SsPingParserDelegate()
-        subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: [], songIdsToAdd: songIdsToAdd)
     }
     
-    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage) {
-        guard isSyncAllowed else { return }
-        os_log("Upload SongDelete on playlist \"%s\"", log: log, type: .info, playlist.name)
-        let updateResponseParser = SsPingParserDelegate()
-        subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: [index], songIdsToAdd: [])
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        os_log("Upload SongDelete on playlist \"%s\" at index: %i", log: log, type: .info, playlist.name, index)
+        return firstly {
+            self.validatePlaylistId(playlist: playlist, persistentContainer: persistentContainer)
+        }.then {
+            self.subsonicServerApi.requestPlaylistUpdate(id: playlist.id, name: playlist.name, songIndicesToRemove: [index], songIdsToAdd: [])
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage) {
-        guard isSyncAllowed else { return }
+    func syncUpload(playlistToUpdateOrder playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
         os_log("Upload OrderChange on playlist \"%s\"", log: log, type: .info, playlist.name)
-        let songIndicesToRemove = Array(0...playlist.songCount-1)
-        let songIdsToAdd = playlist.playables.compactMap{ $0.id }
-        let updateResponseParser = SsPingParserDelegate()
-        subsonicServerApi.requestPlaylistUpdate(parserDelegate: updateResponseParser, playlist: playlist, songIndicesToRemove: songIndicesToRemove, songIdsToAdd: songIdsToAdd)
+        return firstly {
+            self.validatePlaylistId(playlist: playlist, persistentContainer: persistentContainer)
+        }.then { () -> Promise<Data> in
+            let songIdsToAdd = playlist.playables.compactMap{ $0.id }
+            let songIndicesToRemove = Array(0...songIdsToAdd.count-1)
+            return self.subsonicServerApi.requestPlaylistUpdate(id: playlist.id, name: playlist.name, songIndicesToRemove: songIndicesToRemove, songIdsToAdd: songIdsToAdd)
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func syncUpload(playlistToDelete playlist: Playlist) {
-        guard isSyncAllowed else { return }
-        os_log("Upload Delete playlist \"%s\"", log: log, type: .info, playlist.name)
-        let updateResponseParser = SsPingParserDelegate()
-        subsonicServerApi.requestPlaylistDelete(parserDelegate: updateResponseParser, playlist: playlist)
+    func syncUpload(playlistIdToDelete id: String) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        os_log("Upload Delete playlist \"%s\"", log: log, type: .info, id)
+        return firstly {
+            self.subsonicServerApi.requestPlaylistDelete(id: id)
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func syncDownPodcastsWithoutEpisodes(library: LibraryStorage) {
-        guard isSyncAllowed, subsonicServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
-        let oldPodcasts = Set(library.getRemoteAvailablePodcasts())
-        
-        let podcastParser = SsPodcastParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestPodcasts(parserDelegate: podcastParser)
-        library.saveContext()
-        
-        let deletedPodcasts = oldPodcasts.subtracting(podcastParser.parsedPodcasts)
-        deletedPodcasts.forEach { $0.remoteStatus = .deleted }
-        library.saveContext()
+    func syncDownPodcastsWithoutEpisodes(persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            subsonicServerApi.requestServerPodcastSupport()
+        }.then { isSupported -> Promise<Void> in
+            guard isSupported else { return Promise.value }
+            return firstly {
+                self.subsonicServerApi.requestPodcasts()
+            }.then { data in
+                persistentContainer.performAsync { companion in
+                    let oldPodcasts = Set(companion.library.getRemoteAvailablePodcasts())
+                    
+                    let parserDelegate = SsPodcastParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                    try self.parse(data: data, delegate: parserDelegate)
+                    
+                    let deletedPodcasts = oldPodcasts.subtracting(parserDelegate.parsedPodcasts)
+                    deletedPodcasts.forEach {
+                        os_log("Podcast <%s> is remote deleted", log: self.log, type: .info, $0.title)
+                        $0.remoteStatus = .deleted
+                    }
+                }
+            }
+        }
     }
     
-    func sync(podcast: Podcast, library: LibraryStorage) {
-        guard isSyncAllowed, subsonicServerApi.isPodcastSupported, let syncWave = library.getLatestSyncWave() else { return }
-        let oldEpisodes = Set(podcast.episodes)
-        
-        let podcastEpisodeParser = SsPodcastEpisodeParserDelegate(podcast: podcast, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestPodcastEpisodes(parserDelegate: podcastEpisodeParser, id: podcast.id)
-        library.saveContext()
-        
-        let deletedEpisodes = oldEpisodes.subtracting(podcastEpisodeParser.parsedEpisodes)
-        deletedEpisodes.forEach { $0.podcastStatus = .deleted }
-        library.saveContext()
-    }
-    
-    func scrobble(song: Song, date: Date?) {
-        guard isSyncAllowed else { return }
+    func scrobble(song: Song, date: Date?) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
         if let date = date {
             os_log("Scrobbled at %s: %s", log: log, type: .info, date.description, song.displayString)
         } else {
             os_log("Scrobble now: %s", log: log, type: .info, song.displayString)
         }
-        let parser = SsXmlParser()
-        subsonicServerApi.requestRecordSongPlay(parserDelegate: parser, id: song.id, date: date)
+        return firstly {
+            self.subsonicServerApi.requestRecordSongPlay(id: song.id, date: date)
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func setRating(song: Song, rating: Int) {
-        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return }
+    func setRating(song: Song, rating: Int) -> Promise<Void> {
+        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return Promise.value }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, song.displayString)
-        let parser = SsXmlParser()
-        subsonicServerApi.requestRating(parserDelegate: parser, id: song.id, rating: rating)
+        return firstly {
+            self.subsonicServerApi.requestRating(id: song.id, rating: rating)
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func setRating(album: Album, rating: Int) {
-        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return }
+    func setRating(album: Album, rating: Int) -> Promise<Void> {
+        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return Promise.value }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, album.name)
-        let parser = SsXmlParser()
-        subsonicServerApi.requestRating(parserDelegate: parser, id: album.id, rating: rating)
+        return firstly {
+            self.subsonicServerApi.requestRating(id: album.id, rating: rating)
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func setRating(artist: Artist, rating: Int) {
-        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return }
+    func setRating(artist: Artist, rating: Int) -> Promise<Void> {
+        guard isSyncAllowed, rating >= 0 && rating <= 5 else { return Promise.value }
         os_log("Rate %i stars: %s", log: log, type: .info, rating, artist.name)
-        let parser = SsXmlParser()
-        subsonicServerApi.requestRating(parserDelegate: parser, id: artist.id, rating: rating)
+        return firstly {
+            self.subsonicServerApi.requestRating(id: artist.id, rating: rating)
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func setFavorite(song: Song, isFavorite: Bool) {
-        guard isSyncAllowed else { return }
+    func setFavorite(song: Song, isFavorite: Bool) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
         os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", song.displayString)
-        let parser = SsXmlParser()
-        subsonicServerApi.requestSetFavorite(parserDelegate: parser, songId: song.id, isFavorite: isFavorite)
+        return firstly {
+            self.subsonicServerApi.requestSetFavorite(songId: song.id, isFavorite: isFavorite)
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func setFavorite(album: Album, isFavorite: Bool) {
-        guard isSyncAllowed else { return }
+    func setFavorite(album: Album, isFavorite: Bool) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
         os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", album.name)
-        let parser = SsXmlParser()
-        subsonicServerApi.requestSetFavorite(parserDelegate: parser, albumId: album.id, isFavorite: isFavorite)
+        return firstly {
+            self.subsonicServerApi.requestSetFavorite(albumId: album.id, isFavorite: isFavorite)
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func setFavorite(artist: Artist, isFavorite: Bool) {
-        guard isSyncAllowed else { return }
+    func setFavorite(artist: Artist, isFavorite: Bool) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
         os_log("Set Favorite %s: %s", log: log, type: .info, isFavorite ? "TRUE" : "FALSE", artist.name)
-        let parser = SsXmlParser()
-        subsonicServerApi.requestSetFavorite(parserDelegate: parser, artistId: artist.id, isFavorite: isFavorite)
+        return firstly {
+            self.subsonicServerApi.requestSetFavorite(artistId: artist.id, isFavorite: isFavorite)
+        }.then { data in
+            self.parseForError(data: data)
+        }
     }
     
-    func searchArtists(searchText: String, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+    func searchArtists(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed, searchText.count > 0 else { return Promise.value }
         os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
-        let parser = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestSearchArtists(parserDelegate: parser, searchText: searchText)
-        library.saveContext()
+        return firstly {
+            subsonicServerApi.requestSearchArtists(searchText: searchText)
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let parserDelegate = SsArtistParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }
     }
     
-    func searchAlbums(searchText: String, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+    func searchAlbums(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed, searchText.count > 0 else { return Promise.value }
         os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
-        let parser = SsAlbumParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestSearchAlbums(parserDelegate: parser, searchText: searchText)
-        library.saveContext()
+        return firstly {
+            subsonicServerApi.requestSearchAlbums(searchText: searchText)
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let parserDelegate = SsAlbumParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }
     }
     
-    func searchSongs(searchText: String, library: LibraryStorage) {
-        guard isSyncAllowed, let syncWave = library.getLatestSyncWave(), searchText.count > 0 else { return }
+    func searchSongs(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        guard isSyncAllowed, searchText.count > 0 else { return Promise.value }
         os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
-        let parser = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestSearchSongs(parserDelegate: parser, searchText: searchText)
-        library.saveContext()
+        return firstly {
+            subsonicServerApi.requestSearchSongs(searchText: searchText)
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let parserDelegate = SsSongParserDelegate(library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }
     }
     
-    private func createPlaylistRemote(playlist: Playlist, library: LibraryStorage, syncWave: SyncWave) {
+    private func createPlaylistRemote(playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
         os_log("Create playlist on server", log: log, type: .info)
-        let playlistParser = SsPlaylistSongsParserDelegate(playlist: playlist, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicServerApi)
-        subsonicServerApi.requestPlaylistCreate(parserDelegate: playlistParser, playlist: playlist)
-        // Old api version -> need to match the created playlist via name
-        if playlist.id == "" {
-            updatePlaylistIdViaItsName(playlist: playlist, library: library)
+        return firstly {
+            subsonicServerApi.requestPlaylistCreate(name: playlist.name)
+        }.then { data in
+            persistentContainer.performAsync { companion in
+                let playlistAsync = playlist.getManagedObject(in: companion.context, library: companion.library)
+                let parserDelegate = SsPlaylistSongsParserDelegate(playlist: playlistAsync, library: companion.library, syncWave: companion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
+                try self.parse(data: data, delegate: parserDelegate)
+            }
+        }.then { () -> Promise<Void> in
+            // Old api version -> need to match the created playlist via name
+            if playlist.id == "" {
+                return self.updatePlaylistIdViaItsName(playlist: playlist, persistentContainer: persistentContainer)
+            } else {
+                return Promise.value
+            }
         }
     }
 
-    private func updatePlaylistIdViaItsName(playlist: Playlist, library: LibraryStorage) {
-        syncDownPlaylistsWithoutSongs(library: library)
-        let playlists = library.getPlaylists()
-        let nameMatchingPlaylists = playlists.filter{ filterPlaylist in
-            if filterPlaylist.name == playlist.name, filterPlaylist.id != "" {
-                return true
+    private func updatePlaylistIdViaItsName(playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        return firstly {
+            syncDownPlaylistsWithoutSongs(persistentContainer: persistentContainer)
+        }.then {
+            persistentContainer.performAsync { companion in
+                let playlistAsync = playlist.getManagedObject(in: companion.context, library: companion.library)
+                let playlists = companion.library.getPlaylists()
+                let nameMatchingPlaylists = playlists.filter{ filterPlaylist in
+                    return filterPlaylist.name == playlistAsync.name && filterPlaylist.id != ""
+                }
+                guard !nameMatchingPlaylists.isEmpty, let firstMatch = nameMatchingPlaylists.first else { return }
+                let matchedId = firstMatch.id
+                companion.library.deletePlaylist(firstMatch)
+                playlistAsync.id = matchedId
             }
-            return false
         }
-        guard !nameMatchingPlaylists.isEmpty, let firstMatch = nameMatchingPlaylists.first else { return }
-        let matchedId = firstMatch.id
-        library.deletePlaylist(firstMatch)
-        playlist.id = matchedId
+    }
+    
+    private func parseForError(data: Data) -> Promise<Void> {
+        Promise<Void> { seal in
+            let parserDelegate = SsPingParserDelegate()
+            try self.parse(data: data, delegate: parserDelegate)
+            seal.fulfill(Void())
+        }
+    }
+    
+    private func parse(data: Data, delegate: SsXmlParser) throws {
+        let parser = XMLParser(data: data)
+        parser.delegate = delegate
+        parser.parse()
+        if let error = parser.parserError {
+            os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
+            throw BackendError.parser
+        }
+        if let error = delegate.error, let _ = error.asSubsonicError {
+            throw error
+        }
     }
     
 }

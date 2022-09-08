@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     
@@ -41,12 +42,11 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let library = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.syncMusicFolders(library: library)
-            }
+        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncMusicFolders(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Music Folders Sync", error: error)
         }
     }
     

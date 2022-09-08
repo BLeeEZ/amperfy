@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
@@ -54,7 +55,11 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
         swipeCallback = { (indexPath, completionHandler) in
             let playlist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            playlist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+            firstly {
+                playlist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
+            }.finally {
                 completionHandler(SwipeActionContext(containable: playlist))
             }
         }
@@ -72,12 +77,11 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.syncDownPlaylistsWithoutSongs(library: syncLibrary)
-            }
+        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncDownPlaylistsWithoutSongs(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
         }
     }
 
@@ -95,16 +99,15 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let playlistAsync = playlist.getManagedObject(in: context, library: syncLibrary)
-                syncer.syncUpload(playlistToDelete: playlistAsync)
-            }
-            appDelegate.library.deletePlaylist(playlist)
-            appDelegate.library.saveContext()
+        guard editingStyle == .delete else { return }
+        let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
+        let playlistId = playlist.id
+        self.appDelegate.library.deletePlaylist(playlist)
+        self.appDelegate.library.saveContext()
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncUpload(playlistIdToDelete: playlistId)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlist Upload Deletion", error: error)
         }
     }
     
@@ -143,13 +146,12 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let backgroundLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            syncer.syncDownPlaylistsWithoutSongs(library: backgroundLibrary)
-            DispatchQueue.main.async {
-                self.refreshControl?.endRefreshing()
-            }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncDownPlaylistsWithoutSongs(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
+        }.finally {
+            self.refreshControl?.endRefreshing()
         }
     }
 

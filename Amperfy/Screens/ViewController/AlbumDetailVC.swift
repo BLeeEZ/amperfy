@@ -21,6 +21,7 @@
 
 import UIKit
 import AmperfyKit
+import PromiseKit
 
 class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
 
@@ -68,7 +69,11 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+        firstly {
+            album.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+        }.finally {
             self.detailOperationsView?.refresh()
         }
     }

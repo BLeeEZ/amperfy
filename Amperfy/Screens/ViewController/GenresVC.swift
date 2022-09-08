@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
 
@@ -44,7 +45,11 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         }
         swipeCallback = { (indexPath, completionHandler) in
             let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            genre.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+            firstly {
+                genre.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
+            }.finally {
                 completionHandler(SwipeActionContext(containable: genre))
             }
         }
@@ -78,19 +83,17 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            if self.appDelegate.persistentStorage.settings.isOnlineMode {
-                let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: self.appDelegate.persistentStorage.settings, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                autoDownloadSyncer.syncLatestLibraryElements(context: context)
-                DispatchQueue.main.async {
-                    self.refreshControl?.endRefreshing()
-                }
-            } else {
-                DispatchQueue.main.async {
-                    self.refreshControl?.endRefreshing()
-                }
-            }
-
+        guard self.appDelegate.persistentStorage.settings.isOnlineMode else {
+            self.refreshControl?.endRefreshing()
+            return
+        }
+        firstly {
+            AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                .syncLatestLibraryElements()
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Genres Latest Elements Sync", error: error)
+        }.finally {
+            self.refreshControl?.endRefreshing()
         }
     }
 

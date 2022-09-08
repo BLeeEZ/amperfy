@@ -21,6 +21,7 @@
 
 import Foundation
 import CoreData
+import PromiseKit
 
 public enum DetailType {
     case short
@@ -40,10 +41,10 @@ public protocol PlayableContainable {
     var isDownloadAvailable: Bool { get }
     var artworkCollection: ArtworkCollection { get }
     func cachePlayables(downloadManager: DownloadManageable)
-    func fetchFromServer(inContext: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable)
+    func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void>
     var isFavoritable: Bool { get }
     var isFavorite: Bool { get }
-    func remoteToggleFavorite(inContext: NSManagedObjectContext, syncer: LibrarySyncer)
+    func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void>
     func playedViaContext()
 }
 
@@ -64,30 +65,12 @@ extension PlayableContainable {
         return infoDetails(for: api, type: type).joined(separator: " \(CommonString.oneMiddleDot) ")
     }
     
-    public func fetchSync(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) {
-        if storage.settings.isOnlineMode {
-            storage.context.performAndWait {
-                fetchFromServer(inContext: storage.context, backendApi: backendApi, settings: storage.settings, playableDownloadManager: playableDownloadManager)
-            }
-        }
-    }
-    
-    public func fetchAsync(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable, completionHandler: @escaping () -> Void) {
-        if storage.settings.isOnlineMode {
-            storage.persistentContainer.performBackgroundTask() { (context) in
-                fetchFromServer(inContext: context, backendApi: backendApi, settings: storage.settings, playableDownloadManager: playableDownloadManager)
-                DispatchQueue.main.async {
-                    completionHandler()
-                }
-            }
-        } else {
-            completionHandler()
-        }
+    public func fetch(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+        guard storage.settings.isOnlineMode else { return Promise.value }
+        return fetchFromServer(storage: storage, backendApi: backendApi, playableDownloadManager: playableDownloadManager)
     }
     public var isRateable: Bool { return false }
     public var isFavoritable: Bool { return false }
     public var isFavorite: Bool { return false }
-    public func remoteToggleFavorite(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) { }
-    
     public var isDownloadAvailable: Bool { return true }
 }

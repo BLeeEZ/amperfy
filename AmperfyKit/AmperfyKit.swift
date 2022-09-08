@@ -133,10 +133,10 @@ public class AmperKit {
         return dlManager
     }()
     public lazy var backgroundLibrarySyncer = {
-        return BackgroundLibrarySyncer(persistentStorage: persistentStorage, backendApi: backendApi, playableDownloadManager: playableDownloadManager)
+        return BackgroundLibrarySyncer(persistentStorage: persistentStorage, backendApi: backendApi, playableDownloadManager: playableDownloadManager, eventLogger: eventLogger)
     }()
     public lazy var scrobbleSyncer = {
-        return ScrobbleSyncer(persistentStorage: persistentStorage, backendApi: backendApi)
+        return ScrobbleSyncer(persistentStorage: persistentStorage, backendApi: backendApi, eventLogger: eventLogger)
     }()
     public lazy var libraryUpdater = {
         return LibraryUpdater(persistentStorage: persistentStorage, backendApi: backendApi)

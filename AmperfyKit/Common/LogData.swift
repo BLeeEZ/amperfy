@@ -54,7 +54,6 @@ public struct LogData: Encodable {
         
         var serverInfo = ServerInfo()
         serverInfo.apiType = amperfyData.backendProxy.selectedApi.description
-        serverInfo.isAuthenticated = amperfyData.backendProxy.isAuthenticated()
         serverInfo.apiVersion = amperfyData.backendProxy.serverApiVersion
         logData.serverInfo = serverInfo
         
@@ -109,7 +108,6 @@ public struct DeviceInfo: Encodable {
 public struct ServerInfo: Encodable {
     public var apiType: String?
     public var apiVersion: String?
-    public var isAuthenticated: Bool?
 }
 
 public struct LibraryInfo: Encodable {

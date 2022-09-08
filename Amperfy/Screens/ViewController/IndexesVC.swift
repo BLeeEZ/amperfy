@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     
@@ -43,13 +44,11 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let library = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let musicFolderAsync = MusicFolder(managedObject: context.object(with: self.musicFolder.managedObject.objectID) as! MusicFolderMO)
-                syncer.syncIndexes(musicFolder: musicFolderAsync, library: library)
-            }
+        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncIndexes(musicFolder: musicFolder, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Indexes Sync", error: error)
         }
     }
     

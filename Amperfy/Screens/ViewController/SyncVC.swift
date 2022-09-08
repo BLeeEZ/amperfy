@@ -22,6 +22,7 @@
 import UIKit
 import Foundation
 import AmperfyKit
+import PromiseKit
 
 class SyncVC: UIViewController {
 
@@ -56,14 +57,21 @@ class SyncVC: UIViewController {
         self.appDelegate.library.cleanStorage()
         self.appDelegate.reinit()
         
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            self.syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            self.syncer?.sync(currentContext: context, persistentContainer: self.appDelegate.persistentStorage.persistentContainer, statusNotifyier: self)
+        self.syncer = self.appDelegate.backendApi.createLibrarySyncer()
+        firstly {
+            self.syncer!.syncInitial(persistentStorage: self.appDelegate.persistentStorage, statusNotifyier: self)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Initial Sync", error: error, displayPopup: false)
+        }.finally {
             self.appDelegate.persistentStorage.librarySyncVersion = .newestVersion
             self.appDelegate.persistentStorage.isLibrarySynced = true
             self.appDelegate.playableDownloadManager.start()
             self.appDelegate.artworkDownloadManager.start()
             self.appDelegate.backgroundLibrarySyncer.start()
+            
+            self.appDelegate.isKeepScreenAlive = false
+            self.appDelegate.eventLogger.supressAlerts = false
+            self.performSegue(withIdentifier: "toLibrary", sender: self)
         }
     }
     
@@ -101,41 +109,28 @@ extension SyncVC: SyncCallbacks {
         syncSemaphore.signal()
     }
     
-    func notifySyncStarted(ofType parsedObjectType: ParsedObjectType) {
+    func notifySyncStarted(ofType parsedObjectType: ParsedObjectType, totalCount: Int) {
         syncSemaphore.wait()
         self.parsedObjectCount = 0
         self.parsedObjectPercent = 0.0
         self.state = parsedObjectType
+        self.libObjectsToParseCount = totalCount > 0 ? totalCount : 1
         
         switch parsedObjectType {
         case .artist:
-            self.libObjectsToParseCount = self.syncer?.artistCount ?? 1
             self.updateSyncInfo(infoText: "Syncing artists ...", percentParsed: 0.0)
         case .album:
-            self.libObjectsToParseCount = self.syncer?.albumCount ?? 1
             self.updateSyncInfo(infoText: "Syncing albums ...", percentParsed: 0.0)
         case .song:
-            self.libObjectsToParseCount = self.syncer?.songCount ?? 1
             self.updateSyncInfo(infoText: "Syncing songs ...", percentParsed: 0.0)
         case .playlist:
-            self.libObjectsToParseCount = self.syncer?.playlistCount ?? 1
             self.updateSyncInfo(infoText: "Syncing playlists ...", percentParsed: 0.0)
         case .genre:
-            self.libObjectsToParseCount = self.syncer?.genreCount ?? 1
             self.updateSyncInfo(infoText: "Syncing genres ...", percentParsed: 0.0)
         case .podcast:
-            self.libObjectsToParseCount = self.syncer?.podcastCount ?? 1
             self.updateSyncInfo(infoText: "Syncing podcasts ...", percentParsed: 0.0)
         }
         syncSemaphore.signal()
     }
-    
-    func notifySyncFinished() {
-        DispatchQueue.main.async { [weak self] in
-            self?.appDelegate.isKeepScreenAlive = false
-            self?.appDelegate.eventLogger.supressAlerts = false
-            self?.performSegue(withIdentifier: "toLibrary", sender: self)
-        }
-    }
-    
+
 }

@@ -21,6 +21,7 @@
 
 import Foundation
 import CoreData
+import PromiseKit
 
 public typealias CompleteHandlerBlock = () -> ()
 
@@ -40,10 +41,10 @@ public protocol DownloadManageable {
 public protocol DownloadManagerDelegate {
     var requestPredicate: NSPredicate { get }
     var parallelDownloadsCount: Int { get }
-    func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL
+    func prepareDownload(download: Download) -> Promise<URL>
     func validateDownloadedData(download: Download) -> ResponseError?
-    func completedDownload(download: Download, context: NSManagedObjectContext)
-    func failedDownload(download: Download, context: NSManagedObjectContext)
+    func completedDownload(download: Download, persistentStorage: PersistentStorage) -> Guarantee<Void>
+    func failedDownload(download: Download, persistentStorage: PersistentStorage)
 }
 
 public protocol Downloadable: CustomEquatable {

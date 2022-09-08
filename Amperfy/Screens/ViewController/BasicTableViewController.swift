@@ -23,6 +23,7 @@ import UIKit
 import Foundation
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewController where ResultType : NSFetchRequestResult {
     
@@ -130,9 +131,10 @@ extension BasicTableViewController {
                 case .appendPodcastQueue:
                     self.appDelegate.player.appendPodcastQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
                 case .favorite:
-                    self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask { context in
-                        let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                        actionContext.containable.remoteToggleFavorite(inContext: context, syncer: syncer)
+                    firstly {
+                        actionContext.containable.remoteToggleFavorite(syncer: self.appDelegate.backendApi.createLibrarySyncer())
+                    }.catch { error in
+                        self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
                     }
                 }
             }

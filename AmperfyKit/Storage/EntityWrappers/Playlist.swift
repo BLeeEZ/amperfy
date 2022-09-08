@@ -23,6 +23,7 @@ import Foundation
 import CoreData
 import os.log
 import UIKit
+import PromiseKit
 
 public class Playlist: Identifyable {
     
@@ -384,11 +385,11 @@ extension Playlist: PlayableContainable  {
         return infoContent
     }
     public var playContextType: PlayerMode { return .music }
-    public func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
-        let syncer = backendApi.createLibrarySyncer()
-        let library = LibraryStorage(context: context)
-        let playlistAsync = getManagedObject(in: context, library: library)
-        syncer.syncDown(playlist: playlistAsync, library: library)
+    public func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+        return backendApi.createLibrarySyncer().syncDown(playlist: self, persistentContainer: storage.persistentContainer)
+    }
+    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
+        return Promise<Void>(error: BackendError.notSupported)
     }
     public var artworkCollection: ArtworkCollection {
         if songCount < 500 {

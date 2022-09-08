@@ -21,42 +21,55 @@
 
 import Foundation
 import CoreData
+import PromiseKit
 
 public class AutoDownloadLibrarySyncer {
     
-    private let settings: PersistentStorage.Settings
+    private let persistentStorage: PersistentStorage
     private let backendApi: BackendApi
     private let playableDownloadManager: DownloadManageable
     
-    public init(settings: PersistentStorage.Settings, backendApi: BackendApi, playableDownloadManager: DownloadManageable) {
-        self.settings = settings
+    public init(persistentStorage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) {
+        self.persistentStorage = persistentStorage
         self.backendApi = backendApi
         self.playableDownloadManager = playableDownloadManager
     }
     
-    public func syncLatestLibraryElements(context: NSManagedObjectContext) {
-        let library = LibraryStorage(context: context)
-        let syncer = self.backendApi.createLibrarySyncer()
+    public func syncLatestLibraryElements() -> Promise<Void> {
+        let library = LibraryStorage(context: persistentStorage.context)
         let oldRecentSongs = Set(library.getRecentSongs())
-        syncer.syncLatestLibraryElements(library: library)
-        if settings.isAutoDownloadLatestSongsActive {
-            let updatedRecentSongs = Set(library.getRecentSongs())
-            let newAddedRecentSongs = updatedRecentSongs.subtracting(oldRecentSongs)
-            playableDownloadManager.download(objects: Array(newAddedRecentSongs))
+        
+        return firstly {
+            self.backendApi.createLibrarySyncer().syncLatestLibraryElements(persistentStorage: persistentStorage)
+        }.get {
+            if self.persistentStorage.settings.isAutoDownloadLatestSongsActive {
+                let updatedRecentSongs = Set(library.getRecentSongs())
+                let newAddedRecentSongs = updatedRecentSongs.subtracting(oldRecentSongs)
+                self.playableDownloadManager.download(objects: Array(newAddedRecentSongs))
+            }
         }
     }
     
-    public func syncLatestPodcastEpisodes(podcast: Podcast, context: NSManagedObjectContext) -> [PodcastEpisode]{
-        let library = LibraryStorage(context: context)
-        let syncer = self.backendApi.createLibrarySyncer()
+    /// return: new synced podcast episodes if an initial sync already occued. If this is the initial sync no episods are returned
+    public func syncLatestPodcastEpisodes(podcast: Podcast) -> Promise<[PodcastEpisode]> {
         let oldRecentEpisodes = Set(podcast.episodes)
-        syncer.sync(podcast: podcast, library: library)
-        let updatedEpisodes = Set(podcast.episodes)
-        let newAddedRecentEpisodes = updatedEpisodes.subtracting(oldRecentEpisodes)
-        if settings.isAutoDownloadLatestSongsActive {
-            playableDownloadManager.download(objects: Array(newAddedRecentEpisodes))
+        return firstly {
+            self.backendApi.createLibrarySyncer().sync(podcast: podcast, persistentContainer: persistentStorage.persistentContainer)
+        }.then {
+            return Guarantee<[PodcastEpisode]> { seal in
+                let updatedEpisodes = Set(podcast.episodes)
+                let newAddedRecentEpisodes = updatedEpisodes.subtracting(oldRecentEpisodes)
+                if self.persistentStorage.settings.isAutoDownloadLatestSongsActive {
+                    self.playableDownloadManager.download(objects: Array(newAddedRecentEpisodes))
+                }
+                if !oldRecentEpisodes.isEmpty {
+                    seal(Array(newAddedRecentEpisodes))
+                } else {
+                    seal([PodcastEpisode]())
+                }
+                
+            }
         }
-        return Array(newAddedRecentEpisodes)
     }
     
 }

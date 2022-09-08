@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
@@ -64,12 +65,11 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.syncDownPlaylistsWithoutSongs(library: syncLibrary)
-            }
+        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncDownPlaylistsWithoutSongs(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
         }
     }
     
@@ -116,20 +116,17 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        defer { dismiss() }
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
-        if let items = itemsToAdd {
-            playlist.append(playables: items)
-            if appDelegate.persistentStorage.settings.isOnlineMode {
-                appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                    let syncLibrary = LibraryStorage(context: context)
-                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                    let playlistAsync = playlist.getManagedObject(in: context, library: syncLibrary)
-                    let songsAsync = items.compactMap{ context.object(with: $0.objectID) as? SongMO }.compactMap{ Song(managedObject: $0) }
-                    syncer.syncUpload(playlistToAddSongs: playlistAsync, songs: songsAsync, library: syncLibrary)
-                }
-            }
+        guard let items = itemsToAdd else { return }
+        playlist.append(playables: items)
+        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        let songsToAdd = items.compactMap{ $0.asSong }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncUpload(playlistToAddSongs: playlist, songs: songsToAdd, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlist Add Songs", error: error)
         }
-        dismiss()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

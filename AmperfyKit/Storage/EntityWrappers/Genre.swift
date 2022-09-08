@@ -22,6 +22,7 @@
 import Foundation
 import CoreData
 import UIKit
+import PromiseKit
 
 public class Genre: AbstractLibraryEntity {
     
@@ -107,11 +108,11 @@ extension Genre: PlayableContainable  {
         return songs
     }
     public var playContextType: PlayerMode { return .music }
-    public func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
-        let syncer = backendApi.createLibrarySyncer()
-        let library = LibraryStorage(context: context)
-        let genreAsync = Genre(managedObject: context.object(with: managedObject.objectID) as! GenreMO)
-        syncer.sync(genre: genreAsync, library: library)
+    public func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+        return backendApi.createLibrarySyncer().sync(genre: self, persistentContainer: storage.persistentContainer)
+    }
+    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
+        return Promise<Void>(error: BackendError.notSupported)
     }
     public var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)

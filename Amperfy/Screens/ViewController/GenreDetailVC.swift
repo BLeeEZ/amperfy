@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class GenreDetailVC: BasicTableViewController {
 
@@ -79,12 +80,20 @@ class GenreDetailVC: BasicTableViewController {
             switch indexPath.section+1 {
             case LibraryElement.Artist.rawValue:
                 let artist = self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                artist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+                firstly {
+                    artist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
+                }.finally {
                     completionHandler(SwipeActionContext(containable: artist))
                 }
             case LibraryElement.Album.rawValue:
                 let album = self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+                firstly {
+                    album.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+                }.finally {
                     completionHandler(SwipeActionContext(containable: album))
                 }
             case LibraryElement.Song.rawValue:
@@ -100,7 +109,11 @@ class GenreDetailVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        genre.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+        firstly {
+            genre.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
+        }.finally {
             self.detailOperationsView?.refresh()
         }
     }

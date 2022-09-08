@@ -22,6 +22,8 @@
 import Foundation
 import UIKit
 import os.log
+import CoreData
+import PromiseKit
 
 public class BackgroundFetchTriggeredSyncer {
     
@@ -38,38 +40,32 @@ public class BackgroundFetchTriggeredSyncer {
         self.playableDownloadManager = playableDownloadManager
     }
     
-    public func syncAndNotifyPodcastEpisodes(completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            os_log("Perform podcast episode sync", log: self.log, type: .info)
-            let syncLibrary = LibraryStorage(context: context)
-            let syncer = self.backendApi.createLibrarySyncer()
-            syncer.syncDownPodcastsWithoutEpisodes(library: syncLibrary)
-            
-            var backgroundFetchResult = UIBackgroundFetchResult.noData
-            var episodesToNotify = [PodcastEpisode]()
-            for podcast in syncLibrary.getPodcasts() {
-                let oldEpisodes = Set(podcast.episodes)
-                let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: self.persistentStorage.settings, backendApi: self.backendApi, playableDownloadManager: self.playableDownloadManager)
-                let newAddedRecentEpisodes = autoDownloadSyncer.syncLatestPodcastEpisodes(podcast: podcast, context: context)
-                if oldEpisodes.count > 0 {
-                    for newEpisode in newAddedRecentEpisodes {
-                        os_log("Podcast: %s, New Episode: %s", log: self.log, type: .info, podcast.title, newEpisode.title)
-                        episodesToNotify.append(newEpisode)
-                        backgroundFetchResult = .newData
-                    }
-                } else {
-                    os_log("Podcast: %s, Inital episode sync", log: self.log, type: .info, podcast.title)
-                    backgroundFetchResult = .newData
-                }
+    public func syncAndNotifyPodcastEpisodes() -> Promise<Void> {
+        os_log("Perform podcast episode sync", log: self.log, type: .info)
+        return firstly {
+            self.backendApi.createLibrarySyncer().syncDownPodcastsWithoutEpisodes(persistentContainer: self.persistentStorage.persistentContainer)
+        }.then { () -> Promise<Void> in
+            let library = LibraryStorage(context: self.persistentStorage.context)
+            let podcasts = library.getPodcasts()
+            let podcastNotificationPromises = podcasts.compactMap { podcast in return {
+                self.createPodcastNotificationPromise(podcast: podcast, persistentContainer: self.persistentStorage.persistentContainer)
+            }}
+            return podcastNotificationPromises.resolveSequentially()
+        }
+    }
+    
+    private func createPodcastNotificationPromise(podcast: Podcast, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+        return firstly {
+            AutoDownloadLibrarySyncer(persistentStorage: self.persistentStorage,
+                                      backendApi: self.backendApi,
+                                      playableDownloadManager: self.playableDownloadManager)
+            .syncLatestPodcastEpisodes(podcast: podcast)
+        }.then { addedPodcasts -> Guarantee<Void> in
+            for episodeToNotify in addedPodcasts {
+                os_log("Podcast: %s, New Episode: %s", log: self.log, type: .info, podcast.title, episodeToNotify.title)
+                self.notificationManager.notify(podcastEpisode: episodeToNotify)
             }
-            DispatchQueue.main.async {
-                for newEpisode in episodesToNotify {
-                    let episodeMO = try! context.existingObject(with: newEpisode.managedObject.objectID) as! PodcastEpisodeMO
-                    let episodeToNotify = PodcastEpisode(managedObject: episodeMO)
-                    self.notificationManager.notify(podcastEpisode: episodeToNotify)
-                }
-                completionHandler(backgroundFetchResult)
-            }
+            return Guarantee<Void>.value
         }
     }
 

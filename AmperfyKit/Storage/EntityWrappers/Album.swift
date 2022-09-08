@@ -22,6 +22,7 @@
 import Foundation
 import CoreData
 import UIKit
+import PromiseKit
 
 public class Album: AbstractLibraryEntity {
     
@@ -117,6 +118,13 @@ public class Album: AbstractLibraryEntity {
     override public var defaultImage: UIImage {
         return UIImage.albumArtwork
     }
+    
+    public func markAsRemoteDeleted() {
+        self.remoteStatus = .deleted
+        self.songs.forEach {
+            $0.remoteStatus = .deleted
+        }
+    }
 
 }
 
@@ -150,18 +158,15 @@ extension Album: PlayableContainable  {
     public var playContextType: PlayerMode { return .music }
     public var isRateable: Bool { return true }
     public var isFavoritable: Bool { return true }
-    public func remoteToggleFavorite(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
+        guard let context = managedObject.managedObjectContext else { return Promise<Void>(error: BackendError.persistentSaveFailed) }
+        isFavorite.toggle()
         let library = LibraryStorage(context: context)
-        let albumAsync = Album(managedObject: context.object(with: managedObject.objectID) as! AlbumMO)
-        albumAsync.isFavorite.toggle()
         library.saveContext()
-        syncer.setFavorite(album: albumAsync, isFavorite: albumAsync.isFavorite)
+        return syncer.setFavorite(album: self, isFavorite: isFavorite)
     }
-    public func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
-        let syncer = backendApi.createLibrarySyncer()
-        let library = LibraryStorage(context: context)
-        let albumAsync = Album(managedObject: context.object(with: managedObject.objectID) as! AlbumMO)
-        syncer.sync(album: albumAsync, library: library)
+    public func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+        return backendApi.createLibrarySyncer().sync(album: self, persistentContainer: storage.persistentContainer)
     }
     public var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)

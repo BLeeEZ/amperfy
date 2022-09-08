@@ -23,6 +23,7 @@ import Foundation
 import AVFoundation
 import UIKit
 import os.log
+import PromiseKit
 
 protocol BackendAudioPlayerNotifiable {
     func didElapsedTimeChange()
@@ -31,6 +32,7 @@ protocol BackendAudioPlayerNotifiable {
     func playNext()
     func didItemFinishedPlaying()
     func notifyItemPreparationFinished()
+    func notifyErrorOccured(error: Error)
 }
 
 enum PlayType {
@@ -47,7 +49,6 @@ class BackendAudioPlayer {
     private let player: AVPlayer
     private let eventLogger: EventLogger
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
-    private let semaphore = DispatchSemaphore(value: 1)
     
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
@@ -119,23 +120,31 @@ class BackendAudioPlayer {
     }
     
     func requestToPlay(playable: AbstractPlayable) {
-        semaphore.wait()
         if !playable.isPlayableOniOS, let contentType = playable.contentType {
             clearPlayer()
             eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playable.displayString)\" is not playable via Amperfy.", displayPopup: true)
+            self.responder?.notifyItemPreparationFinished()
         } else if playable.isCached {
             insertCachedPlayable(playable: playable)
+            self.continuePlay()
+            self.responder?.notifyItemPreparationFinished()
         } else if !isOfflineMode{
-            insertStreamPlayable(playable: playable)
-            if isAutoCachePlayedItems {
-                playableDownloader.download(object: playable)
+            firstly {
+                insertStreamPlayable(playable: playable)
+            }.done {
+                if self.isAutoCachePlayedItems {
+                    self.playableDownloader.download(object: playable)
+                }
+                self.continuePlay()
+                self.responder?.notifyItemPreparationFinished()
+            }.catch { error in
+                self.responder?.notifyErrorOccured(error: error)
+                self.eventLogger.report(topic: "Player", error: error)
             }
         } else {
             clearPlayer()
+            self.responder?.notifyItemPreparationFinished()
         }
-        self.continuePlay()
-        self.responder?.notifyItemPreparationFinished()
-        semaphore.signal()
     }
     
     private func clearPlayer() {
@@ -145,7 +154,9 @@ class BackendAudioPlayer {
     }
     
     private func insertCachedPlayable(playable: AbstractPlayable) {
-        guard let playableData = cacheProxy.getFile(forPlayable: playable)?.data else { return }
+        guard let playableData = cacheProxy.getFile(forPlayable: playable)?.data else {
+            return
+        }
         os_log(.default, "Play item: %s", playable.displayString)
         playType = .cache
         if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
@@ -153,12 +164,15 @@ class BackendAudioPlayer {
         insert(playable: playable, withUrl: itemUrl)
     }
     
-    private func insertStreamPlayable(playable: AbstractPlayable) {
-        guard let streamUrl = backendApi.generateUrl(forStreamingPlayable: playable) else { return }
-        os_log(.default, "Stream item: %s", playable.displayString)
-        playType = .stream
-        if playable.isSong { userStatistics.playedSong(isPlayedFromCache: false) }
-        insert(playable: playable, withUrl: streamUrl)
+    private func insertStreamPlayable(playable: AbstractPlayable) -> Promise<Void> {
+        return firstly {
+            backendApi.generateUrl(forStreamingPlayable: playable)
+        }.get { streamUrl in
+            os_log(.default, "Stream item: %s", playable.displayString)
+            self.playType = .stream
+            if playable.isSong { self.userStatistics.playedSong(isPlayedFromCache: false) }
+            self.insert(playable: playable, withUrl: streamUrl)
+        }.asVoid()
     }
 
     private func insert(playable: AbstractPlayable, withUrl url: URL) {

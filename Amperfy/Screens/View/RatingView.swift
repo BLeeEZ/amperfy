@@ -21,6 +21,7 @@
 
 import UIKit
 import AmperfyKit
+import PromiseKit
 
 class RatingView: UIView {
     
@@ -117,39 +118,50 @@ class RatingView: UIView {
     
     private func setRating(rating: Int) {
         guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
-            if let song = self.ratingSong {
-                let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
-                syncer.setRating(song: songAsync, rating: rating)
-                songAsync.rating = rating
-            } else if let album = self.ratingAlbum {
-                let albumAsync = Album(managedObject: context.object(with: album.managedObject.objectID) as! AlbumMO)
-                syncer.setRating(album: albumAsync, rating: rating)
-                albumAsync.rating = rating
-            } else if let artist = self.ratingArtist {
-                let artistAsync = Artist(managedObject: context.object(with: artist.managedObject.objectID) as! ArtistMO)
-                syncer.setRating(artist: artistAsync, rating: rating)
-                artistAsync.rating = rating
-            }
-            syncLibrary.saveContext()
-            DispatchQueue.main.async {
+        if let song = self.ratingSong {
+            song.rating = rating
+            self.appDelegate.library.saveContext()
+            firstly {
+                self.appDelegate.backendProxy.createLibrarySyncer().setRating(song: song, rating: rating)
+            }.done {
                 self.refresh()
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Song Rating Sync", error: error)
+            }
+        } else if let album = self.ratingAlbum {
+            album.rating = rating
+            self.appDelegate.library.saveContext()
+            firstly {
+                self.appDelegate.backendProxy.createLibrarySyncer().setRating(album: album, rating: rating)
+            }.done {
+                self.refresh()
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Album Rating Sync", error: error)
+            }
+        } else if let artist = self.ratingArtist {
+            artist.rating = rating
+            self.appDelegate.library.saveContext()
+            firstly {
+                self.appDelegate.backendProxy.createLibrarySyncer().setRating(artist: artist, rating: rating)
+            }.done {
+                self.refresh()
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Artist Rating Sync", error: error)
             }
         }
     }
     
     func toggleFavorite() {
-        guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
-            if let containable: PlayableContainable = self.ratingSong ?? self.ratingAlbum ?? self.ratingArtist {
-                containable.remoteToggleFavorite(inContext: context, syncer: syncer)
-            }
-            DispatchQueue.main.async {
-                self.refresh()
-            }
+        guard self.appDelegate.persistentStorage.settings.isOnlineMode,
+              let containable: PlayableContainable = self.ratingSong ?? self.ratingAlbum ?? self.ratingArtist else {
+            return
+        }
+        firstly {
+            containable.remoteToggleFavorite(syncer: self.appDelegate.backendApi.createLibrarySyncer())
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+        }.finally {
+            self.refresh()
         }
     }
 

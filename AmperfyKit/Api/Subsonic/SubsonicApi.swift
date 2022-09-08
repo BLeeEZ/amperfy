@@ -21,6 +21,7 @@
 
 import Foundation
 import os.log
+import PromiseKit
 
 class SubsonicApi  {
         
@@ -40,42 +41,30 @@ class SubsonicApi  {
 extension SubsonicApi: BackendApi {
     
     public var clientApiVersion: String {
-        return subsonicServerApi.clientApiVersion.description
+        return subsonicServerApi.clientApiVersion?.description ?? "-"
     }
     
     public var serverApiVersion: String {
         return subsonicServerApi.serverApiVersion?.description ?? "-"
     }
-    
-    public var isPodcastSupported: Bool {
-        return subsonicServerApi.isPodcastSupported
-    }
 
     func provideCredentials(credentials: LoginCredentials) {
         subsonicServerApi.provideCredentials(credentials: credentials)
     }
-
-    func authenticate(credentials: LoginCredentials) {
-        subsonicServerApi.authenticate(credentials: credentials)
-    }
-
-    func isAuthenticated() -> Bool {
-        return subsonicServerApi.isAuthenticated()
-    }
     
-    func isAuthenticationValid(credentials: LoginCredentials) -> Bool {
+    func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
         return subsonicServerApi.isAuthenticationValid(credentials: credentials)
     }
 
-    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL? {
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> {
         return subsonicServerApi.generateUrl(forDownloadingPlayable: playable)
     }
 
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL? {
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
         return subsonicServerApi.generateUrl(forStreamingPlayable: playable)
     }
     
-    func generateUrl(forArtwork artwork: Artwork) -> URL? {
+    func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
         return subsonicServerApi.generateUrl(forArtwork: artwork)
     }
 

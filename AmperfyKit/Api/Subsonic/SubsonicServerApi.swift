@@ -21,6 +21,9 @@
 
 import Foundation
 import os.log
+import PromiseKit
+import Alamofire
+import PMKAlamofire
 
 protocol SubsonicUrlCreator {
     func getArtUrlString(forCoverArtId: String) -> String
@@ -64,13 +67,12 @@ class SubsonicServerApi {
     static let defaultClientApiVersionPreToken = SubsonicVersion(major: 1, minor: 11, patch: 0)
     
     var serverApiVersion: SubsonicVersion?
-    var clientApiVersion = defaultClientApiVersionWithToken
+    var clientApiVersion: SubsonicVersion?
     var authType: SubsonicApiAuthType = .autoDetect
     
     private let log = OSLog(subsystem: "Amperfy", category: "Subsonic")
     private let eventLogger: EventLogger
     private var credentials: LoginCredentials?
-    private var isValidCredentials = false
     
     init(eventLogger: EventLogger) {
         self.eventLogger = eventLogger
@@ -94,26 +96,40 @@ class SubsonicServerApi {
         return authenticationToken
     }
     
-    private func determeClientApiVersionToUse(providedCredentials: LoginCredentials? = nil) {
-        if serverApiVersion == nil {
-            serverApiVersion = requestServerApiVersion(providedCredentials: providedCredentials)
+    private func determineApiVersionToUse(providedCredentials: LoginCredentials? = nil) -> Promise<SubsonicVersion> {
+        return firstly {
+            self.getCachedServerApiVersionOrRequestIt(providedCredentials: providedCredentials)
+        }.then { version in
+            self.determineClientApiVersion(serverVersion: version)
+        }
+    }
+    
+    private func getCachedServerApiVersionOrRequestIt(providedCredentials: LoginCredentials? = nil) -> Promise<SubsonicVersion> {
+        if let serverVersion = serverApiVersion {
+            return Promise<SubsonicVersion>.value(serverVersion)
+        } else {
+            return self.requestServerApiVersionPromise(providedCredentials: providedCredentials)
+        }
+    }
+    
+    private func determineClientApiVersion(serverVersion: SubsonicVersion) -> Promise<SubsonicVersion> {
+        return Promise<SubsonicVersion> { seal in
+            if let clientApi = self.clientApiVersion {
+                return seal.fulfill(clientApi)
+            }
             guard authType != .legacy else {
                 os_log("Client API legacy login", log: log, type: .info)
-                clientApiVersion = SubsonicServerApi.defaultClientApiVersionPreToken
-                return
+                self.clientApiVersion = SubsonicServerApi.defaultClientApiVersionPreToken
+                return seal.fulfill(self.clientApiVersion!)
             }
-            guard let serverApiVersion = serverApiVersion else {
-                os_log("Server API could not be fetched", log: log, type: .error)
-                clientApiVersion = SubsonicServerApi.defaultClientApiVersionWithToken
-                return
-            }
-            os_log("Server API version is '%s'", log: log, type: .info, serverApiVersion.description)
-            if serverApiVersion < SubsonicVersion.authenticationTokenRequiredServerApi {
-                clientApiVersion = SubsonicServerApi.defaultClientApiVersionPreToken
+            os_log("Server API version is '%s'", log: log, type: .info, serverVersion.description)
+            if serverVersion < SubsonicVersion.authenticationTokenRequiredServerApi {
+                self.clientApiVersion = SubsonicServerApi.defaultClientApiVersionPreToken
             } else {
-                clientApiVersion = SubsonicServerApi.defaultClientApiVersionWithToken
+                self.clientApiVersion = SubsonicServerApi.defaultClientApiVersionWithToken
             }
-            os_log("Client API version is '%s'", log: log, type: .info, clientApiVersion.description)
+            os_log("Client API version is '%s'", log: log, type: .info, self.clientApiVersion!.description)
+            return seal.fulfill(clientApiVersion!)
         }
     }
     
@@ -129,20 +145,18 @@ class SubsonicServerApi {
         return URLComponents(url: apiUrl, resolvingAgainstBaseURL: false)
     }
     
-    private func createAuthenticatedApiUrlComponent(forAction: String, credentials providedCredentials: LoginCredentials? = nil) -> URLComponents? {
+    private func createAuthApiUrlComponent(version: SubsonicVersion, forAction: String, credentials providedCredentials: LoginCredentials? = nil) throws -> URLComponents {
         let localCredentials = providedCredentials != nil ? providedCredentials : self.credentials
         guard let username = localCredentials?.username,
               let password = localCredentials?.password,
               var urlComp = createBasicApiUrlComponent(forAction: forAction, providedCredentials: localCredentials)
-        else { return nil }
-        
-        determeClientApiVersionToUse(providedCredentials: localCredentials)
+        else { throw BackendError.invalidUrl }
         
         urlComp.addQueryItem(name: "u", value: username)
-        urlComp.addQueryItem(name: "v", value: clientApiVersion.description)
+        urlComp.addQueryItem(name: "v", value: version.description)
         urlComp.addQueryItem(name: "c", value: "Amperfy")
         
-        if clientApiVersion < SubsonicVersion.authenticationTokenRequiredServerApi {
+        if version < SubsonicVersion.authenticationTokenRequiredServerApi {
             urlComp.addQueryItem(name: "p", value: password)
         } else {
             let salt = String.generateRandomString(ofLength: 16)
@@ -154,8 +168,8 @@ class SubsonicServerApi {
         return urlComp
     }
     
-    private func createAuthenticatedApiUrlComponent(forAction: String, id: String) -> URLComponents? {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: forAction) else { return nil }
+    private func createAuthApiUrlComponent(version: SubsonicVersion, forAction: String, id: String) throws -> URLComponents {
+        var urlComp = try createAuthApiUrlComponent(version: version, forAction: forAction)
         urlComp.addQueryItem(name: "id", value: id)
         return urlComp
     }
@@ -164,196 +178,257 @@ class SubsonicServerApi {
         self.credentials = credentials
     }
     
-    func authenticate(credentials: LoginCredentials) {
-        isValidCredentials = isAuthenticationValid(credentials: credentials)
-        if isValidCredentials {
-            self.credentials = credentials
+    func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
+        return firstly {
+            self.requestServerApiVersionPromise(providedCredentials: credentials)
+        }.then { version in
+            self.determineClientApiVersion(serverVersion: version)
+        }.then { version -> Promise<Data> in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "ping", credentials: credentials)
+            return self.request(url: try self.createUrl(from: urlComp))
+        }.then { data -> Promise<Void> in
+            let parserDelegate = SsPingParserDelegate()
+            let parser = XMLParser(data: data)
+            parser.delegate = parserDelegate
+            let success = parser.parse()
+            
+            if let error = parser.parserError {
+                os_log("Error during login parsing: %s", log: self.log, type: .error, error.localizedDescription)
+                throw AuthenticationError.notAbleToLogin
+            }
+            if success, parserDelegate.isAuthValid {
+                return Promise.value
+            } else {
+                os_log("Couldn't login.", log: self.log, type: .error)
+                throw AuthenticationError.notAbleToLogin
+            }
         }
     }
     
-    func isAuthenticationValid(credentials: LoginCredentials) -> Bool {
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "ping", credentials: credentials),
-              let url = urlComp.url else {
-            os_log("Subsonic server URL invalid", log: log, type: .error)
-            return false
-        }
-
-        guard let parser = XMLParser(contentsOf: url) else {
-            os_log("Couldn't load the ping response.", log: log, type: .error)
-            return false
-        }
-        
-        let curDelegate = SsPingParserDelegate()
-        parser.delegate = curDelegate
-        let success = parser.parse()
-        
-        if let error = parser.parserError {
-            os_log("Error during login parsing: %s", log: log, type: .error, error.localizedDescription)
-            return false
-        }
-        if success, curDelegate.isAuthValid {
-            return true
-        } else {
-            os_log("Couldn't login.", log: log, type: .error)
-            return false
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> {
+        return firstly {
+            self.determineApiVersionToUse()
+        }.then { version -> Promise<URL> in
+            if let podcastEpisode = playable.asPodcastEpisode, let streamId = podcastEpisode.streamId {
+                return Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "download", id: streamId)))
+            } else {
+                return Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "download", id: playable.id)))
+            }
         }
     }
     
-    func isAuthenticated() -> Bool {
-        return isValidCredentials
-    }
-    
-    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL? {
-        if let podcastEpisode = playable.asPodcastEpisode, let streamId = podcastEpisode.streamId {
-            return createAuthenticatedApiUrlComponent(forAction: "download", id: streamId)?.url
-        } else {
-            return createAuthenticatedApiUrlComponent(forAction: "download", id: playable.id)?.url
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
+        return firstly {
+            self.determineApiVersionToUse()
+        }.then { version -> Promise<URL> in
+            if let podcastEpisode = playable.asPodcastEpisode, let streamId = podcastEpisode.streamId {
+                return Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: streamId)))
+            } else {
+                return Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: playable.id)))
+            }
         }
     }
     
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL? {
-        if let podcastEpisode = playable.asPodcastEpisode, let streamId = podcastEpisode.streamId {
-            return createAuthenticatedApiUrlComponent(forAction: "stream", id: streamId)?.url
-        } else {
-            return createAuthenticatedApiUrlComponent(forAction: "stream", id: playable.id)?.url
-        }
-    }
-    
-    func generateUrl(forArtwork artwork: Artwork) -> URL? {
+    func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
         guard let urlComp = URLComponents(string: artwork.url),
            let queryItems = urlComp.queryItems,
            let coverArtQuery = queryItems.first(where: {$0.name == "id"}),
            let coverArtId = coverArtQuery.value
-            else { return nil }
-        return createAuthenticatedApiUrlComponent(forAction: "getCoverArt", id: coverArtId)?.url
-    }
-    
-    func requestServerApiVersion(providedCredentials: LoginCredentials? = nil) -> SubsonicVersion? {
-        guard let urlComp = createBasicApiUrlComponent(forAction: "ping", providedCredentials: providedCredentials) else { return nil }
-        let parserDelegate = SsPingParserDelegate()
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate, ignoreErrorResponse: true)
-        guard let serverApiVersionString = parserDelegate.serverApiVersion else { return nil }
-        guard let serverApiVersion = SubsonicVersion(serverApiVersionString) else {
-            os_log("The server API version '%s' could not be parsed to 'SubsonicVersion'", log: log, type: .info, serverApiVersionString)
-            return nil
-        }
-        return serverApiVersion
-    }
-    
-    public var isPodcastSupported: Bool {
-        determeClientApiVersionToUse()
-        if let serverApi = serverApiVersion {
-            return serverApi >= SubsonicVersion(major: 1, minor: 9, patch: 0)
-        } else {
-            return false
+        else { return Promise(error: BackendError.invalidUrl) }
+        return firstly {
+            self.determineApiVersionToUse()
+        }.then { version in
+            Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "getCoverArt", id: coverArtId)))
         }
     }
-
-    func requestGenres(parserDelegate: SsXmlParser) {
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getGenres") else { return }
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-
-    func requestArtists(parserDelegate: SsXmlParser) {
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getArtists") else { return }
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    
+    private func requestServerApiVersionPromise(providedCredentials: LoginCredentials? = nil) -> Promise<SubsonicVersion> {
+        return firstly {
+            Promise<URL> { seal in
+                guard let urlComp = createBasicApiUrlComponent(forAction: "ping", providedCredentials: providedCredentials) else {
+                    throw BackendError.invalidUrl
+                }
+                return seal.fulfill(try createUrl(from: urlComp))
+            }
+        }.then { url in
+            self.request(url: url)
+        }.then { data in
+            return Promise<SubsonicVersion> { seal in
+                let delegate = SsPingParserDelegate()
+                let parser = XMLParser(data: data)
+                parser.delegate = delegate
+                parser.parse()
+                guard let serverApiVersionString = delegate.serverApiVersion else { throw BackendError.parser }
+                guard let serverApiVersion = SubsonicVersion(serverApiVersionString) else {
+                    os_log("The server API version '%s' could not be parsed to 'SubsonicVersion'", log: self.log, type: .info, serverApiVersionString)
+                    throw BackendError.parser
+                }
+                self.serverApiVersion = serverApiVersion
+                return seal.fulfill(serverApiVersion)
+            }
+        }
     }
     
-    func requestArtist(parserDelegate: SsXmlParser, id: String) {
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getArtist", id: id) else { return }
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestAlbum(parserDelegate: SsXmlParser, id: String) {
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getAlbum", id: id) else { return }
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestSong(parserDelegate: SsXmlParser, id: String) {
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getSong", id: id) else { return }
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestFavoriteElements() -> Data? {
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getStarred2") else { return nil }
-        return requestData(fromUrlComponent: urlComp)
-    }
-    
-    func requestLatestAlbums(parserDelegate: SsXmlParser) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getAlbumList2") else { return }
-        urlComp.addQueryItem(name: "type", value: "newest")
-        urlComp.addQueryItem(name: "size", value: 20)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestRandomSongs(parserDelegate: SsXmlParser, count: Int) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getRandomSongs") else { return }
-        urlComp.addQueryItem(name: "size", value: count)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestPodcastEpisodeDelete(parserDelegate: SsXmlParser, id: String) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "deletePodcastEpisode") else { return }
-        urlComp.addQueryItem(name: "id", value: id)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-
-    func requestSearchArtists(parserDelegate: SsXmlParser, searchText: String) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "search3") else { return }
-        urlComp.addQueryItem(name: "query", value: searchText)
-        urlComp.addQueryItem(name: "artistCount", value: 40)
-        urlComp.addQueryItem(name: "artistOffset", value: 0)
-        urlComp.addQueryItem(name: "albumCount", value: 0)
-        urlComp.addQueryItem(name: "albumOffset", value: 0)
-        urlComp.addQueryItem(name: "songCount", value: 0)
-        urlComp.addQueryItem(name: "songOffset", value: 0)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestSearchAlbums(parserDelegate: SsXmlParser, searchText: String) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "search3") else { return }
-        urlComp.addQueryItem(name: "query", value: searchText)
-        urlComp.addQueryItem(name: "artistCount", value: 0)
-        urlComp.addQueryItem(name: "artistOffset", value: 0)
-        urlComp.addQueryItem(name: "albumCount", value: 40)
-        urlComp.addQueryItem(name: "albumOffset", value: 0)
-        urlComp.addQueryItem(name: "songCount", value: 0)
-        urlComp.addQueryItem(name: "songOffset", value: 0)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    func requestServerPodcastSupport() -> Promise<Bool> {
+        return firstly {
+            self.determineApiVersionToUse()
+        }.then { auth -> Promise<Bool> in
+            var isPodcastSupported = false
+            if let serverApi = self.serverApiVersion {
+                isPodcastSupported = serverApi >= SubsonicVersion(major: 1, minor: 9, patch: 0)
+            }
+            if !isPodcastSupported {
+                return Promise<Bool>.value(isPodcastSupported)
+            } else {
+                return Promise<Bool> { seal in
+                    firstly {
+                        self.requestPodcasts().asVoid()
+                    }.done {
+                        seal.fulfill(true)
+                    }.catch { error in
+                        seal.fulfill(false)
+                    }
+                }
+            }
+        }
     }
 
-    func requestSearchSongs(parserDelegate: SsXmlParser, searchText: String) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "search3") else { return }
-        urlComp.addQueryItem(name: "query", value: searchText)
-        urlComp.addQueryItem(name: "artistCount", value: 0)
-        urlComp.addQueryItem(name: "artistOffset", value: 0)
-        urlComp.addQueryItem(name: "albumCount", value: 0)
-        urlComp.addQueryItem(name: "albumOffset", value: 0)
-        urlComp.addQueryItem(name: "songCount", value: 40)
-        urlComp.addQueryItem(name: "songOffset", value: 0)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestPlaylists(parserDelegate: SsXmlParser) {
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getPlaylists") else { return }
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    func requestGenres() -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getGenres")
+            return try self.createUrl(from: urlComp)
+        }
     }
 
-    func requestPlaylistSongs(parserDelegate: SsXmlParser, id: String) {
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getPlaylist", id: id) else { return }
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-
-    func requestPlaylistCreate(parserDelegate: SsXmlParser, playlist: Playlist) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "createPlaylist") else { return }
-        urlComp.addQueryItem(name: "name", value: playlist.name)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    func requestArtists() -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getArtists")
+            return try self.createUrl(from: urlComp)
+        }
     }
     
-    func requestPlaylistDelete(parserDelegate: SsXmlParser, playlist: Playlist) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "deletePlaylist") else { return }
-        urlComp.addQueryItem(name: "id", value: playlist.id)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    func requestArtist(id: String) -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getArtist", id: id)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestAlbum(id: String) -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getAlbum", id: id)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestSongInfo(id: String) -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getSong", id: id)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+
+    func requestFavoriteElements() -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getStarred2")
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestLatestAlbums() -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getAlbumList2")
+            urlComp.addQueryItem(name: "type", value: "newest")
+            urlComp.addQueryItem(name: "size", value: 20)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestRandomSongs(count: Int) -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getRandomSongs")
+            urlComp.addQueryItem(name: "size", value: count)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestPodcastEpisodeDelete(id: String) -> Promise<Data>  {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "deletePodcastEpisode", id: id)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestSearchArtists(searchText: String) -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
+            urlComp.addQueryItem(name: "query", value: searchText)
+            urlComp.addQueryItem(name: "artistCount", value: 40)
+            urlComp.addQueryItem(name: "artistOffset", value: 0)
+            urlComp.addQueryItem(name: "albumCount", value: 0)
+            urlComp.addQueryItem(name: "albumOffset", value: 0)
+            urlComp.addQueryItem(name: "songCount", value: 0)
+            urlComp.addQueryItem(name: "songOffset", value: 0)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    
+    func requestSearchAlbums(searchText: String) -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
+            urlComp.addQueryItem(name: "query", value: searchText)
+            urlComp.addQueryItem(name: "artistCount", value: 0)
+            urlComp.addQueryItem(name: "artistOffset", value: 0)
+            urlComp.addQueryItem(name: "albumCount", value: 40)
+            urlComp.addQueryItem(name: "albumOffset", value: 0)
+            urlComp.addQueryItem(name: "songCount", value: 0)
+            urlComp.addQueryItem(name: "songOffset", value: 0)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestSearchSongs(searchText: String) -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
+            urlComp.addQueryItem(name: "query", value: searchText)
+            urlComp.addQueryItem(name: "artistCount", value: 0)
+            urlComp.addQueryItem(name: "artistOffset", value: 0)
+            urlComp.addQueryItem(name: "albumCount", value: 0)
+            urlComp.addQueryItem(name: "albumOffset", value: 0)
+            urlComp.addQueryItem(name: "songCount", value: 40)
+            urlComp.addQueryItem(name: "songOffset", value: 0)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestPlaylists() -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPlaylists")
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestPlaylistSongs(id: String) -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPlaylist", id: id)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestPlaylistCreate(name: String) -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "createPlaylist")
+            urlComp.addQueryItem(name: "name", value: name)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestPlaylistDelete(id: String) -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "deletePlaylist", id: id)
+            return try self.createUrl(from: urlComp)
+        }
     }
     
     func checkForErrorResponse(inData data: Data) -> ResponseError? {
@@ -364,101 +439,127 @@ class SubsonicServerApi {
         return errorParser.error
     }
 
-    func requestPlaylistUpdate(parserDelegate: SsXmlParser, playlist: Playlist, songIndicesToRemove: [Int], songIdsToAdd: [String]) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "updatePlaylist") else { return }
-        urlComp.addQueryItem(name: "playlistId", value: playlist.id)
-        urlComp.addQueryItem(name: "name", value: playlist.name)
-        for songIndex in songIndicesToRemove {
-            urlComp.addQueryItem(name: "songIndexToRemove", value: songIndex)
+    func requestPlaylistUpdate(id: String, name: String, songIndicesToRemove: [Int], songIdsToAdd: [String]) -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "updatePlaylist")
+            urlComp.addQueryItem(name: "playlistId", value: id)
+            urlComp.addQueryItem(name: "name", value: name)
+            for songIndex in songIndicesToRemove {
+                urlComp.addQueryItem(name: "songIndexToRemove", value: songIndex)
+            }
+            for songId in songIdsToAdd {
+                urlComp.addQueryItem(name: "songIdToAdd", value: songId)
+            }
+            return try self.createUrl(from: urlComp)
         }
-        for songId in songIdsToAdd {
-            urlComp.addQueryItem(name: "songIdToAdd", value: songId)
+    }
+    
+    func requestPodcasts() -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPodcasts")
+            urlComp.addQueryItem(name: "includeEpisodes", value: "false")
+            return try self.createUrl(from: urlComp)
         }
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
     
-    func requestPodcasts(parserDelegate: SsXmlParser) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getPodcasts") else { return }
-        urlComp.addQueryItem(name: "includeEpisodes", value: "false")
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    func requestPodcastEpisodes(id: String) -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPodcasts", id: id)
+            urlComp.addQueryItem(name: "includeEpisodes", value: "true")
+            return try self.createUrl(from: urlComp)
+        }
     }
     
-    func requestPodcastEpisodes(parserDelegate: SsXmlParser, id: String) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getPodcasts", id: id) else { return }
-        urlComp.addQueryItem(name: "includeEpisodes", value: "true")
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    func requestMusicFolders() -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getMusicFolders")
+            return try self.createUrl(from: urlComp)
+        }
     }
     
-    func requestMusicFolders(parserDelegate: SsXmlParser) {
-        guard let urlComp = createAuthenticatedApiUrlComponent(forAction: "getMusicFolders") else { return }
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    func requestIndexes(musicFolderId: String) -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getIndexes")
+            urlComp.addQueryItem(name: "musicFolderId", value: musicFolderId)
+            return try self.createUrl(from: urlComp)
+        }
     }
     
-    func requestIndexes(parserDelegate: SsXmlParser, musicFolderId: String) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getIndexes") else { return }
-        urlComp.addQueryItem(name: "musicFolderId", value: musicFolderId)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestMusicDirectory(parserDelegate: SsXmlParser, id: String) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "getMusicDirectory") else { return }
-        urlComp.addQueryItem(name: "id", value: id)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
+    func requestMusicDirectory(id: String) -> Promise<Data> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getMusicDirectory", id: id)
+            return try self.createUrl(from: urlComp)
+        }
     }
 
-    func requestRecordSongPlay(parserDelegate: SsXmlParser, id: String, date: Date?) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "scrobble") else { return }
-        if let date = date {
-            urlComp.addQueryItem(name: "date", value: Int(date.timeIntervalSince1970))
+    func requestRecordSongPlay(id: String, date: Date?) -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "scrobble", id: id)
+            if let date = date {
+                urlComp.addQueryItem(name: "date", value: Int(date.timeIntervalSince1970))
+            }
+            return try self.createUrl(from: urlComp)
         }
-        urlComp.addQueryItem(name: "id", value: id)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
     }
 
-    // Only songs, albums, artists are supported by the subsonic API
-    func requestRating(parserDelegate: SsXmlParser, id: String, rating: Int) {
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: "setRating") else { return }
-        urlComp.addQueryItem(name: "id", value: id)
-        urlComp.addQueryItem(name: "rating", value: rating)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestSetFavorite(parserDelegate: SsXmlParser, songId: String, isFavorite: Bool) {
-        let apiFavoriteAction = isFavorite ? "star" : "unstar"
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: apiFavoriteAction) else { return }
-        urlComp.addQueryItem(name: "id", value: songId)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestSetFavorite(parserDelegate: SsXmlParser, albumId: String, isFavorite: Bool) {
-        let apiFavoriteAction = isFavorite ? "star" : "unstar"
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: apiFavoriteAction) else { return }
-        urlComp.addQueryItem(name: "albumId", value: albumId)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    func requestSetFavorite(parserDelegate: SsXmlParser, artistId: String, isFavorite: Bool) {
-        let apiFavoriteAction = isFavorite ? "star" : "unstar"
-        guard var urlComp = createAuthenticatedApiUrlComponent(forAction: apiFavoriteAction) else { return }
-        urlComp.addQueryItem(name: "artistId", value: artistId)
-        request(fromUrlComponent: urlComp, viaXmlParser: parserDelegate)
-    }
-    
-    private func requestData(fromUrlComponent: URLComponents) -> Data? {
-        guard let url = fromUrlComponent.url else {
-            os_log("URL could not be created: %s", log: log, type: .error, fromUrlComponent.description)
-            return nil
+    /// Only songs, albums, artists are supported by the subsonic API
+    func requestRating(id: String, rating: Int) -> Promise<Data> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "setRating", id: id)
+            urlComp.addQueryItem(name: "rating", value: rating)
+            return try self.createUrl(from: urlComp)
         }
-        return try? Data(contentsOf: url)
     }
     
-    private func request(fromUrlComponent: URLComponents, viaXmlParser parserDelegate: SsXmlParser, ignoreErrorResponse: Bool = false) {
-        guard let requestedData = requestData(fromUrlComponent: fromUrlComponent) else { return }
-        let parser = XMLParser(data: requestedData)
-        parser.delegate = parserDelegate
-        parser.parse()
-        if !ignoreErrorResponse, let error = parserDelegate.error, let subsonicError = error.asSubsonicError {
-            eventLogger.report(error: error, displayPopup: subsonicError.shouldErrorBeDisplayedToUser)
+    func requestSetFavorite(songId: String, isFavorite: Bool) -> Promise<Data> {
+        return request { version in
+            let apiFavoriteAction = isFavorite ? "star" : "unstar"
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: apiFavoriteAction, id: songId)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestSetFavorite(albumId: String, isFavorite: Bool) -> Promise<Data> {
+        return request { version in
+            let apiFavoriteAction = isFavorite ? "star" : "unstar"
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: apiFavoriteAction)
+            urlComp.addQueryItem(name: "albumId", value: albumId)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func requestSetFavorite(artistId: String, isFavorite: Bool) -> Promise<Data> {
+        return request { version in
+            let apiFavoriteAction = isFavorite ? "star" : "unstar"
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: apiFavoriteAction)
+            urlComp.addQueryItem(name: "artistId", value: artistId)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    private func createUrl(from urlComp: URLComponents) throws -> URL {
+        if let url = urlComp.url {
+            return url
+        } else {
+            throw BackendError.invalidUrl
+        }
+    }
+    
+    private func request(urlCreation: @escaping (_: SubsonicVersion) throws -> URL) -> Promise<Data> {
+        return firstly {
+            self.determineApiVersionToUse()
+        }.then { version in
+            Promise<URL> { seal in seal.fulfill(try urlCreation(version)) }
+        }.then { url in
+            self.request(url: url)
+        }
+    }
+    
+    private func request(url: URL) -> Promise<Data> {
+        return firstly {
+            AF.request(url, method: .get).validate().responseData()
+        }.then { data, response in
+            Promise<Data>.value(data)
         }
     }
     
@@ -466,7 +567,8 @@ class SubsonicServerApi {
 
 extension SubsonicServerApi: SubsonicUrlCreator {
     func getArtUrlString(forCoverArtId id: String) -> String {
-        if let apiUrlComponent = createAuthenticatedApiUrlComponent(forAction: "getCoverArt", id: id),
+        guard let clientVersion = self.clientApiVersion else { return "" }
+        if let apiUrlComponent = try? createAuthApiUrlComponent(version: clientVersion, forAction: "getCoverArt", id: id),
            let url = apiUrlComponent.url {
             return url.absoluteString
         } else {

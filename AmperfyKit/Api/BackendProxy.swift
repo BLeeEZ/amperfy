@@ -21,6 +21,7 @@
 
 import Foundation
 import os.log
+import PromiseKit
 
 public enum BackenApiType: Int {
     case notDetected = 0
@@ -47,21 +48,63 @@ public enum BackenApiType: Int {
     }
 }
 
-public struct AuthenticationError: Error {
-    public enum ErrorKind {
-        case notAbleToLogin
-        case invalidUrl
-        case requestStatusError
-        case downloadError
-    }
+public enum AuthenticationError: LocalizedError {
+    case notAbleToLogin
+    case invalidUrl
+    case requestStatusError(message: String)
+    case downloadError(message: String)
     
-    public var message: String = ""
-    public let kind: ErrorKind
+    public var errorDescription: String? {
+        var ret = ""
+        switch self {
+        case .notAbleToLogin:
+            ret = "Not able to login, please check credentials!"
+        case .invalidUrl:
+            ret = "Server URL is invalid!"
+        case .requestStatusError(message: let message):
+            ret = "Requesting server URL finished with status response error code '\(message)'!"
+        case .downloadError(message: let message):
+            ret = message
+        }
+        return ret
+    }
 }
 
-public struct ResponseError {
-    var statusCode: Int = 0
-    var message: String = ""
+public enum BackendError: LocalizedError {
+    case parser
+    case invalidUrl
+    case noCredentials
+    case persistentSaveFailed
+    case notSupported
+    case incorrectServerBehavior(message: String)
+    
+    public var errorDescription: String? {
+        var ret = ""
+        switch self {
+        case .parser:
+            ret = "XML response could not be parsed."
+        case .invalidUrl:
+            ret = "Provided URL is invalid."
+        case .noCredentials:
+            ret = "Internal error: no credentials provided."
+        case .persistentSaveFailed:
+            ret = "Change could not be saved."
+        case .notSupported:
+            ret = "Requested functionality is not supported."
+        case .incorrectServerBehavior(message: let message):
+            ret = "Server didn't behave as expected: \(message)"
+        }
+        return ret
+    }
+}
+
+public struct ResponseError: LocalizedError {
+    public var statusCode: Int = 0
+    public var message: String
+    
+    public var errorDescription: String? {
+        return "API error \(statusCode): \(message)"
+    }
 }
 
 public class BackendProxy {
@@ -110,67 +153,99 @@ public class BackendProxy {
         self.eventLogger = eventLogger
     }
 
-    public func login(apiType: BackenApiType, credentials: LoginCredentials) throws -> BackenApiType {
-        try checkServerReachablity(credentials: credentials)
-        if apiType == .notDetected || apiType == .ampache {
-            ampacheApi.authenticate(credentials: credentials)
-            if ampacheApi.isAuthenticated() {
-                selectedApi = .ampache
-                return .ampache
-            }
-        }
-        if apiType == .notDetected || apiType == .subsonic {
-            subsonicApi.authenticate(credentials: credentials)
-            if subsonicApi.isAuthenticated() {
-                selectedApi = .subsonic
-                return .subsonic
-            }
-        }
-        if apiType == .notDetected || apiType == .subsonic_legacy {
-            subsonicLegacyApi.authenticate(credentials: credentials)
-            if subsonicLegacyApi.isAuthenticated() {
-                selectedApi = .subsonic_legacy
-                return .subsonic_legacy
-            }
-        }
-        throw AuthenticationError(kind: .notAbleToLogin)
-    }
-    
-    private func checkServerReachablity(credentials: LoginCredentials) throws {
-        guard let serverUrl = URL(string: credentials.serverUrl) else {
-            throw AuthenticationError(kind: .invalidUrl)
-        }
-            
-        let group = DispatchGroup()
-        group.enter()
-        
-        let sessionConfig = URLSessionConfiguration.default
-        let session = URLSession(configuration: sessionConfig)
-        let request = URLRequest(url: serverUrl)
-        var downloadError: AuthenticationError? = nil
-        let task = session.downloadTask(with: request) { (tempLocalUrl, response, error) in
-            if let error = error {
-                downloadError = AuthenticationError(message: error.localizedDescription, kind: .downloadError)
-            } else {
-                if let statusCode = (response as? HTTPURLResponse)?.statusCode {
-                    if statusCode >= 400,
-                       // ignore 401 Unauthorized (RFC 7235) status code
-                       // -> Can occure if root website requires http basic authentication,
-                       //    but the REST API endpoints are reachable without http basic authentication
-                       statusCode != 401 {
-                        downloadError = AuthenticationError(message: "\(statusCode)", kind: .requestStatusError)
+    public func login(apiType: BackenApiType, credentials: LoginCredentials) -> Promise<BackenApiType> {
+        return firstly {
+            checkServerReachablity(credentials: credentials)
+        }.then {
+            return Promise<BackenApiType> { seal in
+                var apiFound = BackenApiType.notDetected
+                firstly { () -> Guarantee<Void> in
+                    if apiFound == .notDetected && (apiType == .notDetected || apiType == .ampache) {
+                        return Guarantee<Void> { apiSeal in
+                            firstly {
+                                self.ampacheApi.isAuthenticationValid(credentials: credentials)
+                            }.done {
+                                apiFound = .ampache
+                            }.catch { error in
+                                // error -> ignore this api and check the others
+                            }.finally {
+                                apiSeal(Void())
+                            }
+                        }
                     } else {
-                        os_log("Server url is reachable. Status code: %d", log: self.log, type: .info, statusCode)
+                        return Guarantee.value
+                    }
+                }.then { () -> Guarantee<Void> in
+                    if apiFound == .notDetected && (apiType == .notDetected || apiType == .subsonic) {
+                        return Guarantee<Void> { apiSeal in
+                            firstly {
+                                self.subsonicApi.isAuthenticationValid(credentials: credentials)
+                            }.done {
+                                apiFound = .subsonic
+                            }.catch { error in
+                                // error -> ignore this api and check the others
+                            }.finally {
+                                apiSeal(Void())
+                            }
+                        }
+                    } else {
+                        return Guarantee.value
+                    }
+                }.then { () -> Guarantee<Void> in
+                    if apiFound == .notDetected && (apiType == .notDetected || apiType == .subsonic_legacy) {
+                        return Guarantee<Void> { apiSeal in
+                            firstly {
+                                self.subsonicLegacyApi.isAuthenticationValid(credentials: credentials)
+                            }.done {
+                                apiFound = .subsonic_legacy
+                            }.catch { error in
+                                // error -> ignore this api and check the others
+                            }.finally {
+                                apiSeal(Void())
+                            }
+                        }
+                    } else {
+                        return Guarantee.value
+                    }
+                }.done {
+                    if apiFound == .notDetected {
+                        seal.reject(AuthenticationError.notAbleToLogin)
+                    } else {
+                        seal.fulfill(apiFound)
                     }
                 }
             }
-            group.leave()
         }
-        task.resume()
-        group.wait()
-        
-        if let error = downloadError {
-            throw error
+    }
+    
+    private func checkServerReachablity(credentials: LoginCredentials) -> Promise<Void> {
+        return Promise<Void> { seal in
+            guard let serverUrl = URL(string: credentials.serverUrl) else {
+                throw AuthenticationError.invalidUrl
+            }
+            
+            let sessionConfig = URLSessionConfiguration.default
+            let session = URLSession(configuration: sessionConfig)
+            let request = URLRequest(url: serverUrl)
+            let task = session.downloadTask(with: request) { (tempLocalUrl, response, error) in
+                if let error = error {
+                    seal.reject(AuthenticationError.downloadError(message: error.localizedDescription))
+                } else {
+                    if let statusCode = (response as? HTTPURLResponse)?.statusCode {
+                        if statusCode >= 400,
+                        // ignore 401 Unauthorized (RFC 7235) status code
+                        // -> Can occure if root website requires http basic authentication,
+                        //    but the REST API endpoints are reachable without http basic authentication
+                        statusCode != 401 {
+                            seal.reject(AuthenticationError.requestStatusError(message: "\(statusCode)"))
+                        } else {
+                            os_log("Server url is reachable. Status code: %d", log: self.log, type: .info, statusCode)
+                            seal.fulfill(Void())
+                        }
+                    }
+                }
+            }
+            task.resume()
         }
     }
 
@@ -186,35 +261,23 @@ extension BackendProxy: BackendApi {
         return activeApi.serverApiVersion
     }
     
-    public var isPodcastSupported: Bool {
-        return activeApi.isPodcastSupported
-    }
-    
     public func provideCredentials(credentials: LoginCredentials) {
         activeApi.provideCredentials(credentials: credentials)
     }
-    
-    public func authenticate(credentials: LoginCredentials) {
-        activeApi.authenticate(credentials: credentials)
-    }
-    
-    public func isAuthenticated() -> Bool {
-        return activeApi.isAuthenticated()
-    }
-    
-    public func isAuthenticationValid(credentials: LoginCredentials) -> Bool {
+
+    public func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
         return activeApi.isAuthenticationValid(credentials: credentials)
     }
     
-    public func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL? {
+    public func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> {
         return activeApi.generateUrl(forDownloadingPlayable: playable)
     }
     
-    public func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL? {
+    public func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
         return activeApi.generateUrl(forStreamingPlayable: playable)
     }
     
-    public func generateUrl(forArtwork artwork: Artwork) -> URL? {
+    public func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
         return activeApi.generateUrl(forArtwork: artwork)
     }
     

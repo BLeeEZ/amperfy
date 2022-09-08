@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class PodcastsVC: BasicTableViewController {
 
@@ -59,7 +60,11 @@ class PodcastsVC: BasicTableViewController {
             switch self.showType {
             case .podcasts:
                 let podcast = self.podcastsFetchedResultsController.getWrappedEntity(at: indexPath)
-                podcast.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+                firstly {
+                    podcast.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
+                }.finally {
                     completionHandler(SwipeActionContext(containable: podcast))
                 }
             case .episodesSortedByReleaseDate:
@@ -80,20 +85,22 @@ class PodcastsVC: BasicTableViewController {
         if appDelegate.persistentStorage.settings.isOnlineMode {
             switch self.showType {
             case .podcasts:
-                appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                    let syncLibrary = LibraryStorage(context: context)
-                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                    syncer.syncDownPodcastsWithoutEpisodes(library: syncLibrary)
+                firstly {
+                    self.appDelegate.backendApi.createLibrarySyncer().syncDownPodcastsWithoutEpisodes(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
                 }
             case .episodesSortedByReleaseDate:
-                appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                    let syncLibrary = LibraryStorage(context: context)
-                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                    syncer.syncDownPodcastsWithoutEpisodes(library: syncLibrary)
-                    let podcasts = syncLibrary.getPodcasts().filter{$0.remoteStatus == .available}
-                    for podcast in podcasts {
-                        podcast.fetchFromServer(inContext: context, backendApi: self.appDelegate.backendApi, settings: self.appDelegate.persistentStorage.settings, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                    }
+                firstly {
+                    self.appDelegate.backendApi.createLibrarySyncer().syncDownPodcastsWithoutEpisodes(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+                }.then { () -> Promise<Void> in
+                    let podcasts = self.appDelegate.library.getPodcasts().filter{ $0.remoteStatus == .available }
+                    let podcastFetchPromises = podcasts.compactMap { podcast in return {
+                        podcast.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    }}
+                    return podcastFetchPromises.resolveSequentially()
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
                 }
             }
         }

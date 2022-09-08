@@ -21,6 +21,7 @@
 
 import UIKit
 import AmperfyKit
+import PromiseKit
 
 extension String {
     var isHyperTextProtocolProvided: Bool {
@@ -99,24 +100,20 @@ class LoginVC: UIViewController {
         }
 
         let credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
-        do {
-            let authenticatedApi = try appDelegate.backendProxy.login(apiType: selectedApiType,credentials: credentials)
+        firstly {
+            self.appDelegate.backendProxy.login(apiType: selectedApiType, credentials: credentials)
+        }.done { authenticatedApi in
+            self.appDelegate.backendProxy.selectedApi = authenticatedApi
             credentials.backendApi = authenticatedApi
-            appDelegate.persistentStorage.loginCredentials = credentials
-            performSegue(withIdentifier: "toSync", sender: self)
-        } catch let e as AuthenticationError {
-            switch e.kind {
-            case .notAbleToLogin:
-                showErrorMsg(message: "Not able to login, please check credentials!")
-            case .invalidUrl:
-                showErrorMsg(message: "Server URL is invalid!")
-            case .requestStatusError:
-                showErrorMsg(message: "Requesting server URL finished with status response error code '\(e.message)'!")
-            case .downloadError:
-                showErrorMsg(message: e.message)
+            self.appDelegate.persistentStorage.loginCredentials = credentials
+            self.appDelegate.backendApi.provideCredentials(credentials: credentials)
+            self.performSegue(withIdentifier: "toSync", sender: self)
+        }.catch { error in
+            if error is AuthenticationError {
+                self.showErrorMsg(message: error.localizedDescription)
+            } else {
+                self.showErrorMsg(message: "Not able to login!")
             }
-        } catch {
-            showErrorMsg(message: "Not able to login!")
         }
     }
 

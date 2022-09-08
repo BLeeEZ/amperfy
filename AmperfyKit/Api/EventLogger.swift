@@ -29,6 +29,7 @@ public enum AmperfyLogStatusCode: Int {
     case playerError = 2
     case emailError = 3
     case internalError = 4
+    case connectionError = 5
 }
 
 /// Must be called from main thread
@@ -56,14 +57,14 @@ public class EventLogger {
     public func error(topic: String, statusCode: AmperfyLogStatusCode, message: String, displayPopup: Bool) {
         report(topic: topic, statusCode: statusCode, message: message, logType: .error, displayPopup: displayPopup)
     }
-    
+     
     private func report(topic: String, statusCode: AmperfyLogStatusCode, message: String, logType: LogEntryType, displayPopup: Bool) {
         persistentContainer.performBackgroundTask { context in
             let library = LibraryStorage(context: context)
             let logEntry = library.createLogEntry()
             logEntry.type = logType
             logEntry.statusCode = statusCode.rawValue
-            logEntry.message = message
+            logEntry.message = topic + ": " + message
             library.saveContext()
             
             let logEntries = library.getLogEntries()
@@ -77,21 +78,36 @@ public class EventLogger {
         }
     }
     
+    public func report(topic: String, error: Error, displayPopup: Bool = true) {
+        if let apiError = error as? ResponseError {
+            return report(error: apiError, displayPopup: displayPopup)
+        } else {
+            persistentContainer.performBackgroundTask { context in
+                let library = LibraryStorage(context: context)
+                let logEntry = library.createLogEntry()
+                logEntry.type = .error
+                logEntry.message = topic + ": " + error.localizedDescription
+                library.saveContext()
+                os_log("%s", log: self.log, type: .error, logEntry.message)
+                if displayPopup {
+                    self.displayAlert(topic: topic, message: error.localizedDescription, logEntry: logEntry)
+                }
+            }
+        }
+    }
+    
     public func report(error: ResponseError, displayPopup: Bool) {
         persistentContainer.performBackgroundTask { context in
             let library = LibraryStorage(context: context)
             let logEntry = library.createLogEntry()
             logEntry.type = .apiError
             logEntry.statusCode = error.statusCode
-            logEntry.message = error.message
+            logEntry.message = "API Error " + error.statusCode.description + ": " + error.message
             library.saveContext()
             
             var alertMessage = ""
             alertMessage += "Status code: \(error.statusCode)"
             alertMessage += "\n\(error.message)"
-            alertMessage += "\n"
-            alertMessage += "\nYou can find the event log at:"
-            alertMessage += "\nSettings -> Support -> Event Log"
             
             let logEntries = library.getLogEntries()
             let sameStatusCodeEntries = logEntries.lazy.filter{ $0.statusCode == error.statusCode && $0.type == .apiError && $0.suppressionTimeInterval > 0 }

@@ -30,6 +30,10 @@
 		502928852656448000DA3A8F /* SupportVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502928842656448000DA3A8F /* SupportVC.swift */; };
 		502E56BC27561AD900638BD2 /* PopupPlayerSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */; };
 		502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */; };
+		502F56B728C8E71400F004C0 /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */; };
+		502F56B828C8E71500F004C0 /* Alamofire.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		502F56B928C8E71B00F004C0 /* PMKAlamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */; };
+		502F56BA28C8E71B00F004C0 /* PMKAlamofire.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5043714E27C23BF4008358AC /* FullWidthDescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5043714C27C23BF4008358AC /* FullWidthDescriptionView.swift */; };
 		5043714F27C23C0C008358AC /* FullWidthDescriptionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5043714D27C23BF4008358AC /* FullWidthDescriptionView.xib */; };
 		5045C7502850A2730095FF09 /* Font Awesome 5 Free-Solid-900.otf in Resources */ = {isa = PBXBuildFile; fileRef = 50BA932021DA4D0B00E5901D /* Font Awesome 5 Free-Solid-900.otf */; };
@@ -77,6 +81,11 @@
 		508FDE5021F64ED6005A0724 /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4F21F64ED6005A0724 /* TabBarVC.swift */; };
 		509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */; };
 		509001B82716C8F400A8056D /* AppDelegateNotificationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001B72716C8F400A8056D /* AppDelegateNotificationExtensions.swift */; };
+		5096EA6F28B3B38500C3E78C /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */; };
+		5096EA7328B3B38900C3E78C /* PMKAlamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */; };
+		5096EA7628B3B38B00C3E78C /* PromiseKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */; };
+		5096EA7828B3B39C00C3E78C /* PromiseKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */; };
+		5096EA7928B3B39C00C3E78C /* PromiseKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		509A7D862808191E009791D1 /* SettingsArtworkVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509A7D852808191E009791D1 /* SettingsArtworkVC.swift */; };
 		509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */ = {isa = PBXBuildFile; productRef = 509D55F7281274F500E0E0B5 /* VYPlayIndicator */; };
 		50A85EF22689E8DC00FB3E31 /* PlayableTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A85EF12689E8DC00FB3E31 /* PlayableTableCell.swift */; };
@@ -442,9 +451,12 @@
 			dstSubfolderSpec = 10;
 			files = (
 				5055AA5C268365DD00096B8D /* SnapKit.xcframework in Embed Frameworks */,
+				5096EA7928B3B39C00C3E78C /* PromiseKit.xcframework in Embed Frameworks */,
 				5055AA5A268365DA00096B8D /* NotificationBanner.xcframework in Embed Frameworks */,
 				50BE5DA02853427800156FC6 /* ID3TagEditor.xcframework in Embed Frameworks */,
+				502F56B828C8E71500F004C0 /* Alamofire.xcframework in Embed Frameworks */,
 				5054689D2625CD95008005EC /* LNPopupController.xcframework in Embed Frameworks */,
+				502F56BA28C8E71B00F004C0 /* PMKAlamofire.xcframework in Embed Frameworks */,
 				50C9D61B284FA847007F18D0 /* AmperfyKit.framework in Embed Frameworks */,
 				506007242625E8BD00F9891D /* MarqueeLabel.xcframework in Embed Frameworks */,
 			);
@@ -637,6 +649,12 @@
 		50947E0427DD37AD00C368D7 /* Amperfy v24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v24.xcdatamodel"; sourceTree = "<group>"; };
 		5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayerTest.swift; sourceTree = "<group>"; };
 		50964D5723B54BBA00B685B2 /* Amperfy v3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v3.xcdatamodel"; sourceTree = "<group>"; };
+		5096EA5E28B3B2D100C3E78C /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = "Carthage/Build/Alamofire.xcframework/ios-arm64_armv7/Alamofire.framework"; sourceTree = "<group>"; };
+		5096EA6128B3B2EA00C3E78C /* PMKAlamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PMKAlamofire.framework; path = "Carthage/Build/PMKAlamofire.xcframework/ios-arm64_armv7/PMKAlamofire.framework"; sourceTree = "<group>"; };
+		5096EA6428B3B2F200C3E78C /* PromiseKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PromiseKit.framework; path = "Carthage/Build/PromiseKit.xcframework/ios-arm64_armv7/PromiseKit.framework"; sourceTree = "<group>"; };
+		5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Alamofire.xcframework; path = Carthage/Build/Alamofire.xcframework; sourceTree = "<group>"; };
+		5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PMKAlamofire.xcframework; path = Carthage/Build/PMKAlamofire.xcframework; sourceTree = "<group>"; };
+		5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PromiseKit.xcframework; path = Carthage/Build/PromiseKit.xcframework; sourceTree = "<group>"; };
 		50973ADC2636E4C4005497CA /* SsGenreParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SsGenreParserDelegate.swift; sourceTree = "<group>"; };
 		509A7D80280594D5009791D1 /* Amperfy v25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v25.xcdatamodel"; sourceTree = "<group>"; };
 		509A7D8128059A0D009791D1 /* BackgroundLibrarySyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundLibrarySyncer.swift; sourceTree = "<group>"; };
@@ -850,10 +868,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				502F56B728C8E71400F004C0 /* Alamofire.xcframework in Frameworks */,
 				5055AA5B268365DD00096B8D /* SnapKit.xcframework in Frameworks */,
 				5054689C2625CD95008005EC /* LNPopupController.xcframework in Frameworks */,
+				502F56B928C8E71B00F004C0 /* PMKAlamofire.xcframework in Frameworks */,
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
 				5055AA59268365DA00096B8D /* NotificationBanner.xcframework in Frameworks */,
+				5096EA7828B3B39C00C3E78C /* PromiseKit.xcframework in Frameworks */,
 				506007232625E8BD00F9891D /* MarqueeLabel.xcframework in Frameworks */,
 				50BE5D9F2853427800156FC6 /* ID3TagEditor.xcframework in Frameworks */,
 				50C9D61A284FA847007F18D0 /* AmperfyKit.framework in Frameworks */,
@@ -872,8 +893,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5096EA6F28B3B38500C3E78C /* Alamofire.xcframework in Frameworks */,
 				50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */,
+				5096EA7628B3B38B00C3E78C /* PromiseKit.xcframework in Frameworks */,
 				50BE5DA7285714A200156FC6 /* CallbackURLKit in Frameworks */,
+				5096EA7328B3B38900C3E78C /* PMKAlamofire.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1098,6 +1122,12 @@
 		5091857E23A753C800A8891E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */,
+				5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */,
+				5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */,
+				5096EA6428B3B2F200C3E78C /* PromiseKit.framework */,
+				5096EA6128B3B2EA00C3E78C /* PMKAlamofire.framework */,
+				5096EA5E28B3B2D100C3E78C /* Alamofire.framework */,
 				50CF3CEE28A4F83100263F7C /* CryptoKit.framework */,
 				505468712625C47D008005EC /* MarqueeLabel.xcframework */,
 				5054686C2625C457008005EC /* LNPopupController.xcframework */,
@@ -1642,7 +1672,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1330;
-				LastUpgradeCheck = 1330;
+				LastUpgradeCheck = 1340;
 				ORGANIZATIONNAME = "Maximilian Bauer";
 				TargetAttributes = {
 					508385E321C5965B00C4BB32 = {

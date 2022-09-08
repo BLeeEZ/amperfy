@@ -21,6 +21,7 @@
 
 import UIKit
 import AmperfyKit
+import PromiseKit
 
 class PlaylistDetailTableHeader: UIView {
 
@@ -73,19 +74,18 @@ class PlaylistDetailTableHeader: UIView {
     }
     
     func endEditing() {
-        if let nameText = nameTextField.text, let playlist = playlist, nameText != playlist.name {
-            playlist.name = nameText
-            nameLabel.text = nameText
-            if appDelegate.persistentStorage.settings.isOnlineMode {
-                appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                    let syncLibrary = LibraryStorage(context: context)
-                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                    let playlistAsync = playlist.getManagedObject(in: context, library: syncLibrary)
-                    syncer.syncUpload(playlistToUpdateName: playlistAsync, library: syncLibrary)
-                }
-            }
+        defer { refresh() }
+        guard let nameText = nameTextField.text, let playlist = playlist, nameText != playlist.name else { return }
+        playlist.name = nameText
+        nameLabel.text = nameText
+        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+     
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncUpload(playlistToUpdateName: playlist, persistentContainer: appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlist Update Name", error: error)
         }
-        refresh()
+
     }
 
 }

@@ -20,6 +20,7 @@
 //
 
 import Foundation
+import PromiseKit
 
 class AmpacheApi: BackendApi {
 
@@ -36,36 +37,24 @@ class AmpacheApi: BackendApi {
     public var serverApiVersion: String {
         return ampacheXmlServerApi.serverApiVersion ?? "-"
     }
-    
-    public var isPodcastSupported: Bool {
-        return ampacheXmlServerApi.isPodcastSupported
-    }
 
     func provideCredentials(credentials: LoginCredentials) {
         ampacheXmlServerApi.provideCredentials(credentials: credentials)
     }
 
-    func authenticate(credentials: LoginCredentials) {
-        ampacheXmlServerApi.authenticate(credentials: credentials)
-    }
-
-    func isAuthenticated() -> Bool {
-        return ampacheXmlServerApi.isAuthenticated()
-    }
-    
-    func isAuthenticationValid(credentials: LoginCredentials) -> Bool {
+    func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
         return ampacheXmlServerApi.isAuthenticationValid(credentials: credentials)
     }
 
-    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL? {
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> {
         return ampacheXmlServerApi.generateUrl(forDownloadingPlayable: playable)
     }
 
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL? {
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
         return ampacheXmlServerApi.generateUrl(forStreamingPlayable: playable)
     }
     
-    func generateUrl(forArtwork artwork: Artwork) -> URL? {
+    func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
         return ampacheXmlServerApi.generateUrl(forArtwork: artwork)
     }
     

@@ -22,6 +22,7 @@
 import Foundation
 import CoreData
 import os.log
+import PromiseKit
 
 class DownloadManager: NSObject, DownloadManageable {
     
@@ -134,10 +135,9 @@ class DownloadManager: NSObject, DownloadManageable {
                     self.downloadPreperationSemaphore.signal()
                     continue
                 }
-
-                self.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                    let download = Download(managedObject: context.object(with: nextDownload.managedObject.objectID) as! DownloadMO)
-                    self.manageDownload(download: download, context: context)
+                
+                self.manageDownload(download: nextDownload)
+                .finally {
                     self.downloadPreperationSemaphore.signal()
                 }
             }
@@ -147,49 +147,62 @@ class DownloadManager: NSObject, DownloadManageable {
         }
     }
     
-    private func manageDownload(download: Download, context: NSManagedObjectContext) {
-        do {
-            os_log("Fetching %s ...", log: self.log, type: .info, download.title)
-            let url = try downloadDelegate.prepareDownload(download: download, context: context)
-            fetch(url: url, download: download, context: context)
-        } catch let fetchError as DownloadError {
-            finishDownload(download: download, context: context, error: fetchError)
-        } catch {
-            finishDownload(download: download, context: context, error: .fetchFailed)
+    private func manageDownload(download: Download) -> PMKFinalizer {
+        return firstly { () -> Guarantee<Void> in
+            return Guarantee<Void> { seal in
+                os_log("Fetching %s ...", log: self.log, type: .info, download.title)
+                seal(Void())
+            }
+        }.then { () -> Promise<URL> in
+            self.downloadDelegate.prepareDownload(download: download)
+        }.get { url in
+            download.url = url
+            let library = LibraryStorage(context: self.persistentStorage.context)
+            library.saveContext()
+            self.fetch(url: url)
+        }.catch { error in
+            if let fetchError = error as? DownloadError {
+                self.finishDownload(download: download, error: fetchError)
+            } else {
+                self.finishDownload(download: download, error: .fetchFailed)
+            }
         }
     }
+      
     
-    func finishDownload(download: Download, context: NSManagedObjectContext, error: DownloadError) {
-        let library = LibraryStorage(context: context)
-        
+    func finishDownload(download: Download, error: DownloadError) {
         if !download.isCanceled {
             download.error = error
             if error != .apiErrorResponse {
                 os_log("Fetching %s FAILED: %s", log: self.log, type: .info, download.title, error.description)
                 eventLogger.error(topic: "Download Error", statusCode: .downloadError, message: "Error \"\(error.description)\" occured while downloading object \"\(download.title)\".", displayPopup: isFailWithPopupError)
             }
-            downloadDelegate.failedDownload(download: download, context: context)
+            downloadDelegate.failedDownload(download: download, persistentStorage: self.persistentStorage)
         }
         download.isDownloading = false
+        let library = LibraryStorage(context: self.persistentStorage.context)
         library.saveContext()
     }
     
-    func finishDownload(download: Download, context: NSManagedObjectContext, data: Data) {
-        let library = LibraryStorage(context: context)
+    func finishDownload(download: Download, data: Data) {
         download.resumeData = data
         if let responseError = downloadDelegate.validateDownloadedData(download: download) {
             os_log("Fetching %s API-ERROR StatusCode: %d, Message: %s", log: log, type: .error, download.title, responseError.statusCode, responseError.message)
             eventLogger.report(error: responseError, displayPopup: isFailWithPopupError)
-            finishDownload(download: download, context: context, error: .apiErrorResponse)
+            finishDownload(download: download, error: .apiErrorResponse)
             return
         }
         os_log("Fetching %s SUCCESS (%{iec-bytes}d)", log: self.log, type: .info, download.title, data.count)
-        downloadDelegate.completedDownload(download: download, context: context)
-        download.resumeData = nil
-        download.isDownloading = false
-        library.saveContext()
-        if let downloadElement = download.element {
-            notificationHandler.post(name: .downloadFinishedSuccess, object: self, userInfo: DownloadNotification(id: downloadElement.uniqueID).asNotificationUserInfo)
+        firstly {
+            downloadDelegate.completedDownload(download: download, persistentStorage: self.persistentStorage)
+        }.done {
+            download.resumeData = nil
+            download.isDownloading = false
+            let library = LibraryStorage(context: self.persistentStorage.context)
+            library.saveContext()
+            if let downloadElement = download.element {
+                self.notificationHandler.post(name: .downloadFinishedSuccess, object: self, userInfo: DownloadNotification(id: downloadElement.uniqueID).asNotificationUserInfo)
+            }
         }
     }
     

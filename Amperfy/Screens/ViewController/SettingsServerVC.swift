@@ -22,6 +22,7 @@
 import Foundation
 import UIKit
 import AmperfyKit
+import PromiseKit
 
 class SettingsServerVC: UITableViewController {
     
@@ -60,23 +61,20 @@ class SettingsServerVC: UITableViewController {
             if let newPassword = alert.textFields?.first?.text,
                let loginCredentials = self.appDelegate.persistentStorage.loginCredentials {
                 loginCredentials.changePasswordAndHash(password: newPassword)
-                DispatchQueue.global().async {
-                    let isValid = self.appDelegate.backendProxy.isAuthenticationValid(credentials: loginCredentials)
-                    DispatchQueue.main.async {
-                        if isValid {
-                            self.appDelegate.persistentStorage.loginCredentials = loginCredentials
-                            self.appDelegate.backendProxy.authenticate(credentials: loginCredentials)
-                            let alert = UIAlertController(title: "Successful", message: "Password updated!", preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: "Close", style: .default))
-                            alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-                            self.present(alert, animated: true)
-                        } else {
-                            let alert = UIAlertController(title: "Failed", message: "Authentication failed! Password has not been updated.", preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: "Close", style: .default))
-                            alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-                            self.present(alert, animated: true)
-                        }
-                    }
+                firstly {
+                    self.appDelegate.backendProxy.isAuthenticationValid(credentials: loginCredentials)
+                }.done {
+                    self.appDelegate.persistentStorage.loginCredentials = loginCredentials
+                    self.appDelegate.backendProxy.provideCredentials(credentials: loginCredentials)
+                    let alert = UIAlertController(title: "Successful", message: "Password updated!", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Close", style: .default))
+                    alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+                    self.present(alert, animated: true)
+                }.catch { error in
+                    let alert = UIAlertController(title: "Failed", message: "Authentication failed! Password has not been updated.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Close", style: .default))
+                    alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+                    self.present(alert, animated: true)
                 }
             }
         }))

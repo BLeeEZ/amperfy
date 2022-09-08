@@ -22,6 +22,7 @@
 import Foundation
 import CoreData
 import UIKit
+import PromiseKit
 
 public class Podcast: AbstractLibraryEntity {
     
@@ -76,10 +77,14 @@ extension Podcast: PlayableContainable  {
         return episodes
     }
     public var playContextType: PlayerMode { return .podcast }
-    public func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
-        let podcastAsync = Podcast(managedObject: context.object(with: managedObject.objectID) as! PodcastMO)
-        let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: settings, backendApi: backendApi, playableDownloadManager: playableDownloadManager)
-        _ = autoDownloadSyncer.syncLatestPodcastEpisodes(podcast: podcastAsync, context: context)
+    public func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+        AutoDownloadLibrarySyncer(persistentStorage: storage,
+                                  backendApi: backendApi,
+                                  playableDownloadManager: playableDownloadManager)
+        .syncLatestPodcastEpisodes(podcast: self).asVoid()
+    }
+    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
+        return Promise<Void>(error: BackendError.notSupported)
     }
     public var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)

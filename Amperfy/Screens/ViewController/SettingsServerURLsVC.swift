@@ -22,6 +22,7 @@
 import Foundation
 import UIKit
 import AmperfyKit
+import PromiseKit
 
 class ServerURLTableCell: UITableViewCell {
     
@@ -104,7 +105,7 @@ class SettingsServerURLsVC: UITableViewController {
             
             let newCredentials = LoginCredentials(serverUrl: serverURLs[indexPath.row], username: currentCredentials.username, password: currentCredentials.password, backendApi: currentCredentials.backendApi)
             self.appDelegate.persistentStorage.loginCredentials = newCredentials
-            self.appDelegate.backendProxy.authenticate(credentials: newCredentials)
+            self.appDelegate.backendProxy.provideCredentials(credentials: newCredentials)
         }
         reload()
     }
@@ -174,29 +175,27 @@ class SettingsServerURLsVC: UITableViewController {
             
             let credentials = LoginCredentials(serverUrl: newAltUrl, username: username, password: password, backendApi: activeApi)
 
-            DispatchQueue.global().async {
-                let isValid = self.appDelegate.backendProxy.isAuthenticationValid(credentials: credentials)
-                DispatchQueue.main.async {
-                    if isValid {
-                        if let activeUrl = self.appDelegate.persistentStorage.loginCredentials?.serverUrl {
-                            var currentAltUrls = self.appDelegate.persistentStorage.alternativeServerURLs
-                            currentAltUrls.append(activeUrl)
-                            self.appDelegate.persistentStorage.alternativeServerURLs = currentAltUrls
-                        }
-                        self.appDelegate.persistentStorage.loginCredentials = credentials
-                        self.reload()
-    
-                        let alert = UIAlertController(title: "Successful", message: "Alternative URL added.", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "Close", style: .default))
-                        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-                        self.present(alert, animated: true)
-                    } else {
-                        let alert = UIAlertController(title: "Failed", message: "Alternative URL could not be verified! Authentication failed! Alternative URL has not been added.", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "Close", style: .default))
-                        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-                        self.present(alert, animated: true)
-                    }
+            firstly {
+                self.appDelegate.backendProxy.isAuthenticationValid(credentials: credentials)
+            }.done {
+                if let activeUrl = self.appDelegate.persistentStorage.loginCredentials?.serverUrl {
+                    var currentAltUrls = self.appDelegate.persistentStorage.alternativeServerURLs
+                    currentAltUrls.append(activeUrl)
+                    self.appDelegate.persistentStorage.alternativeServerURLs = currentAltUrls
                 }
+                self.appDelegate.persistentStorage.loginCredentials = credentials
+                self.appDelegate.backendProxy.provideCredentials(credentials: credentials)
+                self.reload()
+
+                let alert = UIAlertController(title: "Successful", message: "Alternative URL added.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Close", style: .default))
+                alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+                self.present(alert, animated: true)
+            }.catch { error in
+                let alert = UIAlertController(title: "Failed", message: "Alternative URL could not be verified! Authentication failed! Alternative URL has not been added.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Close", style: .default))
+                alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
+                self.present(alert, animated: true)
             }
         }))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()

@@ -22,6 +22,7 @@
 import Foundation
 import CoreData
 import UIKit
+import PromiseKit
 
 public class Artist: AbstractLibraryEntity {
     
@@ -136,18 +137,15 @@ extension Artist: PlayableContainable  {
     public var playContextType: PlayerMode { return .music }
     public var isRateable: Bool { return true }
     public var isFavoritable: Bool { return true }
-    public func remoteToggleFavorite(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
+    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
+        guard let context = managedObject.managedObjectContext else { return Promise<Void>(error: BackendError.persistentSaveFailed) }
+        isFavorite.toggle()
         let library = LibraryStorage(context: context)
-        let artistAsync = Artist(managedObject: context.object(with: managedObject.objectID) as! ArtistMO)
-        artistAsync.isFavorite.toggle()
         library.saveContext()
-        syncer.setFavorite(artist: artistAsync, isFavorite: artistAsync.isFavorite)
+        return syncer.setFavorite(artist: self, isFavorite: isFavorite)
     }
-    public func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
-        let syncer = backendApi.createLibrarySyncer()
-        let library = LibraryStorage(context: context)
-        let artistAsync = Artist(managedObject: context.object(with: managedObject.objectID) as! ArtistMO)
-        syncer.sync(artist: artistAsync, library: library)
+    public func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+        backendApi.createLibrarySyncer().sync(artist: self, persistentContainer: storage.persistentContainer)
     }
     public var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)

@@ -25,11 +25,8 @@ import os.log
 
 extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
         
-    func fetch(url: URL, download: Download, context: NSManagedObjectContext) {
-        let library = LibraryStorage(context: context)
+    func fetch(url: URL) {
         let task = urlSession.downloadTask(with: url)
-        download.url = url
-        library.saveContext()
         task.resume()
     }
     
@@ -54,11 +51,11 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
             let library = LibraryStorage(context: self.persistentStorage.context)
             guard let download = library.getDownload(url: requestUrl) else { return }
             if let activeError = downloadError {
-                self.finishDownload(download: download, context: self.persistentStorage.context, error: activeError)
+                self.finishDownload(download: download, error: activeError)
             } else if let data = downloadedData {
-                self.finishDownload(download: download, context: self.persistentStorage.context, data: data)
+                self.finishDownload(download: download, data: data)
             } else {
-                self.finishDownload(download: download, context: self.persistentStorage.context, error: .emptyFile)
+                self.finishDownload(download: download, error: .emptyFile)
             }
         }
     }
@@ -68,7 +65,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
         self.persistentStorage.context.performAndWait {
             let library = LibraryStorage(context: self.persistentStorage.context)
             guard let download = library.getDownload(url: requestUrl) else { return }
-            self.finishDownload(download: download, context: self.persistentStorage.context, error: .fetchFailed)
+            self.finishDownload(download: download, error: .fetchFailed)
         }
     }
     

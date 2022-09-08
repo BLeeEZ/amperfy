@@ -21,6 +21,7 @@
 
 import Foundation
 import CoreData
+import PromiseKit
 
 class PlayableDownloadDelegate: DownloadManagerDelegate {
 
@@ -39,27 +40,16 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     var parallelDownloadsCount: Int {
         return 4
     }
-
-    func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL {
-        guard let downloadElement = download.element else {
-            throw DownloadError.fetchFailed
+    
+    func prepareDownload(download: Download) -> Promise<URL> {
+        return Promise<AbstractPlayable> { seal in
+            guard let playable = download.element as? AbstractPlayable else { throw DownloadError.fetchFailed }
+            guard !playable.isCached else { throw DownloadError.alreadyDownloaded }
+            guard Reachability.isConnectedToNetwork() else { throw DownloadError.noConnectivity }
+            seal.fulfill(playable)
+        }.then { playable in
+            self.backendApi.generateUrl(forDownloadingPlayable: playable)
         }
-        let playableMO = try context.existingObject(with: downloadElement.objectID) as! AbstractPlayableMO
-        let playable = AbstractPlayable(managedObject: playableMO)
-        guard !playable.isCached else {
-            throw DownloadError.alreadyDownloaded 
-        }
-        return try updateDownloadUrl(forPlayable: playable)
-    }
-
-    private func updateDownloadUrl(forPlayable playable: AbstractPlayable) throws -> URL {
-        guard Reachability.isConnectedToNetwork() else {
-            throw DownloadError.noConnectivity
-        }
-        guard let url = backendApi.generateUrl(forDownloadingPlayable: playable) else {
-            throw DownloadError.urlInvalid
-        }
-        return url
     }
     
     func validateDownloadedData(download: Download) -> ResponseError? {
@@ -69,22 +59,23 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
         return backendApi.checkForErrorResponse(inData: data)
     }
 
-    func completedDownload(download: Download, context: NSManagedObjectContext) {
-        guard let data = download.resumeData,
-              let downloadElement = download.element,
-              let playableMO = try? context.existingObject(with: downloadElement.objectID) as? AbstractPlayableMO else {
-            return
+    func completedDownload(download: Download, persistentStorage: PersistentStorage) -> Guarantee<Void> {
+        return Guarantee<Void> { seal in
+            guard let data = download.resumeData,
+                  let playable = download.element as? AbstractPlayable else {
+                return seal(Void())
+            }
+            let library = LibraryStorage(context: persistentStorage.context)
+            let playableFile = library.createPlayableFile()
+            playableFile.info = playable
+            playableFile.data = data
+            artworkExtractor.extractEmbeddedArtwork(library: library, playable: playable, fileData: data)
+            library.saveContext()
+            seal(Void())
         }
-		let library = LibraryStorage(context: context)
-        let playableFile = library.createPlayableFile()
-        let owner = AbstractPlayable(managedObject: playableMO)
-        playableFile.info = owner
-        playableFile.data = data
-        artworkExtractor.extractEmbeddedArtwork(library: library, playable: owner, fileData: data)
-        library.saveContext()
     }
     
-    func failedDownload(download: Download, context: NSManagedObjectContext) {
+    func failedDownload(download: Download, persistentStorage: PersistentStorage) {
     }
     
 }

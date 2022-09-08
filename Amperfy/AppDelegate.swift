@@ -24,6 +24,7 @@ import MediaPlayer
 import BackgroundTasks
 import os.log
 import AmperfyKit
+import PromiseKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -111,9 +112,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func configureBackgroundFetch() {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: Self.refreshTaskId, using: nil) { task in
             os_log("Perform task: %s", log: self.log, type: .info, Self.refreshTaskId)
-            self.backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes() { fetchResult in
-                self.userStatistics.backgroundFetchPerformed(result: fetchResult)
+            firstly {
+                self.backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
+            }.done {
                 task.setTaskCompleted(success: true)
+            }.catch { error in
+                task.setTaskCompleted(success: false)
+                self.eventLogger.error(topic: "Background Task", statusCode: .connectionError, message: error.localizedDescription, displayPopup: false)
+            }.finally {
+                self.userStatistics.backgroundFetchPerformed(result: UIBackgroundFetchResult.newData)
                 self.scheduleAppRefresh()
             }
         }

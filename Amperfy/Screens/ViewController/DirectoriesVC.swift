@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class DirectoriesVC: BasicTableViewController {
     
@@ -67,13 +68,11 @@ class DirectoriesVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let library = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let directoryAsync = Directory(managedObject: context.object(with: self.directory.managedObject.objectID) as! DirectoryMO)
-                syncer.sync(directory: directoryAsync, library: library)
-            }
+        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().sync(directory: directory, persistentStorage: self.appDelegate.persistentStorage)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Directories Sync", error: error)
         }
     }
     

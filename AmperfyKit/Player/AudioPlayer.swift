@@ -228,6 +228,13 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         seekToLastStoppedPlayTime()
     }
     
+    //BackendAudioPlayerNotifiable
+    func notifyErrorOccured(error: Error) {
+        for notifier in notifierList {
+            notifier.errorOccured(error: error)
+        }
+    }
+    
     func notifyItemPaused() {
         for notifier in notifierList {
             notifier.didPause()

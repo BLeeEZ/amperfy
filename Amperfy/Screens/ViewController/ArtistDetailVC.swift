@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class ArtistDetailVC: BasicTableViewController {
 
@@ -79,7 +80,11 @@ class ArtistDetailVC: BasicTableViewController {
             switch indexPath.section+2 {
             case LibraryElement.Album.rawValue:
                 let album = self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+                firstly {
+                    album.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+                }.finally {
                     completionHandler(SwipeActionContext(containable: album))
                 }
             case LibraryElement.Song.rawValue:
@@ -95,7 +100,11 @@ class ArtistDetailVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        artist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+        firstly {
+            artist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
+        }.finally {
             self.detailOperationsView?.refresh()
         }
     }

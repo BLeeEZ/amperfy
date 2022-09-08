@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
@@ -123,10 +124,10 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     override func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let backgroundLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.searchSongs(searchText: searchText, library: backgroundLibrary)
+            firstly {
+                self.appDelegate.backendApi.createLibrarySyncer().searchSongs(searchText: searchText, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
             }
             fetchedResultsController.search(searchText: searchText, onlyCachedSongs: false, displayFilter: displayFilter)
         } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
@@ -167,15 +168,13 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                 self.displayFilter = .favorites
                 self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
-                if self.appDelegate.persistentStorage.settings.isOnlineMode {
-                    self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                        let syncLibrary = LibraryStorage(context: context)
-                        let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                        syncer.syncFavoriteLibraryElements(library: syncLibrary)
-                        DispatchQueue.main.async {
-                            self.updateSearchResults(for: self.searchController)
-                        }
-                    }
+                guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
+                firstly {
+                    self.appDelegate.backendApi.createLibrarySyncer().syncFavoriteLibraryElements(persistentStorage: self.appDelegate.persistentStorage)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Favorite Songs Sync", error: error)
+                }.finally {
+                    self.updateSearchResults(for: self.searchController)
                 }
             }))
         }
@@ -184,14 +183,14 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                 self.displayFilter = .recentlyAdded
                 self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
-                if self.appDelegate.persistentStorage.settings.isOnlineMode {
-                    self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                        let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: self.appDelegate.persistentStorage.settings, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                        autoDownloadSyncer.syncLatestLibraryElements(context: context)
-                        DispatchQueue.main.async {
-                            self.updateSearchResults(for: self.searchController)
-                        }
-                    }
+                guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
+                firstly {
+                    AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                        .syncLatestLibraryElements()
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Song Latest Elements Sync", error: error)
+                }.finally {
+                    self.updateSearchResults(for: self.searchController)
                 }
             }))
         }
@@ -246,19 +245,17 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            if self.appDelegate.persistentStorage.settings.isOnlineMode {
-                let autoDownloadSyncer = AutoDownloadLibrarySyncer(settings: self.appDelegate.persistentStorage.settings, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                autoDownloadSyncer.syncLatestLibraryElements(context: context)
-                DispatchQueue.main.async {
-                    self.refreshControl?.endRefreshing()
-                }
-            } else {
-                DispatchQueue.main.async {
-                    self.refreshControl?.endRefreshing()
-                }
-            }
-
+        guard self.appDelegate.persistentStorage.settings.isOnlineMode else {
+            self.refreshControl?.endRefreshing()
+            return
+        }
+        firstly {
+            AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                .syncLatestLibraryElements()
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Songs Latest Elements Sync", error: error)
+        }.finally {
+            self.refreshControl?.endRefreshing()
         }
     }
     

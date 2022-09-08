@@ -21,6 +21,7 @@
 
 import UIKit
 import AmperfyKit
+import PromiseKit
 
 class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO> {
 
@@ -69,7 +70,11 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        podcast.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+        firstly {
+            podcast.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
+        }.finally {
             self.detailOperationsView?.refresh()
         }
     }
@@ -96,16 +101,14 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let podcastAsync = Podcast(managedObject: context.object(with: self.podcast.managedObject.objectID) as! PodcastMO)
-            syncer.sync(podcast: podcastAsync, library: library)
-            DispatchQueue.main.async {
-                self.detailOperationsView?.refresh()
-                self.tableView.visibleCells.forEach{ ($0 as! PodcastEpisodeTableCell).refresh() }
-                self.refreshControl?.endRefreshing()
-            }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().sync(podcast: self.podcast, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
+        }.finally {
+            self.detailOperationsView?.refresh()
+            self.tableView.visibleCells.forEach{ ($0 as! PodcastEpisodeTableCell).refresh() }
+            self.refreshControl?.endRefreshing()
         }
     }
     

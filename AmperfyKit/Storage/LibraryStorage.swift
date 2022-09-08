@@ -41,6 +41,19 @@ struct LibraryDuplicateInfo {
     let count: Int
 }
 
+public enum LibraryError: LocalizedError {
+    case noSyncWave
+    
+    public var errorDescription: String? {
+        var ret = ""
+        switch self {
+        case .noSyncWave:
+            ret = "Internal error: no sync wave provided"
+        }
+        return ret
+    }
+}
+
 public class LibraryStorage: PlayableFileCachable {
     
     public static var carPlayMaxElements = 200

@@ -34,8 +34,9 @@ public protocol MusicPlayable {
 }
 
 extension MusicPlayable {
-    func didShuffleChange() { }
-    func didRepeatChange() { }
+    func didShuffleChange() {}
+    func didRepeatChange() {}
+    func errorOccured(error: Error) {}
 }
 
 public enum RepeatMode: Int16 {

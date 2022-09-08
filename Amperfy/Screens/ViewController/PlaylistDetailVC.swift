@@ -21,6 +21,7 @@
 
 import UIKit
 import AmperfyKit
+import PromiseKit
 
 class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> {
 
@@ -76,7 +77,11 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         refreshBarButtons()
-        playlist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+        firstly {
+            playlist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
+        }.finally {
             self.playlistOperationsView?.refresh()
         }
     }
@@ -138,17 +143,14 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            playlist.remove(at: indexPath.row)
-            self.playlistOperationsView?.refresh()
-            if appDelegate.persistentStorage.settings.isOnlineMode {
-                appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                    let syncLibrary = LibraryStorage(context: context)
-                    let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                    let playlistAsync = self.playlist.getManagedObject(in: context, library: syncLibrary)
-                    syncer.syncUpload(playlistToDeleteSong: playlistAsync, index: indexPath.row, library: syncLibrary)
-                }
-            }
+        guard editingStyle == .delete else { return }
+        playlist.remove(at: indexPath.row)
+        self.playlistOperationsView?.refresh()
+        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncUpload(playlistToDeleteSong: playlist, index: indexPath.row, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
         }
     }
     
@@ -156,13 +158,11 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         noAnimationAtNextDataChange = true
         playlist.movePlaylistItem(fromIndex: fromIndexPath.row, to: to.row)
-        if appDelegate.persistentStorage.settings.isOnlineMode {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                let playlistAsync = self.playlist.getManagedObject(in: context, library: syncLibrary)
-                syncer.syncUpload(playlistToUpdateOrder: playlistAsync, library: syncLibrary)
-            }
+        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncUpload(playlistToUpdateOrder: playlist, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlist Upload Order Update", error: error)
         }
     }
     
@@ -178,15 +178,13 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let playlistAsync = self.playlist.getManagedObject(in: context, library: syncLibrary)
-            syncer.syncDown(playlist: playlistAsync, library: syncLibrary)
-            DispatchQueue.main.async {
-                self.playlistOperationsView?.refresh()
-                self.refreshControl?.endRefreshing()
-            }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().syncDown(playlist: playlist, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
+        }.finally {
+            self.playlistOperationsView?.refresh()
+            self.refreshControl?.endRefreshing()
         }
     }
     

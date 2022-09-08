@@ -22,6 +22,7 @@
 import UIKit
 import CoreData
 import AmperfyKit
+import PromiseKit
 
 class SearchVC: BasicTableViewController {
 
@@ -74,17 +75,29 @@ class SearchVC: BasicTableViewController {
         switch indexPath.section {
         case LibraryElement.Playlist.rawValue:
             let playlist = playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            playlist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+            firstly {
+                playlist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
+            }.finally {
                 completionHandler(SwipeActionContext(containable: playlist))
             }
         case LibraryElement.Artist.rawValue:
             let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            artist.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+            firstly {
+                artist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
+            }.finally {
                 completionHandler(SwipeActionContext(containable: artist))
             }
         case LibraryElement.Album.rawValue:
             let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            album.fetchAsync(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+            firstly {
+                album.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+            }.finally {
                 completionHandler(SwipeActionContext(containable: album))
             }
         case LibraryElement.Song.rawValue:
@@ -236,21 +249,24 @@ class SearchVC: BasicTableViewController {
     override func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let backgroundLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.searchArtists(searchText: searchText, library: backgroundLibrary)
+            firstly {
+                self.appDelegate.backendApi.createLibrarySyncer().searchArtists(searchText: searchText, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
             }
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let backgroundLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.searchAlbums(searchText: searchText, library: backgroundLibrary)
+            
+            firstly {
+                self.appDelegate.backendApi.createLibrarySyncer().searchAlbums(searchText: searchText, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
             }
-            appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-                let syncLibrary = LibraryStorage(context: context)
-                let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-                syncer.searchSongs(searchText: searchText, library: syncLibrary)
+            
+            firstly {
+                self.appDelegate.backendApi.createLibrarySyncer().searchSongs(searchText: searchText, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
             }
+
             playlistFetchedResultsController.search(searchText: searchText, playlistSearchCategory: .all)
             artistFetchedResultsController.search(searchText: searchText, onlyCached: false, displayFilter: .all)
             albumFetchedResultsController.search(searchText: searchText, onlyCached: false, displayFilter: .all)

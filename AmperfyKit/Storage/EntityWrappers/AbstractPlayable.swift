@@ -23,6 +23,7 @@ import Foundation
 import CoreData
 import UIKit
 import AVFoundation
+import PromiseKit
 
 public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     /*
@@ -224,22 +225,19 @@ extension AbstractPlayable: PlayableContainable  {
         return [self]
     }
     public var playContextType: PlayerMode { return isSong ? .music : .podcast }
-    public func fetchFromServer(inContext context: NSManagedObjectContext, backendApi: BackendApi, settings: PersistentStorage.Settings, playableDownloadManager: DownloadManageable) {
-        guard let song = asSong else { return }
-        let syncer = backendApi.createLibrarySyncer()
-        let library = LibraryStorage(context: context)
-        let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
-        syncer.sync(song: songAsync, library: library)
+    public func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+        guard let song = asSong else { return Promise.value }
+        return backendApi.createLibrarySyncer().sync(song: song, persistentContainer: storage.persistentContainer)
     }
     public var isRateable: Bool { return isSong }
     public var isFavoritable: Bool { return isSong }
-    public func remoteToggleFavorite(inContext context: NSManagedObjectContext, syncer: LibrarySyncer) {
-        guard let song = asSong else { return }
+    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
+        guard let song = asSong else { return Promise.value}
+        guard let context = song.managedObject.managedObjectContext else { return Promise<Void>(error: BackendError.persistentSaveFailed) }
+        isFavorite.toggle()
         let library = LibraryStorage(context: context)
-        let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
-        songAsync.isFavorite.toggle()
         library.saveContext()
-        syncer.setFavorite(song: songAsync, isFavorite: songAsync.isFavorite)
+        return syncer.setFavorite(song: song, isFavorite: isFavorite)
     }
     public var isDownloadAvailable: Bool { return asPodcastEpisode?.isAvailableToUser ?? true }
     public var artworkCollection: ArtworkCollection {

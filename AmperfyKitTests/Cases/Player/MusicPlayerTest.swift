@@ -22,6 +22,7 @@
 import XCTest
 import AVFoundation
 import CoreData
+import PromiseKit
 @testable import AmperfyKit
 
 class MOCK_AVPlayerItem: AVPlayerItem {
@@ -76,43 +77,37 @@ class MOCK_AlertDisplayable: AlertDisplayable {
 }
 
 class MOCK_LibrarySyncer: LibrarySyncer {
-    var artistCount: Int = 0
-    var albumCount: Int = 0
-    var songCount: Int = 0
-    var genreCount: Int = 0
-    var playlistCount: Int = 0
-    var podcastCount: Int = 0
-    func sync(currentContext: NSManagedObjectContext, persistentContainer: NSPersistentContainer, statusNotifyier: SyncCallbacks?) {}
-    func sync(genre: Genre, library: LibraryStorage) {}
-    func sync(artist: Artist, library: LibraryStorage) {}
-    func sync(album: Album, library: LibraryStorage) {}
-    func sync(song: Song, library: LibraryStorage) {}
-    func syncLatestLibraryElements(library: LibraryStorage) {}
-    func syncFavoriteLibraryElements(library: LibraryStorage) {}
-    func syncDownPlaylistsWithoutSongs(library: LibraryStorage) {}
-    func syncDown(playlist: Playlist, library: LibraryStorage) {}
-    func syncUpload(playlistToUpdateName playlist: Playlist, library: LibraryStorage) {}
-    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], library: LibraryStorage) {}
-    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, library: LibraryStorage) {}
-    func syncUpload(playlistToUpdateOrder playlist: Playlist, library: LibraryStorage) {}
-    func syncUpload(playlistToDelete playlist: Playlist) {}
-    func syncDownPodcastsWithoutEpisodes(library: LibraryStorage) {}
-    func sync(podcast: Podcast, library: LibraryStorage) {}
-    func searchArtists(searchText: String, library: LibraryStorage) {}
-    func searchAlbums(searchText: String, library: LibraryStorage) {}
-    func searchSongs(searchText: String, library: LibraryStorage) {}
-    func syncMusicFolders(library: LibraryStorage) {}
-    func syncIndexes(musicFolder: MusicFolder, library: LibraryStorage) {}
-    func sync(directory: Directory, library: LibraryStorage) {}
-    func requestRandomSongs(playlist: Playlist, count: Int, library: LibraryStorage) {}
-    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) {}
-    func scrobble(song: Song, date: Date?) {}
-    func setRating(song: Song, rating: Int) {}
-    func setRating(album: Album, rating: Int) {}
-    func setRating(artist: Artist, rating: Int) {}
-    func setFavorite(song: Song, isFavorite: Bool) {}
-    func setFavorite(album: Album, isFavorite: Bool) {}
-    func setFavorite(artist: Artist, isFavorite: Bool) {}
+    func syncInitial(persistentStorage: PersistentStorage, statusNotifyier: SyncCallbacks?) -> Promise<Void> { return Promise.value }
+    func sync(genre: Genre, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func sync(artist: Artist, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func sync(album: Album, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func sync(song: Song, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func sync(podcast: Podcast, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func syncLatestLibraryElements(persistentStorage: PersistentStorage) -> Promise<Void> { return Promise.value }
+    func syncFavoriteLibraryElements(persistentStorage: PersistentStorage) -> Promise<Void> { return Promise.value }
+    func syncDownPlaylistsWithoutSongs(persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func syncDown(playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func syncUpload(playlistToUpdateName playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func syncUpload(playlistToUpdateOrder playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func syncUpload(playlistIdToDelete id: String) -> Promise<Void> { return Promise.value }
+    func syncDownPodcastsWithoutEpisodes(persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func searchArtists(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func searchAlbums(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func searchSongs(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func syncMusicFolders(persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func syncIndexes(musicFolder: MusicFolder, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func sync(directory: Directory, persistentStorage: PersistentStorage) -> Promise<Void> { return Promise.value }
+    func requestRandomSongs(playlist: Playlist, count: Int, persistentStorage: PersistentStorage) -> Promise<Void> { return Promise.value }
+    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) -> Promise<Void> { return Promise.value }
+    func scrobble(song: Song, date: Date?) -> Promise<Void> { return Promise.value }
+    func setRating(song: Song, rating: Int) -> Promise<Void> { return Promise.value }
+    func setRating(album: Album, rating: Int) -> Promise<Void> { return Promise.value }
+    func setRating(artist: Artist, rating: Int) -> Promise<Void> { return Promise.value }
+    func setFavorite(song: Song, isFavorite: Bool) -> Promise<Void> { return Promise.value }
+    func setFavorite(album: Album, isFavorite: Bool) -> Promise<Void> { return Promise.value }
+    func setFavorite(artist: Artist, isFavorite: Bool) -> Promise<Void> { return Promise.value }
 }
 
 class MOCK_BackgroundLibraryVersionResyncer: BackgroundLibraryVersionResyncer {
@@ -124,27 +119,48 @@ class MOCK_BackgroundLibraryVersionResyncer: BackgroundLibraryVersionResyncer {
 
 class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
     var requestPredicate: NSPredicate { return NSPredicate.alwaysTrue }
-    func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL { throw DownloadError.urlInvalid }
+    var parallelDownloadsCount = 2
+    func prepareDownload(download: Download) -> Promise<URL> { return Promise(error: BackendError.notSupported) }
     func validateDownloadedData(download: Download) -> ResponseError? { return nil }
-    func completedDownload(download: Download, context: NSManagedObjectContext) {}
-    func failedDownload(download: Download, context: NSManagedObjectContext) {}
+    func completedDownload(download: Download, persistentStorage: PersistentStorage) -> Guarantee<Void> { return Guarantee.value }
+    func failedDownload(download: Download, persistentStorage: PersistentStorage) {}
 }
 
 class MOCK_BackendApi: BackendApi {
     var clientApiVersion: String = ""
     var serverApiVersion: String = ""
-    var isPodcastSupported: Bool = false
     func provideCredentials(credentials: LoginCredentials) {}
-    func authenticate(credentials: LoginCredentials) {}
-    func isAuthenticated() -> Bool { return false }
-    func isAuthenticationValid(credentials: LoginCredentials) -> Bool { return false }
-    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> URL? { return nil }
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> URL? { return nil }
-    func generateUrl(forArtwork artwork: Artwork) -> URL? { return nil }
+    func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> { return Promise(error: BackendError.notSupported) }
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> { return Helper.urlPromise }
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> { return Helper.urlPromise }
+    func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> { return Helper.urlPromise }
     func checkForErrorResponse(inData data: Data) -> ResponseError? { return nil }
     func createLibrarySyncer() -> LibrarySyncer { return MOCK_LibrarySyncer() }
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { return nil }
+}
+
+class MOCK_MusicPlayable: MusicPlayable {
+    var thrownError: Error?
+    
+    var expectationDidStartPlaying: XCTestExpectation?
+    var expectationErrorOccured: XCTestExpectation?
+    
+    func didStartPlaying() {
+        expectationDidStartPlaying?.fulfill()
+    }
+    func didPause() {}
+    func didStopPlaying() {}
+    func didElapsedTimeChange() {}
+    func didPlaylistChange() {}
+    func didArtworkChange() {}
+    func didShuffleChange() {}
+    func didRepeatChange() {}
+
+    func errorOccured(_ error: Error) {
+        thrownError = error
+        expectationErrorOccured?.fulfill()
+    }
 }
 
 class MusicPlayerTest: XCTestCase {
@@ -157,6 +173,7 @@ class MusicPlayerTest: XCTestCase {
     var songDownloader: MOCK_SongDownloader!
     var backendApi: MOCK_BackendApi!
     var backendPlayer: BackendAudioPlayer!
+    var mockMusicPlayable: MOCK_MusicPlayable!
     var playerData: PlayerData!
     var testMusicPlayer: AmperfyKit.AudioPlayer!
     var testPlayer: AmperfyKit.PlayerFacade!
@@ -178,10 +195,12 @@ class MusicPlayerTest: XCTestCase {
         userStatistics = library.getUserStatistics(appVersion: "")
         backendApi = MOCK_BackendApi()
         backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)
+        mockMusicPlayable = MOCK_MusicPlayable()
         playerData = library.getPlayerData()
         testQueueHandler = PlayQueueHandler(playerData: playerData)
         testMusicPlayer = AudioPlayer(coreData: playerData, queueHandler: testQueueHandler, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
         testPlayer = PlayerFacadeImpl(playerStatus: playerData, queueHandler: testQueueHandler, musicPlayer: testMusicPlayer, library: library, playableDownloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
+        testPlayer.addNotifier(notifier: mockMusicPlayable)
         
         guard let songCachedFetched = library.getSong(id: "36") else { XCTFail(); return }
         songCached = songCachedFetched
@@ -292,16 +311,22 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(songDownloader.isNoDownloadRequested())
     }
     
-    func testPlay_OneSongToDownload_IsPlayingTrue_AfterSuccessfulDownload() {
+    func testPlay_OneSongToDownload_IsPlayingFalse_UntilDownloadfinishes() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         testPlayer.appendContextQueue(playables: [songToDownload])
         testPlayer.play()
+        XCTAssertFalse(testPlayer.isPlaying)
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.currentlyPlaying, songToDownload)
     }
     
     func testPlay_OneSongToDownload_CheckDownloadRequest() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         testPlayer.appendContextQueue(playables: [songToDownload])
         testPlayer.play()
+        XCTAssertEqual(songDownloader.downloadables.count, 0)
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertEqual(songDownloader.downloadables.count, 1)
         XCTAssertEqual((songDownloader.downloadables.first! as! AbstractPlayable).asSong!, songToDownload)
     }
@@ -376,8 +401,10 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testPlaySongInPlaylistAt_FetchSuccess_FullPlaylist() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         prepareWithCachedPlaylist()
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 1))
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(playerData.currentIndex, 2)
     }
@@ -489,11 +516,13 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testPlaylistClear_EmptyPlaylist_WaitingQueueHasEntries5() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
         testPlayer.appendUserQueue(playables: [songId0])
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.appendUserQueue(playables: [songId1])
         testPlayer.play()
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         testPlayer.clearContextQueue()
         XCTAssertTrue(testPlayer.isPlaying)
@@ -514,12 +543,14 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testPlaylistClear_FilledPlaylist_WaitingQueuePlaying() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         prepareWithCachedPlaylist()
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
         testPlayer.appendUserQueue(playables: [songId0])
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.appendUserQueue(playables: [songId1])
         testPlayer.clearContextQueue()
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 1)
@@ -528,6 +559,7 @@ class MusicPlayerTest: XCTestCase {
     }
 
     func testPlaylistClear_FilledPlaylist_WaitingQueuePlaying2() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         prepareWithCachedPlaylist()
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
         testPlayer.appendUserQueue(playables: [songId0])
@@ -535,6 +567,7 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.appendUserQueue(playables: [songId1])
         testPlayer.playNext()
         testPlayer.clearContextQueue()
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 1)
@@ -543,6 +576,8 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testPlayMulitpleSongs_WaitingQueuePlaying() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
+        mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
         prepareWithCachedPlaylist()
         playerData.currentIndex = 1
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
@@ -555,6 +590,7 @@ class MusicPlayerTest: XCTestCase {
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.appendContextQueue(playables: [songId1, songId2, songId3])
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
@@ -563,6 +599,8 @@ class MusicPlayerTest: XCTestCase {
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying2() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
+        mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
         prepareWithCachedPlaylist()
         playerData.currentIndex = 1
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
@@ -573,6 +611,7 @@ class MusicPlayerTest: XCTestCase {
         guard let songId2 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1, songId2, songId3]))
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
@@ -581,6 +620,7 @@ class MusicPlayerTest: XCTestCase {
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying8() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         prepareWithCachedPlaylist()
         playerData.currentIndex = 1
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
@@ -590,6 +630,7 @@ class MusicPlayerTest: XCTestCase {
         guard let songId2 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1, songId2, songId3]))
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 1)
@@ -605,7 +646,6 @@ class MusicPlayerTest: XCTestCase {
 
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
-        XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 1)
         XCTAssertEqual(testPlayer.nextQueue.count, 0)
@@ -613,6 +653,8 @@ class MusicPlayerTest: XCTestCase {
     }
 
     func testPlaySong_WaitingQueuePlaying9() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
+        mockMusicPlayable.expectationDidStartPlaying?.expectedFulfillmentCount = 2
         prepareWithCachedPlaylist()
         playerData.currentIndex = 1
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
@@ -625,6 +667,7 @@ class MusicPlayerTest: XCTestCase {
 
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId3]))
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 2)
@@ -645,7 +688,6 @@ class MusicPlayerTest: XCTestCase {
         
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId3]))
-        XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 2)
         XCTAssertEqual(testPlayer.nextQueue.count, 0)
@@ -661,7 +703,6 @@ class MusicPlayerTest: XCTestCase {
         
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
-        XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
         XCTAssertEqual(testPlayer.nextQueue.count, 0)
@@ -669,6 +710,8 @@ class MusicPlayerTest: XCTestCase {
     }
 
     func testPlayMulitpleSongs_WaitingQueuePlaying5() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
+        mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
         prepareWithCachedPlaylist()
         playerData.currentIndex = 1
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
@@ -677,6 +720,8 @@ class MusicPlayerTest: XCTestCase {
         
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
+        XCTAssertFalse(testPlayer.isPlaying)
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
@@ -691,7 +736,6 @@ class MusicPlayerTest: XCTestCase {
 
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
-        XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
         XCTAssertEqual(testPlayer.nextQueue.count, 0)
@@ -706,7 +750,6 @@ class MusicPlayerTest: XCTestCase {
 
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
-        XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
         XCTAssertEqual(testPlayer.nextQueue.count, 0)
@@ -723,7 +766,6 @@ class MusicPlayerTest: XCTestCase {
         guard let songId2 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1, songId2, songId3]))
-        XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
         XCTAssertEqual(testPlayer.nextQueue.count, 2)
@@ -740,7 +782,6 @@ class MusicPlayerTest: XCTestCase {
         guard let songId2 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", index: 1, playables: [songId1, songId2, songId3]))
-        XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 1)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
         XCTAssertEqual(testPlayer.nextQueue.count, 1)
@@ -748,6 +789,7 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testPlayMulitpleSongs_userQueueHasElements_notUserQueuePlaying4() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         playerData.removeAllItems()
         playerData.isUserQueuePlaying = false
         guard let songId0 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
@@ -759,6 +801,8 @@ class MusicPlayerTest: XCTestCase {
         guard let songId2 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", index: 2, playables: [songId1, songId2, songId3]))
+        XCTAssertFalse(testPlayer.isPlaying)
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 2)
         XCTAssertEqual(testPlayer.userQueue.count, 2)
@@ -1091,19 +1135,27 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertEqual(playerData.currentIndex, 0)
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songCached.id)
     }
-    
+
     func testPlayNext_StartPlayIfPaused() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
+        mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
         prepareWithCachedPlaylist()
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 3))
         testMusicPlayer.pause()
         testPlayer.playNext()
+        XCTAssertFalse(testPlayer.isPlaying)
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
     }
     
     func testPlayNext_IsPlayingStaysTrue() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
+        mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
         prepareWithCachedPlaylist()
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 3))
         testPlayer.playNext()
+        XCTAssertFalse(testPlayer.isPlaying)
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
     }
     
@@ -1140,15 +1192,24 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testTogglePlay_AfterPlay() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         prepareWithCachedPlaylist()
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 6))
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         testPlayer.togglePlayPause()
         XCTAssertFalse(testPlayer.isPlaying)
+        
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         testPlayer.togglePlayPause()
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
+        
         testPlayer.togglePlayPause()
         XCTAssertFalse(testPlayer.isPlaying)
+        
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "download is triggered")
         testPlayer.togglePlayPause()
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
     }
     

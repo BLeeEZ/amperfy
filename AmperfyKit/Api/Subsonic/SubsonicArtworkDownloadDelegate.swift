@@ -23,6 +23,7 @@ import Foundation
 import CoreData
 import UIKit
 import os.log
+import PromiseKit
 
 class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         
@@ -40,15 +41,14 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         return 2
     }
 
-    func prepareDownload(download: Download, context: NSManagedObjectContext) throws -> URL {
-        guard let downloadElement = download.element else {
-            throw DownloadError.fetchFailed
+    func prepareDownload(download: Download) -> Promise<URL> {
+        return Promise<Artwork> { seal in
+            guard let artwork = download.element as? Artwork else { throw DownloadError.fetchFailed }
+            guard Reachability.isConnectedToNetwork() else { throw DownloadError.noConnectivity }
+            seal.fulfill(artwork)
+        }.then { artwork in
+            self.subsonicServerApi.generateUrl(forArtwork: artwork)
         }
-        let artworkMO = try context.existingObject(with: downloadElement.objectID) as! ArtworkMO
-        let artwork = Artwork(managedObject: artworkMO)
-        guard Reachability.isConnectedToNetwork() else { throw DownloadError.noConnectivity }
-        guard let url = subsonicServerApi.generateUrl(forArtwork: artwork) else { throw DownloadError.urlInvalid }
-        return url
     }
     
     func validateDownloadedData(download: Download) -> ResponseError? {
@@ -58,27 +58,26 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         return subsonicServerApi.checkForErrorResponse(inData: data)
     }
     
-    func completedDownload(download: Download, context: NSManagedObjectContext) {
-        guard let data = download.resumeData,
-              let downloadElement = download.element,
-              let artworkMO = try? context.existingObject(with: downloadElement.objectID) as? ArtworkMO else {
-            return
+    func completedDownload(download: Download, persistentStorage: PersistentStorage) -> Guarantee<Void> {
+        return Guarantee<Void> { seal in
+            guard let data = download.resumeData,
+                  let artwork = download.element as? Artwork else {
+                return seal(Void())
+            }
+            let library = LibraryStorage(context: persistentStorage.context)
+            artwork.status = .CustomImage
+            artwork.setImage(fromData: data)
+            library.saveContext()
+            seal(Void())
         }
-        let library = LibraryStorage(context: context)
-        let artwork = Artwork(managedObject: artworkMO)
-        artwork.status = .CustomImage
-        artwork.setImage(fromData: data)
-        library.saveContext()
     }
     
-    func failedDownload(download: Download, context: NSManagedObjectContext) {
-        guard let downloadElement = download.element,
-              let artworkMO = try? context.existingObject(with: downloadElement.objectID) as? ArtworkMO else {
+    func failedDownload(download: Download, persistentStorage: PersistentStorage) {
+        guard let artwork = download.element as? Artwork else {
             return
         }
-        let artwork = Artwork(managedObject: artworkMO)
         artwork.status = .FetchError
-        let library = LibraryStorage(context: context)
+        let library = LibraryStorage(context: persistentStorage.context)
         library.saveContext()
     }
 

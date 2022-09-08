@@ -23,6 +23,7 @@ import UIKit
 import MediaPlayer
 import MarqueeLabel
 import AmperfyKit
+import PromiseKit
 
 class PlayerView: UIView {
   
@@ -408,17 +409,16 @@ class PlayerView: UIView {
     }
     
     func fetchSongInfoAndUpdateViews() {
-        guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
-        guard let song = player.currentlyPlaying?.asSong else { return }
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let syncLibrary = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendProxy.createLibrarySyncer()
-            let songAsync = Song(managedObject: context.object(with: song.managedObject.objectID) as! SongMO)
-            syncer.sync(song: songAsync, library: syncLibrary)
-            syncLibrary.saveContext()
-            DispatchQueue.main.async {
-                self.refreshCurrentlyPlayingInfo()
-            }
+        guard self.appDelegate.persistentStorage.settings.isOnlineMode,
+              let song = player.currentlyPlaying?.asSong
+        else { return }
+        
+        firstly {
+            self.appDelegate.backendProxy.createLibrarySyncer().sync(song: song, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.done {
+            self.refreshCurrentlyPlayingInfo()
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
         }
     }
     

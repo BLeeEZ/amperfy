@@ -22,6 +22,7 @@
 import Foundation
 import UIKit
 import AmperfyKit
+import PromiseKit
 
 typealias GetPlayContextCallback = () -> PlayContext?
 typealias GetPlayerIndexCallback = () -> PlayerIndex?
@@ -219,7 +220,11 @@ class LibraryEntityDetailVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
         guard let container = entityContainer else { return }
-        container.fetchAsync(storage: appDelegate.persistentStorage, backendApi: appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager) {
+        firstly {
+            container.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Detail Sync", error: error)
+        }.finally {
             self.refresh()
         }
     }
@@ -444,14 +449,13 @@ class LibraryEntityDetailVC: UIViewController {
     @IBAction func pressedDeleteOnServer(_ sender: Any) {
         dismiss(animated: true)
         guard let playable = entityContainer as? AbstractPlayable, let podcastEpisode = playable.asPodcastEpisode else { return }
-        self.appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
-            let syncer = self.appDelegate.backendApi.createLibrarySyncer()
-            let episodeAsync = PodcastEpisode(managedObject: context.object(with: podcastEpisode.managedObject.objectID) as! PodcastEpisodeMO)
-            syncer.requestPodcastEpisodeDelete(podcastEpisode: episodeAsync)
-            if let podcastAsync = episodeAsync.podcast {
-                syncer.sync(podcast: podcastAsync, library: library)
-            }
+        firstly {
+            self.appDelegate.backendApi.createLibrarySyncer().requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
+        }.then { () -> Promise<Void> in
+            guard let podcast = podcastEpisode.podcast else { return Promise.value }
+            return self.appDelegate.backendApi.createLibrarySyncer().sync(podcast: podcast, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Podcast Episode Sync Delete", error: error)
         }
     }
     
