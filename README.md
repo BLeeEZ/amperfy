@@ -56,7 +56,7 @@ For more information, and to participate in the public beta releases, please vis
 - [CoreDataMigrationRevised-Example](https://github.com/wibosco/CoreDataMigrationRevised-Example) by [William Boles](https://github.com/wibosco) is licensed under [MIT License](https://github.com/wibosco/CoreDataMigrationRevised-Example/blob/master/LICENSE)
 - [VYPlayIndicator](https://github.com/obrhoff/VYPlayIndicator) by [Dennis Oberhoff](https://github.com/obrhoff) is licensed under [MIT License](https://github.com/obrhoff/VYPlayIndicator/blob/master/LICENSE)
 - [CallbackURLKit](https://github.com/phimage/CallbackURLKit) by [Eric Marchand](https://github.com/phimage) is licensed under [MIT License](https://github.com/phimage/CallbackURLKit/blob/master/LICENSE)
-- [Alamofire](https://github.com/Alamofire/Alamofire) by [Alamofire](https://github.com/Alamofire) is licensed under [MIT License](hhttps://github.com/Alamofire/Alamofire/blob/master/LICENSE)
+- [Alamofire](https://github.com/Alamofire/Alamofire) by [Alamofire](https://github.com/Alamofire) is licensed under [MIT License](https://github.com/Alamofire/Alamofire/blob/master/LICENSE)
 - [PromiseKit](https://github.com/mxcl/PromiseKit) by [Max Howell](https://github.com/mxcl) is licensed under [MIT License](https://github.com/mxcl/PromiseKit/blob/master/LICENSE)
 - [PMKAlamofire](https://github.com/PromiseKit/PMKAlamofire) by [Max Howell](https://github.com/mxcl) is licensed under [MIT License](https://github.com/PromiseKit/PMKAlamofire/blob/master/LICENSE)
 - [Font Awesome](https://fontawesome.com/) by [Font Awesome](https://fontawesome.com/) is licensed under [Font Awesome Free License](https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt)
