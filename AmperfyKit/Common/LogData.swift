@@ -53,8 +53,8 @@ public struct LogData: Encodable {
         logData.deviceInfo = deviceInfo
         
         var serverInfo = ServerInfo()
-        serverInfo.apiType = amperfyData.backendProxy.selectedApi.description
-        serverInfo.apiVersion = amperfyData.backendProxy.serverApiVersion
+        serverInfo.apiType = amperfyData.backendApi.selectedApi.description
+        serverInfo.apiVersion = amperfyData.backendApi.serverApiVersion
         logData.serverInfo = serverInfo
         
         logData.libraryInfo = amperfyData.library.getInfo()

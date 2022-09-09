@@ -278,7 +278,7 @@ class LibraryEntityDetailVC: UIViewController {
         albumLabel.text = entityContainer.subsubtitle
         albumContainerView.isHidden = entityContainer.subsubtitle == nil
 
-        infoLabel.text = entityContainer.info(for: appDelegate.backendProxy.selectedApi, type: .long)
+        infoLabel.text = entityContainer.info(for: appDelegate.backendApi.selectedApi, type: .long)
 
         playButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
         playShuffledButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode

@@ -48,7 +48,7 @@ class GenericTableCell: BasicTableCell {
         subtitleLabel.isHidden = container.subtitle == nil
         subtitleLabel.text = container.subtitle
         entityImage.display(container: container)
-        let infoText = container.info(for: appDelegate.backendProxy.selectedApi, type: .short)
+        let infoText = container.info(for: appDelegate.backendApi.selectedApi, type: .short)
         infoLabel.isHidden = infoText.isEmpty
         infoLabel.text = infoText
     }

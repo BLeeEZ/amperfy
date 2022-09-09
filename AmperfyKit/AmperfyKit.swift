@@ -54,11 +54,8 @@ public class AmperKit {
     public lazy var eventLogger = {
         return EventLogger(persistentContainer: persistentStorage.persistentContainer)
     }()
-    public lazy var backendProxy: BackendProxy = {
+    public lazy var backendApi: BackendProxy = {
         return BackendProxy(eventLogger: eventLogger)
-    }()
-    public lazy var backendApi: BackendApi = {
-        return backendProxy
     }()
     public lazy var notificationHandler: EventNotificationHandler = {
         return EventNotificationHandler()

@@ -44,7 +44,7 @@ class PlaylistTableCell: BasicTableCell {
         self.rootView = rootView
         nameLabel.text = playlist.name
         entityImage.display(container: playlist)
-        infoLabel.text = playlist.info(for: appDelegate.backendProxy.selectedApi, type: .short)
+        infoLabel.text = playlist.info(for: appDelegate.backendApi.selectedApi, type: .short)
     }
     
     @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {

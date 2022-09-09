@@ -62,10 +62,10 @@ class SettingsServerVC: UITableViewController {
                let loginCredentials = self.appDelegate.persistentStorage.loginCredentials {
                 loginCredentials.changePasswordAndHash(password: newPassword)
                 firstly {
-                    self.appDelegate.backendProxy.isAuthenticationValid(credentials: loginCredentials)
+                    self.appDelegate.backendApi.isAuthenticationValid(credentials: loginCredentials)
                 }.done {
                     self.appDelegate.persistentStorage.loginCredentials = loginCredentials
-                    self.appDelegate.backendProxy.provideCredentials(credentials: loginCredentials)
+                    self.appDelegate.backendApi.provideCredentials(credentials: loginCredentials)
                     let alert = UIAlertController(title: "Successful", message: "Password updated!", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "Close", style: .default))
                     alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()

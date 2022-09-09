@@ -414,7 +414,7 @@ class PlayerView: UIView {
         else { return }
         
         firstly {
-            self.appDelegate.backendProxy.createLibrarySyncer().sync(song: song, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.backendApi.createLibrarySyncer().sync(song: song, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
         }.done {
             self.refreshCurrentlyPlayingInfo()
         }.catch { error in

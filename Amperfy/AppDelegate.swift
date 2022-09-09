@@ -60,10 +60,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public lazy var eventLogger: EventLogger = {
         return AmperKit.shared.eventLogger
     }()
-    public lazy var backendProxy: BackendProxy = {
-        return AmperKit.shared.backendProxy
-    }()
-    public lazy var backendApi: BackendApi = {
+    public lazy var backendApi: BackendProxy = {
         return AmperKit.shared.backendApi
     }()
     public lazy var notificationHandler: EventNotificationHandler = {
@@ -163,7 +160,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard let credentials = persistentStorage.loginCredentials else {
             return true
         }
-        backendProxy.selectedApi = credentials.backendApi
+        backendApi.selectedApi = credentials.backendApi
         backendApi.provideCredentials(credentials: credentials)
         
         guard AmperKit.shared.persistentStorage.isLibrarySynced else {

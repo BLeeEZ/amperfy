@@ -105,7 +105,7 @@ class SettingsServerURLsVC: UITableViewController {
             
             let newCredentials = LoginCredentials(serverUrl: serverURLs[indexPath.row], username: currentCredentials.username, password: currentCredentials.password, backendApi: currentCredentials.backendApi)
             self.appDelegate.persistentStorage.loginCredentials = newCredentials
-            self.appDelegate.backendProxy.provideCredentials(credentials: newCredentials)
+            self.appDelegate.backendApi.provideCredentials(credentials: newCredentials)
         }
         reload()
     }
@@ -176,7 +176,7 @@ class SettingsServerURLsVC: UITableViewController {
             let credentials = LoginCredentials(serverUrl: newAltUrl, username: username, password: password, backendApi: activeApi)
 
             firstly {
-                self.appDelegate.backendProxy.isAuthenticationValid(credentials: credentials)
+                self.appDelegate.backendApi.isAuthenticationValid(credentials: credentials)
             }.done {
                 if let activeUrl = self.appDelegate.persistentStorage.loginCredentials?.serverUrl {
                     var currentAltUrls = self.appDelegate.persistentStorage.alternativeServerURLs
@@ -184,7 +184,7 @@ class SettingsServerURLsVC: UITableViewController {
                     self.appDelegate.persistentStorage.alternativeServerURLs = currentAltUrls
                 }
                 self.appDelegate.persistentStorage.loginCredentials = credentials
-                self.appDelegate.backendProxy.provideCredentials(credentials: credentials)
+                self.appDelegate.backendApi.provideCredentials(credentials: credentials)
                 self.reload()
 
                 let alert = UIAlertController(title: "Successful", message: "Alternative URL added.", preferredStyle: .alert)

@@ -101,9 +101,9 @@ class LoginVC: UIViewController {
 
         let credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
         firstly {
-            self.appDelegate.backendProxy.login(apiType: selectedApiType, credentials: credentials)
+            self.appDelegate.backendApi.login(apiType: selectedApiType, credentials: credentials)
         }.done { authenticatedApi in
-            self.appDelegate.backendProxy.selectedApi = authenticatedApi
+            self.appDelegate.backendApi.selectedApi = authenticatedApi
             credentials.backendApi = authenticatedApi
             self.appDelegate.persistentStorage.loginCredentials = credentials
             self.appDelegate.backendApi.provideCredentials(credentials: credentials)

@@ -37,9 +37,9 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         change(sortType: appDelegate.persistentStorage.settings.playlistsSortSetting)
 
         var searchTiles: [String]? = nil
-        if appDelegate.backendProxy.selectedApi == .ampache {
+        if appDelegate.backendApi.selectedApi == .ampache {
             searchTiles = ["All", "Cached", "User", "Smart"]
-        } else if appDelegate.backendProxy.selectedApi == .subsonic {
+        } else if appDelegate.backendApi.selectedApi == .subsonic {
             searchTiles = ["All", "Cached"]
         }
         configureSearchController(placeholder: "Search in \"Playlists\"", scopeButtonTitles: searchTiles)

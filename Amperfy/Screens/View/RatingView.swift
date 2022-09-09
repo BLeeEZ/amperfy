@@ -122,7 +122,7 @@ class RatingView: UIView {
             song.rating = rating
             self.appDelegate.library.saveContext()
             firstly {
-                self.appDelegate.backendProxy.createLibrarySyncer().setRating(song: song, rating: rating)
+                self.appDelegate.backendApi.createLibrarySyncer().setRating(song: song, rating: rating)
             }.done {
                 self.refresh()
             }.catch { error in
@@ -132,7 +132,7 @@ class RatingView: UIView {
             album.rating = rating
             self.appDelegate.library.saveContext()
             firstly {
-                self.appDelegate.backendProxy.createLibrarySyncer().setRating(album: album, rating: rating)
+                self.appDelegate.backendApi.createLibrarySyncer().setRating(album: album, rating: rating)
             }.done {
                 self.refresh()
             }.catch { error in
@@ -142,7 +142,7 @@ class RatingView: UIView {
             artist.rating = rating
             self.appDelegate.library.saveContext()
             firstly {
-                self.appDelegate.backendProxy.createLibrarySyncer().setRating(artist: artist, rating: rating)
+                self.appDelegate.backendApi.createLibrarySyncer().setRating(artist: artist, rating: rating)
             }.done {
                 self.refresh()
             }.catch { error in
