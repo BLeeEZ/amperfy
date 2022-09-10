@@ -72,7 +72,7 @@ public class ScrobbleSyncer {
             
             while self.isRunning, self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
                 self.uploadSemaphore.wait()
-                firstly {
+                firstlyOnMain {
                     self.getNextScrobbleEntry()
                 }.then { scobbleEntry -> Promise<Void> in
                     guard let entry = scobbleEntry else {

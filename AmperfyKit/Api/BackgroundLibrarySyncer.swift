@@ -68,7 +68,7 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
             os_log("start", log: self.log, type: .info)
             
             if self.isRunning, self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
-                firstly {
+                firstlyOnMain {
                     AutoDownloadLibrarySyncer(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
                         .syncLatestLibraryElements()
                 }.catch { error in
@@ -80,7 +80,7 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
             }
 
             while self.isRunning, self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
-                firstly { () -> Promise<Void> in
+                firstlyOnMain { () -> Promise<Void> in
                     let albumToSync = self.storage.main.library.getAlbumWithoutSyncedSongs()
                     guard let albumToSync = albumToSync else {
                         self.isRunning = false

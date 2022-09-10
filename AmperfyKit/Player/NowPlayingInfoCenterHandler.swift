@@ -38,6 +38,7 @@ class NowPlayingInfoCenterHandler {
 
     func updateNowPlayingInfo(playable: AbstractPlayable) {
         let albumTitle = playable.asSong?.album?.name ?? ""
+        let artwork = playable.image(setting: storage.settings.artworkDisplayPreference)
         nowPlayingInfoCenter.nowPlayingInfo = [
             MPMediaItemPropertyIsCloudItem: !playable.isCached,
             MPMediaItemPropertyTitle: playable.title,
@@ -45,8 +46,9 @@ class NowPlayingInfoCenterHandler {
             MPMediaItemPropertyArtist: playable.creatorName,
             MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
-            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: playable.image(setting: storage.settings.artworkDisplayPreference).size, requestHandler: { (size) -> UIImage in
-                return playable.image(setting: self.storage.settings.artworkDisplayPreference)
+            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: artwork.size, requestHandler: { (size) -> UIImage in
+                // this completion handler is not called in main thread!
+                return artwork
             })
         ]
     }

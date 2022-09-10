@@ -256,8 +256,9 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         guard isSyncAllowed else { return Promise.value }
         os_log("Sync newest albums", log: log, type: .info)
         let oldRecentSongsMain = Set(storage.main.library.getRecentSongs())
-        var parsedAlbumsMain = [Album]()
-        var recentlyAddedSongsMain: Set<Song> = Set()
+        var recentSongsMain: Set<Song> = Set()
+        var parsedAlbumsCDIDs = [NSManagedObjectID]()
+        var parsedSongsCDIDs = [NSManagedObjectID]()
         
         return firstly {
             subsonicServerApi.requestLatestAlbums()
@@ -265,36 +266,42 @@ class SubsonicLibrarySyncer: LibrarySyncer {
             self.storage.async.perform { asyncCompanion in
                 let parserDelegate = SsAlbumParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
                 try self.parse(data: data, delegate: parserDelegate)
-                parsedAlbumsMain = parserDelegate.parsedAlbums.compactMap {
-                    Album(managedObject: self.storage.main.context.object(with: $0.managedObject.objectID) as! AlbumMO)
+                parsedAlbumsCDIDs = parserDelegate.parsedAlbums.compactMap {
+                    $0.managedObject.objectID
                 }
             }
         }.then { () -> Promise<Void> in
             os_log("Sync songs of newest albums", log: self.log, type: .info)
-            let albumPromises = parsedAlbumsMain.compactMap { album in return {
+            let parsedAlbumsMain = parsedAlbumsCDIDs.compactMap {
+                Album(managedObject: self.storage.main.context.object(with: $0) as! AlbumMO)
+            }
+            let albumPromises = parsedAlbumsMain.compactMap { album -> (() ->Promise<Void>) in return {
+                
                 return firstly {
                     self.subsonicServerApi.requestAlbum(id: album.id)
                 }.then { data in
                     self.storage.async.perform { asyncCompanion in
                         let parserDelegate = SsSongParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave, subsonicUrlCreator: self.subsonicServerApi)
                         try self.parse(data: data, delegate: parserDelegate)
-                        let parsedSongsMain = parserDelegate.parsedSongs.compactMap {
-                            Song(managedObject: self.storage.main.context.object(with: $0.managedObject.objectID) as! SongMO)
+                        parsedSongsCDIDs = parserDelegate.parsedSongs.compactMap {
+                            $0.managedObject.objectID
                         }
-                        recentlyAddedSongsMain = recentlyAddedSongsMain.union(Set(parsedSongsMain))
                     }
-                }.then { () -> Promise<Void> in
+                }.get {
+                    let parsedSongsMain = parsedSongsCDIDs.compactMap {
+                        Song(managedObject: self.storage.main.context.object(with: $0) as! SongMO)
+                    }
+                    recentSongsMain = recentSongsMain.union(Set(parsedSongsMain))
                     album.isSongsMetaDataSynced = true
                     self.storage.main.saveContext()
-                    return Promise.value
                 }
             }}
             return albumPromises.resolveSequentially()
         }.get {
-            os_log("%i newest Albums synced", log: self.log, type: .info, parsedAlbumsMain.count)
-            let notRecentSongsAnymore = oldRecentSongsMain.subtracting(recentlyAddedSongsMain)
+            os_log("%i newest Albums synced", log: self.log, type: .info, parsedAlbumsCDIDs.count)
+            let notRecentSongsAnymore = oldRecentSongsMain.subtracting(recentSongsMain)
             notRecentSongsAnymore.filter{ !$0.id.isEmpty }.forEach { $0.isRecentlyAdded = false }
-            recentlyAddedSongsMain.filter{ !$0.id.isEmpty }.forEach { $0.isRecentlyAdded = true }
+            recentSongsMain.filter{ !$0.id.isEmpty }.forEach { $0.isRecentlyAdded = true }
             self.storage.main.saveContext()
         }
     }

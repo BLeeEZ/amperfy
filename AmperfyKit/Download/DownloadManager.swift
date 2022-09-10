@@ -148,12 +148,10 @@ class DownloadManager: NSObject, DownloadManageable {
     }
     
     private func manageDownload(download: Download) -> PMKFinalizer {
-        return firstly { () -> Guarantee<Void> in
-            return Guarantee<Void> { seal in
-                os_log("Fetching %s ...", log: self.log, type: .info, download.title)
-                seal(Void())
-            }
-        }.then { () -> Promise<URL> in
+        return firstlyOnMain{ () -> Promise<Void> in
+            os_log("Fetching %s ...", log: self.log, type: .info, download.title)
+            return Promise.value
+        }.then {
             self.downloadDelegate.prepareDownload(download: download)
         }.get { url in
             download.url = url

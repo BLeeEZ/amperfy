@@ -293,6 +293,15 @@ extension Promise {
     }
 }
 
+// PromiseKit related
+public func firstlyOnMain<T>(execute body: @escaping () -> Promise<T>) -> Promise<T> {
+    return firstly {
+        Guarantee.value
+    }.then {
+        body()
+    }
+}
+
 extension Array where Element == (() -> Promise<Void>) {
     public func resolveSequentially() -> Promise<Void> {
         Promise<Void>.resolveSequentially(promiseFns: self)
