@@ -34,9 +34,9 @@ class DirectoriesVC: BasicTableViewController {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.directories)
         
-        subdirectoriesFetchedResultsController = DirectorySubdirectoriesFetchedResultsController(for: directory, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        subdirectoriesFetchedResultsController = DirectorySubdirectoriesFetchedResultsController(for: directory, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         subdirectoriesFetchedResultsController.delegate = self
-        songsFetchedResultsController = DirectorySongsFetchedResultsController(for: directory, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        songsFetchedResultsController = DirectorySongsFetchedResultsController(for: directory, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         songsFetchedResultsController.delegate = self
         tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
@@ -68,16 +68,16 @@ class DirectoriesVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().sync(directory: directory, persistentStorage: self.appDelegate.persistentStorage)
+            self.appDelegate.librarySyncer.sync(directory: directory)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Directories Sync", error: error)
         }
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
-        guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
+        guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
         else { return nil }
         let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
         guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }

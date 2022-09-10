@@ -22,7 +22,6 @@
 import Foundation
 import UIKit
 import os.log
-import CoreData
 import PromiseKit
 
 public typealias VoidFunctionCallback = () -> Void
@@ -280,39 +279,6 @@ extension UIActivityIndicatorView {
             return .medium
         } else {
             return .gray
-        }
-    }
-}
-
-extension NSPersistentContainer {
-    public class Companion {
-        public let context: NSManagedObjectContext
-        public let library: LibraryStorage
-        public let syncWave: SyncWave
-        
-        init(context: NSManagedObjectContext, library: LibraryStorage, syncWave: SyncWave) {
-            self.context = context
-            self.library = library
-            self.syncWave = syncWave
-        }
-    }
-    
-    public func performAsync(body: @escaping (_ companion: Companion) throws -> Void) -> Promise<Void> {
-        return Promise<Void> { seal in
-            self.performBackgroundTask() { (context) in
-                let library = LibraryStorage(context: context)
-                guard let syncWave = library.getLatestSyncWave() else {
-                    return seal.reject(LibraryError.noSyncWave)
-                }
-                let companion = Companion(context: context, library: library, syncWave: syncWave)
-                do {
-                    try body(companion)
-                } catch {
-                    return seal.reject(error)
-                }
-                library.saveContext()
-                seal.fulfill(Void())
-            }
         }
     }
 }

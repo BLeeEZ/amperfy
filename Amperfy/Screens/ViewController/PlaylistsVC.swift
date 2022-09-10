@@ -34,7 +34,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.playlists)
         
-        change(sortType: appDelegate.persistentStorage.settings.playlistsSortSetting)
+        change(sortType: appDelegate.storage.settings.playlistsSortSetting)
 
         var searchTiles: [String]? = nil
         if appDelegate.backendApi.selectedApi == .ampache {
@@ -56,7 +56,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         swipeCallback = { (indexPath, completionHandler) in
             let playlist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             firstly {
-                playlist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
             }.finally {
@@ -67,19 +67,19 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     func change(sortType: PlaylistSortType) {
         self.sortType = sortType
-        appDelegate.persistentStorage.settings.playlistsSortSetting = sortType
+        appDelegate.storage.settings.playlistsSortSetting = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: sortType, isGroupedInAlphabeticSections: sortType == .name)
+        fetchedResultsController = PlaylistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType == .name)
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncDownPlaylistsWithoutSongs(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
         }
@@ -102,10 +102,10 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         guard editingStyle == .delete else { return }
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
         let playlistId = playlist.id
-        self.appDelegate.library.deletePlaylist(playlist)
-        self.appDelegate.library.saveContext()
+        self.appDelegate.storage.main.library.deletePlaylist(playlist)
+        self.appDelegate.storage.main.saveContext()
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncUpload(playlistIdToDelete: playlistId)
+            self.appDelegate.librarySyncer.syncUpload(playlistIdToDelete: playlistId)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlist Upload Deletion", error: error)
         }
@@ -147,7 +147,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncDownPlaylistsWithoutSongs(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
         }.finally {

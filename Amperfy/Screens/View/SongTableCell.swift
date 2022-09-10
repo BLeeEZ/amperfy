@@ -80,7 +80,7 @@ class SongTableCell: BasicTableCell {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let song = song, let context = playContextCb?(self) else { return }
 
-        if !isAlertPresented && (song.isCached || appDelegate.persistentStorage.settings.isOnlineMode) {
+        if !isAlertPresented && (song.isCached || appDelegate.storage.settings.isOnlineMode) {
             hideSearchBarKeyboardInRootView()
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)

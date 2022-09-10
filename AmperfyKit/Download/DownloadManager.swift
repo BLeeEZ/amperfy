@@ -26,7 +26,7 @@ import PromiseKit
 
 class DownloadManager: NSObject, DownloadManageable {
     
-    let persistentStorage: PersistentStorage
+    let storage: PersistentStorage
     let requestManager: DownloadRequestManager
     let downloadDelegate: DownloadManagerDelegate
     let notificationHandler: EventNotificationHandler
@@ -43,9 +43,9 @@ class DownloadManager: NSObject, DownloadManageable {
     private var isRunning = false
     private var isActive = false
     
-    init(name: String, persistentStorage: PersistentStorage, requestManager: DownloadRequestManager, downloadDelegate: DownloadManagerDelegate, notificationHandler: EventNotificationHandler, eventLogger: EventLogger) {
+    init(name: String, storage: PersistentStorage, requestManager: DownloadRequestManager, downloadDelegate: DownloadManagerDelegate, notificationHandler: EventNotificationHandler, eventLogger: EventLogger) {
         log = OSLog(subsystem: "Amperfy", category: name)
-        self.persistentStorage = persistentStorage
+        self.storage = storage
         self.requestManager = requestManager
         self.downloadDelegate = downloadDelegate
         self.notificationHandler = notificationHandler
@@ -54,13 +54,13 @@ class DownloadManager: NSObject, DownloadManageable {
     }
     
     func download(object: Downloadable) {
-        guard !object.isCached, persistentStorage.settings.isOnlineMode else { return }
+        guard !object.isCached, storage.settings.isOnlineMode else { return }
         if let isValidCheck = preDownloadIsValidCheck, !isValidCheck(object) { return }
         self.requestManager.add(object: object)
     }
     
     func download(objects: [Downloadable]) {
-        guard persistentStorage.settings.isOnlineMode else { return }
+        guard storage.settings.isOnlineMode else { return }
         let downloadObjects = objects.filter{ !$0.isCached }.filter{ preDownloadIsValidCheck?($0) ?? true }
         if !downloadObjects.isEmpty {
             self.requestManager.add(objects: downloadObjects)
@@ -157,8 +157,7 @@ class DownloadManager: NSObject, DownloadManageable {
             self.downloadDelegate.prepareDownload(download: download)
         }.get { url in
             download.url = url
-            let library = LibraryStorage(context: self.persistentStorage.context)
-            library.saveContext()
+            self.storage.main.saveContext()
             self.fetch(url: url)
         }.catch { error in
             if let fetchError = error as? DownloadError {
@@ -177,11 +176,10 @@ class DownloadManager: NSObject, DownloadManageable {
                 os_log("Fetching %s FAILED: %s", log: self.log, type: .info, download.title, error.description)
                 eventLogger.error(topic: "Download Error", statusCode: .downloadError, message: "Error \"\(error.description)\" occured while downloading object \"\(download.title)\".", displayPopup: isFailWithPopupError)
             }
-            downloadDelegate.failedDownload(download: download, persistentStorage: self.persistentStorage)
+            downloadDelegate.failedDownload(download: download, storage: self.storage)
         }
         download.isDownloading = false
-        let library = LibraryStorage(context: self.persistentStorage.context)
-        library.saveContext()
+        storage.main.library.saveContext()
     }
     
     func finishDownload(download: Download, data: Data) {
@@ -194,12 +192,11 @@ class DownloadManager: NSObject, DownloadManageable {
         }
         os_log("Fetching %s SUCCESS (%{iec-bytes}d)", log: self.log, type: .info, download.title, data.count)
         firstly {
-            downloadDelegate.completedDownload(download: download, persistentStorage: self.persistentStorage)
+            downloadDelegate.completedDownload(download: download, storage: self.storage)
         }.done {
             download.resumeData = nil
             download.isDownloading = false
-            let library = LibraryStorage(context: self.persistentStorage.context)
-            library.saveContext()
+            self.storage.main.saveContext()
             if let downloadElement = download.element {
                 self.notificationHandler.post(name: .downloadFinishedSuccess, object: self, userInfo: DownloadNotification(id: downloadElement.uniqueID).asNotificationUserInfo)
             }

@@ -392,6 +392,7 @@
 		50DEEE0C265E3F9D0073FF20 /* DirectoriesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE0B265E3F9D0073FF20 /* DirectoriesVC.swift */; };
 		50E3D8D02796CB2B009A9680 /* LibraryEntityDetailVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50E3D8CF2796CB2B009A9680 /* LibraryEntityDetailVC.xib */; };
 		50E3D8D22796CB8A009A9680 /* LibraryEntityDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E3D8D12796CB8A009A9680 /* LibraryEntityDetailVC.swift */; };
+		50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -822,6 +823,7 @@
 		50ED2B9027B7AE8500331BF7 /* EventNotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventNotificationHandler.swift; sourceTree = "<group>"; };
 		50ED2B9227BB932700331BF7 /* album_missing_artistId.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = album_missing_artistId.xml; sourceTree = "<group>"; };
 		50ED2B9427BB938500331BF7 /* SsAlbumMissingArtistsIdParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumMissingArtistsIdParserTest.swift; sourceTree = "<group>"; };
+		50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySyncerProxy.swift; sourceTree = "<group>"; };
 		50EF2CB1267F658B0011C42F /* SnapKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SnapKit.xcframework; path = Carthage/Build/SnapKit.xcframework; sourceTree = "<group>"; };
 		50EF2CB3267F65960011C42F /* NotificationBanner.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = NotificationBanner.xcframework; path = Carthage/Build/NotificationBanner.xcframework; sourceTree = "<group>"; };
 		50F800202685B8DA0015844D /* Amperfy v10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v10.xcdatamodel"; sourceTree = "<group>"; };
@@ -1062,6 +1064,7 @@
 				5086F87422384B5500546F5A /* Subsonic */,
 				50BA92F321CC29D600E5901D /* Ampache */,
 				509A7D832806A232009791D1 /* AutoDownloadLibrarySyncer.swift */,
+				50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */,
 			);
 			path = Api;
 			sourceTree = "<group>";
@@ -2000,6 +2003,7 @@
 				50C9D6E3284FAB96007F18D0 /* UIImageAssetsExtension.swift in Sources */,
 				50C9D69B284FAA6C007F18D0 /* PlayerMO+CoreDataClass.swift in Sources */,
 				50C9D69E284FAA6C007F18D0 /* AbstractLibraryEntityMO+CoreDataProperties.swift in Sources */,
+				50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */,
 				50C9D642284FA9C7007F18D0 /* GenericXmlParser.swift in Sources */,
 				50C9D683284FAA6C007F18D0 /* PlaylistItemMO+CoreDataClass.swift in Sources */,
 				50C9D664284FAA0B007F18D0 /* CatalogParserDelegate.swift in Sources */,

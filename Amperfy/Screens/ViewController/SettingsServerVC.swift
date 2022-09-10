@@ -41,7 +41,7 @@ class SettingsServerVC: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        if let loginCredentials = self.appDelegate.persistentStorage.loginCredentials {
+        if let loginCredentials = self.appDelegate.storage.loginCredentials {
             serverUrlTF.text = loginCredentials.serverUrl
             usernameTF.text = loginCredentials.username
             backendApiLabel.text = loginCredentials.backendApi.description
@@ -59,12 +59,12 @@ class SettingsServerVC: UITableViewController {
         })
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
             if let newPassword = alert.textFields?.first?.text,
-               let loginCredentials = self.appDelegate.persistentStorage.loginCredentials {
+               let loginCredentials = self.appDelegate.storage.loginCredentials {
                 loginCredentials.changePasswordAndHash(password: newPassword)
                 firstly {
                     self.appDelegate.backendApi.isAuthenticationValid(credentials: loginCredentials)
                 }.done {
-                    self.appDelegate.persistentStorage.loginCredentials = loginCredentials
+                    self.appDelegate.storage.loginCredentials = loginCredentials
                     self.appDelegate.backendApi.provideCredentials(credentials: loginCredentials)
                     let alert = UIAlertController(title: "Successful", message: "Password updated!", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "Close", style: .default))

@@ -34,7 +34,7 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
         appDelegate.userStatistics.visited(.downloads)
         downloadManager = appDelegate.playableDownloadManager
         
-        fetchedResultsController = DownloadsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        fetchedResultsController = DownloadsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         
         tableView.register(nibName: PlayableTableCell.typeName)

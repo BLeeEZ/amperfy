@@ -35,7 +35,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.podcastDetail)
-        fetchedResultsController = PodcastEpisodesFetchedResultsController(forPodcast: podcast, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        fetchedResultsController = PodcastEpisodesFetchedResultsController(forPodcast: podcast, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Podcast\"", scopeButtonTitles: ["All", "Cached"])
@@ -71,7 +71,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         firstly {
-            podcast.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
         }.finally {
@@ -102,7 +102,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().sync(podcast: self.podcast, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.sync(podcast: self.podcast)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
         }.finally {

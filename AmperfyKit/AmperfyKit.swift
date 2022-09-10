@@ -42,17 +42,20 @@ public class AmperKit {
     public lazy var log = {
         return OSLog(subsystem: "Amperfy", category: "AppDelegate")
     }()
-    public lazy var persistentStorage = {
-        return PersistentStorage()
+    public lazy var coreDataManager = {
+        return CoreDataPersistentManager()
     }()
-    public lazy var library = {
-        return LibraryStorage(context: persistentStorage.context)
+    public lazy var storage = {
+        return PersistentStorage(coreDataManager: coreDataManager)
+    }()
+    public lazy var librarySyncer: LibrarySyncer = {
+        return LibrarySyncerProxy(backendApi: backendApi, storage: storage)
     }()
     public lazy var duplicateEntitiesResolver = {
-        return DuplicateEntitiesResolver(persistentStorage: persistentStorage)
+        return DuplicateEntitiesResolver(storage: storage)
     }()
     public lazy var eventLogger = {
-        return EventLogger(persistentContainer: persistentStorage.persistentContainer)
+        return EventLogger(storage: storage)
     }()
     public lazy var backendApi: BackendProxy = {
         return BackendProxy(eventLogger: eventLogger)
@@ -61,8 +64,8 @@ public class AmperKit {
         return EventNotificationHandler()
     }()
     public lazy var player: PlayerFacade = {
-        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: library, userStatistics: userStatistics)
-        let playerData = library.getPlayerData()
+        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
+        let playerData = storage.main.library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
         let curPlayer = AudioPlayer(coreData: playerData, queueHandler: queueHandler, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
         
@@ -71,13 +74,13 @@ public class AmperKit {
         let songPlayedSyncer = SongPlayedSyncer(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, scrobbleSyncer: scrobbleSyncer)
         curPlayer.addNotifier(notifier: songPlayedSyncer)
 
-        let facadeImpl = PlayerFacadeImpl(playerStatus: playerData, queueHandler: queueHandler, musicPlayer: curPlayer, library: library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
-        facadeImpl.isOfflineMode = persistentStorage.settings.isOfflineMode
+        let facadeImpl = PlayerFacadeImpl(playerStatus: playerData, queueHandler: queueHandler, musicPlayer: curPlayer, library: storage.main.library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        facadeImpl.isOfflineMode = storage.settings.isOfflineMode
         
         let audioSessionHandler = AudioSessionHandler(musicPlayer: curPlayer)
         audioSessionHandler.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
         audioSessionHandler.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
-        let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(), persistentStorage: persistentStorage)
+        let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(), storage: storage)
         curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
         let remoteCommandCenterHandler = RemoteCommandCenterHandler(musicPlayer: facadeImpl, backendAudioPlayer: backendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter.shared())
         remoteCommandCenterHandler.configureRemoteCommands()
@@ -90,8 +93,8 @@ public class AmperKit {
     public lazy var playableDownloadManager: DownloadManageable = {
         let artworkExtractor = EmbeddedArtworkExtractor()
         let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi, artworkExtractor: artworkExtractor)
-        let requestManager = DownloadRequestManager(persistentStorage: persistentStorage, downloadDelegate: dlDelegate)
-        let dlManager = DownloadManager(name: "PlayableDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
+        let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
+        let dlManager = DownloadManager(name: "PlayableDownloader", storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
         
         let configuration = URLSessionConfiguration.background(withIdentifier: "\(Bundle.main.bundleIdentifier!).PlayableDownloader.background")
         var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
@@ -101,14 +104,14 @@ public class AmperKit {
     }()
     public lazy var artworkDownloadManager: DownloadManageable = {
         let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
-        let requestManager = DownloadRequestManager(persistentStorage: persistentStorage, downloadDelegate: dlDelegate)
+        let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
         requestManager.clearAllDownloadsIfAllHaveFinished()
-        let dlManager = DownloadManager(name: "ArtworkDownloader", persistentStorage: persistentStorage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
+        let dlManager = DownloadManager(name: "ArtworkDownloader", storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
         dlManager.isFailWithPopupError = false
         
         dlManager.preDownloadIsValidCheck = { (object: Downloadable) -> Bool in
             guard let artwork = object as? Artwork else { return false }
-            switch self.persistentStorage.settings.artworkDownloadSetting {
+            switch self.storage.settings.artworkDownloadSetting {
             case .updateOncePerSession:
                 return true
             case .onlyOnce:
@@ -130,32 +133,32 @@ public class AmperKit {
         return dlManager
     }()
     public lazy var backgroundLibrarySyncer = {
-        return BackgroundLibrarySyncer(persistentStorage: persistentStorage, backendApi: backendApi, playableDownloadManager: playableDownloadManager, eventLogger: eventLogger)
+        return BackgroundLibrarySyncer(storage: storage, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager, eventLogger: eventLogger)
     }()
     public lazy var scrobbleSyncer = {
-        return ScrobbleSyncer(persistentStorage: persistentStorage, backendApi: backendApi, eventLogger: eventLogger)
+        return ScrobbleSyncer(storage: storage, librarySyncer: librarySyncer, eventLogger: eventLogger)
     }()
     public lazy var libraryUpdater = {
-        return LibraryUpdater(persistentStorage: persistentStorage, backendApi: backendApi)
+        return LibraryUpdater(storage: storage, backendApi: backendApi)
     }()
     public lazy var userStatistics = {
-        return library.getUserStatistics(appVersion: Self.version)
+        return storage.main.library.getUserStatistics(appVersion: Self.version)
     }()
     public lazy var localNotificationManager = {
-        return LocalNotificationManager(userStatistics: userStatistics, persistentStorage: persistentStorage)
+        return LocalNotificationManager(userStatistics: userStatistics, storage: storage)
     }()
     public lazy var backgroundFetchTriggeredSyncer = {
-        return BackgroundFetchTriggeredSyncer(persistentStorage: persistentStorage, backendApi: backendApi, notificationManager: localNotificationManager, playableDownloadManager: playableDownloadManager)
+        return BackgroundFetchTriggeredSyncer(storage: storage, librarySyncer: librarySyncer, notificationManager: localNotificationManager, playableDownloadManager: playableDownloadManager)
     }()
     public lazy var popupDisplaySemaphore = {
         return DispatchSemaphore(value: 1)
     }()
     public lazy var intentManager = {
-        return IntentManager(persistentStorage: self.persistentStorage, library: self.library, player: self.player)
+        return IntentManager(storage: self.storage, library: storage.main.library, player: self.player)
     }()
 
     public func reinit() {
-        let playerData = library.getPlayerData()
+        let playerData = storage.main.library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
         player.reinit(playerStatus: playerData, queueHandler: queueHandler)
     }

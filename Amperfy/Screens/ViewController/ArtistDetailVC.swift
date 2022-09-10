@@ -37,9 +37,9 @@ class ArtistDetailVC: BasicTableViewController {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.artistDetail)
         
-        albumsFetchedResultsController = ArtistAlbumsItemsFetchedResultsController(for: artist, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        albumsFetchedResultsController = ArtistAlbumsItemsFetchedResultsController(for: artist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         albumsFetchedResultsController.delegate = self
-        songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(for: artist, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(for: artist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         songsFetchedResultsController.delegate = self
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
@@ -54,7 +54,7 @@ class ArtistDetailVC: BasicTableViewController {
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
                 playContextCb: {() in
-                    let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? []
+                    let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
                     let sortedSongs = songs.compactMap{ $0.asSong }.sortByAlbum()
                     return PlayContext(containable: self.artist, playables: sortedSongs)
                 },
@@ -81,7 +81,7 @@ class ArtistDetailVC: BasicTableViewController {
             case LibraryElement.Album.rawValue:
                 let album = self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
                 firstly {
-                    album.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 }.catch { error in
                     self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
                 }.finally {
@@ -101,7 +101,7 @@ class ArtistDetailVC: BasicTableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         firstly {
-            artist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
         }.finally {
@@ -120,7 +120,7 @@ class ArtistDetailVC: BasicTableViewController {
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
-        guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
+        guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
         else { return nil }
         let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
         guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }

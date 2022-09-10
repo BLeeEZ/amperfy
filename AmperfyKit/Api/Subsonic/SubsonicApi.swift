@@ -72,8 +72,8 @@ extension SubsonicApi: BackendApi {
         return subsonicServerApi.checkForErrorResponse(inData: data)
     }
     
-    func createLibrarySyncer() -> LibrarySyncer {
-        return SubsonicLibrarySyncer(subsonicServerApi: subsonicServerApi)
+    func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
+        return SubsonicLibrarySyncer(subsonicServerApi: subsonicServerApi, storage: storage)
     }
     
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {

@@ -58,7 +58,7 @@ public class LibraryEntityImage: RoundedImage {
     }
     
     public func refresh() {
-        self.image = entity?.image(setting: appDelegate.persistentStorage.settings.artworkDisplayPreference) ?? backupImage ?? UIImage.songArtwork
+        self.image = entity?.image(setting: appDelegate.storage.settings.artworkDisplayPreference) ?? backupImage ?? UIImage.songArtwork
     }
     
     @objc private func downloadFinishedSuccessful(notification: Notification) {

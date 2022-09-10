@@ -35,9 +35,9 @@ class PodcastsVC: BasicTableViewController {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.podcasts)
         
-        podcastsFetchedResultsController = PodcastFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        podcastsFetchedResultsController = PodcastFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         podcastsFetchedResultsController.delegate = self
-        episodesFetchedResultsController = PodcastEpisodesReleaseDateFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        episodesFetchedResultsController = PodcastEpisodesReleaseDateFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         episodesFetchedResultsController.delegate = self
 
         configureSearchController(placeholder: "Search in \"Podcasts\"", scopeButtonTitles: ["All", "Cached"])
@@ -61,7 +61,7 @@ class PodcastsVC: BasicTableViewController {
             case .podcasts:
                 let podcast = self.podcastsFetchedResultsController.getWrappedEntity(at: indexPath)
                 firstly {
-                    podcast.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 }.catch { error in
                     self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
                 }.finally {
@@ -73,7 +73,7 @@ class PodcastsVC: BasicTableViewController {
             }
         }
         
-        showType = appDelegate.persistentStorage.settings.podcastsShowSetting
+        showType = appDelegate.storage.settings.podcastsShowSetting
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -82,21 +82,21 @@ class PodcastsVC: BasicTableViewController {
     }
     
     func syncFromServer() {
-        if appDelegate.persistentStorage.settings.isOnlineMode {
+        if appDelegate.storage.settings.isOnlineMode {
             switch self.showType {
             case .podcasts:
                 firstly {
-                    self.appDelegate.backendApi.createLibrarySyncer().syncDownPodcastsWithoutEpisodes(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+                    self.appDelegate.librarySyncer.syncDownPodcastsWithoutEpisodes()
                 }.catch { error in
                     self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
                 }
             case .episodesSortedByReleaseDate:
                 firstly {
-                    self.appDelegate.backendApi.createLibrarySyncer().syncDownPodcastsWithoutEpisodes(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+                    self.appDelegate.librarySyncer.syncDownPodcastsWithoutEpisodes()
                 }.then { () -> Promise<Void> in
-                    let podcasts = self.appDelegate.library.getPodcasts().filter{ $0.remoteStatus == .available }
+                    let podcasts = self.appDelegate.storage.main.library.getPodcasts().filter{ $0.remoteStatus == .available }
                     let podcastFetchPromises = podcasts.compactMap { podcast in return {
-                        podcast.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                        podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
                     }}
                     return podcastFetchPromises.resolveSequentially()
                 }.catch { error in
@@ -176,14 +176,14 @@ class PodcastsVC: BasicTableViewController {
         if showType == .podcasts {
             alert.addAction(UIAlertAction(title: "Episodes sorted by release date", style: .default, handler: { _ in
                 self.showType = .episodesSortedByReleaseDate
-                self.appDelegate.persistentStorage.settings.podcastsShowSetting = .episodesSortedByReleaseDate
+                self.appDelegate.storage.settings.podcastsShowSetting = .episodesSortedByReleaseDate
                 self.syncFromServer()
                 self.updateSearchResults(for: self.searchController)
             }))
         } else {
             alert.addAction(UIAlertAction(title: "Podcasts sorted by name", style: .default, handler: { _ in
                 self.showType = .podcasts
-                self.appDelegate.persistentStorage.settings.podcastsShowSetting = .podcasts
+                self.appDelegate.storage.settings.podcastsShowSetting = .podcasts
                 self.syncFromServer()
                 self.updateSearchResults(for: self.searchController)
             }))

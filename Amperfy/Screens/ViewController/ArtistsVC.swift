@@ -36,7 +36,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.artists)
         
-        change(sortType: appDelegate.persistentStorage.settings.artistsSortSetting)
+        change(sortType: appDelegate.storage.settings.artistsSortSetting)
         
         configureSearchController(placeholder: "Search in \"Artists\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: GenericTableCell.typeName)
@@ -53,7 +53,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         swipeCallback = { (indexPath, completionHandler) in
             let artist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             firstly {
-                artist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
             }.finally {
@@ -64,10 +64,10 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     
     func change(sortType: ElementSortType) {
         self.sortType = sortType
-        appDelegate.persistentStorage.settings.artistsSortSetting = sortType
+        appDelegate.storage.settings.artistsSortSetting = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: sortType, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = ArtistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: true)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
@@ -130,7 +130,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         tableView.reloadData()
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
             firstly {
-                self.appDelegate.backendApi.createLibrarySyncer().searchArtists(searchText: searchText, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+                self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
             }
@@ -165,9 +165,9 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
                 self.displayFilter = .favorites
                 self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
-                guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
+                guard self.appDelegate.storage.settings.isOnlineMode else { return }
                 firstly {
-                    self.appDelegate.backendApi.createLibrarySyncer().syncFavoriteLibraryElements(persistentStorage: self.appDelegate.persistentStorage)
+                    self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
                 }.catch { error in
                     self.appDelegate.eventLogger.report(topic: "Favorite Artists Sync", error: error)
                 }.finally {
@@ -189,12 +189,12 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        guard self.appDelegate.persistentStorage.settings.isOnlineMode else {
+        guard self.appDelegate.storage.settings.isOnlineMode else {
             self.refreshControl?.endRefreshing()
             return
         }
         firstly {
-            AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 .syncLatestLibraryElements()
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Artists Latest Elements Sync", error: error)

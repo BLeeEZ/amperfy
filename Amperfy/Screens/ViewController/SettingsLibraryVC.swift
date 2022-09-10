@@ -49,8 +49,8 @@ class SettingsLibraryVC: UITableViewController {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.userStatistics.visited(.settingsLibrary)
         
-        autoDownloadLastestSongsSwitch.isOn = appDelegate.persistentStorage.settings.isAutoDownloadLatestSongsActive
-        autoDownloadLastestPodcastEpisodesSwitch.isOn = appDelegate.persistentStorage.settings.isAutoDownloadLatestPodcastEpisodesActive
+        autoDownloadLastestSongsSwitch.isOn = appDelegate.storage.settings.isAutoDownloadLatestSongsActive
+        autoDownloadLastestPodcastEpisodesSwitch.isOn = appDelegate.storage.settings.isAutoDownloadLatestPodcastEpisodesActive
         updateValues()
     }
     
@@ -65,46 +65,44 @@ class SettingsLibraryVC: UITableViewController {
     }
     
     @objc func updateValues() {
-        appDelegate.persistentStorage.persistentContainer.performBackgroundTask() { (context) in
-            let library = LibraryStorage(context: context)
-
-            let playlistCount = library.playlistCount
+        appDelegate.storage.async.perform { asyncCompanion in
+            let playlistCount = asyncCompanion.library.playlistCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.playlistsCountLabel.text = String(playlistCount)
             }
 
-            let artistCount = library.artistCount
+            let artistCount = asyncCompanion.library.artistCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.artistsCountLabel.text = String(artistCount)
             }
             
-            let albumCount = library.albumCount
+            let albumCount = asyncCompanion.library.albumCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.albumsCountLabel.text = String(albumCount)
             }
             
-            let podcastCount = library.podcastCount
+            let podcastCount = asyncCompanion.library.podcastCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.podcastsCountLabel.text = String(podcastCount)
             }
             
-            let podcastEpisodeCount = library.podcastEpisodeCount
+            let podcastEpisodeCount = asyncCompanion.library.podcastEpisodeCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.podcastEpisodesCountLabel.text = String(podcastEpisodeCount)
             }
             
-            let songCount = library.songCount
+            let songCount = asyncCompanion.library.songCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.songsCountLabel.text = String(songCount)
             }
             
-            let albumWithSyncedSongsCount = library.albumWithSyncedSongsCount
+            let albumWithSyncedSongsCount = asyncCompanion.library.albumWithSyncedSongsCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 if albumCount < 1 {
@@ -115,30 +113,30 @@ class SettingsLibraryVC: UITableViewController {
                 }
             }
             
-            let cachedSongCount = library.cachedSongCount
+            let cachedSongCount = asyncCompanion.library.cachedSongCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.cachedSongsCountLabel.text = String(cachedSongCount)
             }
             
-            let cachedPodcastEpisodesCount = library.cachedPodcastEpisodeCount
+            let cachedPodcastEpisodesCount = asyncCompanion.library.cachedPodcastEpisodeCount
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.cachedPodcastEpisodesCountLabel.text = String(cachedPodcastEpisodesCount)
             }
             
-            let completeCacheSize = library.cachedPlayableSizeInByte
+            let completeCacheSize = asyncCompanion.library.cachedPlayableSizeInByte
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.cachedCompleteSizeLabel.text = completeCacheSize.asByteString
             }
-        }
+        }.catch { error in }
     }
     
     @IBAction func downloadAllSongsInLibraryPressed(_ sender: Any) {
         let alert = UIAlertController(title: "Download all songs in library", message: "This action will add all uncached songs in \"Library -> Songs\" to the download queue. With this action a lot network traffic can be generated and device storage capacity will be taken. Continue?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .default , handler: { _ in
-            let allSongsToDownload = self.appDelegate.library.getSongsForCompleteLibraryDownload()
+            let allSongsToDownload = self.appDelegate.storage.main.library.getSongsForCompleteLibraryDownload()
             self.appDelegate.playableDownloadManager.download(objects: allSongsToDownload)
         }))
         alert.addAction(UIAlertAction(title: "No", style: .default , handler: nil))
@@ -151,8 +149,8 @@ class SettingsLibraryVC: UITableViewController {
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive , handler: { _ in
             self.appDelegate.player.stop()
             self.appDelegate.playableDownloadManager.stopAndWait()
-            self.appDelegate.library.deleteCompleteSongCache()
-            self.appDelegate.library.saveContext()
+            self.appDelegate.storage.main.library.deleteCompleteSongCache()
+            self.appDelegate.storage.main.library.saveContext()
             self.appDelegate.playableDownloadManager.start()
         }))
         alert.addAction(UIAlertAction(title: "No", style: .default , handler: nil))
@@ -161,11 +159,11 @@ class SettingsLibraryVC: UITableViewController {
     }
     
     @IBAction func autoDownloadLastestSongsSwitchPressed(_ sender: Any) {
-        appDelegate.persistentStorage.settings.isAutoDownloadLatestSongsActive = autoDownloadLastestSongsSwitch.isOn
+        appDelegate.storage.settings.isAutoDownloadLatestSongsActive = autoDownloadLastestSongsSwitch.isOn
     }
     
     @IBAction func autoDownloadLastestPodcastEpisodesSwitchPressed(_ sender: Any) {
-        appDelegate.persistentStorage.settings.isAutoDownloadLatestPodcastEpisodesActive = autoDownloadLastestPodcastEpisodesSwitch.isOn
+        appDelegate.storage.settings.isAutoDownloadLatestPodcastEpisodesActive = autoDownloadLastestPodcastEpisodesSwitch.isOn
     }
     
 }

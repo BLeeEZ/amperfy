@@ -45,14 +45,13 @@ public enum DisplayCategoryFilter {
 
 public class PodcastFetchedResultsController: CachedFetchedResultsController<PodcastMO> {
     
-    public init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
-        let library = LibraryStorage(context: context)
+    public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest = PodcastMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-            library.getFetchPredicate(onlyCachedPodcasts: true),
+            coreDataCompanion.library.getFetchPredicate(onlyCachedPodcasts: true),
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
         
     public func search(searchText: String, onlyCached: Bool) {
@@ -60,10 +59,10 @@ public class PodcastFetchedResultsController: CachedFetchedResultsController<Pod
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
                     AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                    library.getFetchPredicate(onlyCachedPodcasts: true),
+                    coreDataCompanion.library.getFetchPredicate(onlyCachedPodcasts: true),
                 ]),
                 PodcastMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedPodcasts: onlyCached)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedPodcasts: onlyCached)
             ])
             search(predicate: predicate)
         } else {
@@ -75,19 +74,18 @@ public class PodcastFetchedResultsController: CachedFetchedResultsController<Pod
 
 public class PodcastEpisodesReleaseDateFetchedResultsController: BasicFetchedResultsController<PodcastEpisodeMO> {
     
-    public init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest = PodcastEpisodeMO.publishedDateSortedFetchRequest
-        let library = LibraryStorage(context: context)
-        fetchRequest.predicate = library.getFetchPredicateForUserAvailableEpisodes()
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        fetchRequest.predicate = coreDataCompanion.library.getFetchPredicateForUserAvailableEpisodes()
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                library.getFetchPredicateForUserAvailableEpisodes(),
+                coreDataCompanion.library.getFetchPredicateForUserAvailableEpisodes(),
                 PodcastEpisodeMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedPodcastEpisodes: onlyCachedSongs)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedPodcastEpisodes: onlyCachedSongs)
             ])
             search(predicate: predicate)
         } else {
@@ -101,20 +99,19 @@ public class PodcastEpisodesFetchedResultsController: BasicFetchedResultsControl
     
     let podcast: Podcast
     
-    public init(forPodcast podcast: Podcast, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(forPodcast podcast: Podcast, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.podcast = podcast
-        let library = LibraryStorage(context: context)
         let fetchRequest = PodcastEpisodeMO.publishedDateSortedFetchRequest
-        fetchRequest.predicate = library.getFetchPredicateForUserAvailableEpisodes(forPodcast: podcast)
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        fetchRequest.predicate = coreDataCompanion.library.getFetchPredicateForUserAvailableEpisodes(forPodcast: podcast)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                library.getFetchPredicateForUserAvailableEpisodes(forPodcast: podcast),
+                coreDataCompanion.library.getFetchPredicateForUserAvailableEpisodes(forPodcast: podcast),
                 PodcastEpisodeMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedPodcastEpisodes: onlyCachedSongs)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedPodcastEpisodes: onlyCachedSongs)
             ])
             search(predicate: predicate)
         } else {
@@ -126,9 +123,9 @@ public class PodcastEpisodesFetchedResultsController: BasicFetchedResultsControl
 
 public class GenreFetchedResultsController: CachedFetchedResultsController<GenreMO> {
     
-    public init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest = GenreMO.identifierSortedFetchRequest
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
         
     public func search(searchText: String, onlyCached: Bool) {
@@ -136,9 +133,9 @@ public class GenreFetchedResultsController: CachedFetchedResultsController<Genre
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 GenreMO.getIdentifierBasedSearchPredicate(searchText: searchText),
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
-                    library.getFetchPredicate(onlyCachedGenreArtists: onlyCached),
-                    library.getFetchPredicate(onlyCachedGenreAlbums: onlyCached),
-                    library.getFetchPredicate(onlyCachedGenreSongs: onlyCached)
+                    coreDataCompanion.library.getFetchPredicate(onlyCachedGenreArtists: onlyCached),
+                    coreDataCompanion.library.getFetchPredicate(onlyCachedGenreAlbums: onlyCached),
+                    coreDataCompanion.library.getFetchPredicate(onlyCachedGenreSongs: onlyCached)
                 ])
             ])
             search(predicate: predicate)
@@ -153,18 +150,17 @@ public class GenreArtistsFetchedResultsController: BasicFetchedResultsController
     
     let genre: Genre
     
-    public init(for genre: Genre, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(for genre: Genre, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.genre = genre
-        let library = LibraryStorage(context: context)
         let fetchRequest = ArtistMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSCompoundPredicate(orPredicateWithSubpredicates: [
                 AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                library.getFetchPredicate(onlyCachedArtists: true)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: true)
             ]),
-            library.getFetchPredicate(forGenre: genre)
+            coreDataCompanion.library.getFetchPredicate(forGenre: genre)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCached: Bool) {
@@ -172,10 +168,10 @@ public class GenreArtistsFetchedResultsController: BasicFetchedResultsController
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
                     AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                    library.getFetchPredicate(onlyCachedArtists: true)
+                    coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: true)
                 ]),
-                library.getFetchPredicate(forGenre: genre),
-                library.getFetchPredicate(onlyCachedArtists: onlyCached),
+                coreDataCompanion.library.getFetchPredicate(forGenre: genre),
+                coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: onlyCached),
                 ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText)
             ])
             search(predicate: predicate)
@@ -190,18 +186,17 @@ public class GenreAlbumsFetchedResultsController: BasicFetchedResultsController<
     
     let genre: Genre
     
-    public init(for genre: Genre, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(for genre: Genre, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.genre = genre
-        let library = LibraryStorage(context: context)
         let fetchRequest = AlbumMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSCompoundPredicate(orPredicateWithSubpredicates: [
                 AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                library.getFetchPredicate(onlyCachedAlbums: true)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true)
             ]),
-            library.getFetchPredicate(forGenre: genre)
+            coreDataCompanion.library.getFetchPredicate(forGenre: genre)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCached: Bool) {
@@ -209,10 +204,10 @@ public class GenreAlbumsFetchedResultsController: BasicFetchedResultsController<
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
                     AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                    library.getFetchPredicate(onlyCachedAlbums: true)
+                    coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true)
                 ]),
-                library.getFetchPredicate(forGenre: genre),
-                library.getFetchPredicate(onlyCachedAlbums: onlyCached),
+                coreDataCompanion.library.getFetchPredicate(forGenre: genre),
+                coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: onlyCached),
                 ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText)
             ])
             search(predicate: predicate)
@@ -227,24 +222,23 @@ public class GenreSongsFetchedResultsController: BasicFetchedResultsController<S
     
     let genre: Genre
     
-    public init(for genre: Genre, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(for genre: Genre, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.genre = genre
-        let library = LibraryStorage(context: context)
         let fetchRequest = SongMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-            library.getFetchPredicate(forGenre: genre)
+            coreDataCompanion.library.getFetchPredicate(forGenre: genre)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-                library.getFetchPredicate(forGenre: genre),
+                coreDataCompanion.library.getFetchPredicate(forGenre: genre),
                 SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
             ])
             search(predicate: predicate)
         } else {
@@ -256,8 +250,7 @@ public class GenreSongsFetchedResultsController: BasicFetchedResultsController<S
 
 public class ArtistFetchedResultsController: CachedFetchedResultsController<ArtistMO> {
     
-    public init(managedObjectContext context: NSManagedObjectContext, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
-        let library = LibraryStorage(context: context)
+    public init(coreDataCompanion: CoreDataCompanion, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
         var fetchRequest = ArtistMO.identifierSortedFetchRequest
         switch sortType {
         case .name:
@@ -267,9 +260,9 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
         }
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-            library.getFetchPredicate(onlyCachedArtists: true)
+            coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: true)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
@@ -277,11 +270,11 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
                     AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                    library.getFetchPredicate(onlyCachedArtists: true)
+                    coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: true)
                 ]),
                 ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedArtists: onlyCached),
-                library.getFetchPredicate(artistsDisplayFilter: displayFilter)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: onlyCached),
+                coreDataCompanion.library.getFetchPredicate(artistsDisplayFilter: displayFilter)
             ])
             search(predicate: predicate)
         } else {
@@ -295,21 +288,20 @@ public class ArtistAlbumsItemsFetchedResultsController: BasicFetchedResultsContr
 
     let artist: Artist
     
-    public init(for artist: Artist, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(for artist: Artist, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.artist = artist
-        let library = LibraryStorage(context: context)
         let fetchRequest = AlbumMO.releaseYearSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSCompoundPredicate(orPredicateWithSubpredicates: [
                 AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                library.getFetchPredicate(onlyCachedAlbums: true)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true)
             ]),
             NSCompoundPredicate(orPredicateWithSubpredicates: [
-                library.getFetchPredicate(forArtist: artist),
+                coreDataCompanion.library.getFetchPredicate(forArtist: artist),
                 AlbumMO.getFetchPredicateForAlbumsWhoseSongsHave(artist: artist)
             ])
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
     public func search(searchText: String, onlyCached: Bool) {
@@ -317,13 +309,13 @@ public class ArtistAlbumsItemsFetchedResultsController: BasicFetchedResultsContr
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
                     AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                    library.getFetchPredicate(onlyCachedAlbums: true)
+                    coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true)
                 ]),
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
-                    library.getFetchPredicate(forArtist: artist),
+                    coreDataCompanion.library.getFetchPredicate(forArtist: artist),
                     AlbumMO.getFetchPredicateForAlbumsWhoseSongsHave(artist: artist)
                 ]),
-                library.getFetchPredicate(onlyCachedAlbums: onlyCached),
+                coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: onlyCached),
                 ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText)
             ])
             search(predicate: predicate)
@@ -338,24 +330,23 @@ public class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsContro
 
     let artist: Artist
     
-    public init(for artist: Artist, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(for artist: Artist, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.artist = artist
-        let library = LibraryStorage(context: context)
         let fetchRequest = SongMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-            library.getFetchPredicate(forArtist: artist)
+            coreDataCompanion.library.getFetchPredicate(forArtist: artist)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
     public func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-                library.getFetchPredicate(forArtist: artist),
+                coreDataCompanion.library.getFetchPredicate(forArtist: artist),
                 SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
             ])
             search(predicate: predicate)
         } else {
@@ -367,8 +358,7 @@ public class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsContro
 
 public class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
     
-    public init(managedObjectContext context: NSManagedObjectContext, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
-        let library = LibraryStorage(context: context)
+    public init(coreDataCompanion: CoreDataCompanion, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
         var fetchRequest = AlbumMO.identifierSortedFetchRequest
         switch sortType {
         case .name:
@@ -378,9 +368,9 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
         }
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-            library.getFetchPredicate(onlyCachedAlbums: true)
+            coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
@@ -388,11 +378,11 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSCompoundPredicate(orPredicateWithSubpredicates: [
                     AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                    library.getFetchPredicate(onlyCachedAlbums: true)
+                    coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true)
                 ]),
                 AlbumMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedAlbums: onlyCached),
-                library.getFetchPredicate(albumsDisplayFilter: displayFilter)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: onlyCached),
+                coreDataCompanion.library.getFetchPredicate(albumsDisplayFilter: displayFilter)
             ])
             search(predicate: predicate)
         } else {
@@ -404,7 +394,7 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
 
 public class SongsFetchedResultsController: CachedFetchedResultsController<SongMO> {
     
-    public init(managedObjectContext context: NSManagedObjectContext, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
         var fetchRequest = SongMO.identifierSortedFetchRequest
         switch sortType {
         case .name:
@@ -413,7 +403,7 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
             fetchRequest = SongMO.ratingSortedFetchRequest
         }
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         keepAllResultsUpdated = false
     }
     
@@ -422,8 +412,8 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
                 SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs),
-                library.getFetchPredicate(songsDisplayFilter: displayFilter)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs),
+                coreDataCompanion.library.getFetchPredicate(songsDisplayFilter: displayFilter)
             ])
             search(predicate: predicate)
         } else {
@@ -437,24 +427,23 @@ public class AlbumSongsFetchedResultsController: BasicFetchedResultsController<S
     
     let album: Album
     
-    public init(forAlbum album: Album, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(forAlbum album: Album, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.album = album
-        let library = LibraryStorage(context: context)
         let fetchRequest = SongMO.trackNumberSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-            library.getFetchPredicate(forAlbum: album)
+            coreDataCompanion.library.getFetchPredicate(forAlbum: album)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-                library.getFetchPredicate(forAlbum: album),
+                coreDataCompanion.library.getFetchPredicate(forAlbum: album),
                 SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
             ])
             search(predicate: predicate)
         } else {
@@ -468,19 +457,18 @@ public class PlaylistItemsFetchedResultsController: BasicFetchedResultsControlle
 
     let playlist: Playlist
     
-    public init(forPlaylist playlist: Playlist, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(forPlaylist playlist: Playlist, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.playlist = playlist
-        let library = LibraryStorage(context: context)
         let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
-        fetchRequest.predicate = library.getFetchPredicate(forPlaylist: playlist)
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        fetchRequest.predicate = coreDataCompanion.library.getFetchPredicate(forPlaylist: playlist)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(onlyCachedSongs: Bool) {
         if onlyCachedSongs {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                library.getFetchPredicate(forPlaylist: playlist),
-                library.getFetchPredicate(onlyCachedPlaylistItems: onlyCachedSongs)
+                coreDataCompanion.library.getFetchPredicate(forPlaylist: playlist),
+                coreDataCompanion.library.getFetchPredicate(onlyCachedPlaylistItems: onlyCachedSongs)
             ])
             search(predicate: predicate)
         } else {
@@ -494,7 +482,7 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
 
     var sortType: PlaylistSortType
     
-    public init(managedObjectContext context: NSManagedObjectContext, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool) {
         self.sortType = sortType
         var fetchRequest = PlaylistMO.identifierSortedFetchRequest
         switch sortType {
@@ -506,7 +494,7 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
             fetchRequest = PlaylistMO.lastChangedDateFetchRequest
         }
         fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, playlistSearchCategory: PlaylistSearchCategory) {
@@ -514,7 +502,7 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 PlaylistMO.excludeSystemPlaylistsFetchPredicate,
                 PlaylistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(forPlaylistSearchCategory: playlistSearchCategory)
+                coreDataCompanion.library.getFetchPredicate(forPlaylistSearchCategory: playlistSearchCategory)
             ])
             search(predicate: predicate)
         } else {
@@ -528,7 +516,7 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
 
     var sortType: PlaylistSortType
     
-    public init(managedObjectContext context: NSManagedObjectContext, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool) {
         self.sortType = sortType
         var fetchRequest = PlaylistMO.identifierSortedFetchRequest
         switch sortType {
@@ -539,12 +527,11 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
         case .lastChanged:
             fetchRequest = PlaylistMO.lastChangedDateFetchRequest
         }
-        let library = LibraryStorage(context: context)
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             PlaylistMO.excludeSystemPlaylistsFetchPredicate,
-            library.getFetchPredicate(forPlaylistSearchCategory: .userOnly)
+            coreDataCompanion.library.getFetchPredicate(forPlaylistSearchCategory: .userOnly)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String) {
@@ -552,7 +539,7 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 PlaylistMO.excludeSystemPlaylistsFetchPredicate,
                 PlaylistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(forPlaylistSearchCategory: .userOnly)
+                coreDataCompanion.library.getFetchPredicate(forPlaylistSearchCategory: .userOnly)
             ])
             search(predicate: predicate)
         } else {
@@ -564,18 +551,18 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
 
 public class ErrorLogFetchedResultsController: BasicFetchedResultsController<LogEntryMO> {
 
-    public init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest = LogEntryMO.creationDateSortedFetchRequest
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
 }
 
 public class MusicFolderFetchedResultsController: CachedFetchedResultsController<MusicFolderMO> {
     
-    public init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest = MusicFolderMO.idSortedFetchRequest
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String) {
@@ -592,18 +579,17 @@ public class MusicFolderDirectoriesFetchedResultsController: BasicFetchedResults
     
     let musicFolder: MusicFolder
     
-    public init(for musicFolder: MusicFolder, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(for musicFolder: MusicFolder, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.musicFolder = musicFolder
-        let library = LibraryStorage(context: context)
         let fetchRequest = DirectoryMO.identifierSortedFetchRequest
-        fetchRequest.predicate = library.getFetchPredicate(forMusicFolder: musicFolder)
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        fetchRequest.predicate = coreDataCompanion.library.getFetchPredicate(forMusicFolder: musicFolder)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
     public func search(searchText: String) {
         if searchText.count > 0 {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                library.getFetchPredicate(forMusicFolder: musicFolder),
+                coreDataCompanion.library.getFetchPredicate(forMusicFolder: musicFolder),
                 DirectoryMO.getIdentifierBasedSearchPredicate(searchText: searchText)
             ])
             search(predicate: predicate)
@@ -618,18 +604,17 @@ public class DirectorySubdirectoriesFetchedResultsController: BasicFetchedResult
     
     let directory: Directory
     
-    public init(for directory: Directory, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(for directory: Directory, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.directory = directory
-        let library = LibraryStorage(context: context)
         let fetchRequest = DirectoryMO.identifierSortedFetchRequest
-        fetchRequest.predicate = library.getDirectoryFetchPredicate(forDirectory: directory)
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        fetchRequest.predicate = coreDataCompanion.library.getDirectoryFetchPredicate(forDirectory: directory)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
     public func search(searchText: String) {
         if searchText.count > 0 {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                library.getDirectoryFetchPredicate(forDirectory: directory),
+                coreDataCompanion.library.getDirectoryFetchPredicate(forDirectory: directory),
                 DirectoryMO.getIdentifierBasedSearchPredicate(searchText: searchText)
             ])
             search(predicate: predicate)
@@ -645,25 +630,24 @@ public class DirectorySongsFetchedResultsController: BasicFetchedResultsControll
     
     let directory: Directory
 
-    public init(for directory: Directory, managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(for directory: Directory, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.directory = directory
-        let library = LibraryStorage(context: context)
         let fetchRequest = SongMO.trackNumberSortedFetchRequest
-        fetchRequest.predicate = library.getSongFetchPredicate(forDirectory: directory)
+        fetchRequest.predicate = coreDataCompanion.library.getSongFetchPredicate(forDirectory: directory)
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-            library.getSongFetchPredicate(forDirectory: directory)
+            coreDataCompanion.library.getSongFetchPredicate(forDirectory: directory)
         ])
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
             let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-                library.getSongFetchPredicate(forDirectory: directory),
+                coreDataCompanion.library.getSongFetchPredicate(forDirectory: directory),
                 SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+                coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
             ])
             search(predicate: predicate)
         } else {
@@ -676,10 +660,10 @@ public class DirectorySongsFetchedResultsController: BasicFetchedResultsControll
 
 public class DownloadsFetchedResultsController: BasicFetchedResultsController<DownloadMO> {
     
-    public init(managedObjectContext context: NSManagedObjectContext, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
         fetchRequest.predicate = DownloadMO.onlyPlayablesPredicate
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
 }

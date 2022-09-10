@@ -25,9 +25,8 @@ import PromiseKit
 
 public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     
-    private let persistentStorage: PersistentStorage
-    private let library: LibraryStorage
-    private let backendApi: BackendApi
+    private let storage: PersistentStorage
+    private let librarySyncer: LibrarySyncer
     private let playableDownloadManager: DownloadManageable
     private let eventLogger: EventLogger
     
@@ -37,10 +36,9 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     private var isRunning = false
     private var isCurrentlyActive = false
     
-    init(persistentStorage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable, eventLogger: EventLogger) {
-        self.persistentStorage = persistentStorage
-        self.library = LibraryStorage(context: self.persistentStorage.context)
-        self.backendApi = backendApi
+    init(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable, eventLogger: EventLogger) {
+        self.storage = storage
+        self.librarySyncer = librarySyncer
         self.playableDownloadManager = playableDownloadManager
         self.eventLogger = eventLogger
     }
@@ -69,9 +67,9 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
             self.activeDispatchGroup.enter()
             os_log("start", log: self.log, type: .info)
             
-            if self.isRunning, self.persistentStorage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
+            if self.isRunning, self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
                 firstly {
-                    AutoDownloadLibrarySyncer(persistentStorage: self.persistentStorage, backendApi: self.backendApi, playableDownloadManager: self.playableDownloadManager)
+                    AutoDownloadLibrarySyncer(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
                         .syncLatestLibraryElements()
                 }.catch { error in
                     self.eventLogger.report(topic: "Latest Library Elements Background Sync", error: error, displayPopup: false)
@@ -81,14 +79,14 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
                 self.syncSemaphore.wait()
             }
 
-            while self.isRunning, self.persistentStorage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
+            while self.isRunning, self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
                 firstly { () -> Promise<Void> in
-                    let albumToSync = self.library.getAlbumWithoutSyncedSongs()
+                    let albumToSync = self.storage.main.library.getAlbumWithoutSyncedSongs()
                     guard let albumToSync = albumToSync else {
                         self.isRunning = false
                         return Promise.value
                     }
-                    return albumToSync.fetchFromServer(storage: self.persistentStorage, backendApi: self.backendApi, playableDownloadManager: self.playableDownloadManager)
+                    return albumToSync.fetchFromServer(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
                 }.catch { error in
                     self.eventLogger.report(topic: "Album Background Sync", error: error, displayPopup: false)
                 }.finally {

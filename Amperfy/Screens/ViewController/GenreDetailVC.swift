@@ -37,11 +37,11 @@ class GenreDetailVC: BasicTableViewController {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.genreDetail)
         
-        artistsFetchedResultsController = GenreArtistsFetchedResultsController(for: genre, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        artistsFetchedResultsController = GenreArtistsFetchedResultsController(for: genre, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         artistsFetchedResultsController.delegate = self
-        albumsFetchedResultsController = GenreAlbumsFetchedResultsController(for: genre, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        albumsFetchedResultsController = GenreAlbumsFetchedResultsController(for: genre, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         albumsFetchedResultsController.delegate = self
-        songsFetchedResultsController = GenreSongsFetchedResultsController(for: genre, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        songsFetchedResultsController = GenreSongsFetchedResultsController(for: genre, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         songsFetchedResultsController.delegate = self
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: GenericTableCell.typeName)
@@ -56,7 +56,7 @@ class GenreDetailVC: BasicTableViewController {
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
-                playContextCb: {() in PlayContext(containable: self.genre, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
+                playContextCb: {() in PlayContext(containable: self.genre, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
@@ -81,7 +81,7 @@ class GenreDetailVC: BasicTableViewController {
             case LibraryElement.Artist.rawValue:
                 let artist = self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
                 firstly {
-                    artist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 }.catch { error in
                     self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
                 }.finally {
@@ -90,7 +90,7 @@ class GenreDetailVC: BasicTableViewController {
             case LibraryElement.Album.rawValue:
                 let album = self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
                 firstly {
-                    album.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 }.catch { error in
                     self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
                 }.finally {
@@ -110,7 +110,7 @@ class GenreDetailVC: BasicTableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         firstly {
-            genre.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            genre.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
         }.finally {
@@ -119,7 +119,7 @@ class GenreDetailVC: BasicTableViewController {
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
-        guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode)
+        guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
         else { return nil }
         let selectedSong = self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
         guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }

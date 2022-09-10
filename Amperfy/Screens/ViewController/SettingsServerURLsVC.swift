@@ -63,8 +63,8 @@ class SettingsServerURLsVC: UITableViewController {
     }
     
     func reload() {
-        serverURLs = appDelegate.persistentStorage.alternativeServerURLs
-        activeServerURL = appDelegate.persistentStorage.loginCredentials?.serverUrl ?? ""
+        serverURLs = appDelegate.storage.alternativeServerURLs
+        activeServerURL = appDelegate.storage.loginCredentials?.serverUrl ?? ""
         serverURLs.append(activeServerURL)
         serverURLs.sort()
         tableView.reloadData()
@@ -96,15 +96,15 @@ class SettingsServerURLsVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard serverURLs[indexPath.row] != activeServerURL else { return }
-        if let altIndex = self.appDelegate.persistentStorage.alternativeServerURLs.firstIndex(of: serverURLs[indexPath.row]),
-           let currentCredentials = self.appDelegate.persistentStorage.loginCredentials {
-            var altURLs = self.appDelegate.persistentStorage.alternativeServerURLs
+        if let altIndex = self.appDelegate.storage.alternativeServerURLs.firstIndex(of: serverURLs[indexPath.row]),
+           let currentCredentials = self.appDelegate.storage.loginCredentials {
+            var altURLs = self.appDelegate.storage.alternativeServerURLs
             altURLs.remove(at: altIndex)
             altURLs.append(currentCredentials.serverUrl)
-            self.appDelegate.persistentStorage.alternativeServerURLs = altURLs
+            self.appDelegate.storage.alternativeServerURLs = altURLs
             
             let newCredentials = LoginCredentials(serverUrl: serverURLs[indexPath.row], username: currentCredentials.username, password: currentCredentials.password, backendApi: currentCredentials.backendApi)
-            self.appDelegate.persistentStorage.loginCredentials = newCredentials
+            self.appDelegate.storage.loginCredentials = newCredentials
             self.appDelegate.backendApi.provideCredentials(credentials: newCredentials)
         }
         reload()
@@ -117,10 +117,10 @@ class SettingsServerURLsVC: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         guard serverURLs[indexPath.row] != activeServerURL else { return }
         if editingStyle == .delete {
-            if let altIndex = self.appDelegate.persistentStorage.alternativeServerURLs.firstIndex(of: serverURLs[indexPath.row]) {
-                var altURLs = self.appDelegate.persistentStorage.alternativeServerURLs
+            if let altIndex = self.appDelegate.storage.alternativeServerURLs.firstIndex(of: serverURLs[indexPath.row]) {
+                var altURLs = self.appDelegate.storage.alternativeServerURLs
                 altURLs.remove(at: altIndex)
-                self.appDelegate.persistentStorage.alternativeServerURLs = altURLs
+                self.appDelegate.storage.alternativeServerURLs = altURLs
                 tableView.beginUpdates()
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 serverURLs.remove(at: indexPath.row)
@@ -146,7 +146,7 @@ class SettingsServerURLsVC: UITableViewController {
             urlTextField.placeholder = "https://localhost/ampache"
         })
         alert.addTextField(configurationHandler: {textField in
-            textField.text = self.appDelegate.persistentStorage.loginCredentials?.username ?? ""
+            textField.text = self.appDelegate.storage.loginCredentials?.username ?? ""
             textField.isEnabled = false
             
         })
@@ -162,7 +162,7 @@ class SettingsServerURLsVC: UITableViewController {
                   !username.isEmpty,
                   let password = alert.textFields?.element(at: 2)?.text,
                   !password.isEmpty,
-                  let activeApi = self.appDelegate.persistentStorage.loginCredentials?.backendApi
+                  let activeApi = self.appDelegate.storage.loginCredentials?.backendApi
             else { return }
             
             guard newAltUrl.isHyperTextProtocolProvided else {
@@ -178,12 +178,12 @@ class SettingsServerURLsVC: UITableViewController {
             firstly {
                 self.appDelegate.backendApi.isAuthenticationValid(credentials: credentials)
             }.done {
-                if let activeUrl = self.appDelegate.persistentStorage.loginCredentials?.serverUrl {
-                    var currentAltUrls = self.appDelegate.persistentStorage.alternativeServerURLs
+                if let activeUrl = self.appDelegate.storage.loginCredentials?.serverUrl {
+                    var currentAltUrls = self.appDelegate.storage.alternativeServerURLs
                     currentAltUrls.append(activeUrl)
-                    self.appDelegate.persistentStorage.alternativeServerURLs = currentAltUrls
+                    self.appDelegate.storage.alternativeServerURLs = currentAltUrls
                 }
-                self.appDelegate.persistentStorage.loginCredentials = credentials
+                self.appDelegate.storage.loginCredentials = credentials
                 self.appDelegate.backendApi.provideCredentials(credentials: credentials)
                 self.reload()
 

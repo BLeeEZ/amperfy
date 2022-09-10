@@ -32,7 +32,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.genres)
         
-        fetchedResultsController = GenreFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = GenreFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Genres\"", scopeButtonTitles: ["All", "Cached"])
@@ -46,7 +46,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         swipeCallback = { (indexPath, completionHandler) in
             let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             firstly {
-                genre.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                genre.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
             }.finally {
@@ -83,12 +83,12 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        guard self.appDelegate.persistentStorage.settings.isOnlineMode else {
+        guard self.appDelegate.storage.settings.isOnlineMode else {
             self.refreshControl?.endRefreshing()
             return
         }
         firstly {
-            AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 .syncLatestLibraryElements()
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Genres Latest Elements Sync", error: error)

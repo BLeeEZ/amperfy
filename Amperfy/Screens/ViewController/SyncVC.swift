@@ -32,7 +32,6 @@ class SyncVC: UIViewController {
     var parsedObjectCount: Int = 0
     var parsedObjectPercent: Float = 0.0
     var libObjectsToParseCount: Int = 1
-    var syncer: LibrarySyncer?
     
     @IBOutlet weak var progressBar: UIProgressView!
     @IBOutlet weak var progressLabel: UILabel!
@@ -53,18 +52,18 @@ class SyncVC: UIViewController {
         self.appDelegate.backgroundLibrarySyncer.stopAndWait()
         self.appDelegate.artworkDownloadManager.stopAndWait()
         self.appDelegate.playableDownloadManager.stopAndWait()
-        self.appDelegate.persistentStorage.isLibrarySynced = false
-        self.appDelegate.library.cleanStorage()
+        self.appDelegate.storage.isLibrarySynced = false
+        self.appDelegate.storage.main.library.cleanStorage()
         self.appDelegate.reinit()
         
-        self.syncer = self.appDelegate.backendApi.createLibrarySyncer()
         firstly {
-            self.syncer!.syncInitial(persistentStorage: self.appDelegate.persistentStorage, statusNotifyier: self)
+            self.appDelegate.librarySyncer.syncInitial(statusNotifyier: self)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Initial Sync", error: error, displayPopup: false)
         }.finally {
-            self.appDelegate.persistentStorage.librarySyncVersion = .newestVersion
-            self.appDelegate.persistentStorage.isLibrarySynced = true
+            self.appDelegate.storage.librarySyncVersion = .newestVersion
+            self.appDelegate.storage.isLibrarySynced = true
+            self.appDelegate.intentManager.registerXCallbackURLs()
             self.appDelegate.playableDownloadManager.start()
             self.appDelegate.artworkDownloadManager.start()
             self.appDelegate.backgroundLibrarySyncer.start()

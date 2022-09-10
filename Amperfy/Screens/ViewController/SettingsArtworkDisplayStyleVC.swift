@@ -68,12 +68,12 @@ class SettingsArtworkDisplayStyleVC: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SettingsArtworkDisplayStyleTableCell = dequeueCell(for: tableView, at: indexPath)
         cell.settingLabel.text = settingOptions[indexPath.row].description
-        cell.setStatusLabel(isActive: settingOptions[indexPath.row] == appDelegate.persistentStorage.settings.artworkDisplayPreference)
+        cell.setStatusLabel(isActive: settingOptions[indexPath.row] == appDelegate.storage.settings.artworkDisplayPreference)
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        appDelegate.persistentStorage.settings.artworkDisplayPreference = settingOptions[indexPath.row]
+        appDelegate.storage.settings.artworkDisplayPreference = settingOptions[indexPath.row]
         reload()
     }
     

@@ -165,8 +165,8 @@ extension Album: PlayableContainable  {
         library.saveContext()
         return syncer.setFavorite(album: self, isFavorite: isFavorite)
     }
-    public func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
-        return backendApi.createLibrarySyncer().sync(album: self, persistentContainer: storage.persistentContainer)
+    public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+        return librarySyncer.sync(album: self)
     }
     public var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)

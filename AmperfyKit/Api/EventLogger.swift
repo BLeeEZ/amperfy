@@ -21,7 +21,6 @@
 
 import Foundation
 import UIKit
-import CoreData
 import os.log
 
 public enum AmperfyLogStatusCode: Int {
@@ -44,10 +43,10 @@ public class EventLogger {
     
     private let log = OSLog(subsystem: "Amperfy", category: "EventLogger")
     public var alertDisplayer: AlertDisplayable?
-    private let persistentContainer: NSPersistentContainer
+    private let storage: PersistentStorage
     
-    init(persistentContainer: NSPersistentContainer) {
-        self.persistentContainer = persistentContainer
+    init(storage: PersistentStorage) {
+        self.storage = storage
     }
     
     public func info(topic: String, statusCode: AmperfyLogStatusCode, message: String, displayPopup: Bool) {
@@ -59,15 +58,14 @@ public class EventLogger {
     }
      
     private func report(topic: String, statusCode: AmperfyLogStatusCode, message: String, logType: LogEntryType, displayPopup: Bool) {
-        persistentContainer.performBackgroundTask { context in
-            let library = LibraryStorage(context: context)
-            let logEntry = library.createLogEntry()
+        storage.async.perform { asynCompanion in
+            let logEntry = asynCompanion.library.createLogEntry()
             logEntry.type = logType
             logEntry.statusCode = statusCode.rawValue
             logEntry.message = topic + ": " + message
-            library.saveContext()
+            asynCompanion.saveContext()
             
-            let logEntries = library.getLogEntries()
+            let logEntries = asynCompanion.library.getLogEntries()
             let sameStatusCodeEntries = logEntries.lazy.filter{ $0.statusCode == statusCode.rawValue && $0.type == logType && $0.suppressionTimeInterval > 0 }
             if let sameEntry = sameStatusCodeEntries.first, sameEntry.creationDate.compare(Date() - Double(sameEntry.suppressionTimeInterval)) == .orderedDescending {
                 return
@@ -75,41 +73,39 @@ public class EventLogger {
             if displayPopup {
                 self.displayAlert(topic: topic, message: message, logEntry: logEntry)
             }
-        }
+        }.catch { error in }
     }
     
     public func report(topic: String, error: Error, displayPopup: Bool = true) {
         if let apiError = error as? ResponseError {
             return report(error: apiError, displayPopup: displayPopup)
         } else {
-            persistentContainer.performBackgroundTask { context in
-                let library = LibraryStorage(context: context)
-                let logEntry = library.createLogEntry()
+            storage.async.perform { asynCompanion in
+                let logEntry = asynCompanion.library.createLogEntry()
                 logEntry.type = .error
                 logEntry.message = topic + ": " + error.localizedDescription
-                library.saveContext()
+                asynCompanion.saveContext()
                 os_log("%s", log: self.log, type: .error, logEntry.message)
                 if displayPopup {
                     self.displayAlert(topic: topic, message: error.localizedDescription, logEntry: logEntry)
                 }
-            }
+            }.catch { error in }
         }
     }
     
     public func report(error: ResponseError, displayPopup: Bool) {
-        persistentContainer.performBackgroundTask { context in
-            let library = LibraryStorage(context: context)
-            let logEntry = library.createLogEntry()
+        storage.async.perform { asynCompanion in
+            let logEntry = asynCompanion.library.createLogEntry()
             logEntry.type = .apiError
             logEntry.statusCode = error.statusCode
             logEntry.message = "API Error " + error.statusCode.description + ": " + error.message
-            library.saveContext()
+            asynCompanion.saveContext()
             
             var alertMessage = ""
             alertMessage += "Status code: \(error.statusCode)"
             alertMessage += "\n\(error.message)"
             
-            let logEntries = library.getLogEntries()
+            let logEntries = asynCompanion.library.getLogEntries()
             let sameStatusCodeEntries = logEntries.lazy.filter{ $0.statusCode == error.statusCode && $0.type == .apiError && $0.suppressionTimeInterval > 0 }
             if let sameEntry = sameStatusCodeEntries.first, sameEntry.creationDate.compare(Date() - Double(sameEntry.suppressionTimeInterval)) == .orderedDescending {
                 return
@@ -117,7 +113,7 @@ public class EventLogger {
             if displayPopup {
                 self.displayAlert(topic: "API Error", message: alertMessage, logEntry: logEntry)
             }
-        }
+        }.catch { error in }
     }
     
     private func displayAlert(topic: String, message: String, logEntry: LogEntry) {
@@ -131,13 +127,12 @@ public class EventLogger {
     }
     
     public func updateSuppressionTimeInterval(logEntry: LogEntry, suppressionTimeInterval: Int) {
-        persistentContainer.performBackgroundTask { context in
-            let library = LibraryStorage(context: context)
-            let logEntryMO = context.object(with: logEntry.managedObject.objectID) as! LogEntryMO
+        storage.async.perform { asynCompanion in
+            let logEntryMO = asynCompanion.context.object(with: logEntry.managedObject.objectID) as! LogEntryMO
             let logEntry = LogEntry(managedObject: logEntryMO)
             logEntry.suppressionTimeInterval = suppressionTimeInterval
-            library.saveContext()
-        }
+            asynCompanion.saveContext()
+        }.catch { error in }
     }
     
 }

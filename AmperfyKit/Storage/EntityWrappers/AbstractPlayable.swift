@@ -225,9 +225,9 @@ extension AbstractPlayable: PlayableContainable  {
         return [self]
     }
     public var playContextType: PlayerMode { return isSong ? .music : .podcast }
-    public func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+    public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
         guard let song = asSong else { return Promise.value }
-        return backendApi.createLibrarySyncer().sync(song: song, persistentContainer: storage.persistentContainer)
+        return librarySyncer.sync(song: song)
     }
     public var isRateable: Bool { return isSong }
     public var isFavoritable: Bool { return isSong }

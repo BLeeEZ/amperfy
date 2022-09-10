@@ -40,7 +40,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate
 
         switch contentType {
         case .podcastEpisode:
-            let episode = library.getPodcastEpisode(id: id)
+            let episode = storage.main.library.getPodcastEpisode(id: id)
             if let podcast = episode?.podcast {
                 let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
                 podcastDetailVC.podcast = podcast

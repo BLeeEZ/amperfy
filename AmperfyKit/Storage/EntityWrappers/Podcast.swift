@@ -77,9 +77,9 @@ extension Podcast: PlayableContainable  {
         return episodes
     }
     public var playContextType: PlayerMode { return .podcast }
-    public func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
-        AutoDownloadLibrarySyncer(persistentStorage: storage,
-                                  backendApi: backendApi,
+    public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+        AutoDownloadLibrarySyncer(storage: storage,
+                                  librarySyncer: librarySyncer,
                                   playableDownloadManager: playableDownloadManager)
         .syncLatestPodcastEpisodes(podcast: self).asVoid()
     }

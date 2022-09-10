@@ -36,7 +36,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.albums)
         
-        change(sortType: appDelegate.persistentStorage.settings.albumsSortSetting)
+        change(sortType: appDelegate.storage.settings.albumsSortSetting)
         
         configureSearchController(placeholder: "Search in \"Albums\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: GenericTableCell.typeName)
@@ -53,7 +53,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         swipeCallback = { (indexPath, completionHandler) in
             let album = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             firstly {
-                album.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
             }.finally {
@@ -64,10 +64,10 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     
     func change(sortType: ElementSortType) {
         self.sortType = sortType
-        appDelegate.persistentStorage.settings.albumsSortSetting = sortType
+        appDelegate.storage.settings.albumsSortSetting = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: sortType, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: true)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
@@ -128,7 +128,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         let searchText = searchController.searchBar.text ?? ""
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
             firstly {
-                self.appDelegate.backendApi.createLibrarySyncer().searchAlbums(searchText: searchText, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+                self.appDelegate.librarySyncer.searchAlbums(searchText: searchText)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
             }
@@ -165,9 +165,9 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
                 self.displayFilter = .favorites
                 self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
-                guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
+                guard self.appDelegate.storage.settings.isOnlineMode else { return }
                 firstly {
-                    self.appDelegate.backendApi.createLibrarySyncer().syncFavoriteLibraryElements(persistentStorage: self.appDelegate.persistentStorage)
+                    self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
                 }.catch { error in
                     self.appDelegate.eventLogger.report(topic: "Favorite Albums Sync", error: error)
                 }.finally {
@@ -180,9 +180,9 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
                 self.displayFilter = .recentlyAdded
                 self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
-                guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
+                guard self.appDelegate.storage.settings.isOnlineMode else { return }
                 firstly {
-                    AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
                         .syncLatestLibraryElements()
                 }.catch { error in
                     self.appDelegate.eventLogger.report(topic: "Albums Latest Elements Sync", error: error)
@@ -205,12 +205,12 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        guard self.appDelegate.persistentStorage.settings.isOnlineMode else {
+        guard self.appDelegate.storage.settings.isOnlineMode else {
             self.refreshControl?.endRefreshing()
             return
         }
         firstly {
-            AutoDownloadLibrarySyncer(persistentStorage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 .syncLatestLibraryElements()
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Albums Latest Elements Sync", error: error)

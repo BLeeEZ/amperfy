@@ -26,25 +26,22 @@ import PromiseKit
 public class ScrobbleSyncer {
     
     private let log = OSLog(subsystem: "Amperfy", category: "ScrobbleSyncer")
-    private let persistentStorage: PersistentStorage
-    private let library: LibraryStorage
-    private let backendApi: BackendApi
+    private let storage: PersistentStorage
+    private let librarySyncer: LibrarySyncer
     private let eventLogger: EventLogger
     private let activeDispatchGroup = DispatchGroup()
     private let uploadSemaphore = DispatchSemaphore(value: 1)
     private var isRunning = false
     private var isActive = false
     
-    init(persistentStorage: PersistentStorage, backendApi: BackendApi, eventLogger: EventLogger) {
-        self.persistentStorage = persistentStorage
-        self.library = LibraryStorage(context: self.persistentStorage.context)
-        self.backendApi = backendApi
+    init(storage: PersistentStorage, librarySyncer: LibrarySyncer, eventLogger: EventLogger) {
+        self.storage = storage
+        self.librarySyncer = librarySyncer
         self.eventLogger = eventLogger
     }
     
     public func start() {
-        let library = LibraryStorage(context: persistentStorage.context)
-        guard library.uploadableScrobbleEntryCount > 0 else { return }
+        guard storage.main.library.uploadableScrobbleEntryCount > 0 else { return }
         isRunning = true
         if !isActive {
             isActive = true
@@ -58,7 +55,7 @@ public class ScrobbleSyncer {
     }
     
     func scrobble(playedSong: Song) {
-        if self.persistentStorage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
+        if self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
             cacheScrobbleRequest(playedSong: playedSong, isUploaded: true)
             scrobbleToServerAsync(playedSong: playedSong)
             start() // send cached request to server
@@ -73,7 +70,7 @@ public class ScrobbleSyncer {
             self.activeDispatchGroup.enter()
             os_log("start", log: self.log, type: .info)
             
-            while self.isRunning, self.persistentStorage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
+            while self.isRunning, self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
                 self.uploadSemaphore.wait()
                 firstly {
                     self.getNextScrobbleEntry()
@@ -84,12 +81,12 @@ public class ScrobbleSyncer {
                     }
                     defer {
                         entry.isUploaded = true;
-                        self.library.saveContext()
+                        self.storage.main.saveContext()
                     }
                     guard let song = entry.playable?.asSong, let date = entry.date else {
                         return Promise.value
                     }
-                    return self.backendApi.createLibrarySyncer().scrobble(song: song, date: date)
+                    return self.librarySyncer.scrobble(song: song, date: date)
                 }.catch { error in
                     self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
                 }.finally {
@@ -105,11 +102,11 @@ public class ScrobbleSyncer {
     
     private func getNextScrobbleEntry() -> Promise<ScrobbleEntry?> {
         return Promise<ScrobbleEntry?> { seal in
-            _ = self.persistentStorage.persistentContainer.performAsync { companion in
-                guard let scobbleEntry = companion.library.getFirstUploadableScrobbleEntry() else {
+            _ = self.storage.async.perform { asyncCompanion in
+                guard let scobbleEntry = asyncCompanion.library.getFirstUploadableScrobbleEntry() else {
                     return seal.fulfill(nil)
                 }
-                let scobbleEntryMain = ScrobbleEntry(managedObject: try! self.persistentStorage.context.existingObject(with: scobbleEntry.managedObject.objectID) as! ScrobbleEntryMO)
+                let scobbleEntryMain = ScrobbleEntry(managedObject: try! self.storage.main.context.existingObject(with: scobbleEntry.managedObject.objectID) as! ScrobbleEntryMO)
                 return seal.fulfill(scobbleEntryMain)
             }
         }
@@ -117,19 +114,18 @@ public class ScrobbleSyncer {
     
     private func scrobbleToServerAsync(playedSong: Song) {
         firstly {
-            self.backendApi.createLibrarySyncer().scrobble(song: playedSong, date: nil)
+            self.librarySyncer.scrobble(song: playedSong, date: nil)
         }.catch { error in
             self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
         }
     }
     
     private func cacheScrobbleRequest(playedSong: Song, isUploaded: Bool) {
-        let library = LibraryStorage(context: persistentStorage.context)
-        let scrobbleEntry = library.createScrobbleEntry()
+        let scrobbleEntry = storage.main.library.createScrobbleEntry()
         scrobbleEntry.date = Date()
         scrobbleEntry.playable = playedSong
         scrobbleEntry.isUploaded = isUploaded
-        library.saveContext()
+        storage.main.saveContext()
     }
     
 }

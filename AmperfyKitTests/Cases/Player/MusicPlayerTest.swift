@@ -77,29 +77,29 @@ class MOCK_AlertDisplayable: AlertDisplayable {
 }
 
 class MOCK_LibrarySyncer: LibrarySyncer {
-    func syncInitial(persistentStorage: PersistentStorage, statusNotifyier: SyncCallbacks?) -> Promise<Void> { return Promise.value }
-    func sync(genre: Genre, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func sync(artist: Artist, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func sync(album: Album, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func sync(song: Song, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func sync(podcast: Podcast, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func syncLatestLibraryElements(persistentStorage: PersistentStorage) -> Promise<Void> { return Promise.value }
-    func syncFavoriteLibraryElements(persistentStorage: PersistentStorage) -> Promise<Void> { return Promise.value }
-    func syncDownPlaylistsWithoutSongs(persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func syncDown(playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func syncUpload(playlistToUpdateName playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func syncUpload(playlistToUpdateOrder playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
+    func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void> { return Promise.value }
+    func sync(genre: Genre) -> Promise<Void> { return Promise.value }
+    func sync(artist: Artist) -> Promise<Void> { return Promise.value }
+    func sync(album: Album) -> Promise<Void> { return Promise.value }
+    func sync(song: Song) -> Promise<Void> { return Promise.value }
+    func sync(podcast: Podcast) -> Promise<Void> { return Promise.value }
+    func syncLatestLibraryElements() -> Promise<Void> { return Promise.value }
+    func syncFavoriteLibraryElements() -> Promise<Void> { return Promise.value }
+    func syncDownPlaylistsWithoutSongs() -> Promise<Void> { return Promise.value }
+    func syncDown(playlist: Playlist) -> Promise<Void> { return Promise.value }
+    func syncUpload(playlistToUpdateName playlist: Playlist) -> Promise<Void> { return Promise.value }
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song]) -> Promise<Void> { return Promise.value }
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int) -> Promise<Void> { return Promise.value }
+    func syncUpload(playlistToUpdateOrder playlist: Playlist) -> Promise<Void> { return Promise.value }
     func syncUpload(playlistIdToDelete id: String) -> Promise<Void> { return Promise.value }
-    func syncDownPodcastsWithoutEpisodes(persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func searchArtists(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func searchAlbums(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func searchSongs(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func syncMusicFolders(persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func syncIndexes(musicFolder: MusicFolder, persistentContainer: NSPersistentContainer) -> Promise<Void> { return Promise.value }
-    func sync(directory: Directory, persistentStorage: PersistentStorage) -> Promise<Void> { return Promise.value }
-    func requestRandomSongs(playlist: Playlist, count: Int, persistentStorage: PersistentStorage) -> Promise<Void> { return Promise.value }
+    func syncDownPodcastsWithoutEpisodes() -> Promise<Void> { return Promise.value }
+    func searchArtists(searchText: String) -> Promise<Void> { return Promise.value }
+    func searchAlbums(searchText: String) -> Promise<Void> { return Promise.value }
+    func searchSongs(searchText: String) -> Promise<Void> { return Promise.value }
+    func syncMusicFolders() -> Promise<Void> { return Promise.value }
+    func syncIndexes(musicFolder: MusicFolder) -> Promise<Void> { return Promise.value }
+    func sync(directory: Directory) -> Promise<Void> { return Promise.value }
+    func requestRandomSongs(playlist: Playlist, count: Int) -> Promise<Void> { return Promise.value }
     func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) -> Promise<Void> { return Promise.value }
     func scrobble(song: Song, date: Date?) -> Promise<Void> { return Promise.value }
     func setRating(song: Song, rating: Int) -> Promise<Void> { return Promise.value }
@@ -122,8 +122,8 @@ class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
     var parallelDownloadsCount = 2
     func prepareDownload(download: Download) -> Promise<URL> { return Promise(error: BackendError.notSupported) }
     func validateDownloadedData(download: Download) -> ResponseError? { return nil }
-    func completedDownload(download: Download, persistentStorage: PersistentStorage) -> Guarantee<Void> { return Guarantee.value }
-    func failedDownload(download: Download, persistentStorage: PersistentStorage) {}
+    func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> { return Guarantee.value }
+    func failedDownload(download: Download, storage: PersistentStorage) {}
 }
 
 class MOCK_BackendApi: BackendApi {
@@ -135,7 +135,7 @@ class MOCK_BackendApi: BackendApi {
     func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> { return Helper.urlPromise }
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> { return Helper.urlPromise }
     func checkForErrorResponse(inData data: Data) -> ResponseError? { return nil }
-    func createLibrarySyncer() -> LibrarySyncer { return MOCK_LibrarySyncer() }
+    func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer { return MOCK_LibrarySyncer() }
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { return nil }
 }
@@ -163,11 +163,29 @@ class MOCK_MusicPlayable: MusicPlayable {
     }
 }
 
+class MOCK_CoreDataManager: CoreDataManagable {
+    var mock_persistentContainer: NSPersistentContainer
+    
+    init(persistentContainer: NSPersistentContainer) {
+        self.mock_persistentContainer = persistentContainer
+    }
+    
+    var persistentContainer: NSPersistentContainer {
+        return mock_persistentContainer
+    }
+    
+    var context: NSManagedObjectContext {
+        return mock_persistentContainer.viewContext
+    }
+}
+
 class MusicPlayerTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
     var library: LibraryStorage!
     var mockAlertDisplayer: MOCK_AlertDisplayable!
+    var mockCoreDataManager: MOCK_CoreDataManager!
+    var storage: PersistentStorage!
     var eventLogger: EventLogger!
     var userStatistics: UserStatistics!
     var songDownloader: MOCK_SongDownloader!
@@ -191,7 +209,9 @@ class MusicPlayerTest: XCTestCase {
         songDownloader = MOCK_SongDownloader()
         mockAVPlayer = MOCK_AVPlayer()
         mockAlertDisplayer = MOCK_AlertDisplayable()
-        eventLogger = EventLogger(persistentContainer: cdHelper.persistentContainer)
+        mockCoreDataManager = MOCK_CoreDataManager(persistentContainer: cdHelper.persistentContainer)
+        storage = PersistentStorage(coreDataManager: mockCoreDataManager)
+        eventLogger = EventLogger(storage: storage)
         userStatistics = library.getUserStatistics(appVersion: "")
         backendApi = MOCK_BackendApi()
         backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)

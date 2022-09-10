@@ -116,7 +116,7 @@ class LibraryEntityDetailVC: UIViewController {
     private var entityContainer: PlayableContainable!
 
     private var entityPlayables: [AbstractPlayable] {
-        let playables = entityContainer?.playables.filterCached(dependigOn: appDelegate.persistentStorage.settings.isOfflineMode) ?? [AbstractPlayable]()
+        let playables = entityContainer?.playables.filterCached(dependigOn: appDelegate.storage.settings.isOfflineMode) ?? [AbstractPlayable]()
         switch(entityContainer.playContextType) {
         case .music:
             return playables.compactMap{ $0.asSong }.filterServerDeleteUncachedSongs()
@@ -218,10 +218,10 @@ class LibraryEntityDetailVC: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard self.appDelegate.storage.settings.isOnlineMode else { return }
         guard let container = entityContainer else { return }
         firstly {
-            container.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            container.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Detail Sync", error: error)
         }.finally {
@@ -280,11 +280,11 @@ class LibraryEntityDetailVC: UIViewController {
 
         infoLabel.text = entityContainer.info(for: appDelegate.backendApi.selectedApi, type: .long)
 
-        playButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
-        playShuffledButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
-        podcastQueueContainerView.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
-        queueContainerView.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.persistentStorage.settings.isOfflineMode
-        addToPlaylistButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
+        playButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.storage.settings.isOfflineMode
+        playShuffledButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.storage.settings.isOfflineMode
+        podcastQueueContainerView.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.storage.settings.isOfflineMode
+        queueContainerView.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.storage.settings.isOfflineMode
+        addToPlaylistButton.isHidden = appDelegate.storage.settings.isOfflineMode
         
         switch entityContainer.playContextType {
         case .music:
@@ -294,7 +294,7 @@ class LibraryEntityDetailVC: UIViewController {
         }
 
         downloadButton.isHidden = entityContainer.playables.isCachedCompletely ||
-            appDelegate.persistentStorage.settings.isOfflineMode ||
+            appDelegate.storage.settings.isOfflineMode ||
             !entityContainer.isDownloadAvailable
         deleteCacheButton.isHidden = !entityContainer.playables.hasCachedItems
         
@@ -347,29 +347,29 @@ class LibraryEntityDetailVC: UIViewController {
     private func configureFor(song: Song) {
         playButton.isHidden =
             (playContextCb == nil) ||
-            (!song.isCached && appDelegate.persistentStorage.settings.isOfflineMode)
+            (!song.isCached && appDelegate.storage.settings.isOfflineMode)
         playShuffledButton.isHidden = true
         queueContainerView.isHidden =
             (playContextCb == nil) ||
             playerIndexCb != nil ||
-            (!song.isCached && appDelegate.persistentStorage.settings.isOfflineMode)
+            (!song.isCached && appDelegate.storage.settings.isOfflineMode)
         
         clearUserQueueButton.isHidden = appDelegate.player.userQueue.isEmpty
-        addContextQueueToPlaylistButton.isHidden = appDelegate.persistentStorage.settings.isOfflineMode
+        addContextQueueToPlaylistButton.isHidden = appDelegate.storage.settings.isOfflineMode
         configurePlayerStack()
     }
     
     private func configureFor(podcastEpisode: PodcastEpisode) {
         playButton.isHidden = (playContextCb == nil) ||
-           (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
-           (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode)
+           (!podcastEpisode.isAvailableToUser && appDelegate.storage.settings.isOnlineMode) ||
+           (!podcastEpisode.isCached && appDelegate.storage.settings.isOfflineMode)
         playShuffledButton.isHidden = true
         podcastQueueContainerView.isHidden = (playContextCb == nil) ||
            (playerIndexCb != nil) ||
-           (!podcastEpisode.isAvailableToUser && appDelegate.persistentStorage.settings.isOnlineMode) ||
-           (!podcastEpisode.isCached && appDelegate.persistentStorage.settings.isOfflineMode)
+           (!podcastEpisode.isAvailableToUser && appDelegate.storage.settings.isOnlineMode) ||
+           (!podcastEpisode.isCached && appDelegate.storage.settings.isOfflineMode)
         addToPlaylistButton.isHidden = true
-        deleteOnServerButton.isHidden = podcastEpisode.podcastStatus == .deleted || appDelegate.persistentStorage.settings.isOfflineMode
+        deleteOnServerButton.isHidden = podcastEpisode.podcastStatus == .deleted || appDelegate.storage.settings.isOfflineMode
         clearUserQueueButton.isHidden = true
         addContextQueueToPlaylistButton.isHidden = true
         configurePlayerStack()
@@ -438,8 +438,8 @@ class LibraryEntityDetailVC: UIViewController {
         dismiss(animated: true)
         guard entityPlayables.hasCachedItems else { return }
         appDelegate.playableDownloadManager.removeFinishedDownload(for: entityPlayables)
-        appDelegate.library.deleteCache(of: entityPlayables)
-        appDelegate.library.saveContext()
+        appDelegate.storage.main.library.deleteCache(of: entityPlayables)
+        appDelegate.storage.main.saveContext()
         if let rootTableView = self.rootView as? UITableViewController{
             rootTableView.tableView.reloadData()
         }
@@ -450,10 +450,10 @@ class LibraryEntityDetailVC: UIViewController {
         dismiss(animated: true)
         guard let playable = entityContainer as? AbstractPlayable, let podcastEpisode = playable.asPodcastEpisode else { return }
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
+            self.appDelegate.librarySyncer.requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
         }.then { () -> Promise<Void> in
             guard let podcast = podcastEpisode.podcast else { return Promise.value }
-            return self.appDelegate.backendApi.createLibrarySyncer().sync(podcast: podcast, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            return self.appDelegate.librarySyncer.sync(podcast: podcast)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Podcast Episode Sync Delete", error: error)
         }

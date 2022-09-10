@@ -33,7 +33,7 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.indexes)
         
-        fetchedResultsController = MusicFolderDirectoriesFetchedResultsController(for: musicFolder, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        fetchedResultsController = MusicFolderDirectoriesFetchedResultsController(for: musicFolder, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         
         navigationItem.title = musicFolder.name
@@ -44,9 +44,9 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncIndexes(musicFolder: musicFolder, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.syncIndexes(musicFolder: musicFolder)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Indexes Sync", error: error)
         }

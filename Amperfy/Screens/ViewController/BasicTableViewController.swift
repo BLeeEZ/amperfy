@@ -100,19 +100,19 @@ extension BasicTableViewController {
                 guard let actionContext = actionContext else { return }
                 switch actionType {
                 case .insertUserQueue:
-                    self.appDelegate.player.insertUserQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    self.appDelegate.player.insertUserQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode))
                 case .appendUserQueue:
-                    self.appDelegate.player.appendUserQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    self.appDelegate.player.appendUserQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode))
                 case .insertContextQueue:
-                    self.appDelegate.player.insertContextQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    self.appDelegate.player.insertContextQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode))
                 case .appendContextQueue:
-                    self.appDelegate.player.appendContextQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    self.appDelegate.player.appendContextQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode))
                 case .download:
                     self.appDelegate.playableDownloadManager.download(objects: actionContext.playables)
                 case .removeFromCache:
                     self.appDelegate.playableDownloadManager.removeFinishedDownload(for: actionContext.playables)
-                    self.appDelegate.library.deleteCache(of: actionContext.playables)
-                    self.appDelegate.library.saveContext()
+                    self.appDelegate.storage.main.library.deleteCache(of: actionContext.playables)
+                    self.appDelegate.storage.main.saveContext()
                 case .addToPlaylist:
                     let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
                     selectPlaylistVC.itemsToAdd = actionContext.playables
@@ -127,12 +127,12 @@ extension BasicTableViewController {
                     }
                     self.appDelegate.player.playShuffled(context: playContext)
                 case .insertPodcastQueue:
-                    self.appDelegate.player.insertPodcastQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    self.appDelegate.player.insertPodcastQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode))
                 case .appendPodcastQueue:
-                    self.appDelegate.player.appendPodcastQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode))
+                    self.appDelegate.player.appendPodcastQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode))
                 case .favorite:
                     firstly {
-                        actionContext.containable.remoteToggleFavorite(syncer: self.appDelegate.backendApi.createLibrarySyncer())
+                        actionContext.containable.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
                     }.catch { error in
                         self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
                     }
@@ -171,7 +171,7 @@ class BasicTableViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if searchController.searchBar.scopeButtonTitles?.count ?? 0 > 1, appDelegate.persistentStorage.settings.isOfflineMode {
+        if searchController.searchBar.scopeButtonTitles?.count ?? 0 > 1, appDelegate.storage.settings.isOfflineMode {
             searchController.searchBar.selectedScopeButtonIndex = 1
         } else {
             searchController.searchBar.selectedScopeButtonIndex = 0
@@ -195,8 +195,8 @@ class BasicTableViewController: UITableViewController {
         
         var createdActionsIndex = 0
         var actions = [UIContextualAction]()
-        for actionType in appDelegate.persistentStorage.settings.swipeActionSettings.leading {
-            if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, containable: containable, isOfflineMode: appDelegate.persistentStorage.settings.isOfflineMode) { continue }
+        for actionType in appDelegate.storage.settings.swipeActionSettings.leading {
+            if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, containable: containable, isOfflineMode: appDelegate.storage.settings.isOfflineMode) { continue }
             let buttonColor = Self.swipeButtonColors.element(at: createdActionsIndex) ?? Self.swipeButtonColors.last!
             actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, preCbContainable: containable, actionCallback: swipeCB))
             createdActionsIndex += 1
@@ -212,8 +212,8 @@ class BasicTableViewController: UITableViewController {
         else { return nil }
         var createdActionsIndex = 0
         var actions = [UIContextualAction]()
-        for actionType in appDelegate.persistentStorage.settings.swipeActionSettings.trailing {
-            if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, containable: containable, isOfflineMode: appDelegate.persistentStorage.settings.isOfflineMode) { continue }
+        for actionType in appDelegate.storage.settings.swipeActionSettings.trailing {
+            if !swipeDisplaySettings.isAllowedToDisplay(actionType: actionType, containable: containable, isOfflineMode: appDelegate.storage.settings.isOfflineMode) { continue }
             let buttonColor = Self.swipeButtonColors.element(at: createdActionsIndex) ?? Self.swipeButtonColors.last!
             actions.append(createSwipeAction(for: actionType, buttonColor: buttonColor, indexPath: indexPath, preCbContainable: containable, actionCallback: swipeCB))
             createdActionsIndex += 1

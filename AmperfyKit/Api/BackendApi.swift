@@ -41,29 +41,29 @@ public protocol SyncCallbacks: ParsedObjectNotifiable {
 }
 
 public protocol LibrarySyncer {
-    func syncInitial(persistentStorage: PersistentStorage, statusNotifyier: SyncCallbacks?) -> Promise<Void>
-    func sync(genre: Genre, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func sync(artist: Artist, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func sync(album: Album, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func sync(song: Song, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func sync(podcast: Podcast, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func syncLatestLibraryElements(persistentStorage: PersistentStorage) -> Promise<Void>
-    func syncFavoriteLibraryElements(persistentStorage: PersistentStorage) -> Promise<Void>
-    func syncDownPlaylistsWithoutSongs(persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func syncDown(playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func syncUpload(playlistToUpdateName playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func syncUpload(playlistToUpdateOrder playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void>
+    func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void>
+    func sync(genre: Genre) -> Promise<Void>
+    func sync(artist: Artist) -> Promise<Void>
+    func sync(album: Album) -> Promise<Void>
+    func sync(song: Song) -> Promise<Void>
+    func sync(podcast: Podcast) -> Promise<Void>
+    func syncLatestLibraryElements() -> Promise<Void>
+    func syncFavoriteLibraryElements() -> Promise<Void>
+    func syncDownPlaylistsWithoutSongs() -> Promise<Void>
+    func syncDown(playlist: Playlist) -> Promise<Void>
+    func syncUpload(playlistToUpdateName playlist: Playlist) -> Promise<Void>
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song]) -> Promise<Void>
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int) -> Promise<Void>
+    func syncUpload(playlistToUpdateOrder playlist: Playlist) -> Promise<Void>
     func syncUpload(playlistIdToDelete id: String) -> Promise<Void>
-    func syncDownPodcastsWithoutEpisodes(persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func searchArtists(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func searchAlbums(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func searchSongs(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func syncMusicFolders(persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func syncIndexes(musicFolder: MusicFolder, persistentContainer: NSPersistentContainer) -> Promise<Void>
-    func sync(directory: Directory, persistentStorage: PersistentStorage) -> Promise<Void>
-    func requestRandomSongs(playlist: Playlist, count: Int, persistentStorage: PersistentStorage) -> Promise<Void>
+    func syncDownPodcastsWithoutEpisodes() -> Promise<Void>
+    func searchArtists(searchText: String) -> Promise<Void>
+    func searchAlbums(searchText: String) -> Promise<Void>
+    func searchSongs(searchText: String) -> Promise<Void>
+    func syncMusicFolders() -> Promise<Void>
+    func syncIndexes(musicFolder: MusicFolder) -> Promise<Void>
+    func sync(directory: Directory) -> Promise<Void>
+    func requestRandomSongs(playlist: Playlist, count: Int) -> Promise<Void>
     func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) -> Promise<Void>
     func scrobble(song: Song, date: Date?) -> Promise<Void>
     func setRating(song: Song, rating: Int) -> Promise<Void>
@@ -93,7 +93,7 @@ public protocol BackendApi {
     func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL>
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL>
     func checkForErrorResponse(inData data: Data) -> ResponseError?
-    func createLibrarySyncer() -> LibrarySyncer
+    func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo?
 }

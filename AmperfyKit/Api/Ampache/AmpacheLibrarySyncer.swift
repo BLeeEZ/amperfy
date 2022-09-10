@@ -28,31 +28,31 @@ import PromiseKit
 class AmpacheLibrarySyncer: LibrarySyncer {
     
     private let ampacheXmlServerApi: AmpacheXmlServerApi
+    private let storage: PersistentStorage
     private let log = OSLog(subsystem: "Amperfy", category: "AmpacheLibSyncer")
     
     var isSyncAllowed: Bool {
         return Reachability.isConnectedToNetwork()
     }
     
-    init(ampacheXmlServerApi: AmpacheXmlServerApi) {
+    init(ampacheXmlServerApi: AmpacheXmlServerApi, storage: PersistentStorage) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
+        self.storage = storage
     }
     
-    func syncInitial(persistentStorage: PersistentStorage, statusNotifyier: SyncCallbacks?) -> Promise<Void> {
-        let library = LibraryStorage(context: persistentStorage.context)
-        
+    func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void> {
         return firstly {
             ampacheXmlServerApi.requesetLibraryMetaData()
         }.get { auth in
-            let syncWave = library.createSyncWave()
+            let syncWave = self.storage.main.library.createSyncWave()
             syncWave.setMetaData(fromLibraryChangeDates: auth.libraryChangeDates)
-            library.saveContext()
+            self.storage.main.library.saveContext()
         }.then { auth -> Promise<Data> in
             statusNotifyier?.notifySyncStarted(ofType: .genre, totalCount: auth.genreCount)
             return self.ampacheXmlServerApi.requestGenres()
         }.then { data in
-            persistentStorage.persistentContainer.performAsync { companion in
-                let parserDelegate = GenreParserDelegate(library: companion.library, syncWave: companion.syncWave, parseNotifier: statusNotifyier)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = GenreParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave, parseNotifier: statusNotifyier)
                 try self.parse(data: data, delegate: parserDelegate)
             }
         }.then {
@@ -64,8 +64,8 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 return firstly {
                     self.ampacheXmlServerApi.requestArtists(startIndex: index*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                 }.then { data in
-                    persistentStorage.persistentContainer.performAsync { companion in
-                        let parserDelegate = ArtistParserDelegate(library: companion.library, syncWave: companion.syncWave, parseNotifier: statusNotifyier)
+                    self.storage.async.perform { asyncCompanion in
+                        let parserDelegate = ArtistParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave, parseNotifier: statusNotifyier)
                         try self.parse(data: data, delegate: parserDelegate)
                     }
                 }
@@ -80,8 +80,8 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 firstly {
                     self.ampacheXmlServerApi.requestAlbums(startIndex: index*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                 }.then { data in
-                    persistentStorage.persistentContainer.performAsync { companion in
-                        let parserDelegate = AlbumParserDelegate(library: companion.library, syncWave: companion.syncWave, parseNotifier: statusNotifyier)
+                    self.storage.async.perform { asyncCompanion in
+                        let parserDelegate = AlbumParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave, parseNotifier: statusNotifyier)
                         try self.parse(data: data, delegate: parserDelegate)
                     }
                 }
@@ -91,8 +91,8 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             statusNotifyier?.notifySyncStarted(ofType: .playlist, totalCount: auth.playlistCount)
             return self.ampacheXmlServerApi.requestPlaylists()
         }.then { data in
-            persistentStorage.persistentContainer.performAsync { companion in
-                let parserDelegate = PlaylistParserDelegate(library: companion.library, parseNotifier: statusNotifyier)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = PlaylistParserDelegate(library: asyncCompanion.library, parseNotifier: statusNotifyier)
                 try self.parse(data: data, delegate: parserDelegate)
             }
         }.then {
@@ -105,38 +105,38 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 return firstly {
                     self.ampacheXmlServerApi.requestPodcasts()
                 }.then { data in
-                    persistentStorage.persistentContainer.performAsync { companion in
-                        let parserDelegate = PodcastParserDelegate(library: companion.library, syncWave: companion.syncWave, parseNotifier: statusNotifyier)
+                    self.storage.async.perform { asyncCompanion in
+                        let parserDelegate = PodcastParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave, parseNotifier: statusNotifyier)
                         try self.parse(data: data, delegate: parserDelegate)
                     }
                 }.then { data in
-                    persistentStorage.persistentContainer.performAsync { companion in
-                        companion.syncWave.syncState = .Done
+                    self.storage.async.perform { asyncCompanion in
+                        asyncCompanion.syncWave.syncState = .Done
                     }
                 }
             } else {
-               return persistentStorage.persistentContainer.performAsync { companion in
-                   companion.syncWave.syncState = .Done
+               return self.storage.async.perform { asyncCompanion in
+                   asyncCompanion.syncWave.syncState = .Done
                }
            }
         }
     }
     
-    func sync(genre: Genre, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func sync(genre: Genre) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         let albumSyncPromises = genre.albums.compactMap { album in return {
-            self.sync(album: album, persistentContainer: persistentContainer)
+            self.sync(album: album)
         }}
         return albumSyncPromises.resolveSequentially()
     }
     
-    func sync(artist: Artist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func sync(artist: Artist) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
             ampacheXmlServerApi.requestArtistInfo(id: artist.id)
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let parserDelegate = ArtistParserDelegate(library: companion.library, syncWave: companion.syncWave)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = ArtistParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 do {
                     try self.parse(data: data, delegate: parserDelegate)
                 } catch {
@@ -153,10 +153,10 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             return firstly {
                 self.ampacheXmlServerApi.requestArtistAlbums(id: artist.id)
             }.then { data in
-                persistentContainer.performAsync { companion in
-                    let artistAsync = Artist(managedObject: companion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
+                self.storage.async.perform { asyncCompanion in
+                    let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
                     let oldAlbums = Set(artistAsync.albums)
-                    let parserDelegate = AlbumParserDelegate(library: companion.library, syncWave: companion.syncWave)
+                    let parserDelegate = AlbumParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                     try self.parse(data: data, delegate: parserDelegate)
                     let removedAlbums = oldAlbums.subtracting(parserDelegate.albumsParsed)
                     for album in removedAlbums {
@@ -171,10 +171,10 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             }.then {
                 self.ampacheXmlServerApi.requestArtistSongs(id: artist.id)
             }.then { data in
-                persistentContainer.performAsync { companion in
-                    let artistAsync = Artist(managedObject: companion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
+                self.storage.async.perform { asyncCompanion in
+                    let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
                     let oldSongs = Set(artistAsync.songs)
-                    let parserDelegate = SongParserDelegate(library: companion.library, syncWave: companion.syncWave)
+                    let parserDelegate = SongParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                     try self.parse(data: data, delegate: parserDelegate)
                     let removedSongs = oldSongs.subtracting(parserDelegate.parsedSongs)
                     removedSongs.lazy.compactMap{$0.asSong}.forEach {
@@ -186,18 +186,18 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func sync(album: Album, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func sync(album: Album) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
             ampacheXmlServerApi.requestAlbumInfo(id: album.id)
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let parserDelegate = AlbumParserDelegate(library: companion.library, syncWave: companion.syncWave)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = AlbumParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 do {
                     try self.parse(data: data, delegate: parserDelegate)
                 } catch {
                     if let responseError = error as? ResponseError, let ampacheError = responseError.asAmpacheError, !ampacheError.isRemoteAvailable {
-                        let albumAsync = Album(managedObject: companion.context.object(with: album.managedObject.objectID) as! AlbumMO)
+                        let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
                         os_log("Album <%s> is remote deleted", log: self.log, type: .info, albumAsync.name)
                         albumAsync.markAsRemoteDeleted()
                     } else {
@@ -210,10 +210,10 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             return firstly {
                 self.ampacheXmlServerApi.requestAlbumSongs(id: album.id)
             }.then { data in
-                persistentContainer.performAsync { companion in
-                    let albumAsync = Album(managedObject: companion.context.object(with: album.managedObject.objectID) as! AlbumMO)
+                self.storage.async.perform { asyncCompanion in
+                    let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
                     let oldSongs = Set(albumAsync.songs)
-                    let parserDelegate = SongParserDelegate(library: companion.library, syncWave: companion.syncWave)
+                    let parserDelegate = SongParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                     try self.parse(data: data, delegate: parserDelegate)
                     let removedSongs = oldSongs.subtracting(parserDelegate.parsedSongs)
                     removedSongs.lazy.compactMap{$0.asSong}.forEach {
@@ -227,19 +227,19 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func sync(song: Song, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func sync(song: Song) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
             ampacheXmlServerApi.requestSongInfo(id: song.id)
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let parserDelegate = SongParserDelegate(library: companion.library, syncWave: companion.syncWave)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = SongParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
             }
         }
     }
     
-    func sync(podcast: Podcast, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func sync(podcast: Podcast) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
             ampacheXmlServerApi.requestServerPodcastSupport()
@@ -248,11 +248,11 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             return firstly {
                 self.ampacheXmlServerApi.requestPodcastEpisodes(id: podcast.id)
             }.then { data in
-                persistentContainer.performAsync { companion in
-                    let podcastAsync = Podcast(managedObject: companion.context.object(with: podcast.managedObject.objectID) as! PodcastMO)
+                self.storage.async.perform { asyncCompanion in
+                    let podcastAsync = Podcast(managedObject: asyncCompanion.context.object(with: podcast.managedObject.objectID) as! PodcastMO)
                     let oldEpisodes = Set(podcastAsync.episodes)
                     
-                    let parserDelegate = PodcastEpisodeParserDelegate(podcast: podcastAsync, library: companion.library, syncWave: companion.syncWave)
+                    let parserDelegate = PodcastEpisodeParserDelegate(podcast: podcastAsync, library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                     try self.parse(data: data, delegate: parserDelegate)
                     
                     let deletedEpisodes = oldEpisodes.subtracting(parserDelegate.parsedEpisodes)
@@ -265,37 +265,37 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func syncMusicFolders(persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func syncMusicFolders() -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
             ampacheXmlServerApi.requestCatalogs()
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let parserDelegate = CatalogParserDelegate(library: companion.library, syncWave: companion.syncWave)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = CatalogParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
             }
         }
     }
     
-    func syncIndexes(musicFolder: MusicFolder, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func syncIndexes(musicFolder: MusicFolder) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
             ampacheXmlServerApi.requestArtistWithinCatalog(id: musicFolder.id)
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let parserDelegate = ArtistParserDelegate(library: companion.library, syncWave: companion.syncWave)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = ArtistParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
                 
-                let musicFolderAsync = MusicFolder(managedObject: companion.context.object(with: musicFolder.managedObject.objectID) as! MusicFolderMO)
+                let musicFolderAsync = MusicFolder(managedObject: asyncCompanion.context.object(with: musicFolder.managedObject.objectID) as! MusicFolderMO)
                 let directoriesBeforeFetch = Set(musicFolderAsync.directories)
                 var directoriesAfterFetch: Set<Directory> = Set()
                 for artist in parserDelegate.artistsParsed {
                     let artistDirId = "artist-\(artist.id)"
                     var curDir: Directory!
-                    if let foundDir = companion.library.getDirectory(id: artistDirId) {
+                    if let foundDir = asyncCompanion.library.getDirectory(id: artistDirId) {
                         curDir = foundDir
                     } else {
-                        curDir = companion.library.createDirectory()
+                        curDir = asyncCompanion.library.createDirectory()
                         curDir.id = artistDirId
                     }
                     curDir.name = artist.name
@@ -304,36 +304,35 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 }
                 
                 let removedDirectories = directoriesBeforeFetch.subtracting(directoriesAfterFetch)
-                removedDirectories.forEach{ companion.library.deleteDirectory(directory: $0) }
+                removedDirectories.forEach{ asyncCompanion.library.deleteDirectory(directory: $0) }
             }
         }
     }
     
-    func sync(directory: Directory, persistentStorage: PersistentStorage) -> Promise<Void> {
+    func sync(directory: Directory) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         if directory.id.starts(with: "album-") {
             let albumId = String(directory.id.dropFirst("album-".count))
-            return self.sync(directory: directory, thatIsAlbumId: albumId, persistentStorage: persistentStorage)
+            return self.sync(directory: directory, thatIsAlbumId: albumId)
         } else if directory.id.starts(with: "artist-") {
             let artistId = String(directory.id.dropFirst("artist-".count))
-            return self.sync(directory: directory, thatIsArtistId: artistId, persistentStorage: persistentStorage)
+            return self.sync(directory: directory, thatIsArtistId: artistId)
         } else {
             return Promise.value
         }
     }
     
-    private func sync(directory: Directory, thatIsAlbumId albumId: String, persistentStorage: PersistentStorage) -> Promise<Void> {
-        let library = LibraryStorage(context: persistentStorage.context)
-        guard let album = library.getAlbum(id: albumId) else { return Promise.value }
+    private func sync(directory: Directory, thatIsAlbumId albumId: String) -> Promise<Void> {
+        guard let album = storage.main.library.getAlbum(id: albumId) else { return Promise.value }
         let songsBeforeFetch = Set(directory.songs)
         
         return firstly {
-            self.sync(album: album, persistentContainer: persistentStorage.persistentContainer)
+            self.sync(album: album)
         }.then {
-            persistentStorage.persistentContainer.performAsync { companion in
-                let directoryAsync = Directory(managedObject: companion.context.object(with: directory.managedObject.objectID) as! DirectoryMO)
+            self.storage.async.perform { asyncCompanion in
+                let directoryAsync = Directory(managedObject: asyncCompanion.context.object(with: directory.managedObject.objectID) as! DirectoryMO)
                 let songsBeforeFetchAsync = Set(songsBeforeFetch.compactMap {
-                    Song(managedObject: companion.context.object(with: $0.managedObject.objectID) as! SongMO)
+                    Song(managedObject: asyncCompanion.context.object(with: $0.managedObject.objectID) as! SongMO)
                 })
                 
                 directoryAsync.songs.forEach { directoryAsync.managedObject.removeFromSongs($0.managedObject) }
@@ -348,30 +347,29 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    private func sync(directory: Directory, thatIsArtistId artistId: String, persistentStorage: PersistentStorage) -> Promise<Void> {
-        let library = LibraryStorage(context: persistentStorage.context)
-        guard let artist = library.getArtist(id: artistId) else { return Promise.value }
+    private func sync(directory: Directory, thatIsArtistId artistId: String) -> Promise<Void> {
+        guard let artist = storage.main.library.getArtist(id: artistId) else { return Promise.value }
         let directoriesBeforeFetch = Set(directory.subdirectories)
         
         return firstly {
-            self.sync(artist: artist, persistentContainer: persistentStorage.persistentContainer)
+            self.sync(artist: artist)
         }.then {
-            persistentStorage.persistentContainer.performAsync { companion in
-                let directoryAsync = Directory(managedObject: companion.context.object(with: directory.managedObject.objectID) as! DirectoryMO)
-                let artistAsync = Artist(managedObject: companion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
+            self.storage.async.perform { asyncCompanion in
+                let directoryAsync = Directory(managedObject: asyncCompanion.context.object(with: directory.managedObject.objectID) as! DirectoryMO)
+                let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
                 let directoriesBeforeFetchAsync = Set(directoriesBeforeFetch.compactMap {
-                    Directory(managedObject: companion.context.object(with: $0.managedObject.objectID) as! DirectoryMO)
+                    Directory(managedObject: asyncCompanion.context.object(with: $0.managedObject.objectID) as! DirectoryMO)
                 })
                 
                 var directoriesAfterFetch: Set<Directory> = Set()
-                let artistAlbums = companion.library.getAlbums(whichContainsSongsWithArtist: artistAsync)
+                let artistAlbums = asyncCompanion.library.getAlbums(whichContainsSongsWithArtist: artistAsync)
                 for album in artistAlbums {
                     let albumDirId = "album-\(album.id)"
                     var albumDir: Directory!
-                    if let foundDir = companion.library.getDirectory(id: albumDirId) {
+                    if let foundDir = asyncCompanion.library.getDirectory(id: albumDirId) {
                         albumDir = foundDir
                     } else {
-                        albumDir = companion.library.createDirectory()
+                        albumDir = asyncCompanion.library.createDirectory()
                         albumDir.id = albumDirId
                     }
                     albumDir.name = album.name
@@ -388,16 +386,16 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func syncRecentSongs(persistentStorage: PersistentStorage) -> Promise<Void> {
+    func syncRecentSongs() -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         os_log("Sync recently added songs", log: log, type: .info)
         return firstly {
             ampacheXmlServerApi.requestRecentSongs(count: 50)
         }.then { data in
-            persistentStorage.persistentContainer.performAsync { companion in
-                let oldRecentSongs = Set(companion.library.getRecentSongs())
+            self.storage.async.perform { asyncCompanion in
+                let oldRecentSongs = Set(asyncCompanion.library.getRecentSongs())
                 
-                let parserDelegate = SongParserDelegate(library: companion.library, syncWave: companion.syncWave)
+                let parserDelegate = SongParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
                 
                 let notRecentSongsAnymore = oldRecentSongs.subtracting(parserDelegate.parsedSongs)
@@ -407,20 +405,20 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func syncLatestLibraryElements(persistentStorage: PersistentStorage) -> Promise<Void> {
-        return syncRecentSongs(persistentStorage: persistentStorage)
+    func syncLatestLibraryElements() -> Promise<Void> {
+        return syncRecentSongs()
     }
     
-    func syncFavoriteLibraryElements(persistentStorage: PersistentStorage) -> Promise<Void> {
+    func syncFavoriteLibraryElements() -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
             self.ampacheXmlServerApi.requestFavoriteArtists()
         }.then { data in
-            persistentStorage.persistentContainer.performAsync { companion in
+            self.storage.async.perform { asyncCompanion in
                 os_log("Sync favorite artists", log: self.log, type: .info)
-                let oldFavoriteArtists = Set(companion.library.getFavoriteArtists())
+                let oldFavoriteArtists = Set(asyncCompanion.library.getFavoriteArtists())
                 
-                let parserDelegate = ArtistParserDelegate(library: companion.library, syncWave: companion.syncWave)
+                let parserDelegate = ArtistParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
                 
                 let notFavoriteArtistsAnymore = oldFavoriteArtists.subtracting(parserDelegate.artistsParsed)
@@ -429,11 +427,11 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }.then {
             self.ampacheXmlServerApi.requestFavoriteAlbums()
         }.then { data in
-            persistentStorage.persistentContainer.performAsync { companion in
+            self.storage.async.perform { asyncCompanion in
                 os_log("Sync favorite albums", log: self.log, type: .info)
-                let oldFavoriteAlbums = Set(companion.library.getFavoriteAlbums())
+                let oldFavoriteAlbums = Set(asyncCompanion.library.getFavoriteAlbums())
                 
-                let parserDelegate = AlbumParserDelegate(library: companion.library, syncWave: companion.syncWave)
+                let parserDelegate = AlbumParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
                 
                 let notFavoriteAlbumsAnymore = oldFavoriteAlbums.subtracting(parserDelegate.albumsParsed)
@@ -442,11 +440,11 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }.then {
             self.ampacheXmlServerApi.requestFavoriteSongs()
         }.then { data in
-            persistentStorage.persistentContainer.performAsync { companion in
+            self.storage.async.perform { asyncCompanion in
                 os_log("Sync favorite songs", log: self.log, type: .info)
-                let oldFavoriteSongs = Set(companion.library.getFavoriteSongs())
+                let oldFavoriteSongs = Set(asyncCompanion.library.getFavoriteSongs())
                 
-                let parserDelegate = SongParserDelegate(library: companion.library, syncWave: companion.syncWave)
+                let parserDelegate = SongParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
                 
                 let notFavoriteSongsAnymore = oldFavoriteSongs.subtracting(parserDelegate.parsedSongs)
@@ -455,15 +453,15 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func requestRandomSongs(playlist: Playlist, count: Int, persistentStorage: PersistentStorage) -> Promise<Void> {
+    func requestRandomSongs(playlist: Playlist, count: Int) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
             ampacheXmlServerApi.requestRandomSongs(count: count)
         }.then { data in
-            persistentStorage.persistentContainer.performAsync { companion in
-                let parserDelegate = SongParserDelegate(library: companion.library, syncWave: companion.syncWave, parseNotifier: nil)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = SongParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave, parseNotifier: nil)
                 try self.parse(data: data, delegate: parserDelegate)
-                playlist.getManagedObject(in: companion.context, library: companion.library).append(playables: parserDelegate.parsedSongs)
+                playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library).append(playables: parserDelegate.parsedSongs)
             }
         }
     }
@@ -477,42 +475,42 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
 
-    func syncDownPlaylistsWithoutSongs(persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func syncDownPlaylistsWithoutSongs() -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
             ampacheXmlServerApi.requestPlaylists()
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let parserDelegate = PlaylistParserDelegate(library: companion.library, parseNotifier: nil)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = PlaylistParserDelegate(library: asyncCompanion.library, parseNotifier: nil)
                 try self.parse(data: data, delegate: parserDelegate)
             }
         }
     }
     
-    func syncDown(playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func syncDown(playlist: Playlist) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         os_log("Download playlist \"%s\" from server", log: log, type: .info, playlist.name)
         return firstly {
-            validatePlaylistId(playlist: playlist, persistentContainer: persistentContainer)
+            validatePlaylistId(playlist: playlist)
         }.get {
             os_log("Sync songs of playlist \"%s\"", log: self.log, type: .info, playlist.name)
         }.then {
             self.ampacheXmlServerApi.requestPlaylistSongs(id: playlist.id)
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let playlistAsync = playlist.getManagedObject(in: companion.context, library: companion.library)
-                let parserDelegate = PlaylistSongsParserDelegate(playlist: playlistAsync, library: companion.library, syncWave: companion.syncWave)
+            self.storage.async.perform { asyncCompanion in
+                let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
+                let parserDelegate = PlaylistSongsParserDelegate(playlist: playlistAsync, library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
                 playlistAsync.ensureConsistentItemOrder()
             }
         }
     }
     
-    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song], persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song]) -> Promise<Void> {
         guard isSyncAllowed, !songs.isEmpty else { return Promise.value }
         os_log("Upload SongsAdded on playlist \"%s\"", log: log, type: .info, playlist.name)
         return firstly {
-            validatePlaylistId(playlist: playlist, persistentContainer: persistentContainer)
+            validatePlaylistId(playlist: playlist)
         }.then { () -> Promise<Void> in
             let playlistAddSongPromises = songs.compactMap { song in return {
                 return firstly {
@@ -525,11 +523,11 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         os_log("Upload SongDelete on playlist \"%s\" at index: %i", log: log, type: .info, playlist.name, index)
         return firstly {
-            self.validatePlaylistId(playlist: playlist, persistentContainer: persistentContainer)
+            self.validatePlaylistId(playlist: playlist)
         }.then {
             self.ampacheXmlServerApi.requestPlaylistDeleteItem(id: playlist.id, index: index)
         }.then { data in
@@ -537,7 +535,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func syncUpload(playlistToUpdateName playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func syncUpload(playlistToUpdateName playlist: Playlist) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         os_log("Upload name on playlist to: \"%s\"", log: log, type: .info, playlist.name)
         return firstly {
@@ -547,7 +545,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func syncUpload(playlistToUpdateOrder playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func syncUpload(playlistToUpdateOrder playlist: Playlist) -> Promise<Void> {
         guard isSyncAllowed, playlist.songCount > 0 else { return Promise.value }
         os_log("Upload OrderChange on playlist \"%s\"", log: log, type: .info, playlist.name)
         let songIds = playlist.playables.compactMap{ $0.id }
@@ -569,13 +567,13 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    private func validatePlaylistId(playlist: Playlist, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    private func validatePlaylistId(playlist: Playlist) -> Promise<Void> {
         return firstly {
             self.ampacheXmlServerApi.requestPlaylist(id: playlist.id)
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let playlistAsync = playlist.getManagedObject(in: companion.context, library: companion.library)
-                let parserDelegate = PlaylistParserDelegate(library: companion.library, parseNotifier: nil, playlistToValidate: playlistAsync)
+            self.storage.async.perform { asyncCompanion in
+                let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
+                let parserDelegate = PlaylistParserDelegate(library: asyncCompanion.library, parseNotifier: nil, playlistToValidate: playlistAsync)
                 try self.parse(data: data, delegate: parserDelegate)
             }
         }.then { () -> Promise<Void> in
@@ -584,9 +582,9 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             return firstly {
                 self.ampacheXmlServerApi.requestPlaylistCreate(name: playlist.name)
             }.then { data in
-                persistentContainer.performAsync { companion in
-                    let playlistAsync = playlist.getManagedObject(in: companion.context, library: companion.library)
-                    let parserDelegate = PlaylistParserDelegate(library: companion.library, parseNotifier: nil, playlistToValidate: playlistAsync)
+                self.storage.async.perform { asyncCompanion in
+                    let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
+                    let parserDelegate = PlaylistParserDelegate(library: asyncCompanion.library, parseNotifier: nil, playlistToValidate: playlistAsync)
                     try self.parse(data: data, delegate: parserDelegate)
                 }
             }.then { () -> Promise<Void> in
@@ -600,7 +598,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func syncDownPodcastsWithoutEpisodes(persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func syncDownPodcastsWithoutEpisodes() -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
             self.ampacheXmlServerApi.requestServerPodcastSupport()
@@ -609,10 +607,10 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             return firstly {
                 self.ampacheXmlServerApi.requestPodcasts()
             }.then { data in
-                persistentContainer.performAsync { companion in
-                    let oldPodcasts = Set(companion.library.getRemoteAvailablePodcasts())
+                self.storage.async.perform { asyncCompanion in
+                    let oldPodcasts = Set(asyncCompanion.library.getRemoteAvailablePodcasts())
                     
-                    let parserDelegate = PodcastParserDelegate(library: companion.library, syncWave: companion.syncWave)
+                    let parserDelegate = PodcastParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                     try self.parse(data: data, delegate: parserDelegate)
                     
                     let deletedPodcasts = oldPodcasts.subtracting(parserDelegate.parsedPodcasts)
@@ -699,40 +697,40 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
 
-    func searchArtists(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func searchArtists(searchText: String) -> Promise<Void> {
         guard isSyncAllowed, searchText.count > 0 else { return Promise.value }
         os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
         return firstly {
             ampacheXmlServerApi.requestSearchArtists(searchText: searchText)
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let parserDelegate = ArtistParserDelegate(library: companion.library, syncWave: companion.syncWave)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = ArtistParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
             }
         }
     }
     
-    func searchAlbums(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func searchAlbums(searchText: String) -> Promise<Void> {
         guard isSyncAllowed, searchText.count > 0 else { return Promise.value }
         os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
         return firstly {
             ampacheXmlServerApi.requestSearchAlbums(searchText: searchText)
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let parserDelegate = AlbumParserDelegate(library: companion.library, syncWave: companion.syncWave)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = AlbumParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
             }
         }
     }
     
-    func searchSongs(searchText: String, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    func searchSongs(searchText: String) -> Promise<Void> {
         guard isSyncAllowed, searchText.count > 0 else { return Promise.value }
         os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
         return firstly {
             ampacheXmlServerApi.requestSearchSongs(searchText: searchText)
         }.then { data in
-            persistentContainer.performAsync { companion in
-                let parserDelegate = SongParserDelegate(library: companion.library, syncWave: companion.syncWave)
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = SongParserDelegate(library: asyncCompanion.library, syncWave: asyncCompanion.syncWave)
                 try self.parse(data: data, delegate: parserDelegate)
             }
         }

@@ -43,8 +43,8 @@ public protocol DownloadManagerDelegate {
     var parallelDownloadsCount: Int { get }
     func prepareDownload(download: Download) -> Promise<URL>
     func validateDownloadedData(download: Download) -> ResponseError?
-    func completedDownload(download: Download, persistentStorage: PersistentStorage) -> Guarantee<Void>
-    func failedDownload(download: Download, persistentStorage: PersistentStorage)
+    func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void>
+    func failedDownload(download: Download, storage: PersistentStorage)
 }
 
 public protocol Downloadable: CustomEquatable {

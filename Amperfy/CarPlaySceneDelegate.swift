@@ -32,10 +32,10 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         return UIApplication.shared.delegate as! AppDelegate
     }()
     var isOfflineMode: Bool {
-        return appDelegate.persistentStorage.settings.isOfflineMode
+        return appDelegate.storage.settings.isOfflineMode
     }
     var artworkDisplayPreference: ArtworkDisplayPreference {
-        return self.appDelegate.persistentStorage.settings.artworkDisplayPreference
+        return self.appDelegate.storage.settings.artworkDisplayPreference
     }
     
     var interfaceController: CPInterfaceController?
@@ -158,7 +158,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         favoritesSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var favoriteSections = [CPListTemplateItem]()
-            let artists = self.appDelegate.library.getFavoriteArtistsForCarPlay(onlyCached: self.isOfflineMode)
+            let artists = self.appDelegate.storage.main.library.getFavoriteArtistsForCarPlay(onlyCached: self.isOfflineMode)
             for artist in artists {
                 let section = self.createDetailTemplate(for: artist, treeDepth: treeDepth+1)
                 favoriteSections.append(section)
@@ -177,7 +177,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         favoritesSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var favoriteSections = [CPListTemplateItem]()
-            let albums = self.appDelegate.library.getFavoriteAlbumsForCarPlay(onlyCached: self.isOfflineMode)
+            let albums = self.appDelegate.storage.main.library.getFavoriteAlbumsForCarPlay(onlyCached: self.isOfflineMode)
             for album in albums {
                 let section = self.createDetailTemplate(for: album, treeDepth: treeDepth+1)
                 favoriteSections.append(section)
@@ -193,7 +193,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         recentlyAddedSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var recentlyAddedSections = [CPListTemplateItem]()
-            let albums = self.appDelegate.library.getRecentAlbumsForCarPlay(onlyCached: self.isOfflineMode)
+            let albums = self.appDelegate.storage.main.library.getRecentAlbumsForCarPlay(onlyCached: self.isOfflineMode)
             for album in albums {
                 let section = self.createDetailTemplate(for: album, treeDepth: treeDepth+1)
                 recentlyAddedSections.append(section)
@@ -212,7 +212,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         favoritesSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var favoriteSections = [CPListTemplateItem]()
-            let songs = self.appDelegate.library.getFavoriteSongsForCarPlay(onlyCached: self.isOfflineMode)
+            let songs = self.appDelegate.storage.main.library.getFavoriteSongsForCarPlay(onlyCached: self.isOfflineMode)
             favoriteSections.append(self.createPlayShuffledListItem(playContext: PlayContext(name: "All favorite songs", playables: songs), treeDepth: treeDepth+1))
             for (index, song) in songs.enumerated() {
                 let section = self.createDetailTemplate(for: song, playContext: PlayContext(name: "All favorite songs", index: index, playables: songs), treeDepth: treeDepth+1)
@@ -229,7 +229,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         recentlyAddedSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var recentlyAddedSections = [CPListTemplateItem]()
-            let songs = self.appDelegate.library.getRecentSongsForCarPlay(onlyCached: self.isOfflineMode)
+            let songs = self.appDelegate.storage.main.library.getRecentSongsForCarPlay(onlyCached: self.isOfflineMode)
             recentlyAddedSections.append(self.createPlayShuffledListItem(playContext: PlayContext(name: "All recent songs", playables: songs), treeDepth: treeDepth+1))
             for (index, song) in songs.enumerated() {
                 let section = self.createDetailTemplate(for: song, playContext: PlayContext(name: "All recent songs", index: index, playables: songs), treeDepth: treeDepth+1)
@@ -242,7 +242,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             completion()
         }
         
-        let songs = self.appDelegate.library.getSongs().filterCached(dependigOn: self.appDelegate.persistentStorage.settings.isOfflineMode)
+        let songs = self.appDelegate.storage.main.library.getSongs().filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode)
         let playRandomSongsSection = self.createPlayShuffledListItem(playContext: PlayContext(name: "Song Collection", playables: songs[randomPick: LibraryStorage.carPlayMaxElements]), treeDepth: treeDepth+1, text: "Play random songs")
         
         return [favoritesSection, recentlyAddedSection, playRandomSongsSection]
@@ -255,7 +255,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             var albumItems = [CPListItem]()
             albumItems.append(self.createPlayShuffledListItem(playContext: PlayContext(containable: artist, playables: artist.playables.filterCached(dependigOn: self.isOfflineMode)), treeDepth: treeDepth+1))
             albumItems.append(self.createDetailAllSongsTemplate(for: artist, treeDepth: treeDepth+1))
-            let artistAlbums = self.appDelegate.library.getAlbums(whichContainsSongsWithArtist: artist, onlyCached: self.isOfflineMode).prefix(LibraryStorage.carPlayMaxElements)
+            let artistAlbums = self.appDelegate.storage.main.library.getAlbums(whichContainsSongsWithArtist: artist, onlyCached: self.isOfflineMode).prefix(LibraryStorage.carPlayMaxElements)
             for album in artistAlbums {
                 let listItem = self.createDetailTemplate(for: album, treeDepth: treeDepth+1)
                 albumItems.append(listItem)
@@ -311,7 +311,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     private func createPlaylistsSections(treeDepth: Int) -> [CPListTemplateItem] {
         var sections = [CPListTemplateItem]()
-        let playlists = appDelegate.library.getPlaylistsForCarPlay(sortType: .lastPlayed, onlyCached: self.isOfflineMode)
+        let playlists = appDelegate.storage.main.library.getPlaylistsForCarPlay(sortType: .lastPlayed, onlyCached: self.isOfflineMode)
         for playlist in playlists {
             let section = CPListItem(text: playlist.name, detailText: playlist.subtitle, image: nil, accessoryImage: nil, accessoryType: .disclosureIndicator)
             section.handler = { [weak self] item, completion in
@@ -336,7 +336,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     private func createPodcastsSections(treeDepth: Int) -> [CPListTemplateItem] {
         var sections = [CPListTemplateItem]()
-        let podcasts = appDelegate.library.getPodcastsForCarPlay(onlyCached: self.isOfflineMode)
+        let podcasts = appDelegate.storage.main.library.getPodcastsForCarPlay(onlyCached: self.isOfflineMode)
         for podcast in podcasts {
             let section = CPListItem(text: podcast.title, detailText: podcast.subtitle, image: podcast.image(setting: artworkDisplayPreference), accessoryImage: nil, accessoryType: .disclosureIndicator)
             section.handler = { [weak self] item, completion in

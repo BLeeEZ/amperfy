@@ -44,9 +44,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.appDelegate.window = self.window
         var initialViewController: UIViewController?
         
-        if AmperKit.shared.persistentStorage.loginCredentials == nil {
+        if AmperKit.shared.storage.loginCredentials == nil {
             initialViewController = LoginVC.instantiateFromAppStoryboard()
-        } else if !AmperKit.shared.persistentStorage.isLibrarySynced {
+        } else if !AmperKit.shared.storage.isLibrarySynced {
             initialViewController = SyncVC.instantiateFromAppStoryboard()
         } else {
             initialViewController = TabBarVC.instantiateFromAppStoryboard()

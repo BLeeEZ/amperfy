@@ -68,12 +68,12 @@ class SettingsArtworkDownloadVC: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SettingsArtworkDownloadTableCell = dequeueCell(for: tableView, at: indexPath)
         cell.settingLabel.text = settingOptions[indexPath.row].description
-        cell.setStatusLabel(isActive: settingOptions[indexPath.row] == appDelegate.persistentStorage.settings.artworkDownloadSetting)
+        cell.setStatusLabel(isActive: settingOptions[indexPath.row] == appDelegate.storage.settings.artworkDownloadSetting)
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        appDelegate.persistentStorage.settings.artworkDownloadSetting = settingOptions[indexPath.row]
+        appDelegate.storage.settings.artworkDownloadSetting = settingOptions[indexPath.row]
         reload()
     }
     

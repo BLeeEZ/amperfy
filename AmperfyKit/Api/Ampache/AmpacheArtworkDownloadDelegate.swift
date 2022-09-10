@@ -60,7 +60,7 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
         return ampacheXmlServerApi.checkForErrorResponse(inData: data)
     }
 
-    func completedDownload(download: Download, persistentStorage: PersistentStorage) -> Guarantee<Void> {
+    func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
         return Guarantee<Void> { seal in
             guard let data = download.resumeData,
                   let artwork = download.element as? Artwork else {
@@ -69,7 +69,6 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
             firstly {
                 self.requestDefaultImageData()
             }.done { defaultImageData in
-                let library = LibraryStorage(context: persistentStorage.context)
                 if data == defaultImageData {
                     artwork.status = .IsDefaultImage
                     artwork.setImage(fromData: nil)
@@ -77,25 +76,23 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
                     artwork.status = .CustomImage
                     artwork.setImage(fromData: data)
                 }
-                library.saveContext()
+                storage.main.saveContext()
             }.catch { error in
-                let library = LibraryStorage(context: persistentStorage.context)
                 artwork.status = .CustomImage
                 artwork.setImage(fromData: data)
-                library.saveContext()
+                storage.main.saveContext()
             }.finally {
                 seal(Void())
             }
         }
     }
     
-    func failedDownload(download: Download, persistentStorage: PersistentStorage) {
+    func failedDownload(download: Download, storage: PersistentStorage) {
         guard let artwork = download.element as? Artwork else {
             return
         }
         artwork.status = .FetchError
-        let library = LibraryStorage(context: persistentStorage.context)
-        library.saveContext()
+        storage.main.saveContext()
     }
     
     private func requestDefaultImageData() -> Promise<Data> {

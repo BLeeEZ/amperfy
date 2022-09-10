@@ -47,8 +47,8 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
             os_log("Could not get downloaded file from disk: %s", log: self.log, type: .error, error.localizedDescription)
         }
         
-        self.persistentStorage.context.performAndWait {
-            let library = LibraryStorage(context: self.persistentStorage.context)
+        self.storage.main.context.performAndWait {
+            let library = LibraryStorage(context: self.storage.main.context)
             guard let download = library.getDownload(url: requestUrl) else { return }
             if let activeError = downloadError {
                 self.finishDownload(download: download, error: activeError)
@@ -62,8 +62,8 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard error != nil, let requestUrl = task.originalRequest?.url?.absoluteString else { return }
-        self.persistentStorage.context.performAndWait {
-            let library = LibraryStorage(context: self.persistentStorage.context)
+        self.storage.main.context.performAndWait {
+            let library = LibraryStorage(context: self.storage.main.context)
             guard let download = library.getDownload(url: requestUrl) else { return }
             self.finishDownload(download: download, error: .fetchFailed)
         }
@@ -75,15 +75,14 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
                     totalBytesExpectedToWrite: Int64) {
         guard let requestUrl = downloadTask.originalRequest?.url?.absoluteString else { return }
         
-        self.persistentStorage.persistentContainer.performBackgroundTask() { context in
-            let library = LibraryStorage(context: context)
-            guard let download = library.getDownload(url: requestUrl) else { return }
+        self.storage.async.perform { asyncCompanion in
+            guard let download = asyncCompanion.library.getDownload(url: requestUrl) else { return }
             let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
             guard progress > download.progress, (download.progress == 0.0) || (progress > download.progress + 0.1) else { return }
             download.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
             download.totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
-            library.saveContext()
-        }
+            asyncCompanion.saveContext()
+        }.catch { error in }
     }
     
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {

@@ -85,7 +85,7 @@ class PlayerView: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        self.displayStyle = appDelegate.persistentStorage.settings.playerDisplayStyle
+        self.displayStyle = appDelegate.storage.settings.playerDisplayStyle
         self.layoutMargins = PlayerView.margin
         player = appDelegate.player
         player.addNotifier(notifier: self)
@@ -169,7 +169,7 @@ class PlayerView: UIView {
     @IBAction private func displayPlaylistPressed() {
         appDelegate.userStatistics.usedAction(.changePlayerDisplayStyle)
         displayStyle.switchToNextStyle()
-        appDelegate.persistentStorage.settings.playerDisplayStyle = displayStyle
+        appDelegate.storage.settings.playerDisplayStyle = displayStyle
         refreshDisplayPlaylistButton()
         renderAnimation()
     }
@@ -409,12 +409,12 @@ class PlayerView: UIView {
     }
     
     func fetchSongInfoAndUpdateViews() {
-        guard self.appDelegate.persistentStorage.settings.isOnlineMode,
+        guard self.appDelegate.storage.settings.isOnlineMode,
               let song = player.currentlyPlaying?.asSong
         else { return }
         
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().sync(song: song, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.sync(song: song)
         }.done {
             self.refreshCurrentlyPlayingInfo()
         }.catch { error in
@@ -462,7 +462,7 @@ class PlayerView: UIView {
     func refreshArtwork() {
         if let playableInfo = player.currentlyPlaying {
             artworkImage.display(entity: playableInfo)
-            rootView?.popupItem.image = playableInfo.image(setting: appDelegate.persistentStorage.settings.artworkDisplayPreference)
+            rootView?.popupItem.image = playableInfo.image(setting: appDelegate.storage.settings.artworkDisplayPreference)
         } else {
             switch player.playerMode {
             case .music:

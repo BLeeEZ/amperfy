@@ -28,7 +28,7 @@ class MainWindow: UIWindow {
     }()
     
     override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
-        guard appDelegate.persistentStorage.isLibrarySynced else {
+        guard appDelegate.storage.isLibrarySynced else {
             super.pressesBegan(presses, with: event)
             return
         }

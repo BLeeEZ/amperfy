@@ -41,7 +41,7 @@ public protocol PlayableContainable {
     var isDownloadAvailable: Bool { get }
     var artworkCollection: ArtworkCollection { get }
     func cachePlayables(downloadManager: DownloadManageable)
-    func fetchFromServer(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void>
+    func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void>
     var isFavoritable: Bool { get }
     var isFavorite: Bool { get }
     func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void>
@@ -65,9 +65,9 @@ extension PlayableContainable {
         return infoDetails(for: api, type: type).joined(separator: " \(CommonString.oneMiddleDot) ")
     }
     
-    public func fetch(storage: PersistentStorage, backendApi: BackendApi, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+    public func fetch(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
         guard storage.settings.isOnlineMode else { return Promise.value }
-        return fetchFromServer(storage: storage, backendApi: backendApi, playableDownloadManager: playableDownloadManager)
+        return fetchFromServer(storage: storage, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager)
     }
     public var isRateable: Bool { return false }
     public var isFavoritable: Bool { return false }

@@ -22,20 +22,19 @@
 import Foundation
 import UIKit
 import os.log
-import CoreData
 import PromiseKit
 
 public class BackgroundFetchTriggeredSyncer {
     
-    private let persistentStorage: PersistentStorage
-    private let backendApi: BackendApi
+    private let storage: PersistentStorage
+    private let librarySyncer: LibrarySyncer
     private let notificationManager: LocalNotificationManager
     private let playableDownloadManager: DownloadManageable
     private let log = OSLog(subsystem: "Amperfy", category: "BackgroundFetchTriggeredSyncer")
     
-    init(persistentStorage: PersistentStorage, backendApi: BackendApi, notificationManager: LocalNotificationManager, playableDownloadManager: DownloadManageable) {
-        self.persistentStorage = persistentStorage
-        self.backendApi = backendApi
+    init(storage: PersistentStorage, librarySyncer: LibrarySyncer, notificationManager: LocalNotificationManager, playableDownloadManager: DownloadManageable) {
+        self.storage = storage
+        self.librarySyncer = librarySyncer
         self.notificationManager = notificationManager
         self.playableDownloadManager = playableDownloadManager
     }
@@ -43,21 +42,20 @@ public class BackgroundFetchTriggeredSyncer {
     public func syncAndNotifyPodcastEpisodes() -> Promise<Void> {
         os_log("Perform podcast episode sync", log: self.log, type: .info)
         return firstly {
-            self.backendApi.createLibrarySyncer().syncDownPodcastsWithoutEpisodes(persistentContainer: self.persistentStorage.persistentContainer)
+            self.librarySyncer.syncDownPodcastsWithoutEpisodes()
         }.then { () -> Promise<Void> in
-            let library = LibraryStorage(context: self.persistentStorage.context)
-            let podcasts = library.getPodcasts()
+            let podcasts = self.storage.main.library.getPodcasts()
             let podcastNotificationPromises = podcasts.compactMap { podcast in return {
-                self.createPodcastNotificationPromise(podcast: podcast, persistentContainer: self.persistentStorage.persistentContainer)
+                self.createPodcastNotificationPromise(podcast: podcast)
             }}
             return podcastNotificationPromises.resolveSequentially()
         }
     }
     
-    private func createPodcastNotificationPromise(podcast: Podcast, persistentContainer: NSPersistentContainer) -> Promise<Void> {
+    private func createPodcastNotificationPromise(podcast: Podcast) -> Promise<Void> {
         return firstly {
-            AutoDownloadLibrarySyncer(persistentStorage: self.persistentStorage,
-                                      backendApi: self.backendApi,
+            AutoDownloadLibrarySyncer(storage: self.storage,
+                                      librarySyncer: self.librarySyncer,
                                       playableDownloadManager: self.playableDownloadManager)
             .syncLatestPodcastEpisodes(podcast: podcast)
         }.then { addedPodcasts -> Guarantee<Void> in

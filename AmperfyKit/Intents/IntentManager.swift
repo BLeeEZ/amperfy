@@ -69,12 +69,12 @@ public struct XCallbackActionDocu {
 public class IntentManager {
     
     public private(set) var documentation: [XCallbackActionDocu]
-    private let persistentStorage: PersistentStorage
+    private let storage: PersistentStorage
     private let library: LibraryStorage
     private let player: PlayerFacade
     
-    init(persistentStorage: PersistentStorage, library: LibraryStorage, player: PlayerFacade) {
-        self.persistentStorage = persistentStorage
+    init(storage: PersistentStorage, library: LibraryStorage, player: PlayerFacade) {
+        self.storage = storage
         self.library = library
         self.player = player
         self.documentation = [XCallbackActionDocu]()
@@ -326,7 +326,7 @@ public class IntentManager {
                 failure(NSError.error(code: .missingParameter, failureReason: "offlineMode is not valid."))
                 return
             }
-            self.persistentStorage.settings.isOfflineMode = offlineMode == 1
+            self.storage.settings.isOfflineMode = offlineMode == 1
             success(nil)
         }
     }

@@ -27,7 +27,7 @@ class CoreDataHelper {
     
     let seeder: CoreDataSeeder
     lazy var persistentContainer = {
-        return NSPersistentContainer(name: "Amperfy", managedObjectModel: PersistentStorage.managedObjectModel)
+        return NSPersistentContainer(name: "Amperfy", managedObjectModel: CoreDataPersistentManager.managedObjectModel)
     }()
 
     init() {

@@ -57,8 +57,8 @@ public struct LogData: Encodable {
         serverInfo.apiVersion = amperfyData.backendApi.serverApiVersion
         logData.serverInfo = serverInfo
         
-        logData.libraryInfo = amperfyData.library.getInfo()
-        logData.libraryInfo?.version = amperfyData.persistentStorage.librarySyncVersion.description
+        logData.libraryInfo = amperfyData.storage.main.library.getInfo()
+        logData.libraryInfo?.version = amperfyData.storage.librarySyncVersion.description
         
         var playerInfo = PlayerInfo()
         playerInfo.isPlaying = amperfyData.player.isPlaying
@@ -69,18 +69,18 @@ public struct LogData: Encodable {
         logData.playerInfo = playerInfo
         
         var userSettings = UserSettings()
-        let settings = amperfyData.persistentStorage.settings
+        let settings = amperfyData.storage.settings
         userSettings.swipeLeadingActions = settings.swipeActionSettings.leading.compactMap{ $0.displayName }
         userSettings.swipeTrailingActions = settings.swipeActionSettings.trailing.compactMap{ $0.displayName }
         userSettings.playerDisplayStyle = settings.playerDisplayStyle.description
         userSettings.isOfflineMode = settings.isOfflineMode
         logData.userSettings = userSettings
         
-        let allUserStatistics = amperfyData.library.getAllUserStatistics()
+        let allUserStatistics = amperfyData.storage.main.library.getAllUserStatistics()
         logData.userStatistics = allUserStatistics.compactMap{ $0.createLogInfo() }
         
         var eventInfo = EventInfo()
-        let eventLogs = amperfyData.library.getLogEntries()
+        let eventLogs = amperfyData.storage.main.library.getLogEntries()
         eventInfo.totalEventCount = eventLogs.count
         eventInfo.events = Array(eventLogs.prefix(Self.latestEventsCount))
         eventInfo.attachedEventCount = eventInfo.events?.count ?? 0

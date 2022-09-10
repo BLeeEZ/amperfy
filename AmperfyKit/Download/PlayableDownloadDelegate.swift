@@ -59,13 +59,13 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
         return backendApi.checkForErrorResponse(inData: data)
     }
 
-    func completedDownload(download: Download, persistentStorage: PersistentStorage) -> Guarantee<Void> {
+    func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
         return Guarantee<Void> { seal in
             guard let data = download.resumeData,
                   let playable = download.element as? AbstractPlayable else {
                 return seal(Void())
             }
-            let library = LibraryStorage(context: persistentStorage.context)
+            let library = LibraryStorage(context: storage.main.context)
             let playableFile = library.createPlayableFile()
             playableFile.info = playable
             playableFile.data = data
@@ -75,7 +75,7 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
         }
     }
     
-    func failedDownload(download: Download, persistentStorage: PersistentStorage) {
+    func failedDownload(download: Download, storage: PersistentStorage) {
     }
     
 }

@@ -78,10 +78,10 @@ class PlaylistDetailTableHeader: UIView {
         guard let nameText = nameTextField.text, let playlist = playlist, nameText != playlist.name else { return }
         playlist.name = nameText
         nameLabel.text = nameText
-        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard appDelegate.storage.settings.isOnlineMode else { return }
      
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncUpload(playlistToUpdateName: playlist, persistentContainer: appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.syncUpload(playlistToUpdateName: playlist)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlist Update Name", error: error)
         }

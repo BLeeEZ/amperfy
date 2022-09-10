@@ -34,7 +34,7 @@ class SettingsSwipeVC: UITableViewController {
         tableView.register(nibName: SwipeActionTableCell.typeName)
         tableView.rowHeight = SwipeActionTableCell.rowHeight
         
-        actionSettings = appDelegate.persistentStorage.settings.swipeActionSettings
+        actionSettings = appDelegate.storage.settings.swipeActionSettings
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -82,7 +82,7 @@ class SettingsSwipeVC: UITableViewController {
         let fromAction = actionSettings.combined[fromIndexPath.section][fromIndexPath.row]
         actionSettings.combined[fromIndexPath.section].remove(at: fromIndexPath.row)
         actionSettings.combined[to.section].insert(fromAction, at: to.row)
-        appDelegate.persistentStorage.settings.swipeActionSettings = actionSettings
+        appDelegate.storage.settings.swipeActionSettings = actionSettings
     }
     
 

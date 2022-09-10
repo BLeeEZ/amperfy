@@ -48,11 +48,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public lazy var log = {
         return AmperKit.shared.log
     }()
-    public lazy var persistentStorage = {
-        return AmperKit.shared.persistentStorage
+    public lazy var storage = {
+        return AmperKit.shared.storage
     }()
-    public lazy var library = {
-        return AmperKit.shared.library
+    public lazy var librarySyncer = {
+        return AmperKit.shared.librarySyncer
     }()
     public lazy var duplicateEntitiesResolver = {
         return AmperKit.shared.duplicateEntitiesResolver
@@ -154,18 +154,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         configureBackgroundFetch()
         configureNotificationHandling()
         initEventLogger()
-        intentManager.registerXCallbackURLs()
         self.window = MainWindow(frame: UIScreen.main.bounds)
         
-        guard let credentials = persistentStorage.loginCredentials else {
+        guard let credentials = storage.loginCredentials else {
             return true
         }
         backendApi.selectedApi = credentials.backendApi
         backendApi.provideCredentials(credentials: credentials)
         
-        guard AmperKit.shared.persistentStorage.isLibrarySynced else {
+        guard AmperKit.shared.storage.isLibrarySynced else {
             return true
         }
+        intentManager.registerXCallbackURLs()
         libraryUpdater.performBlockingLibraryUpdatesIfNeeded()
         duplicateEntitiesResolver.start()
         artworkDownloadManager.start()
@@ -202,7 +202,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         os_log("applicationWillTerminate", log: self.log, type: .info)
         backgroundLibrarySyncer.stopAndWait()
-        library.saveContext()
+        storage.main.saveContext()
     }
     
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {

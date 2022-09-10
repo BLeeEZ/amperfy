@@ -34,13 +34,13 @@ class SearchVC: BasicTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        playlistFetchedResultsController = PlaylistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
+        playlistFetchedResultsController = PlaylistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .name, isGroupedInAlphabeticSections: false)
         playlistFetchedResultsController.delegate = self
-        artistFetchedResultsController = ArtistFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
+        artistFetchedResultsController = ArtistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .name, isGroupedInAlphabeticSections: false)
         artistFetchedResultsController.delegate = self
-        albumFetchedResultsController = AlbumFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
+        albumFetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .name, isGroupedInAlphabeticSections: false)
         albumFetchedResultsController.delegate = self
-        songFetchedResultsController = SongsFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: .name, isGroupedInAlphabeticSections: false)
+        songFetchedResultsController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .name, isGroupedInAlphabeticSections: false)
         songFetchedResultsController.delegate = self
         
         configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"])
@@ -76,7 +76,7 @@ class SearchVC: BasicTableViewController {
         case LibraryElement.Playlist.rawValue:
             let playlist = playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             firstly {
-                playlist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
             }.finally {
@@ -85,7 +85,7 @@ class SearchVC: BasicTableViewController {
         case LibraryElement.Artist.rawValue:
             let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             firstly {
-                artist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
             }.finally {
@@ -94,7 +94,7 @@ class SearchVC: BasicTableViewController {
         case LibraryElement.Album.rawValue:
             let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             firstly {
-                album.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
             }.finally {
@@ -250,19 +250,19 @@ class SearchVC: BasicTableViewController {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
             firstly {
-                self.appDelegate.backendApi.createLibrarySyncer().searchArtists(searchText: searchText, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+                self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
             }
             
             firstly {
-                self.appDelegate.backendApi.createLibrarySyncer().searchAlbums(searchText: searchText, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+                self.appDelegate.librarySyncer.searchAlbums(searchText: searchText)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
             }
             
             firstly {
-                self.appDelegate.backendApi.createLibrarySyncer().searchSongs(searchText: searchText, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+                self.appDelegate.librarySyncer.searchSongs(searchText: searchText)
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
             }

@@ -100,29 +100,29 @@ class RatingView: UIView {
                 } else {
                     button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameRegular, size: 30)!]), for: .normal)
                 }
-                button.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
-                button.setTitleColor(self.appDelegate.persistentStorage.settings.isOnlineMode ? activeStarColor : inactiveStarColor, for: .normal)
-                button.tintColor = self.appDelegate.persistentStorage.settings.isOnlineMode ? activeStarColor : inactiveStarColor
+                button.isEnabled = self.appDelegate.storage.settings.isOnlineMode
+                button.setTitleColor(self.appDelegate.storage.settings.isOnlineMode ? activeStarColor : inactiveStarColor, for: .normal)
+                button.tintColor = self.appDelegate.storage.settings.isOnlineMode ? activeStarColor : inactiveStarColor
                 button.layoutIfNeeded()
             }
-            clearRatingButton.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
+            clearRatingButton.isEnabled = self.appDelegate.storage.settings.isOnlineMode
             
             let favoriteActiveFontName = isFavorite ? FontAwesomeIcon.fontNameSolid : FontAwesomeIcon.fontNameRegular
             favorite.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Heart.asString, attributes: [NSAttributedString.Key.font: UIFont(name: favoriteActiveFontName, size: 30)!]), for: .normal)
-            favorite.isEnabled = self.appDelegate.persistentStorage.settings.isOnlineMode
-            favorite.setTitleColor(self.appDelegate.persistentStorage.settings.isOnlineMode ? activeFavoriteColor : inactiveStarColor, for: .normal)
-            favorite.tintColor = self.appDelegate.persistentStorage.settings.isOnlineMode ? activeFavoriteColor : inactiveStarColor
+            favorite.isEnabled = self.appDelegate.storage.settings.isOnlineMode
+            favorite.setTitleColor(self.appDelegate.storage.settings.isOnlineMode ? activeFavoriteColor : inactiveStarColor, for: .normal)
+            favorite.tintColor = self.appDelegate.storage.settings.isOnlineMode ? activeFavoriteColor : inactiveStarColor
             favorite.layoutIfNeeded()
         }
     }
     
     private func setRating(rating: Int) {
-        guard self.appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard self.appDelegate.storage.settings.isOnlineMode else { return }
         if let song = self.ratingSong {
             song.rating = rating
-            self.appDelegate.library.saveContext()
+            self.appDelegate.storage.main.saveContext()
             firstly {
-                self.appDelegate.backendApi.createLibrarySyncer().setRating(song: song, rating: rating)
+                self.appDelegate.librarySyncer.setRating(song: song, rating: rating)
             }.done {
                 self.refresh()
             }.catch { error in
@@ -130,9 +130,9 @@ class RatingView: UIView {
             }
         } else if let album = self.ratingAlbum {
             album.rating = rating
-            self.appDelegate.library.saveContext()
+            self.appDelegate.storage.main.saveContext()
             firstly {
-                self.appDelegate.backendApi.createLibrarySyncer().setRating(album: album, rating: rating)
+                self.appDelegate.librarySyncer.setRating(album: album, rating: rating)
             }.done {
                 self.refresh()
             }.catch { error in
@@ -140,9 +140,9 @@ class RatingView: UIView {
             }
         } else if let artist = self.ratingArtist {
             artist.rating = rating
-            self.appDelegate.library.saveContext()
+            self.appDelegate.storage.main.saveContext()
             firstly {
-                self.appDelegate.backendApi.createLibrarySyncer().setRating(artist: artist, rating: rating)
+                self.appDelegate.librarySyncer.setRating(artist: artist, rating: rating)
             }.done {
                 self.refresh()
             }.catch { error in
@@ -152,12 +152,12 @@ class RatingView: UIView {
     }
     
     func toggleFavorite() {
-        guard self.appDelegate.persistentStorage.settings.isOnlineMode,
+        guard self.appDelegate.storage.settings.isOnlineMode,
               let containable: PlayableContainable = self.ratingSong ?? self.ratingAlbum ?? self.ratingArtist else {
             return
         }
         firstly {
-            containable.remoteToggleFavorite(syncer: self.appDelegate.backendApi.createLibrarySyncer())
+            containable.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
         }.finally {

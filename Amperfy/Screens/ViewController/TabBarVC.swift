@@ -60,7 +60,7 @@ class TabBarVC: UITabBarController {
         self.popupInteractionStyle = .snap
         displayPopupBar()
         
-        if !appDelegate.persistentStorage.isLibrarySyncInfoReadByUser {
+        if !appDelegate.storage.isLibrarySyncInfoReadByUser {
             displaySyncInfo()
         } else {
             displayNotificationAuthorization()
@@ -101,7 +101,7 @@ class TabBarVC: UITabBarController {
             customIcon: .Sync,
             customAnimation: .rotate,
             onClosePressed: { _ in
-                self.appDelegate.persistentStorage.isLibrarySyncInfoReadByUser = true
+                self.appDelegate.storage.isLibrarySyncInfoReadByUser = true
                 self.displayNotificationAuthorization()
             }
         )

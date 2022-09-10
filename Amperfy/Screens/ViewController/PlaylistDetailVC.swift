@@ -36,7 +36,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.playlistDetail)
-        fetchedResultsController = PlaylistItemsFetchedResultsController(forPlaylist: playlist, managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        fetchedResultsController = PlaylistItemsFetchedResultsController(forPlaylist: playlist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         
         tableView.register(nibName: SongTableCell.typeName)
@@ -56,7 +56,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: playlistTableHeaderFrameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
-                playContextCb: {() in PlayContext(containable: self.playlist, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.persistentStorage.settings.isOfflineMode) ?? [])},
+                playContextCb: {() in PlayContext(containable: self.playlist, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
@@ -78,7 +78,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         super.viewWillAppear(animated)
         refreshBarButtons()
         firstly {
-            playlist.fetch(storage: self.appDelegate.persistentStorage, backendApi: self.appDelegate.backendApi, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
         }.finally {
@@ -89,7 +89,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     func refreshBarButtons() {
         var edititingBarButton: UIBarButtonItem? = nil
         if !tableView.isEditing {
-            if appDelegate.persistentStorage.settings.isOnlineMode {
+            if appDelegate.storage.settings.isOnlineMode {
                 edititingBarButton = editButton
                 if playlist?.isSmartPlaylist ?? false {
                     edititingBarButton?.isEnabled = false
@@ -102,7 +102,7 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
-        guard let songs = fetchedResultsController.getContextSongs(onlyCachedSongs: appDelegate.persistentStorage.settings.isOfflineMode)
+        guard let songs = fetchedResultsController.getContextSongs(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
         else { return nil }
         return PlayContext(containable: playlist, index: songIndexPath.row, playables: songs)
     }
@@ -146,9 +146,9 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         guard editingStyle == .delete else { return }
         playlist.remove(at: indexPath.row)
         self.playlistOperationsView?.refresh()
-        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncUpload(playlistToDeleteSong: playlist, index: indexPath.row, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.syncUpload(playlistToDeleteSong: playlist, index: indexPath.row)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
         }
@@ -158,9 +158,9 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         noAnimationAtNextDataChange = true
         playlist.movePlaylistItem(fromIndex: fromIndexPath.row, to: to.row)
-        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncUpload(playlistToUpdateOrder: playlist, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.syncUpload(playlistToUpdateOrder: playlist)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlist Upload Order Update", error: error)
         }
@@ -173,13 +173,13 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     }
     
     override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(onlyCachedSongs: appDelegate.persistentStorage.settings.isOfflineMode)
+        fetchedResultsController.search(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
         tableView.reloadData()
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncDown(playlist: playlist, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.syncDown(playlist: playlist)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
         }.finally {

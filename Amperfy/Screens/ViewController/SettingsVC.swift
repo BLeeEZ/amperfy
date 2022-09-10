@@ -41,11 +41,11 @@ class SettingsVC: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         appDelegate.userStatistics.visited(.settings)
-        offlineModeSwitch.isOn = appDelegate.persistentStorage.settings.isOfflineMode
+        offlineModeSwitch.isOn = appDelegate.storage.settings.isOfflineMode
     }
     
     @IBAction func triggeredOfflineModeSwitch(_ sender: Any) {
-        appDelegate.persistentStorage.settings.isOfflineMode = offlineModeSwitch.isOn
+        appDelegate.storage.settings.isOfflineMode = offlineModeSwitch.isOn
         appDelegate.player.isOfflineMode = offlineModeSwitch.isOn
         if !offlineModeSwitch.isOn {
             appDelegate.backgroundLibrarySyncer.start()
@@ -62,11 +62,11 @@ class SettingsVC: UITableViewController {
             self.appDelegate.scrobbleSyncer.stopAndWait()
             self.appDelegate.artworkDownloadManager.stopAndWait()
             self.appDelegate.playableDownloadManager.stopAndWait()
-            self.appDelegate.persistentStorage.context.reset()
-            self.appDelegate.persistentStorage.loginCredentials = nil
-            self.appDelegate.library.cleanStorage()
-            self.appDelegate.persistentStorage.isLibrarySyncInfoReadByUser = false
-            self.appDelegate.persistentStorage.isLibrarySynced = false
+            self.appDelegate.storage.main.context.reset()
+            self.appDelegate.storage.loginCredentials = nil
+            self.appDelegate.storage.main.library.cleanStorage()
+            self.appDelegate.storage.isLibrarySyncInfoReadByUser = false
+            self.appDelegate.storage.isLibrarySynced = false
             self.deleteViewControllerCaches()
             self.appDelegate.reinit()
             self.performSegue(withIdentifier: Segues.toLogin.rawValue, sender: nil)

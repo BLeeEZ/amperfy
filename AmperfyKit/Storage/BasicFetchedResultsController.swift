@@ -51,9 +51,9 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
  
     public var sectionIndexType: SectionIndexType
     
-    public init(fetchRequest: NSFetchRequest<ResultType>, managedObjectContext context: NSManagedObjectContext, sectionNameKeyPath: String?, cacheName name: String?, sectionIndexType: SectionIndexType = .defaultValue) {
+    public init(fetchRequest: NSFetchRequest<ResultType>, coreDataCompanion: CoreDataCompanion, sectionNameKeyPath: String?, cacheName name: String?, sectionIndexType: SectionIndexType = .defaultValue) {
         self.sectionIndexType = sectionIndexType
-        super.init(fetchRequest: fetchRequest as! NSFetchRequest<NSFetchRequestResult>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: name)
+        super.init(fetchRequest: fetchRequest as! NSFetchRequest<NSFetchRequestResult>, managedObjectContext: coreDataCompanion.context, sectionNameKeyPath: sectionNameKeyPath, cacheName: name)
     }
     
     override public func sectionIndexTitle(forSectionName sectionName: String) -> String? {
@@ -97,20 +97,18 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
 public class BasicFetchedResultsController<ResultType>: NSObject where ResultType : NSFetchRequestResult  {
   
     public var fetchResultsController: CustomSectionIndexFetchedResultsController<ResultType>
-    let managedObjectContext: NSManagedObjectContext
+    let coreDataCompanion: CoreDataCompanion
     let defaultPredicate: NSPredicate?
-    let library: LibraryStorage
     public var delegate: NSFetchedResultsControllerDelegate? {
         set { fetchResultsController.delegate = newValue }
         get { return fetchResultsController.delegate }
     }
     
-    public init(managedObjectContext context: NSManagedObjectContext, fetchRequest: NSFetchRequest<ResultType>, isGroupedInAlphabeticSections: Bool) {
-        managedObjectContext = context
-        library = LibraryStorage(context: context)
+    public init(coreDataCompanion: CoreDataCompanion, fetchRequest: NSFetchRequest<ResultType>, isGroupedInAlphabeticSections: Bool) {
+        self.coreDataCompanion = coreDataCompanion
         defaultPredicate = fetchRequest.predicate?.copy() as? NSPredicate
         let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? fetchRequest.sortDescriptors![0].key : nil
-        fetchResultsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
+        fetchResultsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, coreDataCompanion: coreDataCompanion, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
     }
     
     public func search(predicate: NSPredicate?) {
@@ -193,9 +191,9 @@ extension BasicFetchedResultsController where ResultType == SongMO {
         let cachedFetchRequest = fetchResultsController.fetchRequest.copy() as! NSFetchRequest<SongMO>
         cachedFetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             basicPredicate,
-            library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+            coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
         ])
-        let songsMO = try? managedObjectContext.fetch(cachedFetchRequest)
+        let songsMO = try? coreDataCompanion.context.fetch(cachedFetchRequest)
         let songs = songsMO?.compactMap{ Song(managedObject: $0) }
         return songs
     }
@@ -204,14 +202,14 @@ extension BasicFetchedResultsController where ResultType == SongMO {
 extension BasicFetchedResultsController where ResultType == PlaylistMO {
     public func getWrappedEntity(at indexPath: IndexPath) -> Playlist {
         let playlistMO = fetchResultsController.object(at: indexPath) as! ResultType
-        return Playlist(library: LibraryStorage(context: self.managedObjectContext), managedObject: playlistMO)
+        return Playlist(library: coreDataCompanion.library, managedObject: playlistMO)
     }
 }
 
 extension BasicFetchedResultsController where ResultType == PlaylistItemMO {
     public func getWrappedEntity(at indexPath: IndexPath) -> PlaylistItem {
         let itemMO = fetchResultsController.object(at: indexPath) as! ResultType
-        return PlaylistItem(library: library, managedObject: itemMO)
+        return PlaylistItem(library: coreDataCompanion.library, managedObject: itemMO)
     }
     
     public func getContextSongs(onlyCachedSongs: Bool) -> [AbstractPlayable]? {
@@ -219,9 +217,9 @@ extension BasicFetchedResultsController where ResultType == PlaylistItemMO {
         let cachedFetchRequest = fetchResultsController.fetchRequest.copy() as! NSFetchRequest<PlaylistItemMO>
         cachedFetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             basicPredicate,
-            library.getFetchPredicate(onlyCachedPlaylistItems: onlyCachedSongs)
+            coreDataCompanion.library.getFetchPredicate(onlyCachedPlaylistItems: onlyCachedSongs)
         ])
-        let playlistItemsMO = try? managedObjectContext.fetch(cachedFetchRequest)
+        let playlistItemsMO = try? coreDataCompanion.context.fetch(cachedFetchRequest)
         let playables = playlistItemsMO?.compactMap{ $0.playable }.compactMap{ AbstractPlayable(managedObject: $0) }
         return playables
     }
@@ -294,14 +292,14 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
         get { return isSearchActiveInternal }
     }
     
-    public init(managedObjectContext context: NSManagedObjectContext, fetchRequest: NSFetchRequest<ResultType>, sortType: ElementSortType = .defaultValue, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, fetchRequest: NSFetchRequest<ResultType>, sortType: ElementSortType = .defaultValue, isGroupedInAlphabeticSections: Bool) {
         self.sortType = sortType
         let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? fetchRequest.sortDescriptors![0].key : nil
-        allFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: Self.typeName)
+        allFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, coreDataCompanion: coreDataCompanion, sectionNameKeyPath: sectionNameKeyPath, cacheName: Self.typeName)
         allFetchResulsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
-        searchFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
+        searchFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, coreDataCompanion: coreDataCompanion, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
         searchFetchResulsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
-        super.init(managedObjectContext: context, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         fetchResultsController = allFetchResulsController
     }
     

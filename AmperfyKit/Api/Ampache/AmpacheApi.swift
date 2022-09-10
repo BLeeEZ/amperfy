@@ -62,8 +62,8 @@ class AmpacheApi: BackendApi {
         return ampacheXmlServerApi.checkForErrorResponse(inData: data)
     }
 
-    func createLibrarySyncer() -> LibrarySyncer {
-        return AmpacheLibrarySyncer(ampacheXmlServerApi: ampacheXmlServerApi)
+    func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
+        return AmpacheLibrarySyncer(ampacheXmlServerApi: ampacheXmlServerApi, storage: storage)
     }    
 
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {

@@ -105,7 +105,7 @@ class LoginVC: UIViewController {
         }.done { authenticatedApi in
             self.appDelegate.backendApi.selectedApi = authenticatedApi
             credentials.backendApi = authenticatedApi
-            self.appDelegate.persistentStorage.loginCredentials = credentials
+            self.appDelegate.storage.loginCredentials = credentials
             self.appDelegate.backendApi.provideCredentials(credentials: credentials)
             self.performSegue(withIdentifier: "toSync", sender: self)
         }.catch { error in
@@ -132,7 +132,7 @@ class LoginVC: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if let credentials = appDelegate.persistentStorage.loginCredentials {
+        if let credentials = appDelegate.storage.loginCredentials {
             serverUrlTF.text = credentials.serverUrl
             usernameTF.text = credentials.username
         }

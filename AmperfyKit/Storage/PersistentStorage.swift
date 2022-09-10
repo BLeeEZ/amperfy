@@ -21,6 +21,7 @@
 
 import Foundation
 import CoreData
+import PromiseKit
 
 public enum ArtworkDownloadSetting: Int, CaseIterable {
     case updateOncePerSession = 0
@@ -63,6 +64,56 @@ public enum ArtworkDisplayPreference: Int, CaseIterable {
     }
 }
 
+public class CoreDataCompanion {
+    public let context: NSManagedObjectContext
+    public let library: LibraryStorage
+    
+    init(context: NSManagedObjectContext) {
+        self.context = context
+        self.library = LibraryStorage(context: context)
+    }
+    
+    public func saveContext() {
+        library.saveContext()
+    }
+}
+
+public class AsyncCoreDataCompanion: CoreDataCompanion {
+    public let syncWave: SyncWave
+    
+    init(context: NSManagedObjectContext, syncWave: SyncWave) {
+        self.syncWave = syncWave
+        super.init(context: context)
+    }
+}
+
+public class AsyncCoreDataAccessWrapper {
+    let persistentContainer: NSPersistentContainer
+    
+    init(persistentContainer: NSPersistentContainer) {
+        self.persistentContainer = persistentContainer
+    }
+    
+    public func perform(body: @escaping (_ asyncCompanion: AsyncCoreDataCompanion) throws -> Void) -> Promise<Void> {
+        return Promise<Void> { seal in
+            self.persistentContainer.performBackgroundTask() { (context) in
+                let library = LibraryStorage(context: context)
+                guard let syncWave = library.getLatestSyncWave() else {
+                    return seal.reject(LibraryError.noSyncWave)
+                }
+                let asyncCompanion = AsyncCoreDataCompanion(context: context, syncWave: syncWave)
+                do {
+                    try body(asyncCompanion)
+                } catch {
+                    return seal.reject(error)
+                }
+                library.saveContext()
+                seal.fulfill(Void())
+            }
+        }
+    }
+}
+
 public class PersistentStorage {
 
     private enum UserDefaultsKey: String {
@@ -90,6 +141,12 @@ public class PersistentStorage {
         case LibrarySyncVersion = "librarySyncVersion"
         
         case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
+    }
+    
+    private var coreDataManager: CoreDataManagable
+    
+    init(coreDataManager: CoreDataManagable) {
+        self.coreDataManager = coreDataManager
     }
     
     public class Settings {
@@ -254,20 +311,36 @@ public class PersistentStorage {
             UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.LibrarySyncVersion.rawValue)
         }
     }
+    
+    public lazy var main: CoreDataCompanion = {
+        return CoreDataCompanion(context: coreDataManager.context)
+    }()
+    
+    public lazy var async: AsyncCoreDataAccessWrapper = {
+        return AsyncCoreDataAccessWrapper(persistentContainer: coreDataManager.persistentContainer)
+    }()
 
-    
-    // MARK: - Core Data stack
-    
+}
+
+// MARK: - Core Data stack
+
+protocol CoreDataManagable {
+    var persistentContainer: NSPersistentContainer { get }
+    var context: NSManagedObjectContext { get }
+}
+
+public class CoreDataPersistentManager: CoreDataManagable {
+
     static var managedObjectModel: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
 
-    public lazy var persistentContainer: NSPersistentContainer = {
+    lazy var persistentContainer: NSPersistentContainer = {
         /*
          The persistent container for the application. This implementation
          creates and returns a container, having loaded the store for the
          application to it. This property is optional since there are legitimate
          error conditions that could cause the creation of the store to fail.
          */
-        let container = NSPersistentContainer(name: "Amperfy", managedObjectModel: PersistentStorage.managedObjectModel)
+        let container = NSPersistentContainer(name: "Amperfy", managedObjectModel: CoreDataPersistentManager.managedObjectModel)
         let description = container.persistentStoreDescriptions.first
         description?.shouldInferMappingModelAutomatically = false
         description?.shouldMigrateStoreAutomatically = false
@@ -302,7 +375,7 @@ public class PersistentStorage {
         return container
     }()
     
-    public lazy var context: NSManagedObjectContext = {
+    lazy var context: NSManagedObjectContext = {
         persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
         return persistentContainer.viewContext
     }()

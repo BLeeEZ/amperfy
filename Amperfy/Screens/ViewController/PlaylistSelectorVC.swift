@@ -37,8 +37,8 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.playlistSelector)
         
-        change(sortType: appDelegate.persistentStorage.settings.playlistsSortSetting)
-        fetchedResultsController = PlaylistSelectorFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: appDelegate.persistentStorage.settings.playlistsSortSetting, isGroupedInAlphabeticSections: true)
+        change(sortType: appDelegate.storage.settings.playlistsSortSetting)
+        fetchedResultsController = PlaylistSelectorFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.playlistsSortSetting, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Playlists\"", showSearchBarAtEnter: true)
@@ -58,16 +58,16 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         // sortType will not be saved permanently. This behaviour differs from PlaylistsVC
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = PlaylistSelectorFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, sortType: sortType, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = PlaylistSelectorFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncDownPlaylistsWithoutSongs(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
         }
@@ -120,10 +120,10 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
         guard let items = itemsToAdd else { return }
         playlist.append(playables: items)
-        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard appDelegate.storage.settings.isOnlineMode else { return }
         let songsToAdd = items.compactMap{ $0.asSong }
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncUpload(playlistToAddSongs: playlist, songs: songsToAdd, persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.syncUpload(playlistToAddSongs: playlist, songs: songsToAdd)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlist Add Songs", error: error)
         }

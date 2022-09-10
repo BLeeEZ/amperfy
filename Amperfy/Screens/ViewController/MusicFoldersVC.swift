@@ -32,7 +32,7 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.musicFolders)
         
-        fetchedResultsController = MusicFolderFetchedResultsController(managedObjectContext: appDelegate.persistentStorage.context, isGroupedInAlphabeticSections: false)
+        fetchedResultsController = MusicFolderFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Directories\"")
@@ -42,9 +42,9 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard appDelegate.persistentStorage.settings.isOnlineMode else { return }
+        guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
-            self.appDelegate.backendApi.createLibrarySyncer().syncMusicFolders(persistentContainer: self.appDelegate.persistentStorage.persistentContainer)
+            self.appDelegate.librarySyncer.syncMusicFolders()
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Music Folders Sync", error: error)
         }

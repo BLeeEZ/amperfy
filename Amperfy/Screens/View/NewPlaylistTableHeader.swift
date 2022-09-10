@@ -47,10 +47,10 @@ class NewPlaylistTableHeader: UIView {
         guard let playlistName = nameTextField.text, !playlistName.isEmpty else {
             return
         }
-        let playlist = appDelegate.library.createPlaylist()
+        let playlist = appDelegate.storage.main.library.createPlaylist()
         playlist.name = playlistName
         nameTextField.text = ""
-        appDelegate.library.saveContext()
+        appDelegate.storage.main.saveContext()
     }
 
 }

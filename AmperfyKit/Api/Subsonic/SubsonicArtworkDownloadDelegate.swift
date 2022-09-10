@@ -58,27 +58,25 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         return subsonicServerApi.checkForErrorResponse(inData: data)
     }
     
-    func completedDownload(download: Download, persistentStorage: PersistentStorage) -> Guarantee<Void> {
+    func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
         return Guarantee<Void> { seal in
             guard let data = download.resumeData,
                   let artwork = download.element as? Artwork else {
                 return seal(Void())
             }
-            let library = LibraryStorage(context: persistentStorage.context)
             artwork.status = .CustomImage
             artwork.setImage(fromData: data)
-            library.saveContext()
+            storage.main.saveContext()
             seal(Void())
         }
     }
     
-    func failedDownload(download: Download, persistentStorage: PersistentStorage) {
+    func failedDownload(download: Download, storage: PersistentStorage) {
         guard let artwork = download.element as? Artwork else {
             return
         }
         artwork.status = .FetchError
-        let library = LibraryStorage(context: persistentStorage.context)
-        library.saveContext()
+        storage.main.saveContext()
     }
 
 }
