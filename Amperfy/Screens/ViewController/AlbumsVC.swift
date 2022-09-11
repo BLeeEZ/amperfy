@@ -44,7 +44,6 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         
         filterButton = UIBarButtonItem(image: UIImage.filter, style: .plain, target: self, action: #selector(filterButtonPressed))
         sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
-        navigationItem.rightBarButtonItems = [filterButton, sortButton]
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -64,22 +63,30 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     
     func change(sortType: ElementSortType) {
         self.sortType = sortType
-        appDelegate.storage.settings.albumsSortSetting = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
         fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: true)
-        fetchedResultsController.fetchResultsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
+        fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        updateRightBarButtonItems()
         updateFilterButton()
     }
     
     func updateFilterButton() {
         filterButton.image = displayFilter == .all ? UIImage.filter : UIImage.filterActive
+    }
+    
+    func updateRightBarButtonItems() {
+        if sortType == .recentlyAddedIndex {
+            navigationItem.rightBarButtonItems = [filterButton]
+        } else {
+            navigationItem.rightBarButtonItems = [filterButton, sortButton]
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -95,6 +102,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             return 0.0
         case .rating:
             return CommonScreenOperations.tableSectionHeightLarge
+        case .recentlyAddedIndex:
+            return 0.0
         }
     }
     
@@ -108,6 +117,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             } else {
                 return "Not rated"
             }
+        case .recentlyAddedIndex:
+            return super.tableView(tableView, titleForHeaderInSection: section)
         }
     }
     
@@ -142,12 +153,14 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         if sortType != .name {
             alert.addAction(UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
                 self.change(sortType: .name)
+                self.appDelegate.storage.settings.albumsSortSetting = .name
                 self.updateSearchResults(for: self.searchController)
             }))
         }
         if sortType != .rating {
             alert.addAction(UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
                 self.change(sortType: .rating)
+                self.appDelegate.storage.settings.albumsSortSetting = .rating
                 self.updateSearchResults(for: self.searchController)
             }))
         }
@@ -163,7 +176,10 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         if displayFilter != .favorites {
             alert.addAction(UIAlertAction(title: "Show favorites", image: UIImage.heartFill, style: .default, handler: { _ in
                 self.displayFilter = .favorites
+                self.change(sortType: self.appDelegate.storage.settings.albumsSortSetting)
+                self.updateRightBarButtonItems()
                 self.updateFilterButton()
+                self.isIndexTitelsHidden = false
                 self.updateSearchResults(for: self.searchController)
                 guard self.appDelegate.storage.settings.isOnlineMode else { return }
                 firstly {
@@ -178,7 +194,10 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         if displayFilter != .recentlyAdded {
             alert.addAction(UIAlertAction(title: "Show recently added", image: UIImage.clock, style: .default, handler: { _ in
                 self.displayFilter = .recentlyAdded
+                self.change(sortType: .recentlyAddedIndex)
+                self.updateRightBarButtonItems()
                 self.updateFilterButton()
+                self.isIndexTitelsHidden = true
                 self.updateSearchResults(for: self.searchController)
                 guard self.appDelegate.storage.settings.isOnlineMode else { return }
                 firstly {
@@ -194,7 +213,10 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         if displayFilter != .all {
             alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
                 self.displayFilter = .all
+                self.change(sortType: self.appDelegate.storage.settings.albumsSortSetting)
+                self.updateRightBarButtonItems()
                 self.updateFilterButton()
+                self.isIndexTitelsHidden = false
                 self.updateSearchResults(for: self.searchController)
             }))
         }

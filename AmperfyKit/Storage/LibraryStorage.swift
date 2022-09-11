@@ -605,7 +605,7 @@ public class LibraryStorage: PlayableFileCachable {
         case .all:
             return NSPredicate.alwaysTrue
         case .recentlyAdded:
-            return NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isRecentlyAdded))
+            return NSPredicate(format: "%K > 0", #keyPath(SongMO.recentlyAddedIndex))
         case .favorites:
             return NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isFavorite))
         }
@@ -616,7 +616,7 @@ public class LibraryStorage: PlayableFileCachable {
         case .all:
             return NSPredicate.alwaysTrue
         case .recentlyAdded:
-            return NSPredicate(format: "SUBQUERY(songs, $song, $song.isRecentlyAdded == TRUE) .@count > 0")
+            return NSPredicate(format: "%K > 0", #keyPath(AlbumMO.recentlyAddedIndex))
         case .favorites:
             return NSPredicate(format: "%K == TRUE", #keyPath(AlbumMO.isFavorite))
         }
@@ -734,6 +734,18 @@ public class LibraryStorage: PlayableFileCachable {
         return albums ?? [Album]()
     }
     
+    public func getRecentAlbums() -> [Album] {
+        let fetchRequest = AlbumMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            getFetchPredicate(albumsDisplayFilter: .recentlyAdded),
+        ])
+        fetchRequest.fetchLimit = Self.carPlayMaxElements
+        let foundAlbums = try? context.fetch(fetchRequest)
+        let albums = foundAlbums?.compactMap{ Album(managedObject: $0) }
+        return albums ?? [Album]()
+    }
+    
+    
     public func getRecentAlbumsForCarPlay(onlyCached: Bool) -> [Album] {
         let fetchRequest = AlbumMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -829,7 +841,7 @@ public class LibraryStorage: PlayableFileCachable {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-            NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isRecentlyAdded))
+            NSPredicate(format: "%K > 0", #keyPath(SongMO.recentlyAddedIndex))
         ])
         let foundSongs = try? context.fetch(fetchRequest)
         let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
@@ -841,7 +853,7 @@ public class LibraryStorage: PlayableFileCachable {
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
             getFetchPredicate(onlyCachedSongs: onlyCached),
-            NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isRecentlyAdded))
+            NSPredicate(format: "%K > 0", #keyPath(SongMO.recentlyAddedIndex))
         ])
         fetchRequest.fetchLimit = Self.carPlayMaxElements
         let foundSongs = try? context.fetch(fetchRequest)

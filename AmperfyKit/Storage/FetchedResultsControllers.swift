@@ -25,8 +25,20 @@ import CoreData
 public enum ElementSortType: Int {
     case name = 0
     case rating = 1
+    case recentlyAddedIndex = 2
     
     public static let defaultValue: ElementSortType = .name
+    
+    public var asSectionIndexType: SectionIndexType {
+        switch(self) {
+        case .name:
+            return .alphabet
+        case .rating:
+            return .rating
+        case .recentlyAddedIndex:
+            return .recentlyAddedIndex
+        }
+    }
 }
 
 public enum PlaylistSortType: Int {
@@ -257,6 +269,9 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
             fetchRequest = ArtistMO.identifierSortedFetchRequest
         case .rating:
             fetchRequest = ArtistMO.ratingSortedFetchRequest
+        case .recentlyAddedIndex:
+            // artist currently does not support recentlyAdded
+            fetchRequest = ArtistMO.identifierSortedFetchRequest
         }
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
@@ -365,6 +380,8 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
             fetchRequest = AlbumMO.identifierSortedFetchRequest
         case .rating:
             fetchRequest = AlbumMO.ratingSortedFetchRequest
+        case .recentlyAddedIndex:
+            fetchRequest = AlbumMO.recentlyAddedSortedFetchRequest
         }
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
@@ -401,6 +418,8 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
             fetchRequest = SongMO.identifierSortedFetchRequest
         case .rating:
             fetchRequest = SongMO.ratingSortedFetchRequest
+        case .recentlyAddedIndex:
+            fetchRequest = SongMO.recentlyAddedSortedFetchRequest
         }
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)

@@ -95,6 +95,8 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             return 0.0
         case .rating:
             return CommonScreenOperations.tableSectionHeightLarge
+        case .recentlyAddedIndex:
+            return 0.0
         }
     }
     
@@ -108,6 +110,8 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             } else {
                 return "Not rated"
             }
+        case .recentlyAddedIndex:
+            return super.tableView(tableView, titleForHeaderInSection: section)
         }
     }
     

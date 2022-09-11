@@ -168,12 +168,17 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         }
         return false
     }
-    
-    public var isRecentlyAdded: Bool {
-        get { return playableManagedObject.isRecentlyAdded }
+
+    public var recentlyAddedIndex: Int {
+        get { return Int(playableManagedObject.recentlyAddedIndex) }
         set {
-            if playableManagedObject.isRecentlyAdded != newValue { playableManagedObject.isRecentlyAdded = newValue }
+            guard Int16.isValid(value: newValue), playableManagedObject.recentlyAddedIndex != Int16(newValue) else { return }
+            playableManagedObject.recentlyAddedIndex = Int16(newValue)
         }
+    }
+    
+    public func markAsNotRecentAnymore() {
+        playableManagedObject.recentlyAddedIndex = 0
     }
     
     public var isSong: Bool {

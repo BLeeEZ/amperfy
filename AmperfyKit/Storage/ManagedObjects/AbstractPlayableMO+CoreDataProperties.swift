@@ -32,9 +32,9 @@ extension AbstractPlayableMO {
     @NSManaged public var bitrate: Int32
     @NSManaged public var contentType: String?
     @NSManaged public var disk: String?
-    @NSManaged public var isRecentlyAdded: Bool
     @NSManaged public var playDuration: Int16
     @NSManaged public var playProgress: Int16
+    @NSManaged public var recentlyAddedIndex: Int16
     @NSManaged public var remoteDuration: Int16
     @NSManaged public var size: Int32
     @NSManaged public var title: String?

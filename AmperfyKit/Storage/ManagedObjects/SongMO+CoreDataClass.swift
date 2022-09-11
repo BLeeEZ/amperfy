@@ -47,9 +47,10 @@ extension SongMO: CoreDataIdentifyable {
     static var trackNumberSortedFetchRequest: NSFetchRequest<SongMO> {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "disk", ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: "track", ascending: true),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
+            NSSortDescriptor(key: #keyPath(SongMO.disk), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(SongMO.track), ascending: true),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
         ]
         return fetchRequest
     }
@@ -58,6 +59,18 @@ extension SongMO: CoreDataIdentifyable {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(SongMO.rating), ascending: false),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
+    
+    static var recentlyAddedSortedFetchRequest: NSFetchRequest<SongMO> {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(SongMO.recentlyAddedIndex), ascending: true),
+            NSSortDescriptor(key: #keyPath(SongMO.disk), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(SongMO.track), ascending: true),
             NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
             NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
         ]

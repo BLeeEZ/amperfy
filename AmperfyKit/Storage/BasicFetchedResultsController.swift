@@ -42,6 +42,7 @@ extension NSFetchedResultsController {
 public enum SectionIndexType: Int {
     case alphabet = 0
     case rating = 1
+    case recentlyAddedIndex = 2
     
     public static let defaultValue: SectionIndexType = .alphabet
     public static let noRatingIndexSymbol = "#"
@@ -62,6 +63,8 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
             return sortByAlphabet(forSectionName: sectionName)
         case .rating:
             return sortByRating(forSectionName: sectionName)
+        case .recentlyAddedIndex:
+            return nil
         }
     }
     

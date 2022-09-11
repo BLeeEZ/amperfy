@@ -47,6 +47,16 @@ public final class AlbumMO: AbstractLibraryEntityMO {
         ]
         return fetchRequest
     }
+    
+    static var recentlyAddedSortedFetchRequest: NSFetchRequest<AlbumMO> {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(AlbumMO.recentlyAddedIndex), ascending: true),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(AlbumMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
 
 }
 

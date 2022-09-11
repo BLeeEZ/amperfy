@@ -381,13 +381,20 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }.then { data in
             self.storage.async.perform { asyncCompanion in
                 let oldRecentSongs = Set(asyncCompanion.library.getRecentSongs())
+                let oldRecentAlbums = Set(asyncCompanion.library.getRecentAlbums())
+                oldRecentAlbums.forEach{ $0.markAsNotRecentAnymore() }
                 
                 let parserDelegate = SongParserDelegate(library: asyncCompanion.library)
                 try self.parse(data: data, delegate: parserDelegate)
                 
+                parserDelegate.parsedSongs.sortById().reversed().enumerated().forEach { (index, song) in
+                    song.recentlyAddedIndex = index
+                    if let album = song.album, album.recentlyAddedIndex == 0 {
+                        album.recentlyAddedIndex = index
+                    }
+                }
                 let notRecentSongsAnymore = oldRecentSongs.subtracting(parserDelegate.parsedSongs)
-                notRecentSongsAnymore.filter{ !$0.id.isEmpty }.forEach { $0.isRecentlyAdded = false }
-                parserDelegate.parsedSongs.filter{ !$0.id.isEmpty }.forEach { $0.isRecentlyAdded = true }
+                notRecentSongsAnymore.forEach { $0.markAsNotRecentAnymore() }
             }
         }
     }

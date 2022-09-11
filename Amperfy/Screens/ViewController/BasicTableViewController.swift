@@ -36,6 +36,8 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
         get { return singleFetchController }
     }
     
+    var isIndexTitelsHidden = false
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return singleFetchController?.numberOfSections ?? 0
     }
@@ -49,7 +51,7 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
     }
     
     override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        return singleFetchController?.sectionIndexTitles
+        return isIndexTitelsHidden ? nil : singleFetchController?.sectionIndexTitles
     }
     
     override func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
