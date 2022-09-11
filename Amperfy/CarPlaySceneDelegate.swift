@@ -193,7 +193,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         recentlyAddedSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var recentlyAddedSections = [CPListTemplateItem]()
-            let albums = self.appDelegate.storage.main.library.getRecentAlbumsForCarPlay(onlyCached: self.isOfflineMode)
+            let albums = self.appDelegate.storage.main.library.getRecentAlbumsForCarPlay(onlyCached: self.isOfflineMode).sorted{ $0.recentlyAddedIndex < $1.recentlyAddedIndex }
             for album in albums {
                 let section = self.createDetailTemplate(for: album, treeDepth: treeDepth+1)
                 recentlyAddedSections.append(section)
@@ -229,7 +229,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         recentlyAddedSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var recentlyAddedSections = [CPListTemplateItem]()
-            let songs = self.appDelegate.storage.main.library.getRecentSongsForCarPlay(onlyCached: self.isOfflineMode)
+            let songs = self.appDelegate.storage.main.library.getRecentSongsForCarPlay(onlyCached: self.isOfflineMode).sorted{ $0.recentlyAddedIndex < $1.recentlyAddedIndex }
             recentlyAddedSections.append(self.createPlayShuffledListItem(playContext: PlayContext(name: "All recent songs", playables: songs), treeDepth: treeDepth+1))
             for (index, song) in songs.enumerated() {
                 let section = self.createDetailTemplate(for: song, playContext: PlayContext(name: "All recent songs", index: index, playables: songs), treeDepth: treeDepth+1)
