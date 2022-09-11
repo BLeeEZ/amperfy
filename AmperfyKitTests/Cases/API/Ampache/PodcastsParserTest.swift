@@ -31,7 +31,7 @@ class PodcastsParserTest: AbstractAmpacheTest {
     }
     
     override func recreateParserDelegate() {
-        parserDelegate = PodcastParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+        parserDelegate = PodcastParserDelegate(library: library, parseNotifier: nil)
     }
     
     override func checkCorrectParsing() {

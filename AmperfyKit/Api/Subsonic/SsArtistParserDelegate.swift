@@ -39,7 +39,6 @@ class SsArtistParserDelegate: SsXmlLibWithArtworkParser {
             } else {
                 artistBuffer = library.createArtist()
                 artistBuffer?.id = artistId
-                artistBuffer?.syncInfo = syncWave
             }
             artistBuffer?.remoteStatus = .available
             if let attributeAlbumCount = attributeDict["albumCount"], let albumCount = Int(attributeAlbumCount) {

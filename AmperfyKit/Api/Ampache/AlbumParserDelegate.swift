@@ -45,7 +45,6 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
                 albumBuffer = fetchedAlbum
             } else {
                 albumBuffer = library.createAlbum()
-                albumBuffer?.syncInfo = syncWave
                 albumBuffer?.id = albumId
             }
 		case "artist":
@@ -77,7 +76,6 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
                 let artist = library.createArtist()
                 artist.id = artistId
                 artist.name = buffer
-                artist.syncInfo = syncWave
                 albumBuffer?.artist = artist
                 artistIdToCreate = nil
             }
@@ -109,7 +107,6 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
                 let genre = library.createGenre()
                 genre.id = genreId
                 genre.name = buffer
-                genre.syncInfo = syncWave
                 albumBuffer?.genre = genre
                 genreIdToCreate = nil
             }

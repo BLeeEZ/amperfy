@@ -121,7 +121,6 @@ public struct LibraryInfo: Encodable {
     public var directoryCount: Int?
     public var podcastCount: Int?
     public var podcastEpisodeCount: Int?
-    public var syncWaveCount: Int?
     public var artworkCount: Int?
     public var cachedSongSize: String?
     public var version: String?

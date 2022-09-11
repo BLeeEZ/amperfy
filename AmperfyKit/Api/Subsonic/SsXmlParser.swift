@@ -50,11 +50,9 @@ class SsNotifiableXmlParser: SsXmlParser {
 class SsXmlLibParser: SsNotifiableXmlParser {
     
     var library: LibraryStorage
-    var syncWave: SyncWave
     
-    init(library: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(library: LibraryStorage, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.library = library
-        self.syncWave = syncWave
         super.init(parseNotifier: parseNotifier)
     }
     
@@ -64,9 +62,9 @@ class SsXmlLibWithArtworkParser: SsXmlLibParser {
     
     var subsonicUrlCreator: SubsonicUrlCreator
     
-    init(library: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.subsonicUrlCreator = subsonicUrlCreator
-        super.init(library: library, syncWave: syncWave, parseNotifier: parseNotifier)
+        super.init(library: library, parseNotifier: parseNotifier)
     }
 
     func parseArtwork(id: String) -> Artwork? {

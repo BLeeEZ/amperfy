@@ -29,9 +29,9 @@ class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
     var parsedPodcasts: Set<Podcast>
     private var podcastBuffer: Podcast?
 
-    override init(library: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
+    override init(library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
         parsedPodcasts = Set<Podcast>()
-        super.init(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: parseNotifier)
+        super.init(library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: parseNotifier)
     }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {

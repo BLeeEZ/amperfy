@@ -27,9 +27,9 @@ class SsMusicFolderParserDelegate: SsXmlLibParser {
     let musicFoldersBeforeFetch: Set<MusicFolder>
     var musicFoldersParsed = Set<MusicFolder>()
     
-    init(library: LibraryStorage, syncWave: SyncWave) {
+    init(library: LibraryStorage) {
         musicFoldersBeforeFetch = Set(library.getMusicFolders())
-        super.init(library: library, syncWave: syncWave)
+        super.init(library: library)
     }
         
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {

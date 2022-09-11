@@ -41,24 +41,11 @@ struct LibraryDuplicateInfo {
     let count: Int
 }
 
-public enum LibraryError: LocalizedError {
-    case noSyncWave
-    
-    public var errorDescription: String? {
-        var ret = ""
-        switch self {
-        case .noSyncWave:
-            ret = "Internal error: no sync wave provided"
-        }
-        return ret
-    }
-}
-
 public class LibraryStorage: PlayableFileCachable {
     
     public static var carPlayMaxElements = 200
     
-    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, SyncWave.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName, ScrobbleEntry.typeName]
+    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName, ScrobbleEntry.typeName]
     private let log = OSLog(subsystem: "Amperfy", category: "LibraryStorage")
     private var context: NSManagedObjectContext
     
@@ -199,7 +186,6 @@ public class LibraryStorage: PlayableFileCachable {
         libraryInfo.playlistCount = playlistCount
         libraryInfo.cachedSongSize = cachedPlayableSizeInByte.asByteString
         libraryInfo.genreCount = genreCount
-        libraryInfo.syncWaveCount = syncWaveCount
         libraryInfo.artworkCount = artworkCount
         libraryInfo.musicFolderCount = musicFolderCount
         libraryInfo.directoryCount = directoryCount
@@ -250,10 +236,6 @@ public class LibraryStorage: PlayableFileCachable {
         let fetchRequest = ScrobbleEntryMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == FALSE", #keyPath(ScrobbleEntryMO.isUploaded))
         return (try? context.count(for: fetchRequest)) ?? 0
-    }
-    
-    public var syncWaveCount: Int {
-        return (try? context.count(for: SyncWaveMO.fetchRequest())) ?? 0
     }
     
     public var artworkCount: Int {
@@ -480,17 +462,6 @@ public class LibraryStorage: PlayableFileCachable {
         context.delete(item.managedObject)
     }
     
-    func deleteSyncWave(item: SyncWave) {
-        context.delete(item.managedObject)
-    }
-
-    func createSyncWave() -> SyncWave {
-        let syncWaveCount = Int16(getSyncWaves().count)
-        let syncWaveMO = SyncWaveMO(context: context)
-        syncWaveMO.id = syncWaveCount
-        return SyncWave(managedObject: syncWaveMO)
-    }
-    
     func createDownload() -> Download {
         return Download(managedObject: DownloadMO(context: context))
     }
@@ -513,10 +484,6 @@ public class LibraryStorage: PlayableFileCachable {
     
     func deleteDownload(_ download: Download) {
         context.delete(download.managedObject)
-    }
-    
-    func getFetchPredicate(forSyncWave syncWave: SyncWave) -> NSPredicate {
-        return NSPredicate(format: "(syncInfo == %@)", syncWave.managedObject.objectID)
     }
     
     func getFetchPredicate(forGenre genre: Genre) -> NSPredicate {
@@ -1166,21 +1133,6 @@ public class LibraryStorage: PlayableFileCachable {
         let foundArtworks = try? context.fetch(fetchRequest)
         let artworks = foundArtworks?.compactMap{ Artwork(managedObject: $0) }
         return artworks ?? [Artwork]()
-    }
-
-    func getSyncWaves() -> [SyncWave] {
-        let fetchRequest: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
-        let foundSyncWaves = try? context.fetch(fetchRequest)
-        let syncWaves = foundSyncWaves?.compactMap{ SyncWave(managedObject: $0) }
-        return syncWaves ?? [SyncWave]()
-    }
-
-    func getLatestSyncWave() -> SyncWave? {
-        let fetchRequest: NSFetchRequest<SyncWaveMO> = SyncWaveMO.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "%K == max(%K)", #keyPath(SyncWaveMO.id), #keyPath(SyncWaveMO.id))
-        fetchRequest.fetchLimit = 1
-        let syncWaves = try? context.fetch(fetchRequest)
-        return syncWaves?.lazy.compactMap{ SyncWave(managedObject: $0) }.first
     }
     
     func getUserStatistics(appVersion: String) -> UserStatistics {

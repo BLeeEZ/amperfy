@@ -48,7 +48,6 @@ class SongTest: XCTestCase {
         XCTAssertEqual(song.url, nil)
         XCTAssertEqual(song.album, nil)
         XCTAssertEqual(song.artist, nil)
-        XCTAssertEqual(song.syncInfo, nil)
         XCTAssertEqual(song.displayString, "Unknown Artist - Unknown Title")
         XCTAssertEqual(song.identifier, "Unknown Title")
         XCTAssertEqual(song.image(setting: .serverArtworkOnly), UIImage.songArtwork)
@@ -128,17 +127,6 @@ class SongTest: XCTestCase {
         guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertNil(songFetched.artwork?.image)
         XCTAssertEqual(songFetched.image(setting: .serverArtworkOnly), testImg)
-    }
-    
-    func testSyncWave() {
-        let testWaveId: Int = 987
-        let testWave = library.createSyncWave()
-        testWave.id = testWaveId
-        testSong.syncInfo = testWave
-        XCTAssertEqual(testSong.syncInfo?.id, testWaveId)
-        library.saveContext()
-        guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
-        XCTAssertEqual(songFetched.syncInfo?.id, testWaveId)
     }
     
     func testRating() {

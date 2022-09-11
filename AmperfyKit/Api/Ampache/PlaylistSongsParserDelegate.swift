@@ -28,10 +28,10 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
     let playlist: Playlist
     var items: [PlaylistItem]
 
-    init(playlist: Playlist, library: LibraryStorage, syncWave: SyncWave) {
+    init(playlist: Playlist, library: LibraryStorage) {
         self.playlist = playlist
         self.items = playlist.items
-        super.init(library: library, syncWave: syncWave, parseNotifier: nil)
+        super.init(library: library, parseNotifier: nil)
     }
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {

@@ -30,7 +30,7 @@ class SsDirectoriesExample1ParserTest: AbstractSsParserTest {
         super.setUp()
         xmlData = getTestFileData(name: "directory_example_1")
         directory = library.createDirectory()
-        ssParserDelegate = SsDirectoryParserDelegate(directory: directory, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
+        ssParserDelegate = SsDirectoryParserDelegate(directory: directory, library: library, subsonicUrlCreator: subsonicUrlCreator)
         createTestPartner()
     }
     

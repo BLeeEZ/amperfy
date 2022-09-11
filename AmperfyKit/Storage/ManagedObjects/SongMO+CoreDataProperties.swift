@@ -34,6 +34,5 @@ extension SongMO {
     @NSManaged public var directory: DirectoryMO?
     @NSManaged public var genre: GenreMO?
     @NSManaged public var musicFolder: MusicFolderMO?
-    @NSManaged public var syncInfo: SyncWaveMO?
 
 }

@@ -46,7 +46,6 @@ class SongParserDelegate: PlayableParserDelegate {
                 songBuffer?.remoteStatus = .available
             } else {
                 songBuffer = library.createSong()
-                songBuffer?.syncInfo = syncWave
                 songBuffer?.id = songId
             }
             playableBuffer = songBuffer
@@ -84,7 +83,6 @@ class SongParserDelegate: PlayableParserDelegate {
                 let artist = library.createArtist()
                 artist.id = artistId
                 artist.name = buffer
-                artist.syncInfo = syncWave
                 songBuffer?.artist = artist
                 artistIdToCreate = nil
             }
@@ -94,7 +92,6 @@ class SongParserDelegate: PlayableParserDelegate {
                 let album = library.createAlbum()
                 album.id = albumId
                 album.name = buffer
-                album.syncInfo = syncWave
                 songBuffer?.album = album
                 albumIdToCreate = nil
             }
@@ -104,7 +101,6 @@ class SongParserDelegate: PlayableParserDelegate {
                 let genre = library.createGenre()
                 genre.id = genreId
                 genre.name = buffer
-                genre.syncInfo = syncWave
                 songBuffer?.genre = genre
                 genreIdToCreate = nil
             }

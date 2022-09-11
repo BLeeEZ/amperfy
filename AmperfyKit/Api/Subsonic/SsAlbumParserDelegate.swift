@@ -41,7 +41,6 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
             } else {
                 albumBuffer = library.createAlbum()
                 albumBuffer?.id = albumId
-                albumBuffer?.syncInfo = syncWave
             }
             albumBuffer?.remoteStatus = .available
             
@@ -69,7 +68,6 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
                     let artist = library.createArtist()
                     artist.id = artistId
                     artist.name = artistName
-                    artist.syncInfo = syncWave
                     os_log("Artist <%s> with id %s has been created", log: log, type: .error, artistName, artistId)
                     albumBuffer?.artist = artist
                 }
@@ -81,7 +79,6 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
                 } else {
                     let genre = library.createGenre()
                     genre.name = genreName
-                    genre.syncInfo = syncWave
                     os_log("Genre <%s> has been created", log: log, type: .error, genreName)
                     albumBuffer?.genre = genre
                 }

@@ -43,7 +43,6 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
             } else {
                 songBuffer = library.createSong()
                 songBuffer?.id = songId
-                songBuffer?.syncInfo = syncWave
             }
             playableBuffer = songBuffer
 
@@ -58,7 +57,6 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
                     let artist = library.createArtist()
                     artist.id = artistId
                     artist.name = artistName
-                    artist.syncInfo = syncWave
                     os_log("Artist <%s> with id %s has been created", log: log, type: .error, artistName, artistId)
                     songBuffer?.artist = artist
                 }
@@ -68,7 +66,6 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
                 } else {
                     let artist = library.createArtist()
                     artist.name = artistName
-                    artist.syncInfo = syncWave
                     songBuffer.artist = artist
                     os_log("Local Artist <%s> has been created (no id)", log: log, type: .error, artistName)
                 }
@@ -85,7 +82,6 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
                     let album = library.createAlbum()
                     album.id = albumId
                     album.name = albumName
-                    album.syncInfo = syncWave
                     os_log("Album <%s> with id %s has been created", log: log, type: .error, albumName, albumId)
                     songBuffer?.album = album
                 }
@@ -99,7 +95,6 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
                 } else {
                     let genre = library.createGenre()
                     genre.name = genreName
-                    genre.syncInfo = syncWave
                     os_log("Genre <%s> has been created", log: log, type: .error, genreName)
                     songBuffer?.genre = genre
                 }

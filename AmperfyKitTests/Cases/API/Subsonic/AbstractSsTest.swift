@@ -37,7 +37,6 @@ class AbstractSsParserTest: XCTestCase {
     var xmlData: Data?
     var xmlErrorData: Data!
     var subsonicUrlCreator: MOCK_SubsonicUrlCreator!
-    var syncWave: SyncWave!
     var ssParserDelegate: SsXmlParser?
 
     override func setUp() {
@@ -47,7 +46,6 @@ class AbstractSsParserTest: XCTestCase {
         library = LibraryStorage(context: context)
         xmlErrorData = getTestFileData(name: "error_example_1")
         subsonicUrlCreator = MOCK_SubsonicUrlCreator()
-        syncWave = library.createSyncWave()
     }
 
     override func tearDown() {
@@ -84,7 +82,6 @@ class AbstractSsParserTest: XCTestCase {
             if Self.typeName != "AbstractSsParserTest" { XCTFail() }
             return
         }
-        syncWave = library.createSyncWave() // set isInitialWave to false
         let parser1 = XMLParser(data: data)
         parser1.delegate = ssParserDelegate
         parser1.parse()

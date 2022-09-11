@@ -47,7 +47,6 @@ class ArtistTest: XCTestCase {
         XCTAssertEqual(artist.songs.count, 0)
         XCTAssertFalse(artist.playables.hasCachedItems)
         XCTAssertEqual(artist.albums.count, 0)
-        XCTAssertEqual(artist.syncInfo, nil)
         XCTAssertNil(artist.artwork)
         XCTAssertEqual(artist.image(setting: .serverArtworkOnly), UIImage.artistArtwork)
     }
@@ -95,17 +94,6 @@ class ArtistTest: XCTestCase {
         guard let artistFetched = library.getArtist(id: testId) else { XCTFail(); return }
         XCTAssertNil(artistFetched.artwork?.image)
         XCTAssertEqual(artistFetched.image(setting: .serverArtworkOnly), testImg)
-    }
-
-    func testSyncWave() {
-        let testWaveId: Int = 987
-        let testWave = library.createSyncWave()
-        testWave.id = testWaveId
-        testArtist.syncInfo = testWave
-        XCTAssertEqual(testArtist.syncInfo?.id, testWaveId)
-        library.saveContext()
-        guard let artistFetched = library.getArtist(id: testId) else { XCTFail(); return }
-        XCTAssertEqual(artistFetched.syncInfo?.id, testWaveId)
     }
 
 }

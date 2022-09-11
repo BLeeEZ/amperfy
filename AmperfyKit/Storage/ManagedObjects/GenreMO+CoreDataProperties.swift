@@ -33,7 +33,6 @@ extension GenreMO {
     @NSManaged public var albums: NSOrderedSet?
     @NSManaged public var artists: NSOrderedSet?
     @NSManaged public var songs: NSOrderedSet?
-    @NSManaged public var syncInfo: SyncWaveMO?
 
 }
 

@@ -28,7 +28,6 @@ class AbstractAmpacheTest: XCTestCase {
     var library: LibraryStorage!
     var xmlData: Data?
     var xmlErrorData: Data!
-    var syncWave: SyncWave!
     var parserDelegate: AmpacheXmlParser?
 
     override func setUp() {
@@ -37,7 +36,6 @@ class AbstractAmpacheTest: XCTestCase {
         cdHelper.clearContext(context: context)
         library = LibraryStorage(context: context)
         xmlErrorData = getTestFileData(name: "error-4700")
-        syncWave = library.createSyncWave()
     }
 
     override func tearDown() {
@@ -74,7 +72,6 @@ class AbstractAmpacheTest: XCTestCase {
             if Self.typeName != "AbstractAmpacheTest" { XCTFail() }
             return
         }
-        syncWave = library.createSyncWave() // set isInitialWave to false
         let parser1 = XMLParser(data: data)
         parser1.delegate = parserDelegate
         parser1.parse()

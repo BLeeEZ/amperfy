@@ -27,7 +27,7 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "album_example_1")
-        ssParserDelegate = SsSongParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        ssParserDelegate = SsSongParserDelegate(library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
         createTestPartner()
     }
 

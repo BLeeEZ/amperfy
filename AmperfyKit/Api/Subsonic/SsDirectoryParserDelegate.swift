@@ -32,20 +32,20 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
     let songsBeforeFetch: Set<Song>
     var songsParsed = Set<Song>()
     
-    init(directory: Directory, library: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator) {
+    init(directory: Directory, library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator) {
         self.directory = directory
         self.musicFolder = nil
         directoriesBeforeFetch = Set(directory.subdirectories)
         songsBeforeFetch = Set(directory.songs)
-        super.init(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
+        super.init(library: library, subsonicUrlCreator: subsonicUrlCreator)
     }
     
-    init(musicFolder: MusicFolder, library: LibraryStorage, syncWave: SyncWave, subsonicUrlCreator: SubsonicUrlCreator) {
+    init(musicFolder: MusicFolder, library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator) {
         self.directory = nil
         self.musicFolder = musicFolder
         directoriesBeforeFetch = Set(musicFolder.directories)
         songsBeforeFetch = Set(musicFolder.songs)
-        super.init(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
+        super.init(library: library, subsonicUrlCreator: subsonicUrlCreator)
     }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {

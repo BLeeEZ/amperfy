@@ -32,7 +32,7 @@ class AlbumParserTest: AbstractAmpacheTest {
     }
     
     override func recreateParserDelegate() {
-        parserDelegate = AlbumParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+        parserDelegate = AlbumParserDelegate(library: library, parseNotifier: nil)
     }
     
     func createTestArtists() {

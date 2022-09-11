@@ -27,11 +27,11 @@ class SsPodcastParserTest: AbstractSsParserTest {
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "podcasts_example_1")
-        ssParserDelegate = SsPodcastParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        ssParserDelegate = SsPodcastParserDelegate(library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
     }
     
     override func recreateParserDelegate() {
-        ssParserDelegate = SsPodcastParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        ssParserDelegate = SsPodcastParserDelegate(library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
     }
 
     override func checkCorrectParsing() {

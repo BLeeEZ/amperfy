@@ -542,7 +542,7 @@ class MusicPlayerTest: XCTestCase {
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.appendUserQueue(playables: [songId1])
         testPlayer.play()
-        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 3.0)
         XCTAssertTrue(testPlayer.isPlaying)
         testPlayer.clearContextQueue()
         XCTAssertTrue(testPlayer.isPlaying)
@@ -687,7 +687,7 @@ class MusicPlayerTest: XCTestCase {
 
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId3]))
-        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 3.0)
         XCTAssertTrue(testPlayer.isPlaying)
         XCTAssertEqual(testPlayer.prevQueue.count, 0)
         XCTAssertEqual(testPlayer.userQueue.count, 2)
@@ -1164,7 +1164,7 @@ class MusicPlayerTest: XCTestCase {
         testMusicPlayer.pause()
         testPlayer.playNext()
         XCTAssertFalse(testPlayer.isPlaying)
-        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 3.0)
         XCTAssertTrue(testPlayer.isPlaying)
     }
     

@@ -43,7 +43,6 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
                 artistBuffer = fetchedArtist
             } else {
                 artistBuffer = library.createArtist()
-                artistBuffer?.syncInfo = syncWave
                 artistBuffer?.id = artistId
             }
 		}
@@ -74,7 +73,6 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
                 let genre = library.createGenre()
                 genre.id = genreId
                 genre.name = buffer
-                genre.syncInfo = syncWave
                 artistBuffer?.genre = genre
                 genreIdToCreate = nil
             }

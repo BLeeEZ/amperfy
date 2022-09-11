@@ -30,7 +30,7 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
         super.setUp()
         xmlData = getTestFileData(name: "podcasts_example_1")
         testPodcast = library.createPodcast()
-        ssParserDelegate = SsPodcastEpisodeParserDelegate(podcast: testPodcast!, library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator)
+        ssParserDelegate = SsPodcastEpisodeParserDelegate(podcast: testPodcast!, library: library, subsonicUrlCreator: subsonicUrlCreator)
     }
     
     override func checkCorrectParsing() {

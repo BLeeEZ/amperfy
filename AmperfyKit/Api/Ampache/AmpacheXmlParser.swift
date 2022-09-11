@@ -66,11 +66,9 @@ class AmpacheNotifiableXmlParser: AmpacheXmlParser {
 class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
     
     var library: LibraryStorage
-    var syncWave: SyncWave
     
-    init(library: LibraryStorage, syncWave: SyncWave, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(library: LibraryStorage, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.library = library
-        self.syncWave = syncWave
         super.init(parseNotifier: parseNotifier)
     }
     

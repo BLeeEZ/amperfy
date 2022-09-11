@@ -82,14 +82,6 @@ public class Artist: AbstractLibraryEntity {
             if managedObject.genre != newValue?.managedObject { managedObject.genre = newValue?.managedObject }
         }
     }
-    public var syncInfo: SyncWave? {
-        get {
-            guard let syncInfoMO = managedObject.syncInfo else { return nil }
-            return SyncWave(managedObject: syncInfoMO) }
-        set {
-            if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
-        }
-    }
     override public var defaultImage: UIImage {
         return UIImage.artistArtwork
     }

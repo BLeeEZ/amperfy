@@ -34,7 +34,6 @@ class SsGenreParserDelegate: SsXmlLibParser {
             } else {
                 let genre = library.createGenre()
                 genre.name = buffer
-                genre.syncInfo = syncWave
             }
             parsedCount += 1
 		default:

@@ -27,7 +27,7 @@ class SsArtistParserTest: AbstractSsParserTest {
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "artists_example_1")
-        ssParserDelegate = SsArtistParserDelegate(library: library, syncWave: syncWave, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        ssParserDelegate = SsArtistParserDelegate(library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
     }
     
     override func checkCorrectParsing() {

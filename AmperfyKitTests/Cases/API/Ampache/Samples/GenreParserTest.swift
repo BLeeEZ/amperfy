@@ -31,7 +31,7 @@ class GenreParserTest: AbstractAmpacheTest {
     }
     
     override func recreateParserDelegate() {
-        parserDelegate = GenreParserDelegate(library: library, syncWave: syncWave, parseNotifier: nil)
+        parserDelegate = GenreParserDelegate(library: library, parseNotifier: nil)
     }
     
     override func checkCorrectParsing() {

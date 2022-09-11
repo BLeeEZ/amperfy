@@ -80,14 +80,6 @@ public class Album: AbstractLibraryEntity {
             if managedObject.genre != newValue?.managedObject { managedObject.genre = newValue?.managedObject }
         }
     }
-    public var syncInfo: SyncWave? {
-        get {
-            guard let syncInfoMO = managedObject.syncInfo else { return nil }
-            return SyncWave(managedObject: syncInfoMO) }
-        set {
-            if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
-        }
-    }
     public var isSongsMetaDataSynced: Bool {
         get { return managedObject.isSongsMetaDataSynced }
         set { managedObject.isSongsMetaDataSynced = newValue }

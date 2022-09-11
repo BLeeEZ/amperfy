@@ -30,9 +30,9 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
     var episodeBuffer: PodcastEpisode?
     var parsedEpisodes = [PodcastEpisode]()
 
-    init(podcast: Podcast, library: LibraryStorage, syncWave: SyncWave) {
+    init(podcast: Podcast, library: LibraryStorage) {
         self.podcast = podcast
-        super.init(library: library, syncWave: syncWave, parseNotifier: nil)
+        super.init(library: library, parseNotifier: nil)
     }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {

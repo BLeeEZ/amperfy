@@ -58,14 +58,6 @@ public class Song: AbstractPlayable, Identifyable {
             if managedObject.genre != newValue?.managedObject { managedObject.genre = newValue?.managedObject }
         }
     }
-    public var syncInfo: SyncWave? {
-        get {
-            guard let syncInfoMO = managedObject.syncInfo else { return nil }
-            return SyncWave(managedObject: syncInfoMO) }
-        set {
-            if managedObject.syncInfo != newValue?.managedObject { managedObject.syncInfo = newValue?.managedObject }
-        }
-    }
     public var isOrphaned: Bool {
         guard let album = album else { return true }
         return album.isOrphaned

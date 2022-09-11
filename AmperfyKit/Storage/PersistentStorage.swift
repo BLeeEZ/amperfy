@@ -78,15 +78,6 @@ public class CoreDataCompanion {
     }
 }
 
-public class AsyncCoreDataCompanion: CoreDataCompanion {
-    public let syncWave: SyncWave
-    
-    init(context: NSManagedObjectContext, syncWave: SyncWave) {
-        self.syncWave = syncWave
-        super.init(context: context)
-    }
-}
-
 public class AsyncCoreDataAccessWrapper {
     let persistentContainer: NSPersistentContainer
     
@@ -94,14 +85,11 @@ public class AsyncCoreDataAccessWrapper {
         self.persistentContainer = persistentContainer
     }
     
-    public func perform(body: @escaping (_ asyncCompanion: AsyncCoreDataCompanion) throws -> Void) -> Promise<Void> {
+    public func perform(body: @escaping (_ asyncCompanion: CoreDataCompanion) throws -> Void) -> Promise<Void> {
         return Promise<Void> { seal in
             self.persistentContainer.performBackgroundTask() { (context) in
                 let library = LibraryStorage(context: context)
-                guard let syncWave = library.getLatestSyncWave() else {
-                    return seal.reject(LibraryError.noSyncWave)
-                }
-                let asyncCompanion = AsyncCoreDataCompanion(context: context, syncWave: syncWave)
+                let asyncCompanion = CoreDataCompanion(context: context)
                 do {
                     try body(asyncCompanion)
                 } catch {

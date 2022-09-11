@@ -20,6 +20,48 @@
                ReferencedContainer = "container:Amperfy.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "50C9D60D284FA847007F18D0"
+               BuildableName = "AmperfyKitTests.xctest"
+               BlueprintName = "AmperfyKitTests"
+               ReferencedContainer = "container:Amperfy.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "508EBB2D2850C9460053D9F0"
+               BuildableName = "AmperfyIntents.appex"
+               BlueprintName = "AmperfyIntents"
+               ReferencedContainer = "container:Amperfy.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "50C9D604284FA847007F18D0"
+               BuildableName = "AmperfyKit.framework"
+               BlueprintName = "AmperfyKit"
+               ReferencedContainer = "container:Amperfy.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -28,6 +70,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "50C9D60D284FA847007F18D0"
+               BuildableName = "AmperfyKitTests.xctest"
+               BlueprintName = "AmperfyKitTests"
+               ReferencedContainer = "container:Amperfy.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
