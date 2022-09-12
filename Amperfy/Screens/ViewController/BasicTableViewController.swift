@@ -159,7 +159,7 @@ class BasicTableViewController: UITableViewController {
     var appDelegate: AppDelegate!
     let searchController = UISearchController(searchResultsController: nil)
     
-    var noAnimationAtNextDataChange = false
+    var isRefreshAnimationOff = false
     var swipeDisplaySettings = SwipeDisplaySettings()
     var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
     var swipeCallback: SwipeActionCallback?
@@ -279,11 +279,11 @@ extension BasicTableViewController: NSFetchedResultsControllerDelegate {
     private func applyChangesFromFetchedResultsController(at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .insert:
-            tableView.insertRows(at: [newIndexPath!], with: .bottom)
+            tableView.insertRows(at: [newIndexPath!], with: isRefreshAnimationOff ? .none : .bottom)
         case .delete:
-            tableView.deleteRows(at: [indexPath!], with: .left)
+            tableView.deleteRows(at: [indexPath!], with: isRefreshAnimationOff ? .none : .left)
         case .move:
-            if indexPath! != newIndexPath! {
+            if indexPath! != newIndexPath!, !isRefreshAnimationOff {
                 tableView.insertRows(at: [newIndexPath!], with: .bottom)
                 tableView.deleteRows(at: [indexPath!], with: .left)
             } else {

@@ -106,6 +106,19 @@ extension UITableViewController {
     func dequeueCell<CellType: UITableViewCell>(for tableView: UITableView, at indexPath: IndexPath) -> CellType {
         return self.tableView.dequeueCell(for: tableView, at: indexPath)
     }
+    
+    func refreshAllVisibleCells() {
+        let visibleIndexPaths = tableView.visibleCells.compactMap{ tableView.indexPath(for: $0) }
+        tableView.reloadRows(at: visibleIndexPaths, with: .none)
+    }
+    
+    func exectueAfterAnimation(body: @escaping () -> Void) {
+        DispatchQueue.global().async {
+            DispatchQueue.main.async {
+                body()
+            }
+        }
+    }
 }
 
 extension UIViewController {

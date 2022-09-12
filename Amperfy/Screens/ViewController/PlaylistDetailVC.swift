@@ -156,8 +156,12 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        noAnimationAtNextDataChange = true
+        isRefreshAnimationOff = true
         playlist.movePlaylistItem(fromIndex: fromIndexPath.row, to: to.row)
+        exectueAfterAnimation {
+            self.refreshAllVisibleCells()
+            self.isRefreshAnimationOff = false
+        }
         guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
             self.appDelegate.librarySyncer.syncUpload(playlistToUpdateOrder: playlist)
