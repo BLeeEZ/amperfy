@@ -138,7 +138,9 @@ class BackendAudioPlayer {
                 self.continuePlay()
                 self.responder?.notifyItemPreparationFinished()
             }.catch { error in
+                self.stop()
                 self.responder?.notifyErrorOccured(error: error)
+                self.responder?.notifyItemPreparationFinished()
                 self.eventLogger.report(topic: "Player", error: error)
             }
         } else {
