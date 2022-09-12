@@ -65,11 +65,6 @@ public class LogEntry: NSObject {
         get { return LogEntryType(rawValue: managedObject.type) ?? .error }
         set { managedObject.type = newValue.rawValue }
     }
-    
-    public var suppressionTimeInterval: Int {
-        get { return Int(managedObject.suppressionTimeInterval) }
-        set { managedObject.suppressionTimeInterval = Int32(newValue) }
-    }
 
 }
 

@@ -88,7 +88,7 @@ class PodcastsVC: BasicTableViewController {
                 firstly {
                     self.appDelegate.librarySyncer.syncDownPodcastsWithoutEpisodes()
                 }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
+                    self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
                 }
             case .episodesSortedByReleaseDate:
                 firstly {
@@ -100,7 +100,7 @@ class PodcastsVC: BasicTableViewController {
                     }}
                     return podcastFetchPromises.resolveSequentially()
                 }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
+                    self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
                 }
             }
         }

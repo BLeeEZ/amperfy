@@ -80,13 +80,9 @@ extension AppDelegate: AlertDisplayable {
         topView.present(popupVC, animated: true, completion: nil)
     }
     
-    func createPopupVC(topic: String, message: String, logType: LogEntryType, logEntry: LogEntry) -> UIViewController {
-        let errorReportOneDaySilentTimeInSec = 60*60*24
+    func createPopupVC(topic: String, message: String, logType: LogEntryType) -> UIViewController {
         let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
         popupVC.setContent(topic: topic, message: message, type: logType)
-        popupVC.useOptionalButton(text: "Suppress for one day", onPressed: { _ in
-            self.eventLogger.updateSuppressionTimeInterval(logEntry: logEntry, suppressionTimeInterval: errorReportOneDaySilentTimeInSec)
-        })
         return popupVC
     }
 }

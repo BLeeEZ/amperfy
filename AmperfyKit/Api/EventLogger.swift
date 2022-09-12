@@ -29,13 +29,14 @@ public enum AmperfyLogStatusCode: Int {
     case emailError = 3
     case internalError = 4
     case connectionError = 5
+    case commonError = 6
 }
 
 /// Must be called from main thread
 public protocol AlertDisplayable {
     func display(notificationBanner popupVC: UIViewController)
     func display(popup popupVC: UIViewController)
-    func createPopupVC(topic: String, message: String, logType: LogEntryType, logEntry: LogEntry) -> UIViewController
+    func createPopupVC(topic: String, message: String, logType: LogEntryType) -> UIViewController
 }
 
 public class EventLogger {
@@ -58,81 +59,64 @@ public class EventLogger {
     }
      
     private func report(topic: String, statusCode: AmperfyLogStatusCode, message: String, logType: LogEntryType, displayPopup: Bool) {
-        storage.async.perform { asynCompanion in
-            let logEntry = asynCompanion.library.createLogEntry()
-            logEntry.type = logType
-            logEntry.statusCode = statusCode.rawValue
-            logEntry.message = topic + ": " + message
-            asynCompanion.saveContext()
-            
-            let logEntries = asynCompanion.library.getLogEntries()
-            let sameStatusCodeEntries = logEntries.lazy.filter{ $0.statusCode == statusCode.rawValue && $0.type == logType && $0.suppressionTimeInterval > 0 }
-            if let sameEntry = sameStatusCodeEntries.first, sameEntry.creationDate.compare(Date() - Double(sameEntry.suppressionTimeInterval)) == .orderedDescending {
-                return
-            }
-            if displayPopup {
-                self.displayAlert(topic: topic, message: message, logEntry: logEntry)
-            }
-        }.catch { error in }
+        saveAndDisplay(topic: topic,
+            logType: logType,
+            errorType: statusCode,
+            statusCode: statusCode.rawValue,
+            errorMessage: topic + ": " + message,
+            displayPopup: displayPopup,
+            popupMessage: message)
     }
     
     public func report(topic: String, error: Error, displayPopup: Bool = true) {
         if let apiError = error as? ResponseError {
             return report(error: apiError, displayPopup: displayPopup)
-        } else {
-            storage.async.perform { asynCompanion in
-                let logEntry = asynCompanion.library.createLogEntry()
-                logEntry.type = .error
-                logEntry.message = topic + ": " + error.localizedDescription
-                asynCompanion.saveContext()
-                os_log("%s", log: self.log, type: .error, logEntry.message)
-                if displayPopup {
-                    self.displayAlert(topic: topic, message: error.localizedDescription, logEntry: logEntry)
-                }
-            }.catch { error in }
         }
+        saveAndDisplay(topic: topic,
+            logType: .error,
+            errorType: .commonError,
+            statusCode: 0,
+            errorMessage: topic + ": " + error.localizedDescription,
+            displayPopup: displayPopup,
+            popupMessage: error.localizedDescription)
     }
     
     public func report(error: ResponseError, displayPopup: Bool) {
+        var alertMessage = ""
+        alertMessage += "Status code: \(error.statusCode)"
+        alertMessage += "\n\(error.message)"
+        
+        saveAndDisplay(topic: "API Error",
+            logType: .apiError,
+            errorType: .connectionError,
+            statusCode: error.statusCode,
+            errorMessage: "API Error " + error.statusCode.description + ": " + error.message,
+            displayPopup: displayPopup,
+            popupMessage: alertMessage)
+    }
+    
+    private func saveAndDisplay(topic: String, logType: LogEntryType, errorType: AmperfyLogStatusCode, statusCode: Int, errorMessage: String, displayPopup: Bool, popupMessage: String) {
+        os_log("%s", log: self.log, type: .error, errorMessage)
         storage.async.perform { asynCompanion in
             let logEntry = asynCompanion.library.createLogEntry()
-            logEntry.type = .apiError
-            logEntry.statusCode = error.statusCode
-            logEntry.message = "API Error " + error.statusCode.description + ": " + error.message
+            logEntry.type = logType
+            logEntry.statusCode = statusCode
+            logEntry.message = errorMessage
             asynCompanion.saveContext()
             
-            var alertMessage = ""
-            alertMessage += "Status code: \(error.statusCode)"
-            alertMessage += "\n\(error.message)"
-            
-            let logEntries = asynCompanion.library.getLogEntries()
-            let sameStatusCodeEntries = logEntries.lazy.filter{ $0.statusCode == error.statusCode && $0.type == .apiError && $0.suppressionTimeInterval > 0 }
-            if let sameEntry = sameStatusCodeEntries.first, sameEntry.creationDate.compare(Date() - Double(sameEntry.suppressionTimeInterval)) == .orderedDescending {
-                return
-            }
             if displayPopup {
-                self.displayAlert(topic: "API Error", message: alertMessage, logEntry: logEntry)
+                self.displayAlert(topic: topic, message: popupMessage, logType: logType)
             }
         }.catch { error in }
     }
     
-    private func displayAlert(topic: String, message: String, logEntry: LogEntry) {
-        let logType = logEntry.type
+    private func displayAlert(topic: String, message: String, logType: LogEntryType) {
         guard let displayer = self.alertDisplayer else { return }
         DispatchQueue.main.async {
             guard !self.supressAlerts else { return }
-            let popupVC = displayer.createPopupVC(topic: topic, message: message, logType: logType, logEntry: logEntry)
+            let popupVC = displayer.createPopupVC(topic: topic, message: message, logType: logType)
             displayer.display(notificationBanner: popupVC)
         }
-    }
-    
-    public func updateSuppressionTimeInterval(logEntry: LogEntry, suppressionTimeInterval: Int) {
-        storage.async.perform { asynCompanion in
-            let logEntryMO = asynCompanion.context.object(with: logEntry.managedObject.objectID) as! LogEntryMO
-            let logEntry = LogEntry(managedObject: logEntryMO)
-            logEntry.suppressionTimeInterval = suppressionTimeInterval
-            asynCompanion.saveContext()
-        }.catch { error in }
     }
     
 }
