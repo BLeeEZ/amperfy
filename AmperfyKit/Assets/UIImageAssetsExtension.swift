@@ -52,6 +52,7 @@ extension UIImage {
     public static var podcastCarplay: UIImage = { return UIImage.create("podcast_carplay") }()
     public static var podcastEpisode: UIImage = { return UIImage.create("podcast") }()
     public static var podcastEpisodeArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.podcastEpisode, iconSizeType: .small) }()
+    public static var folder: UIImage = { return UIImage.create("folder") }() // SF-Symbols 3.2 Regular:  foldes.fill
     public static var playlist: UIImage = { return UIImage.create("playlist_svg") }()
     public static var playlistArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, switchColors: true) }()
     public static var playlistCarplay: UIImage = { return UIImage.create("playlist_carplay") }()

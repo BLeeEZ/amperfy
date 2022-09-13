@@ -31,8 +31,8 @@ class SettingsSwipeVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        tableView.register(nibName: SwipeActionTableCell.typeName)
-        tableView.rowHeight = SwipeActionTableCell.rowHeight
+        tableView.register(nibName: IconLabelTableCell.typeName)
+        tableView.rowHeight = IconLabelTableCell.rowHeight
         
         actionSettings = appDelegate.storage.settings.swipeActionSettings
     }
@@ -47,7 +47,7 @@ class SettingsSwipeVC: UITableViewController {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         for visibleCell in tableView.visibleCells {
-            let cell = visibleCell as! SwipeActionTableCell
+            let cell = visibleCell as! IconLabelTableCell
             cell.refreshStyle()
         }
     }
@@ -72,7 +72,7 @@ class SettingsSwipeVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: SwipeActionTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
+        let cell: IconLabelTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
         cell.display(action: actionSettings.combined[indexPath.section][indexPath.row])
         return cell
     }

@@ -115,6 +115,7 @@ public class PersistentStorage {
         case ArtworkDisplayPreference = "artworkDisplayPreference"
         
         case SongActionOnTab = "songActionOnTab"
+        case LibraryDisplaySettings = "libraryDisplaySettings"
         case SwipeLeadingActionSettings = "swipeLeadingActionSettings"
         case SwipeTrailingActionSettings = "swipeTrailingActionSettings"
         case PlaylistsSortSetting = "playlistsSortSetting"
@@ -201,6 +202,20 @@ public class PersistentStorage {
             set {
                 UserDefaults.standard.set(newValue.leading.compactMap{ $0.rawValue }, forKey: UserDefaultsKey.SwipeLeadingActionSettings.rawValue)
                 UserDefaults.standard.set(newValue.trailing.compactMap{ $0.rawValue }, forKey: UserDefaultsKey.SwipeTrailingActionSettings.rawValue)
+            }
+        }
+        
+        public var libraryDisplaySettings: LibraryDisplaySettings {
+            get {
+                guard let libraryDisplaySettingsRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.LibraryDisplaySettings.rawValue) as? [Int]
+                else {
+                    return LibraryDisplaySettings.defaultSettings
+                }
+                let libraryDisplaySettings = libraryDisplaySettingsRaw.compactMap{ LibraryDisplayType(rawValue: $0) }
+                return LibraryDisplaySettings(inUse: libraryDisplaySettings)
+            }
+            set {
+                UserDefaults.standard.set(newValue.inUse.compactMap{ $0.rawValue }, forKey: UserDefaultsKey.LibraryDisplaySettings.rawValue)
             }
         }
         

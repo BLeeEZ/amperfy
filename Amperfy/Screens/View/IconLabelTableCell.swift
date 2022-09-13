@@ -1,5 +1,5 @@
 //
-//  SwipeActionTableCell.swift
+//  IconLabelTableCell.swift
 //  Amperfy
 //
 //  Created by Maximilian Bauer on 06.02.22.
@@ -22,14 +22,16 @@
 import UIKit
 import AmperfyKit
 
-class SwipeActionTableCell: BasicTableCell {
+class IconLabelTableCell: BasicTableCell {
     
     @IBOutlet weak var nameLabel: MarqueeLabel!
     @IBOutlet weak var actionImage: UIImageView!
+    @IBOutlet weak var directoryIconLabel: UILabel!
     
     private var action: SwipeActionType?
+    private var libraryDisplayType: LibraryDisplayType?
     
-    static let rowHeight: CGFloat = 50.0
+    static let rowHeight: CGFloat = 60.0
     
     func display(action: SwipeActionType) {
         self.action = action
@@ -38,14 +40,27 @@ class SwipeActionTableCell: BasicTableCell {
         refreshStyle()
     }
     
+    func display(libraryDisplayType: LibraryDisplayType) {
+        self.libraryDisplayType = libraryDisplayType
+        nameLabel.applyAmperfyStyle()
+        nameLabel.text = libraryDisplayType.displayName
+        refreshStyle()
+    }
+    
     func refreshStyle() {
-        guard let action = action else { return }
-        if traitCollection.userInterfaceStyle == .dark {
-            actionImage.image = action.image.invertedImage()
-        } else {
-            actionImage.image = action.image
+        if let action = action {
+            if traitCollection.userInterfaceStyle == .dark {
+                actionImage.image = action.image.invertedImage()
+            } else {
+                actionImage.image = action.image
+            }
+            nameLabel.font = nameLabel.font.withSize(16)
+            directoryIconLabel.isHidden = true
+        } else if let libraryDisplayType = libraryDisplayType {
+            actionImage.image = libraryDisplayType.image.withTintColor(.defaultBlue)
+            directoryIconLabel.isHidden = false
+            nameLabel.font = nameLabel.font.withSize(20)
         }
-        
     }
 
 }

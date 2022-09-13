@@ -25,30 +25,111 @@ import AmperfyKit
 
 class LibraryVC: UITableViewController {
     
-    @IBOutlet weak var genreTableViewCell: UITableViewCell!
-    @IBOutlet weak var directoriesTableViewCell: UITableViewCell!
-    @IBOutlet weak var genreImageButton: UIButton!
-    
     var appDelegate: AppDelegate!
+    private var librarySettings = LibraryDisplaySettings.defaultSettings
+    private var editButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        genreImageButton.imageView?.contentMode = .scaleAspectFit
+        
+        tableView.register(nibName: IconLabelTableCell.typeName)
+        tableView.rowHeight = IconLabelTableCell.rowHeight
+        
+        editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editingPressed))
+        navigationItem.rightBarButtonItems = [editButton]
+        librarySettings = appDelegate.storage.settings.libraryDisplaySettings
+    }
+    
+    @objc private func editingPressed() {
+        tableView.isEditing.toggle()
+        editButton.title = tableView.isEditing ? "Done" : "Edit"
+        editButton.style = tableView.isEditing ? .done : .plain
+        if tableView.isEditing {
+            tableView.insertSections(IndexSet(integer: 1), with: .bottom)
+        } else {
+            tableView.deleteSections(IndexSet(integer: 1), with: .fade)
+        }
+        tableView.visibleCells.compactMap{ $0 as? IconLabelTableCell }.forEach{ $0.directoryIconLabel.isHidden = tableView.isEditing }
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         appDelegate.userStatistics.visited(.library)
         tableView.reloadData()
     }
     
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let cell = super.tableView(tableView, cellForRowAt: indexPath)
-        if cell == genreTableViewCell, appDelegate.storage.librarySyncVersion < .v7 {
-            return 0
-        } else {
-            return super.tableView(tableView, heightForRowAt: indexPath)
+    // handle dark/light mode change
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        for visibleCell in tableView.visibleCells {
+            let cell = visibleCell as! IconLabelTableCell
+            cell.refreshStyle()
+            cell.directoryIconLabel.isHidden = tableView.isEditing
         }
+    }
+
+    // MARK: - Table view data source
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        if tableView.isEditing {
+            return 2
+        } else {
+            return 1
+        }
+    }
+
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch section {
+        case 0: return nil
+        case 1: return "Hidden"
+        default: return nil
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return librarySettings.combined[section].count
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: IconLabelTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
+        cell.display(libraryDisplayType: librarySettings.combined[indexPath.section][indexPath.row])
+        cell.directoryIconLabel.isHidden = tableView.isEditing
+        return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard !tableView.isEditing else { return }
+        performSegue(withIdentifier: librarySettings.combined[indexPath.section][indexPath.row].segueName, sender: nil)
+    }
+    
+    // Override to support rearranging the table view.
+    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+        let fromAction = librarySettings.combined[fromIndexPath.section][fromIndexPath.row]
+        librarySettings.combined[fromIndexPath.section].remove(at: fromIndexPath.row)
+        librarySettings.combined[to.section].insert(fromAction, at: to.row)
+        appDelegate.storage.settings.libraryDisplaySettings = librarySettings
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        switch section {
+        case 0: return 0.0
+        case 1: return CommonScreenOperations.tableSectionHeightLarge
+        default: return 0.0
+        }
+    }
+    
+    // Override to support conditional rearranging of the table view.
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return tableView.isEditing
+    }
+    
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .none
+    }
+    
+    override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        return false
     }
     
 }

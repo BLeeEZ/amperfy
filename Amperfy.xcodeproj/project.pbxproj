@@ -91,8 +91,8 @@
 		50A85EF22689E8DC00FB3E31 /* PlayableTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A85EF12689E8DC00FB3E31 /* PlayableTableCell.swift */; };
 		50A85EF32689E95300FB3E31 /* PlayableTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50A85EF02689E8DC00FB3E31 /* PlayableTableCell.xib */; };
 		50ACAF0C27B10E270039913C /* SettingsSwipeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ACAF0B27B10E270039913C /* SettingsSwipeVC.swift */; };
-		50ACAF0F27B112A20039913C /* SwipeActionTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ACAF0D27B112A10039913C /* SwipeActionTableCell.swift */; };
-		50ACAF1027B113440039913C /* SwipeActionTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50ACAF0E27B112A10039913C /* SwipeActionTableCell.xib */; };
+		50ACAF0F27B112A20039913C /* IconLabelTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ACAF0D27B112A10039913C /* IconLabelTableCell.swift */; };
+		50ACAF1027B113440039913C /* IconLabelTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50ACAF0E27B112A10039913C /* IconLabelTableCell.xib */; };
 		50ADCD482660E70D007FE3BD /* SettingsPlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ADCD472660E70D007FE3BD /* SettingsPlayerVC.swift */; };
 		50AFA1492632E83100F198DD /* GenericDetailTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AFA1472632E83100F198DD /* GenericDetailTableHeader.swift */; };
 		50AFA14E2632E95900F198DD /* GenericDetailTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50AFA1482632E83100F198DD /* GenericDetailTableHeader.xib */; };
@@ -388,6 +388,7 @@
 		50DEEE0C265E3F9D0073FF20 /* DirectoriesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE0B265E3F9D0073FF20 /* DirectoriesVC.swift */; };
 		50E3D8D02796CB2B009A9680 /* LibraryEntityDetailVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50E3D8CF2796CB2B009A9680 /* LibraryEntityDetailVC.xib */; };
 		50E3D8D22796CB8A009A9680 /* LibraryEntityDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E3D8D12796CB8A009A9680 /* LibraryEntityDetailVC.swift */; };
+		50E77DB428D1B63200BDF882 /* LibraryDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */; };
 		50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */; };
 /* End PBXBuildFile section */
 
@@ -705,8 +706,8 @@
 		50AB92E3266760C100DCE45C /* SsDirectoriesExample2ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsDirectoriesExample2ParserTest.swift; sourceTree = "<group>"; };
 		50AB92E52667615400DCE45C /* AbstractAmpacheTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbstractAmpacheTest.swift; sourceTree = "<group>"; };
 		50ACAF0B27B10E270039913C /* SettingsSwipeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSwipeVC.swift; sourceTree = "<group>"; };
-		50ACAF0D27B112A10039913C /* SwipeActionTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActionTableCell.swift; sourceTree = "<group>"; };
-		50ACAF0E27B112A10039913C /* SwipeActionTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SwipeActionTableCell.xib; sourceTree = "<group>"; };
+		50ACAF0D27B112A10039913C /* IconLabelTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLabelTableCell.swift; sourceTree = "<group>"; };
+		50ACAF0E27B112A10039913C /* IconLabelTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IconLabelTableCell.xib; sourceTree = "<group>"; };
 		50ACAF1127B144040039913C /* SwipeActionSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActionSettings.swift; sourceTree = "<group>"; };
 		50ACAF1327B277B50039913C /* Entitlements.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
 		50ADCD472660E70D007FE3BD /* SettingsPlayerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPlayerVC.swift; sourceTree = "<group>"; };
@@ -816,6 +817,7 @@
 		50E15407261311590021F47D /* Amperfy v6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v6.xcdatamodel"; sourceTree = "<group>"; };
 		50E3D8CF2796CB2B009A9680 /* LibraryEntityDetailVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LibraryEntityDetailVC.xib; sourceTree = "<group>"; };
 		50E3D8D12796CB8A009A9680 /* LibraryEntityDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryEntityDetailVC.swift; sourceTree = "<group>"; };
+		50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryDisplaySettings.swift; sourceTree = "<group>"; };
 		50E964A925E8E20E00E3210F /* SubsonicVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersion.swift; sourceTree = "<group>"; };
 		50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersionTest.swift; sourceTree = "<group>"; };
 		50ED2B9027B7AE8500331BF7 /* EventNotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventNotificationHandler.swift; sourceTree = "<group>"; };
@@ -1241,6 +1243,7 @@
 				50FBE7DD262DD86500114278 /* BasicFetchedResultsController.swift */,
 				50120A2026280C9200B037B1 /* FetchedResultsControllers.swift */,
 				50ACAF1127B144040039913C /* SwipeActionSettings.swift */,
+				50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */,
 				50253F78284614A100BCCFB2 /* DuplicateEntitiesResolver.swift */,
 				50C9D6EA284FAD51007F18D0 /* PodcastsShowType.swift */,
 				50C9D6EC284FADB8007F18D0 /* PlayerDisplayStyleType.swift */,
@@ -1379,8 +1382,8 @@
 				502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */,
 				50CDF20F264BF0FB00F83EF6 /* LogEntryTableCell.xib */,
 				50CDF210264BF0FB00F83EF6 /* LogEntryTableCell.swift */,
-				50ACAF0E27B112A10039913C /* SwipeActionTableCell.xib */,
-				50ACAF0D27B112A10039913C /* SwipeActionTableCell.swift */,
+				50ACAF0E27B112A10039913C /* IconLabelTableCell.xib */,
+				50ACAF0D27B112A10039913C /* IconLabelTableCell.swift */,
 				500631FE23A1747B000F75A3 /* PlayerView.xib */,
 				5006320023A174C0000F75A3 /* PlayerView.swift */,
 				504CE14D27920965005E0DE7 /* RatingView.xib */,
@@ -1721,7 +1724,7 @@
 			files = (
 				502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */,
 				5000C1FE2799B32700DD73BB /* AlbumSongTableCell.xib in Resources */,
-				50ACAF1027B113440039913C /* SwipeActionTableCell.xib in Resources */,
+				50ACAF1027B113440039913C /* IconLabelTableCell.xib in Resources */,
 				5055AA5826835AB000096B8D /* PodcastEpisodeTableCell.xib in Resources */,
 				50C16C0C21E52BBB00F086F0 /* SongTableCell.xib in Resources */,
 				50CDF212264BF11800F83EF6 /* LogEntryTableCell.xib in Resources */,
@@ -1826,7 +1829,7 @@
 				506B7AF325DD0243006CD6F9 /* SettingsLibraryVC.swift in Sources */,
 				50C9D717285075E3007F18D0 /* UtilitiesExtensions.swift in Sources */,
 				508FDE4C21F58AFC005A0724 /* AppStoryboard.swift in Sources */,
-				50ACAF0F27B112A20039913C /* SwipeActionTableCell.swift in Sources */,
+				50ACAF0F27B112A20039913C /* IconLabelTableCell.swift in Sources */,
 				50DEEE0C265E3F9D0073FF20 /* DirectoriesVC.swift in Sources */,
 				502E56BC27561AD900638BD2 /* PopupPlayerSectionHeader.swift in Sources */,
 				50ADCD482660E70D007FE3BD /* SettingsPlayerVC.swift in Sources */,
@@ -2016,6 +2019,7 @@
 				50C9D6C4284FAB0C007F18D0 /* LocalNotificationManager.swift in Sources */,
 				50C9D6B5284FAA87007F18D0 /* PlayableFile.swift in Sources */,
 				50C9D654284FAA02007F18D0 /* SsPlayableParserDelegate.swift in Sources */,
+				50E77DB428D1B63200BDF882 /* LibraryDisplaySettings.swift in Sources */,
 				50C9D64D284FAA02007F18D0 /* SubsonicArtworkDownloadDelegate.swift in Sources */,
 				50C9D6D0284FAB0C007F18D0 /* ConcurrentTaskGroup.swift in Sources */,
 				50BE5D9828511C3800156FC6 /* Amperfy.xcdatamodeld in Sources */,
