@@ -50,7 +50,8 @@ extension PlayableContainerType {
     }
 }
 
-public struct XCallbackActionParameterDocu {
+public struct XCallbackActionParameterDocu: Hashable {
+    public var id = UUID()
     public var name: String
     public var type: String
     public var isMandatory: Bool
@@ -58,7 +59,8 @@ public struct XCallbackActionParameterDocu {
     public var defaultIfNotGiven: String?
 }
 
-public struct XCallbackActionDocu {
+public struct XCallbackActionDocu: Hashable {
+    public var id = UUID()
     public var name: String
     public var description: String
     public var exampleURLs: [String]

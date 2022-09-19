@@ -546,15 +546,15 @@ extension UIImage {
         return result
     }
     
-    public func invertedImage() -> UIImage? {
-        guard let cgImage = self.cgImage else { return nil }
+    public func invertedImage() -> UIImage {
+        guard let cgImage = self.cgImage else { return UIImage() }
         let ciImage = CoreImage.CIImage(cgImage: cgImage)
-        guard let filter = CIFilter(name: "CIColorInvert") else { return nil }
+        guard let filter = CIFilter(name: "CIColorInvert") else { return UIImage() }
         filter.setDefaults()
         filter.setValue(ciImage, forKey: kCIInputImageKey)
         let context = CIContext(options: nil)
-        guard let outputImage = filter.outputImage else { return nil }
-        guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
+        guard let outputImage = filter.outputImage else { return UIImage() }
+        guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return UIImage() }
         return UIImage(cgImage: outputImageCopy, scale: self.scale, orientation: .up)
     }
 }

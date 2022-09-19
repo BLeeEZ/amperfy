@@ -1,9 +1,9 @@
 //
-//  LogEntryMO+CoreDataClass.swift
-//  AmperfyKit
+//  ObservableSettings.swift
+//  Amperfy
 //
-//  Created by Maximilian Bauer on 16.05.21.
-//  Copyright (c) 2021 Maximilian Bauer. All rights reserved.
+//  Created by Maximilian Bauer on 20.09.22.
+//  Copyright (c) 2022 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,22 +19,13 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
-import CoreData
+import SwiftUI
+import AmperfyKit
 
-@objc(LogEntryMO)
-public class LogEntryMO: NSManagedObject {
-
-}
-
-extension LogEntryMO {
-    
-    public static var creationDateSortedFetchRequest: NSFetchRequest<LogEntryMO> {
-        let fetchRequest: NSFetchRequest<LogEntryMO> = LogEntryMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(LogEntryMO.creationDate), ascending: false)
-        ]
-        return fetchRequest
-    }
-
+final class Settings: ObservableObject {
+    @Published var isOfflineMode = false
+    @Published var isAutoCacheLatestSongs = false
+    @Published var isAutoCacheLatestPodcastEpisodes = false
+    @Published var isPlayerAutoCachePlayedItems = false
+    @Published var swipeActionSettings = SwipeActionSettings(leading: [], trailing: [])
 }
