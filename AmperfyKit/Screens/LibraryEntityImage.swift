@@ -34,10 +34,6 @@ public class LibraryEntityImage: RoundedImage {
         appDelegate.notificationHandler.register(self, selector: #selector(self.downloadFinishedSuccessful(notification:)), name: .downloadFinishedSuccess, object: appDelegate.playableDownloadManager)
     }
     
-    deinit {
-        appDelegate.notificationHandler.remove(self, name: .downloadFinishedSuccess, object: appDelegate.artworkDownloadManager)
-    }
-    
     public func display(entity: AbstractLibraryEntity) {
         self.entity = entity
         self.backupImage = entity.defaultImage
