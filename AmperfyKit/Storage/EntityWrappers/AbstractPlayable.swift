@@ -204,6 +204,9 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
             if duration > 0 {
                 infoContent.append("\(duration.asDurationString)")
             }
+            if bitrate > 0 {
+                infoContent.append("Bitrate \(bitrate)")
+            }
         }
         return infoContent
     }

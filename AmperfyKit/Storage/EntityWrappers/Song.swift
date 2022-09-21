@@ -106,6 +106,9 @@ public class Song: AbstractPlayable, Identifyable {
             if let genre = genre {
                 infoContent.append("Genre: \(genre.name)")
             }
+            if bitrate > 0 {
+                infoContent.append("Bitrate \(bitrate)")
+            }
         }
         return infoContent
     }
