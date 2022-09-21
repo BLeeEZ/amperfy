@@ -27,24 +27,23 @@ import PromiseKit
 class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
 
     private var fetchedResultsController: ArtistFetchedResultsController!
-    private var filterButton: UIBarButtonItem!
     private var sortButton: UIBarButtonItem!
-    private var displayFilter: DisplayCategoryFilter = .all
+    public var displayFilter: DisplayCategoryFilter = .all
     private var sortType: ElementSortType = .name
+    private var filterTitle = "Artists"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.artists)
         
+        applyFilter()
         change(sortType: appDelegate.storage.settings.artistsSortSetting)
-        
-        configureSearchController(placeholder: "Search in \"Artists\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
+        configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
 
-        filterButton = UIBarButtonItem(image: UIImage.filter, style: .plain, target: self, action: #selector(filterButtonPressed))
         sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
-        navigationItem.rightBarButtonItems = [filterButton, sortButton]
+        navigationItem.rightBarButtonItems = [sortButton]
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -62,6 +61,18 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         }
     }
     
+    func applyFilter() {
+        switch displayFilter {
+        case .all:
+            self.filterTitle = "Artists"
+        case .recentlyAdded:
+            self.filterTitle = "Recent Artists"
+        case .favorites:
+            self.filterTitle = "Favorite Artists"
+        }
+        self.navigationItem.title = self.filterTitle
+    }
+    
     func change(sortType: ElementSortType) {
         self.sortType = sortType
         appDelegate.storage.settings.artistsSortSetting = sortType
@@ -75,11 +86,25 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        updateFilterButton()
+        updateFromRemote()
     }
     
-    func updateFilterButton() {
-        filterButton.image = displayFilter == .all ? UIImage.filter : UIImage.filterActive
+    func updateFromRemote() {
+        guard self.appDelegate.storage.settings.isOnlineMode else { return }
+        switch displayFilter {
+        case .all:
+            break
+        case .recentlyAdded:
+            break
+        case .favorites:
+            firstly {
+                self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Favorite Artists Sync", error: error)
+            }.finally {
+                self.updateSearchResults(for: self.searchController)
+            }
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -152,37 +177,6 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         if sortType != .rating {
             alert.addAction(UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
                 self.change(sortType: .rating)
-                self.updateSearchResults(for: self.searchController)
-            }))
-        }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
-        present(alert, animated: true, completion: nil)
-    }
-    
-    @objc private func filterButtonPressed() {
-        let alert = UIAlertController(title: "Artists filter", message: nil, preferredStyle: .actionSheet)
-        
-        if displayFilter != .favorites {
-            alert.addAction(UIAlertAction(title: "Show favorites", image: UIImage.heartFill, style: .default, handler: { _ in
-                self.displayFilter = .favorites
-                self.updateFilterButton()
-                self.updateSearchResults(for: self.searchController)
-                guard self.appDelegate.storage.settings.isOnlineMode else { return }
-                firstly {
-                    self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Favorite Artists Sync", error: error)
-                }.finally {
-                    self.updateSearchResults(for: self.searchController)
-                }
-            }))
-        }
-        if displayFilter != .all {
-            alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
-                self.displayFilter = .all
-                self.updateFilterButton()
                 self.updateSearchResults(for: self.searchController)
             }))
         }

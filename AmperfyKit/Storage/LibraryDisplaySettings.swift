@@ -33,6 +33,11 @@ public enum LibraryDisplayType: Int, CaseIterable {
     case playlists = 5
     case podcasts = 6
     case downloads = 7
+    case favoriteSongs = 8
+    case favoriteAlbums = 9
+    case favoriteArtists = 10
+    case recentSongs = 11
+    case recentAlbums = 12
 
     public var displayName: String {
         switch self {
@@ -52,6 +57,16 @@ public enum LibraryDisplayType: Int, CaseIterable {
             return "Podcasts"
         case .downloads:
             return "Downloads"
+        case .favoriteSongs:
+            return "Favorite Songs"
+        case .favoriteAlbums:
+            return "Favorite Albums"
+        case .favoriteArtists:
+            return "Favorite Artists"
+        case .recentSongs:
+            return "Recent Songs"
+        case .recentAlbums:
+            return "Recent Albums"
         }
     }
 
@@ -73,6 +88,16 @@ public enum LibraryDisplayType: Int, CaseIterable {
             return UIImage.podcast
         case .downloads:
             return UIImage.download
+        case .favoriteSongs:
+            return UIImage.heartFill
+        case .favoriteAlbums:
+            return UIImage.heartFill
+        case .favoriteArtists:
+            return UIImage.heartFill
+        case .recentSongs:
+            return UIImage.clock
+        case .recentAlbums:
+            return UIImage.clock
         }
     }
     
@@ -94,6 +119,16 @@ public enum LibraryDisplayType: Int, CaseIterable {
             return "toPodcasts"
         case .downloads:
             return "toDownloads"
+        case .favoriteSongs:
+            return "toFavoriteSongs"
+        case .favoriteAlbums:
+            return "toFavoriteAlbums"
+        case .favoriteArtists:
+            return "toFavoriteArtists"
+        case .recentSongs:
+            return "toRecentSongs"
+        case .recentAlbums:
+            return "toRecentAlbums"
         }
     }
     
@@ -119,8 +154,9 @@ public struct LibraryDisplaySettings {
             inUse: [
                 .artists,
                 .albums,
+                .recentAlbums,
                 .songs,
-                .genres,
+                .favoriteSongs,
                 .directories,
                 .playlists,
                 .podcasts

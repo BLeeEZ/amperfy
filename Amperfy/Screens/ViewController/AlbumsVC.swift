@@ -27,22 +27,21 @@ import PromiseKit
 class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
 
     private var fetchedResultsController: AlbumFetchedResultsController!
-    private var filterButton: UIBarButtonItem!
     private var sortButton: UIBarButtonItem!
-    private var displayFilter: DisplayCategoryFilter = .all
+    public var displayFilter: DisplayCategoryFilter = .all
     private var sortType: ElementSortType = .name
+    private var filterTitle = "Albums"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.albums)
-        
+
+        applyFilter()
         change(sortType: appDelegate.storage.settings.albumsSortSetting)
-        
-        configureSearchController(placeholder: "Search in \"Albums\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
+        configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
         
-        filterButton = UIBarButtonItem(image: UIImage.filter, style: .plain, target: self, action: #selector(filterButtonPressed))
         sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
@@ -61,6 +60,21 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         }
     }
     
+    func applyFilter() {
+        switch displayFilter {
+        case .all:
+            self.filterTitle = "Albums"
+            self.isIndexTitelsHidden = false
+        case .recentlyAdded:
+            self.filterTitle = "Recent Albums"
+            self.isIndexTitelsHidden = true
+        case .favorites:
+            self.filterTitle = "Favorite Albums"
+            self.isIndexTitelsHidden = false
+        }
+        self.navigationItem.title = self.filterTitle
+    }
+    
     func change(sortType: ElementSortType) {
         self.sortType = sortType
         singleFetchedResultsController?.clearResults()
@@ -74,18 +88,39 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateRightBarButtonItems()
-        updateFilterButton()
-    }
-    
-    func updateFilterButton() {
-        filterButton.image = displayFilter == .all ? UIImage.filter : UIImage.filterActive
+        updateFromRemote()
     }
     
     func updateRightBarButtonItems() {
         if sortType == .recentlyAddedIndex {
-            navigationItem.rightBarButtonItems = [filterButton]
+            navigationItem.rightBarButtonItems = []
         } else {
-            navigationItem.rightBarButtonItems = [filterButton, sortButton]
+            navigationItem.rightBarButtonItems = [sortButton]
+        }
+    }
+    
+    func updateFromRemote() {
+        guard self.appDelegate.storage.settings.isOnlineMode else { return }
+        switch displayFilter {
+        case .all:
+            break
+        case .recentlyAdded:
+            firstly {
+                AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    .syncLatestLibraryElements()
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
+            }.finally {
+                self.updateSearchResults(for: self.searchController)
+            }
+        case .favorites:
+            firstly {
+                self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Favorite Albums Sync", error: error)
+            }.finally {
+                self.updateSearchResults(for: self.searchController)
+            }
         }
     }
 
@@ -161,62 +196,6 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             alert.addAction(UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
                 self.change(sortType: .rating)
                 self.appDelegate.storage.settings.albumsSortSetting = .rating
-                self.updateSearchResults(for: self.searchController)
-            }))
-        }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
-        present(alert, animated: true, completion: nil)
-    }
-    
-    @objc private func filterButtonPressed() {
-        let alert = UIAlertController(title: "Albums filter", message: nil, preferredStyle: .actionSheet)
-        
-        if displayFilter != .favorites {
-            alert.addAction(UIAlertAction(title: "Show favorites", image: UIImage.heartFill, style: .default, handler: { _ in
-                self.displayFilter = .favorites
-                self.change(sortType: self.appDelegate.storage.settings.albumsSortSetting)
-                self.updateRightBarButtonItems()
-                self.updateFilterButton()
-                self.isIndexTitelsHidden = false
-                self.updateSearchResults(for: self.searchController)
-                guard self.appDelegate.storage.settings.isOnlineMode else { return }
-                firstly {
-                    self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Favorite Albums Sync", error: error)
-                }.finally {
-                    self.updateSearchResults(for: self.searchController)
-                }
-            }))
-        }
-        if displayFilter != .recentlyAdded {
-            alert.addAction(UIAlertAction(title: "Show recently added", image: UIImage.clock, style: .default, handler: { _ in
-                self.displayFilter = .recentlyAdded
-                self.change(sortType: .recentlyAddedIndex)
-                self.updateRightBarButtonItems()
-                self.updateFilterButton()
-                self.isIndexTitelsHidden = true
-                self.updateSearchResults(for: self.searchController)
-                guard self.appDelegate.storage.settings.isOnlineMode else { return }
-                firstly {
-                    AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                        .syncLatestLibraryElements()
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Albums Latest Elements Sync", error: error)
-                }.finally {
-                    self.updateSearchResults(for: self.searchController)
-                }
-            }))
-        }
-        if displayFilter != .all {
-            alert.addAction(UIAlertAction(title: "Show all", style: .default, handler: { _ in
-                self.displayFilter = .all
-                self.change(sortType: self.appDelegate.storage.settings.albumsSortSetting)
-                self.updateRightBarButtonItems()
-                self.updateFilterButton()
-                self.isIndexTitelsHidden = false
                 self.updateSearchResults(for: self.searchController)
             }))
         }
