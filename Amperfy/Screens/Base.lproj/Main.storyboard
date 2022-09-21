@@ -479,8 +479,8 @@
                                     <outlet property="delegate" destination="ZrD-yX-z8h" id="29g-X4-JqF"/>
                                 </connections>
                             </tableView>
-                            <view contentMode="scaleToFill" ambiguous="YES" id="KWj-US-4T0">
-                                <rect key="frame" x="0.0" y="44" width="413" height="282"/>
+                            <view contentMode="scaleToFill" id="KWj-US-4T0">
+                                <rect key="frame" x="0.0" y="44" width="412" height="282"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
@@ -492,7 +492,7 @@
                             <constraint firstItem="KWj-US-4T0" firstAttribute="leading" secondItem="0WA-1Z-yPH" secondAttribute="leading" id="I7U-7e-RgY"/>
                             <constraint firstAttribute="bottom" secondItem="AEg-Xh-QOY" secondAttribute="bottom" placeholder="YES" id="N37-tW-lWl"/>
                             <constraint firstItem="AEg-Xh-QOY" firstAttribute="leading" secondItem="0WA-1Z-yPH" secondAttribute="leading" id="ZdK-hu-mjo"/>
-                            <constraint firstAttribute="trailing" secondItem="KWj-US-4T0" secondAttribute="trailing" id="gXH-Od-Mog"/>
+                            <constraint firstAttribute="trailing" secondItem="KWj-US-4T0" secondAttribute="trailing" priority="999" id="gXH-Od-Mog"/>
                             <constraint firstAttribute="trailing" secondItem="AEg-Xh-QOY" secondAttribute="trailing" id="h7G-sQ-PEK"/>
                         </constraints>
                     </view>

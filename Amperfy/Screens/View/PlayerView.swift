@@ -373,6 +373,10 @@ class PlayerView: UIView {
     }
     
     func viewWillAppear(_ animated: Bool) {
+        refreshView()
+    }
+    
+    func refreshView() {
         refreshPlayer()
         renderAnimation(animationDuration: TimeInterval(0.0))
         

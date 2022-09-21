@@ -79,11 +79,10 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         appDelegate.userStatistics.visited(.popupPlayer)
         reloadData()
         adjustConstraintsForCompactPlayer()
-        self.playerView?.viewWillAppear(animated)
+        self.playerView?.refreshView()
     }
     
     // Detecet device (iPad) rotation
