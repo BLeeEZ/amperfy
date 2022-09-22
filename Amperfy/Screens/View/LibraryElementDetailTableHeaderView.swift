@@ -32,6 +32,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     
     private var appDelegate: AppDelegate!
     private var playContextCb: GetPlayContextCallback?
+    private var shuffleContextCb: GetPlayContextCallback?
     private var player: PlayerFacade?
     
     required init?(coder aDecoder: NSCoder) {
@@ -49,7 +50,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     @IBAction func addAllShuffledButtonPressed(_ sender: Any) {
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
-        play(isShuffled: true)
+        shuffle()
     }
     
     private func play(isShuffled: Bool) {
@@ -57,9 +58,19 @@ class LibraryElementDetailTableHeaderView: UIView {
         isShuffled ? player.playShuffled(context: playContext) : player.play(context: playContext)
     }
     
-    func prepare(playContextCb: GetPlayContextCallback?, with player: PlayerFacade) {
+    private func shuffle() {
+        guard let player = player else { return }
+        if let shuffleContext = shuffleContextCb?() {
+            player.playShuffled(context: shuffleContext)
+        } else {
+            play(isShuffled: true)
+        }
+    }
+    
+    func prepare(playContextCb: GetPlayContextCallback?, with player: PlayerFacade, shuffleContextCb: GetPlayContextCallback? = nil) {
         self.playContextCb = playContextCb
         self.player = player
+        self.shuffleContextCb = shuffleContextCb
         playAllButton.setImage(UIImage.play.invertedImage(), for: .normal)
         playAllButton.imageView?.contentMode = .scaleAspectFit
         playShuffledButton.setImage(UIImage.shuffle.invertedImage(), for: .normal)

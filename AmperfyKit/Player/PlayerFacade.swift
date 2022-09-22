@@ -129,6 +129,7 @@ public protocol PlayerFacade {
 }
 
 extension PlayerFacade {
+    public var maxSongsToAddOnce: Int { return 500 }
     var skipForwardInterval: Double { return 30.0 }
     var skipBackwardInterval: Double { return 15.0 }
 }

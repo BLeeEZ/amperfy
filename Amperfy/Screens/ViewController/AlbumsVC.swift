@@ -42,6 +42,15 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
         
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+            libraryElementDetailTableHeaderView.prepare(
+                playContextCb: self.handleHeaderPlay,
+                with: appDelegate.player,
+                shuffleContextCb: self.handleHeaderShuffle)
+            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
+        }
+        
         sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
@@ -181,6 +190,32 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         }
         fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1, displayFilter: displayFilter)
         tableView.reloadData()
+    }
+    
+    private var displayedSongs: [AbstractPlayable] {
+        guard let displayedAlbumsMO = self.fetchedResultsController.fetchedObjects else { return [] }
+        let displayedAlbums = displayedAlbumsMO.compactMap{ Album(managedObject: $0) }
+        var songs = [AbstractPlayable]()
+        displayedAlbums.forEach { songs.append(contentsOf: $0.playables) }
+        return songs
+    }
+    
+    private func handleHeaderPlay() -> PlayContext {
+        let songs = displayedSongs
+        if songs.count > appDelegate.player.maxSongsToAddOnce {
+            return PlayContext(name: filterTitle, playables: Array(songs.prefix(appDelegate.player.maxSongsToAddOnce)))
+        } else {
+            return PlayContext(name: filterTitle, playables: songs)
+        }
+    }
+    
+    private func handleHeaderShuffle() -> PlayContext {
+        let songs = displayedSongs
+        if songs.count > appDelegate.player.maxSongsToAddOnce {
+            return PlayContext(name: filterTitle, playables: songs[randomPick: appDelegate.player.maxSongsToAddOnce])
+        } else {
+            return PlayContext(name: filterTitle, playables: songs)
+        }
     }
     
     @objc private func sortButtonPressed() {

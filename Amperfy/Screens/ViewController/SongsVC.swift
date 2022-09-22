@@ -25,12 +25,8 @@ import AmperfyKit
 import PromiseKit
 
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
-    
-    static let maxPlayAllSongsCount = 2000
-    static let maxPlayRandomSongsCount = 500
 
     private var fetchedResultsController: SongsFetchedResultsController!
-    private var optionsButton: UIBarButtonItem!
     private var sortButton: UIBarButtonItem!
     public var displayFilter: DisplayCategoryFilter = .all
     private var sortType: ElementSortType = .name
@@ -46,7 +42,15 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
         
-        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+            libraryElementDetailTableHeaderView.prepare(
+                playContextCb: self.handleHeaderPlay,
+                with: appDelegate.player,
+                shuffleContextCb: self.handleHeaderShuffle)
+            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
+        }
+        
         sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
@@ -87,16 +91,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        updateRightBarButtonItems()
+        navigationItem.rightBarButtonItems = [sortButton]
         updateFromRemote()
-    }
-    
-    func updateRightBarButtonItems() {
-        if sortType == .recentlyAddedIndex {
-            navigationItem.rightBarButtonItems = [optionsButton]
-        } else {
-            navigationItem.rightBarButtonItems = [optionsButton, sortButton]
-        }
     }
     
     func updateFromRemote() {
@@ -186,6 +182,26 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.reloadData()
     }
     
+    private func handleHeaderPlay() -> PlayContext {
+        guard let displayedSongsMO = self.fetchedResultsController.fetchedObjects else { return PlayContext(name: filterTitle, playables: []) }
+        let displayedSongs = displayedSongsMO.compactMap{ Song(managedObject: $0) }
+        if displayedSongs.count > appDelegate.player.maxSongsToAddOnce {
+            return PlayContext(name: filterTitle, playables: Array(displayedSongs.prefix(appDelegate.player.maxSongsToAddOnce)))
+        } else {
+            return PlayContext(name: filterTitle, playables: displayedSongs)
+        }
+    }
+    
+    private func handleHeaderShuffle() -> PlayContext {
+        guard let displayedSongsMO = self.fetchedResultsController.fetchedObjects else { return PlayContext(name: filterTitle, playables: []) }
+        let displayedSongs = displayedSongsMO.compactMap{ Song(managedObject: $0) }
+        if displayedSongs.count > appDelegate.player.maxSongsToAddOnce {
+            return PlayContext(name: filterTitle, playables: displayedSongs[randomPick: appDelegate.player.maxSongsToAddOnce])
+        } else {
+            return PlayContext(name: filterTitle, playables: displayedSongs)
+        }
+    }
+    
     @objc private func sortButtonPressed() {
         let alert = UIAlertController(title: "Songs sorting", message: nil, preferredStyle: .actionSheet)
         if sortType != .name {
@@ -202,43 +218,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                 self.updateSearchResults(for: self.searchController)
             }))
         }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
-        present(alert, animated: true, completion: nil)
-    }
-    
-    @objc private func optionsPressed() {
-        let alert = UIAlertController(title: self.filterTitle, message: nil, preferredStyle: .actionSheet)
-
-        alert.addAction(UIAlertAction(title: "Play all displayed songs", style: .default, handler: { _ in
-            guard let displayedSongsMO = self.fetchedResultsController.fetchedObjects else { return }
-            let displayedSongs = displayedSongsMO.compactMap{ Song(managedObject: $0) }
-            guard displayedSongs.count > 0 else { return }
-            if displayedSongs.count > Self.maxPlayAllSongsCount {
-                let toManySongsAlert = UIAlertController(title: "Too many songs", message: nil, preferredStyle: .actionSheet)
-                toManySongsAlert.addAction(UIAlertAction(title: "Play the first \(Self.maxPlayAllSongsCount) songs", style: .default, handler: { _ in
-                    self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: Array(displayedSongs.prefix(Self.maxPlayAllSongsCount))))
-                }))
-                toManySongsAlert.addAction(UIAlertAction(title: "Play the last \(Self.maxPlayAllSongsCount) songs", style: .default, handler: { _ in
-                    self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: Array(displayedSongs[(displayedSongs.count-Self.maxPlayAllSongsCount)...])))
-                }))
-                toManySongsAlert.addAction(UIAlertAction(title: "Play \(Self.maxPlayAllSongsCount) random songs from collection", style: .default, handler: { _ in
-                    self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: displayedSongs[randomPick: Self.maxPlayAllSongsCount]))
-                }))
-                toManySongsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-                toManySongsAlert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-                toManySongsAlert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
-                self.present(toManySongsAlert, animated: true, completion: nil)
-                
-            } else {
-                self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: displayedSongs))
-            }
-        }))
-        alert.addAction(UIAlertAction(title: "Play random songs", style: .default, handler: { _ in
-            let songs = self.appDelegate.storage.main.library.getSongs().filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode)
-            self.appDelegate.player.play(context: PlayContext(name: "Song Collection", playables: songs[randomPick: Self.maxPlayRandomSongsCount]))
-        }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
