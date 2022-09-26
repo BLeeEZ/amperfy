@@ -29,6 +29,16 @@ public final class AlbumMO: AbstractLibraryEntityMO {
         return NSPredicate(format: "SUBQUERY(songs, $song, $song.artist == %@) .@count > 0", artist.managedObject.objectID)
     }
     
+    static var alphabeticSortedFetchRequest: NSFetchRequest<AlbumMO> {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(AlbumMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
+    
     static var releaseYearSortedFetchRequest: NSFetchRequest<AlbumMO> {
         let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
         fetchRequest.sortDescriptors = [

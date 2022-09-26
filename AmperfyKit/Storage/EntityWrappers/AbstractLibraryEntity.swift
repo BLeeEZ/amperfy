@@ -84,6 +84,13 @@ public class AbstractLibraryEntity {
         }
     }
     
+    func updateAlphabeticSectionInitial(section: String) {
+        let initial = section.sectionInitial
+        if managedObject.alphabeticSectionInitial != initial {
+            managedObject.alphabeticSectionInitial = initial
+        }
+    }
+    
     public func image(setting: ArtworkDisplayPreference) -> UIImage {
         guard let img = artwork?.image else {
             return defaultImage

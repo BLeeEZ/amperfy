@@ -33,6 +33,16 @@ extension GenreMO: CoreDataIdentifyable {
         return \GenreMO.name
     }
     
+    static var alphabeticSortedFetchRequest: NSFetchRequest<GenreMO> {
+        let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(GenreMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
+    
     func passOwnership(to targetGenre: GenreMO) {
         let artistsCopy = artists?.compactMap{ $0 as? ArtistMO }
         artistsCopy?.forEach{

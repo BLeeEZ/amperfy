@@ -38,7 +38,12 @@ public class Podcast: AbstractLibraryEntity {
     }
     public var title: String {
         get { return managedObject.title ?? "Unknown Podcast" }
-        set { if managedObject.title != newValue { managedObject.title = newValue } }
+        set {
+            if managedObject.title != newValue {
+                managedObject.title = newValue
+                updateAlphabeticSectionInitial(section: newValue)
+            }
+        }
     }
     public var depiction: String {
         get { return managedObject.depiction ?? "" }

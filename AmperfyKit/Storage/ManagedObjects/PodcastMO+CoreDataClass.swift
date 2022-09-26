@@ -33,6 +33,16 @@ extension PodcastMO: CoreDataIdentifyable {
         return \PodcastMO.title
     }
     
+    static var alphabeticSortedFetchRequest: NSFetchRequest<PodcastMO> {
+        let fetchRequest: NSFetchRequest<PodcastMO> = PodcastMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(PodcastMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
+    
     func passOwnership(to targetPodcast: PodcastMO) {
         let episodesCopy = episodes?.compactMap{ $0 as? PodcastEpisodeMO }
         episodesCopy?.forEach{

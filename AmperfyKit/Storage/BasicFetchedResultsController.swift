@@ -60,25 +60,11 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
     override public func sectionIndexTitle(forSectionName sectionName: String) -> String? {
         switch sectionIndexType {
         case .alphabet:
-            return sortByAlphabet(forSectionName: sectionName)
+            return sectionName
         case .rating:
             return sortByRating(forSectionName: sectionName)
         case .recentlyAddedIndex:
             return nil
-        }
-    }
-    
-    private func sortByAlphabet(forSectionName sectionName: String) -> String? {
-        guard sectionName.count > 0 else { return "?" }
-        let initial = String(sectionName.prefix(1).folding(options: .diacriticInsensitive, locale: nil).uppercased())
-        if let _ = initial.rangeOfCharacter(from: CharacterSet.decimalDigits) {
-            return "#"
-        } else if let _ = initial.rangeOfCharacter(from: CharacterSet(charactersIn: String.uppercaseAsciiLetters)) {
-            return initial
-        } else if let _ = initial.rangeOfCharacter(from: CharacterSet.letters) {
-            return "&"
-        } else {
-            return "?"
         }
     }
     

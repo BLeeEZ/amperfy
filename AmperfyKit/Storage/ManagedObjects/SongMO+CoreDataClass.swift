@@ -44,6 +44,16 @@ extension SongMO: CoreDataIdentifyable {
         ])
     }
     
+    static var alphabeticSortedFetchRequest: NSFetchRequest<SongMO> {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(SongMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
+    
     static var trackNumberSortedFetchRequest: NSFetchRequest<SongMO> {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fetchRequest.sortDescriptors = [

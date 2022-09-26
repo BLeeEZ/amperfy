@@ -33,6 +33,16 @@ extension ArtistMO: CoreDataIdentifyable {
         return \ArtistMO.name
     }
     
+    static var alphabeticSortedFetchRequest: NSFetchRequest<ArtistMO> {
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(ArtistMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
+    
     static var ratingSortedFetchRequest: NSFetchRequest<ArtistMO> {
         let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
         fetchRequest.sortDescriptors = [

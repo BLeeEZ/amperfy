@@ -73,7 +73,7 @@ class MOCK_SongDownloader: DownloadManageable {
 class MOCK_AlertDisplayable: AlertDisplayable {
     func display(notificationBanner popupVC: UIViewController) {}
     func display(popup popupVC: UIViewController) {}
-    func createPopupVC(topic: String, message: String, logType: LogEntryType, logEntry: LogEntry) -> UIViewController { return UIViewController() }
+    func createPopupVC(topic: String, message: String, logType: LogEntryType) -> UIViewController { return UIViewController() }
 }
 
 class MOCK_LibrarySyncer: LibrarySyncer {
@@ -108,13 +108,6 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func setFavorite(song: Song, isFavorite: Bool) -> Promise<Void> { return Promise.value }
     func setFavorite(album: Album, isFavorite: Bool) -> Promise<Void> { return Promise.value }
     func setFavorite(artist: Artist, isFavorite: Bool) -> Promise<Void> { return Promise.value }
-}
-
-class MOCK_BackgroundLibraryVersionResyncer: BackgroundLibraryVersionResyncer {
-    func resyncDueToNewLibraryVersionInBackground(library: LibraryStorage, libraryVersion: LibrarySyncVersion) {}
-    var isActive: Bool = false
-    func stop() {}
-    func stopAndWait() {}
 }
 
 class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {

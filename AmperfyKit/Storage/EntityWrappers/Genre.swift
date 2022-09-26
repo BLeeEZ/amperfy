@@ -39,7 +39,10 @@ public class Genre: AbstractLibraryEntity {
     public var name: String {
         get { return managedObject.name ?? "Unknown Genre" }
         set {
-            if managedObject.name != newValue { managedObject.name = newValue }
+            if managedObject.name != newValue {
+                managedObject.name = newValue
+                updateAlphabeticSectionInitial(section: newValue)
+            }
         }
     }
     public var artists: [Artist] {

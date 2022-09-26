@@ -53,7 +53,10 @@ public class Artist: AbstractLibraryEntity {
     public var name: String {
         get { return managedObject.name ?? "Unknown Artist" }
         set {
-            if managedObject.name != newValue { managedObject.name = newValue }
+            if managedObject.name != newValue {
+                managedObject.name = newValue
+                updateAlphabeticSectionInitial(section: newValue)
+            }
         }
     }
     public var albumCount: Int {

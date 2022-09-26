@@ -139,6 +139,24 @@ extension String {
         return (components[0] * 60 * 24) + (components[1] * 60) + components[2]
     }
     
+    public static var defaultSectionInital: String.Element {
+        return "?"
+    }
+    
+    public var sectionInitial: String {
+        guard self.count > 0 else { return "?" }
+        let initial = String(self.prefix(1).folding(options: .diacriticInsensitive, locale: nil).uppercased())
+        if let _ = initial.rangeOfCharacter(from: CharacterSet.decimalDigits) {
+            return "#"
+        } else if let _ = initial.rangeOfCharacter(from: CharacterSet(charactersIn: String.uppercaseAsciiLetters)) {
+            return initial
+        } else if let _ = initial.rangeOfCharacter(from: CharacterSet.letters) { // japanese / chinese letters
+            return "&"
+        } else {
+            return "?"
+        }
+    }
+    
     public static var uppercaseAsciiLetters: String {
         return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     }

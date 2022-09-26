@@ -33,7 +33,10 @@ public class Directory: AbstractLibraryEntity {
     public var name: String {
         get { return managedObject.name ?? "" }
         set {
-            if managedObject.name != newValue { managedObject.name = newValue }
+            if managedObject.name != newValue {
+                managedObject.name = newValue
+                updateAlphabeticSectionInitial(section: newValue)
+            }
         }
     }
     public var songs: [Song] {

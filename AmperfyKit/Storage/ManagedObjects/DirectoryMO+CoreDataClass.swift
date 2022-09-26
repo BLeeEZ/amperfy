@@ -25,10 +25,12 @@ import CoreData
 @objc(DirectoryMO)
 public final class DirectoryMO: AbstractLibraryEntityMO {
 
-    static var nameSortedFetchRequest: NSFetchRequest<DirectoryMO> {
+    static var alphabeticSortedFetchRequest: NSFetchRequest<DirectoryMO> {
         let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(DirectoryMO.name), ascending: true)
+            NSSortDescriptor(key: #keyPath(DirectoryMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
         ]
         return fetchRequest
     }

@@ -58,7 +58,7 @@ public enum DisplayCategoryFilter {
 public class PodcastFetchedResultsController: CachedFetchedResultsController<PodcastMO> {
     
     public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
-        let fetchRequest = PodcastMO.identifierSortedFetchRequest
+        let fetchRequest = PodcastMO.alphabeticSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(onlyCachedPodcasts: true),
@@ -136,7 +136,7 @@ public class PodcastEpisodesFetchedResultsController: BasicFetchedResultsControl
 public class GenreFetchedResultsController: CachedFetchedResultsController<GenreMO> {
     
     public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
-        let fetchRequest = GenreMO.identifierSortedFetchRequest
+        let fetchRequest = GenreMO.alphabeticSortedFetchRequest
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
         
@@ -164,7 +164,7 @@ public class GenreArtistsFetchedResultsController: BasicFetchedResultsController
     
     public init(for genre: Genre, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.genre = genre
-        let fetchRequest = ArtistMO.identifierSortedFetchRequest
+        let fetchRequest = ArtistMO.alphabeticSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSCompoundPredicate(orPredicateWithSubpredicates: [
                 AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
@@ -200,7 +200,7 @@ public class GenreAlbumsFetchedResultsController: BasicFetchedResultsController<
     
     public init(for genre: Genre, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.genre = genre
-        let fetchRequest = AlbumMO.identifierSortedFetchRequest
+        let fetchRequest = AlbumMO.alphabeticSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSCompoundPredicate(orPredicateWithSubpredicates: [
                 AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
@@ -236,7 +236,7 @@ public class GenreSongsFetchedResultsController: BasicFetchedResultsController<S
     
     public init(for genre: Genre, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.genre = genre
-        let fetchRequest = SongMO.identifierSortedFetchRequest
+        let fetchRequest = SongMO.alphabeticSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(forGenre: genre)
@@ -263,10 +263,10 @@ public class GenreSongsFetchedResultsController: BasicFetchedResultsController<S
 public class ArtistFetchedResultsController: CachedFetchedResultsController<ArtistMO> {
     
     public init(coreDataCompanion: CoreDataCompanion, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
-        var fetchRequest = ArtistMO.identifierSortedFetchRequest
+        var fetchRequest = ArtistMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
-            fetchRequest = ArtistMO.identifierSortedFetchRequest
+            fetchRequest = ArtistMO.alphabeticSortedFetchRequest
         case .rating:
             fetchRequest = ArtistMO.ratingSortedFetchRequest
         case .recentlyAddedIndex:
@@ -347,7 +347,7 @@ public class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsContro
     
     public init(for artist: Artist, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.artist = artist
-        let fetchRequest = SongMO.identifierSortedFetchRequest
+        let fetchRequest = SongMO.alphabeticSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(forArtist: artist)
@@ -374,10 +374,10 @@ public class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsContro
 public class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
     
     public init(coreDataCompanion: CoreDataCompanion, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
-        var fetchRequest = AlbumMO.identifierSortedFetchRequest
+        var fetchRequest = AlbumMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
-            fetchRequest = AlbumMO.identifierSortedFetchRequest
+            fetchRequest = AlbumMO.alphabeticSortedFetchRequest
         case .rating:
             fetchRequest = AlbumMO.ratingSortedFetchRequest
         case .recentlyAddedIndex:
@@ -412,10 +412,10 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
 public class SongsFetchedResultsController: CachedFetchedResultsController<SongMO> {
     
     public init(coreDataCompanion: CoreDataCompanion, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
-        var fetchRequest = SongMO.identifierSortedFetchRequest
+        var fetchRequest = SongMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
-            fetchRequest = SongMO.identifierSortedFetchRequest
+            fetchRequest = SongMO.alphabeticSortedFetchRequest
         case .rating:
             fetchRequest = SongMO.ratingSortedFetchRequest
         case .recentlyAddedIndex:
@@ -503,10 +503,10 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
     
     public init(coreDataCompanion: CoreDataCompanion, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool) {
         self.sortType = sortType
-        var fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        var fetchRequest = PlaylistMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
-            fetchRequest = PlaylistMO.identifierSortedFetchRequest
+            fetchRequest = PlaylistMO.alphabeticSortedFetchRequest
         case .lastPlayed:
             fetchRequest = PlaylistMO.lastPlayedDateFetchRequest
         case .lastChanged:
@@ -537,10 +537,10 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
     
     public init(coreDataCompanion: CoreDataCompanion, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool) {
         self.sortType = sortType
-        var fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        var fetchRequest = PlaylistMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
-            fetchRequest = PlaylistMO.identifierSortedFetchRequest
+            fetchRequest = PlaylistMO.alphabeticSortedFetchRequest
         case .lastPlayed:
             fetchRequest = PlaylistMO.lastPlayedDateFetchRequest
         case .lastChanged:
@@ -600,7 +600,7 @@ public class MusicFolderDirectoriesFetchedResultsController: BasicFetchedResults
     
     public init(for musicFolder: MusicFolder, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.musicFolder = musicFolder
-        let fetchRequest = DirectoryMO.identifierSortedFetchRequest
+        let fetchRequest = DirectoryMO.alphabeticSortedFetchRequest
         fetchRequest.predicate = coreDataCompanion.library.getFetchPredicate(forMusicFolder: musicFolder)
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
@@ -625,7 +625,7 @@ public class DirectorySubdirectoriesFetchedResultsController: BasicFetchedResult
     
     public init(for directory: Directory, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.directory = directory
-        let fetchRequest = DirectoryMO.identifierSortedFetchRequest
+        let fetchRequest = DirectoryMO.alphabeticSortedFetchRequest
         fetchRequest.predicate = coreDataCompanion.library.getDirectoryFetchPredicate(forDirectory: directory)
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }

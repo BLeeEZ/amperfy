@@ -80,10 +80,6 @@ protocol AbstractBackgroundLibrarySyncer {
     func stopAndWait()
 }
 
-protocol BackgroundLibraryVersionResyncer: AbstractBackgroundLibrarySyncer {
-    func resyncDueToNewLibraryVersionInBackground(library: LibraryStorage, libraryVersion: LibrarySyncVersion)
-}
-
 public protocol BackendApi {
     var clientApiVersion: String { get }
     var serverApiVersion: String { get }

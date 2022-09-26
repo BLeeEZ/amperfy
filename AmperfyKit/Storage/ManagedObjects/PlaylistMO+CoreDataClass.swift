@@ -34,6 +34,16 @@ public final class PlaylistMO: NSManagedObject {
         ])
     }
     
+    static var alphabeticSortedFetchRequest: NSFetchRequest<PlaylistMO> {
+        let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(PlaylistMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
+    
     static var lastPlayedDateFetchRequest: NSFetchRequest<PlaylistMO> {
         let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         fetchRequest.sortDescriptors = [

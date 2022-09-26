@@ -39,6 +39,12 @@ public class LibraryUpdater {
             updateArtworkIdStructure()
             os_log("Perform blocking library update (DONE): Artwork ids", log: log, type: .info)
         }
+        if storage.librarySyncVersion < .v12 {
+            os_log("Perform blocking library update (START): alphabeticSectionInitial", log: log, type: .info)
+            updateAlphabeticSectionInitial()
+            os_log("Perform blocking library update (DONE): alphabeticSectionInitial", log: log, type: .info)
+        }
+        storage.librarySyncVersion = .newestVersion
     }
     
     private func updateArtworkIdStructure() {
@@ -65,6 +71,34 @@ public class LibraryUpdater {
                 uniqueArtworks[artwork.uniqueID] = artwork
             }
         }
+        storage.main.saveContext()
+    }
+    
+    private func updateAlphabeticSectionInitial() {
+        os_log("Library update: Genres", log: log, type: .info)
+        let genres = storage.main.library.getGenres()
+        genres.forEach{ $0.updateAlphabeticSectionInitial(section: $0.name) }
+        os_log("Library update: Artists", log: log, type: .info)
+        let artists = storage.main.library.getArtists()
+        artists.forEach{ $0.updateAlphabeticSectionInitial(section: $0.name) }
+        os_log("Library update: Albums", log: log, type: .info)
+        let albums = storage.main.library.getAlbums()
+        albums.forEach{ $0.updateAlphabeticSectionInitial(section: $0.name) }
+        os_log("Library update: Songs", log: log, type: .info)
+        let songs = storage.main.library.getSongs()
+        songs.forEach{ $0.updateAlphabeticSectionInitial(section: $0.name) }
+        os_log("Library update: Podcasts", log: log, type: .info)
+        let podcasts = storage.main.library.getPodcasts()
+        podcasts.forEach{ $0.updateAlphabeticSectionInitial(section: $0.name) }
+        os_log("Library update: PodcastEpisodes", log: log, type: .info)
+        let podcastEpisodes = storage.main.library.getPodcastEpisodes()
+        podcastEpisodes.forEach{ $0.updateAlphabeticSectionInitial(section: $0.name) }
+        os_log("Library update: Directories", log: log, type: .info)
+        let directories = storage.main.library.getDirectories()
+        directories.forEach{ $0.updateAlphabeticSectionInitial(section: $0.name) }
+        os_log("Library update: Playlists", log: log, type: .info)
+        let playlists = storage.main.library.getPlaylists()
+        playlists.forEach{ $0.updateAlphabeticSectionInitial(section: $0.name) }
         storage.main.saveContext()
     }
     

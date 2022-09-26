@@ -1183,6 +1183,12 @@ public class LibraryStorage: PlayableFileCachable {
         return musicFolders?.lazy.compactMap{ MusicFolder(managedObject: $0) }.first
     }
     
+    func getDirectories() -> [Directory] {
+        let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
+        let directories = try? context.fetch(fetchRequest)
+        return directories?.lazy.compactMap{ Directory(managedObject: $0) } ?? [Directory]()
+    }
+    
     func getDirectory(id: String) -> Directory? {
         let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(DirectoryMO.id), NSString(string: id))

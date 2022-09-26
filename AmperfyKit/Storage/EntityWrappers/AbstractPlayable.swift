@@ -72,7 +72,10 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     public var title: String {
         get { return playableManagedObject.title ?? "Unknown Title" }
         set {
-            if playableManagedObject.title != newValue { playableManagedObject.title = newValue }
+            if playableManagedObject.title != newValue {
+                playableManagedObject.title = newValue
+                updateAlphabeticSectionInitial(section: newValue)
+            }
         }
     }
     public var track: Int {

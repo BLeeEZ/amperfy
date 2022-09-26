@@ -53,7 +53,10 @@ public class Album: AbstractLibraryEntity {
     public var name: String {
         get { return managedObject.name ?? "Unknown Album" }
         set {
-            if managedObject.name != newValue { managedObject.name = newValue }
+            if managedObject.name != newValue {
+                managedObject.name = newValue
+                updateAlphabeticSectionInitial(section: newValue)
+            }
         }
     }
     public var year: Int {

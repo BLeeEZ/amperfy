@@ -33,6 +33,16 @@ extension PodcastEpisodeMO: CoreDataIdentifyable {
         return \PodcastEpisodeMO.title
     }
     
+    static var alphabeticSortedFetchRequest: NSFetchRequest<PodcastEpisodeMO> {
+        let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(PodcastEpisodeMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
+    
     static var publishedDateSortedFetchRequest: NSFetchRequest<PodcastEpisodeMO> {
         let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
         fetchRequest.sortDescriptors = [

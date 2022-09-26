@@ -124,9 +124,16 @@ public class Playlist: Identifyable {
         set {
             if managedObject.name != newValue {
                 managedObject.name = newValue
+                updateAlphabeticSectionInitial(section: newValue)
                 updateChangeDate()
                 library.saveContext()
             }
+        }
+    }
+    func updateAlphabeticSectionInitial(section: String) {
+        let initial = section.sectionInitial
+        if managedObject.alphabeticSectionInitial != initial {
+            managedObject.alphabeticSectionInitial = initial
         }
     }
     public var playCount: Int {
