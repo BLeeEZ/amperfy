@@ -112,10 +112,10 @@ struct SettingsView: View {
                 }
                 #endif
             }
-            .listStyle(GroupedListStyle())
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
