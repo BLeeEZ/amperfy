@@ -37,7 +37,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         appDelegate.userStatistics.visited(.songs)
         
         applyFilter()
-        change(sortType: appDelegate.storage.settings.songsSortSetting)
         configureSearchController(placeholder: "Search in \"\(self.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
@@ -69,12 +68,15 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         case .all:
             self.filterTitle = "Songs"
             self.isIndexTitelsHidden = false
+            change(sortType: appDelegate.storage.settings.songsSortSetting)
         case .recentlyAdded:
             self.filterTitle = "Recent Songs"
             self.isIndexTitelsHidden = true
+            change(sortType: .recentlyAddedIndex)
         case .favorites:
             self.filterTitle = "Favorite Songs"
             self.isIndexTitelsHidden = false
+            change(sortType: appDelegate.storage.settings.songsSortSetting)
         }
         self.navigationItem.title = self.filterTitle
     }
@@ -83,7 +85,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         self.sortType = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType != .recentlyAddedIndex)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
@@ -91,8 +93,16 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationItem.rightBarButtonItems = [sortButton]
+        updateRightBarButtonItems()
         updateFromRemote()
+    }
+    
+    func updateRightBarButtonItems() {
+        if sortType == .recentlyAddedIndex {
+            navigationItem.rightBarButtonItems = []
+        } else {
+            navigationItem.rightBarButtonItems = [sortButton]
+        }
     }
     
     func updateFromRemote() {

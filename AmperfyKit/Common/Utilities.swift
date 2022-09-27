@@ -180,6 +180,10 @@ extension String {
 }
 
 extension Array {
+    public func object(at: Int) -> Element? {
+        return at < self.count ? self[at] : nil
+    }
+    
     public func chunked(intoSubarrayCount chunkCount: Int) -> [[Element]] {
         let chuckSize: Int = Int(ceil(Float(count)/Float(chunkCount)))
         return chunked(intoSubarraySize: chuckSize)

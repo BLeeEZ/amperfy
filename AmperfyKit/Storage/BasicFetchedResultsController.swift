@@ -131,7 +131,7 @@ public class BasicFetchedResultsController<ResultType>: NSObject where ResultTyp
     }
 
     public func titleForHeader(inSection section: Int) -> String? {
-        return fetchResultsController.sectionIndexTitles[section]
+        return fetchResultsController.sectionIndexTitles.object(at: section)
     }
 
     public func numberOfRows(inSection section: Int) -> Int {
