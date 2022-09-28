@@ -77,7 +77,6 @@ class LoginVC: UIViewController {
             self.updateApiSelectorText()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -120,7 +119,6 @@ class LoginVC: UIViewController {
     func showErrorMsg(message: String) {
         let alert = UIAlertController(title: "Login failed", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
         self.present(alert, animated: true, completion: nil)
     }
 

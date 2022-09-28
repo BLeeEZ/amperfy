@@ -229,8 +229,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             }))
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
+        alert.popoverPresentationController?.barButtonItem = sortButton
         present(alert, animated: true, completion: nil)
     }
     

@@ -140,8 +140,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
             }))
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.pruneNegativeWidthConstraintsToAvoidFalseConstraintWarnings()
-        alert.setOptionsForIPadToDisplayPopupCentricIn(view: self.view)
+        alert.popoverPresentationController?.barButtonItem = optionsButton
         present(alert, animated: true, completion: nil)
     }
     
