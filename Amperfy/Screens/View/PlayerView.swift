@@ -46,6 +46,9 @@ class PlayerView: UIView {
     @IBOutlet weak var titleLargeLabel: MarqueeLabel!
     @IBOutlet weak var titleLargeButton: UIButton!
     
+    @IBOutlet weak var albumLargeLabel: MarqueeLabel!
+    @IBOutlet weak var albumLargeButton: UIButton!
+    
     @IBOutlet weak var artistNameCompactLabel: MarqueeLabel!
     @IBOutlet weak var artistNameCompactButton: UIButton!
     @IBOutlet weak var artistNameLargeLabel: MarqueeLabel!
@@ -192,6 +195,10 @@ class PlayerView: UIView {
         displayAlbumDetail()
         displayPodcastDetail()
     }
+    @IBAction func albumLargePressed(_ sender: Any) {
+        displayAlbumDetail()
+        displayPodcastDetail()
+    }
     @IBAction func artistNameCompactPressed(_ sender: Any) {
         displayArtistDetail()
         displayPodcastDetail()
@@ -276,6 +283,8 @@ class PlayerView: UIView {
             self.ratingPlaceholderView.isHidden = true
             self.titleLargeLabel.alpha = 0
             self.titleLargeButton.isHidden = true
+            self.albumLargeLabel.alpha = 0
+            self.albumLargeButton.isHidden = true
             self.artistNameLargeLabel.alpha = 0
             self.artistNameLargeButton.isHidden = true
         }), completion: nil)
@@ -361,6 +370,8 @@ class PlayerView: UIView {
             self.ratingPlaceholderView.isHidden = false
             self.titleLargeLabel.alpha = 1
             self.titleLargeButton.isHidden = false
+            self.albumLargeLabel.alpha = 1
+            self.albumLargeButton.isHidden = false
             self.artistNameLargeLabel.alpha = 1
             self.artistNameLargeButton.isHidden = false
         }), completion: nil)
@@ -382,6 +393,7 @@ class PlayerView: UIView {
         
         titleCompactLabel.applyAmperfyStyle()
         titleLargeLabel.applyAmperfyStyle()
+        albumLargeLabel.applyAmperfyStyle()
         artistNameCompactLabel.applyAmperfyStyle()
         artistNameLargeLabel.applyAmperfyStyle()
 
@@ -431,6 +443,8 @@ class PlayerView: UIView {
         if let playableInfo = player.currentlyPlaying {
             titleCompactLabel.text = playableInfo.title
             titleLargeLabel.text = playableInfo.title
+            albumLargeLabel.text = playableInfo.asSong?.album?.name ?? ""
+            albumLargeButton.isEnabled = playableInfo.asSong != nil
             artistNameCompactLabel.text = playableInfo.creatorName
             artistNameLargeLabel.text = playableInfo.creatorName
             rootView?.popupItem.title = playableInfo.title
@@ -448,6 +462,7 @@ class PlayerView: UIView {
                 titleLargeLabel.text = "No podcast playing"
                 rootView?.popupItem.title = "No podcast playing"
             }
+            albumLargeLabel.text = ""
             artistNameCompactLabel.text = ""
             artistNameLargeLabel.text = ""
             rootView?.popupItem.subtitle = ""
