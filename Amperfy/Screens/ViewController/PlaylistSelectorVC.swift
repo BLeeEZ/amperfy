@@ -73,24 +73,30 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     @IBAction func sortBarButtonPressed(_ sender: Any) {
         let alert = UIAlertController(title: "Playlists sorting", message: nil, preferredStyle: .actionSheet)
-        if sortType != .name {
-            alert.addAction(UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
-                self.change(sortType: .name)
-                self.updateSearchResults(for: self.searchController)
-            }))
+        var action = UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+            self.change(sortType: .name)
+            self.updateSearchResults(for: self.searchController)
+        })
+        if sortType == .name {
+            action.image = UIImage.check
         }
-        if sortType != .lastPlayed {
-            alert.addAction(UIAlertAction(title: "Sort by last time played", style: .default, handler: { _ in
-                self.change(sortType: .lastPlayed)
-                self.updateSearchResults(for: self.searchController)
-            }))
+        alert.addAction(action)
+        action = UIAlertAction(title: "Sort by last time played", style: .default, handler: { _ in
+            self.change(sortType: .lastPlayed)
+            self.updateSearchResults(for: self.searchController)
+        })
+        if sortType == .lastPlayed {
+            action.image = UIImage.check
         }
-        if sortType != .lastChanged {
-            alert.addAction(UIAlertAction(title: "Sort by last time changed", style: .default, handler: { _ in
-                self.change(sortType: .lastChanged)
-                self.updateSearchResults(for: self.searchController)
-            }))
+        alert.addAction(action)
+        action = UIAlertAction(title: "Sort by last time changed", style: .default, handler: { _ in
+            self.change(sortType: .lastChanged)
+            self.updateSearchResults(for: self.searchController)
+        })
+        if sortType == .lastChanged {
+            action.image = UIImage.check
         }
+        alert.addAction(action)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.popoverPresentationController?.barButtonItem = sortBarButton
         present(alert, animated: true, completion: nil)

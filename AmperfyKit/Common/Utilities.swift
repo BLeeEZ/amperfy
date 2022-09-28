@@ -470,10 +470,10 @@ extension UIImageView {
 extension UIAlertAction {
     public convenience init(title: String?, image: UIImage, style: Style, handler: ((UIAlertAction) -> Void)? = nil) {
         self.init(title: title, style: style, handler: handler)
-        self.actionImage = image
+        self.image = image
     }
 
-    public var actionImage: UIImage {
+    public var image: UIImage {
         get { return self.value(forKey: "image") as? UIImage ?? UIImage() }
         set(image) { self.setValue(image, forKey: "image") }
     }

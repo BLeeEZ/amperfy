@@ -168,18 +168,22 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     
     @objc private func sortButtonPressed() {
         let alert = UIAlertController(title: "Artists sorting", message: nil, preferredStyle: .actionSheet)
-        if sortType != .name {
-            alert.addAction(UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
-                self.change(sortType: .name)
-                self.updateSearchResults(for: self.searchController)
-            }))
+        var action = UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+            self.change(sortType: .name)
+            self.updateSearchResults(for: self.searchController)
+        })
+        if sortType == .name {
+            action.image = UIImage.check
         }
-        if sortType != .rating {
-            alert.addAction(UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
-                self.change(sortType: .rating)
-                self.updateSearchResults(for: self.searchController)
-            }))
+        alert.addAction(action)
+        action = UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
+            self.change(sortType: .rating)
+            self.updateSearchResults(for: self.searchController)
+        })
+        if sortType == .rating {
+            action.image = UIImage.check
         }
+        alert.addAction(action)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.popoverPresentationController?.barButtonItem = sortButton
         present(alert, animated: true, completion: nil)

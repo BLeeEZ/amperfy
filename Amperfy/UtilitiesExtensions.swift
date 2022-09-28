@@ -208,6 +208,9 @@ extension UIApplication {
 }
 
 extension UIImage {
+    static let plus = UIImage(systemName: "plus")!
+    static let check = UIImage(systemName: "checkmark")!
+    
     private static func createEmptyImage(with size: CGSize) -> UIImage?
     {
         UIGraphicsBeginImageContext(size)

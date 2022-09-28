@@ -30,7 +30,7 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
     private var sortButton: UIBarButtonItem!
     private var refreshControl: UIRefreshControl?
     public var displayFilter: DisplayCategoryFilter = .all
-    private var sortType: ElementSortType = .name
+    private var sortType: AlbumElementSortType = .name
     private var filterTitle = "Albums"
     
     override func viewDidLoad() {
@@ -67,7 +67,7 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
         self.navigationItem.title = self.filterTitle
     }
     
-    func change(sortType: ElementSortType) {
+    func change(sortType: AlbumElementSortType) {
         self.sortType = sortType
         fetchedResultsController?.clearResults()
         fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType != .recentlyAddedIndex)
@@ -154,6 +154,8 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
             }
         case .recentlyAddedIndex:
             return fetchedResultsController.titleForHeader(inSection: section) ?? ""
+        case .artist:
+            return fetchedResultsController.titleForHeader(inSection: section) ?? ""
         }
     }
     
@@ -232,6 +234,8 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
             return CGSize(width: collectionView.bounds.size.width, height: CommonCollectionSectionHeader.frameHeight + headerTopHeight)
         case .recentlyAddedIndex:
             return CGSize(width: collectionView.bounds.size.width, height: headerTopHeight)
+        case .artist:
+            return CGSize(width: collectionView.bounds.size.width, height: CommonCollectionSectionHeader.frameHeight + headerTopHeight)
         }
     }
     
@@ -276,20 +280,33 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
     
     @objc private func sortButtonPressed() {
         let alert = UIAlertController(title: "Albums sorting", message: nil, preferredStyle: .actionSheet)
-        if sortType != .name {
-            alert.addAction(UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
-                self.change(sortType: .name)
-                self.appDelegate.storage.settings.albumsSortSetting = .name
-                self.updateSearchResults(for: self.searchController)
-            }))
+        var action = UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+            self.change(sortType: .name)
+            self.appDelegate.storage.settings.albumsSortSetting = .name
+            self.updateSearchResults(for: self.searchController)
+        })
+        if sortType == .name {
+            action.image = UIImage.check
         }
-        if sortType != .rating {
-            alert.addAction(UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
-                self.change(sortType: .rating)
-                self.appDelegate.storage.settings.albumsSortSetting = .rating
-                self.updateSearchResults(for: self.searchController)
-            }))
+        alert.addAction(action)
+        action = UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
+            self.change(sortType: .rating)
+            self.appDelegate.storage.settings.albumsSortSetting = .rating
+            self.updateSearchResults(for: self.searchController)
+        })
+        if sortType == .rating {
+            action.image = UIImage.check
         }
+        alert.addAction(action)
+        action = UIAlertAction(title: "Sort by artist", style: .default, handler: { _ in
+            self.change(sortType: .artist)
+            self.appDelegate.storage.settings.albumsSortSetting = .artist
+            self.updateSearchResults(for: self.searchController)
+        })
+        if sortType == .artist {
+            action.image = UIImage.check
+        }
+        alert.addAction(action)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.popoverPresentationController?.barButtonItem = sortButton
         present(alert, animated: true, completion: nil)

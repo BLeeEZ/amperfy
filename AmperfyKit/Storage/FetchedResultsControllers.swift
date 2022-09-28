@@ -41,6 +41,28 @@ public enum ElementSortType: Int {
     }
 }
 
+public enum AlbumElementSortType: Int {
+    case name = 0
+    case rating = 1
+    case recentlyAddedIndex = 2
+    case artist = 3
+    
+    public static let defaultValue: AlbumElementSortType = .name
+    
+    public var asSectionIndexType: SectionIndexType {
+        switch(self) {
+        case .name:
+            return .alphabet
+        case .rating:
+            return .rating
+        case .recentlyAddedIndex:
+            return .recentlyAddedIndex
+        case .artist:
+            return .alphabet
+        }
+    }
+}
+
 public enum PlaylistSortType: Int {
     case name = 0
     case lastPlayed = 1
@@ -277,7 +299,7 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: true)
         ])
-        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
@@ -373,7 +395,7 @@ public class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsContro
 
 public class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
     
-    public init(coreDataCompanion: CoreDataCompanion, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, sortType: AlbumElementSortType, isGroupedInAlphabeticSections: Bool) {
         var fetchRequest = AlbumMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
@@ -382,12 +404,14 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
             fetchRequest = AlbumMO.ratingSortedFetchRequest
         case .recentlyAddedIndex:
             fetchRequest = AlbumMO.recentlyAddedSortedFetchRequest
+        case .artist:
+            fetchRequest = AlbumMO.artistNameSortedFetchRequest
         }
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true)
         ])
-        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
     public func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
@@ -422,7 +446,7 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
             fetchRequest = SongMO.recentlyAddedSortedFetchRequest
         }
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
-        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         keepAllResultsUpdated = false
     }
     

@@ -262,7 +262,7 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
     var keepAllResultsUpdated = true
     private let allFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
     private let searchFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
-    private var sortType: ElementSortType
+    private var sectionIndexType: SectionIndexType
     
     private var delegateInternal: NSFetchedResultsControllerDelegate?
     override public var delegate: NSFetchedResultsControllerDelegate? {
@@ -281,13 +281,13 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
         get { return isSearchActiveInternal }
     }
     
-    public init(coreDataCompanion: CoreDataCompanion, fetchRequest: NSFetchRequest<ResultType>, sortType: ElementSortType = .defaultValue, isGroupedInAlphabeticSections: Bool) {
-        self.sortType = sortType
+    public init(coreDataCompanion: CoreDataCompanion, fetchRequest: NSFetchRequest<ResultType>, sectionIndexType: SectionIndexType = .defaultValue, isGroupedInAlphabeticSections: Bool) {
+        self.sectionIndexType = sectionIndexType
         let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? fetchRequest.sortDescriptors![0].key : nil
         allFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, coreDataCompanion: coreDataCompanion, sectionNameKeyPath: sectionNameKeyPath, cacheName: Self.typeName)
-        allFetchResulsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
+        allFetchResulsController.sectionIndexType = sectionIndexType
         searchFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>, coreDataCompanion: coreDataCompanion, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
-        searchFetchResulsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
+        searchFetchResulsController.sectionIndexType = sectionIndexType
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         fetchResultsController = allFetchResulsController
     }

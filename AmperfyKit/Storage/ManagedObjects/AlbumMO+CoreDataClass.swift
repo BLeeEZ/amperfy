@@ -67,7 +67,18 @@ public final class AlbumMO: AbstractLibraryEntityMO {
         ]
         return fetchRequest
     }
-
+    
+    static var artistNameSortedFetchRequest: NSFetchRequest<AlbumMO> {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(AlbumMO.artist.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(AlbumMO.artist.name), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(AlbumMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
 }
 
 extension AlbumMO: CoreDataIdentifyable {

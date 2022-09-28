@@ -172,10 +172,10 @@ public class PersistentStorage {
         }
         
         
-        public var albumsSortSetting: ElementSortType {
+        public var albumsSortSetting: AlbumElementSortType {
             get {
-                let albumsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.AlbumsSortSetting.rawValue) as? Int ?? ElementSortType.defaultValue.rawValue
-                return ElementSortType(rawValue: albumsSortSettingRaw) ?? ElementSortType.defaultValue
+                let albumsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.AlbumsSortSetting.rawValue) as? Int ?? AlbumElementSortType.defaultValue.rawValue
+                return AlbumElementSortType(rawValue: albumsSortSettingRaw) ?? AlbumElementSortType.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.AlbumsSortSetting.rawValue) }
         }

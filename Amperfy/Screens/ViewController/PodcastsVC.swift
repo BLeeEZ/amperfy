@@ -173,21 +173,26 @@ class PodcastsVC: BasicTableViewController {
     @objc private func sortButtonPressed() {
         let alert = UIAlertController(title: "Podcasts sorting", message: nil, preferredStyle: .actionSheet)
 
+        var action = UIAlertAction(title: "Podcasts sorted by name", style: .default, handler: { _ in
+            self.showType = .podcasts
+            self.appDelegate.storage.settings.podcastsShowSetting = .podcasts
+            self.syncFromServer()
+            self.updateSearchResults(for: self.searchController)
+        })
         if showType == .podcasts {
-            alert.addAction(UIAlertAction(title: "Episodes sorted by release date", style: .default, handler: { _ in
-                self.showType = .episodesSortedByReleaseDate
-                self.appDelegate.storage.settings.podcastsShowSetting = .episodesSortedByReleaseDate
-                self.syncFromServer()
-                self.updateSearchResults(for: self.searchController)
-            }))
-        } else {
-            alert.addAction(UIAlertAction(title: "Podcasts sorted by name", style: .default, handler: { _ in
-                self.showType = .podcasts
-                self.appDelegate.storage.settings.podcastsShowSetting = .podcasts
-                self.syncFromServer()
-                self.updateSearchResults(for: self.searchController)
-            }))
+            action.image = UIImage.check
         }
+        alert.addAction(action)
+        action = UIAlertAction(title: "Episodes sorted by release date", style: .default, handler: { _ in
+            self.showType = .episodesSortedByReleaseDate
+            self.appDelegate.storage.settings.podcastsShowSetting = .episodesSortedByReleaseDate
+            self.syncFromServer()
+            self.updateSearchResults(for: self.searchController)
+        })
+        if showType == .episodesSortedByReleaseDate {
+            action.image = UIImage.check
+        }
+        alert.addAction(action)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.popoverPresentationController?.barButtonItem = sortButton
         present(alert, animated: true, completion: nil)
