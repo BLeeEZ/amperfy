@@ -38,8 +38,6 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         appDelegate.userStatistics.visited(.playlistSelector)
         
         change(sortType: appDelegate.storage.settings.playlistsSortSetting)
-        fetchedResultsController = PlaylistSelectorFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.playlistsSortSetting, isGroupedInAlphabeticSections: true)
-        singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Playlists\"", showSearchBarAtEnter: true)
         tableView.register(nibName: PlaylistTableCell.typeName)
@@ -58,7 +56,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         // sortType will not be saved permanently. This behaviour differs from PlaylistsVC
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = PlaylistSelectorFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = PlaylistSelectorFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType == .name)
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
     }
