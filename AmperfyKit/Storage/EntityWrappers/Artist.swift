@@ -120,6 +120,9 @@ extension Artist: PlayableContainable  {
             infoContent.append("\(songCount) Songs")
         }
         if type == .long {
+            if isCompletelyCached {
+                infoContent.append("Cached")
+            }
             if let genre = genre {
                 infoContent.append("Genre: \(genre.name)")
             }

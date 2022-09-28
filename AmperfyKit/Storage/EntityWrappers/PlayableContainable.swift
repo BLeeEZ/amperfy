@@ -69,6 +69,7 @@ extension PlayableContainable {
         guard storage.settings.isOnlineMode else { return Promise.value }
         return fetchFromServer(storage: storage, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager)
     }
+    public var isCompletelyCached: Bool { return !playables.isEmpty && playables.isCachedCompletely }
     public var isRateable: Bool { return false }
     public var isFavoritable: Bool { return false }
     public var isFavorite: Bool { return false }

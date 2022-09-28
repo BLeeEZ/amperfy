@@ -148,6 +148,9 @@ extension Album: PlayableContainable  {
             infoContent.append("\(songCount) Songs")
         }
         if type == .long {
+            if isCompletelyCached {
+                infoContent.append("Cached")
+            }
             if year > 0 {
                 infoContent.append("Year \(year)")
             }
