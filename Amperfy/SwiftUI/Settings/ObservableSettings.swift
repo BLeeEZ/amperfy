@@ -24,6 +24,8 @@ import AmperfyKit
 
 final class Settings: ObservableObject {
     @Published var isOfflineMode = false
+    @Published var sleepTimerInterval = 0
+    @Published var sleepTimer: Timer? = nil
     @Published var isAutoCacheLatestSongs = false
     @Published var isAutoCacheLatestPodcastEpisodes = false
     @Published var isPlayerAutoCachePlayedItems = false

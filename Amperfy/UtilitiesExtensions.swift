@@ -247,3 +247,11 @@ extension UIImage {
         return newImage!
     }
 }
+
+/// This fixes in swiftui mutliple picker views side by side to overlapp their touch areas
+/// This is effective in addition to use .clipped() which only fixes the overlapping area visually
+extension UIPickerView {
+    open override var intrinsicContentSize: CGSize {
+        return CGSize(width: UIView.noIntrinsicMetric , height: 150)
+    }
+}

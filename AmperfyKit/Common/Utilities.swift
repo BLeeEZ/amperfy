@@ -382,6 +382,13 @@ extension Date {
         dateFormatter.timeZone = NSTimeZone(name: "UTC")! as TimeZone
         return dateFormatter.string(from: self)
     }
+    
+    public var asShortHrMinString: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .none
+        dateFormatter.timeStyle = .short
+        return dateFormatter.string(from: self)
+    }
 }
 
 extension URLComponents {

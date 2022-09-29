@@ -30,6 +30,7 @@ public enum AmperfyLogStatusCode: Int {
     case internalError = 4
     case connectionError = 5
     case commonError = 6
+    case info
 }
 
 /// Must be called from main thread
@@ -48,6 +49,10 @@ public class EventLogger {
     
     init(storage: PersistentStorage) {
         self.storage = storage
+    }
+    
+    public func info(topic: String, message: String, displayPopup: Bool = true) {
+        report(topic: topic, statusCode: .info, message: message, logType: .info, displayPopup: displayPopup)
     }
     
     public func info(topic: String, statusCode: AmperfyLogStatusCode, message: String, displayPopup: Bool) {

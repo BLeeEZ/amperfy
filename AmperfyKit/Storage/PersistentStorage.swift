@@ -113,6 +113,7 @@ public class PersistentStorage {
         case LibraryIsSynced = "libraryIsSynced"
         case ArtworkDownloadSetting = "artworkDownloadSetting"
         case ArtworkDisplayPreference = "artworkDisplayPreference"
+        case SleepTimerInterval = "sleepTimerInterval"
         
         case SongActionOnTab = "songActionOnTab"
         case LibraryDisplaySettings = "libraryDisplaySettings"
@@ -153,6 +154,13 @@ public class PersistentStorage {
                 return ArtworkDisplayPreference(rawValue: artworkDisplayStyleRaw) ?? ArtworkDisplayPreference.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtworkDisplayPreference.rawValue) }
+        }
+        
+        public var sleepTimerInterval: Int {
+            get {
+                return UserDefaults.standard.object(forKey: UserDefaultsKey.SleepTimerInterval.rawValue) as? Int ?? 0
+            }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.SleepTimerInterval.rawValue) }
         }
         
         public var playlistsSortSetting: PlaylistSortType {

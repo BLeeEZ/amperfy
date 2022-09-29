@@ -98,6 +98,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public lazy var intentManager = {
         return AmperKit.shared.intentManager
     }()
+    
+    var sleepTimer: Timer?
 
     var isKeepScreenAlive: Bool {
         get { return UIApplication.shared.isIdleTimerDisabled }

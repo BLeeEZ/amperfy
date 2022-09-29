@@ -28,6 +28,8 @@ struct SettingsView: View {
     #if false
     func resetAppData() {
         // ask if user is sure
+        self.appDelegate.sleepTimer?.invalidate()
+        self.appDelegate.sleepTimer = nil
         self.appDelegate.player.stop()
         self.appDelegate.scrobbleSyncer.stopAndWait()
         self.appDelegate.artworkDownloadManager.stopAndWait()
@@ -72,6 +74,12 @@ struct SettingsView: View {
                 , footer: {
                     Text("Songs, podcasts and artworks will not be downloaded when you are offline. Searches are restricted to device only. Playlists will not be synced with the server.")
                 })
+                
+                Section() {
+                    NavigationLink(destination: SleepTimerView()) {
+                        Text("Sleep Timer")
+                    }
+                }
                 
                 Section() {
                     NavigationLink(destination: ServerSettingsView()) {
