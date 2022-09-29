@@ -28,6 +28,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
 
     private var fetchedResultsController: ArtistFetchedResultsController!
     private var sortButton: UIBarButtonItem!
+    private var actionButton: UIBarButtonItem!
     public var displayFilter: DisplayCategoryFilter = .all
     private var sortType: ElementSortType = .name
     private var filterTitle = "Artists"
@@ -43,7 +44,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         tableView.rowHeight = GenericTableCell.rowHeight
 
         sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
-        navigationItem.rightBarButtonItems = [sortButton]
+        actionButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(performActionButtonOperation))
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -86,7 +87,15 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        updateRightBarButtonItems()
         updateFromRemote()
+    }
+    
+    func updateRightBarButtonItems() {
+        navigationItem.rightBarButtonItems = [sortButton]
+        if appDelegate.storage.settings.isOnlineMode {
+            navigationItem.rightBarButtonItems?.insert(actionButton, at: 0)
+        }
     }
     
     func updateFromRemote() {
@@ -186,6 +195,36 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         alert.addAction(action)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.popoverPresentationController?.barButtonItem = sortButton
+        present(alert, animated: true, completion: nil)
+    }
+    
+    @objc private func performActionButtonOperation() {
+        let alert = UIAlertController(title: self.filterTitle, message: nil, preferredStyle: .actionSheet)
+        let action = UIAlertAction(title: "Download \(filterTitle)", style: .default, handler: { _ in
+            var artists = [Artist]()
+            switch self.displayFilter {
+            case .all:
+                artists = self.appDelegate.storage.main.library.getArtists()
+            case .recentlyAdded:
+                break
+            case .favorites:
+                artists = self.appDelegate.storage.main.library.getFavoriteArtists()
+            }
+            let artistSongs = Array(artists.compactMap{ $0.playables }.joined())
+            if artistSongs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {
+                let alert = UIAlertController(title: "Many Songs", message: "Are you shure to add \(artistSongs.count) songs from \"\(self.filterTitle)\" to download queue?", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                    self.appDelegate.playableDownloadManager.download(objects: artistSongs)
+                }))
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                self.appDelegate.playableDownloadManager.download(objects: artistSongs)
+            }
+        })
+        alert.addAction(action)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.popoverPresentationController?.barButtonItem = actionButton
         present(alert, animated: true, completion: nil)
     }
     

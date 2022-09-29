@@ -28,6 +28,7 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
 
     private var fetchedResultsController: AlbumFetchedResultsController!
     private var sortButton: UIBarButtonItem!
+    private var actionButton: UIBarButtonItem!
     private var refreshControl: UIRefreshControl?
     public var displayFilter: DisplayCategoryFilter = .all
     private var sortType: AlbumElementSortType = .name
@@ -44,6 +45,7 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
         configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         
         sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
+        actionButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(performActionButtonOperation))
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         collectionView.refreshControl = refreshControl
@@ -87,6 +89,9 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
             navigationItem.rightBarButtonItems = []
         } else {
             navigationItem.rightBarButtonItems = [sortButton]
+        }
+        if appDelegate.storage.settings.isOnlineMode {
+            navigationItem.rightBarButtonItems?.insert(actionButton, at: 0)
         }
     }
     
@@ -309,6 +314,36 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
         alert.addAction(action)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.popoverPresentationController?.barButtonItem = sortButton
+        present(alert, animated: true, completion: nil)
+    }
+    
+    @objc private func performActionButtonOperation() {
+        let alert = UIAlertController(title: self.filterTitle, message: nil, preferredStyle: .actionSheet)
+        let action = UIAlertAction(title: "Download \(filterTitle)", style: .default, handler: { _ in
+            var albums = [Album]()
+            switch self.displayFilter {
+            case .all:
+                albums = self.appDelegate.storage.main.library.getAlbums()
+            case .recentlyAdded:
+                albums = self.appDelegate.storage.main.library.getRecentAlbums()
+            case .favorites:
+                albums = self.appDelegate.storage.main.library.getFavoriteAlbums()
+            }
+            let albumSongs = Array(albums.compactMap{ $0.playables }.joined())
+            if albumSongs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {
+                let alert = UIAlertController(title: "Many Songs", message: "Are you shure to add \(albumSongs.count) songs from \"\(self.filterTitle)\" to download queue?", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                    self.appDelegate.playableDownloadManager.download(objects: albumSongs)
+                }))
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                self.appDelegate.playableDownloadManager.download(objects: albumSongs)
+            }
+        })
+        alert.addAction(action)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.popoverPresentationController?.barButtonItem = actionButton
         present(alert, animated: true, completion: nil)
     }
     

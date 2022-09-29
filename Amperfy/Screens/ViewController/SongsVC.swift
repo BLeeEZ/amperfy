@@ -28,6 +28,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
     private var fetchedResultsController: SongsFetchedResultsController!
     private var sortButton: UIBarButtonItem!
+    private var actionButton: UIBarButtonItem!
     public var displayFilter: DisplayCategoryFilter = .all
     private var sortType: ElementSortType = .name
     private var filterTitle = "Songs"
@@ -51,6 +52,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         }
         
         sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
+        actionButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(performActionButtonOperation))
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -102,6 +104,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             navigationItem.rightBarButtonItems = []
         } else {
             navigationItem.rightBarButtonItems = [sortButton]
+        }
+        if appDelegate.storage.settings.isOnlineMode {
+            navigationItem.rightBarButtonItems?.insert(actionButton, at: 0)
         }
     }
     
@@ -234,6 +239,35 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         alert.addAction(action)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.popoverPresentationController?.barButtonItem = sortButton
+        present(alert, animated: true, completion: nil)
+    }
+    
+    @objc private func performActionButtonOperation() {
+        let alert = UIAlertController(title: self.filterTitle, message: nil, preferredStyle: .actionSheet)
+        let action = UIAlertAction(title: "Download \(filterTitle)", style: .default, handler: { _ in
+            var songs = [Song]()
+            switch self.displayFilter {
+            case .all:
+                songs = self.appDelegate.storage.main.library.getSongs()
+            case .recentlyAdded:
+                songs = self.appDelegate.storage.main.library.getRecentSongs()
+            case .favorites:
+                songs = self.appDelegate.storage.main.library.getFavoriteSongs()
+            }
+            if songs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {
+                let alert = UIAlertController(title: "Many Songs", message: "Are you shure to add \(songs.count) songs from \"\(self.filterTitle)\" to download queue?", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                    self.appDelegate.playableDownloadManager.download(objects: songs)
+                }))
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                self.appDelegate.playableDownloadManager.download(objects: songs)
+            }
+        })
+        alert.addAction(action)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.popoverPresentationController?.barButtonItem = actionButton
         present(alert, animated: true, completion: nil)
     }
     

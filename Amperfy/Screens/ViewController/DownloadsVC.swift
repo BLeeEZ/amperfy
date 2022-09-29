@@ -44,7 +44,6 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
         navigationItem.rightBarButtonItem = actionButton
     }
     
-    
     @objc private func performActionButtonOperation() {
         let alert = UIAlertController(title: "Downloads", message: nil, preferredStyle: .actionSheet)
         let activeDownloadIndex = fetchedResultsController.fetchedObjects?.compactMap{ Download(managedObject: $0) }.enumerated().first(where: {$1.isDownloading})

@@ -39,6 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /// Task IDs need to be added to the array in Info.list under: <key>BGTaskSchedulerPermittedIdentifiers</key>
     static let refreshTaskId = "de.familie-zimba.Amperfy.RefreshTask"
     
+    static let maxPlayablesDownloadsToAddAtOnceWithoutWarning = 200
+    
     var window: UIWindow?
     
     lazy var player: PlayerFacade = {
