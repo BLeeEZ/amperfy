@@ -39,24 +39,29 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
     
     var interfaceController: CPInterfaceController?
+    var traits: UITraitCollection {
+        return self.interfaceController?.carTraitCollection ?? UITraitCollection.maxDisplayScale
+    }
     
     /// CarPlay connected
     func templateApplicationScene(_ templateApplicationScene: CPTemplateApplicationScene, didConnect interfaceController: CPInterfaceController) {
         self.interfaceController = interfaceController
-        
-        configureNowPlayingTemplate()
-
-        let tab = CPTabBarTemplate(templates: [
-            createLibraryTab(),
-            createPlaylistsTab(),
-            createPodcastsTab()
-        ])
-        self.interfaceController?.setRootTemplate(tab, animated: true, completion: nil)
+        self.configureNowPlayingTemplate()
+        self.displayInitTabTemplate()
     }
     
     /// CarPlay disconnected
     private func templateApplicationScene(_ templateApplicationScene: CPTemplateApplicationScene, didDisconnect interfaceController: CPInterfaceController) {
         self.interfaceController = nil
+    }
+    
+    private func displayInitTabTemplate() {
+        let tab = CPTabBarTemplate(templates: [
+            self.createLibraryTab(),
+            self.createPlaylistsTab(),
+            self.createPodcastsTab()
+        ])
+        self.interfaceController?.setRootTemplate(tab, animated: true, completion: nil)
     }
     
     private func configureNowPlayingTemplate() {
@@ -154,7 +159,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
 
     private func createArtistsSections(treeDepth: Int) -> [CPListTemplateItem] {
-        let favoritesSection = CPListItem(text: "Favorites", detailText: nil, image: UIImage.createArtwork(with: UIImage.heartFill, iconSizeType: .small, switchColors: true), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let favoritesSection = CPListItem(text: "Favorites", detailText: nil, image: UIImage.createArtwork(with: UIImage.heartFill, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         favoritesSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var favoriteSections = [CPListTemplateItem]()
@@ -173,7 +178,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
     
     private func createAlbumsSections(treeDepth: Int) -> [CPListTemplateItem] {
-        let favoritesSection = CPListItem(text: "Favorites", detailText: nil, image: UIImage.createArtwork(with: UIImage.heartFill, iconSizeType: .small, switchColors: true), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let favoritesSection = CPListItem(text: "Favorites", detailText: nil, image: UIImage.createArtwork(with: UIImage.heartFill, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         favoritesSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var favoriteSections = [CPListTemplateItem]()
@@ -189,7 +194,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             completion()
         }
         
-        let recentlyAddedSection = CPListItem(text: "Recently added", detailText: nil, image: UIImage.createArtwork(with: UIImage.clock, iconSizeType: .small, switchColors: true), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let recentlyAddedSection = CPListItem(text: "Recently added", detailText: nil, image: UIImage.createArtwork(with: UIImage.clock, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         recentlyAddedSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var recentlyAddedSections = [CPListTemplateItem]()
@@ -208,7 +213,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
     
     private func createSongsSections(treeDepth: Int) -> [CPListTemplateItem] {
-        let favoritesSection = CPListItem(text: "Favorites", detailText: nil, image: UIImage.createArtwork(with: UIImage.heartFill, iconSizeType: .small, switchColors: true), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let favoritesSection = CPListItem(text: "Favorites", detailText: nil, image: UIImage.createArtwork(with: UIImage.heartFill, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         favoritesSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var favoriteSections = [CPListTemplateItem]()
@@ -225,7 +230,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             completion()
         }
         
-        let recentlyAddedSection = CPListItem(text: "Recently added", detailText: nil, image: UIImage.createArtwork(with: UIImage.clock, iconSizeType: .small, switchColors: true), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let recentlyAddedSection = CPListItem(text: "Recently added", detailText: nil, image: UIImage.createArtwork(with: UIImage.clock, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         recentlyAddedSection.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var recentlyAddedSections = [CPListTemplateItem]()
@@ -249,7 +254,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
     
     private func createDetailTemplate(for artist: Artist, treeDepth: Int) -> CPListItem {
-        let section = CPListItem(text: artist.name, detailText: artist.subtitle, image: artist.image(setting: artworkDisplayPreference), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let section = CPListItem(text: artist.name, detailText: artist.subtitle, image: artist.image(setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var albumItems = [CPListItem]()
@@ -270,7 +275,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
     
     private func createDetailAllSongsTemplate(for artist: Artist, treeDepth: Int) -> CPListItem {
-        let section = CPListItem(text: "All songs", detailText: nil, image: UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, switchColors: true), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let section = CPListItem(text: "All songs", detailText: nil, image: UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var songItems = [CPListItem]()
@@ -290,7 +295,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
     
     private func createDetailTemplate(for album: Album, treeDepth: Int) -> CPListItem {
-        let section = CPListItem(text: album.name, detailText: album.subtitle, image: album.image(setting: artworkDisplayPreference), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let section = CPListItem(text: album.name, detailText: album.subtitle, image: album.image(setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var songItems = [CPListItem]()
@@ -338,7 +343,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         var sections = [CPListTemplateItem]()
         let podcasts = appDelegate.storage.main.library.getPodcastsForCarPlay(onlyCached: self.isOfflineMode)
         for podcast in podcasts {
-            let section = CPListItem(text: podcast.title, detailText: podcast.subtitle, image: podcast.image(setting: artworkDisplayPreference), accessoryImage: nil, accessoryType: .disclosureIndicator)
+            let section = CPListItem(text: podcast.title, detailText: podcast.subtitle, image: podcast.image(setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
             section.handler = { [weak self] item, completion in
                 guard let `self` = self else { completion(); return }
                 var episodeItems = [CPListItem]()
@@ -359,7 +364,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
 
     private func createPlayShuffledListItem(playContext: PlayContext, treeDepth: Int, text: String = "Shuffle") -> CPListItem {
-        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, switchColors: true)
+        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits)
         let listItem = CPListItem(text: text, detailText: nil, image: img)
         listItem.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
@@ -389,7 +394,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     private func createDetailTemplate(for playable: AbstractPlayable, playContext: PlayContext, treeDepth: Int, isTrackDisplayed: Bool = false) -> CPListItem {
         let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
         let image = isTrackDisplayed ? UIImage.numberToImage(number: playable.track) : playable.image(setting: artworkDisplayPreference)
-        let listItem = CPListItem(text: playable.title, detailText: playable.subtitle, image: image, accessoryImage: nil, accessoryType: accessoryType)
+        let listItem = CPListItem(text: playable.title, detailText: playable.subtitle, image: image.carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: accessoryType)
         listItem.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             self.appDelegate.player.play(context: playContext)

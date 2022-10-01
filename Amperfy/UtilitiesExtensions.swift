@@ -248,6 +248,18 @@ extension UIImage {
     }
 }
 
+extension UITraitCollection {
+    static let maxDisplayScale = UITraitCollection(displayScale: 3.0)
+}
+
+extension UIImage {
+    func carPlayImage(carTraitCollection traits: UITraitCollection) -> UIImage {
+        let imageAsset = UIImageAsset()
+        imageAsset.register(self, with: traits)
+        return imageAsset.image(with: traits)
+    }
+}
+
 /// This fixes in swiftui mutliple picker views side by side to overlapp their touch areas
 /// This is effective in addition to use .clipped() which only fixes the overlapping area visually
 extension UIPickerView {
