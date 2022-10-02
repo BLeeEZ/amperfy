@@ -211,6 +211,9 @@ extension UIImage {
     static let forwardFill = UIImage(systemName: "forward.fill") ?? UIImage()
     static let goBackward15 = UIImage(systemName: "gobackward.15") ?? UIImage()
     static let goForward30 = UIImage(systemName: "goforward.30") ?? UIImage()
+    static let redo = UIImage(systemName: "gobackward") ?? UIImage()
+    static let clear = UIImage(systemName: "clear") ?? UIImage()
+    static let cancleDownloads = UIImage(systemName: "xmark.icloud") ?? UIImage()
     
     private static func createEmptyImage(with size: CGSize) -> UIImage?
     {

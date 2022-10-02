@@ -51,8 +51,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         
-        sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
-        actionButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(performActionButtonOperation))
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -91,6 +89,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
+        updateRightBarButtonItems()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -100,6 +99,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     }
     
     func updateRightBarButtonItems() {
+        sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
+        actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
+
         if sortType == .recentlyAddedIndex {
             navigationItem.rightBarButtonItems = []
         } else {
@@ -217,34 +219,22 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         }
     }
     
-    @objc private func sortButtonPressed() {
-        let alert = UIAlertController(title: "Songs sorting", message: nil, preferredStyle: .actionSheet)
-        var action = UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+    private func createSortButtonMenu() -> UIMenu {
+        let sortByName = UIAction(title: "Name", image: sortType == .name ? .check : nil, handler: { _ in
             self.change(sortType: .name)
             self.appDelegate.storage.settings.songsSortSetting = .name
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .name {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        action = UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
+        let sortByRating = UIAction(title: "Rating", image: sortType == .rating ? .check : nil, handler: { _ in
             self.change(sortType: .rating)
             self.appDelegate.storage.settings.songsSortSetting = .rating
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .rating {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.popoverPresentationController?.barButtonItem = sortButton
-        present(alert, animated: true, completion: nil)
+        return UIMenu(children: [sortByName, sortByRating])
     }
     
-    @objc private func performActionButtonOperation() {
-        let alert = UIAlertController(title: self.filterTitle, message: nil, preferredStyle: .actionSheet)
-        let action = UIAlertAction(title: "Download \(filterTitle)", style: .default, handler: { _ in
+    private func createActionButtonMenu() -> UIMenu {
+        let action = UIAction(title: "Download \(filterTitle)", handler: { _ in
             var songs = [Song]()
             switch self.displayFilter {
             case .all:
@@ -265,10 +255,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                 self.appDelegate.playableDownloadManager.download(objects: songs)
             }
         })
-        alert.addAction(action)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.popoverPresentationController?.barButtonItem = actionButton
-        present(alert, animated: true, completion: nil)
+        return UIMenu(children: [action])
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {

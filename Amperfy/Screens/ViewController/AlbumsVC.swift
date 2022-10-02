@@ -44,8 +44,6 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
         applyFilter()
         configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         
-        sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
-        actionButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(performActionButtonOperation))
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         collectionView.refreshControl = refreshControl
@@ -76,6 +74,7 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         fetchedResultsController.fetch()
         collectionView.reloadData()
+        updateRightBarButtonItems()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -85,6 +84,9 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
     }
     
     func updateRightBarButtonItems() {
+        sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
+        actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
+
         if sortType == .recentlyAddedIndex {
             navigationItem.rightBarButtonItems = []
         } else {
@@ -283,43 +285,27 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
         }
     }
     
-    @objc private func sortButtonPressed() {
-        let alert = UIAlertController(title: "Albums sorting", message: nil, preferredStyle: .actionSheet)
-        var action = UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+    private func createSortButtonMenu() -> UIMenu {
+        let sortByName = UIAction(title: "Name", image: sortType == .name ? .check : nil, handler: { _ in
             self.change(sortType: .name)
             self.appDelegate.storage.settings.albumsSortSetting = .name
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .name {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        action = UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
+        let sortByRating = UIAction(title: "Rating", image: sortType == .rating ? .check : nil, handler: { _ in
             self.change(sortType: .rating)
             self.appDelegate.storage.settings.albumsSortSetting = .rating
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .rating {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        action = UIAlertAction(title: "Sort by artist", style: .default, handler: { _ in
+        let sortByArtist = UIAction(title: "Artist", image: sortType == .artist ? .check : nil, handler: { _ in
             self.change(sortType: .artist)
             self.appDelegate.storage.settings.albumsSortSetting = .artist
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .artist {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.popoverPresentationController?.barButtonItem = sortButton
-        present(alert, animated: true, completion: nil)
+        return UIMenu(children: [sortByName, sortByRating, sortByArtist])
     }
     
-    @objc private func performActionButtonOperation() {
-        let alert = UIAlertController(title: self.filterTitle, message: nil, preferredStyle: .actionSheet)
-        let action = UIAlertAction(title: "Download \(filterTitle)", style: .default, handler: { _ in
+    private func createActionButtonMenu() -> UIMenu {
+        let action = UIAction(title: "Download \(filterTitle)", handler: { _ in
             var albums = [Album]()
             switch self.displayFilter {
             case .all:
@@ -341,10 +327,7 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
                 self.appDelegate.playableDownloadManager.download(objects: albumSongs)
             }
         })
-        alert.addAction(action)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.popoverPresentationController?.barButtonItem = actionButton
-        present(alert, animated: true, completion: nil)
+        return UIMenu(children: [action])
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {

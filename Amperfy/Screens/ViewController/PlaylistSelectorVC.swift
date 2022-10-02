@@ -31,7 +31,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
     private var sortType: PlaylistSortType = .name
     
-    @IBOutlet weak var sortBarButton: UIBarButtonItem!
+    @IBOutlet weak var sortButton: UIBarButtonItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,8 +43,6 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         
-        sortBarButton.image = UIImage.sort
-
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight))
         if let newPlaylistTableHeaderView = ViewBuilder<NewPlaylistTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight)) {
             tableView.tableHeaderView?.addSubview(newPlaylistTableHeaderView)
@@ -59,10 +57,12 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         fetchedResultsController = PlaylistSelectorFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType == .name)
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
+        updateRightBarButtonItems()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        updateRightBarButtonItems()
         guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
             self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
@@ -71,35 +71,24 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
     }
     
-    @IBAction func sortBarButtonPressed(_ sender: Any) {
-        let alert = UIAlertController(title: "Playlists sorting", message: nil, preferredStyle: .actionSheet)
-        var action = UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+    func updateRightBarButtonItems() {
+        sortButton.menu = createSortButtonMenu()
+    }
+    
+    private func createSortButtonMenu() -> UIMenu {
+        let sortByName = UIAction(title: "Name", image: sortType == .name ? .check : nil, handler: { _ in
             self.change(sortType: .name)
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .name {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        action = UIAlertAction(title: "Sort by last time played", style: .default, handler: { _ in
+        let sortByLastTimePlayed = UIAction(title: "Last time played", image: sortType == .lastPlayed ? .check : nil, handler: { _ in
             self.change(sortType: .lastPlayed)
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .lastPlayed {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        action = UIAlertAction(title: "Sort by last time changed", style: .default, handler: { _ in
+        let sortByChangeDate = UIAction(title: "Change date", image: sortType == .lastChanged ? .check : nil, handler: { _ in
             self.change(sortType: .lastChanged)
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .lastChanged {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.popoverPresentationController?.barButtonItem = sortBarButton
-        present(alert, animated: true, completion: nil)
+        return UIMenu(children: [sortByName, sortByLastTimePlayed, sortByChangeDate])
     }
     
     @IBAction func cancelBarButtonPressed(_ sender: UIBarButtonItem) {

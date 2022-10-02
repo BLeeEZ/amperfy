@@ -40,30 +40,21 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
         
-        actionButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(performActionButtonOperation))
+        actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
         navigationItem.rightBarButtonItem = actionButton
     }
     
-    @objc private func performActionButtonOperation() {
-        let alert = UIAlertController(title: "Downloads", message: nil, preferredStyle: .actionSheet)
-        let activeDownloadIndex = fetchedResultsController.fetchedObjects?.compactMap{ Download(managedObject: $0) }.enumerated().first(where: {$1.isDownloading})
-        if let activeDownloadIndex = activeDownloadIndex {
-            alert.addAction(UIAlertAction(title: "Scroll to active downloads", style: .default, handler: { _ in
-                self.tableView.scrollToRow(at: IndexPath(row: activeDownloadIndex.offset, section: 0), at: .top, animated: true)
-            }))
-        }
-        alert.addAction(UIAlertAction(title: "Clear finished downloads", style: .default, handler: { _ in
+    private func createActionButtonMenu() -> UIMenu {
+        let clearFinishedDownloadsAction = UIAction(title: "Clear finished downloads", image: UIImage.clear, handler: { _ in
             self.downloadManager.clearFinishedDownloads()
-        }))
-        alert.addAction(UIAlertAction(title: "Retry failed downloads", style: .default, handler: { _ in
+        })
+        let retryFailedDownloadsAction = UIAction(title: "Retry failed downloads", image: UIImage.redo, handler: { _ in
             self.downloadManager.resetFailedDownloads()
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel all downloads", style: .default, handler: { _ in
+        })
+        let cancelAllDownloadsAction = UIAction(title: "Cancel all downloads", image: UIImage.cancleDownloads, handler: { _ in
             self.downloadManager.cancelDownloads()
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.popoverPresentationController?.barButtonItem = actionButton
-        present(alert, animated: true, completion: nil)
+        })
+        return UIMenu(children: [clearFinishedDownloadsAction, retryFailedDownloadsAction, cancelAllDownloadsAction])
     }
     
     override func viewWillAppear(_ animated: Bool) {

@@ -43,9 +43,6 @@ class PodcastsVC: BasicTableViewController {
         configureSearchController(placeholder: "Search in \"Podcasts\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: PodcastEpisodeTableCell.typeName)
-
-        sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
-        navigationItem.rightBarButtonItem = sortButton
         
         swipeDisplaySettings.playContextTypeOfElements = .podcast
         containableAtIndexPathCallback = { (indexPath) in
@@ -78,7 +75,13 @@ class PodcastsVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        updateRightBarButtonItems()
         syncFromServer()
+    }
+    
+    func updateRightBarButtonItems() {
+        sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
+        navigationItem.rightBarButtonItem = sortButton
     }
     
     func syncFromServer() {
@@ -170,32 +173,22 @@ class PodcastsVC: BasicTableViewController {
         }
     }
     
-    @objc private func sortButtonPressed() {
-        let alert = UIAlertController(title: "Podcasts sorting", message: nil, preferredStyle: .actionSheet)
-
-        var action = UIAlertAction(title: "Podcasts sorted by name", style: .default, handler: { _ in
+    private func createSortButtonMenu() -> UIMenu {
+        let podcastsSortByName = UIAction(title: "Podcasts sorted by name", image: showType == .podcasts ? .check : nil, handler: { _ in
             self.showType = .podcasts
             self.appDelegate.storage.settings.podcastsShowSetting = .podcasts
             self.syncFromServer()
+            self.updateRightBarButtonItems()
             self.updateSearchResults(for: self.searchController)
         })
-        if showType == .podcasts {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        action = UIAlertAction(title: "Episodes sorted by release date", style: .default, handler: { _ in
+        let episodesSortByReleaseDate = UIAction(title: "Episodes sorted by release date", image: showType == .episodesSortedByReleaseDate ? .check : nil, handler: { _ in
             self.showType = .episodesSortedByReleaseDate
             self.appDelegate.storage.settings.podcastsShowSetting = .episodesSortedByReleaseDate
             self.syncFromServer()
+            self.updateRightBarButtonItems()
             self.updateSearchResults(for: self.searchController)
         })
-        if showType == .episodesSortedByReleaseDate {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.popoverPresentationController?.barButtonItem = sortButton
-        present(alert, animated: true, completion: nil)
+        return UIMenu(children: [podcastsSortByName, episodesSortByReleaseDate])
     }
 
 }

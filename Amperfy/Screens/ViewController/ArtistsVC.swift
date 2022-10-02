@@ -43,8 +43,6 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
 
-        sortButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(sortButtonPressed))
-        actionButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(performActionButtonOperation))
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -83,6 +81,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
+        updateRightBarButtonItems()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -92,6 +91,9 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     }
     
     func updateRightBarButtonItems() {
+        sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
+        actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
+
         navigationItem.rightBarButtonItems = [sortButton]
         if appDelegate.storage.settings.isOnlineMode {
             navigationItem.rightBarButtonItems?.insert(actionButton, at: 0)
@@ -175,32 +177,20 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         }
     }
     
-    @objc private func sortButtonPressed() {
-        let alert = UIAlertController(title: "Artists sorting", message: nil, preferredStyle: .actionSheet)
-        var action = UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+    private func createSortButtonMenu() -> UIMenu {
+        let sortByName = UIAction(title: "Name", image: sortType == .name ? .check : nil, handler: { _ in
             self.change(sortType: .name)
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .name {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        action = UIAlertAction(title: "Sort by rating", style: .default, handler: { _ in
+        let sortByRating = UIAction(title: "Rating", image: sortType == .rating ? .check : nil, handler: { _ in
             self.change(sortType: .rating)
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .rating {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.popoverPresentationController?.barButtonItem = sortButton
-        present(alert, animated: true, completion: nil)
+        return UIMenu(children: [sortByName, sortByRating])
     }
     
-    @objc private func performActionButtonOperation() {
-        let alert = UIAlertController(title: self.filterTitle, message: nil, preferredStyle: .actionSheet)
-        let action = UIAlertAction(title: "Download \(filterTitle)", style: .default, handler: { _ in
+    private func createActionButtonMenu() -> UIMenu {
+        let action = UIAction(title: "Download \(filterTitle)", handler: { _ in
             var artists = [Artist]()
             switch self.displayFilter {
             case .all:
@@ -222,10 +212,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
                 self.appDelegate.playableDownloadManager.download(objects: artistSongs)
             }
         })
-        alert.addAction(action)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.popoverPresentationController?.barButtonItem = actionButton
-        present(alert, animated: true, completion: nil)
+        return UIMenu(children: [action])
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {

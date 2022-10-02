@@ -27,7 +27,7 @@ import PromiseKit
 class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
     private var fetchedResultsController: PlaylistFetchedResultsController!
-    private var optionsButton: UIBarButtonItem!
+    private var sortButton: UIBarButtonItem!
     private var sortType: PlaylistSortType = .name
     
     override func viewDidLoad() {
@@ -46,8 +46,6 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         
-        optionsButton = UIBarButtonItem(image: UIImage.sort, style: .plain, target: self, action: #selector(optionsPressed))
-        navigationItem.rightBarButtonItems = [optionsButton, editButtonItem]
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -73,16 +71,23 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         fetchedResultsController = PlaylistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType == .name)
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
+        updateRightBarButtonItems()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        updateRightBarButtonItems()
         guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
             self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
         }
+    }
+    
+    func updateRightBarButtonItems() {
+        sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
+        navigationItem.rightBarButtonItems = [editButtonItem, sortButton]
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -119,35 +124,20 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
     }
     
-    @objc private func optionsPressed() {
-        let alert = UIAlertController(title: "Playlists sorting", message: nil, preferredStyle: .actionSheet)
-        var action = UIAlertAction(title: "Sort by name", style: .default, handler: { _ in
+    private func createSortButtonMenu() -> UIMenu {
+        let sortByName = UIAction(title: "Name", image: sortType == .name ? .check : nil, handler: { _ in
             self.change(sortType: .name)
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .name {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        action = UIAlertAction(title: "Sort by last time played", style: .default, handler: { _ in
+        let sortByLastTimePlayed = UIAction(title: "Last time played", image: sortType == .lastPlayed ? .check : nil, handler: { _ in
             self.change(sortType: .lastPlayed)
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .lastPlayed {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        action = UIAlertAction(title: "Sort by last time changed", style: .default, handler: { _ in
+        let sortByChangeDate = UIAction(title: "Change date", image: sortType == .lastChanged ? .check : nil, handler: { _ in
             self.change(sortType: .lastChanged)
             self.updateSearchResults(for: self.searchController)
         })
-        if sortType == .lastChanged {
-            action.image = UIImage.check
-        }
-        alert.addAction(action)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.popoverPresentationController?.barButtonItem = optionsButton
-        present(alert, animated: true, completion: nil)
+        return UIMenu(children: [sortByName, sortByLastTimePlayed, sortByChangeDate])
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {

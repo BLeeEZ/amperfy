@@ -248,15 +248,11 @@
                                     <action selector="cancelBarButtonPressed:" destination="4rB-Ko-4wo" id="ZWF-SU-5xR"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem title="Sort" id="JE3-ch-0t4">
-                                <connections>
-                                    <action selector="sortBarButtonPressed:" destination="4rB-Ko-4wo" id="0TV-D3-iKv"/>
-                                </connections>
-                            </barButtonItem>
+                            <barButtonItem title="Sort" id="JE3-ch-0t4"/>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
-                        <outlet property="sortBarButton" destination="JE3-ch-0t4" id="AOl-DV-Blu"/>
+                        <outlet property="sortButton" destination="JE3-ch-0t4" id="AOl-DV-Blu"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1s6-dv-ao6" userLabel="First Responder" sceneMemberID="firstResponder"/>
