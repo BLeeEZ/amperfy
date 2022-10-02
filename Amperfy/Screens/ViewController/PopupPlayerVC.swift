@@ -26,6 +26,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var playerPlaceholderView: UIView!
+    @IBOutlet weak var backgroundImage: UIImageView!
     
     private var playerViewToTableViewConstraint: NSLayoutConstraint?
     
@@ -53,9 +54,16 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         player = appDelegate.player
         player.addNotifier(notifier: self)
+        
+        let blurEffect = UIBlurEffect(style: .systemThinMaterial)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        // BlurEffect rect is a square to avoid rerendering during iPad device rotation
+        blurEffectView.frame = CGRect(x: 0, y: 0, width: max(self.view.frame.width, self.view.frame.height), height: max(self.view.frame.width, self.view.frame.height))
+        self.backgroundImage.insertSubview(blurEffectView, at: 0)
+        
         backgroundColorGradient = PopupAnimatedGradientLayer(view: view)
         backgroundColorGradient?.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
-        
+    
         if let createdPlayerView = ViewBuilder<PlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: playerPlaceholderView.bounds.size.width, height: playerPlaceholderView.bounds.size.height)) {
             playerView = createdPlayerView
             createdPlayerView.prepare(toWorkOnRootView: self)
@@ -113,6 +121,11 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         var customColor: UIColor?
         let defaultArtwork = playable.defaultImage
         let artwork = playable.image(setting: appDelegate.storage.settings.artworkDisplayPreference)
+        if artwork != playable.defaultImage {
+            backgroundImage.image = artwork
+        } else {
+            backgroundImage.image = nil
+        }
 
         guard let playerView = playerView else { return }
         if playerView.lastDisplayedPlayable != playable {
@@ -138,6 +151,10 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         backgroundColorGradient?.applyStyleChange(traitCollection.userInterfaceStyle, isAnimated: false)
+        let subtitleColor = playerView?.subtitleColor(style: traitCollection.userInterfaceStyle)
+        tableView.visibleCells.forEach {
+            ($0 as? PlayableTableCell)?.updateSubtitleColor(color: subtitleColor)
+        }
     }
     
     func scrollToNextPlayingRow() {
@@ -252,7 +269,8 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             playable: playable,
             playContextCb: {(_) in PlayContext()},
             rootView: self,
-            playerIndexCb: convertCellViewToPlayerIndex)
+            playerIndexCb: convertCellViewToPlayerIndex,
+            subtitleColor: playerView?.subtitleColor(style: traitCollection.userInterfaceStyle))
         return cell
     }
 

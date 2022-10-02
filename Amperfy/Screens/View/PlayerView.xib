@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -69,7 +70,6 @@
                         <constraint firstAttribute="height" constant="23" id="yJg-88-RGh"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                    <color key="textColor" systemColor="tintColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uqN-6M-JGc" userLabel="Title Large Button">
@@ -192,7 +192,6 @@
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8F1-fg-8m2" userLabel="Artist Name Compact Label" customClass="MarqueeLabel" customModule="Amperfy">
                     <rect key="frame" x="84" y="71" width="275" height="30"/>
                     <fontDescription key="fontDescription" type="system" pointSize="19"/>
-                    <color key="textColor" systemColor="tintColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4O4-sy-Ien" userLabel="Title Compact Button">
@@ -224,7 +223,7 @@
                                         <color key="titleColor" systemColor="labelColor"/>
                                     </state>
                                     <state key="selected" title=" all">
-                                        <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="titleColor" systemColor="labelColor"/>
                                     </state>
                                     <connections>
                                         <action selector="repeatButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="t47-X3-Ber"/>
@@ -240,14 +239,17 @@
                                 <constraint firstItem="zaZ-s9-erE" firstAttribute="width" secondItem="w3n-lC-0kw" secondAttribute="width" id="wZX-Us-rRT"/>
                             </constraints>
                         </view>
-                        <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Previous Button">
+                        <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Previous Button">
                             <rect key="frame" x="79.5" y="2.5" width="45" height="45"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="PZj-JS-NGq" secondAttribute="height" multiplier="1:1" id="ZRw-7y-r95"/>
                                 <constraint firstAttribute="width" constant="45" id="eKD-Lq-gH3"/>
                             </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                            <state key="normal" image="backward"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal" image="backward.fill" catalog="system">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="45"/>
+                            </state>
                             <connections>
                                 <action selector="previousButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Nbe-mz-kqt"/>
                             </connections>
@@ -255,19 +257,24 @@
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Byk-rx-3Lv">
                             <rect key="frame" x="154" y="0.0" width="40" height="50"/>
                             <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
-                            <state key="normal" title=""/>
+                            <state key="normal" title="">
+                                <color key="titleColor" systemColor="labelColor"/>
+                            </state>
                             <connections>
                                 <action selector="playButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="x3u-6i-ytK"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E3q-DK-jgm" userLabel="Next Button">
+                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E3q-DK-jgm" userLabel="Next Button">
                             <rect key="frame" x="223.5" y="2.5" width="45" height="45"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="45" id="0wH-NC-0Wb"/>
                                 <constraint firstAttribute="width" secondItem="E3q-DK-jgm" secondAttribute="height" multiplier="1:1" id="Sqc-EY-2LH"/>
                             </constraints>
-                            <state key="normal" image="forward">
-                                <color key="titleColor" systemColor="tintColor"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="forward.fill" catalog="system" symbolScale="default" variableValue="1"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="45"/>
                             </state>
                             <connections>
                                 <action selector="nextButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="aSu-T2-0y0"/>
@@ -285,9 +292,6 @@
                                     <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <state key="normal" image="shuffle">
                                         <color key="titleColor" systemColor="labelColor"/>
-                                    </state>
-                                    <state key="selected">
-                                        <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </state>
                                     <connections>
                                         <action selector="shuffleButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="s11-0d-7rF"/>
@@ -432,9 +436,9 @@
     </designables>
     <resources>
         <image name="airplay" width="20" height="20"/>
-        <image name="backward" width="121" height="69"/>
+        <image name="backward.fill" catalog="system" width="128" height="77"/>
         <image name="ellipsis" width="18.417999267578125" height="3.9160199165344238"/>
-        <image name="forward" width="121" height="69"/>
+        <image name="forward.fill" catalog="system" width="128" height="77"/>
         <image name="musical_notes" width="30" height="30"/>
         <image name="player_style_compact" width="16.425800323486328" height="20.947299957275391"/>
         <image name="shuffle" width="30" height="30"/>
@@ -443,9 +447,6 @@
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tintColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

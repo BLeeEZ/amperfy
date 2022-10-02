@@ -406,6 +406,7 @@ class PlayerView: UIView {
         super.traitCollectionDidChange(previousTraitCollection)
         timeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
         timeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
+        refreshLabelColor()
     }
     
     func refreshPlayButtonTitle() {
@@ -440,6 +441,7 @@ class PlayerView: UIView {
     
     func refreshCurrentlyPlayingInfo() {
         refreshArtwork()
+        refreshLabelColor()
         if let playableInfo = player.currentlyPlaying {
             titleCompactLabel.text = playableInfo.title
             titleLargeLabel.text = playableInfo.title
@@ -493,6 +495,25 @@ class PlayerView: UIView {
             }
         }
     }
+    
+    func refreshLabelColor() {
+        artistNameLargeLabel.textColor = subtitleColor(style: traitCollection.userInterfaceStyle)
+        artistNameCompactLabel.textColor = subtitleColor(style: traitCollection.userInterfaceStyle)
+    }
+    
+    func subtitleColor(style: UIUserInterfaceStyle) -> UIColor {
+        if let artwork = player.currentlyPlaying?.image(setting: appDelegate.storage.settings.artworkDisplayPreference), artwork != player.currentlyPlaying?.defaultImage {
+            let customColor: UIColor!
+            if traitCollection.userInterfaceStyle == .dark {
+                customColor = artwork.averageColor().getWithLightness(of: 0.8)
+            } else {
+                customColor = artwork.averageColor().getWithLightness(of: 0.2)
+            }
+            return customColor
+        } else {
+            return .labelColor
+        }
+    }
 
     func refreshTimeInfo() {
         if player.currentlyPlaying != nil {
@@ -532,11 +553,11 @@ class PlayerView: UIView {
         nextButton.imageView?.contentMode = .scaleAspectFit
         switch player.playerMode {
         case .music:
-            previousButton.setImage(UIImage.backward, for: .normal)
-            nextButton.setImage(UIImage.forward, for: .normal)
+            previousButton.setImage(UIImage.backwardFill, for: .normal)
+            nextButton.setImage(UIImage.forwardFill, for: .normal)
         case .podcast:
-            previousButton.setImage(UIImage.skipBackward15, for: .normal)
-            nextButton.setImage(UIImage.skipForward30, for: .normal)
+            previousButton.setImage(UIImage.goBackward15, for: .normal)
+            nextButton.setImage(UIImage.goForward30, for: .normal)
         }
     }
     
@@ -561,7 +582,7 @@ class PlayerView: UIView {
         shuffleButton.imageView?.contentMode = .scaleAspectFit
         if player.isShuffle {
             shuffleButton.setImage(UIImage.shuffle.withRenderingMode(.alwaysTemplate), for: .normal)
-            shuffleButton.tintColor = .defaultBlue
+            shuffleButton.tintColor = .labelColor
         } else {
             shuffleButton.setImage(UIImage.shuffleOff.withRenderingMode(.alwaysTemplate), for: .normal)
             shuffleButton.tintColor = .labelColor

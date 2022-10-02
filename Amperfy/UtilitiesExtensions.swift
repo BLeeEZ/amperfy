@@ -149,16 +149,13 @@ extension UIView {
         return UIApplication.shared.mainWindow?.rootViewController?.traitCollection.forceTouchCapability ?? .unknown
     }
     
-    public func setBackgroundBlur(style: UIBlurEffect.Style, backupBackgroundColor: UIColor = .backgroundColor) {
-        if #available(iOS 13.0, *) {
-            self.backgroundColor = UIColor.clear
-            let blurEffect = UIBlurEffect(style: .prominent)
-            let blurEffectView = UIVisualEffectView(effect: blurEffect)
-            blurEffectView.frame = self.frame
-            self.insertSubview(blurEffectView, at: 0)
-        } else {
-            self.backgroundColor = backupBackgroundColor
-        }
+    public func setBackgroundBlur(style: UIBlurEffect.Style, alpha: CGFloat = 1.0) {
+        self.backgroundColor = UIColor.clear
+        let blurEffect = UIBlurEffect(style: style)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.alpha = alpha
+        blurEffectView.frame = self.frame
+        self.insertSubview(blurEffectView, at: 0)
     }
 }
 
@@ -208,8 +205,12 @@ extension UIApplication {
 }
 
 extension UIImage {
-    static let plus = UIImage(systemName: "plus")!
-    static let check = UIImage(systemName: "checkmark")!
+    static let plus = UIImage(systemName: "plus") ?? UIImage()
+    static let check = UIImage(systemName: "checkmark") ?? UIImage()
+    static let backwardFill = UIImage(systemName: "backward.fill") ?? UIImage()
+    static let forwardFill = UIImage(systemName: "forward.fill") ?? UIImage()
+    static let goBackward15 = UIImage(systemName: "gobackward.15") ?? UIImage()
+    static let goForward30 = UIImage(systemName: "goforward.30") ?? UIImage()
     
     private static func createEmptyImage(with size: CGSize) -> UIImage?
     {

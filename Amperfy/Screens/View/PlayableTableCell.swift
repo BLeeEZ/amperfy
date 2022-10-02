@@ -43,6 +43,7 @@ class PlayableTableCell: BasicTableCell {
     private var download: Download?
     private var rootView: UIViewController?
     private var isAlertPresented = false
+    private var subtitleColor: UIColor?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -50,12 +51,13 @@ class PlayableTableCell: BasicTableCell {
         self.addGestureRecognizer(longPressGesture)
     }
     
-    func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, download: Download? = nil) {
+    func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, download: Download? = nil, subtitleColor: UIColor? = nil) {
         self.playable = playable
         self.playContextCb = playContextCb
         self.playerIndexCb = playerIndexCb
         self.rootView = rootView
         self.download = download
+        self.subtitleColor = subtitleColor
         refresh()
     }
     
@@ -79,14 +81,8 @@ class PlayableTableCell: BasicTableCell {
             self.reorderLabel?.isHidden = true
         }
         
-        if playerIndexCb != nil {
-            cacheIconImage.tintColor = UIColor.labelColor
-            artistLabel.textColor = UIColor.labelColor
-        } else {
-            cacheIconImage.tintColor = UIColor.secondaryLabelColor
-            artistLabel.textColor = UIColor.secondaryLabelColor
-        }
-        
+        refreshSubtitleColor()
+
         if playable.isCached {
             cacheIconImage.isHidden = false
             artistLabelLeadingConstraint.constant = 20
@@ -100,6 +96,26 @@ class PlayableTableCell: BasicTableCell {
             downloadProgress.progress = download.progress
         } else {
             downloadProgress.isHidden = true
+        }
+    }
+    
+    func updateSubtitleColor(color: UIColor?) {
+        self.subtitleColor = color
+        refreshSubtitleColor()
+    }
+    
+    private func refreshSubtitleColor() {
+        if playerIndexCb != nil {
+            if let subtitleColor = self.subtitleColor {
+                cacheIconImage.tintColor = subtitleColor
+                artistLabel.textColor = subtitleColor
+            } else {
+                cacheIconImage.tintColor = UIColor.labelColor
+                artistLabel.textColor = UIColor.labelColor
+            }
+        } else {
+            cacheIconImage.tintColor = UIColor.secondaryLabelColor
+            artistLabel.textColor = UIColor.secondaryLabelColor
         }
     }
     

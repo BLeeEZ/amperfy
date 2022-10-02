@@ -473,6 +473,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="L34-LR-WRM">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                            </imageView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" contentViewInsetsToSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AEg-Xh-QOY">
                                 <rect key="frame" x="0.0" y="326" width="414" height="570"/>
                                 <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -492,14 +495,19 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="AEg-Xh-QOY" firstAttribute="top" secondItem="KWj-US-4T0" secondAttribute="bottom" id="0hW-Xj-irh"/>
+                            <constraint firstAttribute="bottom" secondItem="L34-LR-WRM" secondAttribute="bottom" id="8fL-Xh-ni7"/>
                             <constraint firstItem="KWj-US-4T0" firstAttribute="leading" secondItem="0WA-1Z-yPH" secondAttribute="leading" id="I7U-7e-RgY"/>
                             <constraint firstAttribute="bottom" secondItem="AEg-Xh-QOY" secondAttribute="bottom" placeholder="YES" id="N37-tW-lWl"/>
+                            <constraint firstItem="5vd-Ap-Yw9" firstAttribute="trailing" secondItem="L34-LR-WRM" secondAttribute="trailing" id="UVl-7L-h8u"/>
                             <constraint firstItem="AEg-Xh-QOY" firstAttribute="leading" secondItem="0WA-1Z-yPH" secondAttribute="leading" id="ZdK-hu-mjo"/>
+                            <constraint firstItem="L34-LR-WRM" firstAttribute="leading" secondItem="5vd-Ap-Yw9" secondAttribute="leading" id="gNd-aR-M9C"/>
                             <constraint firstAttribute="trailing" secondItem="KWj-US-4T0" secondAttribute="trailing" priority="999" id="gXH-Od-Mog"/>
                             <constraint firstAttribute="trailing" secondItem="AEg-Xh-QOY" secondAttribute="trailing" id="h7G-sQ-PEK"/>
+                            <constraint firstItem="L34-LR-WRM" firstAttribute="top" secondItem="0WA-1Z-yPH" secondAttribute="top" id="y9D-hr-zKV"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="backgroundImage" destination="L34-LR-WRM" id="NIo-j8-dSq"/>
                         <outlet property="playerPlaceholderView" destination="KWj-US-4T0" id="mLO-ZN-1of"/>
                         <outlet property="tableView" destination="AEg-Xh-QOY" id="mWy-OI-U3N"/>
                     </connections>
