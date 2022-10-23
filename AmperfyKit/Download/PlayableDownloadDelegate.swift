@@ -66,12 +66,27 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
                 return seal(Void())
             }
             let library = LibraryStorage(context: storage.main.context)
-            let playableFile = library.createPlayableFile()
-            playableFile.info = playable
-            playableFile.data = data
+            savePlayableDataAsync(playable: playable, data: data, storage: storage)
             artworkExtractor.extractEmbeddedArtwork(library: library, playable: playable, fileData: data)
             library.saveContext()
             seal(Void())
+        }
+    }
+    
+    /// save downloaded playable async to avoid memory overflow issues due to kept references
+    func savePlayableDataAsync(playable: AbstractPlayable, data: Data, storage: PersistentStorage) {
+        firstly {
+            storage.async.perform { companion in
+                guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else {
+                    return
+                }
+                let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
+                let playableFile = companion.library.createPlayableFile()
+                playableFile.info = playableAsync
+                playableFile.data = data
+            }
+        }.catch { error in
+            // no error possible
         }
     }
     
