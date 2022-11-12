@@ -308,31 +308,28 @@
             <point key="canvasLocation" x="4708" y="-1331"/>
         </scene>
         <!--Albums-->
-        <scene sceneID="itr-yx-Kbl">
+        <scene sceneID="lgQ-R5-DqE">
             <objects>
-                <collectionViewController id="Hlp-zH-Xjy" customClass="AlbumsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="F6e-dk-JrK">
+                <tableViewController title="Albums" id="w9f-yb-ooi" customClass="AlbumsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="ili-jA-D28">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="epO-IP-P2z">
-                            <size key="itemSize" width="50" height="128"/>
-                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                        </collectionViewFlowLayout>
-                        <cells/>
                         <connections>
-                            <outlet property="dataSource" destination="Hlp-zH-Xjy" id="DFv-Hr-nlQ"/>
-                            <outlet property="delegate" destination="Hlp-zH-Xjy" id="H3y-um-cPe"/>
+                            <outlet property="dataSource" destination="w9f-yb-ooi" id="8L8-Dr-F2F"/>
+                            <outlet property="delegate" destination="w9f-yb-ooi" id="7fk-6A-CFI"/>
                         </connections>
-                    </collectionView>
-                    <navigationItem key="navigationItem" title="Albums" id="Zqu-Id-WAl"/>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Albums" id="tB5-PS-t7P"/>
+                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="hYm-lD-F5a">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </refreshControl>
                     <connections>
-                        <segue destination="CiG-al-lkI" kind="show" identifier="toAlbumDetail" id="nui-pI-Of4"/>
+                        <segue destination="CiG-al-lkI" kind="show" identifier="toAlbumDetail" id="sdx-Gn-m0J"/>
                     </connections>
-                </collectionViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="L93-7b-Z3z" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VJz-wm-vV8" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3919" y="-593"/>
         </scene>
@@ -718,8 +715,8 @@
                         <segue destination="abK-SC-K8I" kind="show" identifier="toDirectories" id="nwc-WO-tbD"/>
                         <segue destination="cJ5-gG-DGL" kind="show" identifier="toPodcasts" id="Xiq-DP-96p"/>
                         <segue destination="ZGw-SA-mia" kind="show" identifier="toArtists" id="vLO-F3-007"/>
+                        <segue destination="w9f-yb-ooi" kind="show" identifier="toAlbums" id="GEw-MS-cJL"/>
                         <segue destination="PdJ-u4-MrR" kind="show" identifier="toSongs" id="XzL-3u-R9K"/>
-                        <segue destination="Hlp-zH-Xjy" kind="show" identifier="toAlbums" id="k8P-8I-6jk"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uW8-CC-aBP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -946,7 +943,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="nui-pI-Of4"/>
+        <segue reference="axa-3B-EfE"/>
         <segue reference="PtL-O3-n85"/>
         <segue reference="qYo-eV-9nj"/>
     </inferredMetricsTieBreakers>

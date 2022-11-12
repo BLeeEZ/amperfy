@@ -24,12 +24,11 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
-class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayout {
+class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
 
     private var fetchedResultsController: AlbumFetchedResultsController!
     private var sortButton: UIBarButtonItem!
     private var actionButton: UIBarButtonItem!
-    private var refreshControl: UIRefreshControl?
     public var displayFilter: DisplayCategoryFilter = .all
     private var sortType: AlbumElementSortType = .name
     private var filterTitle = "Albums"
@@ -38,15 +37,36 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.albums)
 
-        collectionView.register(UINib(nibName: CommonCollectionSectionHeader.typeName, bundle: .main), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CommonCollectionSectionHeader.typeName)
-        collectionView.register(UINib(nibName: AlbumCollectionCell.typeName, bundle: .main), forCellWithReuseIdentifier: AlbumCollectionCell.typeName)
-        
         applyFilter()
+        change(sortType: appDelegate.storage.settings.albumsSortSetting)
         configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
+        tableView.register(nibName: GenericTableCell.typeName)
+        tableView.rowHeight = GenericTableCell.rowHeight
         
-        refreshControl = UIRefreshControl()
-        refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
-        collectionView.refreshControl = refreshControl
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+            libraryElementDetailTableHeaderView.prepare(
+                playContextCb: self.handleHeaderPlay,
+                with: appDelegate.player,
+                shuffleContextCb: self.handleHeaderShuffle)
+            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
+        }
+        
+        self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
+        
+        containableAtIndexPathCallback = { (indexPath) in
+            return self.fetchedResultsController.getWrappedEntity(at: indexPath)
+        }
+        swipeCallback = { (indexPath, completionHandler) in
+            let album = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            firstly {
+                album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+            }.finally {
+                completionHandler(SwipeActionContext(containable: album))
+            }
+        }
     }
     
     func applyFilter() {
@@ -69,11 +89,12 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
     
     func change(sortType: AlbumElementSortType) {
         self.sortType = sortType
-        fetchedResultsController?.clearResults()
-        fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType != .recentlyAddedIndex)
+        singleFetchedResultsController?.clearResults()
+        tableView.reloadData()
+        fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: true)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
-        fetchedResultsController.fetch()
-        collectionView.reloadData()
+        singleFetchedResultsController = fetchedResultsController
+        tableView.reloadData()
         updateRightBarButtonItems()
     }
     
@@ -122,59 +143,44 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
         }
     }
 
-    
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return fetchedResultsController.numberOfSections
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return fetchedResultsController.sections?[section].numberOfObjects ?? 0
-        }
-    
-    override func collectionView(_ collectionView: UICollectionView,
-                            viewForSupplementaryElementOfKind kind: String,
-                            at indexPath: IndexPath) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader else {
-            return UICollectionReusableView()
-        }
-        let sectionHeader: CommonCollectionSectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: CommonCollectionSectionHeader.typeName, for: indexPath) as! CommonCollectionSectionHeader
-        sectionHeader.display(title: sectionTitle(for: indexPath.section))
-        
-        if indexPath.section == 0 {
-            sectionHeader.displayPlayHeader(
-                playContextCb: self.handleHeaderPlay,
-                with: appDelegate.player,
-                shuffleContextCb: self.handleHeaderShuffle)
-        }
-        return sectionHeader
-    }
-    
-    func sectionTitle(for section: Int) -> String {
-        switch sortType {
-        case .name:
-            return fetchedResultsController.titleForHeader(inSection: section) ?? ""
-        case .rating:
-            if let sectionNameInitial = fetchedResultsController.titleForHeader(inSection: section), sectionNameInitial != SectionIndexType.noRatingIndexSymbol {
-                return "\(sectionNameInitial) Star\(sectionNameInitial != "1" ? "s" : "")"
-            } else {
-                return "Not rated"
-            }
-        case .recentlyAddedIndex:
-            return fetchedResultsController.titleForHeader(inSection: section) ?? ""
-        case .artist:
-            return fetchedResultsController.titleForHeader(inSection: section) ?? ""
-        }
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell: AlbumCollectionCell = collectionView.dequeueReusableCell(withReuseIdentifier: AlbumCollectionCell.typeName, for: indexPath) as! AlbumCollectionCell
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
         let album = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(container: album, rootView: self)
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        switch sortType {
+        case .name:
+            return 0.0
+        case .rating:
+            return CommonScreenOperations.tableSectionHeightLarge
+        case .recentlyAddedIndex:
+            return 0.0
+        case .artist:
+            return 0.0
+        }
+    }
+        
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch sortType {
+        case .name:
+            return super.tableView(tableView, titleForHeaderInSection: section)
+        case .rating:
+            if let sectionNameInitial = super.tableView(tableView, titleForHeaderInSection: section), sectionNameInitial != SectionIndexType.noRatingIndexSymbol {
+                return "\(sectionNameInitial) Star\(sectionNameInitial != "1" ? "s" : "")"
+            } else {
+                return "Not rated"
+            }
+        case .recentlyAddedIndex:
+            return super.tableView(tableView, titleForHeaderInSection: section)
+        case .artist:
+            return super.tableView(tableView, titleForHeaderInSection: section)
+        }
+    }
     
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let album = fetchedResultsController.getWrappedEntity(at: indexPath)
         performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
     }
@@ -184,65 +190,6 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
             let vc = segue.destination as! AlbumDetailVC
             let album = sender as? Album
             vc.album = album
-        }
-    }
-    
-    override func indexTitles(for collectionView: UICollectionView) -> [String]? {
-        return isIndexTitelsHidden ? nil : fetchedResultsController.sectionIndexTitles
-    }
-    
-    /// UICollectionViewDelegateFlowLayout
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let inset = self.collectionView(collectionView, layout: collectionViewLayout, insetForSectionAt: indexPath.section)
-        let spaceBetweenCells = self.collectionView(collectionView, layout: collectionViewLayout, minimumInteritemSpacingForSectionAt: indexPath.section)
-        let availableWidth = collectionView.bounds.size.width - inset.left - inset.right
-        let rowCount = (availableWidth) / AlbumCollectionCell.maxWidth
-        let count = ceil(rowCount)
-        let artworkWidth = (availableWidth - (spaceBetweenCells * (count - 1))) / count
-        return CGSize(width: artworkWidth, height: artworkWidth + 45)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 8
-    }
-
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        if self.collectionView.traitCollection.userInterfaceIdiom == .phone {
-            return 8.0
-        } else {
-            return 16.0
-        }
-    }
-
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        insetForSectionAt section: Int) -> UIEdgeInsets {
-        if self.collectionView.traitCollection.userInterfaceIdiom == .phone {
-            return UIEdgeInsets.init(top: 8, left: 8, bottom: 8, right: 16)
-        } else {
-            return UIEdgeInsets.init(top: 8, left: 8, bottom: 8, right: 32)
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        referenceSizeForHeaderInSection section: Int) -> CGSize {
-        let  headerTopHeight = section == 0 ? LibraryElementDetailTableHeaderView.frameHeight : 0.0
-        switch sortType {
-        case .name:
-            return CGSize(width: collectionView.bounds.size.width, height: CommonCollectionSectionHeader.frameHeight + headerTopHeight)
-        case .rating:
-            return CGSize(width: collectionView.bounds.size.width, height: CommonCollectionSectionHeader.frameHeight + headerTopHeight)
-        case .recentlyAddedIndex:
-            return CGSize(width: collectionView.bounds.size.width, height: headerTopHeight)
-        case .artist:
-            return CGSize(width: collectionView.bounds.size.width, height: CommonCollectionSectionHeader.frameHeight + headerTopHeight)
         }
     }
     
@@ -256,7 +203,7 @@ class AlbumsVC: BasicCollectionViewController, UICollectionViewDelegateFlowLayou
             }
         }
         fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1, displayFilter: displayFilter)
-        collectionView.reloadData()
+        tableView.reloadData()
     }
     
     private var displayedSongs: [AbstractPlayable] {
