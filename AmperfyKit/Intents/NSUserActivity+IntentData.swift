@@ -29,6 +29,7 @@ extension NSUserActivity {
         case shuffleOption
         case repeatOption
         case offlineMode
+        case onlyCached
     }
     
     public static let searchAndPlayActivityType = "de.familie-zimba.Amperfy.SearchAndPlay"

@@ -162,6 +162,38 @@ public class IntentManager {
         }
         
         documentation.append(XCallbackActionDocu(
+            name: "PlayRandomSongs",
+            description: "Plays \(player.maxSongsToAddOnce) random songs from library",
+            exampleURLs: [
+                "amperfy://x-callback-url/playRandomSongs",
+                "amperfy://x-callback-url/playRandomSongs?onlyCached=1"
+            ],
+            action: "playRandomSongs",
+            parameters: [
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.onlyCached.rawValue,
+                    type: "Int",
+                    isMandatory: false,
+                    description: "0 (false) or 1 (true), use only cached songs from library",
+                    defaultIfNotGiven: "false"
+                ),
+            ])
+        )
+        CallbackURLKit.register(action: "playRandomSongs") { parameters, success, failure, cancel in
+            var isOnlyUseCached = false
+            if let onlyCachedStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.onlyCached.rawValue} )?.value,
+               let onlyCachedRaw = Int(onlyCachedStringRaw),
+               onlyCachedRaw <= 1 {
+                isOnlyUseCached = onlyCachedRaw == 1
+            }
+            
+            let songs = self.library.getSongs().filterCached(dependigOn: isOnlyUseCached)[randomPick: self.player.maxSongsToAddOnce]
+            let playerContext = PlayContext(name: "Random Songs", playables: songs)
+            self.player.play(context: playerContext)
+            success(nil)
+        }
+        
+        documentation.append(XCallbackActionDocu(
             name: "Play",
             description: "Changes the play state of the player to play",
             exampleURLs: [
