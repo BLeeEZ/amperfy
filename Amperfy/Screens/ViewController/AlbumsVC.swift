@@ -38,7 +38,6 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         appDelegate.userStatistics.visited(.albums)
 
         applyFilter()
-        change(sortType: appDelegate.storage.settings.albumsSortSetting)
         configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
@@ -91,7 +90,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         self.sortType = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: true)
+        fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType != .recentlyAddedIndex)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
