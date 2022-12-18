@@ -23,7 +23,8 @@ import Foundation
 
 class SongPlayedSyncer  {
     
-    private static let minimumPlaytimeTillSyncedAsPlayedToServerInSec: UInt32 = 5
+    private static let minimumPlaytimeForNoAvailableDuration = 30
+    private static let minimumPlaytimeForLongSongs = 60*4
     
     private let musicPlayer: AudioPlayer
     private let backendAudioPlayer: BackendAudioPlayer
@@ -37,8 +38,18 @@ class SongPlayedSyncer  {
     
     private func syncSongPlayed() {
         guard let curPlaying = musicPlayer.currentlyPlaying, let curPlayingSong = curPlaying.asSong else { return }
+        var waitDuration = curPlayingSong.duration
+        if waitDuration > 0 {
+            waitDuration = curPlayingSong.duration / 2
+            if waitDuration > Self.minimumPlaytimeForLongSongs {
+                waitDuration = Self.minimumPlaytimeForLongSongs
+            }
+        } else {
+            waitDuration = Self.minimumPlaytimeForNoAvailableDuration
+        }
+        
         DispatchQueue.global().async {
-            sleep(Self.minimumPlaytimeTillSyncedAsPlayedToServerInSec)
+            sleep(UInt32(waitDuration))
             DispatchQueue.main.async {
                 guard self.backendAudioPlayer.isPlaying, curPlaying == self.musicPlayer.currentlyPlaying, self.backendAudioPlayer.playType == .cache else { return }
                 self.scrobbleSyncer.scrobble(playedSong: curPlayingSong)
