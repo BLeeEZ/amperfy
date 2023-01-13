@@ -24,7 +24,7 @@ import SwiftUI
 struct LicenseSettingsView: View {
 
     var licenseText = """
-Copyright © 2019-2022 Maximilian Bauer
+Copyright © 2019-2023 Maximilian Bauer
 All rights reserved.
 GPLv3 Licensed
 
