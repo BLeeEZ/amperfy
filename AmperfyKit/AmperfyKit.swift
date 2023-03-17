@@ -63,6 +63,7 @@ public class AmperKit {
     public lazy var notificationHandler: EventNotificationHandler = {
         return EventNotificationHandler()
     }()
+    private var audioSessionHandler: AudioSessionHandler?
     public lazy var player: PlayerFacade = {
         let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
         let playerData = storage.main.library.getPlayerData()
@@ -77,9 +78,9 @@ public class AmperKit {
         let facadeImpl = PlayerFacadeImpl(playerStatus: playerData, queueHandler: queueHandler, musicPlayer: curPlayer, library: storage.main.library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
         facadeImpl.isOfflineMode = storage.settings.isOfflineMode
         
-        let audioSessionHandler = AudioSessionHandler(musicPlayer: curPlayer)
-        audioSessionHandler.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
-        audioSessionHandler.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
+        audioSessionHandler = AudioSessionHandler(musicPlayer: curPlayer)
+        audioSessionHandler?.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
+        audioSessionHandler?.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
         let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(), storage: storage)
         curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
         let remoteCommandCenterHandler = RemoteCommandCenterHandler(musicPlayer: facadeImpl, backendAudioPlayer: backendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter.shared())

@@ -67,7 +67,7 @@ class AudioSessionHandler {
 
     func configureBackgroundPlayback(audioSession: AVAudioSession) {
         do {
-            try audioSession.setCategory(AVAudioSession.Category.playback, mode: AVAudioSession.Mode.default, options: AVAudioSession.CategoryOptions.defaultToSpeaker)
+            try audioSession.setCategory(AVAudioSession.Category.playback)
             try audioSession.setActive(true)
         } catch {
             os_log(.error, "Error Player: %s", error.localizedDescription)

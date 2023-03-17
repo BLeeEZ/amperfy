@@ -36,10 +36,10 @@ public struct NotificationUserInfo {
 public class LocalNotificationManager {
     
     private static let notificationTimeInterval = 1.0 // time interval in seconds
+    private static let log = OSLog(subsystem: "Amperfy", category: "LocalNotificationManager")
     
     private let userStatistics: UserStatistics
     private let storage: PersistentStorage
-    private let log = OSLog(subsystem: "Amperfy", category: "LocalNotificationManager")
     
     init(userStatistics: UserStatistics, storage: PersistentStorage) {
         self.userStatistics = userStatistics
@@ -60,7 +60,7 @@ public class LocalNotificationManager {
     public func requestAuthorization() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
             if let error = error {
-                os_log("Authorization Error: %s", log: self.log, type: .error, error.localizedDescription)
+                os_log("Authorization Error: %s", log: Self.log, type: .error, error.localizedDescription)
             }
         }
     }
@@ -79,7 +79,7 @@ public class LocalNotificationManager {
             let attachment = try UNNotificationAttachment(identifier: fileIdentifier, url: artworkUrl, options: nil)
             content.attachments = [attachment]
         } catch {
-            os_log("Attachment Error: %s", log: self.log, type: .error, error.localizedDescription)
+            os_log("Attachment Error: %s", log: Self.log, type: .error, error.localizedDescription)
         }
         content.userInfo = [
             NotificationUserInfo.type: NotificationContentType.podcastEpisode.rawValue,
@@ -87,18 +87,18 @@ public class LocalNotificationManager {
         ]
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: Self.notificationTimeInterval, repeats: false)
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        notify(request: request)
+        Self.notify(request: request)
     }
     
     /// Must be called from main thread
-    public func notifyDebug(title: String, body: String) {
+    public static func notifyDebug(title: String, body: String) {
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: Self.notificationTimeInterval, repeats: false)
         let request = UNNotificationRequest(identifier: String.generateRandomString(ofLength: 15), content: content, trigger: trigger)
-        notify(request: request)
+        Self.notify(request: request)
     }
 
     public func listPendingNotifications() {
@@ -109,7 +109,7 @@ public class LocalNotificationManager {
         }
     }
     
-    private func notify(request: UNNotificationRequest) {
+    private static func notify(request: UNNotificationRequest) {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             switch settings.authorizationStatus {
             case .authorized, .provisional:
