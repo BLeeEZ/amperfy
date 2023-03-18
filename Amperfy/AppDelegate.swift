@@ -145,6 +145,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func reinit() {
         AmperKit.shared.reinit()
     }
+    
+    func restartByUser() {
+        LocalNotificationManager.notifyDebug(title: "Amperfy Restart", body: "Tap to reopen Amperfy")
+        sleepTimer?.invalidate()
+        sleepTimer = nil
+        player.stop()
+        // Wait some time to let the notification appear
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: 1500000)) {
+            // close Amperfy
+            exit(0)
+        }
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if let options = launchOptions {

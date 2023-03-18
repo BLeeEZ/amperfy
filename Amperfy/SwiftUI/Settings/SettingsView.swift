@@ -20,30 +20,11 @@
 //
 
 import SwiftUI
+import AmperfyKit
 
 struct SettingsView: View {
     
     @EnvironmentObject private var settings: Settings
-    
-    #if false
-    func resetAppData() {
-        // ask if user is sure
-        self.appDelegate.sleepTimer?.invalidate()
-        self.appDelegate.sleepTimer = nil
-        self.appDelegate.player.stop()
-        self.appDelegate.scrobbleSyncer.stopAndWait()
-        self.appDelegate.artworkDownloadManager.stopAndWait()
-        self.appDelegate.playableDownloadManager.stopAndWait()
-        self.appDelegate.storage.main.context.reset()
-        self.appDelegate.storage.loginCredentials = nil
-        self.appDelegate.storage.main.library.cleanStorage()
-        self.appDelegate.storage.isLibrarySyncInfoReadByUser = false
-        self.appDelegate.storage.isLibrarySynced = false
-        //self.deleteViewControllerCaches()
-        self.appDelegate.reinit()
-        //self.performSegue(withIdentifier: Segues.toLogin.rawValue, sender: nil)
-    }
-    #endif
     
     var body: some View {
         NavigationView {
@@ -110,15 +91,6 @@ struct SettingsView: View {
                         Text("X-Callback-URL Documentation")
                     }
                 }
-                
-                #if false
-                Section() {
-                    Button(action: { resetAppData() }) {
-                        Text("Reset App Data")
-                            .foregroundColor(.red)
-                    }
-                }
-                #endif
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)

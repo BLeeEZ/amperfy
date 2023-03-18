@@ -35,7 +35,7 @@ public struct NotificationUserInfo {
 
 public class LocalNotificationManager {
     
-    private static let notificationTimeInterval = 1.0 // time interval in seconds
+    private static let notificationTimeInterval = 0.1 // time interval in seconds
     private static let log = OSLog(subsystem: "Amperfy", category: "LocalNotificationManager")
     
     private let userStatistics: UserStatistics

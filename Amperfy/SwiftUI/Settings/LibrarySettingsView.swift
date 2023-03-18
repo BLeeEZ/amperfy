@@ -41,8 +41,9 @@ struct LibrarySettingsView: View {
     
     @State var isShowDeleteCacheAlert = false
     @State var isShowDownloadSongsAlert = false
+    @State var isShowResyncLibraryAlert = false
     
-    func updateValues() {
+    private func updateValues() {
         appDelegate.storage.async.perform { asyncCompanion in
             self.playlistCount = asyncCompanion.library.playlistCount
             self.artistCount = asyncCompanion.library.artistCount
@@ -61,6 +62,12 @@ struct LibrarySettingsView: View {
             self.cachedPodcastEpisodesCount = asyncCompanion.library.cachedPodcastEpisodeCount
             self.completeCacheSize = asyncCompanion.library.cachedPlayableSizeInByte.asByteString
         }.catch { error in }
+    }
+    
+    private func resyncLibrary() {
+        // reset library sync flag -> rest library at new start and continue with sync
+        self.appDelegate.storage.isLibrarySynced = false
+        self.appDelegate.restartByUser()
     }
     
     var body: some View {
@@ -186,6 +193,21 @@ struct LibrarySettingsView: View {
                 }, header: {
                     Text("Cache")
                 })
+                
+                Section() {
+                    Button(action: {
+                        isShowResyncLibraryAlert = true
+                    }) {
+                        Text("Resync Library")
+                            .foregroundColor(.red)
+                    }
+                    .alert(isPresented: $isShowResyncLibraryAlert) {
+                        Alert(title: Text("Resync Library"), message: Text("This action resets your local library and starts the sync process from remote. Amperfy needs to restart to perform a resync.\n\nDo you want to resync your library and restart Amperfy?"),
+                        primaryButton: .destructive(Text("Resync")) {
+                            resyncLibrary()
+                        },secondaryButton: .cancel())
+                    }
+                }
             }
         }
         .navigationTitle("Library")
