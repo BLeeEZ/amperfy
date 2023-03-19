@@ -29,6 +29,8 @@ struct ServerSettingsView: View {
     private func logout() {
         // reset login credentials -> at new start the login view is presented to auth and resync library
         self.appDelegate.storage.loginCredentials = nil
+        // force resync after login
+        self.appDelegate.storage.isLibrarySynced = false
         self.appDelegate.restartByUser()
     }
     
