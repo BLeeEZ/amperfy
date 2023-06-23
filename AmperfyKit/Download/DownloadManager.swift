@@ -54,13 +54,13 @@ class DownloadManager: NSObject, DownloadManageable {
     }
     
     func download(object: Downloadable) {
-        guard !object.isCached, storage.settings.isOnlineMode else { return }
+        guard !object.isCached, storage.settings.isOnlineMode, (object is Artwork) || !storageExceedsCacheLimit() else { return }
         if let isValidCheck = preDownloadIsValidCheck, !isValidCheck(object) { return }
         self.requestManager.add(object: object)
     }
     
     func download(objects: [Downloadable]) {
-        guard storage.settings.isOnlineMode else { return }
+        guard storage.settings.isOnlineMode, !storageExceedsCacheLimit() else { return }
         let downloadObjects = objects.filter{ !$0.isCached }.filter{ preDownloadIsValidCheck?($0) ?? true }
         if !downloadObjects.isEmpty {
             self.requestManager.add(objects: downloadObjects)
@@ -106,6 +106,17 @@ class DownloadManager: NSObject, DownloadManageable {
     
     func resetFailedDownloads() {
         requestManager.resetFailedDownloads()
+    }
+    
+    func storageExceedsCacheLimit()->Bool{
+        if storage.settings.cacheLimit == 0{
+            return false
+        }
+        return storage.main.library.cachedPlayableSizeInByte > storage.settings.cacheLimit
+    }
+    
+    func cancelPlayableDownloads(){
+        requestManager.cancelPlayablesDownloads()
     }
     
     func isDownloadSlotAvailable() -> Bool {
@@ -197,6 +208,9 @@ class DownloadManager: NSObject, DownloadManageable {
             self.storage.main.saveContext()
             if let downloadElement = download.element {
                 self.notificationHandler.post(name: .downloadFinishedSuccess, object: self, userInfo: DownloadNotification(id: downloadElement.uniqueID).asNotificationUserInfo)
+                if self.storageExceedsCacheLimit(){
+                    self.cancelPlayableDownloads()
+                }
             }
         }
     }

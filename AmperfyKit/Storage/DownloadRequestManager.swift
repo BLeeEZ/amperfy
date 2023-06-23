@@ -171,6 +171,19 @@ class DownloadRequestManager {
         storage.main.saveContext()
     }
     
+    func cancelPlayablesDownloads() {
+        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
+            NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
+            self.downloadDelegate.requestPredicate
+        ])
+        let results = try? storage.main.context.fetch(fetchRequest).filter({$0.playable != nil})
+        let downloads = results?.compactMap{ Download(managedObject: $0) }
+        downloads?.forEach{ $0.isCanceled = true }
+        storage.main.saveContext()
+    }
+    
     func resetFailedDownloads() {
         let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [

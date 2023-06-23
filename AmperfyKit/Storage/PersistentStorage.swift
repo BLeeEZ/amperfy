@@ -131,6 +131,8 @@ public class PersistentStorage {
         case LibrarySyncVersion = "librarySyncVersion"
         
         case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
+        
+        case CacheLimit = "cacheLimitInBytes"
     }
     
     private var coreDataManager: CoreDataManagable
@@ -161,6 +163,13 @@ public class PersistentStorage {
                 return UserDefaults.standard.object(forKey: UserDefaultsKey.SleepTimerInterval.rawValue) as? Int ?? 0
             }
             set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.SleepTimerInterval.rawValue) }
+        }
+        
+        public var cacheLimit: Int {
+            get {
+                return UserDefaults.standard.object(forKey: UserDefaultsKey.CacheLimit.rawValue) as? Int ?? 0
+            }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.CacheLimit.rawValue) }
         }
         
         public var playlistsSortSetting: PlaylistSortType {

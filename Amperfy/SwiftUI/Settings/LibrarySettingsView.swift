@@ -37,11 +37,15 @@ struct LibrarySettingsView: View {
     @State var cachedSongCount = 0
     @State var cachedPodcastEpisodesCount = 0
     @State var completeCacheSize = ""
+    @State var cacheSizeLimit = ""
+    @State var cacheSelection = ["0", " MB"]
     @State var autoSyncProgressText = ""
     
     @State var isShowDeleteCacheAlert = false
     @State var isShowDownloadSongsAlert = false
     @State var isShowResyncLibraryAlert = false
+    
+    let byteValues = (stride(from: 0, through: 19, by: 1).map({$0.description}))+(stride(from: 20, through: 970, by: 25).map({$0.description}))
     
     private func updateValues() {
         appDelegate.storage.async.perform { asyncCompanion in
@@ -61,6 +65,9 @@ struct LibrarySettingsView: View {
             self.cachedSongCount = asyncCompanion.library.cachedSongCount
             self.cachedPodcastEpisodesCount = asyncCompanion.library.cachedPodcastEpisodeCount
             self.completeCacheSize = asyncCompanion.library.cachedPlayableSizeInByte.asByteString
+            let cacheSize = Int64(settings.cacheSizeLimit)
+            self.cacheSizeLimit = cacheSize > 0 ? cacheSize.asByteString : "No Limit"
+                                                                          
         }.catch { error in }
     }
     
@@ -160,6 +167,27 @@ struct LibrarySettingsView: View {
                         Text(completeCacheSize.description)
                             .foregroundColor(.secondary)
                     }
+                    NavigationLink{
+                        MultiPickerView(data: [("Size", byteValues),(" Bytes",[" MB"," GB"])], selection: $cacheSelection)
+                    } label: {
+                        
+                        HStack {
+                            Text("Cache Size Limit")
+                            Spacer()
+                            Text(cacheSizeLimit.description)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .onChange(of: cacheSelection, perform: { cacheString in
+                        if cacheString[1] == ""{
+                            settings.cacheSizeLimit = 0
+                            cacheSelection = ["0"," KB"]
+                        }
+                        if let cacheInByte = (cacheString[0] + cacheString[1]).asByteCount{
+                            settings.cacheSizeLimit = cacheInByte
+                        }
+                    })
+                    
                     
                     Button(action: {
                         isShowDownloadSongsAlert = true

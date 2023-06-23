@@ -74,6 +74,11 @@ class SettingsHostVC: UIViewController {
         changesAgent.append(settings.$swipeActionSettings.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.swipeActionSettings = newValue
         }))
+        
+        settings.cacheSizeLimit = self.appDelegate.storage.settings.cacheLimit
+        changesAgent.append(settings.$cacheSizeLimit.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.cacheLimit = newValue
+        }))
     }
     
     @IBSegueAction func segueToSwiftUI(_ coder: NSCoder) -> UIViewController? {
