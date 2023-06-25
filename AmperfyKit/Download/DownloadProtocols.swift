@@ -34,8 +34,10 @@ public protocol DownloadManageable {
     func clearFinishedDownloads()
     func resetFailedDownloads()
     func cancelDownloads()
+    func cancelPlayableDownloads()
     func start()
     func stopAndWait()
+    func storageExceedsCacheLimit() -> Bool
 }
 
 public protocol DownloadManagerDelegate {

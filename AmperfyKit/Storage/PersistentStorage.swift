@@ -114,6 +114,7 @@ public class PersistentStorage {
         case ArtworkDownloadSetting = "artworkDownloadSetting"
         case ArtworkDisplayPreference = "artworkDisplayPreference"
         case SleepTimerInterval = "sleepTimerInterval"
+        case CacheLimit = "cacheLimitInBytes" // limit in byte
         
         case SongActionOnTab = "songActionOnTab"
         case LibraryDisplaySettings = "libraryDisplaySettings"
@@ -161,6 +162,13 @@ public class PersistentStorage {
                 return UserDefaults.standard.object(forKey: UserDefaultsKey.SleepTimerInterval.rawValue) as? Int ?? 0
             }
             set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.SleepTimerInterval.rawValue) }
+        }
+        
+        public var cacheLimit: Int {
+            get {
+                return UserDefaults.standard.object(forKey: UserDefaultsKey.CacheLimit.rawValue) as? Int ?? 0
+            }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.CacheLimit.rawValue) }
         }
         
         public var playlistsSortSetting: PlaylistSortType {
