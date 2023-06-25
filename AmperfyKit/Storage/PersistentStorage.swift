@@ -114,6 +114,7 @@ public class PersistentStorage {
         case ArtworkDownloadSetting = "artworkDownloadSetting"
         case ArtworkDisplayPreference = "artworkDisplayPreference"
         case SleepTimerInterval = "sleepTimerInterval"
+        case CacheLimit = "cacheLimitInBytes" // limit in byte
         
         case SongActionOnTab = "songActionOnTab"
         case LibraryDisplaySettings = "libraryDisplaySettings"
@@ -131,8 +132,6 @@ public class PersistentStorage {
         case LibrarySyncVersion = "librarySyncVersion"
         
         case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
-        
-        case CacheLimit = "cacheLimitInBytes"
     }
     
     private var coreDataManager: CoreDataManagable

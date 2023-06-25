@@ -69,7 +69,7 @@ class MOCK_SongDownloader: DownloadManageable {
     func start() {}
     func stopAndWait() {}
     func cancelPlayableDownloads() {}
-    func storageExceedsCacheLimit()->Bool{return false}
+    func storageExceedsCacheLimit() -> Bool { return false }
 }
 
 class MOCK_AlertDisplayable: AlertDisplayable {

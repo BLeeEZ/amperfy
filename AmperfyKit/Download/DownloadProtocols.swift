@@ -37,7 +37,7 @@ public protocol DownloadManageable {
     func cancelPlayableDownloads()
     func start()
     func stopAndWait()
-    func storageExceedsCacheLimit()->Bool
+    func storageExceedsCacheLimit() -> Bool
 }
 
 public protocol DownloadManagerDelegate {

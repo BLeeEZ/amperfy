@@ -108,10 +108,8 @@ class DownloadManager: NSObject, DownloadManageable {
         requestManager.resetFailedDownloads()
     }
     
-    func storageExceedsCacheLimit()->Bool{
-        if storage.settings.cacheLimit == 0{
-            return false
-        }
+    func storageExceedsCacheLimit() -> Bool {
+        guard storage.settings.cacheLimit != 0 else { return false }
         return storage.main.library.cachedPlayableSizeInByte > storage.settings.cacheLimit
     }
     
@@ -208,7 +206,7 @@ class DownloadManager: NSObject, DownloadManageable {
             self.storage.main.saveContext()
             if let downloadElement = download.element {
                 self.notificationHandler.post(name: .downloadFinishedSuccess, object: self, userInfo: DownloadNotification(id: downloadElement.uniqueID).asNotificationUserInfo)
-                if self.storageExceedsCacheLimit(){
+                if self.storageExceedsCacheLimit() {
                     self.cancelPlayableDownloads()
                 }
             }
