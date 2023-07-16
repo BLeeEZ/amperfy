@@ -26,7 +26,6 @@ class IconLabelTableCell: BasicTableCell {
     
     @IBOutlet weak var nameLabel: MarqueeLabel!
     @IBOutlet weak var actionImage: UIImageView!
-    @IBOutlet weak var directoryIconLabel: UILabel!
     
     private var action: SwipeActionType?
     private var libraryDisplayType: LibraryDisplayType?
@@ -55,10 +54,10 @@ class IconLabelTableCell: BasicTableCell {
                 actionImage.image = action.image
             }
             nameLabel.font = nameLabel.font.withSize(16)
-            directoryIconLabel.isHidden = true
+            self.accessoryType = .none
         } else if let libraryDisplayType = libraryDisplayType {
             actionImage.image = libraryDisplayType.image.withTintColor(.defaultBlue)
-            directoryIconLabel.isHidden = false
+            self.accessoryType = .disclosureIndicator
             nameLabel.font = nameLabel.font.withSize(20)
         }
     }
