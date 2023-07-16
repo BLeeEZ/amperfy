@@ -28,7 +28,6 @@ public enum ParsedObjectType {
     case album
     case song
     case playlist
-    case playlistSongs
     case genre
     case podcast
 }

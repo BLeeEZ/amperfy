@@ -124,8 +124,6 @@ extension SyncVC: SyncCallbacks {
             self.updateSyncInfo(infoText: "Syncing songs ...", percentParsed: 0.0)
         case .playlist:
             self.updateSyncInfo(infoText: "Syncing playlists ...", percentParsed: 0.0)
-        case .playlistSongs:
-            self.updateSyncInfo(infoText: "Syncing playlist songs...", percentParsed: 0.0)
         case .genre:
             self.updateSyncInfo(infoText: "Syncing genres ...", percentParsed: 0.0)
         case .podcast:
