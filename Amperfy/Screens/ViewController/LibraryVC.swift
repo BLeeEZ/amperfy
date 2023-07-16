@@ -50,7 +50,9 @@ class LibraryVC: UITableViewController {
         } else {
             tableView.deleteSections(IndexSet(integer: 1), with: .fade)
         }
-        tableView.visibleCells.compactMap{ $0 as? IconLabelTableCell }.forEach{ $0.directoryIconLabel.isHidden = tableView.isEditing }
+        tableView.visibleCells
+            .compactMap { $0 as? IconLabelTableCell }
+            .forEach{ $0.accessoryType = tableView.isEditing ? .none : .disclosureIndicator }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -65,7 +67,7 @@ class LibraryVC: UITableViewController {
         for visibleCell in tableView.visibleCells {
             let cell = visibleCell as! IconLabelTableCell
             cell.refreshStyle()
-            cell.directoryIconLabel.isHidden = tableView.isEditing
+            cell.accessoryType = tableView.isEditing ? .none : .disclosureIndicator
         }
     }
 
@@ -94,7 +96,7 @@ class LibraryVC: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: IconLabelTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
         cell.display(libraryDisplayType: librarySettings.combined[indexPath.section][indexPath.row])
-        cell.directoryIconLabel.isHidden = tableView.isEditing
+        cell.accessoryType = tableView.isEditing ? .none : .disclosureIndicator
         return cell
     }
     
