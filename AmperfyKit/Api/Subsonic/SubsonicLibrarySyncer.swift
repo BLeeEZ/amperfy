@@ -108,6 +108,27 @@ class SubsonicLibrarySyncer: LibrarySyncer {
                 let parserDelegate = SsPlaylistParserDelegate(library: asyncCompanion.library)
                 try self.parse(data: data, delegate: parserDelegate)
             }
+        }.then { auth -> Promise<Void> in
+            let playlists = self.storage.main.library.getPlaylists().filter{ !$0.id.isEmpty }
+            statusNotifyier?.notifySyncStarted(ofType: .playlistSongs, totalCount: playlists.count)
+            
+            let playlistPromises: [() -> Promise<Void>] = playlists.compactMap { playlist in return {
+                return firstly {
+                        self.subsonicServerApi.requestPlaylistSongs(id: playlist.id)
+                    }.then { data in
+                        self.storage.async.perform { asyncCompanion in
+                            guard let localContextPlaylist = asyncCompanion.library.getPlaylist(id: playlist.id) else {
+                                return
+                            }
+                            let parserDelegate = SsPlaylistSongsParserDelegate(playlist: localContextPlaylist, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+                            try self.parse(data: data, delegate: parserDelegate)
+                        }
+                    }.get {
+                        statusNotifyier?.notifyParsedObject(ofType: .playlistSongs)
+                    }
+                }
+            }
+            return playlistPromises.resolveSequentially()
         }.then {
             self.subsonicServerApi.requestServerPodcastSupport()
         }.then { isSupported -> Promise<Void> in
