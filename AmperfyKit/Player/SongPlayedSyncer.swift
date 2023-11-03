@@ -23,8 +23,7 @@ import Foundation
 
 class SongPlayedSyncer  {
     
-    private static let minimumPlaytimeForNoAvailableDuration = 30
-    private static let minimumPlaytimeForLongSongs = 60*4
+    private static let maximumWaitDurationInSec = 20
     
     private let musicPlayer: AudioPlayer
     private let backendAudioPlayer: BackendAudioPlayer
@@ -38,14 +37,9 @@ class SongPlayedSyncer  {
     
     private func syncSongPlayed() {
         guard let curPlaying = musicPlayer.currentlyPlaying, let curPlayingSong = curPlaying.asSong else { return }
-        var waitDuration = curPlayingSong.duration
-        if waitDuration > 0 {
-            waitDuration = curPlayingSong.duration / 2
-            if waitDuration > Self.minimumPlaytimeForLongSongs {
-                waitDuration = Self.minimumPlaytimeForLongSongs
-            }
-        } else {
-            waitDuration = Self.minimumPlaytimeForNoAvailableDuration
+        var waitDuration = curPlayingSong.duration / 2
+        if waitDuration > Self.maximumWaitDurationInSec {
+            waitDuration = Self.maximumWaitDurationInSec
         }
         
         DispatchQueue.global().async {
