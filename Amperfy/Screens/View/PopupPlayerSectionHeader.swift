@@ -20,6 +20,7 @@
 //
 
 import UIKit
+import MarqueeLabel
 
 class PopupPlayerSectionHeader: UIView {
 

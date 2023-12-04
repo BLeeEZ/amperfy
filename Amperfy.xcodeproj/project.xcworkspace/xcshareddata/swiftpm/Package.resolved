@@ -1,12 +1,84 @@
 {
   "pins" : [
     {
+      "identity" : "alamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/Alamofire",
+      "state" : {
+        "revision" : "8dd85aee02e39dd280c75eef88ffdb86eed4b07b",
+        "version" : "5.6.2"
+      }
+    },
+    {
       "identity" : "callbackurlkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/phimage/CallbackURLKit",
       "state" : {
         "revision" : "5411bfc17cd0787ac80c46f312c7235783ff9421",
         "version" : "3.0.0"
+      }
+    },
+    {
+      "identity" : "id3tageditor",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/chicio/ID3TagEditor",
+      "state" : {
+        "revision" : "1f631c8d8f5f70d8ba00ea2c448fe6a1eb4529c2",
+        "version" : "4.3.0"
+      }
+    },
+    {
+      "identity" : "lnpopupcontroller",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/LeoNatan/LNPopupController",
+      "state" : {
+        "revision" : "9f44dd1ce6d9946210deea4d19b305df0d39503e",
+        "version" : "2.13.7"
+      }
+    },
+    {
+      "identity" : "marqueelabel",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cbpowell/MarqueeLabel",
+      "state" : {
+        "revision" : "f2c72a5f8568579dade6350dc26a482076d3d346",
+        "version" : "4.3.0"
+      }
+    },
+    {
+      "identity" : "notificationbanner",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Daltron/NotificationBanner",
+      "state" : {
+        "revision" : "e856a462053daf80c7936056d64246983f3f4d14",
+        "version" : "3.1.0"
+      }
+    },
+    {
+      "identity" : "pmkalamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/PromiseKit/PMKAlamofire",
+      "state" : {
+        "revision" : "e1791b81d309d4b4853127d72473978f86e96ebe",
+        "version" : "4.0.0"
+      }
+    },
+    {
+      "identity" : "promisekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mxcl/PromiseKit",
+      "state" : {
+        "revision" : "43772616c46a44a9977e41924ae01d0e55f2f9ca",
+        "version" : "6.18.1"
+      }
+    },
+    {
+      "identity" : "snapkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SnapKit/SnapKit",
+      "state" : {
+        "revision" : "f222cbdf325885926566172f6f5f06af95473158",
+        "version" : "5.6.0"
       }
     },
     {

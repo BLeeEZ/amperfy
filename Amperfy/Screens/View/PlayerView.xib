@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -64,7 +64,7 @@
                         <action selector="artistNameLargePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Lno-fc-kKQ"/>
                     </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GST-UH-ejT" userLabel="Artist Name Large Label" customClass="MarqueeLabel" customModule="Amperfy">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GST-UH-ejT" userLabel="Artist Name Large Label" customClass="MarqueeLabel" customModule="MarqueeLabel">
                     <rect key="frame" x="16" y="195.5" width="343" height="23"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="23" id="yJg-88-RGh"/>
@@ -78,7 +78,7 @@
                         <action selector="titleLargePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="f7Y-PD-RbX"/>
                     </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6NT-8n-tg9" userLabel="Title Large Label" customClass="MarqueeLabel" customModule="Amperfy">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6NT-8n-tg9" userLabel="Title Large Label" customClass="MarqueeLabel" customModule="MarqueeLabel">
                     <rect key="frame" x="16" y="134" width="343" height="25.5"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="25.5" id="Srp-a1-Y1D"/>
@@ -93,7 +93,7 @@
                         <action selector="albumLargePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Vay-5f-ISV"/>
                     </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Album Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uVF-NM-dm3" userLabel="Album Large Label" customClass="MarqueeLabel" customModule="Amperfy">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Album Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uVF-NM-dm3" userLabel="Album Large Label" customClass="MarqueeLabel" customModule="MarqueeLabel">
                     <rect key="frame" x="16" y="164.5" width="343" height="25.5"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="25.5" id="30d-B4-p99"/>
@@ -189,7 +189,7 @@
                         <action selector="artistNameCompactPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="PSZ-f0-sKI"/>
                     </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8F1-fg-8m2" userLabel="Artist Name Compact Label" customClass="MarqueeLabel" customModule="Amperfy">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8F1-fg-8m2" userLabel="Artist Name Compact Label" customClass="MarqueeLabel" customModule="MarqueeLabel">
                     <rect key="frame" x="84" y="71" width="275" height="30"/>
                     <fontDescription key="fontDescription" type="system" pointSize="19"/>
                     <nil key="highlightedColor"/>
@@ -200,7 +200,7 @@
                         <action selector="titleCompactPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="9aD-KS-kRv"/>
                     </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pOR-k2-6Vf" userLabel="Title Compact Label" customClass="MarqueeLabel" customModule="Amperfy">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pOR-k2-6Vf" userLabel="Title Compact Label" customClass="MarqueeLabel" customModule="MarqueeLabel">
                     <rect key="frame" x="84" y="38" width="275" height="30"/>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="21"/>
                     <nil key="textColor"/>

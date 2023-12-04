@@ -24,6 +24,7 @@ import UIKit
 import os.log
 import AmperfyKit
 import SwiftUI
+import MarqueeLabel
 
 extension MarqueeLabel {
     func applyAmperfyStyle() {
@@ -39,9 +40,7 @@ extension MarqueeLabel {
         if type != .continuous {
             self.type = .continuous
         }
-        if speed.value != 30.0 {
-            self.speed = .rate(30.0)
-        }
+        self.speed = .rate(30.0)
         if fadeLength != 10.0 {
             self.fadeLength = 10.0
         }

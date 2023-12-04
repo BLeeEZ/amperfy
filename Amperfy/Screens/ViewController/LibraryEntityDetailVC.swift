@@ -23,6 +23,7 @@ import Foundation
 import UIKit
 import AmperfyKit
 import PromiseKit
+import MarqueeLabel
 
 typealias GetPlayContextCallback = () -> PlayContext?
 typealias GetPlayerIndexCallback = () -> PlayerIndex?

@@ -21,7 +21,7 @@
 
 import Foundation
 import UIKit
-import NotificationBanner
+import NotificationBannerSwift
 import AmperfyKit
 
 

@@ -19,7 +19,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import NotificationBanner
+import NotificationBannerSwift
+import UIKit
 import AmperfyKit
 
 class AmperfyBannerColors: BannerColorsProtocol {

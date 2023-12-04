@@ -21,6 +21,7 @@
 
 import UIKit
 import AmperfyKit
+import MarqueeLabel
 
 class IconLabelTableCell: BasicTableCell {
     

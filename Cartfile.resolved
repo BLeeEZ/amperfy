@@ -1,8 +1,0 @@
-github "Alamofire/Alamofire" "5.6.2"
-github "Daltron/NotificationBanner" "3.1.0"
-github "LeoNatan/LNPopupController" "2.13.7"
-github "PromiseKit/PMKAlamofire" "4.0.0"
-github "SnapKit/SnapKit" "5.6.0"
-github "cbpowell/MarqueeLabel" "4.3.0"
-github "chicio/ID3TagEditor" "4.3.0"
-github "mxcl/PromiseKit" "6.18.1"

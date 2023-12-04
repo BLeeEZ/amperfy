@@ -33,10 +33,6 @@
 		501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501DBE9E2632D2CF00B31128 /* GenreDetailVC.swift */; };
 		502E56BC27561AD900638BD2 /* PopupPlayerSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */; };
 		502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */; };
-		502F56B728C8E71400F004C0 /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */; };
-		502F56B828C8E71500F004C0 /* Alamofire.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		502F56B928C8E71B00F004C0 /* PMKAlamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */; };
-		502F56BA28C8E71B00F004C0 /* PMKAlamofire.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5043714E27C23BF4008358AC /* FullWidthDescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5043714C27C23BF4008358AC /* FullWidthDescriptionView.swift */; };
 		5043714F27C23C0C008358AC /* FullWidthDescriptionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5043714D27C23BF4008358AC /* FullWidthDescriptionView.xib */; };
 		5045C7502850A2730095FF09 /* Font Awesome 5 Free-Solid-900.otf in Resources */ = {isa = PBXBuildFile; fileRef = 50BA932021DA4D0B00E5901D /* Font Awesome 5 Free-Solid-900.otf */; };
@@ -48,19 +44,11 @@
 		504B442228D8EBB20033982C /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B442128D8EBB20033982C /* MailView.swift */; };
 		504CE14E27920965005E0DE7 /* RatingView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 504CE14D27920965005E0DE7 /* RatingView.xib */; };
 		504CE15027920988005E0DE7 /* RatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504CE14F27920988005E0DE7 /* RatingView.swift */; };
-		5054689C2625CD95008005EC /* LNPopupController.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5054686C2625C457008005EC /* LNPopupController.xcframework */; };
-		5054689D2625CD95008005EC /* LNPopupController.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5054686C2625C457008005EC /* LNPopupController.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5055AA5626835A9000096B8D /* PodcastEpisodeTableCell.swift */; };
 		5055AA5826835AB000096B8D /* PodcastEpisodeTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5055AA5526835A9000096B8D /* PodcastEpisodeTableCell.xib */; };
-		5055AA59268365DA00096B8D /* NotificationBanner.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50EF2CB3267F65960011C42F /* NotificationBanner.xcframework */; };
-		5055AA5A268365DA00096B8D /* NotificationBanner.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 50EF2CB3267F65960011C42F /* NotificationBanner.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5055AA5B268365DD00096B8D /* SnapKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50EF2CB1267F658B0011C42F /* SnapKit.xcframework */; };
-		5055AA5C268365DD00096B8D /* SnapKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 50EF2CB1267F658B0011C42F /* SnapKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */; };
 		5059A31C28A9ED680068E4D2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5059A31B28A9ED680068E4D2 /* SceneDelegate.swift */; };
 		5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5059A31D28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift */; };
-		506007232625E8BD00F9891D /* MarqueeLabel.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 505468712625C47D008005EC /* MarqueeLabel.xcframework */; };
-		506007242625E8BD00F9891D /* MarqueeLabel.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 505468712625C47D008005EC /* MarqueeLabel.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		50722747286794FC00910574 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50722746286794FC00910574 /* MainWindow.swift */; };
 		507361E02632BA3B005F151D /* GenresVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507361DF2632BA3B005F151D /* GenresVC.swift */; };
 		5077F936221E6D0E0099CA91 /* DownloadsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F935221E6D0E0099CA91 /* DownloadsVC.swift */; };
@@ -72,10 +60,33 @@
 		50791E8528D36F1F006CE6E5 /* LibrarySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E8428D36F1F006CE6E5 /* LibrarySettingsView.swift */; };
 		50791E8728D3B7BF006CE6E5 /* PlayerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */; };
 		50791E8928D3BC4D006CE6E5 /* SwipeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E8828D3BC4D006CE6E5 /* SwipeSettingsView.swift */; };
+		507DFE4C2B1E57BE002BBB1D /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */; };
+		507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */; };
+		507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE512B1E5848002BBB1D /* ID3TagEditor */; };
+		507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE542B1E587B002BBB1D /* Alamofire */; };
+		507DFE5B2B1E58CB002BBB1D /* PMKAlamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE5A2B1E58CB002BBB1D /* PMKAlamofire */; };
+		507DFE622B1E59F2002BBB1D /* PromiseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE612B1E59F2002BBB1D /* PromiseKit */; };
+		507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE632B1E5A03002BBB1D /* Alamofire */; };
+		507DFE662B1E5A0E002BBB1D /* PMKAlamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE652B1E5A0E002BBB1D /* PMKAlamofire */; };
+		507DFE682B1E5A1A002BBB1D /* PromiseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE672B1E5A1A002BBB1D /* PromiseKit */; };
+		507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE692B1E62C9002BBB1D /* ID3TagEditor */; };
+		507DFE6E2B1E6DFE002BBB1D /* PromiseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE6D2B1E6DFE002BBB1D /* PromiseKit */; };
+		507DFE782B1E70DE002BBB1D /* VYPlayIndicator in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE772B1E70DE002BBB1D /* VYPlayIndicator */; };
+		507DFE7A2B1E70E1002BBB1D /* CallbackURLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE792B1E70E1002BBB1D /* CallbackURLKit */; };
+		507DFE7C2B1E70E4002BBB1D /* LNPopupController in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE7B2B1E70E4002BBB1D /* LNPopupController */; };
+		507DFE7E2B1E70E4002BBB1D /* LNPopupController in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE7B2B1E70E4002BBB1D /* LNPopupController */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		507DFE802B1E70E8002BBB1D /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE7F2B1E70E8002BBB1D /* MarqueeLabel */; };
+		507DFE822B1E70EC002BBB1D /* NotificationBannerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE812B1E70EC002BBB1D /* NotificationBannerSwift */; };
+		507DFE842B1E70F0002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE832B1E70F0002BBB1D /* ID3TagEditor */; };
+		507DFE862B1E70F3002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE852B1E70F3002BBB1D /* Alamofire */; };
+		507DFE882B1E70F8002BBB1D /* PromiseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE872B1E70F8002BBB1D /* PromiseKit */; };
+		507DFE8A2B1E70FC002BBB1D /* PMKAlamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE892B1E70FC002BBB1D /* PMKAlamofire */; };
+		507DFE8D2B1E7192002BBB1D /* LNPopupController in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8C2B1E7192002BBB1D /* LNPopupController */; };
+		507DFE8E2B1E7192002BBB1D /* LNPopupController in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8C2B1E7192002BBB1D /* LNPopupController */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		507DFE902B1E7262002BBB1D /* CallbackURLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8F2B1E7262002BBB1D /* CallbackURLKit */; };
 		508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E721C5965B00C4BB32 /* AppDelegate.swift */; };
 		508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E921C5965B00C4BB32 /* LoginVC.swift */; };
 		508385ED21C5965B00C4BB32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 508385EB21C5965B00C4BB32 /* Main.storyboard */; };
-		508EBB252850A4270053D9F0 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508EBB242850A4270053D9F0 /* MarqueeLabel.swift */; };
 		508EBB282850C8D90053D9F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 508385EE21C5965E00C4BB32 /* Assets.xcassets */; };
 		508EBB292850C8DF0053D9F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 508385EE21C5965E00C4BB32 /* Assets.xcassets */; };
 		508EBB322850C9460053D9F0 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508EBB312850C9460053D9F0 /* IntentHandler.swift */; };
@@ -92,11 +103,6 @@
 		508FDE5021F64ED6005A0724 /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4F21F64ED6005A0724 /* TabBarVC.swift */; };
 		509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */; };
 		509001B82716C8F400A8056D /* AppDelegateNotificationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001B72716C8F400A8056D /* AppDelegateNotificationExtensions.swift */; };
-		5096EA6F28B3B38500C3E78C /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */; };
-		5096EA7328B3B38900C3E78C /* PMKAlamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */; };
-		5096EA7628B3B38B00C3E78C /* PromiseKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */; };
-		5096EA7828B3B39C00C3E78C /* PromiseKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */; };
-		5096EA7928B3B39C00C3E78C /* PromiseKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */ = {isa = PBXBuildFile; productRef = 509D55F7281274F500E0E0B5 /* VYPlayIndicator */; };
 		50A85EF22689E8DC00FB3E31 /* PlayableTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A85EF12689E8DC00FB3E31 /* PlayableTableCell.swift */; };
 		50A85EF32689E95300FB3E31 /* PlayableTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50A85EF02689E8DC00FB3E31 /* PlayableTableCell.xib */; };
@@ -193,8 +199,6 @@
 		50BE5D9828511C3800156FC6 /* Amperfy.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */; };
 		50BE5D9928511C3A00156FC6 /* Amperfy.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */; };
 		50BE5D9E2851D5DE00156FC6 /* IntentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BE5D9D2851D5DE00156FC6 /* IntentManager.swift */; };
-		50BE5D9F2853427800156FC6 /* ID3TagEditor.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50814C9727D2550D0072738F /* ID3TagEditor.xcframework */; };
-		50BE5DA02853427800156FC6 /* ID3TagEditor.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 50814C9727D2550D0072738F /* ID3TagEditor.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		50BE5DA7285714A200156FC6 /* CallbackURLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 50BE5DA6285714A200156FC6 /* CallbackURLKit */; };
 		50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C0521E241B200F086F0 /* SearchVC.swift */; };
 		50C16C0C21E52BBB00F086F0 /* SongTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50C16C0B21E52BBB00F086F0 /* SongTableCell.xib */; };
@@ -464,15 +468,19 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5055AA5C268365DD00096B8D /* SnapKit.xcframework in Embed Frameworks */,
-				5096EA7928B3B39C00C3E78C /* PromiseKit.xcframework in Embed Frameworks */,
-				5055AA5A268365DA00096B8D /* NotificationBanner.xcframework in Embed Frameworks */,
-				50BE5DA02853427800156FC6 /* ID3TagEditor.xcframework in Embed Frameworks */,
-				502F56B828C8E71500F004C0 /* Alamofire.xcframework in Embed Frameworks */,
-				5054689D2625CD95008005EC /* LNPopupController.xcframework in Embed Frameworks */,
-				502F56BA28C8E71B00F004C0 /* PMKAlamofire.xcframework in Embed Frameworks */,
 				50C9D61B284FA847007F18D0 /* AmperfyKit.framework in Embed Frameworks */,
-				506007242625E8BD00F9891D /* MarqueeLabel.xcframework in Embed Frameworks */,
+				507DFE8E2B1E7192002BBB1D /* LNPopupController in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		507DFE7D2B1E70E4002BBB1D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				507DFE7E2B1E70E4002BBB1D /* LNPopupController in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -590,8 +598,6 @@
 		504C719023BAD112001F82C7 /* SongTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTest.swift; sourceTree = "<group>"; };
 		504CE14D27920965005E0DE7 /* RatingView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RatingView.xib; sourceTree = "<group>"; };
 		504CE14F27920988005E0DE7 /* RatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingView.swift; sourceTree = "<group>"; };
-		5054686C2625C457008005EC /* LNPopupController.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LNPopupController.xcframework; path = Carthage/Build/LNPopupController.xcframework; sourceTree = "<group>"; };
-		505468712625C47D008005EC /* MarqueeLabel.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MarqueeLabel.xcframework; path = Carthage/Build/MarqueeLabel.xcframework; sourceTree = "<group>"; };
 		5055AA5526835A9000096B8D /* PodcastEpisodeTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastEpisodeTableCell.xib; sourceTree = "<group>"; };
 		5055AA5626835A9000096B8D /* PodcastEpisodeTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastEpisodeTableCell.swift; sourceTree = "<group>"; };
 		5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupPlayerVC.swift; sourceTree = "<group>"; };
@@ -630,7 +636,6 @@
 		50791E8428D36F1F006CE6E5 /* LibrarySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySettingsView.swift; sourceTree = "<group>"; };
 		50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerSettingsView.swift; sourceTree = "<group>"; };
 		50791E8828D3BC4D006CE6E5 /* SwipeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeSettingsView.swift; sourceTree = "<group>"; };
-		50814C9727D2550D0072738F /* ID3TagEditor.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ID3TagEditor.xcframework; path = Carthage/Build/ID3TagEditor.xcframework; sourceTree = "<group>"; };
 		50814C9E27D9FE460072738F /* Amperfy v23.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v23.xcdatamodel"; sourceTree = "<group>"; };
 		50814C9F27D9FF660072738F /* ScrobbleEntryMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrobbleEntryMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50814CA027D9FF660072738F /* ScrobbleEntryMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrobbleEntryMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -654,7 +659,6 @@
 		5086F886223BD68B00546F5A /* SsArtistParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SsArtistParserDelegate.swift; sourceTree = "<group>"; };
 		5086F88A223E867500546F5A /* SsAlbumParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserDelegate.swift; sourceTree = "<group>"; };
 		5088A8A426A955AD00B4C8C6 /* DownloadProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadProtocols.swift; sourceTree = "<group>"; };
-		508EBB242850A4270053D9F0 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MarqueeLabel.swift; path = Carthage/Checkouts/MarqueeLabel/Sources/MarqueeLabel.swift; sourceTree = SOURCE_ROOT; };
 		508EBB2E2850C9460053D9F0 /* AmperfyIntents.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AmperfyIntents.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		508EBB312850C9460053D9F0 /* IntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentHandler.swift; sourceTree = "<group>"; };
 		508EBB332850C9460053D9F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -677,12 +681,6 @@
 		50947E0427DD37AD00C368D7 /* Amperfy v24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v24.xcdatamodel"; sourceTree = "<group>"; };
 		5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayerTest.swift; sourceTree = "<group>"; };
 		50964D5723B54BBA00B685B2 /* Amperfy v3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v3.xcdatamodel"; sourceTree = "<group>"; };
-		5096EA5E28B3B2D100C3E78C /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = "Carthage/Build/Alamofire.xcframework/ios-arm64_armv7/Alamofire.framework"; sourceTree = "<group>"; };
-		5096EA6128B3B2EA00C3E78C /* PMKAlamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PMKAlamofire.framework; path = "Carthage/Build/PMKAlamofire.xcframework/ios-arm64_armv7/PMKAlamofire.framework"; sourceTree = "<group>"; };
-		5096EA6428B3B2F200C3E78C /* PromiseKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PromiseKit.framework; path = "Carthage/Build/PromiseKit.xcframework/ios-arm64_armv7/PromiseKit.framework"; sourceTree = "<group>"; };
-		5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Alamofire.xcframework; path = Carthage/Build/Alamofire.xcframework; sourceTree = "<group>"; };
-		5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PMKAlamofire.xcframework; path = Carthage/Build/PMKAlamofire.xcframework; sourceTree = "<group>"; };
-		5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PromiseKit.xcframework; path = Carthage/Build/PromiseKit.xcframework; sourceTree = "<group>"; };
 		50973ADC2636E4C4005497CA /* SsGenreParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SsGenreParserDelegate.swift; sourceTree = "<group>"; };
 		509A7D80280594D5009791D1 /* Amperfy v25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v25.xcdatamodel"; sourceTree = "<group>"; };
 		509A7D8128059A0D009791D1 /* BackgroundLibrarySyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundLibrarySyncer.swift; sourceTree = "<group>"; };
@@ -857,8 +855,6 @@
 		50ED2B9227BB932700331BF7 /* album_missing_artistId.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = album_missing_artistId.xml; sourceTree = "<group>"; };
 		50ED2B9427BB938500331BF7 /* SsAlbumMissingArtistsIdParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumMissingArtistsIdParserTest.swift; sourceTree = "<group>"; };
 		50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySyncerProxy.swift; sourceTree = "<group>"; };
-		50EF2CB1267F658B0011C42F /* SnapKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SnapKit.xcframework; path = Carthage/Build/SnapKit.xcframework; sourceTree = "<group>"; };
-		50EF2CB3267F65960011C42F /* NotificationBanner.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = NotificationBanner.xcframework; path = Carthage/Build/NotificationBanner.xcframework; sourceTree = "<group>"; };
 		50F800202685B8DA0015844D /* Amperfy v10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v10.xcdatamodel"; sourceTree = "<group>"; };
 		50F81E8523BAF25900EAAC3E /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		50F81E8723BB29CD00EAAC3E /* AlbumTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumTest.swift; sourceTree = "<group>"; };
@@ -899,15 +895,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				502F56B728C8E71400F004C0 /* Alamofire.xcframework in Frameworks */,
-				5055AA5B268365DD00096B8D /* SnapKit.xcframework in Frameworks */,
-				5054689C2625CD95008005EC /* LNPopupController.xcframework in Frameworks */,
-				502F56B928C8E71B00F004C0 /* PMKAlamofire.xcframework in Frameworks */,
+				507DFE902B1E7262002BBB1D /* CallbackURLKit in Frameworks */,
+				507DFE5B2B1E58CB002BBB1D /* PMKAlamofire in Frameworks */,
+				507DFE622B1E59F2002BBB1D /* PromiseKit in Frameworks */,
+				507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */,
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
-				5055AA59268365DA00096B8D /* NotificationBanner.xcframework in Frameworks */,
-				5096EA7828B3B39C00C3E78C /* PromiseKit.xcframework in Frameworks */,
-				506007232625E8BD00F9891D /* MarqueeLabel.xcframework in Frameworks */,
-				50BE5D9F2853427800156FC6 /* ID3TagEditor.xcframework in Frameworks */,
+				507DFE8D2B1E7192002BBB1D /* LNPopupController in Frameworks */,
+				507DFE4C2B1E57BE002BBB1D /* MarqueeLabel in Frameworks */,
+				507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */,
+				507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */,
 				50C9D61A284FA847007F18D0 /* AmperfyKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -916,7 +912,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				507DFE7A2B1E70E1002BBB1D /* CallbackURLKit in Frameworks */,
+				507DFE882B1E70F8002BBB1D /* PromiseKit in Frameworks */,
+				507DFE862B1E70F3002BBB1D /* Alamofire in Frameworks */,
+				507DFE822B1E70EC002BBB1D /* NotificationBannerSwift in Frameworks */,
+				507DFE842B1E70F0002BBB1D /* ID3TagEditor in Frameworks */,
+				507DFE802B1E70E8002BBB1D /* MarqueeLabel in Frameworks */,
 				508EBB4D2850C9BA0053D9F0 /* AmperfyKit.framework in Frameworks */,
+				507DFE782B1E70DE002BBB1D /* VYPlayIndicator in Frameworks */,
+				507DFE8A2B1E70FC002BBB1D /* PMKAlamofire in Frameworks */,
+				507DFE7C2B1E70E4002BBB1D /* LNPopupController in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -924,11 +929,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5096EA6F28B3B38500C3E78C /* Alamofire.xcframework in Frameworks */,
+				507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */,
+				507DFE682B1E5A1A002BBB1D /* PromiseKit in Frameworks */,
 				50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */,
-				5096EA7628B3B38B00C3E78C /* PromiseKit.xcframework in Frameworks */,
+				507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */,
+				507DFE662B1E5A0E002BBB1D /* PMKAlamofire in Frameworks */,
 				50BE5DA7285714A200156FC6 /* CallbackURLKit in Frameworks */,
-				5096EA7328B3B38900C3E78C /* PMKAlamofire.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -937,6 +943,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				50C9D60F284FA847007F18D0 /* AmperfyKit.framework in Frameworks */,
+				507DFE6E2B1E6DFE002BBB1D /* PromiseKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -958,7 +965,6 @@
 		5009863A2208CB170057A1A6 /* Basics */ = {
 			isa = PBXGroup;
 			children = (
-				508EBB242850A4270053D9F0 /* MarqueeLabel.swift */,
 				5009863B2208CB650057A1A6 /* OptionsButton.swift */,
 				5009863D2208CC1E0057A1A6 /* BasicButton.swift */,
 				5077F95022279DF40099CA91 /* PlaytimeSlider.swift */,
@@ -1208,7 +1214,6 @@
 				5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */,
 				5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */,
 				5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */,
-				5096EA6428B3B2F200C3E78C /* PromiseKit.framework */,
 				5096EA6128B3B2EA00C3E78C /* PMKAlamofire.framework */,
 				5096EA5E28B3B2D100C3E78C /* Alamofire.framework */,
 				50CF3CEE28A4F83100263F7C /* CryptoKit.framework */,
@@ -1703,6 +1708,14 @@
 			name = Amperfy;
 			packageProductDependencies = (
 				509D55F7281274F500E0E0B5 /* VYPlayIndicator */,
+				507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */,
+				507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */,
+				507DFE512B1E5848002BBB1D /* ID3TagEditor */,
+				507DFE542B1E587B002BBB1D /* Alamofire */,
+				507DFE5A2B1E58CB002BBB1D /* PMKAlamofire */,
+				507DFE612B1E59F2002BBB1D /* PromiseKit */,
+				507DFE8C2B1E7192002BBB1D /* LNPopupController */,
+				507DFE8F2B1E7262002BBB1D /* CallbackURLKit */,
 			);
 			productName = Amperfy;
 			productReference = 508385E421C5965B00C4BB32 /* Amperfy.app */;
@@ -1715,6 +1728,7 @@
 				508EBB2A2850C9460053D9F0 /* Sources */,
 				508EBB2B2850C9460053D9F0 /* Frameworks */,
 				508EBB2C2850C9460053D9F0 /* Resources */,
+				507DFE7D2B1E70E4002BBB1D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1722,6 +1736,17 @@
 				508EBB502850C9BA0053D9F0 /* PBXTargetDependency */,
 			);
 			name = AmperfyIntents;
+			packageProductDependencies = (
+				507DFE772B1E70DE002BBB1D /* VYPlayIndicator */,
+				507DFE792B1E70E1002BBB1D /* CallbackURLKit */,
+				507DFE7B2B1E70E4002BBB1D /* LNPopupController */,
+				507DFE7F2B1E70E8002BBB1D /* MarqueeLabel */,
+				507DFE812B1E70EC002BBB1D /* NotificationBannerSwift */,
+				507DFE832B1E70F0002BBB1D /* ID3TagEditor */,
+				507DFE852B1E70F3002BBB1D /* Alamofire */,
+				507DFE872B1E70F8002BBB1D /* PromiseKit */,
+				507DFE892B1E70FC002BBB1D /* PMKAlamofire */,
+			);
 			productName = AmperfyIntents;
 			productReference = 508EBB2E2850C9460053D9F0 /* AmperfyIntents.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -1742,6 +1767,10 @@
 			name = AmperfyKit;
 			packageProductDependencies = (
 				50BE5DA6285714A200156FC6 /* CallbackURLKit */,
+				507DFE632B1E5A03002BBB1D /* Alamofire */,
+				507DFE652B1E5A0E002BBB1D /* PMKAlamofire */,
+				507DFE672B1E5A1A002BBB1D /* PromiseKit */,
+				507DFE692B1E62C9002BBB1D /* ID3TagEditor */,
 			);
 			productName = AmpertyKit;
 			productReference = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */;
@@ -1762,6 +1791,9 @@
 				50C9D613284FA847007F18D0 /* PBXTargetDependency */,
 			);
 			name = AmperfyKitTests;
+			packageProductDependencies = (
+				507DFE6D2B1E6DFE002BBB1D /* PromiseKit */,
+			);
 			productName = AmpertyKitTests;
 			productReference = 50C9D60E284FA847007F18D0 /* AmperfyKitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -1772,6 +1804,9 @@
 		508385DC21C5965B00C4BB32 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				KnownAssetTags = (
+					New,
+				);
 				LastSwiftUpdateCheck = 1330;
 				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = "Maximilian Bauer";
@@ -1809,6 +1844,13 @@
 			packageReferences = (
 				509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */,
 				50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */,
+				507DFE472B1E577D002BBB1D /* XCRemoteSwiftPackageReference "LNPopupController" */,
+				507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
+				507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */,
+				507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */,
+				507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */,
+				507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */,
+				507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */,
 			);
 			productRefGroup = 508385E521C5965B00C4BB32 /* Products */;
 			projectDirPath = "";
@@ -1971,7 +2013,6 @@
 				508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */,
 				50C9D7152850759B007F18D0 /* AnimatedGradientLayer.swift in Sources */,
 				50CFB59228D483AD00A47D44 /* AddSwipeActionView.swift in Sources */,
-				508EBB252850A4270053D9F0 /* MarqueeLabel.swift in Sources */,
 				508FDE3621F1E130005A0724 /* NewPlaylistTableHeader.swift in Sources */,
 				50722747286794FC00910574 /* MainWindow.swift in Sources */,
 				50C9D7102850759B007F18D0 /* OptionsButton.swift in Sources */,
@@ -2685,6 +2726,62 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		507DFE472B1E577D002BBB1D /* XCRemoteSwiftPackageReference "LNPopupController" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/LeoNatan/LNPopupController";
+			requirement = {
+				kind = exactVersion;
+				version = 2.13.7;
+			};
+		};
+		507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/cbpowell/MarqueeLabel";
+			requirement = {
+				kind = exactVersion;
+				version = 4.3.0;
+			};
+		};
+		507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Daltron/NotificationBanner";
+			requirement = {
+				kind = exactVersion;
+				version = 3.1.0;
+			};
+		};
+		507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/chicio/ID3TagEditor";
+			requirement = {
+				kind = exactVersion;
+				version = 4.3.0;
+			};
+		};
+		507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire";
+			requirement = {
+				kind = exactVersion;
+				version = 5.6.2;
+			};
+		};
+		507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mxcl/PromiseKit";
+			requirement = {
+				kind = exactVersion;
+				version = 6.18.1;
+			};
+		};
+		507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PromiseKit/PMKAlamofire";
+			requirement = {
+				kind = exactVersion;
+				version = 4.0.0;
+			};
+		};
 		509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/obrhoff/VYPlayIndicator";
@@ -2704,6 +2801,116 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
+			productName = MarqueeLabel;
+		};
+		507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */;
+			productName = NotificationBannerSwift;
+		};
+		507DFE512B1E5848002BBB1D /* ID3TagEditor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */;
+			productName = ID3TagEditor;
+		};
+		507DFE542B1E587B002BBB1D /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		507DFE5A2B1E58CB002BBB1D /* PMKAlamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */;
+			productName = PMKAlamofire;
+		};
+		507DFE612B1E59F2002BBB1D /* PromiseKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */;
+			productName = PromiseKit;
+		};
+		507DFE632B1E5A03002BBB1D /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		507DFE652B1E5A0E002BBB1D /* PMKAlamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */;
+			productName = PMKAlamofire;
+		};
+		507DFE672B1E5A1A002BBB1D /* PromiseKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */;
+			productName = PromiseKit;
+		};
+		507DFE692B1E62C9002BBB1D /* ID3TagEditor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */;
+			productName = ID3TagEditor;
+		};
+		507DFE6D2B1E6DFE002BBB1D /* PromiseKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */;
+			productName = PromiseKit;
+		};
+		507DFE772B1E70DE002BBB1D /* VYPlayIndicator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */;
+			productName = VYPlayIndicator;
+		};
+		507DFE792B1E70E1002BBB1D /* CallbackURLKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */;
+			productName = CallbackURLKit;
+		};
+		507DFE7B2B1E70E4002BBB1D /* LNPopupController */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE472B1E577D002BBB1D /* XCRemoteSwiftPackageReference "LNPopupController" */;
+			productName = LNPopupController;
+		};
+		507DFE7F2B1E70E8002BBB1D /* MarqueeLabel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
+			productName = MarqueeLabel;
+		};
+		507DFE812B1E70EC002BBB1D /* NotificationBannerSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */;
+			productName = NotificationBannerSwift;
+		};
+		507DFE832B1E70F0002BBB1D /* ID3TagEditor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */;
+			productName = ID3TagEditor;
+		};
+		507DFE852B1E70F3002BBB1D /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		507DFE872B1E70F8002BBB1D /* PromiseKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */;
+			productName = PromiseKit;
+		};
+		507DFE892B1E70FC002BBB1D /* PMKAlamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */;
+			productName = PMKAlamofire;
+		};
+		507DFE8C2B1E7192002BBB1D /* LNPopupController */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507DFE472B1E577D002BBB1D /* XCRemoteSwiftPackageReference "LNPopupController" */;
+			productName = LNPopupController;
+		};
+		507DFE8F2B1E7262002BBB1D /* CallbackURLKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */;
+			productName = CallbackURLKit;
+		};
 		509D55F7281274F500E0E0B5 /* VYPlayIndicator */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */;
