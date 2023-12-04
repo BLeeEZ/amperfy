@@ -1211,17 +1211,7 @@
 		5091857E23A753C800A8891E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5096EA7528B3B38B00C3E78C /* PromiseKit.xcframework */,
-				5096EA7228B3B38900C3E78C /* PMKAlamofire.xcframework */,
-				5096EA6E28B3B38500C3E78C /* Alamofire.xcframework */,
-				5096EA6128B3B2EA00C3E78C /* PMKAlamofire.framework */,
-				5096EA5E28B3B2D100C3E78C /* Alamofire.framework */,
 				50CF3CEE28A4F83100263F7C /* CryptoKit.framework */,
-				505468712625C47D008005EC /* MarqueeLabel.xcframework */,
-				5054686C2625C457008005EC /* LNPopupController.xcframework */,
-				50EF2CB3267F65960011C42F /* NotificationBanner.xcframework */,
-				50EF2CB1267F658B0011C42F /* SnapKit.xcframework */,
-				50814C9727D2550D0072738F /* ID3TagEditor.xcframework */,
 				50253F81284A5EEA00BCCFB2 /* Intents.framework */,
 				50253F8C284A5EEB00BCCFB2 /* IntentsUI.framework */,
 			);
