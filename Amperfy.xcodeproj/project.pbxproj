@@ -74,7 +74,6 @@
 		507DFE782B1E70DE002BBB1D /* VYPlayIndicator in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE772B1E70DE002BBB1D /* VYPlayIndicator */; };
 		507DFE7A2B1E70E1002BBB1D /* CallbackURLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE792B1E70E1002BBB1D /* CallbackURLKit */; };
 		507DFE7C2B1E70E4002BBB1D /* LNPopupController in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE7B2B1E70E4002BBB1D /* LNPopupController */; };
-		507DFE7E2B1E70E4002BBB1D /* LNPopupController in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE7B2B1E70E4002BBB1D /* LNPopupController */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		507DFE802B1E70E8002BBB1D /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE7F2B1E70E8002BBB1D /* MarqueeLabel */; };
 		507DFE822B1E70EC002BBB1D /* NotificationBannerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE812B1E70EC002BBB1D /* NotificationBannerSwift */; };
 		507DFE842B1E70F0002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE832B1E70F0002BBB1D /* ID3TagEditor */; };
@@ -480,7 +479,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				507DFE7E2B1E70E4002BBB1D /* LNPopupController in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
