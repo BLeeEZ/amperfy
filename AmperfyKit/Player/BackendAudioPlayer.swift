@@ -50,6 +50,8 @@ class BackendAudioPlayer {
     private let eventLogger: EventLogger
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     
+    private var userDefinedPlaybackRate: Double = 1.0
+    
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
     public private(set) var isPlaying: Bool = false
@@ -103,6 +105,7 @@ class BackendAudioPlayer {
     func continuePlay() {
         isPlaying = true
         player.play()
+        player.playImmediately(atRate: Float(userDefinedPlaybackRate))
     }
     
     func pause() {
@@ -115,11 +118,17 @@ class BackendAudioPlayer {
         clearPlayer()
     }
     
+    func setPlaybackRate(_ newValue: Double) {
+        userDefinedPlaybackRate = newValue
+        player.playImmediately(atRate: Float(newValue))
+    }
+    
     func seek(toSecond: Double) {
         player.seek(to: CMTime(seconds: toSecond, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
     }
     
-    func requestToPlay(playable: AbstractPlayable) {
+    func requestToPlay(playable: AbstractPlayable, playbackRate: Double) {
+        userDefinedPlaybackRate = playbackRate
         if !playable.isPlayableOniOS, let contentType = playable.contentType {
             clearPlayer()
             eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playable.displayString)\" is not playable via Amperfy.", displayPopup: true)

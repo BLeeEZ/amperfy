@@ -66,6 +66,7 @@ class PlayerView: UIView {
     
     @IBOutlet weak var playerModeButton: UIButton!
     @IBOutlet weak var displayPlaylistButton: UIButton!
+    @IBOutlet weak var playbackRateButton: UIButton!
     
     @IBOutlet weak var ratingPlaceholderView: UIView!
 
@@ -544,6 +545,7 @@ class PlayerView: UIView {
         refreshPrevNextButtons()
         refreshRepeatButton()
         refreshShuffleButton()
+        refreshPlaybackRateButton()
         refreshDisplayPlaylistButton()
         refreshPlayerModeChangeButton()
     }
@@ -587,6 +589,58 @@ class PlayerView: UIView {
             shuffleButton.setImage(UIImage.shuffleOff.withRenderingMode(.alwaysTemplate), for: .normal)
             shuffleButton.tintColor = .labelColor
         }
+    }
+    
+    func refreshPlaybackRateButton() {
+        let playbackRate = self.player.playbackRate
+        var playbackRateString = ""
+        if (playbackRate < 0.6) {
+            playbackRateString = "0.5x"
+        } else if (playbackRate < 0.8) {
+            playbackRateString = "0.75x"
+        } else if (playbackRate < 1.1) {
+            playbackRateString = "1x"
+        } else if (playbackRate < 1.3) {
+            playbackRateString = "1.25x"
+        } else if (playbackRate < 1.6) {
+            playbackRateString = "1.5x"
+        } else if (playbackRate < 1.8) {
+            playbackRateString = "1.75x"
+        } else if (playbackRate < 2.1) {
+            playbackRateString = "2x"
+        }
+        playbackRateButton.setTitle(playbackRateString, for: .normal)
+        
+        let doubleRate = UIAction(title: "2x", image: playbackRateString == "2x" ? .check : nil, handler: { _ in
+            self.player.setPlaybackRate(2.0)
+            self.refreshPlaybackRateButton()
+        })
+        let oneDot75ByRate = UIAction(title: "1.75x", image: playbackRateString == "1.75x" ? .check : nil, handler: { _ in
+            self.player.setPlaybackRate(1.75)
+            self.refreshPlaybackRateButton()
+        })
+        let oneDot5ByRate = UIAction(title: "1.5x", image: playbackRateString == "1.5x" ? .check : nil, handler: { _ in
+            self.player.setPlaybackRate(1.5)
+            self.refreshPlaybackRateButton()
+        })
+        let oneDot25Rate = UIAction(title: "1.25x", image: playbackRateString == "1.25x" ? .check : nil, handler: { _ in
+            self.player.setPlaybackRate(1.25)
+            self.refreshPlaybackRateButton()
+        })
+        let normalRate = UIAction(title: "1x", image: playbackRateString == "1x" ? .check : nil, handler: { _ in
+            self.player.setPlaybackRate(1.0)
+            self.refreshPlaybackRateButton()
+        })
+        let dot75Rate = UIAction(title: "0.75x", image: playbackRateString == "0.75x" ? .check : nil, handler: { _ in
+            self.player.setPlaybackRate(0.75)
+            self.refreshPlaybackRateButton()
+        })
+        let dot5Rate = UIAction(title: "0.5x", image: playbackRateString == "0.5x" ? .check : nil, handler: { _ in
+            self.player.setPlaybackRate(0.5)
+            self.refreshPlaybackRateButton()
+        })
+        playbackRateButton.menu = UIMenu(children: [doubleRate, oneDot75ByRate, oneDot5ByRate, oneDot25Rate, normalRate, dot75Rate, dot5Rate])
+        playbackRateButton.showsMenuAsPrimaryAction = true
     }
     
     func refreshDisplayPlaylistButton() {

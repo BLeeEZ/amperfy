@@ -31,6 +31,9 @@ protocol PlayerStatusPersistent {
     var playerMode: PlayerMode { get set }
     var isShuffle: Bool { get set }
     var repeatMode: RepeatMode { get set }
+    var playbackRate: Double { get set }
+    var musicPlaybackRate: Double { get set }
+    var podcastPlaybackRate: Double { get set }
 }
 
 protocol PlayerQueuesPersistent {
@@ -163,6 +166,52 @@ extension PlayerData: PlayerStatusPersistent {
         }
         set {
             managedObject.repeatSetting = newValue.rawValue
+            library.saveContext()
+        }
+    }
+    
+    var playbackRate: Double {
+        get {
+            switch playerMode {
+            case .music:
+                return managedObject.musicPlaybackRate
+            case .podcast:
+                return managedObject.podcastPlaybackRate
+            }
+        }
+        set {
+            switch playerMode {
+            case .music:
+                managedObject.musicPlaybackRate = newValue
+            case .podcast:
+                managedObject.podcastPlaybackRate = newValue
+            }
+            library.saveContext()
+        }
+    }
+    
+    var musicPlaybackRate: Double {
+        get {
+            if (managedObject.musicPlaybackRate < 0.1) {
+                return 1.0
+            }
+            return managedObject.musicPlaybackRate
+        }
+        set {
+            managedObject.musicPlaybackRate = newValue
+            library.saveContext()
+        }
+    }
+    
+    var podcastPlaybackRate: Double {
+        get {
+            if (managedObject.podcastPlaybackRate < 0.1) {
+                return 1.0
+            }
+            return managedObject.podcastPlaybackRate
+        }
+        set {
+            managedObject.podcastPlaybackRate = newValue
             library.saveContext()
         }
     }

@@ -35,6 +35,8 @@ extension PlayerMO {
     @NSManaged public var isUserQueuePlaying: Bool
     @NSManaged public var repeatSetting: Int16
     @NSManaged public var shuffleSetting: Int16
+    @NSManaged public var musicPlaybackRate: Double
+    @NSManaged public var podcastPlaybackRate: Double
     @NSManaged public var contextPlaylist: PlaylistMO?
     @NSManaged public var shuffledContextPlaylist: PlaylistMO?
     @NSManaged public var userQueuePlaylist: PlaylistMO?

@@ -313,6 +313,19 @@
                         <constraint firstAttribute="height" constant="50" id="dq3-fM-BgC"/>
                     </constraints>
                 </stackView>
+                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MoM-N8-wb9" userLabel="Playback Rate Button">
+                    <rect key="frame" x="209" y="-15" width="60" height="60"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="MoM-N8-wb9" secondAttribute="height" multiplier="1:1" id="A0O-7N-2HB"/>
+                        <constraint firstAttribute="width" constant="60" id="iqC-rY-gI6"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="tintColor" systemColor="labelColor"/>
+                    <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
+                    <state key="normal" title="1.75x">
+                        <color key="titleColor" systemColor="labelColor"/>
+                    </state>
+                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -343,6 +356,7 @@
                 <constraint firstItem="6NT-8n-tg9" firstAttribute="top" secondItem="42q-l9-IXM" secondAttribute="bottom" id="Qu9-nI-cVh"/>
                 <constraint firstItem="0xq-hb-FZa" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" constant="-5" id="RVS-Ku-emC"/>
                 <constraint firstItem="Fzn-VY-lpT" firstAttribute="bottom" secondItem="GST-UH-ejT" secondAttribute="bottom" id="Seg-qg-2gb"/>
+                <constraint firstItem="l5j-2I-Ltc" firstAttribute="leading" secondItem="MoM-N8-wb9" secondAttribute="trailing" constant="2" id="Sfh-tA-qi1"/>
                 <constraint firstItem="uqN-6M-JGc" firstAttribute="leading" secondItem="6NT-8n-tg9" secondAttribute="leading" id="Suu-4x-GTB"/>
                 <constraint firstItem="4O4-sy-Ien" firstAttribute="bottom" secondItem="pOR-k2-6Vf" secondAttribute="bottom" id="UNn-87-JZ9"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="bottom" secondItem="2Oi-ys-XoJ" secondAttribute="bottom" id="V1E-8l-ETr"/>
@@ -351,6 +365,7 @@
                 <constraint firstItem="uqN-6M-JGc" firstAttribute="bottom" secondItem="6NT-8n-tg9" secondAttribute="bottom" id="ZJp-b2-w7Y"/>
                 <constraint firstItem="4O4-sy-Ien" firstAttribute="top" secondItem="pOR-k2-6Vf" secondAttribute="top" id="a3u-K2-swP"/>
                 <constraint firstItem="GST-UH-ejT" firstAttribute="top" secondItem="6NT-8n-tg9" secondAttribute="bottom" constant="36" id="aHN-mb-PDa"/>
+                <constraint firstItem="MoM-N8-wb9" firstAttribute="centerY" secondItem="ZVN-JG-VAA" secondAttribute="centerY" id="az8-MV-QX3"/>
                 <constraint firstItem="sop-QK-f5X" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" constant="34" id="b1y-tu-qs4"/>
                 <constraint firstItem="sop-QK-f5X" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" placeholder="YES" id="b5S-5X-xP4"/>
                 <constraint firstItem="Fzn-VY-lpT" firstAttribute="trailing" secondItem="GST-UH-ejT" secondAttribute="trailing" id="bYb-V0-xVg"/>
@@ -399,6 +414,7 @@
                 <outlet property="infoLargeToProgressDistanceConstraint" destination="Qu9-nI-cVh" id="iph-Qw-oog"/>
                 <outlet property="nextButton" destination="E3q-DK-jgm" id="MGI-Lm-8TL"/>
                 <outlet property="playButton" destination="Byk-rx-3Lv" id="03r-73-6Na"/>
+                <outlet property="playbackRateButton" destination="MoM-N8-wb9" id="Piq-Wo-3oY"/>
                 <outlet property="playerModeButton" destination="7xb-YR-9X6" id="yNk-04-nkT"/>
                 <outlet property="previousButton" destination="PZj-JS-NGq" id="uue-oe-5FL"/>
                 <outlet property="ratingPlaceholderView" destination="VVf-kL-Ei5" id="cix-bZ-01K"/>

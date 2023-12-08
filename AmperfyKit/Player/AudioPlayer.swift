@@ -71,7 +71,7 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     private func insertIntoPlayer(playable: AbstractPlayable) {
         userStatistics.playedItem(repeatMode: playerStatus.repeatMode, isShuffle: playerStatus.isShuffle)
         playable.countPlayed()
-        backendAudioPlayer.requestToPlay(playable: playable)
+        backendAudioPlayer.requestToPlay(playable: playable, playbackRate: playerStatus.playbackRate)
     }
     
     //BackendAudioPlayerNotifiable
