@@ -110,6 +110,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UINavigationBar.appearance().shadowImage = UIImage()
     }
     
+    func configureBatteryMonitoring() {
+        UIDevice.current.isBatteryMonitoringEnabled =
+            (AmperKit.shared.storage.settings.screenLockPreventionPreference == .onlyIfCharging)
+        configureLockScreenPrevention()
+        NotificationCenter.default.addObserver(self, selector: #selector(batteryStateDidChange), name: UIDevice.batteryStateDidChangeNotification, object: nil)
+    }
+    
+    @objc private func batteryStateDidChange(notification: NSNotification) {
+        configureLockScreenPrevention()
+    }
+    
+    func configureLockScreenPrevention() {
+        os_log("Device Battery Status: %s", log: self.log, type: .info, UIDevice.current.batteryState.description)
+        switch(AmperKit.shared.storage.settings.screenLockPreventionPreference) {
+        case .always:
+            isKeepScreenAlive = true
+        case .never:
+            isKeepScreenAlive = false
+        case .onlyIfCharging:
+            isKeepScreenAlive = UIDevice.current.batteryState != .unplugged
+        }
+        os_log("Lock Screen Prevention: %s", log: self.log, type: .info, isKeepScreenAlive.description)
+    }
+    
     func configureBackgroundFetch() {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: Self.refreshTaskId, using: nil) { task in
             os_log("Perform task: %s", log: self.log, type: .info, Self.refreshTaskId)
@@ -167,6 +191,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         configureDefaultNavigationBarStyle()
+        configureBatteryMonitoring()
         configureBackgroundFetch()
         configureNotificationHandling()
         initEventLogger()

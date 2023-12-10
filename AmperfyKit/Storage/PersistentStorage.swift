@@ -64,6 +64,25 @@ public enum ArtworkDisplayPreference: Int, CaseIterable {
     }
 }
 
+public enum ScreenLockPreventionPreference: Int, CaseIterable {
+    case always = 0
+    case never = 1
+    case onlyIfCharging = 2
+    
+    public static let defaultValue: ScreenLockPreventionPreference = .never
+    
+    public var description: String {
+        switch self {
+        case .always:
+            return "Always"
+        case .never:
+            return "Never"
+        case .onlyIfCharging:
+            return "When connected to charger"
+        }
+    }
+}
+
 public class CoreDataCompanion {
     public let context: NSManagedObjectContext
     public let library: LibraryStorage
@@ -114,6 +133,7 @@ public class PersistentStorage {
         case ArtworkDownloadSetting = "artworkDownloadSetting"
         case ArtworkDisplayPreference = "artworkDisplayPreference"
         case SleepTimerInterval = "sleepTimerInterval"
+        case ScreenLockPreventionPreference = "screenLockPreventionPreference"
         case CacheLimit = "cacheLimitInBytes" // limit in byte
         
         case SongActionOnTab = "songActionOnTab"
@@ -162,6 +182,14 @@ public class PersistentStorage {
                 return UserDefaults.standard.object(forKey: UserDefaultsKey.SleepTimerInterval.rawValue) as? Int ?? 0
             }
             set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.SleepTimerInterval.rawValue) }
+        }
+        
+        public var screenLockPreventionPreference: ScreenLockPreventionPreference {
+            get {
+                let screenLockPreventionPreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ScreenLockPreventionPreference.rawValue) as? Int ?? ScreenLockPreventionPreference.defaultValue.rawValue
+                return ScreenLockPreventionPreference(rawValue: screenLockPreventionPreferenceRaw) ?? ScreenLockPreventionPreference.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ScreenLockPreventionPreference.rawValue) }
         }
         
         public var cacheLimit: Int {

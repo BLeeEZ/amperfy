@@ -26,6 +26,24 @@ struct SettingsView: View {
     
     @EnvironmentObject private var settings: Settings
     
+    func screenLockPreventionOffPressed() {
+        settings.screenLockPreventionPreference = .never
+        UIDevice.current.isBatteryMonitoringEnabled = false
+        appDelegate.configureLockScreenPrevention()
+    }
+    
+    func screenLockPreventionOnPressed() {
+        settings.screenLockPreventionPreference = .always
+        UIDevice.current.isBatteryMonitoringEnabled = false
+        appDelegate.configureLockScreenPrevention()
+    }
+    
+    func screenLockPreventionChargingPressed() {
+        settings.screenLockPreventionPreference = .onlyIfCharging
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        appDelegate.configureLockScreenPrevention()
+    }
+    
     var body: some View {
         NavigationView {
             List {
@@ -61,6 +79,18 @@ struct SettingsView: View {
                         Text("Sleep Timer")
                     }
                 }
+                
+                Section(content: {
+                    HStack {
+                        Text("Prevent Screen Lock")
+                        Spacer()
+                        Menu(settings.screenLockPreventionPreference.description) {
+                            Button(ScreenLockPreventionPreference.never.description, action: screenLockPreventionOffPressed)
+                            Button(ScreenLockPreventionPreference.always.description, action: screenLockPreventionOnPressed)
+                            Button(ScreenLockPreventionPreference.onlyIfCharging.description, action: screenLockPreventionChargingPressed)
+                        }
+                    }
+                })
                 
                 Section() {
                     NavigationLink(destination: ServerSettingsView()) {

@@ -55,6 +55,11 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.sleepTimer = newValue
         }))
         
+        settings.screenLockPreventionPreference = self.appDelegate.storage.settings.screenLockPreventionPreference
+        changesAgent.append(settings.$screenLockPreventionPreference.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.screenLockPreventionPreference = newValue
+        }))
+        
         settings.isAutoCacheLatestSongs = self.appDelegate.storage.settings.isAutoDownloadLatestSongsActive
         changesAgent.append(settings.$isAutoCacheLatestSongs.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.isAutoDownloadLatestSongsActive = newValue

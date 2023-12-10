@@ -263,6 +263,23 @@ extension UIImage {
     }
 }
 
+extension UIDevice.BatteryState {
+    public var description: String {
+        switch self {
+        case .unknown:
+            return "unknown"
+        case .unplugged:
+            return "unplugged"
+        case .charging:
+            return "charging"
+        case .full:
+            return "full"
+        @unknown default:
+            return "@unknown default"
+        }
+    }
+}
+
 /// This fixes in swiftui mutliple picker views side by side to overlapp their touch areas
 /// This is effective in addition to use .clipped() which only fixes the overlapping area visually
 extension UIPickerView {
