@@ -133,7 +133,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     }
     
     func sync(artist: Artist) -> Promise<Void> {
-        guard isSyncAllowed else { return Promise.value }
+        guard isSyncAllowed, !artist.id.isEmpty else { return Promise.value }
         return firstly {
             subsonicServerApi.requestArtist(id: artist.id)
         }.then { data in
