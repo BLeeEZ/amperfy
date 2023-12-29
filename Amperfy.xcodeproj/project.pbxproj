@@ -2736,7 +2736,7 @@
 			repositoryURL = "https://github.com/Daltron/NotificationBanner";
 			requirement = {
 				kind = exactVersion;
-				version = 3.1.0;
+				version = 3.2.0;
 			};
 		};
 		507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */ = {

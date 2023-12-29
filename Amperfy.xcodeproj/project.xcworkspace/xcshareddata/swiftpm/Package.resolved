@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Daltron/NotificationBanner",
       "state" : {
-        "revision" : "e856a462053daf80c7936056d64246983f3f4d14",
-        "version" : "3.1.0"
+        "revision" : "a9ec5cd29b4669f5fdf3dcd494a08cea4776913c",
+        "version" : "3.2.0"
       }
     },
     {
