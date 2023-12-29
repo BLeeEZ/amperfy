@@ -318,16 +318,17 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }.then {
             self.storage.async.perform { asyncCompanion in
                 let directoryAsync = Directory(managedObject: asyncCompanion.context.object(with: directory.managedObject.objectID) as! DirectoryMO)
+                let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
                 let songsBeforeFetchAsync = Set(songsBeforeFetch.compactMap {
                     Song(managedObject: asyncCompanion.context.object(with: $0.managedObject.objectID) as! SongMO)
                 })
                 
                 directoryAsync.songs.forEach { directoryAsync.managedObject.removeFromSongs($0.managedObject) }
-                let songsToRemove = songsBeforeFetchAsync.subtracting(Set(album.songs.compactMap{$0.asSong}))
+                let songsToRemove = songsBeforeFetchAsync.subtracting(Set(albumAsync.songs.compactMap{$0.asSong}))
                 songsToRemove.lazy.compactMap{$0.asSong}.forEach{
                     directoryAsync.managedObject.removeFromSongs($0.managedObject)
                 }
-                album.songs.compactMap{$0.asSong}.forEach{
+                albumAsync.songs.compactMap{$0.asSong}.forEach{
                     directoryAsync.managedObject.addToSongs($0.managedObject)
                 }
             }
