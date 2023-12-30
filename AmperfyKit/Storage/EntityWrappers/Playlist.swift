@@ -383,7 +383,7 @@ extension Playlist: PlayableContainable  {
         if isSmartPlaylist {
             infoContent.append("Smart Playlist")
         }
-        if type == .long {
+        if type == .long || type == .longDetailed {
             if isCompletelyCached {
                 infoContent.append("Cached")
             }
@@ -391,6 +391,9 @@ extension Playlist: PlayableContainable  {
             if completeDuration > 0 {
                 infoContent.append("\(completeDuration.asDurationString)")
             }
+        }
+        if type == .longDetailed {
+            infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
         }
         return infoContent
     }

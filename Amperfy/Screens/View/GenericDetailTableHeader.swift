@@ -59,7 +59,7 @@ class GenericDetailTableHeader: UIView {
         titleLabel.text = entityContainer.name
         subtitleView.isHidden = entityContainer.subtitle == nil
         subtitleLabel.text = entityContainer.subtitle
-        let infoText = entityContainer.info(for: appDelegate.backendApi.selectedApi, type: .long)
+        let infoText = entityContainer.info(for: appDelegate.backendApi.selectedApi, type: appDelegate.storage.settings.isShowDetailedInfo ? .longDetailed : .long)
         infoLabel.isHidden = infoText.isEmpty
         infoLabel.text = infoText
     }

@@ -49,3 +49,30 @@ public class SearchAndPlayIntentHandler: NSObject, SearchAndPlayIntentHandling {
         completion(response)
     }
 }
+
+public class PlayIDIntentHandler: NSObject, PlayIDIntentHandling {
+    @available(iOSApplicationExtension 13.0, *)
+    public func resolveShuffleOption(for intent: PlayIDIntent, with completion: @escaping (ShuffleTypeResolutionResult) -> Void) {
+        completion(ShuffleTypeResolutionResult.success(with: intent.shuffleOption))
+    }
+    
+    @available(iOSApplicationExtension 13.0, *)
+    public func resolveRepeatOption(for intent: PlayIDIntent, with completion: @escaping (RepeatTypeResolutionResult) -> Void) {
+        completion(RepeatTypeResolutionResult.success(with: intent.repeatOption))
+    }
+    
+    @available(iOSApplicationExtension 13.0, *)
+    public func resolveLibraryElementType(for intent: PlayIDIntent, with completion: @escaping (PlayableContainerTypeResolutionResult) -> Void) {
+        completion(PlayableContainerTypeResolutionResult.success(with: intent.libraryElementType))
+    }
+    
+    public func handle(intent: PlayIDIntent, completion: @escaping (PlayIDIntentResponse) -> Void) {
+        let userActivity = NSUserActivity(activityType: NSUserActivity.playIdActivityType)
+        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.id.rawValue: intent.id ?? ""])
+        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.libraryElementType.rawValue: intent.libraryElementType.rawValue])
+        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: intent.shuffleOption.rawValue])
+        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.repeatOption.rawValue: intent.repeatOption.rawValue])
+        let response = PlayIDIntentResponse(code: .continueInApp, userActivity: userActivity)
+        completion(response)
+    }
+}

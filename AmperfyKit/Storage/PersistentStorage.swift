@@ -135,6 +135,7 @@ public class PersistentStorage {
         case SleepTimerInterval = "sleepTimerInterval"
         case ScreenLockPreventionPreference = "screenLockPreventionPreference"
         case CacheLimit = "cacheLimitInBytes" // limit in byte
+        case ShowDetailedInfo = "showDetailedInfo"
         
         case SongActionOnTab = "songActionOnTab"
         case LibraryDisplaySettings = "libraryDisplaySettings"
@@ -190,6 +191,11 @@ public class PersistentStorage {
                 return ScreenLockPreventionPreference(rawValue: screenLockPreventionPreferenceRaw) ?? ScreenLockPreventionPreference.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ScreenLockPreventionPreference.rawValue) }
+        }
+        
+        public var isShowDetailedInfo: Bool {
+            get { return UserDefaults.standard.object(forKey: UserDefaultsKey.ShowDetailedInfo.rawValue) as? Bool ?? false }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.ShowDetailedInfo.rawValue) }
         }
         
         public var cacheLimit: Int {

@@ -162,6 +162,74 @@ public class IntentManager {
         }
         
         documentation.append(XCallbackActionDocu(
+            name: "PlayID",
+            description: "Plays the library element with the given ID and player options",
+            exampleURLs: [
+                "amperfy://x-callback-url/playID?id=123456&libraryElementType=playlist",
+                "amperfy://x-callback-url/playID?id=aa2349&libraryElementType=artist&shuffleOption=1&repeatOption=2"
+            ],
+            action: "playID",
+            parameters: [
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.id.rawValue,
+                    type: "String",
+                    isMandatory: true,
+                    description: "ID of the library element"
+                ),
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.libraryElementType.rawValue,
+                    type: "String",
+                    isMandatory: true,
+                    description: PlayableContainerType.allCasesDescription
+                ),
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.shuffleOption.rawValue,
+                    type: "Int",
+                    isMandatory: false,
+                    description: "0 (false) or 1 (true)",
+                    defaultIfNotGiven: "false"
+                ),
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.repeatOption.rawValue,
+                    type: "Int",
+                    isMandatory: false,
+                    description: "0 (off), 1 (all), 2 (single)",
+                    defaultIfNotGiven: "off"
+                ),
+            ])
+        )
+        CallbackURLKit.register(action: "playID") { parameters, success, failure, cancel in
+            var shuffleOption = false
+            var repeatOption = RepeatMode.off
+            
+            guard let id = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.id.rawValue} )?.value else {
+                failure(NSError.error(code: .missingParameter, failureReason: "ID not provided."))
+                return
+            }
+            guard let libraryElementTypeRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.libraryElementType.rawValue} )?.value else {
+                failure(NSError.error(code: .missingParameter, failureReason: "Library element type not provided."))
+                return
+            }
+            guard let libraryElementType = PlayableContainerType.from(string: libraryElementTypeRaw) else {
+                failure(NSError.error(code: .missingParameter, failureReason: "Library element type is not valid."))
+                return
+            }
+            if let shuffleStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.shuffleOption.rawValue} )?.value,
+               let shuffleRaw = Int(shuffleStringRaw),
+               shuffleRaw <= 1 {
+                shuffleOption = shuffleRaw == 1
+            }
+            if let repeatStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.repeatOption.rawValue} )?.value,
+               let repeatRaw = Int16(repeatStringRaw),
+               let repeatInput = RepeatMode(rawValue: repeatRaw) {
+                repeatOption = repeatInput
+            }
+            let playableContainer = self.getPlayableContainer(id: id, libraryElementType: libraryElementType)
+            self.play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            success(nil)
+        }
+        
+        documentation.append(XCallbackActionDocu(
             name: "PlayRandomSongs",
             description: "Plays \(player.maxSongsToAddOnce) random songs from library",
             exampleURLs: [
@@ -367,7 +435,10 @@ public class IntentManager {
     
     public func handleIncomingIntent(userActivity: NSUserActivity) -> Bool {
         guard userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self) ||
-                userActivity.activityType == NSUserActivity.searchAndPlayActivityType else {
+              userActivity.activityType == NSUserActivity.searchAndPlayActivityType ||
+              userActivity.activityType == NSStringFromClass(PlayIDIntent.self) ||
+              userActivity.activityType == NSUserActivity.playIdActivityType
+            else {
                 return false
         }
         if userActivity.activityType == NSUserActivity.searchAndPlayActivityType,
@@ -388,6 +459,25 @@ public class IntentManager {
             }
 
             let playableContainer = self.getPlayableContainer(searchTerm: searchTerm, searchCategory: searchCategory)
+            play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+        } else if userActivity.activityType == NSUserActivity.playIdActivityType,
+           let id = userActivity.userInfo?[NSUserActivity.ActivityKeys.id.rawValue] as? String,
+           let libraryElementTypeRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.libraryElementType.rawValue] as? Int,
+           let libraryElementType = PlayableContainerType(rawValue: libraryElementTypeRaw) {
+            
+            var shuffleOption = false
+            var repeatOption = RepeatMode.off
+            
+            if let shuffleUserRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.shuffleOption.rawValue] as? Int,
+               let shuffleUser = ShuffleType(rawValue: shuffleUserRaw) {
+                shuffleOption = shuffleUser == .on
+            }
+            if let repeatUserRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.repeatOption.rawValue] as? Int,
+               let repeatUser = RepeatType(rawValue: repeatUserRaw) {
+                repeatOption = RepeatMode.fromIntent(type: repeatUser)
+            }
+
+            let playableContainer = self.getPlayableContainer(id: id, libraryElementType: libraryElementType)
             play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
         }
         return true
@@ -413,6 +503,30 @@ public class IntentManager {
             playableContainer = library.getGenres().lazy.first(where: { $0.name.contains(searchTerm) })
         case .podcast:
             playableContainer = library.getPodcasts().lazy.first(where: { $0.name.contains(searchTerm) })
+        }
+        return playableContainer
+    }
+    
+    private func getPlayableContainer(id: String, libraryElementType: PlayableContainerType) -> PlayableContainable? {
+        var playableContainer: PlayableContainable?
+        
+        switch libraryElementType {
+        case .unknown:
+            fallthrough
+        case .song:
+            playableContainer = library.getSong(id: id)
+        case .artist:
+            playableContainer = library.getArtist(id: id)
+        case .podcastEpisode:
+            playableContainer = library.getPodcastEpisode(id: id)
+        case .playlist:
+            playableContainer = library.getPlaylist(id: id)
+        case .album:
+            playableContainer = library.getAlbum(id: id)
+        case .genre:
+            playableContainer = library.getGenre(id: id)
+        case .podcast:
+            playableContainer = library.getPodcast(id: id)
         }
         return playableContainer
     }

@@ -24,6 +24,7 @@ import AmperfyKit
 
 final class Settings: ObservableObject {
     @Published var isOfflineMode = false
+    @Published var isShowDetailedInfo = false
     @Published var sleepTimerInterval = 0
     @Published var sleepTimer: Timer? = nil
     @Published var screenLockPreventionPreference: ScreenLockPreventionPreference = .defaultValue

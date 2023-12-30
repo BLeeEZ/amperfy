@@ -58,7 +58,7 @@ class PlaylistDetailTableHeader: UIView {
         entityImage.display(container: playlist)
         nameLabel.text = playlist.name
         nameTextField.text = playlist.name
-        infoLabel.text = playlist.info(for: appDelegate.backendApi.selectedApi, type: .long)
+        infoLabel.text = playlist.info(for: appDelegate.backendApi.selectedApi, type: appDelegate.storage.settings.isShowDetailedInfo ? .longDetailed : .long)
         if rootView.tableView.isEditing {
             nameLabel.isHidden = true
             nameTextField.isHidden = false

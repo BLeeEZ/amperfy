@@ -26,6 +26,7 @@
                 <outlet property="clearUserQueueButton" destination="jcw-t1-z3e" id="pW6-5r-Ro2"/>
                 <outlet property="contextQueueAppendButton" destination="cvP-d9-XH3" id="tBY-6A-wG6"/>
                 <outlet property="contextQueueInsertButton" destination="kjv-5v-4aM" id="xVW-T1-CWr"/>
+                <outlet property="copyIdToClipboardButton" destination="5rj-fD-Icd" id="YOE-sc-JBI"/>
                 <outlet property="deleteCacheButton" destination="qeo-wc-t8G" id="ybz-ZC-3Ow"/>
                 <outlet property="deleteOnServerButton" destination="o9z-34-kMZ" id="P3Q-u6-ON7"/>
                 <outlet property="detailLabelsClusterHeightConstraint" destination="ft1-Xj-zQi" id="Yfu-2D-bBu"/>
@@ -71,7 +72,7 @@
                     <rect key="frame" x="20" y="0.0" width="984" height="1330"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Z3t-pV-Lbw" userLabel="Main Stack View">
-                            <rect key="frame" x="0.0" y="0.0" width="984" height="1310"/>
+                            <rect key="frame" x="0.0" y="0.0" width="984" height="1355"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="J91-VR-QdL" userLabel="ElementInfo Stack View">
                                     <rect key="frame" x="0.0" y="0.0" width="984" height="90"/>
@@ -305,7 +306,7 @@
                                     </constraints>
                                 </view>
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="qzF-wh-zOU" userLabel="MainStackCluster">
-                                    <rect key="frame" x="0.0" y="358" width="984" height="265"/>
+                                    <rect key="frame" x="0.0" y="358" width="984" height="310"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XDf-oc-z0s">
                                             <rect key="frame" x="0.0" y="0.0" width="984" height="40"/>
@@ -383,14 +384,27 @@
                                                 <action selector="pressedDeleteOnServer:" destination="-1" eventType="touchUpInside" id="luM-R5-mVF"/>
                                             </connections>
                                         </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5rj-fD-Icd" userLabel="CopyIdToClipboard">
+                                            <rect key="frame" x="0.0" y="270" width="984" height="40"/>
+                                            <color key="backgroundColor" systemColor="systemFillColor"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="40" id="YZZ-LH-4bA"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                            <state key="normal" title="Copy ID to Clipboard"/>
+                                            <connections>
+                                                <action selector="pressedCopyIdToClipboard:" destination="-1" eventType="touchUpInside" id="UU7-5s-kXW"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
-                                        <constraint firstAttribute="height" constant="265" id="FlB-wv-mVd"/>
+                                        <constraint firstAttribute="height" constant="310" id="FlB-wv-mVd"/>
                                     </constraints>
                                 </stackView>
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="seo-iu-BAW" userLabel="Player Stack View">
-                                    <rect key="frame" x="0.0" y="631" width="984" height="163"/>
+                                    <rect key="frame" x="0.0" y="676" width="984" height="163"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Player Actions" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5DK-wY-WrQ">
                                             <rect key="frame" x="0.0" y="0.0" width="984" height="40"/>
@@ -447,7 +461,7 @@
                                     </constraints>
                                 </stackView>
                                 <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZeO-Lx-9J7">
-                                    <rect key="frame" x="0.0" y="802" width="984" height="508"/>
+                                    <rect key="frame" x="0.0" y="847" width="984" height="508"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jma-L5-peG" userLabel="Cancel" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="468" width="984" height="40"/>

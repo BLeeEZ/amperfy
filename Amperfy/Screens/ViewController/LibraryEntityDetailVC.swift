@@ -65,6 +65,7 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var downloadButton: UIButton!
     @IBOutlet weak var deleteCacheButton: UIButton!
     @IBOutlet weak var deleteOnServerButton: UIButton!
+    @IBOutlet weak var copyIdToClipboardButton: UIButton!
     private var buttonsOfMainCluster: [UIButton] {
         return [
             playButton,
@@ -73,6 +74,7 @@ class LibraryEntityDetailVC: UIViewController {
             downloadButton,
             deleteCacheButton,
             deleteOnServerButton,
+            copyIdToClipboardButton,
         ]
     }
 
@@ -279,7 +281,7 @@ class LibraryEntityDetailVC: UIViewController {
         albumLabel.text = entityContainer.subsubtitle
         albumContainerView.isHidden = entityContainer.subsubtitle == nil
 
-        infoLabel.text = entityContainer.info(for: appDelegate.backendApi.selectedApi, type: .long)
+        infoLabel.text = entityContainer.info(for: appDelegate.backendApi.selectedApi, type: appDelegate.storage.settings.isShowDetailedInfo ? .longDetailed : .long)
 
         playButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.storage.settings.isOfflineMode
         playShuffledButton.isHidden = !entityContainer.playables.hasCachedItems && appDelegate.storage.settings.isOfflineMode
@@ -300,6 +302,7 @@ class LibraryEntityDetailVC: UIViewController {
         deleteCacheButton.isHidden = !entityContainer.playables.hasCachedItems
         
         deleteOnServerButton.isHidden = true
+        copyIdToClipboardButton.isHidden = !appDelegate.storage.settings.isShowDetailedInfo
 
         if let playable = entityContainer as? AbstractPlayable {
             if let song = playable.asSong {
@@ -457,6 +460,12 @@ class LibraryEntityDetailVC: UIViewController {
             return self.appDelegate.librarySyncer.sync(podcast: podcast)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Podcast Episode Sync Delete", error: error)
+        }
+    }
+    
+    @IBAction func pressedCopyIdToClipboard(_ sender: Any) {
+        if !self.entityContainer.id.isEmpty {
+            UIPasteboard.general.string = self.entityContainer.id
         }
     }
     

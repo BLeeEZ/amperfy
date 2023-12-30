@@ -26,6 +26,8 @@ extension NSUserActivity {
     public enum ActivityKeys: String {
         case searchTerm
         case searchCategory
+        case id
+        case libraryElementType
         case shuffleOption
         case repeatOption
         case offlineMode
@@ -33,5 +35,6 @@ extension NSUserActivity {
     }
     
     public static let searchAndPlayActivityType = "de.familie-zimba.Amperfy.SearchAndPlay"
+    public static let playIdActivityType = "de.familie-zimba.Amperfy.PlayID"
 
 }

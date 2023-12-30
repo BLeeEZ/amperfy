@@ -91,7 +91,7 @@ public class Song: AbstractPlayable, Identifyable {
     
     override public func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
         var infoContent = [String]()
-        if type == .long {
+        if type == .long || type == .longDetailed {
             if track > 0 {
                 infoContent.append("Track \(track)")
             }
@@ -106,9 +106,12 @@ public class Song: AbstractPlayable, Identifyable {
             if let genre = genre {
                 infoContent.append("Genre: \(genre.name)")
             }
+        }
+        if type == .longDetailed {
             if bitrate > 0 {
-                infoContent.append("Bitrate \(bitrate)")
+                infoContent.append("Bitrate: \(bitrate)")
             }
+            infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
         }
         return infoContent
     }

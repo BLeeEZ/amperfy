@@ -119,7 +119,7 @@ extension Artist: PlayableContainable  {
         } else if songs.count > 1 {
             infoContent.append("\(songCount) Songs")
         }
-        if type == .long {
+        if type == .long || type == .longDetailed {
             if isCompletelyCached {
                 infoContent.append("Cached")
             }
@@ -129,6 +129,9 @@ extension Artist: PlayableContainable  {
             if duration > 0 {
                 infoContent.append("\(duration.asDurationString)")
             }
+        }
+        if type == .longDetailed {
+            infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
         }
         return infoContent
     }

@@ -199,11 +199,11 @@
 	<key>INIntentDefinitionNamespace</key>
 	<string>1o3qqV</string>
 	<key>INIntentDefinitionSystemVersion</key>
-	<string>21E258</string>
+	<string>22D68</string>
 	<key>INIntentDefinitionToolsBuildVersion</key>
-	<string>13E500a</string>
+	<string>14C18</string>
 	<key>INIntentDefinitionToolsVersion</key>
-	<string>13.3.1</string>
+	<string>14.2</string>
 	<key>INIntents</key>
 	<array>
 		<dict>
@@ -212,7 +212,7 @@
 			<key>INIntentConfigurable</key>
 			<true/>
 			<key>INIntentDescription</key>
-			<string>Searches and plays the first result</string>
+			<string>Searches and plays the first result with the given player options</string>
 			<key>INIntentDescriptionID</key>
 			<string>41BCti</string>
 			<key>INIntentLastParameterTag</key>
@@ -524,6 +524,307 @@
 			<string>Search And Play</string>
 			<key>INIntentTitleID</key>
 			<string>casSTj</string>
+			<key>INIntentType</key>
+			<string>Custom</string>
+			<key>INIntentVerb</key>
+			<string>Do</string>
+		</dict>
+		<dict>
+			<key>INIntentCategory</key>
+			<string>generic</string>
+			<key>INIntentConfigurable</key>
+			<true/>
+			<key>INIntentDescription</key>
+			<string>Plays the library element with the given ID and player options</string>
+			<key>INIntentDescriptionID</key>
+			<string>BsRe2Q</string>
+			<key>INIntentLastParameterTag</key>
+			<integer>7</integer>
+			<key>INIntentManagedParameterCombinations</key>
+			<dict>
+				<key>id,libraryElementType,shuffleOption,repeatOption</key>
+				<dict>
+					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
+					<true/>
+					<key>INIntentParameterCombinationTitle</key>
+					<string>Play ID</string>
+					<key>INIntentParameterCombinationTitleID</key>
+					<string>pYo3j8</string>
+					<key>INIntentParameterCombinationUpdatesLinked</key>
+					<true/>
+				</dict>
+			</dict>
+			<key>INIntentName</key>
+			<string>PlayID</string>
+			<key>INIntentParameterCombinations</key>
+			<dict>
+				<key>id,libraryElementType,shuffleOption,repeatOption</key>
+				<dict>
+					<key>INIntentParameterCombinationIsLinked</key>
+					<true/>
+					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
+					<true/>
+					<key>INIntentParameterCombinationTitle</key>
+					<string>Play ID</string>
+					<key>INIntentParameterCombinationTitleID</key>
+					<string>DaTywU</string>
+				</dict>
+			</dict>
+			<key>INIntentParameters</key>
+			<array>
+				<dict>
+					<key>INIntentParameterConfigurable</key>
+					<true/>
+					<key>INIntentParameterDisplayName</key>
+					<string>ID</string>
+					<key>INIntentParameterDisplayNameID</key>
+					<string>kmidc8</string>
+					<key>INIntentParameterDisplayPriority</key>
+					<integer>1</integer>
+					<key>INIntentParameterMetadata</key>
+					<dict>
+						<key>INIntentParameterMetadataCapitalization</key>
+						<string>Sentences</string>
+						<key>INIntentParameterMetadataDefaultValueID</key>
+						<string>1zHW8L</string>
+						<key>INIntentParameterMetadataDisableAutocorrect</key>
+						<true/>
+					</dict>
+					<key>INIntentParameterName</key>
+					<string>id</string>
+					<key>INIntentParameterPromptDialogs</key>
+					<array>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Configuration</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Primary</string>
+						</dict>
+					</array>
+					<key>INIntentParameterTag</key>
+					<integer>1</integer>
+					<key>INIntentParameterType</key>
+					<string>String</string>
+				</dict>
+				<dict>
+					<key>INIntentParameterConfigurable</key>
+					<true/>
+					<key>INIntentParameterCustomDisambiguation</key>
+					<true/>
+					<key>INIntentParameterDisplayName</key>
+					<string>Library Element Type</string>
+					<key>INIntentParameterDisplayNameID</key>
+					<string>oX6QAW</string>
+					<key>INIntentParameterDisplayPriority</key>
+					<integer>2</integer>
+					<key>INIntentParameterEnumType</key>
+					<string>PlayableContainerType</string>
+					<key>INIntentParameterEnumTypeNamespace</key>
+					<string>1o3qqV</string>
+					<key>INIntentParameterMetadata</key>
+					<dict>
+						<key>INIntentParameterMetadataDefaultValue</key>
+						<string>song</string>
+					</dict>
+					<key>INIntentParameterName</key>
+					<string>libraryElementType</string>
+					<key>INIntentParameterPromptDialogs</key>
+					<array>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Configuration</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Primary</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>There are ${count} options matching ‘${libraryElementType}’.</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>wWVuoB</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>DisambiguationIntroduction</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>Just to confirm, you wanted ‘${libraryElementType}’?</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>YqJZOr</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Confirmation</string>
+						</dict>
+					</array>
+					<key>INIntentParameterSupportsResolution</key>
+					<true/>
+					<key>INIntentParameterTag</key>
+					<integer>3</integer>
+					<key>INIntentParameterType</key>
+					<string>Integer</string>
+				</dict>
+				<dict>
+					<key>INIntentParameterConfigurable</key>
+					<true/>
+					<key>INIntentParameterCustomDisambiguation</key>
+					<true/>
+					<key>INIntentParameterDisplayName</key>
+					<string>Shuffle</string>
+					<key>INIntentParameterDisplayNameID</key>
+					<string>4fWXEE</string>
+					<key>INIntentParameterDisplayPriority</key>
+					<integer>3</integer>
+					<key>INIntentParameterEnumType</key>
+					<string>ShuffleType</string>
+					<key>INIntentParameterEnumTypeNamespace</key>
+					<string>1o3qqV</string>
+					<key>INIntentParameterMetadata</key>
+					<dict>
+						<key>INIntentParameterMetadataDefaultValue</key>
+						<string>off</string>
+					</dict>
+					<key>INIntentParameterName</key>
+					<string>shuffleOption</string>
+					<key>INIntentParameterPromptDialogs</key>
+					<array>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Configuration</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Primary</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>There are ${count} options matching ‘${shuffleOption}’.</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>qT4D31</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>DisambiguationIntroduction</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>Just to confirm, you wanted ‘${shuffleOption}’?</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>5RVwNb</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Confirmation</string>
+						</dict>
+					</array>
+					<key>INIntentParameterSupportsResolution</key>
+					<true/>
+					<key>INIntentParameterTag</key>
+					<integer>5</integer>
+					<key>INIntentParameterType</key>
+					<string>Integer</string>
+				</dict>
+				<dict>
+					<key>INIntentParameterConfigurable</key>
+					<true/>
+					<key>INIntentParameterCustomDisambiguation</key>
+					<true/>
+					<key>INIntentParameterDisplayName</key>
+					<string>Repeat</string>
+					<key>INIntentParameterDisplayNameID</key>
+					<string>LDg5rm</string>
+					<key>INIntentParameterDisplayPriority</key>
+					<integer>4</integer>
+					<key>INIntentParameterEnumType</key>
+					<string>RepeatType</string>
+					<key>INIntentParameterEnumTypeNamespace</key>
+					<string>1o3qqV</string>
+					<key>INIntentParameterMetadata</key>
+					<dict>
+						<key>INIntentParameterMetadataDefaultValue</key>
+						<string>off</string>
+					</dict>
+					<key>INIntentParameterName</key>
+					<string>repeatOption</string>
+					<key>INIntentParameterPromptDialogs</key>
+					<array>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Configuration</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Primary</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>There are ${count} options matching ‘${repeatOption}’.</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>UWyRWo</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>DisambiguationIntroduction</string>
+						</dict>
+						<dict>
+							<key>INIntentParameterPromptDialogCustom</key>
+							<true/>
+							<key>INIntentParameterPromptDialogFormatString</key>
+							<string>Just to confirm, you wanted ‘${repeatOption}’?</string>
+							<key>INIntentParameterPromptDialogFormatStringID</key>
+							<string>q9T7XX</string>
+							<key>INIntentParameterPromptDialogType</key>
+							<string>Confirmation</string>
+						</dict>
+					</array>
+					<key>INIntentParameterSupportsResolution</key>
+					<true/>
+					<key>INIntentParameterTag</key>
+					<integer>7</integer>
+					<key>INIntentParameterType</key>
+					<string>Integer</string>
+				</dict>
+			</array>
+			<key>INIntentResponse</key>
+			<dict>
+				<key>INIntentResponseCodes</key>
+				<array>
+					<dict>
+						<key>INIntentResponseCodeName</key>
+						<string>success</string>
+						<key>INIntentResponseCodeSuccess</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>INIntentResponseCodeName</key>
+						<string>failure</string>
+					</dict>
+				</array>
+			</dict>
+			<key>INIntentTitle</key>
+			<string>Play ID</string>
+			<key>INIntentTitleID</key>
+			<string>MrKUzO</string>
 			<key>INIntentType</key>
 			<string>Custom</string>
 			<key>INIntentVerb</key>

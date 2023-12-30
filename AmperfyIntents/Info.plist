@@ -12,6 +12,7 @@
 			<array/>
 			<key>IntentsSupported</key>
 			<array>
+				<string>PlayIDIntent</string>
 				<string>SearchAndPlayIntent</string>
 			</array>
 		</dict>

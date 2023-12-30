@@ -45,6 +45,11 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.isOfflineMode = newValue
         }))
         
+        settings.isShowDetailedInfo = self.appDelegate.storage.settings.isShowDetailedInfo
+        changesAgent.append(settings.$isShowDetailedInfo.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.isShowDetailedInfo = newValue
+        }))
+        
         settings.sleepTimerInterval = self.appDelegate.storage.settings.sleepTimerInterval
         changesAgent.append(settings.$sleepTimerInterval.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.sleepTimerInterval = newValue

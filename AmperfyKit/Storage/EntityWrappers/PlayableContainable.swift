@@ -26,9 +26,11 @@ import PromiseKit
 public enum DetailType {
     case short
     case long
+    case longDetailed
 }
 
 public protocol PlayableContainable {
+    var id: String { get }
     var name: String { get }
     var subtitle: String? { get }
     var subsubtitle: String? { get }

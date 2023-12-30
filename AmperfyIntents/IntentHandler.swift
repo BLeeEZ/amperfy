@@ -40,6 +40,9 @@ class IntentHandler: INExtension {
         if intent is SearchAndPlayIntent {
             return SearchAndPlayIntentHandler()
         }
+        if intent is PlayIDIntent {
+            return PlayIDIntentHandler()
+        }
         fatalError("Unhandled intent type: \(intent)")
     }
     
