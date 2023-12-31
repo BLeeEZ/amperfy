@@ -594,22 +594,31 @@ class PlayerView: UIView {
     func refreshPlaybackRateButton() {
         let playbackRate = self.player.playbackRate
         var playbackRateString = ""
+        var icon = UIImage.gauge
         if (playbackRate < 0.6) {
             playbackRateString = "0.5x"
+            icon = UIImage.gaugeDown.withRenderingMode(.alwaysTemplate)
         } else if (playbackRate < 0.8) {
             playbackRateString = "0.75x"
+            icon = UIImage.gaugeDown.withRenderingMode(.alwaysTemplate)
         } else if (playbackRate < 1.1) {
             playbackRateString = "1x"
+            icon = UIImage.gauge.withRenderingMode(.alwaysTemplate)
         } else if (playbackRate < 1.3) {
             playbackRateString = "1.25x"
+            icon = UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
         } else if (playbackRate < 1.6) {
             playbackRateString = "1.5x"
+            icon = UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
         } else if (playbackRate < 1.8) {
             playbackRateString = "1.75x"
+            icon = UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
         } else if (playbackRate < 2.1) {
             playbackRateString = "2x"
+            icon = UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
         }
-        playbackRateButton.setTitle(playbackRateString, for: .normal)
+        playbackRateButton.setImage(icon, for: .normal)
+        playbackRateButton.tintColor = .labelColor
         
         let doubleRate = UIAction(title: "2x", image: playbackRateString == "2x" ? .check : nil, handler: { _ in
             self.player.setPlaybackRate(2.0)
@@ -627,7 +636,7 @@ class PlayerView: UIView {
             self.player.setPlaybackRate(1.25)
             self.refreshPlaybackRateButton()
         })
-        let normalRate = UIAction(title: "1x", image: playbackRateString == "1x" ? .check : nil, handler: { _ in
+        let normalRate = UIAction(title: "normal", image: playbackRateString == "1x" ? .check : nil, handler: { _ in
             self.player.setPlaybackRate(1.0)
             self.refreshPlaybackRateButton()
         })

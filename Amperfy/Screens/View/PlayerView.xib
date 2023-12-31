@@ -313,16 +313,15 @@
                         <constraint firstAttribute="height" constant="50" id="dq3-fM-BgC"/>
                     </constraints>
                 </stackView>
-                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MoM-N8-wb9" userLabel="Playback Rate Button">
-                    <rect key="frame" x="209" y="-15" width="60" height="60"/>
+                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MoM-N8-wb9" userLabel="Playback Rate Button">
+                    <rect key="frame" x="223" y="-5" width="40" height="40"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="MoM-N8-wb9" secondAttribute="height" multiplier="1:1" id="A0O-7N-2HB"/>
-                        <constraint firstAttribute="width" constant="60" id="iqC-rY-gI6"/>
+                        <constraint firstAttribute="width" constant="40" id="iqC-rY-gI6"/>
                     </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <color key="tintColor" systemColor="labelColor"/>
-                    <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
-                    <state key="normal" title="1.75x">
+                    <inset key="contentEdgeInsets" minX="10" minY="11" maxX="8" maxY="7"/>
+                    <state key="normal" image="gauge">
                         <color key="titleColor" systemColor="labelColor"/>
                     </state>
                 </button>
@@ -356,7 +355,7 @@
                 <constraint firstItem="6NT-8n-tg9" firstAttribute="top" secondItem="42q-l9-IXM" secondAttribute="bottom" id="Qu9-nI-cVh"/>
                 <constraint firstItem="0xq-hb-FZa" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" constant="-5" id="RVS-Ku-emC"/>
                 <constraint firstItem="Fzn-VY-lpT" firstAttribute="bottom" secondItem="GST-UH-ejT" secondAttribute="bottom" id="Seg-qg-2gb"/>
-                <constraint firstItem="l5j-2I-Ltc" firstAttribute="leading" secondItem="MoM-N8-wb9" secondAttribute="trailing" constant="2" id="Sfh-tA-qi1"/>
+                <constraint firstItem="l5j-2I-Ltc" firstAttribute="leading" secondItem="MoM-N8-wb9" secondAttribute="trailing" constant="8" id="Sfh-tA-qi1"/>
                 <constraint firstItem="uqN-6M-JGc" firstAttribute="leading" secondItem="6NT-8n-tg9" secondAttribute="leading" id="Suu-4x-GTB"/>
                 <constraint firstItem="4O4-sy-Ien" firstAttribute="bottom" secondItem="pOR-k2-6Vf" secondAttribute="bottom" id="UNn-87-JZ9"/>
                 <constraint firstItem="8F1-fg-8m2" firstAttribute="bottom" secondItem="2Oi-ys-XoJ" secondAttribute="bottom" id="V1E-8l-ETr"/>
@@ -455,6 +454,7 @@
         <image name="backward.fill" catalog="system" width="128" height="77"/>
         <image name="ellipsis" width="18.417999267578125" height="3.9160199165344238"/>
         <image name="forward.fill" catalog="system" width="128" height="77"/>
+        <image name="gauge" width="168" height="145"/>
         <image name="musical_notes" width="30" height="30"/>
         <image name="player_style_compact" width="16.425800323486328" height="20.947299957275391"/>
         <image name="shuffle" width="30" height="30"/>
