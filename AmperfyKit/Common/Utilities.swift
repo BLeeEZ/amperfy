@@ -74,6 +74,17 @@ extension Int {
         self = newValue
     }
     
+    public var asColonDurationString: String {
+        var hourString = ""
+        let hours = self / (60*60)
+        if (hours > 0) {
+            hourString += "\(hours):"
+        }
+        let minutes = (self - (hours * 60 * 60)) / 60
+        let seconds = self - ((hours * 60 * 60) + (minutes * 60))
+        return hourString + String(format: "%02d", minutes) + ":" + String(format: "%02d", seconds)
+    }
+    
     public var asDurationString: String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.hour, .minute, .second]

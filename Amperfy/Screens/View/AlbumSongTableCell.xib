@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -53,6 +53,12 @@
                             <constraint firstAttribute="width" secondItem="59g-M4-BV0" secondAttribute="height" multiplier="1:1" id="TLv-DM-CAd"/>
                         </constraints>
                     </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="99:59:59" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="isF-fg-ddx" userLabel="Duration">
+                        <rect key="frame" x="411" y="19" width="61" height="17"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" systemColor="secondaryLabelColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailingMargin" secondItem="hPr-VQ-rTt" secondAttribute="trailing" id="0Jf-pS-3te"/>
@@ -61,20 +67,25 @@
                     <constraint firstItem="59g-M4-BV0" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="69g-Qg-fnj"/>
                     <constraint firstItem="GFX-bI-uSL" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="9NK-Zt-Udb"/>
                     <constraint firstItem="59g-M4-BV0" firstAttribute="width" secondItem="59g-M4-BV0" secondAttribute="height" multiplier="1:1" id="Ggl-Rc-JWp"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="isF-fg-ddx" secondAttribute="trailing" id="Jrg-hR-I0V"/>
+                    <constraint firstItem="isF-fg-ddx" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="a5K-hW-aMk"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" constant="-10" id="bvj-Mr-vRL"/>
                     <constraint firstItem="GFX-bI-uSL" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leadingMargin" id="fOI-Fn-425"/>
                     <constraint firstItem="YMj-gk-9M5" firstAttribute="top" secondItem="hPr-VQ-rTt" secondAttribute="bottom" constant="2" id="hWk-ln-K9O"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="leading" secondItem="GFX-bI-uSL" secondAttribute="trailing" constant="16" id="lqV-fj-OxU"/>
-                    <constraint firstItem="YMj-gk-9M5" firstAttribute="trailing" secondItem="hPr-VQ-rTt" secondAttribute="trailing" id="y6K-XE-CyN"/>
+                    <constraint firstItem="YMj-gk-9M5" firstAttribute="trailing" secondItem="WOq-tb-OTF" secondAttribute="trailingMargin" id="y6K-XE-CyN"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="artistLabel" destination="YMj-gk-9M5" id="uoo-D3-R7t"/>
                 <outlet property="artistLabelLeadConstraint" destination="0cg-qO-oSe" id="Bg8-Eh-uKj"/>
                 <outlet property="artistLabelLeadingConstraint" destination="69g-Qg-fnj" id="bGd-dv-it9"/>
+                <outlet property="artistLabelTrailingConstraint" destination="y6K-XE-CyN" id="f8N-lG-no9"/>
                 <outlet property="cacheIconImage" destination="59g-M4-BV0" id="cob-f2-gd9"/>
                 <outlet property="cacheIndicatorImage" destination="59g-M4-BV0" id="DEG-6l-yYB"/>
+                <outlet property="durationLabel" destination="isF-fg-ddx" id="rSJ-6b-a0y"/>
                 <outlet property="titleLabel" destination="hPr-VQ-rTt" id="wmq-Vm-6lz"/>
+                <outlet property="titleLabelTrailingConstraint" destination="0Jf-pS-3te" id="uiR-Wp-UNA"/>
                 <outlet property="trackNumberLabel" destination="GFX-bI-uSL" id="Vzm-7H-jGn"/>
             </connections>
             <point key="canvasLocation" x="233.59999999999999" y="-210.04497751124438"/>

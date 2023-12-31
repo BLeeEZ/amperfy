@@ -82,18 +82,6 @@ struct SettingsView: View {
                 
                 Section(content: {
                     HStack {
-                        Text("Show Detailed Information")
-                        Spacer()
-                        Toggle(isOn: $settings.isShowDetailedInfo) {}
-                    }
- 
-                }
-                , footer: {
-                    Text("Show detailed information (bitrate, ID) and button \"Copy ID to Clipboard\".")
-                })
-                
-                Section(content: {
-                    HStack {
                         Text("Prevent Screen Lock")
                         Spacer()
                         Menu(settings.screenLockPreventionPreference.description) {
@@ -105,6 +93,9 @@ struct SettingsView: View {
                 })
                 
                 Section() {
+                    NavigationLink(destination: DisplaySettingsView()) {
+                        Text("Display")
+                    }
                     NavigationLink(destination: ServerSettingsView()) {
                         Text("Server")
                     }

@@ -29,11 +29,17 @@ class PlayableTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
+    @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var downloadProgress: UIProgressView!
     @IBOutlet weak var reorderLabel: UILabel?
     @IBOutlet weak var cacheIconImage: UIImageView!
     @IBOutlet weak var artistLabelLeadingConstraint: NSLayoutConstraint!
+    
+    @IBOutlet weak var titleLabelTrailingConstraint: NSLayoutConstraint!
+    
+    @IBOutlet weak var artistLabelTrailingConstraint: NSLayoutConstraint!
+    
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     
@@ -82,6 +88,18 @@ class PlayableTableCell: BasicTableCell {
         }
         
         refreshSubtitleColor()
+        refreshCacheAndDuration()
+        
+        if let download = download, download.isDownloading {
+            downloadProgress.isHidden = false
+            downloadProgress.progress = download.progress
+        } else {
+            downloadProgress.isHidden = true
+        }
+    }
+    
+    func refreshCacheAndDuration() {
+        guard let playable = playable else { return }
 
         if playable.isCached {
             cacheIconImage.isHidden = false
@@ -91,11 +109,16 @@ class PlayableTableCell: BasicTableCell {
             artistLabelLeadingConstraint.constant = 0
         }
         
-        if let download = download, download.isDownloading {
-            downloadProgress.isHidden = false
-            downloadProgress.progress = download.progress
+        let isDurationVisible = appDelegate.storage.settings.isShowSongDuration && (playable.duration > 0)
+        durationLabel.isHidden = !isDurationVisible
+        if isDurationVisible {
+            durationLabel.text = playable.duration.asColonDurationString
+            durationLabel.layoutIfNeeded()
+            artistLabelTrailingConstraint.constant = durationLabel.frame.width + 16
+            titleLabelTrailingConstraint.constant = durationLabel.frame.width + 16
         } else {
-            downloadProgress.isHidden = true
+            artistLabelTrailingConstraint.constant = 8
+            titleLabelTrailingConstraint.constant = 8
         }
     }
     
@@ -109,13 +132,16 @@ class PlayableTableCell: BasicTableCell {
             if let subtitleColor = self.subtitleColor {
                 cacheIconImage.tintColor = subtitleColor
                 artistLabel.textColor = subtitleColor
+                durationLabel.textColor = subtitleColor
             } else {
                 cacheIconImage.tintColor = UIColor.labelColor
                 artistLabel.textColor = UIColor.labelColor
+                durationLabel.textColor = UIColor.labelColor
             }
         } else {
             cacheIconImage.tintColor = UIColor.secondaryLabelColor
             artistLabel.textColor = UIColor.secondaryLabelColor
+            durationLabel.textColor = UIColor.secondaryLabelColor
         }
     }
     

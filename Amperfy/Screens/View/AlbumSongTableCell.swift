@@ -43,14 +43,7 @@ class AlbumSongTableCell: SongTableCell {
         playIndicator.display(playable: song, rootView: self.trackNumberLabel)
         titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         artistLabel.text = song.creatorName
-
-        if song.isCached {
-            cacheIndicatorImage.isHidden = false
-            artistLabelLeadConstraint.constant = 20
-        } else {
-            cacheIndicatorImage.isHidden = true
-            artistLabelLeadConstraint.constant = 0
-        }
+        refreshCacheAndDuration()
     }
     
     private func configureTrackNumberLabel() {

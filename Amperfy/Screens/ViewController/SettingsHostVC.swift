@@ -50,6 +50,11 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.isShowDetailedInfo = newValue
         }))
         
+        settings.isShowSongDuration = self.appDelegate.storage.settings.isShowSongDuration
+        changesAgent.append(settings.$isShowSongDuration.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.isShowSongDuration = newValue
+        }))
+        
         settings.sleepTimerInterval = self.appDelegate.storage.settings.sleepTimerInterval
         changesAgent.append(settings.$sleepTimerInterval.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.sleepTimerInterval = newValue

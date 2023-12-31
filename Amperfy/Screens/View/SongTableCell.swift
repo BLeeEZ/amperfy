@@ -26,9 +26,12 @@ class SongTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
+    @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak private var cacheIconImage: UIImageView!
     @IBOutlet weak private var artistLabelLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var artistLabelTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var titleLabelTrailingConstraint: NSLayoutConstraint!
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     
@@ -60,8 +63,12 @@ class SongTableCell: BasicTableCell {
         playIndicator.display(playable: song, rootView: self.entityImage, isOnImage: true)
         titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         artistLabel.text = song.creatorName
-        
         entityImage.display(container: song)
+        refreshCacheAndDuration()
+    }
+    
+    func refreshCacheAndDuration() {
+        guard let song = song else { return }
 
         if song.isCached {
             cacheIconImage.isHidden = false
@@ -69,6 +76,18 @@ class SongTableCell: BasicTableCell {
         } else {
             cacheIconImage.isHidden = true
             artistLabelLeadingConstraint.constant = 0
+        }
+        
+        let isDurationVisible = appDelegate.storage.settings.isShowSongDuration && (song.duration > 0)
+        durationLabel.isHidden = !isDurationVisible
+        if isDurationVisible {
+            durationLabel.text = song.duration.asColonDurationString
+            durationLabel.layoutIfNeeded()
+            artistLabelTrailingConstraint.constant = durationLabel.frame.width + 8
+            titleLabelTrailingConstraint.constant = durationLabel.frame.width + 8
+        } else {
+            artistLabelTrailingConstraint.constant = 0
+            titleLabelTrailingConstraint.constant = 0
         }
     }
     
