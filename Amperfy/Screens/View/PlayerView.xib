@@ -325,6 +325,18 @@
                         <color key="titleColor" systemColor="labelColor"/>
                     </state>
                 </button>
+                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FVB-BI-Jue" userLabel="Sleep Timer Button">
+                    <rect key="frame" x="111" y="-5" width="40" height="40"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="40" id="3sJ-M0-pR8"/>
+                        <constraint firstAttribute="width" secondItem="FVB-BI-Jue" secondAttribute="height" multiplier="1:1" id="wde-yH-fAR"/>
+                    </constraints>
+                    <color key="tintColor" systemColor="labelColor"/>
+                    <inset key="contentEdgeInsets" minX="8" minY="8" maxX="8" maxY="8"/>
+                    <state key="normal" image="moon.zzz.fill" catalog="system">
+                        <color key="titleColor" systemColor="labelColor"/>
+                    </state>
+                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -341,6 +353,7 @@
                 <constraint firstItem="4O4-sy-Ien" firstAttribute="trailing" secondItem="pOR-k2-6Vf" secondAttribute="trailing" id="8Ig-ny-bha"/>
                 <constraint firstAttribute="trailingMargin" secondItem="SoI-ny-Hw0" secondAttribute="trailing" priority="999" id="9wH-XK-zJU"/>
                 <constraint firstItem="ZVN-JG-VAA" firstAttribute="centerY" secondItem="0xq-hb-FZa" secondAttribute="centerY" id="AXX-7H-ArF"/>
+                <constraint firstItem="FVB-BI-Jue" firstAttribute="centerY" secondItem="ZVN-JG-VAA" secondAttribute="centerY" id="BZU-C3-rZI"/>
                 <constraint firstItem="7xb-YR-9X6" firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="DpG-Q6-B6H"/>
                 <constraint firstItem="VVf-kL-Ei5" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="IHy-h6-9bV"/>
                 <constraint firstItem="Fzn-VY-lpT" firstAttribute="leading" secondItem="GST-UH-ejT" secondAttribute="leading" id="KAn-Lo-bQl"/>
@@ -393,6 +406,8 @@
                 <constraint firstItem="4O4-sy-Ien" firstAttribute="leading" secondItem="pOR-k2-6Vf" secondAttribute="leading" id="w2X-uD-cdZ"/>
                 <constraint firstAttribute="trailingMargin" secondItem="8F1-fg-8m2" secondAttribute="trailing" id="yHU-J1-HIo"/>
                 <constraint firstAttribute="trailingMargin" secondItem="0xq-hb-FZa" secondAttribute="trailing" id="z0g-DY-iPu"/>
+                <constraint firstItem="FVB-BI-Jue" firstAttribute="leading" secondItem="7xb-YR-9X6" secondAttribute="trailing" constant="13" id="z4C-UH-GIg"/>
+                <constraint firstItem="FVB-BI-Jue" firstAttribute="width" secondItem="FVB-BI-Jue" secondAttribute="height" multiplier="1:1" id="zMd-yw-Ipc"/>
                 <constraint firstItem="6NT-8n-tg9" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="zPJ-Rr-xW5"/>
             </constraints>
             <connections>
@@ -422,6 +437,7 @@
                 <outlet property="remainingTimeToArtworkDistanceConstraint" destination="MnT-rV-Opr" id="qal-ry-Pge"/>
                 <outlet property="repeatButton" destination="zaZ-s9-erE" id="GdF-O9-5q9"/>
                 <outlet property="shuffleButton" destination="mhL-mu-zks" id="GGU-BH-0MG"/>
+                <outlet property="sleepTimerButton" destination="FVB-BI-Jue" id="SzJ-8l-ofI"/>
                 <outlet property="timeSlider" destination="42q-l9-IXM" id="Uit-8D-ekQ"/>
                 <outlet property="timeSliderToArtworkDistanceConstraint" destination="guh-i3-Npn" id="kpa-DZ-5bm"/>
                 <outlet property="titleCompactButton" destination="4O4-sy-Ien" id="yOM-El-uh3"/>
@@ -455,6 +471,7 @@
         <image name="ellipsis" width="18.417999267578125" height="3.9160199165344238"/>
         <image name="forward.fill" catalog="system" width="128" height="77"/>
         <image name="gauge" width="168" height="145"/>
+        <image name="moon.zzz.fill" catalog="system" width="117" height="128"/>
         <image name="musical_notes" width="30" height="30"/>
         <image name="player_style_compact" width="16.425800323486328" height="20.947299957275391"/>
         <image name="shuffle" width="30" height="30"/>

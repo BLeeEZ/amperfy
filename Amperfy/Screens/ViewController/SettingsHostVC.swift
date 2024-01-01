@@ -55,16 +55,6 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.isShowSongDuration = newValue
         }))
         
-        settings.sleepTimerInterval = self.appDelegate.storage.settings.sleepTimerInterval
-        changesAgent.append(settings.$sleepTimerInterval.sink(receiveValue: { newValue in
-            self.appDelegate.storage.settings.sleepTimerInterval = newValue
-        }))
-        
-        settings.sleepTimer = self.appDelegate.sleepTimer
-        changesAgent.append(settings.$sleepTimer.sink(receiveValue: { newValue in
-            self.appDelegate.sleepTimer = newValue
-        }))
-        
         settings.screenLockPreventionPreference = self.appDelegate.storage.settings.screenLockPreventionPreference
         changesAgent.append(settings.$screenLockPreventionPreference.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.screenLockPreventionPreference = newValue

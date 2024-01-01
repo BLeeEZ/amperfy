@@ -67,6 +67,7 @@ class PlayerView: UIView {
     @IBOutlet weak var playerModeButton: UIButton!
     @IBOutlet weak var displayPlaylistButton: UIButton!
     @IBOutlet weak var playbackRateButton: UIButton!
+    @IBOutlet weak var sleepTimerButton: UIButton!
     
     @IBOutlet weak var ratingPlaceholderView: UIView!
 
@@ -546,6 +547,7 @@ class PlayerView: UIView {
         refreshRepeatButton()
         refreshShuffleButton()
         refreshPlaybackRateButton()
+        refreshSleepTimerButton()
         refreshDisplayPlaylistButton()
         refreshPlayerModeChangeButton()
     }
@@ -636,7 +638,7 @@ class PlayerView: UIView {
             self.player.setPlaybackRate(1.25)
             self.refreshPlaybackRateButton()
         })
-        let normalRate = UIAction(title: "normal", image: playbackRateString == "1x" ? .check : nil, handler: { _ in
+        let normalRate = UIAction(title: "Normal", image: playbackRateString == "1x" ? .check : nil, handler: { _ in
             self.player.setPlaybackRate(1.0)
             self.refreshPlaybackRateButton()
         })
@@ -648,8 +650,64 @@ class PlayerView: UIView {
             self.player.setPlaybackRate(0.5)
             self.refreshPlaybackRateButton()
         })
-        playbackRateButton.menu = UIMenu(children: [doubleRate, oneDot75ByRate, oneDot5ByRate, oneDot25Rate, normalRate, dot75Rate, dot5Rate])
+        playbackRateButton.menu = UIMenu(title: "Playback Rate", children: [doubleRate, oneDot75ByRate, oneDot5ByRate, oneDot25Rate, normalRate, dot75Rate, dot5Rate])
         playbackRateButton.showsMenuAsPrimaryAction = true
+    }
+    
+    func refreshSleepTimerButton() {
+        if appDelegate.sleepTimer != nil {
+            sleepTimerButton.setImage(UIImage.sleep.withRenderingMode(.alwaysTemplate), for: .normal)
+        } else {
+            sleepTimerButton.setImage(UIImage.sleepFill.withRenderingMode(.alwaysTemplate), for: .normal)
+        }
+        playbackRateButton.tintColor = .labelColor
+        
+        if let timer = appDelegate.sleepTimer {
+            let deactivate = UIAction(title: "Off", image: nil, handler: { _ in
+                self.appDelegate.sleepTimer?.invalidate()
+                self.appDelegate.sleepTimer = nil
+                self.refreshSleepTimerButton()
+            })
+            sleepTimerButton.menu = UIMenu(title: "Will pause at: \(timer.fireDate.asShortHrMinString)", children: [deactivate])
+        } else {
+            let sleep5 = UIAction(title: "5 Minutes", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(5 * 60))
+                self.refreshSleepTimerButton()
+            })
+            let sleep10 = UIAction(title: "10 Minutes", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(10 * 60))
+                self.refreshSleepTimerButton()
+            })
+            let sleep15 = UIAction(title: "15 Minutes", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(15 * 60))
+                self.refreshSleepTimerButton()
+            })
+            let sleep30 = UIAction(title: "30 Minutes", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(30 * 60))
+                self.refreshSleepTimerButton()
+            })
+            let sleep45 = UIAction(title: "45 Minutes", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(45 * 60))
+                self.refreshSleepTimerButton()
+            })
+            let sleep60 = UIAction(title: "1 Hour", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(60 * 60))
+                self.refreshSleepTimerButton()
+            })
+            sleepTimerButton.menu = UIMenu(title: "Sleep Timer", children: [sleep5, sleep10, sleep15, sleep30, sleep45, sleep60])
+        }
+        sleepTimerButton.showsMenuAsPrimaryAction = true
+    }
+    
+    func activateSleepTimer(timeInterval: TimeInterval) {
+        appDelegate.sleepTimer?.invalidate()
+        appDelegate.sleepTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { (t) in
+            self.appDelegate.player.pause()
+            self.appDelegate.eventLogger.info(topic: "Sleep Timer", message: "Sleep timer paused playback.")
+            self.appDelegate.sleepTimer?.invalidate()
+            self.appDelegate.sleepTimer = nil
+            self.refreshSleepTimerButton()
+        }
     }
     
     func refreshDisplayPlaylistButton() {

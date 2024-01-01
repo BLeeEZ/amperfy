@@ -15,7 +15,6 @@
 		5005938B28E2D4FB008C8DF6 /* CommonCollectionSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5005938A28E2D4FB008C8DF6 /* CommonCollectionSectionHeader.swift */; };
 		5005938F28E2EDDB008C8DF6 /* BasicCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5005938E28E2EDDB008C8DF6 /* BasicCollectionViewController.swift */; };
 		5005939128E42F66008C8DF6 /* BasicCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5005939028E42F66008C8DF6 /* BasicCollectionCell.swift */; };
-		5005939728E593F1008C8DF6 /* SleepTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5005939628E593F0008C8DF6 /* SleepTimerView.swift */; };
 		5005939928E5C5E5008C8DF6 /* MultiPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5005939828E5C5E5008C8DF6 /* MultiPickerView.swift */; };
 		500631FF23A1747B000F75A3 /* PlayerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500631FE23A1747B000F75A3 /* PlayerView.xib */; };
 		5006320123A174C0000F75A3 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5006320023A174C0000F75A3 /* PlayerView.swift */; };
@@ -504,7 +503,6 @@
 		5005938A28E2D4FB008C8DF6 /* CommonCollectionSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonCollectionSectionHeader.swift; sourceTree = "<group>"; };
 		5005938E28E2EDDB008C8DF6 /* BasicCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicCollectionViewController.swift; sourceTree = "<group>"; };
 		5005939028E42F66008C8DF6 /* BasicCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicCollectionCell.swift; sourceTree = "<group>"; };
-		5005939628E593F0008C8DF6 /* SleepTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepTimerView.swift; sourceTree = "<group>"; };
 		5005939828E5C5E5008C8DF6 /* MultiPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPickerView.swift; sourceTree = "<group>"; };
 		500631FE23A1747B000F75A3 /* PlayerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlayerView.xib; sourceTree = "<group>"; };
 		5006320023A174C0000F75A3 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
@@ -1075,7 +1073,6 @@
 				5078AFB12B40CA5E0038FD17 /* DisplaySettingsView.swift */,
 				50791E8428D36F1F006CE6E5 /* LibrarySettingsView.swift */,
 				50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */,
-				5005939628E593F0008C8DF6 /* SleepTimerView.swift */,
 				504B441828D6F0920033982C /* LicenseSettingsView.swift */,
 				504B441C28D7A6330033982C /* XCallbackURLsSetttingsView.swift */,
 				50CFB59828D5006100A47D44 /* Artwork */,
@@ -1948,7 +1945,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5005939728E593F1008C8DF6 /* SleepTimerView.swift in Sources */,
 				504CE15027920988005E0DE7 /* RatingView.swift in Sources */,
 				504B441D28D7A6330033982C /* XCallbackURLsSetttingsView.swift in Sources */,
 				507361E02632BA3B005F151D /* GenresVC.swift in Sources */,

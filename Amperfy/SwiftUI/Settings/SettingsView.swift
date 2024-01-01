@@ -74,12 +74,6 @@ struct SettingsView: View {
                     Text("Songs, podcasts and artworks will not be downloaded when you are offline. Searches are restricted to device only. Playlists will not be synced with the server.")
                 })
                 
-                Section() {
-                    NavigationLink(destination: SleepTimerView()) {
-                        Text("Sleep Timer")
-                    }
-                }
-                
                 Section(content: {
                     HStack {
                         Text("Prevent Screen Lock")

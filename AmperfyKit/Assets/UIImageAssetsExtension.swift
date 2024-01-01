@@ -73,9 +73,11 @@ extension UIImage {
 
     public static var play: UIImage = { return UIImage.create("play") }()
     public static var pause: UIImage = { return UIImage.create("pause") }()
-    public static var gauge: UIImage = { return UIImage.create("gauge") }() // SF-Symbols 5 Regular: custom.gauge.open.with.lines.needle.33percent
-    public static var gaugeDown: UIImage = { return UIImage.create("gauge_down") }() // SF-Symbols 5 Regular:  custom.gauge.open.with.lines.needle.33percent.badge.arrow.down
-    public static var gaugeUp: UIImage = { return UIImage.create("gauge_up") }() // SF-Symbols 5 Regular: custom.gauge.open.with.lines.needle.33percent.badge.arrow.up
+    public static var gauge: UIImage = { return UIImage.create("gauge") }() // SF-Symbols 5 Regular: gauge.open.with.lines.needle.33percent
+    public static var gaugeDown: UIImage = { return UIImage.create("gauge_down") }() // SF-Symbols 5 Regular:  gauge.open.with.lines.needle.33percent.badge.arrow.down
+    public static var gaugeUp: UIImage = { return UIImage.create("gauge_up") }() // SF-Symbols 5 Regular: gauge.open.with.lines.needle.33percent.badge.arrow.up
+    public static var sleep: UIImage = { return UIImage(systemName: "moon.zzz") ?? clock }()
+    public static var sleepFill: UIImage = { return UIImage(systemName: "moon.zzz.fill") ?? clock }()
     public static var cache: UIImage = { return UIImage.create("cache") }() // Font Awesome 6.1.1 Solid: cloud-arrow-down
     public static var forward: UIImage = { return UIImage.create("forward") }()  // SF-Symbols 3.2 Regular:  forward.filled
     public static var backward: UIImage = { return UIImage.create("backward") }()  // SF-Symbols 3.2 Regular:  backward.filled
