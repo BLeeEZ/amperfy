@@ -655,7 +655,7 @@ class PlayerView: UIView {
     }
     
     func refreshSleepTimerButton() {
-        if appDelegate.sleepTimer != nil {
+        if appDelegate.sleepTimer != nil || self.appDelegate.player.isShouldPauseAfterFinishedPlaying {
             sleepTimerButton.setImage(UIImage.sleep.withRenderingMode(.alwaysTemplate), for: .normal)
         } else {
             sleepTimerButton.setImage(UIImage.sleepFill.withRenderingMode(.alwaysTemplate), for: .normal)
@@ -669,7 +669,22 @@ class PlayerView: UIView {
                 self.refreshSleepTimerButton()
             })
             sleepTimerButton.menu = UIMenu(title: "Will pause at: \(timer.fireDate.asShortHrMinString)", children: [deactivate])
+        } else if self.appDelegate.player.isShouldPauseAfterFinishedPlaying {
+            let deactivate = UIAction(title: "Off", image: nil, handler: { _ in
+                self.appDelegate.player.isShouldPauseAfterFinishedPlaying = false
+                self.refreshSleepTimerButton()
+            })
+            switch player.playerMode {
+            case .music:
+                sleepTimerButton.menu = UIMenu(title: "Will pause at end of song", children: [deactivate])
+            case .podcast:
+                sleepTimerButton.menu = UIMenu(title: "Will pause at end of episode", children: [deactivate])
+            }
         } else {
+            let endOfTrack = UIAction(title: "End of song or episode", image: nil, handler: { _ in
+                self.appDelegate.player.isShouldPauseAfterFinishedPlaying = true
+                self.refreshSleepTimerButton()
+            })
             let sleep5 = UIAction(title: "5 Minutes", image: nil, handler: { _ in
                 self.activateSleepTimer(timeInterval: TimeInterval(5 * 60))
                 self.refreshSleepTimerButton()
@@ -694,7 +709,7 @@ class PlayerView: UIView {
                 self.activateSleepTimer(timeInterval: TimeInterval(60 * 60))
                 self.refreshSleepTimerButton()
             })
-            sleepTimerButton.menu = UIMenu(title: "Sleep Timer", children: [sleep5, sleep10, sleep15, sleep30, sleep45, sleep60])
+            sleepTimerButton.menu = UIMenu(title: "Sleep Timer", children: [endOfTrack, sleep5, sleep10, sleep15, sleep30, sleep45, sleep60])
         }
         sleepTimerButton.showsMenuAsPrimaryAction = true
     }

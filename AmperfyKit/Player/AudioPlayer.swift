@@ -33,6 +33,7 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     var currentlyPlaying: AbstractPlayable? {
         return queueHandler.currentlyPlaying
     }
+    var isShouldPauseAfterFinishedPlaying = false
 
     private var playerStatus: PlayerStatusPersistent
     private var queueHandler: PlayQueueHandler
@@ -81,7 +82,10 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     
     //BackendAudioPlayerNotifiable
     func didItemFinishedPlaying() {
-        if playerStatus.repeatMode == .single {
+        if isShouldPauseAfterFinishedPlaying {
+            isShouldPauseAfterFinishedPlaying = false
+            pause()
+        } else if playerStatus.repeatMode == .single {
             replayCurrentItem()
         } else {
             playNext()
