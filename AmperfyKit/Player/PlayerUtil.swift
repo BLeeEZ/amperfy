@@ -21,6 +21,7 @@
 
 import Foundation
 import MediaPlayer
+import Intents
 
 public protocol MusicPlayable {
     func didStartPlaying()
@@ -80,6 +81,21 @@ public enum RepeatMode: Int16 {
         case .all:
             return .all
         default:
+            return .off
+        }
+    }
+    
+    public static func fromINPlaybackRepeatMode(mode: INPlaybackRepeatMode) -> RepeatMode {
+        switch mode {
+        case .unknown:
+            return .off
+        case .none:
+            return .off
+        case .all:
+            return .all
+        case .one:
+            return .single
+        @unknown default:
             return .off
         }
     }

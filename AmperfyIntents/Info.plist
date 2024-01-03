@@ -12,8 +12,14 @@
 			<array/>
 			<key>IntentsSupported</key>
 			<array>
+				<string>INPlayMediaIntent</string>
 				<string>PlayIDIntent</string>
 				<string>SearchAndPlayIntent</string>
+			</array>
+			<key>SupportedMediaCategories</key>
+			<array>
+				<string>INMediaCategoryPodcasts</string>
+				<string>INMediaCategoryMusic</string>
 			</array>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>

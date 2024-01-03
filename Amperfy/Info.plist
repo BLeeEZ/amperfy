@@ -35,6 +35,15 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>INAlternativeAppNames</key>
+	<array>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Amperfy Music</string>
+			<key>INAlternativeAppNamePronunciationHint</key>
+			<string>amperfy music</string>
+		</dict>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -46,6 +55,7 @@
 	</dict>
 	<key>NSUserActivityTypes</key>
 	<array>
+		<string>INPlayMediaIntent</string>
 		<string>PlayIDIntent</string>
 		<string>SearchAndPlayIntent</string>
 	</array>

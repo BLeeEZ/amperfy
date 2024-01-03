@@ -43,6 +43,9 @@ class IntentHandler: INExtension {
         if intent is PlayIDIntent {
             return PlayIDIntentHandler()
         }
+        if intent is INPlayMediaIntent {
+            return PlayMediaIntentHandler()
+        }
         fatalError("Unhandled intent type: \(intent)")
     }
     

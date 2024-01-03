@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IntentPhrases</key>
+	<array>
+		<dict>
+			<key>IntentName</key>
+			<string>SearchAndPlayIntent</string>
+			<key>IntentExamples</key>
+			<array>
+				<string>Search and play example title in Amperfy</string>
+			</array>
+		</dict>
+		<dict>
+			<key>IntentName</key>
+			<string>PlayIDIntent</string>
+			<key>IntentExamples</key>
+			<array>
+				<string>Play ID 1acc2 in Amperfy</string>
+			</array>
+		</dict>
+		<dict>
+			<key>IntentName</key>
+			<string>INPlayMediaIntent</string>
+			<key>IntentExamples</key>
+			<array>
+				<string>Play the example band in Amperfy</string>
+				<string>Play playlist example in Amperfy</string>
+				<string>Play title by artist in Amperfy</string>
+			</array>
+		</dict>
+	</array>
+	<key>ParameterVocabularies</key>
+	<array/>
+</dict>
+</plist>

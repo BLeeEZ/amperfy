@@ -22,6 +22,7 @@
 import Foundation
 import Intents
 import CallbackURLKit
+import OSLog
 
 extension PlayableContainerType {
     public static func from(string: String) -> PlayableContainerType? {
@@ -81,6 +82,10 @@ public class IntentManager {
         self.player = player
         self.documentation = [XCallbackActionDocu]()
     }
+    
+    public lazy var log = {
+        return OSLog(subsystem: "Amperfy", category: "IntentManager")
+    }()
     
     /// URLs to handle need to define in Project -> Targerts: Amperfy -> Info -> URL Types
     public func handleIncoming(url: URL) -> Bool {
@@ -433,6 +438,96 @@ public class IntentManager {
         }
     }
     
+    public func handleIncomingPlayMediaIntent(playMediaIntent: INPlayMediaIntent) -> Bool {
+        // intent interpretion is only working if media search is provided
+        guard let mediaSearch = playMediaIntent.mediaSearch else {
+            os_log("No media search provided", log: self.log, type: .error)
+            return false
+        }
+#if false // use for debug only
+        os_log("playMediaIntent: %s", log: self.log, type: .debug, playMediaIntent.debugDescription)
+        os_log("mediaSearch: %s", log: self.log, type: .debug, mediaSearch.debugDescription)
+#endif
+        
+        var playableContainer: PlayableContainable?
+        let playableContainerType = PlayableContainerType.fromINMediaItemType(type: mediaSearch.mediaType)
+        if playableContainerType != .unknown {
+            // media type is provided by user
+            // "play song <blub> by <artist>" => mediaType: 1; mediaName: blub; artistNames: artist
+            // "play song <blub>" => mediaType: 1; mediaName: blub; artistNames: -
+            // "play album <blub>" => mediaType: 2; mediaName: blub; artistNames: -
+            // "play artist <blub>" => mediaType: 3; mediaName: blub; artistNames: -
+            // "play <Rock>" => mediaType: 4; mediaName: -; artistNames: -; genreNames: Rock
+            // "play playlist <blub>" => mediaType: 5; mediaName: blub; artistNames: -
+            // "play podcast <blub>" => mediaType: 6; mediaName: blub; artistNames: -
+            if let mediaName = mediaSearch.mediaName {
+                os_log("Search explicitly in %ss: <%s>", log: self.log, type: .info, playableContainerType.description, mediaName)
+                playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: playableContainerType)
+            } else if let genres = mediaSearch.genreNames {
+                os_log("Search explicitly in genres: <%s>", log: self.log, type: .info, genres.joined(separator: ", "))
+                for genre in genres {
+                    guard playableContainer == nil else { break }
+                    os_log("Search explicitly in genre: <%s>", log: self.log, type: .info, genre)
+                    playableContainer = self.getPlayableContainer(searchTerm: genre, searchCategory: .genre)
+                }
+            }
+        } else {
+            // Do a full search due to missing media type
+            if let mediaName = mediaSearch.mediaName {
+                // "play <title>" => mediaType: 0; mediaName: title; artistNames: -
+                // "play <title> by <artist>" => mediaType: 0; mediaName: title; artistNames: artist
+                if let artistName = mediaSearch.artistName {
+                    os_log("Search implicitly in songs: <%s> - <%s>", log: self.log, type: .info, artistName, mediaName)
+                    let foundSongs = library.getSongs().filterBy(searchText: mediaName)
+                    let foundSong = foundSongs.lazy.first(where: { $0.creatorName.isFoundBy(searchText: artistName) })
+                    playableContainer = foundSong
+                }
+                if playableContainer == nil {
+                    os_log("Search implicitly in playlists: <%s>", log: self.log, type: .info, mediaName)
+                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .playlist)
+                }
+                if playableContainer == nil {
+                    os_log("Search implicitly in artists: <%s>", log: self.log, type: .info, mediaName)
+                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .artist)
+                }
+                if playableContainer == nil {
+                    os_log("Search implicitly in podcasts: <%s>", log: self.log, type: .info, mediaName)
+                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .podcast)
+                }
+                if playableContainer == nil {
+                    os_log("Search implicitly in albums: <%s>", log: self.log, type: .info, mediaName)
+                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .album)
+                }
+                if playableContainer == nil {
+                    os_log("Search implicitly in songs: <%s>", log: self.log, type: .info, mediaName)
+                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .song)
+                }
+                if playableContainer == nil {
+                    os_log("Search implicitly in podcastEpisodes: <%s>", log: self.log, type: .info, mediaName)
+                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .podcastEpisode)
+                }
+            } else if let genres = mediaSearch.genreNames {
+                os_log("Search implicitly in genres: <%s>", log: self.log, type: .info, genres.joined(separator: ", "))
+                for genre in genres {
+                    guard playableContainer == nil else { break }
+                    os_log("Search implicitly in genre: <%s>", log: self.log, type: .info, genre)
+                    playableContainer = self.getPlayableContainer(searchTerm: genre, searchCategory: .genre)
+                }
+            }
+        }
+        
+        guard let playableContainer = playableContainer else {
+            os_log("No playable container found", log: self.log, type: .error)
+            return false
+        }
+        
+        let shuffleOption = playMediaIntent.playShuffled ?? false
+        let repeatOption = RepeatMode.fromINPlaybackRepeatMode(mode: playMediaIntent.playbackRepeatMode)
+        os_log("Play container <%s> (shuffle: %s, repeat: %s)", log: self.log, type: .info, playableContainer.name, shuffleOption.description, repeatOption.description)
+        play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+        return true
+    }
+    
     public func handleIncomingIntent(userActivity: NSUserActivity) -> Bool {
         guard userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self) ||
               userActivity.activityType == NSUserActivity.searchAndPlayActivityType ||
@@ -490,19 +585,19 @@ public class IntentManager {
         case .unknown:
             fallthrough
         case .song:
-            playableContainer = library.getSongs().lazy.first(where: { $0.name.contains(searchTerm) })
+            playableContainer = library.getSongs().lazy.first(where: { $0.name.isFoundBy(searchText: searchTerm) })
         case .artist:
-            playableContainer = library.getArtists().lazy.first(where: { $0.name.contains(searchTerm) })
+            playableContainer = library.getArtists().lazy.first(where: { $0.name.isFoundBy(searchText: searchTerm) })
         case .podcastEpisode:
-            playableContainer = library.getPodcastEpisodes().lazy.first(where: { $0.name.contains(searchTerm) })
+            playableContainer = library.getPodcastEpisodes().lazy.first(where: { $0.name.isFoundBy(searchText: searchTerm) })
         case .playlist:
-            playableContainer = library.getPlaylists().lazy.first(where: { $0.name.contains(searchTerm) })
+            playableContainer = library.getPlaylists().lazy.first(where: { $0.name.isFoundBy(searchText: searchTerm) })
         case .album:
-            playableContainer = library.getAlbums().lazy.first(where: { $0.name.contains(searchTerm) })
+            playableContainer = library.getAlbums().lazy.first(where: { $0.name.isFoundBy(searchText: searchTerm) })
         case .genre:
-            playableContainer = library.getGenres().lazy.first(where: { $0.name.contains(searchTerm) })
+            playableContainer = library.getGenres().lazy.first(where: { $0.name.isFoundBy(searchText: searchTerm) })
         case .podcast:
-            playableContainer = library.getPodcasts().lazy.first(where: { $0.name.contains(searchTerm) })
+            playableContainer = library.getPodcasts().lazy.first(where: { $0.name.isFoundBy(searchText: searchTerm) })
         }
         return playableContainer
     }
@@ -541,4 +636,78 @@ public class IntentManager {
         player.setRepeatMode(repeatOption)
     }
     
+}
+
+extension PlayableContainerType {
+    public var description: String {
+        switch (self) {
+        case .unknown:
+            return "unknown"
+        case .artist:
+            return "artist"
+        case .song:
+            return "song"
+        case .podcastEpisode:
+            return "podcastEpisode"
+        case .playlist:
+            return "playlist"
+        case .album:
+            return "album"
+        case .genre:
+            return "genre"
+        case .podcast:
+            return "podcast"
+        }
+    }
+}
+
+extension PlayableContainerType {
+    static public func fromINMediaItemType(type: INMediaItemType) -> PlayableContainerType {
+        switch (type) {
+        case .unknown:
+            return .unknown
+        case .song:
+            return .song
+        case .album:
+            return .album
+        case .artist:
+            return .artist
+        case .genre:
+            return .genre
+        case .playlist:
+            return .playlist
+        case .podcastShow:
+            return .podcast
+        case .podcastEpisode:
+            return .podcastEpisode
+        case .podcastPlaylist:
+            return .podcast
+        case .musicStation:
+            return .unknown
+        case .audioBook:
+            return .unknown
+        case .movie:
+            return .unknown
+        case .tvShow:
+            return .unknown
+        case .tvShowEpisode:
+            return .unknown
+        case .musicVideo:
+            return .unknown
+        case .podcastStation:
+            return .podcast
+        case .radioStation:
+            return .unknown
+        case .station:
+            return .unknown
+        case .music:
+            return .unknown
+        case .algorithmicRadioStation:
+            return .unknown
+        case .news:
+            return .unknown
+        @unknown default:
+            return .unknown
+        }
+    }
 }

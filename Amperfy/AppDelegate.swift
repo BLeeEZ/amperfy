@@ -25,6 +25,7 @@ import BackgroundTasks
 import os.log
 import AmperfyKit
 import PromiseKit
+import Intents
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -264,6 +265,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
         os_log("didDiscardSceneSessions", log: self.log, type: .info)
+    }
+
+    // This method is called when the application is background launched in response to the extension returning .handleInApp.
+    func application(_ application: UIApplication, handle intent: INIntent, completionHandler: @escaping (INIntentResponse) -> Void) {
+        os_log("application handle INPlayMediaIntent", log: self.log, type: .info)
+        guard let playMediaIntent = intent as? INPlayMediaIntent else {
+            completionHandler(INPlayMediaIntentResponse(code: .failure, userActivity: nil))
+            return
+        }
+        let isSuccess = intentManager.handleIncomingPlayMediaIntent(playMediaIntent: playMediaIntent)
+        completionHandler(INPlayMediaIntentResponse(code: isSuccess ? .success : .failure, userActivity: nil))
     }
     
 }

@@ -13,9 +13,14 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 ## Features
 
 - Offline support
+- Support for music and podcasts
 - Syncing the database after first login
-- Update library via search API
+- Update library in background
+- Siri voice commands: "play \<example artist\> in Amperfy"
+- Siri shortcuts: play id, search and play
 - Player interaction from lock screen
+- Sleep timer
+- Adjustable playback rate
 - Remote controlable
 - Dark mode support
 
@@ -35,7 +40,7 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 
 4. Build and run the "Amperfy" scheme
 
-  >Real device testing: Amperfy has Apple CarPlay support. To test it on a real device a developer certificate with granted access to `com.apple.developer.playable-content` is requiered. To test Amperfy without Apple CarPlay clear the entitlement signing entry under Amperfy -> Targets: Amperfy -> Build Settings -> Signing -> `Code Signing Entitlements` (clear `Amperfy/Entitlements.plist`)
+  >Real device testing: Amperfy has Apple CarPlay and Siri support. To test it on a real device a developer certificate with granted access to `com.apple.developer.playable-content` and `com.apple.developer.siri` is requiered. To test Amperfy without Apple CarPlay and Siri clear all entries in `Amperfy/Amperfy.entitlements`.
 
 ## Beta test releases
 
