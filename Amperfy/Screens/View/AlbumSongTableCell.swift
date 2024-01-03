@@ -28,7 +28,6 @@ class AlbumSongTableCell: SongTableCell {
     
     @IBOutlet weak var trackNumberLabel: UILabel!
     @IBOutlet weak var cacheIndicatorImage: UIImageView!
-    @IBOutlet weak var artistLabelLeadConstraint: NSLayoutConstraint!
     
     override func refresh() {
         guard let song = song else { return }

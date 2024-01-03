@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -50,6 +50,7 @@
                         <color key="tintColor" systemColor="secondaryLabelColor"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="15" id="Dm2-ce-DxY"/>
+                            <constraint firstAttribute="width" secondItem="59g-M4-BV0" secondAttribute="height" multiplier="1:1" id="Ggl-Rc-JWp"/>
                             <constraint firstAttribute="width" secondItem="59g-M4-BV0" secondAttribute="height" multiplier="1:1" id="TLv-DM-CAd"/>
                         </constraints>
                     </imageView>
@@ -66,7 +67,6 @@
                     <constraint firstItem="59g-M4-BV0" firstAttribute="centerY" secondItem="YMj-gk-9M5" secondAttribute="centerY" id="4Un-Kw-iq7"/>
                     <constraint firstItem="59g-M4-BV0" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="69g-Qg-fnj"/>
                     <constraint firstItem="GFX-bI-uSL" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="9NK-Zt-Udb"/>
-                    <constraint firstItem="59g-M4-BV0" firstAttribute="width" secondItem="59g-M4-BV0" secondAttribute="height" multiplier="1:1" id="Ggl-Rc-JWp"/>
                     <constraint firstAttribute="trailingMargin" secondItem="isF-fg-ddx" secondAttribute="trailing" id="Jrg-hR-I0V"/>
                     <constraint firstItem="isF-fg-ddx" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="a5K-hW-aMk"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" constant="-10" id="bvj-Mr-vRL"/>
@@ -78,8 +78,7 @@
             </tableViewCellContentView>
             <connections>
                 <outlet property="artistLabel" destination="YMj-gk-9M5" id="uoo-D3-R7t"/>
-                <outlet property="artistLabelLeadConstraint" destination="0cg-qO-oSe" id="Bg8-Eh-uKj"/>
-                <outlet property="artistLabelLeadingConstraint" destination="69g-Qg-fnj" id="bGd-dv-it9"/>
+                <outlet property="artistLabelLeadingConstraint" destination="0cg-qO-oSe" id="A3E-bz-CNB"/>
                 <outlet property="artistLabelTrailingConstraint" destination="y6K-XE-CyN" id="f8N-lG-no9"/>
                 <outlet property="cacheIconImage" destination="59g-M4-BV0" id="cob-f2-gd9"/>
                 <outlet property="cacheIndicatorImage" destination="59g-M4-BV0" id="DEG-6l-yYB"/>
@@ -94,7 +93,7 @@
     <resources>
         <image name="cache" width="640" height="512"/>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
