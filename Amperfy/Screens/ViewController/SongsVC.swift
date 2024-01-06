@@ -30,7 +30,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     private var sortButton: UIBarButtonItem!
     private var actionButton: UIBarButtonItem!
     public var displayFilter: DisplayCategoryFilter = .all
-    private var sortType: ElementSortType = .name
+    private var sortType: SongElementSortType = .name
     private var filterTitle = "Songs"
     
     override func viewDidLoad() {
@@ -81,7 +81,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         self.navigationItem.title = self.filterTitle
     }
     
-    func change(sortType: ElementSortType) {
+    func change(sortType: SongElementSortType) {
         self.sortType = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
@@ -152,6 +152,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             return CommonScreenOperations.tableSectionHeightLarge
         case .recentlyAddedIndex:
             return 0.0
+        case .duration:
+            return 0.0
         }
     }
     
@@ -167,6 +169,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             }
         case .recentlyAddedIndex:
             return super.tableView(tableView, titleForHeaderInSection: section)
+        case .duration:
+            return nil
         }
     }
     
@@ -230,7 +234,12 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             self.appDelegate.storage.settings.songsSortSetting = .rating
             self.updateSearchResults(for: self.searchController)
         })
-        return UIMenu(children: [sortByName, sortByRating])
+        let sortByDuration = UIAction(title: "Duration", image: sortType == .duration ? .check : nil, handler: { _ in
+            self.change(sortType: .duration)
+            self.appDelegate.storage.settings.songsSortSetting = .duration
+            self.updateSearchResults(for: self.searchController)
+        })
+        return UIMenu(children: [sortByName, sortByRating, sortByDuration])
     }
     
     private func createActionButtonMenu() -> UIMenu {

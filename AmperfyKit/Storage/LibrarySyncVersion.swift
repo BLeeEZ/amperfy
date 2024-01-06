@@ -29,6 +29,7 @@ public enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible {
     case v10 = 4 // Podcasts added
     case v11 = 5 // isRecentAdded added to AbstractPlayable
     case v12 = 6 // alphabeticSectionInitial added to AbstractPlayable
+    case v13 = 7 // duration added to AbstractPlayable (CoreDataMigrationVersion v30)
     
     public var description : String {
         switch self {
@@ -39,13 +40,14 @@ public enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible {
         case .v10: return "v10"
         case .v11: return "v11"
         case .v12: return "v12"
+        case .v13: return "v13"
         }
     }
     public var isNewestVersion: Bool {
         return self == Self.newestVersion
     }
     
-    public static let newestVersion: LibrarySyncVersion = .v12
+    public static let newestVersion: LibrarySyncVersion = .v13
     public static let defaultValue: LibrarySyncVersion = .v6
     
     public static func < (lhs: LibrarySyncVersion, rhs: LibrarySyncVersion) -> Bool {

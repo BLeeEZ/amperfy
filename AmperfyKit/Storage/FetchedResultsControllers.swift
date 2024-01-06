@@ -22,12 +22,12 @@
 import Foundation
 import CoreData
 
-public enum ElementSortType: Int {
+public enum ArtistElementSortType: Int {
     case name = 0
     case rating = 1
     case recentlyAddedIndex = 2
     
-    public static let defaultValue: ElementSortType = .name
+    public static let defaultValue: ArtistElementSortType = .name
     
     public var asSectionIndexType: SectionIndexType {
         switch(self) {
@@ -69,6 +69,28 @@ public enum PlaylistSortType: Int {
     case lastChanged = 2
     
     static let defaultValue: PlaylistSortType = .name
+}
+
+public enum SongElementSortType: Int {
+    case name = 0
+    case rating = 1
+    case recentlyAddedIndex = 2
+    case duration = 3
+    
+    public static let defaultValue: SongElementSortType = .name
+    
+    public var asSectionIndexType: SectionIndexType {
+        switch(self) {
+        case .name:
+            return .alphabet
+        case .rating:
+            return .rating
+        case .recentlyAddedIndex:
+            return .recentlyAddedIndex
+        case .duration:
+            return .duration
+        }
+    }
 }
 
 public enum DisplayCategoryFilter {
@@ -284,7 +306,7 @@ public class GenreSongsFetchedResultsController: BasicFetchedResultsController<S
 
 public class ArtistFetchedResultsController: CachedFetchedResultsController<ArtistMO> {
     
-    public init(coreDataCompanion: CoreDataCompanion, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, sortType: ArtistElementSortType, isGroupedInAlphabeticSections: Bool) {
         var fetchRequest = ArtistMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
@@ -435,7 +457,7 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
 
 public class SongsFetchedResultsController: CachedFetchedResultsController<SongMO> {
     
-    public init(coreDataCompanion: CoreDataCompanion, sortType: ElementSortType, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, sortType: SongElementSortType, isGroupedInAlphabeticSections: Bool) {
         var fetchRequest = SongMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
@@ -444,6 +466,8 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
             fetchRequest = SongMO.ratingSortedFetchRequest
         case .recentlyAddedIndex:
             fetchRequest = SongMO.recentlyAddedSortedFetchRequest
+        case .duration:
+            fetchRequest = SongMO.durationSortedFetchRequest
         }
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)

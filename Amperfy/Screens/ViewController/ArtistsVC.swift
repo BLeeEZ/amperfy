@@ -30,7 +30,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     private var sortButton: UIBarButtonItem!
     private var actionButton: UIBarButtonItem!
     public var displayFilter: DisplayCategoryFilter = .all
-    private var sortType: ElementSortType = .name
+    private var sortType: ArtistElementSortType = .name
     private var filterTitle = "Artists"
     
     override func viewDidLoad() {
@@ -72,7 +72,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         self.navigationItem.title = self.filterTitle
     }
     
-    func change(sortType: ElementSortType) {
+    func change(sortType: ArtistElementSortType) {
         self.sortType = sortType
         appDelegate.storage.settings.artistsSortSetting = sortType
         singleFetchedResultsController?.clearResults()

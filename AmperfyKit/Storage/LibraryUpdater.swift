@@ -44,6 +44,11 @@ public class LibraryUpdater {
             updateAlphabeticSectionInitial()
             os_log("Perform blocking library update (DONE): alphabeticSectionInitial", log: log, type: .info)
         }
+        if storage.librarySyncVersion < .v13 {
+            os_log("Perform blocking library update (START): AbstractPlayable.duration", log: log, type: .info)
+            updateAbstractPlayableDuration()
+            os_log("Perform blocking library update (DONE): AbstractPlayable.duration", log: log, type: .info)
+        }
         storage.librarySyncVersion = .newestVersion
     }
     
@@ -99,6 +104,16 @@ public class LibraryUpdater {
         os_log("Library update: Playlists", log: log, type: .info)
         let playlists = storage.main.library.getPlaylists()
         playlists.forEach{ $0.updateAlphabeticSectionInitial(section: $0.name) }
+        storage.main.saveContext()
+    }
+    
+    private func updateAbstractPlayableDuration() {
+        os_log("Library update: Songs", log: log, type: .info)
+        let songs = storage.main.library.getSongs()
+        songs.forEach{ $0.updateDuration() }
+        os_log("Library update: PodcastEpisodes", log: log, type: .info)
+        let podcastEpisodes = storage.main.library.getPodcastEpisodes()
+        podcastEpisodes.forEach{ $0.updateDuration() }
         storage.main.saveContext()
     }
     

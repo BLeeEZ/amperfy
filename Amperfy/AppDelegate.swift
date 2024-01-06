@@ -207,8 +207,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard AmperKit.shared.storage.isLibrarySynced else {
             return true
         }
-        intentManager.registerXCallbackURLs()
         libraryUpdater.performBlockingLibraryUpdatesIfNeeded()
+        intentManager.registerXCallbackURLs()
         duplicateEntitiesResolver.start()
         artworkDownloadManager.start()
         playableDownloadManager.start()

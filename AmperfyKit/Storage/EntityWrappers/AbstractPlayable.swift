@@ -93,14 +93,21 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         }
     }
     public var duration: Int {
-        get { return playDuration > 0 ? playDuration : remoteDuration }
+        get { return Int(playableManagedObject.combinedDuration) }
     }
+    public func updateDuration() {
+        playableManagedObject.combinedDuration = playableManagedObject.playDuration > 0 ? playableManagedObject.playDuration : playableManagedObject.remoteDuration
+    }
+    
     /// duration based on the data from the xml parser
     public var remoteDuration: Int {
         get { return Int(playableManagedObject.remoteDuration) }
         set {
             guard Int16.isValid(value: newValue), playableManagedObject.remoteDuration != Int16(newValue) else { return }
             playableManagedObject.remoteDuration = Int16(newValue)
+            if playableManagedObject.playDuration == 0 {
+                playableManagedObject.combinedDuration = Int16(newValue)
+            }
         }
     }
     /// duration based on the downloaded/streamed file reported by the player
@@ -109,6 +116,7 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         set {
             guard Int16.isValid(value: newValue), playableManagedObject.playDuration != Int16(newValue) else { return }
             playableManagedObject.playDuration = Int16(newValue)
+            playableManagedObject.combinedDuration = Int16(newValue)
         }
     }
     public var playProgress: Int {

@@ -14,6 +14,7 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 
 - Offline support
 - Support for music and podcasts
+- CarPlay support
 - Syncing the database after first login
 - Update library in background
 - Siri voice commands: "play \<example artist\> in Amperfy"

@@ -43,9 +43,11 @@ public enum SectionIndexType: Int {
     case alphabet = 0
     case rating = 1
     case recentlyAddedIndex = 2
+    case duration = 3
     
     public static let defaultValue: SectionIndexType = .alphabet
     public static let noRatingIndexSymbol = "#"
+    public static let noDurationSymbol = "#"
 }
 
 public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchRequestResult>: NSFetchedResultsController<NSFetchRequestResult> {
@@ -65,6 +67,8 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
             return sortByRating(forSectionName: sectionName)
         case .recentlyAddedIndex:
             return nil
+        case .duration:
+            return sortByDuration(forSectionName: sectionName)
         }
     }
     
@@ -78,6 +82,67 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
         case "2": return "2"
         case "1": return "1"
         default: return SectionIndexType.noRatingIndexSymbol
+        }
+    }
+    
+    private func sortByDuration(forSectionName sectionName: String) -> String? {
+        guard let sectionNumber = Int(sectionName), sectionNumber > 0 else { return SectionIndexType.noDurationSymbol }
+        if sectionNumber < Int(0.5*60) {
+            return "0:00"
+        } else if sectionNumber < 1*60 {
+            return "0:30"
+        } else if sectionNumber < Int(1.5*60) {
+            return "1:00"
+        } else if sectionNumber < 2*60 {
+            return "1:30"
+        } else if sectionNumber < Int(2.5*60) {
+            return "2:00"
+        } else if sectionNumber < 3*60 {
+            return "2:30"
+        } else if sectionNumber < Int(3.5*60) {
+            return "3:00"
+        } else if sectionNumber < 4*60 {
+            return "3:30"
+        } else if sectionNumber < Int(4.5*60) {
+            return "4:00"
+        } else if sectionNumber < 5*60 {
+            return "4:30"
+        } else if sectionNumber < Int(5.5*60) {
+            return "5:00"
+        } else if sectionNumber < 6*60 {
+            return "5:30"
+        } else if sectionNumber < Int(6.5*60) {
+            return "6:00"
+        } else if sectionNumber < 7*60 {
+            return "6:30"
+        } else if sectionNumber < Int(7.5*60) {
+            return "7:00"
+        } else if sectionNumber < 8*60 {
+            return "7:30"
+        } else if sectionNumber < Int(8.5*60) {
+            return "8:00"
+        } else if sectionNumber < 9*60 {
+            return "8:30"
+        } else if sectionNumber < Int(9.5*60) {
+            return "9:00"
+        } else if sectionNumber < 10*60 {
+            return "9:30"
+        } else if sectionNumber < 15*60 {
+            return "10:00"
+        } else if sectionNumber < 20*60 {
+            return "15:00"
+        } else if sectionNumber < 30*60 {
+            return "20:00"
+        } else if sectionNumber < 45*60 {
+            return "30:00"
+        } else if sectionNumber < 60*60 {
+            return "45:00"
+        } else if sectionNumber < 90*60 {
+            return "1:00:00"
+        } else if sectionNumber < 120*60 {
+            return "1:30:00"
+        } else {
+            return "2:00:00"
         }
     }
     

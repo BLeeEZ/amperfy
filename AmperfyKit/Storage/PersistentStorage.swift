@@ -212,10 +212,10 @@ public class PersistentStorage {
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.PlaylistsSortSetting.rawValue) }
         }
         
-        public var artistsSortSetting: ElementSortType {
+        public var artistsSortSetting: ArtistElementSortType {
             get {
-                let artistsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ArtistsSortSetting.rawValue) as? Int ?? ElementSortType.defaultValue.rawValue
-                return ElementSortType(rawValue: artistsSortSettingRaw) ?? ElementSortType.defaultValue
+                let artistsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ArtistsSortSetting.rawValue) as? Int ?? ArtistElementSortType.defaultValue.rawValue
+                return ArtistElementSortType(rawValue: artistsSortSettingRaw) ?? ArtistElementSortType.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtistsSortSetting.rawValue) }
         }
@@ -229,10 +229,10 @@ public class PersistentStorage {
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.AlbumsSortSetting.rawValue) }
         }
         
-        public var songsSortSetting: ElementSortType {
+        public var songsSortSetting: SongElementSortType {
             get {
-                let songsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongsSortSetting.rawValue) as? Int ?? ElementSortType.defaultValue.rawValue
-                return ElementSortType(rawValue: songsSortSettingRaw) ?? ElementSortType.defaultValue
+                let songsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongsSortSetting.rawValue) as? Int ?? SongElementSortType.defaultValue.rawValue
+                return SongElementSortType(rawValue: songsSortSettingRaw) ?? SongElementSortType.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.SongsSortSetting.rawValue) }
         }
