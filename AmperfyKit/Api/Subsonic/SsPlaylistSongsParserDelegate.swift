@@ -79,6 +79,7 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
                     library.deletePlaylistItem(item: items[i])
                 }
             }
+            playlist.updateDuration()
         default:
             break
         }

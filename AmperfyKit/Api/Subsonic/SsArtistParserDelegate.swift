@@ -61,6 +61,7 @@ class SsArtistParserDelegate: SsXmlLibWithArtworkParser {
 		case "artist":
             parsedCount += 1
             if let artist = artistBuffer {
+                artist.updateDuration()
                 parsedArtists.append(artist)
             }
             artistBuffer = nil

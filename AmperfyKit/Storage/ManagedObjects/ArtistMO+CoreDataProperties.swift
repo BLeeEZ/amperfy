@@ -30,6 +30,8 @@ extension ArtistMO {
     }
 
     @NSManaged public var albumCount: Int16
+    @NSManaged public var duration: Int16
+    @NSManaged public var remoteDuration: Int16
     @NSManaged public var name: String?
     @NSManaged public var albums: NSOrderedSet?
     @NSManaged public var genre: GenreMO?

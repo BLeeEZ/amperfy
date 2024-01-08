@@ -165,9 +165,9 @@ public class PodcastEpisode: AbstractPlayable {
         return info
     }
     
-    override public func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+    override public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
-        if type == .long || type == .longDetailed {
+        if details.type == .long {
             infoContent.append("\(publishDate.asShortDayMonthString)")
             if !isAvailableToUser && !isCached  {
                 infoContent.append("Not Available")
@@ -176,12 +176,12 @@ public class PodcastEpisode: AbstractPlayable {
             } else if duration > 0 {
                 infoContent.append("\(duration.asDurationString)")
             }
-        }
-        if type == .longDetailed {
-            if bitrate > 0 {
-                infoContent.append("Bitrate: \(bitrate)")
+            if details.isShowDetailedInfo {
+                if bitrate > 0 {
+                    infoContent.append("Bitrate: \(bitrate)")
+                }
+                infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
             }
-            infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
         }
         return infoContent
     }

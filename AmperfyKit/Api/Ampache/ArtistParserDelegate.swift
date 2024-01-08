@@ -67,6 +67,8 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
             artistBuffer?.isFavorite = flag == 1 ? true : false
         case "albumcount":
             artistBuffer?.albumCount = Int(buffer) ?? 0
+        case "time":
+            artistBuffer?.remoteDuration = Int(buffer) ?? 0
         case "genre":
             if let genreId = genreIdToCreate {
                 os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
@@ -82,6 +84,7 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
             parsedCount += 1
             parseNotifier?.notifyParsedObject(ofType: .artist)
             artistBuffer?.rating = rating
+            artistBuffer?.updateDuration()
             rating = 0
             if let parsedArtist = artistBuffer {
                 artistsParsed.insert(parsedArtist)

@@ -58,6 +58,9 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
             if let attributeSongCount = attributeDict["songCount"], let songCount = Int(attributeSongCount) {
                 albumBuffer?.songCount = songCount
             }
+            if let attributeDuration = attributeDict["duration"], let duration = Int(attributeDuration) {
+                albumBuffer?.remoteDuration = duration
+            }
             
             if let artistId = attributeDict["artistId"] {
                 if let guessedArtist = guessedArtist, guessedArtist.id == artistId {
@@ -91,6 +94,7 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
         case "album":
             parsedCount += 1
             if let album = albumBuffer {
+                album.updateDuration()
                 parsedAlbums.append(album)
             }
             albumBuffer = nil

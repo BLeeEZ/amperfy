@@ -52,21 +52,29 @@ class PlaylistsParserTest: AbstractAmpacheTest {
         XCTAssertEqual(playlist.id, "smart_21")
         XCTAssertEqual(playlist.name, "admin - 02/23/2021 14:36:44")
         XCTAssertEqual(playlist.songCount, 5000)
+        XCTAssertEqual(playlist.duration, 0)
+        XCTAssertEqual(playlist.remoteDuration, 0)
         
         playlist = playlists[1]
         XCTAssertEqual(playlist.id, "smart_14")
         XCTAssertEqual(playlist.name, "Album 1*")
         XCTAssertEqual(playlist.songCount, 2)
+        XCTAssertEqual(playlist.duration, 0)
+        XCTAssertEqual(playlist.remoteDuration, 0)
         
         playlist = playlists[2]
         XCTAssertEqual(playlist.id, "3")
         XCTAssertEqual(playlist.name, "random - admin - private")
         XCTAssertEqual(playlist.songCount, 43)
+        XCTAssertEqual(playlist.duration, 0)
+        XCTAssertEqual(playlist.remoteDuration, 0)
         
         playlist = playlists[3]
         XCTAssertEqual(playlist.id, "2")
         XCTAssertEqual(playlist.name, "random - admin - public")
         XCTAssertEqual(playlist.songCount, 43)
+        XCTAssertEqual(playlist.duration, 0)
+        XCTAssertEqual(playlist.remoteDuration, 0)
     }
 
 }

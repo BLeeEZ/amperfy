@@ -53,6 +53,32 @@ struct DisplaySettingsView: View {
                 , footer: {
                     Text("Display song duration in table rows.")
                 })
+                
+                Section(content: {
+                    HStack {
+                        Text("Album Duration")
+                        Spacer()
+                        Toggle(isOn: $settings.isShowAlbumDuration) {}
+                            .frame(width: 130)
+                    }
+ 
+                }
+                , footer: {
+                    Text("Display album duration in table rows.")
+                })
+                
+                Section(content: {
+                    HStack {
+                        Text("Artist Duration")
+                        Spacer()
+                        Toggle(isOn: $settings.isShowArtistDuration) {}
+                            .frame(width: 130)
+                    }
+ 
+                }
+                , footer: {
+                    Text("Display artist duration in table rows.")
+                })
             }
         }
         .navigationTitle("Display")

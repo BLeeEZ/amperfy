@@ -105,6 +105,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(playlist.playables[3].id, "848")
         XCTAssertEqual(playlist.playables[4].id, "884")
         XCTAssertEqual(playlist.playables[5].id, "805")
+        XCTAssertEqual(playlist.duration, 1391)
         
         XCTAssertEqual(library.songCount, 6+createdSongCount)
         

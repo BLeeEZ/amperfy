@@ -66,6 +66,31 @@ public class Album: AbstractLibraryEntity {
             managedObject.year = Int16(newValue)
         }
     }
+    public var duration: Int {
+        get { return Int(managedObject.duration) }
+    }
+    public var remoteDuration: Int {
+        get { return Int(managedObject.remoteDuration) }
+        set {
+            if Int16.isValid(value: newValue), managedObject.remoteDuration != Int16(newValue) {
+                managedObject.remoteDuration = Int16(newValue)
+            }
+            updateDuration()
+        }
+    }
+    public func updateDuration() {
+        if isSongsMetaDataSynced {
+            let playablesDuration = playables.reduce(0){ $0 + $1.duration }
+            if Int16.isValid(value: playablesDuration), managedObject.duration != Int16(playablesDuration) {
+                managedObject.duration = Int16(playablesDuration)
+            }
+        } else {
+            if managedObject.duration != managedObject.remoteDuration {
+                managedObject.duration = managedObject.remoteDuration
+            }
+        }
+        artist?.updateDuration()
+    }
     public var artist: Artist? {
         get {
             guard let artistMO = managedObject.artist else { return nil }
@@ -136,7 +161,7 @@ public class Album: AbstractLibraryEntity {
 extension Album: PlayableContainable  {
     public var subtitle: String? { return artist?.name }
     public var subsubtitle: String? { return nil }
-    public func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+    public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
         if songs.count == 1 {
             infoContent.append("1 Song")
@@ -147,7 +172,10 @@ extension Album: PlayableContainable  {
         } else if songCount > 1 {
             infoContent.append("\(songCount) Songs")
         }
-        if type == .long || type == .longDetailed {
+        if details.type == .short, details.isShowAlbumDuration, duration > 0 {
+            infoContent.append("\(duration.asDurationString)")
+        }
+        if details.type == .long {
             if isCompletelyCached {
                 infoContent.append("Cached")
             }
@@ -160,9 +188,9 @@ extension Album: PlayableContainable  {
             if duration > 0 {
                 infoContent.append("\(duration.asDurationString)")
             }
-        }
-        if type == .longDetailed {
-            infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
+            if details.isShowDetailedInfo {
+                infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
+            }
         }
         return infoContent
     }

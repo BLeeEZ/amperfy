@@ -62,6 +62,11 @@ public class Song: AbstractPlayable, Identifyable {
         guard let album = album else { return true }
         return album.isOrphaned
     }
+    public override func updateDuration() {
+        super.updateDuration()
+        album?.updateDuration()
+        artist?.updateDuration()
+    }
 
     override public var creatorName: String {
         return artist?.name ?? "Unknown Artist"
@@ -89,9 +94,9 @@ public class Song: AbstractPlayable, Identifyable {
         return info
     }
     
-    override public func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+    override public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
-        if type == .long || type == .longDetailed {
+        if details.type == .long {
             if track > 0 {
                 infoContent.append("Track \(track)")
             }
@@ -106,12 +111,12 @@ public class Song: AbstractPlayable, Identifyable {
             if let genre = genre {
                 infoContent.append("Genre: \(genre.name)")
             }
-        }
-        if type == .longDetailed {
-            if bitrate > 0 {
-                infoContent.append("Bitrate: \(bitrate)")
+            if details.isShowDetailedInfo {
+                if bitrate > 0 {
+                    infoContent.append("Bitrate: \(bitrate)")
+                }
+                infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
             }
-            infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
         }
         return infoContent
     }

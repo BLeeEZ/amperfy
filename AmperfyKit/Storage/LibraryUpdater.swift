@@ -49,6 +49,11 @@ public class LibraryUpdater {
             updateAbstractPlayableDuration()
             os_log("Perform blocking library update (DONE): AbstractPlayable.duration", log: log, type: .info)
         }
+        if storage.librarySyncVersion < .v14 {
+            os_log("Perform blocking library update (START): Artist,Album,Playlist duration", log: log, type: .info)
+            updateArtistAlbumPlaylistDuration()
+            os_log("Perform blocking library update (DONE): Artist,Album,Playlist duration", log: log, type: .info)
+        }
         storage.librarySyncVersion = .newestVersion
     }
     
@@ -114,6 +119,19 @@ public class LibraryUpdater {
         os_log("Library update: PodcastEpisodes", log: log, type: .info)
         let podcastEpisodes = storage.main.library.getPodcastEpisodes()
         podcastEpisodes.forEach{ $0.updateDuration() }
+        storage.main.saveContext()
+    }
+    
+    private func updateArtistAlbumPlaylistDuration() {
+        os_log("Library update: Artists", log: log, type: .info)
+        let artists = storage.main.library.getArtists()
+        artists.forEach{ $0.updateDuration() }
+        os_log("Library update: Albums", log: log, type: .info)
+        let albums = storage.main.library.getAlbums()
+        albums.forEach{ $0.updateDuration() }
+        os_log("Library update: Playlists", log: log, type: .info)
+        let playlists = storage.main.library.getPlaylists()
+        playlists.forEach{ $0.updateDuration() }
         storage.main.saveContext()
     }
     

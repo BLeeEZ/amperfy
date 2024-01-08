@@ -60,11 +60,12 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
                     library.deletePlaylistItem(item: items[i])
                 }
             }
+            playlist.updateDuration()
         default:
             break
         }
         
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
     }
-
+    
 }

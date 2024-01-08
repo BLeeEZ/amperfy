@@ -59,6 +59,22 @@ public class Artist: AbstractLibraryEntity {
             }
         }
     }
+    public var duration: Int {
+        get { return Int(managedObject.duration) }
+    }
+    public var remoteDuration: Int {
+        get { return Int(managedObject.remoteDuration) }
+        set {
+            if Int16.isValid(value: newValue), managedObject.remoteDuration != Int16(newValue) {
+                managedObject.remoteDuration = Int16(newValue)
+            }
+        }
+    }
+    public func updateDuration() {
+        let playablesDuration = playables.reduce(0){ $0 + $1.duration }
+        guard Int16.isValid(value: playablesDuration), managedObject.duration != Int16(playablesDuration) else { return }
+        managedObject.duration = Int16(playablesDuration)
+    }
     public var albumCount: Int {
         get {
             let moAlbumCount = Int(managedObject.albumCount)
@@ -94,7 +110,7 @@ public class Artist: AbstractLibraryEntity {
 extension Artist: PlayableContainable  {
     public var subtitle: String? { return nil }
     public var subsubtitle: String? { return nil }
-    public func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+    public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
         if let managedObjectContext = managedObject.managedObjectContext {
             let library = LibraryStorage(context: managedObjectContext)
@@ -119,7 +135,10 @@ extension Artist: PlayableContainable  {
         } else if songs.count > 1 {
             infoContent.append("\(songCount) Songs")
         }
-        if type == .long || type == .longDetailed {
+        if details.type == .short, details.isShowArtistDuration, duration > 0 {
+            infoContent.append("\(duration.asDurationString)")
+        }
+        if details.type == .long {
             if isCompletelyCached {
                 infoContent.append("Cached")
             }
@@ -129,9 +148,9 @@ extension Artist: PlayableContainable  {
             if duration > 0 {
                 infoContent.append("\(duration.asDurationString)")
             }
-        }
-        if type == .longDetailed {
-            infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
+            if details.isShowDetailedInfo {
+                infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
+            }
         }
         return infoContent
     }

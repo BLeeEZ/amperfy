@@ -26,6 +26,8 @@ final class Settings: ObservableObject {
     @Published var isOfflineMode = false
     @Published var isShowDetailedInfo = false
     @Published var isShowSongDuration = false
+    @Published var isShowAlbumDuration = false
+    @Published var isShowArtistDuration = false
     @Published var screenLockPreventionPreference: ScreenLockPreventionPreference = .defaultValue
     @Published var isAutoCacheLatestSongs = false
     @Published var isAutoCacheLatestPodcastEpisodes = false

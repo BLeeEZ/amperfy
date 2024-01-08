@@ -109,6 +109,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         XCTAssertEqual(library.songCount, 4+createdSongCount)
         
         XCTAssertEqual(playlist.playables.count, 4)
+        XCTAssertEqual(playlist.duration, 1442)
                
         var song = playlist.playables[0].asSong!
         XCTAssertEqual(song.id, "56")

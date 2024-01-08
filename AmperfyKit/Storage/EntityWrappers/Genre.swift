@@ -45,6 +45,9 @@ public class Genre: AbstractLibraryEntity {
             }
         }
     }
+    public var duration: Int {
+        return playables.reduce(0){ $0 + $1.duration }
+    }
     public var artists: [Artist] {
         guard let artistsSet = managedObject.artists, let artistsMO = artistsSet.array as? [ArtistMO] else { return [Artist]() }
         return artistsMO.compactMap {
@@ -72,7 +75,7 @@ public class Genre: AbstractLibraryEntity {
 extension Genre: PlayableContainable  {
     public var subtitle: String? { return nil }
     public var subsubtitle: String? { return nil }
-    public func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+    public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
         if api == .ampache {
             if artists.count == 1 {
@@ -91,7 +94,7 @@ extension Genre: PlayableContainable  {
         } else if songs.count > 1 {
             infoContent.append("\(songs.count) Songs")
         }
-        if type == .long || type == .longDetailed {
+        if details.type == .long {
             if isCompletelyCached {
                 infoContent.append("Cached")
             }
@@ -99,9 +102,9 @@ extension Genre: PlayableContainable  {
             if completeDuration > 0 {
                 infoContent.append("\(completeDuration.asDurationString)")
             }
-        }
-        if type == .longDetailed {
-            infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
+            if details.isShowDetailedInfo {
+                infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
+            }
         }
         return infoContent
     }

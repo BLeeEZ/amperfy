@@ -55,6 +55,16 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.isShowSongDuration = newValue
         }))
         
+        settings.isShowAlbumDuration = self.appDelegate.storage.settings.isShowAlbumDuration
+        changesAgent.append(settings.$isShowAlbumDuration.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.isShowAlbumDuration = newValue
+        }))
+        
+        settings.isShowArtistDuration = self.appDelegate.storage.settings.isShowArtistDuration
+        changesAgent.append(settings.$isShowArtistDuration.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.isShowArtistDuration = newValue
+        }))
+        
         settings.screenLockPreventionPreference = self.appDelegate.storage.settings.screenLockPreventionPreference
         changesAgent.append(settings.$screenLockPreventionPreference.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.screenLockPreventionPreference = newValue

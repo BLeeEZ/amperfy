@@ -26,7 +26,20 @@ import PromiseKit
 public enum DetailType {
     case short
     case long
-    case longDetailed
+}
+
+public struct DetailInfoType {
+    public var type: DetailType
+    public var isShowDetailedInfo: Bool
+    public var isShowAlbumDuration: Bool
+    public var isShowArtistDuration: Bool
+    
+    public init(type: DetailType, settings: PersistentStorage.Settings) {
+        self.type = type
+        self.isShowDetailedInfo = settings.isShowDetailedInfo
+        self.isShowAlbumDuration = settings.isShowAlbumDuration
+        self.isShowArtistDuration = settings.isShowArtistDuration
+    }
 }
 
 public protocol PlayableContainable {
@@ -34,8 +47,8 @@ public protocol PlayableContainable {
     var name: String { get }
     var subtitle: String? { get }
     var subsubtitle: String? { get }
-    func infoDetails(for api: BackenApiType, type: DetailType) -> [String]
-    func info(for api: BackenApiType, type: DetailType) -> String
+    func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String]
+    func info(for api: BackenApiType, details: DetailInfoType) -> String
     var playables: [AbstractPlayable] { get }
     var playContextType: PlayerMode { get }
     var duration: Int { get }
@@ -51,9 +64,6 @@ public protocol PlayableContainable {
 }
 
 extension PlayableContainable {
-    public var duration: Int {
-        return playables.reduce(0){ $0 + $1.duration }
-    }
     
     public func cachePlayables(downloadManager: DownloadManageable) {
         for playable in playables {
@@ -63,8 +73,8 @@ extension PlayableContainable {
         }
     }
     
-    public func info(for api: BackenApiType, type: DetailType) -> String {
-        return infoDetails(for: api, type: type).joined(separator: " \(CommonString.oneMiddleDot) ")
+    public func info(for api: BackenApiType, details: DetailInfoType) -> String {
+        return infoDetails(for: api, details: details).joined(separator: " \(CommonString.oneMiddleDot) ")
     }
     
     public func fetch(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {

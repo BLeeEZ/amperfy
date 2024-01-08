@@ -52,11 +52,15 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
         XCTAssertEqual(playlist.id, "15")
         XCTAssertEqual(playlist.name, "Some random songs")
         XCTAssertEqual(playlist.songCount, 6)
+        XCTAssertEqual(playlist.duration, 1391)
+        XCTAssertEqual(playlist.remoteDuration, 1391)
         
         playlist = playlists[0]
         XCTAssertEqual(playlist.id, "16")
         XCTAssertEqual(playlist.name, "More random songs")
         XCTAssertEqual(playlist.songCount, 5)
+        XCTAssertEqual(playlist.duration, 1018)
+        XCTAssertEqual(playlist.remoteDuration, 1018)
     }
 
 }

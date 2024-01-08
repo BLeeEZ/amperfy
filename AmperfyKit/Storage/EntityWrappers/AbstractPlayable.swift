@@ -96,7 +96,10 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         get { return Int(playableManagedObject.combinedDuration) }
     }
     public func updateDuration() {
-        playableManagedObject.combinedDuration = playableManagedObject.playDuration > 0 ? playableManagedObject.playDuration : playableManagedObject.remoteDuration
+        let combinedDuration = playableManagedObject.playDuration > 0 ? playableManagedObject.playDuration : playableManagedObject.remoteDuration
+        if playableManagedObject.combinedDuration != combinedDuration {
+            playableManagedObject.combinedDuration = combinedDuration
+        }
     }
     
     /// duration based on the data from the xml parser
@@ -117,6 +120,11 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
             guard Int16.isValid(value: newValue), playableManagedObject.playDuration != Int16(newValue) else { return }
             playableManagedObject.playDuration = Int16(newValue)
             playableManagedObject.combinedDuration = Int16(newValue)
+            updateDuration()
+            // songs need to update more members
+            if let song = asSong {
+                song.updateDuration()
+            }
         }
     }
     public var playProgress: Int {
@@ -206,9 +214,9 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         guard self.isPodcastEpisode, let playablePodcastEpisode = playableManagedObject as? PodcastEpisodeMO else { return nil }
         return PodcastEpisode(managedObject: playablePodcastEpisode)
     }
-    public func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+    public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
-        if type == .long {
+        if details.type == .long {
             if year > 0 {
                 infoContent.append("Year \(year)")
             }

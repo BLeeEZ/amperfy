@@ -539,6 +539,7 @@
 		501267B6264C058500E13F08 /* SsXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsXmlParser.swift; sourceTree = "<group>"; };
 		501267B8264C187600E13F08 /* AmpacheXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheXmlParser.swift; sourceTree = "<group>"; };
 		5013DC8B2B49997F00EC191E /* Amperfy v30.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v30.xcdatamodel"; sourceTree = "<group>"; };
+		5013DC8C2B49EEC100EC191E /* Amperfy v31.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v31.xcdatamodel"; sourceTree = "<group>"; };
 		5017996127CFB292002554E5 /* Amperfy v22.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v22.xcdatamodel"; sourceTree = "<group>"; };
 		501858F7265F779B00F2E13A /* Directory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Directory.swift; sourceTree = "<group>"; };
 		501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationBannerCustomization.swift; sourceTree = "<group>"; };
@@ -2921,6 +2922,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				5013DC8C2B49EEC100EC191E /* Amperfy v31.xcdatamodel */,
 				5013DC8B2B49997F00EC191E /* Amperfy v30.xcdatamodel */,
 				50C86CA22B23545400385328 /* Amperfy v29.xcdatamodel */,
 				509362EC28E041FF005C2AAC /* Amperfy v28.xcdatamodel */,
@@ -2952,7 +2954,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 5013DC8B2B49997F00EC191E /* Amperfy v30.xcdatamodel */;
+			currentVersion = 5013DC8C2B49EEC100EC191E /* Amperfy v31.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

@@ -49,6 +49,9 @@ public class Podcast: AbstractLibraryEntity {
         get { return managedObject.depiction ?? "" }
         set { if managedObject.depiction != newValue { managedObject.depiction = newValue } }
     }
+    public var duration: Int {
+        return playables.reduce(0){ $0 + $1.duration }
+    }
     public var episodes: [PodcastEpisode] {
         guard let episodesSet = managedObject.episodes, let episodesMO = episodesSet.array as? [PodcastEpisodeMO] else { return [PodcastEpisode]() }
         return episodesMO.compactMap{ PodcastEpisode(managedObject: $0) }.filter{ $0.userStatus != .deleted }.sortByPublishDate()
@@ -63,14 +66,14 @@ extension Podcast: PlayableContainable  {
     public var name: String { return title }
     public var subtitle: String? { return nil }
     public var subsubtitle: String? { return nil }
-    public func infoDetails(for api: BackenApiType, type: DetailType) -> [String] {
+    public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
         if episodes.count == 1 {
             infoContent.append("1 Episode")
         } else if episodes.count > 1 {
             infoContent.append("\(episodes.count) Episodes")
         }
-        if type == .long || type == .longDetailed {
+        if details.type == .long {
             if isCompletelyCached {
                 infoContent.append("Cached")
             }
@@ -78,9 +81,9 @@ extension Podcast: PlayableContainable  {
             if completeDuration > 0 {
                 infoContent.append("\(completeDuration.asDurationString)")
             }
-        }
-        if type == .longDetailed {
-            infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
+            if details.isShowDetailedInfo {
+                infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
+            }
         }
         return infoContent
     }
