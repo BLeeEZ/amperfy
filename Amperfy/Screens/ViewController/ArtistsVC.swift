@@ -78,7 +78,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
         fetchedResultsController = ArtistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: true)
-        fetchedResultsController.fetchResultsController.sectionIndexType = sortType == .rating ? .rating : .alphabet
+        fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
         updateRightBarButtonItems()
@@ -133,6 +133,8 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             return CommonScreenOperations.tableSectionHeightLarge
         case .recentlyAddedIndex:
             return 0.0
+        case .duration:
+            return 0.0
         }
     }
     
@@ -148,6 +150,8 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             }
         case .recentlyAddedIndex:
             return super.tableView(tableView, titleForHeaderInSection: section)
+        case .duration:
+            return nil
         }
     }
     
@@ -186,7 +190,11 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             self.change(sortType: .rating)
             self.updateSearchResults(for: self.searchController)
         })
-        return UIMenu(children: [sortByName, sortByRating])
+        let sortByDuration = UIAction(title: "Duration", image: sortType == .duration ? .check : nil, handler: { _ in
+            self.change(sortType: .duration)
+            self.updateSearchResults(for: self.searchController)
+        })
+        return UIMenu(children: [sortByName, sortByRating, sortByDuration])
     }
     
     private func createActionButtonMenu() -> UIMenu {

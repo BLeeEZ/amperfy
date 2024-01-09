@@ -26,6 +26,7 @@ public enum ArtistElementSortType: Int {
     case name = 0
     case rating = 1
     case recentlyAddedIndex = 2
+    case duration = 3
     
     public static let defaultValue: ArtistElementSortType = .name
     
@@ -37,6 +38,8 @@ public enum ArtistElementSortType: Int {
             return .rating
         case .recentlyAddedIndex:
             return .recentlyAddedIndex
+        case .duration:
+            return .durationArtist
         }
     }
 }
@@ -46,6 +49,7 @@ public enum AlbumElementSortType: Int {
     case rating = 1
     case recentlyAddedIndex = 2
     case artist = 3
+    case duration = 4
     
     public static let defaultValue: AlbumElementSortType = .name
     
@@ -59,6 +63,8 @@ public enum AlbumElementSortType: Int {
             return .recentlyAddedIndex
         case .artist:
             return .alphabet
+        case .duration:
+            return .durationAlbum
         }
     }
 }
@@ -67,8 +73,22 @@ public enum PlaylistSortType: Int {
     case name = 0
     case lastPlayed = 1
     case lastChanged = 2
+    case duration = 3
     
     static let defaultValue: PlaylistSortType = .name
+    
+    public var asSectionIndexType: SectionIndexType {
+        switch(self) {
+        case .name:
+            return .alphabet
+        case .lastPlayed:
+            return .none
+        case .lastChanged:
+            return .none
+        case .duration:
+            return .none
+        }
+    }
 }
 
 public enum SongElementSortType: Int {
@@ -88,7 +108,7 @@ public enum SongElementSortType: Int {
         case .recentlyAddedIndex:
             return .recentlyAddedIndex
         case .duration:
-            return .duration
+            return .durationSong
         }
     }
 }
@@ -316,6 +336,8 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
         case .recentlyAddedIndex:
             // artist currently does not support recentlyAdded
             fetchRequest = ArtistMO.identifierSortedFetchRequest
+        case .duration:
+            fetchRequest = ArtistMO.durationSortedFetchRequest
         }
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
@@ -428,6 +450,8 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
             fetchRequest = AlbumMO.recentlyAddedSortedFetchRequest
         case .artist:
             fetchRequest = AlbumMO.artistNameSortedFetchRequest
+        case .duration:
+            fetchRequest = AlbumMO.durationSortedFetchRequest
         }
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
@@ -559,6 +583,8 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
             fetchRequest = PlaylistMO.lastPlayedDateFetchRequest
         case .lastChanged:
             fetchRequest = PlaylistMO.lastChangedDateFetchRequest
+        case .duration:
+            fetchRequest = PlaylistMO.durationFetchRequest
         }
         fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
@@ -593,6 +619,8 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
             fetchRequest = PlaylistMO.lastPlayedDateFetchRequest
         case .lastChanged:
             fetchRequest = PlaylistMO.lastChangedDateFetchRequest
+        case .duration:
+            fetchRequest = PlaylistMO.durationFetchRequest
         }
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             PlaylistMO.excludeSystemPlaylistsFetchPredicate,

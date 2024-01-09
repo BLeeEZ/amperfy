@@ -68,7 +68,8 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         appDelegate.storage.settings.playlistsSortSetting = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = PlaylistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType == .name)
+        fetchedResultsController = PlaylistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType.asSectionIndexType != .none)
+        fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
         updateRightBarButtonItems()
@@ -137,7 +138,11 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
             self.change(sortType: .lastChanged)
             self.updateSearchResults(for: self.searchController)
         })
-        return UIMenu(children: [sortByName, sortByLastTimePlayed, sortByChangeDate])
+        let sortByDuration = UIAction(title: "Duration", image: sortType == .duration ? .check : nil, handler: { _ in
+            self.change(sortType: .duration)
+            self.updateSearchResults(for: self.searchController)
+        })
+        return UIMenu(children: [sortByName, sortByLastTimePlayed, sortByChangeDate, sortByDuration])
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {

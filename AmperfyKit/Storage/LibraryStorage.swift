@@ -889,6 +889,8 @@ public class LibraryStorage: PlayableFileCachable {
             fetchRequest = PlaylistMO.lastPlayedDateFetchRequest
         case .lastChanged:
             fetchRequest = PlaylistMO.lastChangedDateFetchRequest
+        case .duration:
+            fetchRequest = PlaylistMO.durationFetchRequest
         }
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             PlaylistMO.excludeSystemPlaylistsFetchPredicate,

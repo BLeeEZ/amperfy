@@ -54,7 +54,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         // sortType will not be saved permanently. This behaviour differs from PlaylistsVC
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = PlaylistSelectorFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType == .name)
+        fetchedResultsController = PlaylistSelectorFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType.asSectionIndexType != .none)
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
         updateRightBarButtonItems()
@@ -88,7 +88,11 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
             self.change(sortType: .lastChanged)
             self.updateSearchResults(for: self.searchController)
         })
-        return UIMenu(children: [sortByName, sortByLastTimePlayed, sortByChangeDate])
+        let sortByDuration = UIAction(title: "Duration", image: sortType == .duration ? .check : nil, handler: { _ in
+            self.change(sortType: .duration)
+            self.updateSearchResults(for: self.searchController)
+        })
+        return UIMenu(children: [sortByName, sortByLastTimePlayed, sortByChangeDate, sortByDuration])
     }
     
     @IBAction func cancelBarButtonPressed(_ sender: UIBarButtonItem) {

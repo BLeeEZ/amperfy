@@ -43,7 +43,10 @@ public enum SectionIndexType: Int {
     case alphabet = 0
     case rating = 1
     case recentlyAddedIndex = 2
-    case duration = 3
+    case durationSong = 3
+    case durationAlbum = 4
+    case durationArtist = 5
+    case none = 6
     
     public static let defaultValue: SectionIndexType = .alphabet
     public static let noRatingIndexSymbol = "#"
@@ -67,8 +70,14 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
             return sortByRating(forSectionName: sectionName)
         case .recentlyAddedIndex:
             return nil
-        case .duration:
-            return sortByDuration(forSectionName: sectionName)
+        case .durationSong:
+            return sortByDurationSong(forSectionName: sectionName)
+        case .durationAlbum:
+            return sortByDurationAlbum(forSectionName: sectionName)
+        case .durationArtist:
+            return sortByDurationArtist(forSectionName: sectionName)
+        case .none:
+            return nil
         }
     }
     
@@ -85,64 +94,76 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
         }
     }
     
-    private func sortByDuration(forSectionName sectionName: String) -> String? {
-        guard let sectionNumber = Int(sectionName), sectionNumber > 0 else { return SectionIndexType.noDurationSymbol }
-        if sectionNumber < Int(0.5*60) {
-            return "0:00"
-        } else if sectionNumber < 1*60 {
-            return "0:30"
-        } else if sectionNumber < Int(1.5*60) {
-            return "1:00"
-        } else if sectionNumber < 2*60 {
-            return "1:30"
-        } else if sectionNumber < Int(2.5*60) {
-            return "2:00"
-        } else if sectionNumber < 3*60 {
-            return "2:30"
-        } else if sectionNumber < Int(3.5*60) {
-            return "3:00"
-        } else if sectionNumber < 4*60 {
-            return "3:30"
-        } else if sectionNumber < Int(4.5*60) {
-            return "4:00"
-        } else if sectionNumber < 5*60 {
-            return "4:30"
-        } else if sectionNumber < Int(5.5*60) {
-            return "5:00"
-        } else if sectionNumber < 6*60 {
-            return "5:30"
-        } else if sectionNumber < Int(6.5*60) {
-            return "6:00"
-        } else if sectionNumber < 7*60 {
-            return "6:30"
-        } else if sectionNumber < Int(7.5*60) {
-            return "7:00"
-        } else if sectionNumber < 8*60 {
-            return "7:30"
-        } else if sectionNumber < Int(8.5*60) {
-            return "8:00"
-        } else if sectionNumber < 9*60 {
-            return "8:30"
-        } else if sectionNumber < Int(9.5*60) {
-            return "9:00"
-        } else if sectionNumber < 10*60 {
-            return "9:30"
-        } else if sectionNumber < 15*60 {
-            return "10:00"
-        } else if sectionNumber < 20*60 {
-            return "15:00"
-        } else if sectionNumber < 30*60 {
-            return "20:00"
-        } else if sectionNumber < 45*60 {
-            return "30:00"
-        } else if sectionNumber < 60*60 {
-            return "45:00"
-        } else if sectionNumber < 90*60 {
-            return "1:00:00"
-        } else if sectionNumber < 120*60 {
-            return "1:30:00"
+    
+    private func sortByDurationSong(forSectionName sectionName: String) -> String? {
+        if let durationInSec = Int(sectionName) {
+            if durationInSec == 0 {
+                return SectionIndexType.noDurationSymbol
+            } else if durationInSec >= 3*60*60 {
+                return Int(180*60).asColonDurationString
+            } else if durationInSec >= 1*60*60 {
+                return durationInSec.roundDownToFractionOf(30*60).asColonDurationString
+            } else if durationInSec >= 30*60 {
+                return durationInSec.roundDownToFractionOf(10*60).asColonDurationString
+            } else if durationInSec >= 10*60 {
+                return durationInSec.roundDownToFractionOf(5*60).asColonDurationString
+            } else if durationInSec >= 5*60 {
+                return durationInSec.roundDownToFractionOf(1*60).asColonDurationString
+            } else {
+                return durationInSec.roundDownToFractionOf(30).asColonDurationString
+            }
         } else {
-            return "2:00:00"
+            return SectionIndexType.noDurationSymbol
+        }
+    }
+    
+    private func sortByDurationAlbum(forSectionName sectionName: String) -> String? {
+        if let durationInSec = Int(sectionName) {
+            if durationInSec == 0 {
+                return SectionIndexType.noDurationSymbol
+            } else if durationInSec >= 5*60*60 {
+                return Int(5*60*60).asColonDurationString
+            } else if durationInSec >= 100*60 {
+                if durationInSec < 2*60*60 {
+                    return Int(100*60).asColonDurationString
+                } else {
+                    return durationInSec.roundDownToFractionOf(60*60).asColonDurationString
+                }
+            } else if durationInSec >= 70*60 {
+                return durationInSec.roundDownToFractionOf(10*60).asColonDurationString
+            } else if durationInSec >= 30*60 {
+                return durationInSec.roundDownToFractionOf(5*60).asColonDurationString
+            } else if durationInSec >= 10*60 {
+                return durationInSec.roundDownToFractionOf(10*60).asColonDurationString
+            } else if durationInSec >= 1*60 {
+                return durationInSec.roundDownToFractionOf(2*60).asColonDurationString
+            } else {
+                return Int(0).asColonDurationString
+            }
+        } else {
+            return SectionIndexType.noDurationSymbol
+        }
+    }
+    
+    private func sortByDurationArtist(forSectionName sectionName: String) -> String? {
+        if let durationInSec = Int(sectionName) {
+            if durationInSec == 0 {
+                return SectionIndexType.noDurationSymbol
+            } else if durationInSec >= 20*60*60 {
+                return Int(20*60*60).asColonDurationString
+            } else if durationInSec >= 5*60*60 {
+                return durationInSec.roundDownToFractionOf(5*60*60).asColonDurationString
+            } else if durationInSec >= 60*60 {
+                return durationInSec.roundDownToFractionOf(30*60).asColonDurationString
+            } else if durationInSec >= 20*60 {
+                return durationInSec.roundDownToFractionOf(10*60).asColonDurationString
+            } else if durationInSec >= 5*60 {
+                return durationInSec.roundDownToFractionOf(Int(2*60)).asColonDurationString
+            } else {
+                return Int(0).asColonDurationString
+            }
+        } else {
+            return SectionIndexType.noDurationSymbol
         }
     }
     

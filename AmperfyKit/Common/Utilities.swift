@@ -74,6 +74,10 @@ extension Int {
         self = newValue
     }
     
+    public func roundDownToFractionOf(_ value: Int) -> Int {
+        return (self / value) * value
+    }
+    
     public var asColonDurationString: String {
         var hourString = ""
         let hours = self / (60*60)

@@ -159,6 +159,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             return 0.0
         case .artist:
             return 0.0
+        case .duration:
+            return 0.0
         }
     }
         
@@ -176,6 +178,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             return super.tableView(tableView, titleForHeaderInSection: section)
         case .artist:
             return super.tableView(tableView, titleForHeaderInSection: section)
+        case .duration:
+            return nil
         }
     }
     
@@ -247,7 +251,12 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             self.appDelegate.storage.settings.albumsSortSetting = .artist
             self.updateSearchResults(for: self.searchController)
         })
-        return UIMenu(children: [sortByName, sortByRating, sortByArtist])
+        let sortByDuration = UIAction(title: "Duration", image: sortType == .duration ? .check : nil, handler: { _ in
+            self.change(sortType: .duration)
+            self.appDelegate.storage.settings.albumsSortSetting = .duration
+            self.updateSearchResults(for: self.searchController)
+        })
+        return UIMenu(children: [sortByName, sortByRating, sortByArtist, sortByDuration])
     }
     
     private func createActionButtonMenu() -> UIMenu {

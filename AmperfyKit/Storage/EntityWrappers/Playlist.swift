@@ -171,7 +171,7 @@ public class Playlist: Identifyable {
         }
     }
     public func updateDuration() {
-        if playables.count > 0 {
+        if (managedObject.items?.count ?? 0) > 0 {
             let playablesDuration = playables.reduce(0){ $0 + $1.duration }
             if Int16.isValid(value: playablesDuration), managedObject.duration != Int16(playablesDuration) {
                 managedObject.duration = Int16(playablesDuration)
@@ -180,6 +180,16 @@ public class Playlist: Identifyable {
             if managedObject.duration != managedObject.remoteDuration {
                 managedObject.duration = managedObject.remoteDuration
             }
+        }
+    }
+    private func updateDuration(byReducingDuration: Int) {
+        if byReducingDuration > 0, duration >= byReducingDuration, Int16.isValid(value: byReducingDuration) {
+            managedObject.duration -= Int16(byReducingDuration)
+        }
+    }
+    private func updateDuration(byIncreasingDuration: Int) {
+        if byIncreasingDuration > 0, Int16.isValid(value: byIncreasingDuration), Int16.isValid(value: duration + byIncreasingDuration) {
+            managedObject.duration += Int16(byIncreasingDuration)
         }
     }
 
@@ -251,7 +261,7 @@ public class Playlist: Identifyable {
         }
         songCount += playablesToInsert.count
         updateChangeDate()
-        updateDuration()
+        updateDuration(byIncreasingDuration: playablesToInsert.reduce(0){ $0 + $1.duration })
         library.saveContext()
         isInternalArrayUpdateNeeded = true
     }
@@ -260,7 +270,7 @@ public class Playlist: Identifyable {
         createPlaylistItem(for: playable)
         songCount += 1
         updateChangeDate()
-        updateDuration()
+        updateDuration(byIncreasingDuration: playable.duration)
         library.saveContext()
         isInternalArrayUpdateNeeded = true
     }
@@ -270,6 +280,8 @@ public class Playlist: Identifyable {
             createPlaylistItem(for: playable)
         }
         songCount += playablesToAppend.count
+        updateChangeDate()
+        updateDuration(byIncreasingDuration: playablesToAppend.reduce(0){ $0 + $1.duration })
         library.saveContext()
         isInternalArrayUpdateNeeded = true
     }
@@ -284,7 +296,7 @@ public class Playlist: Identifyable {
     public func add(item: PlaylistItem) {
         songCount += 1
         updateChangeDate()
-        updateDuration()
+        updateDuration(byIncreasingDuration: item.playable?.duration ?? 0)
         managedObject.addToItems(item.managedObject)
         isInternalArrayUpdateNeeded = true
     }
@@ -321,7 +333,7 @@ public class Playlist: Identifyable {
             library.deletePlaylistItem(item: itemToBeRemoved)
             songCount -= 1
             updateChangeDate()
-            updateDuration()
+            updateDuration(byReducingDuration: itemToBeRemoved.playable?.duration ?? 0)
             library.saveContext()
             isInternalArrayUpdateNeeded = true
         }
@@ -354,6 +366,7 @@ public class Playlist: Identifyable {
         songCount = 0
         updateChangeDate()
         managedObject.duration = 0
+        managedObject.remoteDuration = 0
         library.saveContext()
         isInternalArrayUpdateNeeded = true
     }

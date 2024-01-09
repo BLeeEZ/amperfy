@@ -53,6 +53,16 @@ extension ArtistMO: CoreDataIdentifyable {
         return fetchRequest
     }
     
+    static var durationSortedFetchRequest: NSFetchRequest<ArtistMO> {
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(ArtistMO.duration), ascending: true),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(ArtistMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
+    
     func passOwnership(to targetArtist: ArtistMO) {
         let albumsCopy = albums?.compactMap{ $0 as? AlbumMO }
         albumsCopy?.forEach{
