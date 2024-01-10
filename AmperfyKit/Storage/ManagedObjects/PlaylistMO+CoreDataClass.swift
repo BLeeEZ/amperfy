@@ -68,6 +68,7 @@ public final class PlaylistMO: NSManagedObject {
         let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(PlaylistMO.duration), ascending: false),
+            NSSortDescriptor(key: #keyPath(PlaylistMO.songCount), ascending: false),
             NSSortDescriptor(key: #keyPath(PlaylistMO.name), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
             NSSortDescriptor(key: #keyPath(PlaylistMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
         ]
