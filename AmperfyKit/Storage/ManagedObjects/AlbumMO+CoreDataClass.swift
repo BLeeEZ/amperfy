@@ -89,6 +89,16 @@ public final class AlbumMO: AbstractLibraryEntityMO {
         ]
         return fetchRequest
     }
+    
+    static var yearSortedFetchRequest: NSFetchRequest<AlbumMO> {
+        let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(AlbumMO.year), ascending: false),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
 }
 
 extension AlbumMO: CoreDataIdentifyable {

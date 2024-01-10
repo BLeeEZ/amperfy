@@ -161,6 +161,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             return 0.0
         case .duration:
             return 0.0
+        case .year:
+            return CommonScreenOperations.tableSectionHeightLarge
         }
     }
         
@@ -180,6 +182,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             return super.tableView(tableView, titleForHeaderInSection: section)
         case .duration:
             return nil
+        case .year:
+            return super.tableView(tableView, titleForHeaderInSection: section)
         }
     }
     
@@ -256,7 +260,12 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             self.appDelegate.storage.settings.albumsSortSetting = .duration
             self.updateSearchResults(for: self.searchController)
         })
-        return UIMenu(children: [sortByName, sortByRating, sortByArtist, sortByDuration])
+        let sortByYear = UIAction(title: "Year", image: sortType == .year ? .check : nil, handler: { _ in
+            self.change(sortType: .year)
+            self.appDelegate.storage.settings.albumsSortSetting = .year
+            self.updateSearchResults(for: self.searchController)
+        })
+        return UIMenu(children: [sortByName, sortByRating, sortByArtist, sortByDuration, sortByYear])
     }
     
     private func createActionButtonMenu() -> UIMenu {

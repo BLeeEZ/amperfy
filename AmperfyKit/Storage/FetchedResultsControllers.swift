@@ -50,6 +50,7 @@ public enum AlbumElementSortType: Int {
     case recentlyAddedIndex = 2
     case artist = 3
     case duration = 4
+    case year = 5
     
     public static let defaultValue: AlbumElementSortType = .name
     
@@ -65,6 +66,8 @@ public enum AlbumElementSortType: Int {
             return .alphabet
         case .duration:
             return .durationAlbum
+        case .year:
+            return .year
         }
     }
 }
@@ -452,6 +455,8 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
             fetchRequest = AlbumMO.artistNameSortedFetchRequest
         case .duration:
             fetchRequest = AlbumMO.durationSortedFetchRequest
+        case .year:
+            fetchRequest = AlbumMO.yearSortedFetchRequest
         }
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,

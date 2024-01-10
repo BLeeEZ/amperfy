@@ -47,10 +47,12 @@ public enum SectionIndexType: Int {
     case durationAlbum = 4
     case durationArtist = 5
     case none = 6
+    case year = 7
     
     public static let defaultValue: SectionIndexType = .alphabet
     public static let noRatingIndexSymbol = "#"
     public static let noDurationSymbol = "#"
+    public static let noYearSymbol = "#"
 }
 
 public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchRequestResult>: NSFetchedResultsController<NSFetchRequestResult> {
@@ -78,6 +80,8 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
             return sortByDurationArtist(forSectionName: sectionName)
         case .none:
             return nil
+        case .year:
+            return sortByYear(forSectionName: sectionName)
         }
     }
     
@@ -164,6 +168,14 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
             }
         } else {
             return SectionIndexType.noDurationSymbol
+        }
+    }
+    
+    private func sortByYear(forSectionName sectionName: String) -> String? {
+        if let year = Int(sectionName), year > 0 {
+            return "\(year)"
+        } else {
+            return SectionIndexType.noYearSymbol
         }
     }
     
