@@ -67,7 +67,7 @@ class SsPlaylistParserDelegate: SsXmlParser {
             playlist?.name = attributePlaylistName
             
             if let attributeSongCount = attributeDict["songCount"], let songCount = Int(attributeSongCount) {
-                playlist?.songCount = songCount
+                playlist?.remoteSongCount = songCount
             }
         }
     }

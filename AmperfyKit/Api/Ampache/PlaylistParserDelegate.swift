@@ -82,7 +82,7 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
         case "name":
             playlist?.name = buffer
         case "items":
-            playlist?.songCount = Int(buffer) ?? 0
+            playlist?.remoteSongCount = Int(buffer) ?? 0
         case "playlist":
             if let parsedPlaylist = playlist {
                 parsedPlaylists.insert(parsedPlaylist)

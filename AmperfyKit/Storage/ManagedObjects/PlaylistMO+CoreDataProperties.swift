@@ -35,6 +35,7 @@ extension PlaylistMO {
     @NSManaged public var duration: Int16
     @NSManaged public var remoteDuration: Int16
     @NSManaged public var songCount: Int16
+    @NSManaged public var remoteSongCount: Int16
     @NSManaged public var items: NSSet?
     @NSManaged public var changeDate: Date?
     @NSManaged public var lastPlayedDate: Date?

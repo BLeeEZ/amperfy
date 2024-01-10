@@ -107,6 +107,25 @@ public class Playlist: Identifyable {
             managedObject.songCount = Int16(newValue)
         }
     }
+    public var remoteSongCount: Int {
+        get { return Int(managedObject.remoteSongCount) }
+        set {
+            if Int16.isValid(value: newValue) {
+                if managedObject.remoteSongCount != Int16(newValue) {
+                    managedObject.remoteSongCount = Int16(newValue)
+                }
+                updateSongCount()
+            }
+        }
+    }
+    public func updateSongCount() {
+        if let items = managedObject.items, items.count > 0, Int16.isValid(value: items.count) {
+            managedObject.songCount = Int16(items.count)
+        } else {
+            // set songCount to remoteSongCount only if no songs are locally available
+            managedObject.songCount = managedObject.remoteSongCount
+        }
+    }
 
     public var id: String {
         get {

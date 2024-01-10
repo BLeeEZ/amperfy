@@ -80,6 +80,7 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
                 }
             }
             playlist.updateDuration()
+            playlist.updateSongCount()
         default:
             break
         }
