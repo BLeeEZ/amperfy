@@ -28,6 +28,7 @@ class GenericTableCell: BasicTableCell {
     @IBOutlet weak var subtitleLabel: UILabel!
     @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var infoLabel: UILabel!
+    @IBOutlet weak var favoriteIconImage: UIImageView!
     
     static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
     static let rowHeightWithoutImage: CGFloat = 28.0 + margin.bottom + margin.top
@@ -51,6 +52,7 @@ class GenericTableCell: BasicTableCell {
         let infoText = container.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .short, settings: appDelegate.storage.settings))
         infoLabel.isHidden = infoText.isEmpty
         infoLabel.text = infoText
+        favoriteIconImage.isHidden = !container.isFavorite
     }
 
     @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {

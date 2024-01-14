@@ -29,6 +29,7 @@ class SongTableCell: BasicTableCell {
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak private var cacheIconImage: UIImageView!
+    @IBOutlet weak private var favoriteIconImage: UIImageView!
     @IBOutlet weak private var artistLabelLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var artistLabelTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var titleLabelTrailingConstraint: NSLayoutConstraint!
@@ -77,6 +78,8 @@ class SongTableCell: BasicTableCell {
             cacheIconImage.isHidden = true
             artistLabelLeadingConstraint.constant = 0
         }
+        
+        favoriteIconImage.isHidden = !song.isFavorite
         
         let isDurationVisible = appDelegate.storage.settings.isShowSongDuration && (song.duration > 0)
         durationLabel.isHidden = !isDurationVisible

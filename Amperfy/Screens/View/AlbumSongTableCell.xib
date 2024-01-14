@@ -60,14 +60,26 @@
                         <color key="textColor" systemColor="secondaryLabelColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="suit.heart.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="bEU-Ar-zr1" userLabel="Favorite Icon">
+                        <rect key="frame" x="2" y="23" width="12" height="9.5"/>
+                        <color key="tintColor" systemColor="systemRedColor"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="12" id="fdK-Gq-7ay"/>
+                            <constraint firstAttribute="width" secondItem="bEU-Ar-zr1" secondAttribute="height" multiplier="1:1" id="p0U-3w-ZH0"/>
+                        </constraints>
+                    </imageView>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailingMargin" secondItem="hPr-VQ-rTt" secondAttribute="trailing" id="0Jf-pS-3te"/>
                     <constraint firstItem="YMj-gk-9M5" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="0cg-qO-oSe"/>
+                    <constraint firstItem="bEU-Ar-zr1" firstAttribute="width" secondItem="bEU-Ar-zr1" secondAttribute="height" multiplier="1:1" id="18V-ky-cIy"/>
                     <constraint firstItem="59g-M4-BV0" firstAttribute="centerY" secondItem="YMj-gk-9M5" secondAttribute="centerY" id="4Un-Kw-iq7"/>
                     <constraint firstItem="59g-M4-BV0" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="69g-Qg-fnj"/>
                     <constraint firstItem="GFX-bI-uSL" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="9NK-Zt-Udb"/>
+                    <constraint firstItem="bEU-Ar-zr1" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="Ddj-b8-3ug"/>
                     <constraint firstAttribute="trailingMargin" secondItem="isF-fg-ddx" secondAttribute="trailing" id="Jrg-hR-I0V"/>
+                    <constraint firstItem="bEU-Ar-zr1" firstAttribute="width" secondItem="bEU-Ar-zr1" secondAttribute="height" multiplier="1:1" id="Jyl-YX-DXO"/>
+                    <constraint firstItem="bEU-Ar-zr1" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leading" constant="2" id="UOU-ST-8OU"/>
                     <constraint firstItem="isF-fg-ddx" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="a5K-hW-aMk"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" constant="-10" id="bvj-Mr-vRL"/>
                     <constraint firstItem="GFX-bI-uSL" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leadingMargin" id="fOI-Fn-425"/>
@@ -83,6 +95,7 @@
                 <outlet property="cacheIconImage" destination="59g-M4-BV0" id="cob-f2-gd9"/>
                 <outlet property="cacheIndicatorImage" destination="59g-M4-BV0" id="DEG-6l-yYB"/>
                 <outlet property="durationLabel" destination="isF-fg-ddx" id="rSJ-6b-a0y"/>
+                <outlet property="favoriteIconImage" destination="bEU-Ar-zr1" id="d3V-A6-xjd"/>
                 <outlet property="titleLabel" destination="hPr-VQ-rTt" id="wmq-Vm-6lz"/>
                 <outlet property="titleLabelTrailingConstraint" destination="0Jf-pS-3te" id="uiR-Wp-UNA"/>
                 <outlet property="trackNumberLabel" destination="GFX-bI-uSL" id="Vzm-7H-jGn"/>
@@ -92,8 +105,12 @@
     </objects>
     <resources>
         <image name="cache" width="640" height="512"/>
+        <image name="suit.heart.fill" catalog="system" width="128" height="107"/>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -57,17 +57,28 @@
                             <constraint firstAttribute="height" constant="15" id="FU5-gZ-NAG"/>
                         </constraints>
                     </imageView>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="suit.heart.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="ww2-RJ-EgX" userLabel="Favorite Icon">
+                        <rect key="frame" x="2" y="30.5" width="12" height="9.5"/>
+                        <color key="tintColor" systemColor="systemRedColor"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="12" id="DXc-FO-IFH"/>
+                            <constraint firstAttribute="width" secondItem="ww2-RJ-EgX" secondAttribute="height" multiplier="1:1" id="awP-Bj-bNx"/>
+                        </constraints>
+                    </imageView>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="ww2-RJ-EgX" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leading" constant="2" id="2jh-xM-aNl"/>
                     <constraint firstAttribute="trailingMargin" secondItem="hPr-VQ-rTt" secondAttribute="trailing" constant="8" id="AUO-iE-pDI"/>
                     <constraint firstItem="XQO-xE-pLx" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="AWT-UF-9SZ"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="top" secondItem="hPr-VQ-rTt" secondAttribute="bottom" constant="2" id="E4f-kL-YK1"/>
                     <constraint firstItem="2Xe-ur-neX" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="Is1-hD-Vsn"/>
                     <constraint firstItem="2Xe-ur-neX" firstAttribute="centerY" secondItem="nJe-7h-3tU" secondAttribute="centerY" id="Ocl-h6-l98"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" constant="3" id="PbZ-KR-6Uu"/>
+                    <constraint firstItem="ww2-RJ-EgX" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="Pfz-sC-QH5"/>
                     <constraint firstItem="nJe-7h-3tU" firstAttribute="leading" secondItem="hPr-VQ-rTt" secondAttribute="leading" id="Pwh-zQ-8MT"/>
                     <constraint firstItem="hPr-VQ-rTt" firstAttribute="leading" secondItem="Uwb-Vy-dE7" secondAttribute="trailing" constant="8" id="YjP-mp-fEC"/>
                     <constraint firstItem="Uwb-Vy-dE7" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="b4X-h3-kb4"/>
+                    <constraint firstItem="ww2-RJ-EgX" firstAttribute="width" secondItem="ww2-RJ-EgX" secondAttribute="height" multiplier="1:1" id="bfH-Zl-nvZ"/>
                     <constraint firstItem="Uwb-Vy-dE7" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leadingMargin" id="gsz-pP-Pmt"/>
                     <constraint firstAttribute="trailingMargin" secondItem="XQO-xE-pLx" secondAttribute="trailing" id="hKM-ht-A1q"/>
                     <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="hPr-VQ-rTt" secondAttribute="trailing" id="hho-eL-Cqq"/>
@@ -81,6 +92,7 @@
                 <outlet property="cacheIconImage" destination="2Xe-ur-neX" id="Wt7-D7-TTG"/>
                 <outlet property="durationLabel" destination="XQO-xE-pLx" id="LV8-46-i0Q"/>
                 <outlet property="entityImage" destination="Uwb-Vy-dE7" id="hLh-iq-m4X"/>
+                <outlet property="favoriteIconImage" destination="ww2-RJ-EgX" id="Mbz-hq-RMS"/>
                 <outlet property="titleLabel" destination="hPr-VQ-rTt" id="Gwv-hx-ZdG"/>
                 <outlet property="titleLabelTrailingConstraint" destination="AUO-iE-pDI" id="GFy-kQ-7Aw"/>
             </connections>
@@ -89,11 +101,15 @@
     </objects>
     <resources>
         <image name="cache" width="640" height="512"/>
+        <image name="suit.heart.fill" catalog="system" width="128" height="107"/>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
