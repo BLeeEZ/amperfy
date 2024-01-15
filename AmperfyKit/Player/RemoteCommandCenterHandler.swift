@@ -82,15 +82,15 @@ class RemoteCommandCenterHandler {
             return .success})
         
         remoteCommandCenter.skipBackwardCommand.isEnabled = true
-        remoteCommandCenter.skipBackwardCommand.preferredIntervals = [NSNumber(value: self.musicPlayer.skipBackwardInterval)]
+        remoteCommandCenter.skipBackwardCommand.preferredIntervals = [NSNumber(value: self.musicPlayer.skipBackwardPodcastInterval)]
         remoteCommandCenter.skipBackwardCommand.addTarget(handler: { (event) in
-            self.musicPlayer.skipBackward()
+            self.musicPlayer.skipBackward(interval: self.musicPlayer.skipBackwardPodcastInterval)
             return .success})
         
         remoteCommandCenter.skipForwardCommand.isEnabled = true
-        remoteCommandCenter.skipForwardCommand.preferredIntervals = [NSNumber(value:  self.musicPlayer.skipForwardInterval)]
+        remoteCommandCenter.skipForwardCommand.preferredIntervals = [NSNumber(value:  self.musicPlayer.skipForwardPodcastInterval)]
         remoteCommandCenter.skipForwardCommand.addTarget(handler: { (event) in
-            self.musicPlayer.skipForward()
+            self.musicPlayer.skipForward(interval: self.musicPlayer.skipForwardPodcastInterval)
             return .success})
     }
 

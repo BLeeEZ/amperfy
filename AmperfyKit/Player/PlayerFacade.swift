@@ -125,16 +125,18 @@ public protocol PlayerFacade {
     func stop()
     func playPreviousOrReplay()
     func playNext()
-    func skipForward()
-    func skipBackward()
+    func skipForward(interval: Double)
+    func skipBackward(interval: Double)
     
     func addNotifier(notifier: MusicPlayable)
 }
 
 extension PlayerFacade {
     public var maxSongsToAddOnce: Int { return 500 }
-    var skipForwardInterval: Double { return 30.0 }
-    var skipBackwardInterval: Double { return 15.0 }
+    public var skipForwardPodcastInterval: Double { return 30.0 }
+    public var skipBackwardPodcastInterval: Double { return 15.0 }
+    public var skipForwardMusicInterval: Double { return 10.0 }
+    public var skipBackwardMusicInterval: Double { return 10.0 }
 }
 
 class PlayerFacadeImpl: PlayerFacade {
@@ -367,12 +369,12 @@ class PlayerFacadeImpl: PlayerFacade {
         musicPlayer.playNext()
     }
     
-    func skipForward() {
-        seek(toSecond: elapsedTime + self.skipForwardInterval)
+    func skipForward(interval: Double) {
+        seek(toSecond: elapsedTime + interval)
     }
     
-    func skipBackward() {
-        seek(toSecond: elapsedTime - self.skipBackwardInterval)
+    func skipBackward(interval: Double) {
+        seek(toSecond: elapsedTime - interval)
     }
     
     func addNotifier(notifier: MusicPlayable) {

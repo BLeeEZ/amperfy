@@ -30,6 +30,19 @@ struct DisplaySettingsView: View {
             List {
                 Section(content: {
                     HStack {
+                        Text("Music player skip buttons")
+                        Spacer()
+                        Toggle(isOn: $settings.isShowMusicPlayerSkipButtons) {}
+                            .frame(width: 130)
+                    }
+ 
+                }
+                , footer: {
+                    Text("Displays skip forward button and skip backward button in music player in addition to previous/next buttons.")
+                })
+                
+                Section(content: {
+                    HStack {
                         Text("Detailed Information")
                         Spacer()
                         Toggle(isOn: $settings.isShowDetailedInfo) {}

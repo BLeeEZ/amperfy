@@ -59,6 +59,8 @@ class PlayerView: UIView {
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var repeatButton: UIButton!
     @IBOutlet weak var shuffleButton: UIButton!
+    @IBOutlet weak var skipBackwardButton: UIButton!
+    @IBOutlet weak var skipForwardButton: UIButton!
     
     @IBOutlet weak var timeSlider: UISlider!
     @IBOutlet weak var elapsedTimeLabel: UILabel!
@@ -113,7 +115,7 @@ class PlayerView: UIView {
         case .music:
             player.playPreviousOrReplay()
         case .podcast:
-            player.skipBackward()
+            player.skipBackward(interval: player.skipBackwardPodcastInterval)
         }
     }
     
@@ -122,7 +124,7 @@ class PlayerView: UIView {
         case .music:
             player.playNext()
         case .podcast:
-            player.skipForward()
+            player.skipForward(interval: player.skipForwardPodcastInterval)
         }
     }
     
@@ -135,6 +137,14 @@ class PlayerView: UIView {
         player.toggleShuffle()
         refreshShuffleButton()
         rootView?.scrollToNextPlayingRow()
+    }
+    
+    @IBAction func skipBackwardButtonPushed(_ sender: Any) {
+        player.skipBackward(interval: player.skipBackwardMusicInterval)
+    }
+    
+    @IBAction func skipForwardButtonPushed(_ sender: Any) {
+        player.skipForward(interval: player.skipForwardMusicInterval)
     }
     
     @IBAction func timeSliderChanged(_ sender: Any) {
@@ -476,9 +486,15 @@ class PlayerView: UIView {
         case .music:
             repeatButton.isHidden = false
             shuffleButton.isHidden = false
+            skipBackwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
+            skipForwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
+            skipBackwardButton.alpha = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons ? 0.0 : 1.0
+            skipForwardButton.alpha = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons ? 0.0 : 1.0
         case .podcast:
             repeatButton.isHidden = true
             shuffleButton.isHidden = true
+            skipBackwardButton.isHidden = true
+            skipForwardButton.isHidden = true
         }
     }
     
