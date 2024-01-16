@@ -40,7 +40,9 @@ class LibrarySyncPopupVC: UIViewController {
     
     var appDelegate: AppDelegate!
     var topic = ""
+    var shortMessage = ""
     var message = ""
+    var clipboardContent: String?
     var logType = LogEntryType.info
     var onClose: (() -> Void)?
     private var popupColor = UIColor.systemBlue
@@ -123,11 +125,19 @@ class LibrarySyncPopupVC: UIViewController {
         }
     }
     
-    func setContent(topic: String, message: String, type: LogEntryType, customIcon: FontAwesomeIcon? = nil, customAnimation: PopupIconAnimation? = nil, onClosePressed: ((Bool) -> Void)? = nil) {
+    func setContent(topic: String, shortMessage: String?, detailMessage: String, clipboardContent: String?, type: LogEntryType, customIcon: FontAwesomeIcon? = nil, customAnimation: PopupIconAnimation? = nil, onClosePressed: ((Bool) -> Void)? = nil) {
         self.topic = topic
-        self.message = message
+        self.shortMessage = shortMessage ?? ""
+        self.message = detailMessage
+        self.clipboardContent = clipboardContent
         self.logType = type
         self.closeButtonOnPressed = onClosePressed
+        
+        if let clipboardContent = clipboardContent {
+            useOptionalButton(text: "Copy to Clipboard", onPressed: {_ in 
+                UIPasteboard.general.string = clipboardContent
+            })
+        }
         
         self.iconAnimation = customAnimation != nil ? customAnimation! : .zoomInZoomOut
         switch type {

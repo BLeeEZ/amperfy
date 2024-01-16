@@ -54,9 +54,9 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     
     func validateDownloadedData(download: Download) -> ResponseError? {
         guard let data = download.resumeData else {
-            return ResponseError(statusCode: 0, message: "Invalid download")
+            return ResponseError(statusCode: 0, message: "Invalid download", url: download.url)
         }
-        return backendApi.checkForErrorResponse(inData: data)
+        return backendApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url, meta: nil))
     }
 
     func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {

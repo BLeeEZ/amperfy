@@ -23,7 +23,7 @@ import Foundation
 
 class AmpacheXmlParser: GenericXmlParser {
     
-    var error: ResponseError?
+    var error: AmpacheResponseError?
     private var statusCode: Int = 0
     private var message = ""
 
@@ -43,7 +43,7 @@ class AmpacheXmlParser: GenericXmlParser {
         case "errorMessage":
             message = buffer
         case "error":
-            error = ResponseError(statusCode: statusCode, message: message)
+            error = AmpacheResponseError(statusCode: statusCode, message: message)
         default:
             break
         }

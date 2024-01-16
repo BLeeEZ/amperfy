@@ -181,7 +181,9 @@ class DownloadManager: NSObject, DownloadManageable {
             download.error = error
             if error != .apiErrorResponse {
                 os_log("Fetching %s FAILED: %s", log: self.log, type: .info, download.title, error.description)
-                eventLogger.error(topic: "Download Error", statusCode: .downloadError, message: "Error \"\(error.description)\" occured while downloading object \"\(download.title)\".", displayPopup: isFailWithPopupError)
+                let shortMessage = "Error \"\(error.description)\" occured while downloading object \"\(download.title)\"."
+                let detailMessage = shortMessage + "\n\nURL:\n\(download.urlString)"
+                eventLogger.error(topic: "Download Error", statusCode: .downloadError, shortMessage: shortMessage, detailMessage: detailMessage, displayPopup: isFailWithPopupError)
             }
             downloadDelegate.failedDownload(download: download, storage: self.storage)
         }
@@ -193,7 +195,7 @@ class DownloadManager: NSObject, DownloadManageable {
         download.resumeData = data
         if let responseError = downloadDelegate.validateDownloadedData(download: download) {
             os_log("Fetching %s API-ERROR StatusCode: %d, Message: %s", log: log, type: .error, download.title, responseError.statusCode, responseError.message)
-            eventLogger.report(error: responseError, displayPopup: isFailWithPopupError)
+            eventLogger.report(topic: "Download", error: responseError, displayPopup: isFailWithPopupError)
             finishDownload(download: download, error: .apiErrorResponse)
             return
         }

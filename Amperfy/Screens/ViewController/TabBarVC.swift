@@ -96,7 +96,9 @@ class TabBarVC: UITabBarController {
         let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
         popupVC.setContent(
             topic: "Synchronization",
-            message: "Your music collection is constantly updating. Already synced library items are offline available. If library items (artists/albums/songs) are not shown in your  collection please use the various search functionalities to synchronize with the server.",
+            shortMessage: nil,
+            detailMessage: "Your music collection is constantly updating. Already synced library items are offline available. If library items (artists/albums/songs) are not shown in your  collection please use the various search functionalities to synchronize with the server.",
+            clipboardContent: nil,
             type: .info,
             customIcon: .Sync,
             customAnimation: .rotate,
@@ -114,7 +116,9 @@ class TabBarVC: UITabBarController {
                 let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
                 popupVC.setContent(
                     topic: "Notifications",
-                    message: "Amperfy can inform you about the latest podcast episodes. If you want to, please authorize Amperfy to send you notifications.",
+                    shortMessage: nil,
+                    detailMessage: "Amperfy can inform you about the latest podcast episodes. If you want to, please authorize Amperfy to send you notifications.",
+                    clipboardContent: nil,
                     type: .info,
                     customIcon: .Bell,
                     customAnimation: .swing,

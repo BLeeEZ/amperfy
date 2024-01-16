@@ -68,8 +68,8 @@ extension SubsonicApi: BackendApi {
         return subsonicServerApi.generateUrl(forArtwork: artwork)
     }
 
-    func checkForErrorResponse(inData data: Data) -> ResponseError? {
-        return subsonicServerApi.checkForErrorResponse(inData: data)
+    func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+        return subsonicServerApi.checkForErrorResponse(response: response)
     }
     
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {

@@ -34,9 +34,22 @@ enum SubsonicApiAuthType: Int {
     case legacy = 1
 }
 
+struct SubsonicResponseError: LocalizedError {
+    public var statusCode: Int = 0
+    public var message: String
+    
+    public var subsonicError: SubsonicServerApi.SubsonicError? {
+        return SubsonicServerApi.SubsonicError(rawValue: statusCode)
+    }
+}
+
 extension ResponseError {
     var asSubsonicError: SubsonicServerApi.SubsonicError? {
         return SubsonicServerApi.SubsonicError(rawValue: statusCode)
+    }
+    
+    static func createFromSubsonicError(url: URL, error: SubsonicResponseError) -> ResponseError {
+        return ResponseError(statusCode: error.statusCode, message: error.message, url: url)
     }
 }
 
@@ -183,12 +196,12 @@ class SubsonicServerApi {
             self.requestServerApiVersionPromise(providedCredentials: credentials)
         }.then { version in
             self.determineClientApiVersion(serverVersion: version)
-        }.then { version -> Promise<Data> in
+        }.then { version -> Promise<APIDataResponse> in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "ping", credentials: credentials)
             return self.request(url: try self.createUrl(from: urlComp))
-        }.then { data -> Promise<Void> in
+        }.then { response -> Promise<Void> in
             let parserDelegate = SsPingParserDelegate()
-            let parser = XMLParser(data: data)
+            let parser = XMLParser(data: response.data)
             parser.delegate = parserDelegate
             let success = parser.parse()
             
@@ -252,16 +265,16 @@ class SubsonicServerApi {
             }
         }.then { url in
             self.request(url: url)
-        }.then { data in
+        }.then { response in
             return Promise<SubsonicVersion> { seal in
                 let delegate = SsPingParserDelegate()
-                let parser = XMLParser(data: data)
+                let parser = XMLParser(data: response.data)
                 parser.delegate = delegate
                 parser.parse()
-                guard let serverApiVersionString = delegate.serverApiVersion else { throw BackendError.parser }
+                guard let serverApiVersionString = delegate.serverApiVersion else { throw XMLParserResponseError(url: response.url) }
                 guard let serverApiVersion = SubsonicVersion(serverApiVersionString) else {
                     os_log("The server API version '%s' could not be parsed to 'SubsonicVersion'", log: self.log, type: .info, serverApiVersionString)
-                    throw BackendError.parser
+                    throw XMLParserResponseError(url: response.url)
                 }
                 self.serverApiVersion = serverApiVersion
                 return seal.fulfill(serverApiVersion)
@@ -293,49 +306,49 @@ class SubsonicServerApi {
         }
     }
 
-    func requestGenres() -> Promise<Data> {
+    func requestGenres() -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getGenres")
             return try self.createUrl(from: urlComp)
         }
     }
 
-    func requestArtists() -> Promise<Data> {
+    func requestArtists() -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getArtists")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestArtist(id: String) -> Promise<Data> {
+    func requestArtist(id: String) -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getArtist", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestAlbum(id: String) -> Promise<Data> {
+    func requestAlbum(id: String) -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getAlbum", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestSongInfo(id: String) -> Promise<Data> {
+    func requestSongInfo(id: String) -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getSong", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
 
-    func requestFavoriteElements() -> Promise<Data> {
+    func requestFavoriteElements() -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getStarred2")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestLatestAlbums() -> Promise<Data> {
+    func requestLatestAlbums() -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getAlbumList2")
             urlComp.addQueryItem(name: "type", value: "newest")
@@ -344,7 +357,7 @@ class SubsonicServerApi {
         }
     }
     
-    func requestRandomSongs(count: Int) -> Promise<Data> {
+    func requestRandomSongs(count: Int) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getRandomSongs")
             urlComp.addQueryItem(name: "size", value: count)
@@ -352,14 +365,14 @@ class SubsonicServerApi {
         }
     }
     
-    func requestPodcastEpisodeDelete(id: String) -> Promise<Data>  {
+    func requestPodcastEpisodeDelete(id: String) -> Promise<APIDataResponse>  {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "deletePodcastEpisode", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestSearchArtists(searchText: String) -> Promise<Data> {
+    func requestSearchArtists(searchText: String) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
             urlComp.addQueryItem(name: "query", value: searchText)
@@ -374,7 +387,7 @@ class SubsonicServerApi {
     }
     
     
-    func requestSearchAlbums(searchText: String) -> Promise<Data> {
+    func requestSearchAlbums(searchText: String) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
             urlComp.addQueryItem(name: "query", value: searchText)
@@ -388,7 +401,7 @@ class SubsonicServerApi {
         }
     }
     
-    func requestSearchSongs(searchText: String) -> Promise<Data> {
+    func requestSearchSongs(searchText: String) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
             urlComp.addQueryItem(name: "query", value: searchText)
@@ -402,21 +415,21 @@ class SubsonicServerApi {
         }
     }
     
-    func requestPlaylists() -> Promise<Data> {
+    func requestPlaylists() -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPlaylists")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestPlaylistSongs(id: String) -> Promise<Data> {
+    func requestPlaylistSongs(id: String) -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPlaylist", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestPlaylistCreate(name: String) -> Promise<Data> {
+    func requestPlaylistCreate(name: String) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "createPlaylist")
             urlComp.addQueryItem(name: "name", value: name)
@@ -424,22 +437,23 @@ class SubsonicServerApi {
         }
     }
     
-    func requestPlaylistDelete(id: String) -> Promise<Data> {
+    func requestPlaylistDelete(id: String) -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "deletePlaylist", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func checkForErrorResponse(inData data: Data) -> ResponseError? {
+    func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
         let errorParser = SsXmlParser()
-        let parser = XMLParser(data: data)
+        let parser = XMLParser(data: response.data)
         parser.delegate = errorParser
         parser.parse()
-        return errorParser.error
+        guard let subsonicError = errorParser.error else { return nil }
+        return ResponseError.createFromSubsonicError(url: response.url, error: subsonicError)
     }
 
-    func requestPlaylistUpdate(id: String, name: String, songIndicesToRemove: [Int], songIdsToAdd: [String]) -> Promise<Data> {
+    func requestPlaylistUpdate(id: String, name: String, songIndicesToRemove: [Int], songIdsToAdd: [String]) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "updatePlaylist")
             urlComp.addQueryItem(name: "playlistId", value: id)
@@ -454,7 +468,7 @@ class SubsonicServerApi {
         }
     }
     
-    func requestPodcasts() -> Promise<Data> {
+    func requestPodcasts() -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPodcasts")
             urlComp.addQueryItem(name: "includeEpisodes", value: "false")
@@ -462,7 +476,7 @@ class SubsonicServerApi {
         }
     }
     
-    func requestPodcastEpisodes(id: String) -> Promise<Data> {
+    func requestPodcastEpisodes(id: String) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPodcasts", id: id)
             urlComp.addQueryItem(name: "includeEpisodes", value: "true")
@@ -470,14 +484,14 @@ class SubsonicServerApi {
         }
     }
     
-    func requestMusicFolders() -> Promise<Data> {
+    func requestMusicFolders() -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getMusicFolders")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestIndexes(musicFolderId: String) -> Promise<Data> {
+    func requestIndexes(musicFolderId: String) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getIndexes")
             urlComp.addQueryItem(name: "musicFolderId", value: musicFolderId)
@@ -485,14 +499,14 @@ class SubsonicServerApi {
         }
     }
     
-    func requestMusicDirectory(id: String) -> Promise<Data> {
+    func requestMusicDirectory(id: String) -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getMusicDirectory", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
 
-    func requestRecordSongPlay(id: String, date: Date?) -> Promise<Data> {
+    func requestRecordSongPlay(id: String, date: Date?) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "scrobble", id: id)
             if let date = date {
@@ -503,7 +517,7 @@ class SubsonicServerApi {
     }
 
     /// Only songs, albums, artists are supported by the subsonic API
-    func requestRating(id: String, rating: Int) -> Promise<Data> {
+    func requestRating(id: String, rating: Int) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "setRating", id: id)
             urlComp.addQueryItem(name: "rating", value: rating)
@@ -511,7 +525,7 @@ class SubsonicServerApi {
         }
     }
     
-    func requestSetFavorite(songId: String, isFavorite: Bool) -> Promise<Data> {
+    func requestSetFavorite(songId: String, isFavorite: Bool) -> Promise<APIDataResponse> {
         return request { version in
             let apiFavoriteAction = isFavorite ? "star" : "unstar"
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: apiFavoriteAction, id: songId)
@@ -519,7 +533,7 @@ class SubsonicServerApi {
         }
     }
     
-    func requestSetFavorite(albumId: String, isFavorite: Bool) -> Promise<Data> {
+    func requestSetFavorite(albumId: String, isFavorite: Bool) -> Promise<APIDataResponse> {
         return request { version in
             let apiFavoriteAction = isFavorite ? "star" : "unstar"
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: apiFavoriteAction)
@@ -528,7 +542,7 @@ class SubsonicServerApi {
         }
     }
     
-    func requestSetFavorite(artistId: String, isFavorite: Bool) -> Promise<Data> {
+    func requestSetFavorite(artistId: String, isFavorite: Bool) -> Promise<APIDataResponse> {
         return request { version in
             let apiFavoriteAction = isFavorite ? "star" : "unstar"
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: apiFavoriteAction)
@@ -545,7 +559,7 @@ class SubsonicServerApi {
         }
     }
     
-    private func request(urlCreation: @escaping (_: SubsonicVersion) throws -> URL) -> Promise<Data> {
+    private func request(urlCreation: @escaping (_: SubsonicVersion) throws -> URL) -> Promise<APIDataResponse> {
         return firstly {
             self.determineApiVersionToUse()
         }.then { version in
@@ -555,11 +569,11 @@ class SubsonicServerApi {
         }
     }
     
-    private func request(url: URL) -> Promise<Data> {
+    private func request(url: URL) -> Promise<APIDataResponse> {
         return firstly {
             AF.request(url, method: .get).validate().responseData()
         }.then { data, response in
-            Promise<Data>.value(data)
+            Promise<APIDataResponse>.value(APIDataResponse(data: data, url: url, meta: response))
         }
     }
     

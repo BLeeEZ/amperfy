@@ -129,7 +129,7 @@ class MOCK_BackendApi: BackendApi {
     func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> { return Helper.urlPromise }
     func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> { return Helper.urlPromise }
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> { return Helper.urlPromise }
-    func checkForErrorResponse(inData data: Data) -> ResponseError? { return nil }
+    func checkForErrorResponse(response: APIDataResponse) -> ResponseError? { return nil }
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer { return MOCK_LibrarySyncer() }
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { return nil }

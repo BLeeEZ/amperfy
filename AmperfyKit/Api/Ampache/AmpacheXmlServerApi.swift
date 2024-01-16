@@ -26,9 +26,22 @@ import PromiseKit
 import Alamofire
 import PMKAlamofire
 
+struct AmpacheResponseError: LocalizedError {
+    public var statusCode: Int = 0
+    public var message: String
+    
+    public var ampacheError: AmpacheXmlServerApi.AmpacheError? {
+        return AmpacheXmlServerApi.AmpacheError(rawValue: statusCode)
+    }
+}
+
 extension ResponseError {
     var asAmpacheError: AmpacheXmlServerApi.AmpacheError? {
         return AmpacheXmlServerApi.AmpacheError(rawValue: statusCode)
+    }
+    
+    static func createFromAmpacheError(url: URL, error: AmpacheResponseError) -> ResponseError {
+        return ResponseError(statusCode: error.statusCode, message: error.message, url: url)
     }
 }
 
@@ -148,8 +161,8 @@ class AmpacheXmlServerApi {
             createAuthURL(credentials: credentials)
         }.then { url in
             self.request(url: url)
-        }.then { data in
-            self.parseAuthResult(data: data)
+        }.then { response in
+            self.parseAuthResult(response: response)
         }
     }
     
@@ -172,9 +185,9 @@ class AmpacheXmlServerApi {
         }
     }
     
-    private func parseAuthResult(data: Data) -> Promise<AuthentificationHandshake> {
+    private func parseAuthResult(response: APIDataResponse) -> Promise<AuthentificationHandshake> {
         return Promise<AuthentificationHandshake> { seal in
-            let parser = XMLParser(data: data)
+            let parser = XMLParser(data: response.data)
             let curDelegate = AuthParserDelegate()
             parser.delegate = curDelegate
             let success = parser.parse()
@@ -183,7 +196,7 @@ class AmpacheXmlServerApi {
             }
             if let error = parser.parserError {
                 os_log("Error during AuthPars: %s", log: self.log, type: .error, error.localizedDescription)
-                throw BackendError.parser
+                throw XMLParserResponseError(url: response.url)
             }
             if success, let auth = curDelegate.authHandshake {
                 return seal.fulfill(auth)
@@ -207,7 +220,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestDefaultArtwork() -> Promise<Data> {
+    func requestDefaultArtwork() -> Promise<APIDataResponse> {
         return request { auth in
             guard let hostname = self.credentials?.serverUrl,
                   var url = URL(string: hostname)
@@ -223,7 +236,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestCatalogs() -> Promise<Data> {
+    func requestCatalogs() -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "catalogs")
@@ -231,7 +244,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestGenres() -> Promise<Data> {
+    func requestGenres() -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "genres")
@@ -239,7 +252,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestArtists(startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) -> Promise<Data> {
+    func requestArtists(startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) -> Promise<APIDataResponse> {
         return request { auth in
             let offset = startIndex < auth.artistCount ? startIndex : auth.artistCount-1
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
@@ -250,7 +263,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestArtistWithinCatalog(id: String) -> Promise<Data> {
+    func requestArtistWithinCatalog(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "advanced_search")
@@ -262,7 +275,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestArtistInfo(id: String) -> Promise<Data> {
+    func requestArtistInfo(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "artist")
@@ -271,7 +284,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestArtistAlbums(id: String) -> Promise<Data> {
+    func requestArtistAlbums(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "artist_albums")
@@ -280,7 +293,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestArtistSongs(id: String) -> Promise<Data> {
+    func requestArtistSongs(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "artist_songs")
@@ -289,7 +302,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestAlbumInfo(id: String) -> Promise<Data> {
+    func requestAlbumInfo(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "album")
@@ -298,7 +311,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestAlbumSongs(id: String) -> Promise<Data> {
+    func requestAlbumSongs(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "album_songs")
@@ -307,7 +320,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestSongInfo(id: String) -> Promise<Data> {
+    func requestSongInfo(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "song")
@@ -316,7 +329,7 @@ class AmpacheXmlServerApi {
         }
     }
 
-    func requestAlbums(startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) -> Promise<Data> {
+    func requestAlbums(startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) -> Promise<APIDataResponse> {
         return request { auth in
             let offset = startIndex < auth.albumCount ? startIndex : auth.albumCount-1
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
@@ -327,7 +340,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestRandomSongs(count: Int) -> Promise<Data> {
+    func requestRandomSongs(count: Int) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_generate")
@@ -338,7 +351,7 @@ class AmpacheXmlServerApi {
         }
     }
 
-    func requestPodcastEpisodeDelete(id: String) -> Promise<Data> {
+    func requestPodcastEpisodeDelete(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "podcast_episode_delete")
@@ -347,7 +360,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestFavoriteArtists() -> Promise<Data> {
+    func requestFavoriteArtists() -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "advanced_search")
@@ -359,7 +372,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestFavoriteAlbums() -> Promise<Data> {
+    func requestFavoriteAlbums() -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "advanced_search")
@@ -371,7 +384,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestFavoriteSongs() -> Promise<Data> {
+    func requestFavoriteSongs() -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "advanced_search")
@@ -383,7 +396,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestRecentSongs(count: Int) -> Promise<Data> {
+    func requestRecentSongs(count: Int) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "advanced_search")
@@ -395,7 +408,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylists() -> Promise<Data> {
+    func requestPlaylists() -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlists")
@@ -403,7 +416,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylist(id: String) -> Promise<Data> {
+    func requestPlaylist(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist")
@@ -412,7 +425,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylistSongs(id: String) -> Promise<Data> {
+    func requestPlaylistSongs(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_songs")
@@ -421,7 +434,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylistCreate(name: String) -> Promise<Data> {
+    func requestPlaylistCreate(name: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_create")
@@ -431,7 +444,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylistDelete(id: String) -> Promise<Data> {
+    func requestPlaylistDelete(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_delete")
@@ -440,7 +453,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylistAddSong(playlistId: String, songId: String) -> Promise<Data> {
+    func requestPlaylistAddSong(playlistId: String, songId: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_add_song")
@@ -450,7 +463,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylistDeleteItem(id: String, index: Int) -> Promise<Data> {
+    func requestPlaylistDeleteItem(id: String, index: Int) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_remove_song")
@@ -460,7 +473,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylistEditOnlyName(id: String, name: String) -> Promise<Data> {
+    func requestPlaylistEditOnlyName(id: String, name: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_edit")
@@ -470,7 +483,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPlaylistEdit(id: String, songsIds: [String]) -> Promise<Data> {
+    func requestPlaylistEdit(id: String, songsIds: [String]) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_edit")
@@ -481,7 +494,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPodcasts() -> Promise<Data> {
+    func requestPodcasts() -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "podcasts")
@@ -489,7 +502,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestPodcastEpisodes(id: String) -> Promise<Data> {
+    func requestPodcastEpisodes(id: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "podcast_episodes")
@@ -498,7 +511,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestRecordPlay(songId: String, date: Date?) -> Promise<Data> {
+    func requestRecordPlay(songId: String, date: Date?) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "record_play")
@@ -513,7 +526,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestRate(songId: String, rating: Int) -> Promise<Data> {
+    func requestRate(songId: String, rating: Int) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "rate")
@@ -524,7 +537,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestRate(albumId: String, rating: Int) -> Promise<Data> {
+    func requestRate(albumId: String, rating: Int) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "rate")
@@ -535,7 +548,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestRate(artistId: String, rating: Int) -> Promise<Data> {
+    func requestRate(artistId: String, rating: Int) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "rate")
@@ -546,7 +559,7 @@ class AmpacheXmlServerApi {
         }
     }
 
-    func requestSetFavorite(songId: String, isFavorite: Bool) -> Promise<Data> {
+    func requestSetFavorite(songId: String, isFavorite: Bool) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "flag")
@@ -557,7 +570,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestSetFavorite(albumId: String, isFavorite: Bool) -> Promise<Data> {
+    func requestSetFavorite(albumId: String, isFavorite: Bool) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "flag")
@@ -568,7 +581,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestSetFavorite(artistId: String, isFavorite: Bool) -> Promise<Data> {
+    func requestSetFavorite(artistId: String, isFavorite: Bool) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "flag")
@@ -579,7 +592,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestSearchArtists(searchText: String) -> Promise<Data> {
+    func requestSearchArtists(searchText: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "artists")
@@ -589,7 +602,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestSearchAlbums(searchText: String) -> Promise<Data> {
+    func requestSearchAlbums(searchText: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "albums")
@@ -599,7 +612,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    func requestSearchSongs(searchText: String) -> Promise<Data> {
+    func requestSearchSongs(searchText: String) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "search_songs")
@@ -617,11 +630,11 @@ class AmpacheXmlServerApi {
         }
     }
     
-    private func request(url: URL) -> Promise<Data> {
+    private func request(url: URL) -> Promise<APIDataResponse> {
         return firstly {
             AF.request(url, method: .get).validate().responseData()
         }.then { data, response in
-            Promise<Data>.value(data)
+            Promise<APIDataResponse>.value(APIDataResponse(data: data, url: url, meta: response))
         }
     }
 
@@ -642,12 +655,13 @@ class AmpacheXmlServerApi {
         return self.updateUrlToken(urlString: artwork.url)
     }
     
-    func checkForErrorResponse(inData data: Data) -> ResponseError? {
+    func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
         let errorParser = AmpacheXmlParser()
-        let parser = XMLParser(data: data)
+        let parser = XMLParser(data: response.data)
         parser.delegate = errorParser
         parser.parse()
-        return errorParser.error
+        guard let ampacheError = errorParser.error else { return nil }
+        return ResponseError.createFromAmpacheError(url: response.url, error: ampacheError)
     }
     
     func updateUrlToken(urlString: String) -> Promise<URL> {
@@ -676,7 +690,7 @@ class AmpacheXmlServerApi {
         }
     }
     
-    private func request(urlCreation: @escaping (_: AuthentificationHandshake) throws -> URL) -> Promise<Data> {
+    private func request(urlCreation: @escaping (_: AuthentificationHandshake) throws -> URL) -> Promise<APIDataResponse> {
         return firstly {
             reauthenticate()
         }.then { auth in

@@ -71,7 +71,6 @@ public enum AuthenticationError: LocalizedError {
 }
 
 public enum BackendError: LocalizedError {
-    case parser
     case invalidUrl
     case noCredentials
     case persistentSaveFailed
@@ -81,8 +80,6 @@ public enum BackendError: LocalizedError {
     public var errorDescription: String? {
         var ret = ""
         switch self {
-        case .parser:
-            ret = "XML response could not be parsed."
         case .invalidUrl:
             ret = "Provided URL is invalid."
         case .noCredentials:
@@ -98,14 +95,32 @@ public enum BackendError: LocalizedError {
     }
 }
 
-public struct ResponseError: LocalizedError {
+public class ResponseError: LocalizedError {
     public var statusCode: Int = 0
     public var message: String
+    public var url: URL
+    
+    init(statusCode: Int = 0, message: String, url: URL) {
+        self.statusCode = statusCode
+        self.message = message
+        self.url = url
+    }
     
     public var errorDescription: String? {
         return "API error \(statusCode): \(message)"
     }
 }
+
+public class XMLParserResponseError: ResponseError {
+    init(url: URL) {
+        super.init(message: "XML response could not be parsed.", url: url)
+    }
+    
+    public override var errorDescription: String? {
+        return "\(message)"
+    }
+}
+
 
 public class BackendProxy {
     
@@ -281,8 +296,8 @@ extension BackendProxy: BackendApi {
         return activeApi.generateUrl(forArtwork: artwork)
     }
     
-    public func checkForErrorResponse(inData data: Data) -> ResponseError? {
-        return activeApi.checkForErrorResponse(inData: data)
+    public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+        return activeApi.checkForErrorResponse(response: response)
     }
     
     public func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {

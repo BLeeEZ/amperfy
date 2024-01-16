@@ -55,9 +55,9 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     
     func validateDownloadedData(download: Download) -> ResponseError? {
         guard let data = download.resumeData else {
-            return ResponseError(statusCode: 0, message: "Invalid download")
+            return ResponseError(statusCode: 0, message: "Invalid download", url: download.url)
         }
-        return ampacheXmlServerApi.checkForErrorResponse(inData: data)
+        return ampacheXmlServerApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url, meta: nil))
     }
 
     func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
@@ -101,8 +101,9 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
         } else {
             return firstly {
                 self.ampacheXmlServerApi.requestDefaultArtwork()
-            }.get { data in
-                self.defaultImageData = data
+            }.then { response in
+                self.defaultImageData = response.data
+                return Promise<Data>.value(response.data)
             }
         }
     }

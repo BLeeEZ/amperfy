@@ -50,7 +50,7 @@ extension AppDelegate: AlertDisplayable {
               let popupVC = popupVC as? LibrarySyncPopupVC
               else { return }
 
-        let banner = FloatingNotificationBanner(title: popupVC.topic, subtitle: popupVC.message, style: BannerStyle.from(logType: popupVC.logType), colors: AmperfyBannerColors())
+        let banner = FloatingNotificationBanner(title: popupVC.topic, subtitle: popupVC.shortMessage, style: BannerStyle.from(logType: popupVC.logType), colors: AmperfyBannerColors())
         
         banner.onTap = {
             self.display(popup: popupVC)
@@ -80,9 +80,9 @@ extension AppDelegate: AlertDisplayable {
         topView.present(popupVC, animated: true, completion: nil)
     }
     
-    func createPopupVC(topic: String, message: String, logType: LogEntryType) -> UIViewController {
+    func createPopupVC(topic: String, shortMessage: String, detailMessage: String, clipboardContent: String?, logType: LogEntryType) -> UIViewController {
         let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
-        popupVC.setContent(topic: topic, message: message, type: logType)
+        popupVC.setContent(topic: topic, shortMessage: shortMessage, detailMessage: detailMessage, clipboardContent: clipboardContent, type: logType)
         return popupVC
     }
 }

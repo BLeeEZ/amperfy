@@ -23,7 +23,7 @@ import Foundation
 
 class SsXmlParser: GenericXmlParser {
     
-    var error: ResponseError?
+    var error: SubsonicResponseError?
 
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
@@ -31,7 +31,7 @@ class SsXmlParser: GenericXmlParser {
         if(elementName == "error") {
             let statusCode = Int(attributeDict["code"] ?? "0") ?? 0
             let message = attributeDict["message"] ?? ""
-            error = ResponseError(statusCode: statusCode, message: message)
+            error = SubsonicResponseError(statusCode: statusCode, message: message)
         }
     }
     

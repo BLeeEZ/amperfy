@@ -22,6 +22,7 @@
 import Foundation
 import CoreData
 import PromiseKit
+import PMKAlamofire
 
 public enum ParsedObjectType {
     case artist
@@ -38,6 +39,18 @@ public protocol ParsedObjectNotifiable {
 
 public protocol SyncCallbacks: ParsedObjectNotifiable {
     func notifySyncStarted(ofType parsedObjectType: ParsedObjectType, totalCount: Int)
+}
+
+public class APIDataResponse {
+    public var data: Data
+    public var url: URL
+    public var meta: PMKAlamofireDataResponse?
+    
+    init(data: Data, url: URL, meta: PMKAlamofireDataResponse?) {
+        self.data = data
+        self.url = url
+        self.meta = meta
+    }
 }
 
 public protocol LibrarySyncer {
@@ -88,7 +101,7 @@ public protocol BackendApi {
     func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL>
     func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL>
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL>
-    func checkForErrorResponse(inData data: Data) -> ResponseError?
+    func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo?

@@ -37,7 +37,7 @@ public enum AmperfyLogStatusCode: Int {
 public protocol AlertDisplayable {
     func display(notificationBanner popupVC: UIViewController)
     func display(popup popupVC: UIViewController)
-    func createPopupVC(topic: String, message: String, logType: LogEntryType) -> UIViewController
+    func createPopupVC(topic: String, shortMessage: String, detailMessage: String, clipboardContent: String?, logType: LogEntryType) -> UIViewController
 }
 
 public class EventLogger {
@@ -52,30 +52,36 @@ public class EventLogger {
     }
     
     public func info(topic: String, message: String, displayPopup: Bool = true) {
-        report(topic: topic, statusCode: .info, message: message, logType: .info, displayPopup: displayPopup)
+        report(topic: topic, statusCode: .info, shortMessage: message, detailMessage: message, logType: .info, displayPopup: displayPopup)
     }
     
     public func info(topic: String, statusCode: AmperfyLogStatusCode, message: String, displayPopup: Bool) {
-        report(topic: topic, statusCode: statusCode, message: message, logType: .info, displayPopup: displayPopup)
+        report(topic: topic, statusCode: statusCode, shortMessage: message, detailMessage: message, logType: .info, displayPopup: displayPopup)
     }
     
     public func error(topic: String, statusCode: AmperfyLogStatusCode, message: String, displayPopup: Bool) {
-        report(topic: topic, statusCode: statusCode, message: message, logType: .error, displayPopup: displayPopup)
+        report(topic: topic, statusCode: statusCode, shortMessage: message, detailMessage: message, logType: .error, displayPopup: displayPopup)
+    }
+    
+    public func error(topic: String, statusCode: AmperfyLogStatusCode, shortMessage: String, detailMessage: String, displayPopup: Bool) {
+        report(topic: topic, statusCode: statusCode, shortMessage: shortMessage, detailMessage: detailMessage, logType: .error, displayPopup: displayPopup)
     }
      
-    private func report(topic: String, statusCode: AmperfyLogStatusCode, message: String, logType: LogEntryType, displayPopup: Bool) {
+    private func report(topic: String, statusCode: AmperfyLogStatusCode, shortMessage: String, detailMessage: String, logType: LogEntryType, displayPopup: Bool) {
         saveAndDisplay(topic: topic,
             logType: logType,
             errorType: statusCode,
             statusCode: statusCode.rawValue,
-            errorMessage: topic + ": " + message,
+            errorMessage: topic + ": " + shortMessage,
             displayPopup: displayPopup,
-            popupMessage: message)
+            popupMessage: shortMessage,
+            detailMessage: detailMessage,
+            clipboardContent: nil)
     }
     
     public func report(topic: String, error: Error, displayPopup: Bool = true) {
         if let apiError = error as? ResponseError {
-            return report(error: apiError, displayPopup: displayPopup)
+            return report(topic: topic, error: apiError, displayPopup: displayPopup)
         }
         saveAndDisplay(topic: topic,
             logType: .error,
@@ -83,24 +89,30 @@ public class EventLogger {
             statusCode: 0,
             errorMessage: topic + ": " + error.localizedDescription,
             displayPopup: displayPopup,
-            popupMessage: error.localizedDescription)
+            popupMessage: error.localizedDescription,
+            detailMessage: error.localizedDescription,
+            clipboardContent: nil)
     }
     
-    public func report(error: ResponseError, displayPopup: Bool) {
+    public func report(topic: String, error: ResponseError, displayPopup: Bool) {
         var alertMessage = ""
         alertMessage += "Status code: \(error.statusCode)"
         alertMessage += "\n\(error.message)"
+        var detailMessage = "\(alertMessage)"
+        detailMessage += "\n\nURL:\n\(error.url)"
         
-        saveAndDisplay(topic: "API Error",
+        saveAndDisplay(topic: topic,
             logType: .apiError,
             errorType: .connectionError,
             statusCode: error.statusCode,
             errorMessage: "API Error " + error.statusCode.description + ": " + error.message,
             displayPopup: displayPopup,
-            popupMessage: alertMessage)
+            popupMessage: alertMessage,
+            detailMessage: detailMessage,
+            clipboardContent: error.url.absoluteString)
     }
     
-    private func saveAndDisplay(topic: String, logType: LogEntryType, errorType: AmperfyLogStatusCode, statusCode: Int, errorMessage: String, displayPopup: Bool, popupMessage: String) {
+    private func saveAndDisplay(topic: String, logType: LogEntryType, errorType: AmperfyLogStatusCode, statusCode: Int, errorMessage: String, displayPopup: Bool, popupMessage: String, detailMessage: String, clipboardContent: String?) {
         os_log("%s", log: self.log, type: .error, errorMessage)
         storage.async.perform { asynCompanion in
             let logEntry = asynCompanion.library.createLogEntry()
@@ -110,16 +122,16 @@ public class EventLogger {
             asynCompanion.saveContext()
             
             if displayPopup {
-                self.displayAlert(topic: topic, message: popupMessage, logType: logType)
+                self.displayAlert(topic: topic, shortMessage: popupMessage, detailMessage: detailMessage, clipboardContent: clipboardContent, logType: logType)
             }
         }.catch { error in }
     }
     
-    private func displayAlert(topic: String, message: String, logType: LogEntryType) {
+    private func displayAlert(topic: String, shortMessage: String, detailMessage: String, clipboardContent: String?, logType: LogEntryType) {
         guard let displayer = self.alertDisplayer else { return }
         DispatchQueue.main.async {
             guard !self.supressAlerts else { return }
-            let popupVC = displayer.createPopupVC(topic: topic, message: message, logType: logType)
+            let popupVC = displayer.createPopupVC(topic: topic, shortMessage: shortMessage, detailMessage: detailMessage, clipboardContent: clipboardContent, logType: logType)
             displayer.display(notificationBanner: popupVC)
         }
     }

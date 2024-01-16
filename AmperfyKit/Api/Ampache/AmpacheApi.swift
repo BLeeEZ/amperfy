@@ -58,8 +58,8 @@ class AmpacheApi: BackendApi {
         return ampacheXmlServerApi.generateUrl(forArtwork: artwork)
     }
     
-    func checkForErrorResponse(inData data: Data) -> ResponseError? {
-        return ampacheXmlServerApi.checkForErrorResponse(inData: data)
+    func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+        return ampacheXmlServerApi.checkForErrorResponse(response: response)
     }
 
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
