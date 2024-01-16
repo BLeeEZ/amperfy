@@ -40,12 +40,12 @@ extension ResponseError {
         return AmpacheXmlServerApi.AmpacheError(rawValue: statusCode)
     }
     
-    static func createFromAmpacheError(url: URL, error: AmpacheResponseError) -> ResponseError {
-        return ResponseError(statusCode: error.statusCode, message: error.message, url: url)
+    static func createFromAmpacheError(cleansedURL: CleansedURL, error: AmpacheResponseError) -> ResponseError {
+        return ResponseError(statusCode: error.statusCode, message: error.message, cleansedURL: cleansedURL)
     }
 }
 
-class AmpacheXmlServerApi {
+class AmpacheXmlServerApi: URLCleanser {
     
     enum AmpacheError: Int {
         case empty = 0
@@ -185,6 +185,32 @@ class AmpacheXmlServerApi {
         }
     }
     
+    func cleanse(url: URL) -> CleansedURL {
+        guard
+            var urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
+            let queryItems = urlComp.queryItems
+        else { return CleansedURL(urlString: "") }
+        
+        urlComp.host = "SERVERURL"
+        if urlComp.port != nil {
+            urlComp.port = nil
+        }
+        var outputItems = [URLQueryItem]()
+        for queryItem in queryItems {
+            if queryItem.name == "ssid" {
+                outputItems.append(URLQueryItem(name: queryItem.name, value: "SSID"))
+            } else if queryItem.name == "auth" {
+                outputItems.append(URLQueryItem(name: queryItem.name, value: "AUTH"))
+            } else if queryItem.name == "user" {
+                outputItems.append(URLQueryItem(name: queryItem.name, value: "USER"))
+            } else {
+                outputItems.append(queryItem)
+            }
+        }
+        urlComp.queryItems = outputItems
+        return CleansedURL(urlString: urlComp.string ?? "")
+    }
+    
     private func parseAuthResult(response: APIDataResponse) -> Promise<AuthentificationHandshake> {
         return Promise<AuthentificationHandshake> { seal in
             let parser = XMLParser(data: response.data)
@@ -196,7 +222,7 @@ class AmpacheXmlServerApi {
             }
             if let error = parser.parserError {
                 os_log("Error during AuthPars: %s", log: self.log, type: .error, error.localizedDescription)
-                throw XMLParserResponseError(url: response.url)
+                throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: self))
             }
             if success, let auth = curDelegate.authHandshake {
                 return seal.fulfill(auth)
@@ -661,7 +687,7 @@ class AmpacheXmlServerApi {
         parser.delegate = errorParser
         parser.parse()
         guard let ampacheError = errorParser.error else { return nil }
-        return ResponseError.createFromAmpacheError(url: response.url, error: ampacheError)
+        return ResponseError.createFromAmpacheError(cleansedURL: response.url.asCleansedURL(cleanser: self), error: ampacheError)
     }
     
     func updateUrlToken(urlString: String) -> Promise<URL> {

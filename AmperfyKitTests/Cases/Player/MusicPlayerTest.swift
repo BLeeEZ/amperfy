@@ -75,7 +75,7 @@ class MOCK_SongDownloader: DownloadManageable {
 class MOCK_AlertDisplayable: AlertDisplayable {
     func display(notificationBanner popupVC: UIViewController) {}
     func display(popup popupVC: UIViewController) {}
-    func createPopupVC(topic: String, message: String, logType: LogEntryType) -> UIViewController { return UIViewController() }
+    func createPopupVC(topic: String, shortMessage: String, detailMessage: String, clipboardContent: String?, logType: AmperfyKit.LogEntryType) -> UIViewController { return UIViewController() }
 }
 
 class MOCK_LibrarySyncer: LibrarySyncer {
@@ -133,6 +133,7 @@ class MOCK_BackendApi: BackendApi {
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer { return MOCK_LibrarySyncer() }
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { return nil }
+    func cleanse(url: URL) -> CleansedURL { return CleansedURL(urlString: "") }
 }
 
 class MOCK_MusicPlayable: MusicPlayable {

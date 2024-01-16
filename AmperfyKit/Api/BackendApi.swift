@@ -93,7 +93,30 @@ protocol AbstractBackgroundLibrarySyncer {
     func stopAndWait()
 }
 
-public protocol BackendApi {
+
+public class CleansedURL {
+    private var urlString: String
+    
+    init(urlString: String) {
+        self.urlString = urlString
+    }
+    
+    var description: String {
+        return urlString
+    }
+}
+
+extension URL {
+    func asCleansedURL(cleanser: URLCleanser) -> CleansedURL {
+        return cleanser.cleanse(url: self)
+    }
+}
+
+public protocol URLCleanser {
+    func cleanse(url: URL) -> CleansedURL
+}
+
+public protocol BackendApi: URLCleanser {
     var clientApiVersion: String { get }
     var serverApiVersion: String { get }
     func provideCredentials(credentials: LoginCredentials)

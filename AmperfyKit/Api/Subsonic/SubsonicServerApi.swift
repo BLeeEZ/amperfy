@@ -48,13 +48,13 @@ extension ResponseError {
         return SubsonicServerApi.SubsonicError(rawValue: statusCode)
     }
     
-    static func createFromSubsonicError(url: URL, error: SubsonicResponseError) -> ResponseError {
-        return ResponseError(statusCode: error.statusCode, message: error.message, url: url)
+    static func createFromSubsonicError(cleansedURL: CleansedURL, error: SubsonicResponseError) -> ResponseError {
+        return ResponseError(statusCode: error.statusCode, message: error.message, cleansedURL: cleansedURL)
     }
 }
 
 
-class SubsonicServerApi {
+class SubsonicServerApi: URLCleanser {
     
     enum SubsonicError: Int {
         case generic = 0 // A generic error.
@@ -191,6 +191,34 @@ class SubsonicServerApi {
         self.credentials = credentials
     }
     
+    func cleanse(url: URL) -> CleansedURL {
+        guard
+            var urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
+            let queryItems = urlComp.queryItems
+        else { return CleansedURL(urlString: "") }
+        
+        urlComp.host = "SERVERURL"
+        if urlComp.port != nil {
+            urlComp.port = nil
+        }
+        var outputItems = [URLQueryItem]()
+        for queryItem in queryItems {
+            if queryItem.name == "p" {
+                outputItems.append(URLQueryItem(name: queryItem.name, value: "PASSWORD"))
+            } else if queryItem.name == "t" {
+                outputItems.append(URLQueryItem(name: queryItem.name, value: "AUTHTOKEN"))
+            } else if queryItem.name == "s" {
+                outputItems.append(URLQueryItem(name: queryItem.name, value: "SALT"))
+            } else if queryItem.name == "u" {
+                outputItems.append(URLQueryItem(name: queryItem.name, value: "USER"))
+            } else {
+                outputItems.append(queryItem)
+            }
+        }
+        urlComp.queryItems = outputItems
+        return CleansedURL(urlString: urlComp.string ?? "")
+    }
+    
     func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
         return firstly {
             self.requestServerApiVersionPromise(providedCredentials: credentials)
@@ -271,10 +299,10 @@ class SubsonicServerApi {
                 let parser = XMLParser(data: response.data)
                 parser.delegate = delegate
                 parser.parse()
-                guard let serverApiVersionString = delegate.serverApiVersion else { throw XMLParserResponseError(url: response.url) }
+                guard let serverApiVersionString = delegate.serverApiVersion else { throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: self)) }
                 guard let serverApiVersion = SubsonicVersion(serverApiVersionString) else {
                     os_log("The server API version '%s' could not be parsed to 'SubsonicVersion'", log: self.log, type: .info, serverApiVersionString)
-                    throw XMLParserResponseError(url: response.url)
+                    throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: self))
                 }
                 self.serverApiVersion = serverApiVersion
                 return seal.fulfill(serverApiVersion)
@@ -450,7 +478,7 @@ class SubsonicServerApi {
         parser.delegate = errorParser
         parser.parse()
         guard let subsonicError = errorParser.error else { return nil }
-        return ResponseError.createFromSubsonicError(url: response.url, error: subsonicError)
+        return ResponseError.createFromSubsonicError(cleansedURL: response.url.asCleansedURL(cleanser: self), error: subsonicError)
     }
 
     func requestPlaylistUpdate(id: String, name: String, songIndicesToRemove: [Int], songIdsToAdd: [String]) -> Promise<APIDataResponse> {

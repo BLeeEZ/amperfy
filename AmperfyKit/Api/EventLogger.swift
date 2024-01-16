@@ -99,7 +99,7 @@ public class EventLogger {
         alertMessage += "Status code: \(error.statusCode)"
         alertMessage += "\n\(error.message)"
         var detailMessage = "\(alertMessage)"
-        detailMessage += "\n\nURL:\n\(error.url)"
+        detailMessage += "\n\nURL:\n\(error.cleansedURL.description)"
         
         saveAndDisplay(topic: topic,
             logType: .apiError,
@@ -109,7 +109,7 @@ public class EventLogger {
             displayPopup: displayPopup,
             popupMessage: alertMessage,
             detailMessage: detailMessage,
-            clipboardContent: error.url.absoluteString)
+            clipboardContent: error.cleansedURL.description)
     }
     
     private func saveAndDisplay(topic: String, logType: LogEntryType, errorType: AmperfyLogStatusCode, statusCode: Int, errorMessage: String, displayPopup: Bool, popupMessage: String, detailMessage: String, clipboardContent: String?) {

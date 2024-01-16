@@ -98,12 +98,12 @@ public enum BackendError: LocalizedError {
 public class ResponseError: LocalizedError {
     public var statusCode: Int = 0
     public var message: String
-    public var url: URL
+    public var cleansedURL: CleansedURL
     
-    init(statusCode: Int = 0, message: String, url: URL) {
+    init(statusCode: Int = 0, message: String, cleansedURL: CleansedURL) {
         self.statusCode = statusCode
         self.message = message
-        self.url = url
+        self.cleansedURL = cleansedURL
     }
     
     public var errorDescription: String? {
@@ -112,8 +112,8 @@ public class ResponseError: LocalizedError {
 }
 
 public class XMLParserResponseError: ResponseError {
-    init(url: URL) {
-        super.init(message: "XML response could not be parsed.", url: url)
+    init(cleansedURL: CleansedURL) {
+        super.init(message: "XML response could not be parsed.", cleansedURL: cleansedURL)
     }
     
     public override var errorDescription: String? {
@@ -310,6 +310,10 @@ extension BackendProxy: BackendApi {
     
     public func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
         return activeApi.extractArtworkInfoFromURL(urlString: urlString)
+    }
+    
+    public func cleanse(url: URL) -> CleansedURL {
+        return activeApi.cleanse(url: url)
     }
     
 }

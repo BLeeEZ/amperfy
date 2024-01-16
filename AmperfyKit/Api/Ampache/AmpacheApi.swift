@@ -73,5 +73,9 @@ class AmpacheApi: BackendApi {
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
         AmpacheXmlServerApi.extractArtworkInfoFromURL(urlString: urlString)
     }
+    
+    func cleanse(url: URL) -> CleansedURL {
+        return ampacheXmlServerApi.cleanse(url: url)
+    }
 
 }

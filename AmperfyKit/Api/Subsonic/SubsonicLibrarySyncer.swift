@@ -692,10 +692,10 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         parser.parse()
         if let error = parser.parserError {
             os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
-            throw XMLParserResponseError(url: response.url)
+            throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: subsonicServerApi))
         }
         if let error = delegate.error, let _ = error.subsonicError {
-            throw ResponseError.createFromSubsonicError(url: response.url, error: error)
+            throw ResponseError.createFromSubsonicError(cleansedURL: response.url.asCleansedURL(cleanser: subsonicServerApi), error: error)
         }
     }
     

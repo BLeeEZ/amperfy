@@ -83,5 +83,9 @@ extension SubsonicApi: BackendApi {
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
         return SubsonicServerApi.extractArtworkInfoFromURL(urlString: urlString)
     }
+    
+    func cleanse(url: URL) -> CleansedURL {
+        return subsonicServerApi.cleanse(url: url)
+    }
 
 }
