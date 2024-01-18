@@ -26,9 +26,11 @@ import PromiseKit
 class SubsonicApi  {
         
     private let subsonicServerApi: SubsonicServerApi
+    private let eventLogger: EventLogger
 
-    init(subsonicServerApi: SubsonicServerApi) {
+    init(subsonicServerApi: SubsonicServerApi, eventLogger: EventLogger) {
         self.subsonicServerApi = subsonicServerApi
+        self.eventLogger = eventLogger
     }
     
     var authType: SubsonicApiAuthType {
@@ -73,7 +75,7 @@ extension SubsonicApi: BackendApi {
     }
     
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
-        return SubsonicLibrarySyncer(subsonicServerApi: subsonicServerApi, storage: storage)
+        return SubsonicLibrarySyncer(subsonicServerApi: subsonicServerApi, storage: storage, eventLogger: eventLogger)
     }
     
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {

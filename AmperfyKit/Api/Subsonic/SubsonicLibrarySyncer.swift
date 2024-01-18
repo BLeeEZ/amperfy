@@ -28,15 +28,17 @@ class SubsonicLibrarySyncer: LibrarySyncer {
 
     private let subsonicServerApi: SubsonicServerApi
     private let storage: PersistentStorage
+    private let eventLogger: EventLogger
     private let log = OSLog(subsystem: "Amperfy", category: "SubsonicLibSyncer")
     
     var isSyncAllowed: Bool {
         return Reachability.isConnectedToNetwork()
     }
     
-    init(subsonicServerApi: SubsonicServerApi, storage: PersistentStorage) {
+    init(subsonicServerApi: SubsonicServerApi, storage: PersistentStorage, eventLogger: EventLogger) {
         self.subsonicServerApi = subsonicServerApi
         self.storage = storage
+        self.eventLogger = eventLogger
     }
     
     func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void> {
@@ -144,8 +146,9 @@ class SubsonicLibrarySyncer: LibrarySyncer {
                 } catch {
                     if let responseError = error as? ResponseError, let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
                         let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
-                        os_log("Artist <%s> is remote deleted", log: self.log, type: .info, artistAsync.name)
+                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Artist \"\(artistAsync.name)\" is no longer available on the server.", cleansedURL: response.url.asCleansedURL(cleanser: self.subsonicServerApi), data: response.data)
                         artistAsync.remoteStatus = .deleted
+                        throw reportError
                     } else {
                         throw error
                     }
@@ -172,8 +175,9 @@ class SubsonicLibrarySyncer: LibrarySyncer {
                 } catch {
                     if let responseError = error as? ResponseError, let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
                         let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
-                        os_log("Album <%s> is remote deleted", log: self.log, type: .info, albumAsync.name)
+                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Album \"\(albumAsync.name)\" is no longer available on the server.", cleansedURL: response.url.asCleansedURL(cleanser: self.subsonicServerApi), data: response.data)
                         albumAsync.markAsRemoteDeleted()
+                        throw reportError
                     } else {
                         throw error
                     }

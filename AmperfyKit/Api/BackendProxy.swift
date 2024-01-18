@@ -139,6 +139,9 @@ public class XMLParserResponseError: ResponseError {
     }
 }
 
+public class ResourceNotAvailableResponseError: ResponseError {
+}
+
 
 public class BackendProxy {
     
@@ -169,15 +172,15 @@ public class BackendProxy {
     }
  
     private lazy var ampacheApi: BackendApi = {
-        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(eventLogger: eventLogger))
+        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(eventLogger: eventLogger), eventLogger: eventLogger)
     }()
     private lazy var subsonicApi: BackendApi = {
-        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(eventLogger: eventLogger))
+        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(eventLogger: eventLogger), eventLogger: eventLogger)
         api.authType = .autoDetect
         return api
     }()
     private lazy var subsonicLegacyApi: BackendApi = {
-        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(eventLogger: eventLogger))
+        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(eventLogger: eventLogger), eventLogger: eventLogger)
         api.authType = .legacy
         return api
     }()

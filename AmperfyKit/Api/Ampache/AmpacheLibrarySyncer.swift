@@ -29,15 +29,17 @@ class AmpacheLibrarySyncer: LibrarySyncer {
     
     private let ampacheXmlServerApi: AmpacheXmlServerApi
     private let storage: PersistentStorage
+    private let eventLogger: EventLogger
     private let log = OSLog(subsystem: "Amperfy", category: "AmpacheLibSyncer")
     
     var isSyncAllowed: Bool {
         return Reachability.isConnectedToNetwork()
     }
     
-    init(ampacheXmlServerApi: AmpacheXmlServerApi, storage: PersistentStorage) {
+    init(ampacheXmlServerApi: AmpacheXmlServerApi, storage: PersistentStorage, eventLogger: EventLogger) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
         self.storage = storage
+        self.eventLogger = eventLogger
     }
     
     func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void> {
@@ -125,11 +127,13 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             self.storage.async.perform { asyncCompanion in
                 let parserDelegate = ArtistParserDelegate(library: asyncCompanion.library)
                 do {
-                    try self.parse(response: response, delegate: parserDelegate)
+                    try self.parse(response: response, delegate: parserDelegate, throwForNotFoundErrors: true)
                 } catch {
                     if let responseError = error as? ResponseError, let ampacheError = responseError.asAmpacheError, !ampacheError.isRemoteAvailable {
-                        os_log("Artist <%s> is remote deleted", log: self.log, type: .info, artist.name)
+                        let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
+                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Artist \"\(artistAsync.name)\" is no longer available on the server.", cleansedURL: response.url.asCleansedURL(cleanser: self.ampacheXmlServerApi), data: response.data)
                         artist.remoteStatus = .deleted
+                        throw reportError
                     } else {
                         throw error
                     }
@@ -181,12 +185,13 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             self.storage.async.perform { asyncCompanion in
                 let parserDelegate = AlbumParserDelegate(library: asyncCompanion.library)
                 do {
-                    try self.parse(response: response, delegate: parserDelegate)
+                    try self.parse(response: response, delegate: parserDelegate, throwForNotFoundErrors: true)
                 } catch {
                     if let responseError = error as? ResponseError, let ampacheError = responseError.asAmpacheError, !ampacheError.isRemoteAvailable {
                         let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
-                        os_log("Album <%s> is remote deleted", log: self.log, type: .info, albumAsync.name)
+                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Album \"\(albumAsync.name)\" is no longer available on the server.", cleansedURL: response.url.asCleansedURL(cleanser: self.ampacheXmlServerApi), data: response.data)
                         albumAsync.markAsRemoteDeleted()
+                        throw reportError
                     } else {
                         throw error
                     }
@@ -739,7 +744,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    private func parse(response: APIDataResponse, delegate: AmpacheXmlParser) throws {
+    private func parse(response: APIDataResponse, delegate: AmpacheXmlParser, throwForNotFoundErrors: Bool = false) throws {
         let parser = XMLParser(data: response.data)
         parser.delegate = delegate
         parser.parse()
@@ -747,7 +752,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
             throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: ampacheXmlServerApi), data: response.data)
         }
-        if let error = delegate.error, let ampacheError = error.ampacheError, ampacheError.shouldErrorBeDisplayedToUser {
+        if let error = delegate.error, let ampacheError = error.ampacheError, ampacheError.shouldErrorBeDisplayedToUser || throwForNotFoundErrors {
             throw ResponseError.createFromAmpacheError(cleansedURL: response.url.asCleansedURL(cleanser: ampacheXmlServerApi), error: error, data: response.data)
         }
     }

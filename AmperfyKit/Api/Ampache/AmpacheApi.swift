@@ -25,9 +25,11 @@ import PromiseKit
 class AmpacheApi: BackendApi {
 
     private let ampacheXmlServerApi: AmpacheXmlServerApi
+    private let eventLogger: EventLogger
 
-    init(ampacheXmlServerApi: AmpacheXmlServerApi) {
+    init(ampacheXmlServerApi: AmpacheXmlServerApi, eventLogger: EventLogger) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
+        self.eventLogger = eventLogger
     }
     
     public var clientApiVersion: String {
@@ -63,7 +65,7 @@ class AmpacheApi: BackendApi {
     }
 
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
-        return AmpacheLibrarySyncer(ampacheXmlServerApi: ampacheXmlServerApi, storage: storage)
+        return AmpacheLibrarySyncer(ampacheXmlServerApi: ampacheXmlServerApi, storage: storage, eventLogger: eventLogger)
     }    
 
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {

@@ -112,6 +112,7 @@ public class AsyncCoreDataAccessWrapper {
                 do {
                     try body(asyncCompanion)
                 } catch {
+                    library.saveContext()
                     return seal.reject(error)
                 }
                 library.saveContext()

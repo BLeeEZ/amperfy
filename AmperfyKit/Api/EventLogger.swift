@@ -66,13 +66,13 @@ public class EventLogger {
     public func error(topic: String, statusCode: AmperfyLogStatusCode, shortMessage: String, detailMessage: String, displayPopup: Bool) {
         report(topic: topic, statusCode: statusCode, shortMessage: shortMessage, detailMessage: detailMessage, logType: .error, displayPopup: displayPopup)
     }
-     
+    
     private func report(topic: String, statusCode: AmperfyLogStatusCode, shortMessage: String, detailMessage: String, logType: LogEntryType, displayPopup: Bool) {
         saveAndDisplay(topic: topic,
             logType: logType,
             errorType: statusCode,
             statusCode: statusCode.rawValue,
-            errorMessage: topic + ": " + shortMessage,
+            logMessage: topic + ": " + shortMessage,
             displayPopup: displayPopup,
             popupMessage: shortMessage,
             detailMessage: detailMessage,
@@ -87,7 +87,7 @@ public class EventLogger {
             logType: .error,
             errorType: .commonError,
             statusCode: 0,
-            errorMessage: topic + ": " + error.localizedDescription,
+            logMessage: topic + ": " + error.localizedDescription,
             displayPopup: displayPopup,
             popupMessage: error.localizedDescription,
             detailMessage: error.localizedDescription,
@@ -102,25 +102,27 @@ public class EventLogger {
         alertMessage += "\(error.message)"
         var detailMessage = "\(alertMessage)"
         detailMessage += "\n\nURL:\n\(error.cleansedURL.description)"
+        
+        let isInfoError = error is ResourceNotAvailableResponseError
 
         saveAndDisplay(topic: topic,
-            logType: .apiError,
-            errorType: .connectionError,
+            logType: isInfoError ? .info : .apiError,
+            errorType: isInfoError ? .info : .connectionError,
             statusCode: error.statusCode,
-            errorMessage: "API Error " + error.statusCode.description + ": " + error.message,
+            logMessage: error.message,
             displayPopup: displayPopup,
             popupMessage: alertMessage,
             detailMessage: detailMessage,
             clipboardContent: error.asInfo(topic: topic).asJSONString())
     }
     
-    private func saveAndDisplay(topic: String, logType: LogEntryType, errorType: AmperfyLogStatusCode, statusCode: Int, errorMessage: String, displayPopup: Bool, popupMessage: String, detailMessage: String, clipboardContent: String?) {
-        os_log("%s", log: self.log, type: .error, errorMessage)
+    private func saveAndDisplay(topic: String, logType: LogEntryType, errorType: AmperfyLogStatusCode, statusCode: Int, logMessage: String, displayPopup: Bool, popupMessage: String, detailMessage: String, clipboardContent: String?) {
+        os_log("%s", log: self.log, type: .error, logMessage)
         storage.async.perform { asynCompanion in
             let logEntry = asynCompanion.library.createLogEntry()
             logEntry.type = logType
             logEntry.statusCode = statusCode
-            logEntry.message = errorMessage
+            logEntry.message = logMessage
             asynCompanion.saveContext()
             
             if displayPopup {
