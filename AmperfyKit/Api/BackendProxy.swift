@@ -99,21 +99,39 @@ public class ResponseError: LocalizedError {
     public var statusCode: Int = 0
     public var message: String
     public var cleansedURL: CleansedURL
+    public var data: Data?
     
-    init(statusCode: Int = 0, message: String, cleansedURL: CleansedURL) {
+    init(statusCode: Int = 0, message: String, cleansedURL: CleansedURL, data: Data?) {
         self.statusCode = statusCode
         self.message = message
         self.cleansedURL = cleansedURL
+        self.data = data
     }
     
     public var errorDescription: String? {
         return "API error \(statusCode): \(message)"
     }
+    
+    public func asInfo(topic: String) -> ResponseErrorInfo {
+        var dataString: String?
+        if let data = data {
+            dataString = String(decoding: data, as: UTF8.self)
+        }
+        return ResponseErrorInfo(topic: topic, statusCode: statusCode, message: message, cleansedURL: cleansedURL.description, data: dataString)
+    }
+}
+
+public struct ResponseErrorInfo: Encodable {
+    public var topic: String
+    public var statusCode: Int
+    public var message: String
+    public var cleansedURL: String
+    public var data: String?
 }
 
 public class XMLParserResponseError: ResponseError {
-    init(cleansedURL: CleansedURL) {
-        super.init(message: "XML response could not be parsed.", cleansedURL: cleansedURL)
+    init(cleansedURL: CleansedURL, data: Data?) {
+        super.init(message: "XML response could not be parsed.", cleansedURL: cleansedURL, data: data)
     }
     
     public override var errorDescription: String? {

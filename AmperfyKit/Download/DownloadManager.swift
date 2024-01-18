@@ -38,18 +38,20 @@ class DownloadManager: NSObject, DownloadManageable {
     
     private let downloadSlotCount: Int
     private let eventLogger: EventLogger
+    private let urlCleanser: URLCleanser
     private let activeDispatchGroup = DispatchGroup()
     private let downloadPreperationSemaphore = DispatchSemaphore(value: 1)
     private var isRunning = false
     private var isActive = false
     
-    init(name: String, storage: PersistentStorage, requestManager: DownloadRequestManager, downloadDelegate: DownloadManagerDelegate, notificationHandler: EventNotificationHandler, eventLogger: EventLogger) {
+    init(name: String, storage: PersistentStorage, requestManager: DownloadRequestManager, downloadDelegate: DownloadManagerDelegate, notificationHandler: EventNotificationHandler, eventLogger: EventLogger, urlCleanser: URLCleanser) {
         log = OSLog(subsystem: "Amperfy", category: name)
         self.storage = storage
         self.requestManager = requestManager
         self.downloadDelegate = downloadDelegate
         self.notificationHandler = notificationHandler
         self.eventLogger = eventLogger
+        self.urlCleanser = urlCleanser
         self.downloadSlotCount = downloadDelegate.parallelDownloadsCount
     }
     
@@ -182,8 +184,8 @@ class DownloadManager: NSObject, DownloadManageable {
             if error != .apiErrorResponse {
                 os_log("Fetching %s FAILED: %s", log: self.log, type: .info, download.title, error.description)
                 let shortMessage = "Error \"\(error.description)\" occured while downloading object \"\(download.title)\"."
-                let detailMessage = shortMessage + "\n\nURL:\n\(download.urlString)"
-                eventLogger.error(topic: "Download Error", statusCode: .downloadError, shortMessage: shortMessage, detailMessage: detailMessage, displayPopup: isFailWithPopupError)
+                let responseError = ResponseError(message: shortMessage, cleansedURL: download.url.asCleansedURL(cleanser: urlCleanser), data: download.resumeData)
+                eventLogger.report(topic: "Download Error", error: responseError, displayPopup: isFailWithPopupError)
             }
             downloadDelegate.failedDownload(download: download, storage: self.storage)
         }

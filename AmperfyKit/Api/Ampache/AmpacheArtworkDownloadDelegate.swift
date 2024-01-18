@@ -55,7 +55,7 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     
     func validateDownloadedData(download: Download) -> ResponseError? {
         guard let data = download.resumeData else {
-            return ResponseError(message: "Invalid download", cleansedURL: download.url.asCleansedURL(cleanser: ampacheXmlServerApi))
+            return ResponseError(message: "Invalid download", cleansedURL: download.url.asCleansedURL(cleanser: ampacheXmlServerApi), data: download.resumeData)
         }
         return ampacheXmlServerApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url, meta: nil))
     }

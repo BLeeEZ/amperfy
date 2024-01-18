@@ -53,7 +53,7 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     
     func validateDownloadedData(download: Download) -> ResponseError? {
         guard let data = download.resumeData else {
-            return ResponseError(statusCode: 0, message: "Invalid download", cleansedURL: download.url.asCleansedURL(cleanser: subsonicServerApi))
+            return ResponseError(message: "Invalid download", cleansedURL: download.url.asCleansedURL(cleanser: subsonicServerApi), data: download.resumeData)
         }
         return subsonicServerApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url, meta: nil))
     }

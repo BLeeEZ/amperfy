@@ -95,7 +95,7 @@ public class AmperKit {
         let artworkExtractor = EmbeddedArtworkExtractor()
         let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi, artworkExtractor: artworkExtractor)
         let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
-        let dlManager = DownloadManager(name: "PlayableDownloader", storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
+        let dlManager = DownloadManager(name: "PlayableDownloader", storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger, urlCleanser: backendApi)
         
         let configuration = URLSessionConfiguration.background(withIdentifier: "\(Bundle.main.bundleIdentifier!).PlayableDownloader.background")
         var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
@@ -107,7 +107,7 @@ public class AmperKit {
         let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
         let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
         requestManager.clearAllDownloadsIfAllHaveFinished()
-        let dlManager = DownloadManager(name: "ArtworkDownloader", storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger)
+        let dlManager = DownloadManager(name: "ArtworkDownloader", storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger, urlCleanser: backendApi)
         dlManager.isFailWithPopupError = false
         
         dlManager.preDownloadIsValidCheck = { (object: Downloadable) -> Bool in

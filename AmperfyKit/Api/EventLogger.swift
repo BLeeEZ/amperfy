@@ -96,11 +96,13 @@ public class EventLogger {
     
     public func report(topic: String, error: ResponseError, displayPopup: Bool) {
         var alertMessage = ""
-        alertMessage += "Status code: \(error.statusCode)"
-        alertMessage += "\n\(error.message)"
+        if error.statusCode > 0 {
+            alertMessage += "Status code: \(error.statusCode)\n"
+        }
+        alertMessage += "\(error.message)"
         var detailMessage = "\(alertMessage)"
         detailMessage += "\n\nURL:\n\(error.cleansedURL.description)"
-        
+
         saveAndDisplay(topic: topic,
             logType: .apiError,
             errorType: .connectionError,
@@ -109,7 +111,7 @@ public class EventLogger {
             displayPopup: displayPopup,
             popupMessage: alertMessage,
             detailMessage: detailMessage,
-            clipboardContent: error.cleansedURL.description)
+            clipboardContent: error.asInfo(topic: topic).asJSONString())
     }
     
     private func saveAndDisplay(topic: String, logType: LogEntryType, errorType: AmperfyLogStatusCode, statusCode: Int, errorMessage: String, displayPopup: Bool, popupMessage: String, detailMessage: String, clipboardContent: String?) {

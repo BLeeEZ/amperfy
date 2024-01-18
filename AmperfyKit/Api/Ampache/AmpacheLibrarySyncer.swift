@@ -745,10 +745,10 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         parser.parse()
         if let error = parser.parserError {
             os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
-            throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: ampacheXmlServerApi))
+            throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: ampacheXmlServerApi), data: response.data)
         }
         if let error = delegate.error, let ampacheError = error.ampacheError, ampacheError.shouldErrorBeDisplayedToUser {
-            throw ResponseError.createFromAmpacheError(cleansedURL: response.url.asCleansedURL(cleanser: ampacheXmlServerApi), error: error)
+            throw ResponseError.createFromAmpacheError(cleansedURL: response.url.asCleansedURL(cleanser: ampacheXmlServerApi), error: error, data: response.data)
         }
     }
 
