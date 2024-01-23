@@ -159,6 +159,9 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         if originalContenType == "audio/x-flac" {
             return "audio/flac"
         }
+        if originalContenType == "audio/m4a" {
+            return "audio/mp4"
+        }
         return originalContenType
     }
     public var isPlayableOniOS: Bool {
