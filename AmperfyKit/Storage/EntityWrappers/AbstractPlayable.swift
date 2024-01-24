@@ -95,11 +95,14 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     public var duration: Int {
         get { return Int(playableManagedObject.combinedDuration) }
     }
-    public func updateDuration() {
+    public func updateDuration() -> Bool {
+        var isUpdated = false
         let combinedDuration = playableManagedObject.playDuration > 0 ? playableManagedObject.playDuration : playableManagedObject.remoteDuration
         if playableManagedObject.combinedDuration != combinedDuration {
             playableManagedObject.combinedDuration = combinedDuration
+            isUpdated = true
         }
+        return isUpdated
     }
     
     /// duration based on the data from the xml parser
@@ -120,10 +123,10 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
             guard Int16.isValid(value: newValue), playableManagedObject.playDuration != Int16(newValue) else { return }
             playableManagedObject.playDuration = Int16(newValue)
             playableManagedObject.combinedDuration = Int16(newValue)
-            updateDuration()
+            _ = updateDuration()
             // songs need to update more members
             if let song = asSong {
-                song.updateDuration()
+                _ = song.updateDuration()
             }
         }
     }

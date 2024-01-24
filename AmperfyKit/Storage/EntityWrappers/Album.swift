@@ -75,10 +75,10 @@ public class Album: AbstractLibraryEntity {
             if Int16.isValid(value: newValue), managedObject.remoteDuration != Int16(newValue) {
                 managedObject.remoteDuration = Int16(newValue)
             }
-            updateDuration()
+            updateDuration(updateArtistToo: true)
         }
     }
-    public func updateDuration() {
+    public func updateDuration(updateArtistToo: Bool) {
         if isSongsMetaDataSynced {
             let playablesDuration = playables.reduce(0){ $0 + $1.duration }
             if Int16.isValid(value: playablesDuration), managedObject.duration != Int16(playablesDuration) {
@@ -89,7 +89,9 @@ public class Album: AbstractLibraryEntity {
                 managedObject.duration = managedObject.remoteDuration
             }
         }
-        artist?.updateDuration()
+        if updateArtistToo {
+            artist?.updateDuration()
+        }
     }
     public var artist: Artist? {
         get {

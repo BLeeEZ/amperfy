@@ -94,7 +94,7 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
         case "album":
             parsedCount += 1
             if let album = albumBuffer {
-                album.updateDuration()
+                album.updateDuration(updateArtistToo: true)
                 parsedAlbums.append(album)
             }
             albumBuffer = nil

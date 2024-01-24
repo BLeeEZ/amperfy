@@ -86,8 +86,7 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
             albumBuffer?.rating = rating
             rating = 0
             if let parsedAlbum = albumBuffer {
-                parsedAlbum.updateDuration()
-                parsedAlbum.artist?.updateDuration()
+                parsedAlbum.updateDuration(updateArtistToo: true)
                 albumsParsed.insert(parsedAlbum)
             }
             parseNotifier?.notifyParsedObject(ofType: .album)

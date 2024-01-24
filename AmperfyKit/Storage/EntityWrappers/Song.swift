@@ -62,10 +62,15 @@ public class Song: AbstractPlayable, Identifyable {
         guard let album = album else { return true }
         return album.isOrphaned
     }
-    public override func updateDuration() {
-        super.updateDuration()
-        album?.updateDuration()
-        artist?.updateDuration()
+    public override func updateDuration() -> Bool {
+        return updateDuration(updateArtistAndAlbumToo: true)
+    }
+    public func updateDuration(updateArtistAndAlbumToo: Bool) -> Bool {
+        let isUpdateNeeded = super.updateDuration()
+        if updateArtistAndAlbumToo, isUpdateNeeded {
+            album?.updateDuration(updateArtistToo: true)
+        }
+        return isUpdateNeeded
     }
 
     override public var creatorName: String {
