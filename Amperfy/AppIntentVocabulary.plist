@@ -6,22 +6,6 @@
 	<array>
 		<dict>
 			<key>IntentName</key>
-			<string>SearchAndPlayIntent</string>
-			<key>IntentExamples</key>
-			<array>
-				<string>Search and play example title in Amperfy</string>
-			</array>
-		</dict>
-		<dict>
-			<key>IntentName</key>
-			<string>PlayIDIntent</string>
-			<key>IntentExamples</key>
-			<array>
-				<string>Play ID 1acc2 in Amperfy</string>
-			</array>
-		</dict>
-		<dict>
-			<key>IntentName</key>
 			<string>INPlayMediaIntent</string>
 			<key>IntentExamples</key>
 			<array>
