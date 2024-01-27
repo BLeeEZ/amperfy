@@ -108,7 +108,7 @@ class SongParserDelegate: PlayableParserDelegate {
             parsedCount += 1
             parseNotifier?.notifyParsedObject(ofType: .song)
             songBuffer?.rating = rating
-            songBuffer?.updateDuration()
+            _ = songBuffer?.updateDuration()
             rating = 0
             playableBuffer = nil
             if let song = songBuffer {
