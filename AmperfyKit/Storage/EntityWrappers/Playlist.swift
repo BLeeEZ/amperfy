@@ -59,46 +59,66 @@ public class Playlist: Identifyable {
     }
     
     private var internalSortedPlaylistItems: [PlaylistItem]?
-    private func updateSortedPlaylistItems() {
-        guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else { return }
-        internalSortedPlaylistItems = itemsMO
-            .sorted(by: { $0.order < $1.order })
-            .compactMap{ PlaylistItem(library: library, managedObject: $0) }
-    }
-    private var sortedPlaylistItems: [PlaylistItem] {
-        if internalSortedPlaylistItems == nil || isInternalArrayUpdateNeeded { updateInternalArrays() }
-        return internalSortedPlaylistItems ?? [PlaylistItem]()
-    }
-    
     private var internalSortedCachedPlaylistItems: [PlaylistItem]?
-    private func updateSortedCachedPlaylistItems() {
-        internalSortedCachedPlaylistItems = sortedPlaylistItems.filter{ return $0.playable?.isCached ?? false }
-    }
-    private var sortedCachedPlaylistItems: [PlaylistItem] {
-        if internalSortedCachedPlaylistItems == nil || isInternalArrayUpdateNeeded { updateInternalArrays() }
-        return internalSortedCachedPlaylistItems ?? [PlaylistItem]()
-    }
-    public var items: [PlaylistItem] {
-        return sortedPlaylistItems
-    }
-    
-
     private var internalPlayables: [AbstractPlayable]?
-    private func updateInternalPlayables() {
-        internalPlayables = sortedPlaylistItems.compactMap{ $0.playable }
-    }
-    public var playables: [AbstractPlayable] {
-        if internalPlayables == nil || isInternalArrayUpdateNeeded { updateInternalArrays() }
-        updateInternalPlayables()
-        return internalPlayables ?? [AbstractPlayable]()
-    }
     
+    private func checkIfUpdateIsNeeded() -> Bool {
+        let managedObjectItemCount = managedObject.items?.count ?? 0
+        
+        guard let internalSortedPI = internalSortedPlaylistItems,
+              let internalPlayables = internalPlayables,
+              let internalSortedCachedPlaylistItems = internalSortedCachedPlaylistItems
+        else { return true }
+        
+        let cachedPI = internalSortedPI.reduce(0){ $0 + (($1.playable?.isCached ?? false) ? 1 : 0) }
+        
+        return isInternalArrayUpdateNeeded ||
+            (managedObjectItemCount != internalSortedPI.count) ||
+            (managedObjectItemCount != internalPlayables.count) ||
+            (cachedPI != internalSortedCachedPlaylistItems.count)
+    }
     private func updateInternalArrays() {
         isInternalArrayUpdateNeeded = false
         updateSortedPlaylistItems()
         updateSortedCachedPlaylistItems()
         updateInternalPlayables()
     }
+    private func updateSortedPlaylistItems() {
+        guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else { return }
+        internalSortedPlaylistItems = itemsMO
+            .sorted(by: { $0.order < $1.order })
+            .compactMap{ PlaylistItem(library: library, managedObject: $0) }
+    } 
+    private func updateSortedCachedPlaylistItems() {
+        internalSortedCachedPlaylistItems = internalSortedPlaylistItems?.filter{ return $0.playable?.isCached ?? false }
+    }
+    private func updateInternalPlayables() {
+        internalPlayables = internalSortedPlaylistItems?.compactMap{ $0.playable }
+    }
+
+    private var sortedPlaylistItems: [PlaylistItem] {
+        if internalSortedPlaylistItems == nil || checkIfUpdateIsNeeded() { updateInternalArrays() }
+        return internalSortedPlaylistItems ?? [PlaylistItem]()
+    }
+    
+    private var sortedCachedPlaylistItems: [PlaylistItem] {
+        if internalSortedCachedPlaylistItems == nil || checkIfUpdateIsNeeded() { updateInternalArrays() }
+        return internalSortedCachedPlaylistItems ?? [PlaylistItem]()
+    }
+    public var items: [PlaylistItem] {
+        return sortedPlaylistItems
+    }
+    
+    public var playables: [AbstractPlayable] {
+        if internalPlayables == nil || checkIfUpdateIsNeeded() {
+            updateInternalArrays()
+        } else {
+            updateInternalPlayables()
+        }
+        return internalPlayables ?? [AbstractPlayable]()
+    }
+    
+
     
     public var songCount: Int {
         get { return Int(managedObject.songCount) }
