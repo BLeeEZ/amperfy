@@ -244,26 +244,31 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             self.change(sortType: .name)
             self.appDelegate.storage.settings.albumsSortSetting = .name
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByRating = UIAction(title: "Rating", image: sortType == .rating ? .check : nil, handler: { _ in
             self.change(sortType: .rating)
             self.appDelegate.storage.settings.albumsSortSetting = .rating
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByArtist = UIAction(title: "Artist", image: sortType == .artist ? .check : nil, handler: { _ in
             self.change(sortType: .artist)
             self.appDelegate.storage.settings.albumsSortSetting = .artist
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByDuration = UIAction(title: "Duration", image: sortType == .duration ? .check : nil, handler: { _ in
             self.change(sortType: .duration)
             self.appDelegate.storage.settings.albumsSortSetting = .duration
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByYear = UIAction(title: "Year", image: sortType == .year ? .check : nil, handler: { _ in
             self.change(sortType: .year)
             self.appDelegate.storage.settings.albumsSortSetting = .year
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         return UIMenu(children: [sortByName, sortByRating, sortByArtist, sortByDuration, sortByYear])
     }

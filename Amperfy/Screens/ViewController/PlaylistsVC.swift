@@ -129,18 +129,22 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         let sortByName = UIAction(title: "Name", image: sortType == .name ? .check : nil, handler: { _ in
             self.change(sortType: .name)
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByLastTimePlayed = UIAction(title: "Last time played", image: sortType == .lastPlayed ? .check : nil, handler: { _ in
             self.change(sortType: .lastPlayed)
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByChangeDate = UIAction(title: "Change date", image: sortType == .lastChanged ? .check : nil, handler: { _ in
             self.change(sortType: .lastChanged)
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByDuration = UIAction(title: "Duration", image: sortType == .duration ? .check : nil, handler: { _ in
             self.change(sortType: .duration)
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         return UIMenu(children: [sortByName, sortByLastTimePlayed, sortByChangeDate, sortByDuration])
     }

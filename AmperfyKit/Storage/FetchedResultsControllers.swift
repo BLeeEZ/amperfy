@@ -329,7 +329,10 @@ public class GenreSongsFetchedResultsController: BasicFetchedResultsController<S
 
 public class ArtistFetchedResultsController: CachedFetchedResultsController<ArtistMO> {
     
+    public private(set) var sortType: ArtistElementSortType
+    
     public init(coreDataCompanion: CoreDataCompanion, sortType: ArtistElementSortType, isGroupedInAlphabeticSections: Bool) {
+        self.sortType = sortType
         var fetchRequest = ArtistMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
@@ -442,7 +445,10 @@ public class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsContro
 
 public class AlbumFetchedResultsController: CachedFetchedResultsController<AlbumMO> {
     
+    public private(set) var sortType: AlbumElementSortType
+    
     public init(coreDataCompanion: CoreDataCompanion, sortType: AlbumElementSortType, isGroupedInAlphabeticSections: Bool) {
+        self.sortType = sortType
         var fetchRequest = AlbumMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
@@ -486,7 +492,10 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
 
 public class SongsFetchedResultsController: CachedFetchedResultsController<SongMO> {
     
+    public private(set) var sortType: SongElementSortType
+    
     public init(coreDataCompanion: CoreDataCompanion, sortType: SongElementSortType, isGroupedInAlphabeticSections: Bool) {
+        self.sortType = sortType
         var fetchRequest = SongMO.alphabeticSortedFetchRequest
         switch sortType {
         case .name:
@@ -576,7 +585,7 @@ public class PlaylistItemsFetchedResultsController: BasicFetchedResultsControlle
 
 public class PlaylistFetchedResultsController: BasicFetchedResultsController<PlaylistMO> {
 
-    var sortType: PlaylistSortType
+    public private(set) var sortType: PlaylistSortType
     
     public init(coreDataCompanion: CoreDataCompanion, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool) {
         self.sortType = sortType

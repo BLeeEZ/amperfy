@@ -228,16 +228,19 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             self.change(sortType: .name)
             self.appDelegate.storage.settings.songsSortSetting = .name
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByRating = UIAction(title: "Rating", image: sortType == .rating ? .check : nil, handler: { _ in
             self.change(sortType: .rating)
             self.appDelegate.storage.settings.songsSortSetting = .rating
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByDuration = UIAction(title: "Duration", image: sortType == .duration ? .check : nil, handler: { _ in
             self.change(sortType: .duration)
             self.appDelegate.storage.settings.songsSortSetting = .duration
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         return UIMenu(children: [sortByName, sortByRating, sortByDuration])
     }

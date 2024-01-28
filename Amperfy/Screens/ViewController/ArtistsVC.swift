@@ -185,14 +185,17 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         let sortByName = UIAction(title: "Name", image: sortType == .name ? .check : nil, handler: { _ in
             self.change(sortType: .name)
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByRating = UIAction(title: "Rating", image: sortType == .rating ? .check : nil, handler: { _ in
             self.change(sortType: .rating)
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByDuration = UIAction(title: "Duration", image: sortType == .duration ? .check : nil, handler: { _ in
             self.change(sortType: .duration)
             self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         return UIMenu(children: [sortByName, sortByRating, sortByDuration])
     }
