@@ -2760,7 +2760,7 @@
 			repositoryURL = "https://github.com/chicio/ID3TagEditor";
 			requirement = {
 				kind = exactVersion;
-				version = 4.3.0;
+				version = 4.6.0;
 			};
 		};
 		507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */ = {
