@@ -34,6 +34,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate, NSF
         return UIApplication.shared.delegate as! AppDelegate
     }()
     private let log = OSLog(subsystem: "Amperfy", category: "CarPlay")
+    private static let assistantConfig = CPAssistantCellConfiguration(position: .top, visibility: .always, assistantAction: .playMedia)
     var isOfflineMode: Bool {
         return appDelegate.storage.settings.isOfflineMode
     }
@@ -245,6 +246,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate, NSF
     private func createLibraryTab() -> CPListTemplate {
         let libraryTab = CPListTemplate(title: "Library", sections: [CPListSection(items: createLibrarySections() )])
         libraryTab.tabImage = UIImage.musicLibrary
+        libraryTab.assistantCellConfiguration = CarPlaySceneDelegate.assistantConfig
         return libraryTab
     }
     
