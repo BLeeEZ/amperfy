@@ -199,7 +199,17 @@ extension UIViewController {
 
 extension UIApplication {
     var mainWindow: UIWindow? {
-        return windows.first(where: \.isKeyWindow)
+        let scenes = UIApplication.shared.connectedScenes
+        for uiScene in scenes {
+            if let windowScene = uiScene as? UIWindowScene {
+                for window in windowScene.windows {
+                    if window.isKeyWindow {
+                        return window
+                    }
+                }
+            }
+        }
+        return nil
     }
 }
 
