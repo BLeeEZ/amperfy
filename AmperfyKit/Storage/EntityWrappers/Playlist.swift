@@ -82,6 +82,7 @@ public class Playlist: Identifyable {
         updateSortedPlaylistItems()
         updateSortedCachedPlaylistItems()
         updateInternalPlayables()
+        updateArtworkItems(isInitialUpdate: false)
     }
     private func updateSortedPlaylistItems() {
         guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else { return }
@@ -107,6 +108,39 @@ public class Playlist: Identifyable {
     }
     public var items: [PlaylistItem] {
         return sortedPlaylistItems
+    }
+    public var artworkItems: [PlaylistItem] {
+        guard let artworkItemsMO = managedObject.artworkItems?.allObjects as? [PlaylistItemMO] else { return [PlaylistItem]() }
+        return artworkItemsMO
+            .sorted(by: { $0.order < $1.order })
+            .compactMap{ PlaylistItem(library: library, managedObject: $0) }
+    }
+    public func updateArtworkItems(isInitialUpdate: Bool) {
+        guard !isInitialUpdate || songCount < 100 else { return }
+        
+        if isInitialUpdate {
+            updateSortedPlaylistItems()
+        }
+        
+        if let internalSortedPlaylistItems = internalSortedPlaylistItems {
+            var updatedArtworkItems = [PlaylistItem]()
+            for (index, playlistItem) in internalSortedPlaylistItems.enumerated() {
+                if playlistItem.playable?.artwork != nil {
+                    updatedArtworkItems.append(playlistItem)
+                    if updatedArtworkItems.count >= 4 || index > 20 {
+                        break
+                    }
+                }
+            }
+            let artworkItems = artworkItems
+            if artworkItems != updatedArtworkItems {
+                managedObject.artworkItems = nil
+                for item in updatedArtworkItems {
+                    managedObject.addToArtworkItems(item.managedObject)
+                }
+                library.saveContext()
+            }
+        }
     }
     
     public var playables: [AbstractPlayable] {
@@ -489,18 +523,15 @@ extension Playlist: PlayableContainable  {
         return Promise<Void>(error: BackendError.notSupported)
     }
     public var artworkCollection: ArtworkCollection {
-        if songCount < 500 {
-            let customArtworkSongs = playables.filterCustomArt()
-            if customArtworkSongs.isEmpty {
-                return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: nil)
-            } else if customArtworkSongs.count == 1 {
-                return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: customArtworkSongs[0])
-            } else {
-                let quadImages = Array(customArtworkSongs.prefix(4))
-                return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: customArtworkSongs[0], quadImageEntity: quadImages)
-            }
-        } else {
+        let artworkItems = artworkItems
+        
+        if artworkItems.isEmpty {
             return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: nil)
+        } else if artworkItems.count == 1 {
+            return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: artworkItems[0].playable)
+        } else {
+            let quadImages = artworkItems.compactMap { return $0.playable }
+            return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: artworkItems[0].playable, quadImageEntity: quadImages)
         }
     }
     public func playedViaContext() {

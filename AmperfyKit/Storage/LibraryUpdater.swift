@@ -56,6 +56,12 @@ public class LibraryUpdater {
             updateArtistAlbumPlaylistDurationAndSongCount()
             os_log("Perform blocking library update (DONE): Artist,Album,Playlist duration,remoteSongCount", log: log, type: .info)
         }
+        if storage.librarySyncVersion < .v16 {
+            storage.librarySyncVersion = .v16 // if App crashes don't do this step again -> This step is only for convenience
+            os_log("Perform blocking library update (START): Playlist artworkItems", log: log, type: .info)
+            updatePlaylistArtworkItems()
+            os_log("Perform blocking library update (DONE): Playlist artworkItems", log: log, type: .info)
+        }
         storage.librarySyncVersion = .newestVersion
     }
     
@@ -137,6 +143,15 @@ public class LibraryUpdater {
             $0.updateDuration()
             $0.remoteSongCount = $0.songCount
         }
+        storage.main.saveContext()
+    }
+    
+    private func updatePlaylistArtworkItems() {
+        let playlists = storage.main.library.getPlaylists()
+        playlists.forEach{
+            $0.updateArtworkItems(isInitialUpdate: true)
+        }
+        storage.main.saveContext()
     }
     
 }

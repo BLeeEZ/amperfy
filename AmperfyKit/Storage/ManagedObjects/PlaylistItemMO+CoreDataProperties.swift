@@ -30,7 +30,8 @@ extension PlaylistItemMO {
     }
 
     @NSManaged public var order: Int32
-    @NSManaged public var playlist: PlaylistMO?
     @NSManaged public var playable: AbstractPlayableMO?
+    @NSManaged public var playlist: PlaylistMO?
+    @NSManaged public var playlistArtworkItem: PlaylistMO?
 
 }

@@ -29,21 +29,22 @@ extension PlaylistMO {
         return NSFetchRequest<PlaylistMO>(entityName: "Playlist")
     }
 
-    @NSManaged public var id: String
     @NSManaged public var alphabeticSectionInitial: String
-    @NSManaged public var name: String?
-    @NSManaged public var duration: Int16
-    @NSManaged public var remoteDuration: Int16
-    @NSManaged public var songCount: Int16
-    @NSManaged public var remoteSongCount: Int16
-    @NSManaged public var items: NSSet?
     @NSManaged public var changeDate: Date?
+    @NSManaged public var duration: Int16
+    @NSManaged public var id: String
     @NSManaged public var lastPlayedDate: Date?
+    @NSManaged public var name: String?
     @NSManaged public var playCount: Int32
+    @NSManaged public var remoteDuration: Int16
+    @NSManaged public var remoteSongCount: Int16
+    @NSManaged public var songCount: Int16
+    @NSManaged public var items: NSSet?
     @NSManaged public var playersContextPlaylist: PlayerMO?
+    @NSManaged public var playersPodcastPlaylist: PlayerMO?
     @NSManaged public var playersShuffledContextPlaylist: PlayerMO?
     @NSManaged public var playersUserQueuePlaylist: PlayerMO?
-    @NSManaged public var playersPodcastPlaylist: PlayerMO?
+    @NSManaged public var artworkItems: NSSet?
 
 }
 
@@ -61,5 +62,22 @@ extension PlaylistMO {
 
     @objc(removeItems:)
     @NSManaged public func removeFromItems(_ values: NSSet)
+
+}
+
+// MARK: Generated accessors for artworkItems
+extension PlaylistMO {
+
+    @objc(addArtworkItemsObject:)
+    @NSManaged public func addToArtworkItems(_ value: PlaylistItemMO)
+
+    @objc(removeArtworkItemsObject:)
+    @NSManaged public func removeFromArtworkItems(_ value: PlaylistItemMO)
+
+    @objc(addArtworkItems:)
+    @NSManaged public func addToArtworkItems(_ values: NSSet)
+
+    @objc(removeArtworkItems:)
+    @NSManaged public func removeFromArtworkItems(_ values: NSSet)
 
 }
