@@ -48,7 +48,7 @@ extension ResponseError {
         return SubsonicServerApi.SubsonicError(rawValue: statusCode)
     }
     
-    static func createFromSubsonicError(cleansedURL: CleansedURL, error: SubsonicResponseError, data: Data?) -> ResponseError {
+    static func createFromSubsonicError(cleansedURL: CleansedURL?, error: SubsonicResponseError, data: Data?) -> ResponseError {
         return ResponseError(statusCode: error.statusCode, message: error.message, cleansedURL: cleansedURL, data: data)
     }
 }
@@ -299,10 +299,10 @@ class SubsonicServerApi: URLCleanser {
                 let parser = XMLParser(data: response.data)
                 parser.delegate = delegate
                 parser.parse()
-                guard let serverApiVersionString = delegate.serverApiVersion else { throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: self), data: response.data) }
+                guard let serverApiVersionString = delegate.serverApiVersion else { throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data) }
                 guard let serverApiVersion = SubsonicVersion(serverApiVersionString) else {
                     os_log("The server API version '%s' could not be parsed to 'SubsonicVersion'", log: self.log, type: .info, serverApiVersionString)
-                    throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: self), data: response.data)
+                    throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
                 }
                 self.serverApiVersion = serverApiVersion
                 return seal.fulfill(serverApiVersion)
@@ -478,7 +478,7 @@ class SubsonicServerApi: URLCleanser {
         parser.delegate = errorParser
         parser.parse()
         guard let subsonicError = errorParser.error else { return nil }
-        return ResponseError.createFromSubsonicError(cleansedURL: response.url.asCleansedURL(cleanser: self), error: subsonicError, data: response.data)
+        return ResponseError.createFromSubsonicError(cleansedURL: response.url?.asCleansedURL(cleanser: self), error: subsonicError, data: response.data)
     }
 
     func requestPlaylistUpdate(id: String, name: String, songIndicesToRemove: [Int], songIdsToAdd: [String]) -> Promise<APIDataResponse> {

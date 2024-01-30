@@ -101,7 +101,9 @@ public class EventLogger {
         }
         alertMessage += "\(error.message)"
         var detailMessage = "\(alertMessage)"
-        detailMessage += "\n\nURL:\n\(error.cleansedURL.description)"
+        if let cleansedURL = error.cleansedURL {
+            detailMessage += "\n\nURL:\n\(cleansedURL.description)"
+        }
         
         let isInfoError = error is ResourceNotAvailableResponseError
 

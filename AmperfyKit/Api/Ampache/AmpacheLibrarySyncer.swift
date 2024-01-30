@@ -131,7 +131,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 } catch {
                     if let responseError = error as? ResponseError, let ampacheError = responseError.asAmpacheError, !ampacheError.isRemoteAvailable {
                         let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
-                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Artist \"\(artistAsync.name)\" is no longer available on the server.", cleansedURL: response.url.asCleansedURL(cleanser: self.ampacheXmlServerApi), data: response.data)
+                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Artist \"\(artistAsync.name)\" is no longer available on the server.", cleansedURL: response.url?.asCleansedURL(cleanser: self.ampacheXmlServerApi), data: response.data)
                         artist.remoteStatus = .deleted
                         throw reportError
                     } else {
@@ -189,7 +189,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 } catch {
                     if let responseError = error as? ResponseError, let ampacheError = responseError.asAmpacheError, !ampacheError.isRemoteAvailable {
                         let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
-                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Album \"\(albumAsync.name)\" is no longer available on the server.", cleansedURL: response.url.asCleansedURL(cleanser: self.ampacheXmlServerApi), data: response.data)
+                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Album \"\(albumAsync.name)\" is no longer available on the server.", cleansedURL: response.url?.asCleansedURL(cleanser: self.ampacheXmlServerApi), data: response.data)
                         albumAsync.markAsRemoteDeleted()
                         throw reportError
                     } else {
@@ -750,10 +750,10 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         parser.parse()
         if let error = parser.parserError {
             os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
-            throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: ampacheXmlServerApi), data: response.data)
+            throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: ampacheXmlServerApi), data: response.data)
         }
         if let error = delegate.error, let ampacheError = error.ampacheError, ampacheError.shouldErrorBeDisplayedToUser || throwForNotFoundErrors {
-            throw ResponseError.createFromAmpacheError(cleansedURL: response.url.asCleansedURL(cleanser: ampacheXmlServerApi), error: error, data: response.data)
+            throw ResponseError.createFromAmpacheError(cleansedURL: response.url?.asCleansedURL(cleanser: ampacheXmlServerApi), error: error, data: response.data)
         }
     }
 

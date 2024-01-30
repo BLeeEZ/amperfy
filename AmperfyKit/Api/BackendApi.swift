@@ -43,10 +43,10 @@ public protocol SyncCallbacks: ParsedObjectNotifiable {
 
 public class APIDataResponse {
     public var data: Data
-    public var url: URL
+    public var url: URL?
     public var meta: PMKAlamofireDataResponse?
     
-    init(data: Data, url: URL, meta: PMKAlamofireDataResponse?) {
+    init(data: Data, url: URL?, meta: PMKAlamofireDataResponse?) {
         self.data = data
         self.url = url
         self.meta = meta

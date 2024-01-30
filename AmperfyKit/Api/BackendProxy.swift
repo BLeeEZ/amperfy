@@ -98,10 +98,10 @@ public enum BackendError: LocalizedError {
 public class ResponseError: LocalizedError {
     public var statusCode: Int = 0
     public var message: String
-    public var cleansedURL: CleansedURL
+    public var cleansedURL: CleansedURL?
     public var data: Data?
     
-    init(statusCode: Int = 0, message: String, cleansedURL: CleansedURL, data: Data?) {
+    init(statusCode: Int = 0, message: String, cleansedURL: CleansedURL?, data: Data?) {
         self.statusCode = statusCode
         self.message = message
         self.cleansedURL = cleansedURL
@@ -117,7 +117,7 @@ public class ResponseError: LocalizedError {
         if let data = data {
             dataString = String(decoding: data, as: UTF8.self)
         }
-        return ResponseErrorInfo(topic: topic, statusCode: statusCode, message: message, cleansedURL: cleansedURL.description, data: dataString)
+        return ResponseErrorInfo(topic: topic, statusCode: statusCode, message: message, cleansedURL: cleansedURL?.description ?? "", data: dataString)
     }
 }
 
@@ -130,7 +130,7 @@ public struct ResponseErrorInfo: Encodable {
 }
 
 public class XMLParserResponseError: ResponseError {
-    init(cleansedURL: CleansedURL, data: Data?) {
+    init(cleansedURL: CleansedURL?, data: Data?) {
         super.init(message: "XML response could not be parsed.", cleansedURL: cleansedURL, data: data)
     }
     

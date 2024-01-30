@@ -165,7 +165,7 @@ class DownloadManager: NSObject, DownloadManageable {
         }.then {
             self.downloadDelegate.prepareDownload(download: download)
         }.get { url in
-            download.url = url
+            download.setURL(url)
             self.storage.main.saveContext()
             self.fetch(url: url)
         }.catch { error in
@@ -184,7 +184,7 @@ class DownloadManager: NSObject, DownloadManageable {
             if error != .apiErrorResponse {
                 os_log("Fetching %s FAILED: %s", log: self.log, type: .info, download.title, error.description)
                 let shortMessage = "Error \"\(error.description)\" occured while downloading object \"\(download.title)\"."
-                let responseError = ResponseError(message: shortMessage, cleansedURL: download.url.asCleansedURL(cleanser: urlCleanser), data: download.resumeData)
+                let responseError = ResponseError(message: shortMessage, cleansedURL: download.url?.asCleansedURL(cleanser: urlCleanser), data: download.resumeData)
                 eventLogger.report(topic: "Download Error", error: responseError, displayPopup: isFailWithPopupError)
             }
             downloadDelegate.failedDownload(download: download, storage: self.storage)

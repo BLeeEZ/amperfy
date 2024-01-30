@@ -146,7 +146,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
                 } catch {
                     if let responseError = error as? ResponseError, let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
                         let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
-                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Artist \"\(artistAsync.name)\" is no longer available on the server.", cleansedURL: response.url.asCleansedURL(cleanser: self.subsonicServerApi), data: response.data)
+                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Artist \"\(artistAsync.name)\" is no longer available on the server.", cleansedURL: response.url?.asCleansedURL(cleanser: self.subsonicServerApi), data: response.data)
                         artistAsync.remoteStatus = .deleted
                         throw reportError
                     } else {
@@ -175,7 +175,7 @@ class SubsonicLibrarySyncer: LibrarySyncer {
                 } catch {
                     if let responseError = error as? ResponseError, let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
                         let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
-                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Album \"\(albumAsync.name)\" is no longer available on the server.", cleansedURL: response.url.asCleansedURL(cleanser: self.subsonicServerApi), data: response.data)
+                        let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Album \"\(albumAsync.name)\" is no longer available on the server.", cleansedURL: response.url?.asCleansedURL(cleanser: self.subsonicServerApi), data: response.data)
                         albumAsync.markAsRemoteDeleted()
                         throw reportError
                     } else {
@@ -696,10 +696,10 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         parser.parse()
         if let error = parser.parserError {
             os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
-            throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: subsonicServerApi), data: response.data)
+            throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: subsonicServerApi), data: response.data)
         }
         if let error = delegate.error, let _ = error.subsonicError {
-            throw ResponseError.createFromSubsonicError(cleansedURL: response.url.asCleansedURL(cleanser: subsonicServerApi), error: error, data: response.data)
+            throw ResponseError.createFromSubsonicError(cleansedURL: response.url?.asCleansedURL(cleanser: subsonicServerApi), error: error, data: response.data)
         }
     }
     

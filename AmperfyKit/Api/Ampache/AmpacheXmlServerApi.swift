@@ -40,7 +40,7 @@ extension ResponseError {
         return AmpacheXmlServerApi.AmpacheError(rawValue: statusCode)
     }
     
-    static func createFromAmpacheError(cleansedURL: CleansedURL, error: AmpacheResponseError, data: Data?) -> ResponseError {
+    static func createFromAmpacheError(cleansedURL: CleansedURL?, error: AmpacheResponseError, data: Data?) -> ResponseError {
         return ResponseError(statusCode: error.statusCode, message: error.message, cleansedURL: cleansedURL, data: data)
     }
 }
@@ -222,7 +222,7 @@ class AmpacheXmlServerApi: URLCleanser {
             }
             if let error = parser.parserError {
                 os_log("Error during AuthPars: %s", log: self.log, type: .error, error.localizedDescription)
-                throw XMLParserResponseError(cleansedURL: response.url.asCleansedURL(cleanser: self), data: response.data)
+                throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
             }
             if success, let auth = curDelegate.authHandshake {
                 return seal.fulfill(auth)
@@ -687,7 +687,7 @@ class AmpacheXmlServerApi: URLCleanser {
         parser.delegate = errorParser
         parser.parse()
         guard let ampacheError = errorParser.error else { return nil }
-        return ResponseError.createFromAmpacheError(cleansedURL: response.url.asCleansedURL(cleanser: self), error: ampacheError, data: response.data)
+        return ResponseError.createFromAmpacheError(cleansedURL: response.url?.asCleansedURL(cleanser: self), error: ampacheError, data: response.data)
     }
     
     func updateUrlToken(urlString: String) -> Promise<URL> {
