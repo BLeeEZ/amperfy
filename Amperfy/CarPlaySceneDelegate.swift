@@ -26,7 +26,7 @@ import CoreData
 import OSLog
 import AmperfyKit
 
-class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate, NSFetchedResultsControllerDelegate {
+class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     static let maxTreeDepth = 4
     
@@ -51,6 +51,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate, NSF
     func templateApplicationScene(_ templateApplicationScene: CPTemplateApplicationScene, didConnect interfaceController: CPInterfaceController) {
         os_log("didConnect CarPlay", log: self.log, type: .info)
         appDelegate.notificationHandler.register(self, selector: #selector(refreshSort), name: .fetchControllerSortChanged, object: nil)
+        CPNowPlayingTemplate.shared.add(self)
               
         createPlaylistFetchController()
         createPodcastFetchController()
@@ -69,6 +70,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate, NSF
     /// CarPlay disconnected
     func templateApplicationScene(_ templateApplicationScene: CPTemplateApplicationScene, didDisconnect interfaceController: CPInterfaceController, from window: CPWindow) {
         os_log("didDisconnect CarPlay", log: self.log, type: .info)
+        CPNowPlayingTemplate.shared.remove(self)
         self.interfaceController = nil
     }
     
@@ -146,15 +148,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate, NSF
         songsRecentlyAddedFetchController?.search(searchText: "", onlyCachedSongs: isOfflineMode, displayFilter: .recentlyAdded)
     }
     
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if let playlistFetchController = playlistFetchController, controller == playlistFetchController.fetchResultsController {
-            playlistTab.updateSections([CPListSection(items: createPlaylistsSections(treeDepth: 1))])
-        }
-        if let podcastFetchController = podcastFetchController, controller == podcastFetchController.fetchResultsController {
-            podcastTab.updateSections([CPListSection(items: createPodcastsSections(treeDepth: 1))])
-        }
-    }
-    
     private func displayInitTabTemplate() {
         let tab = CPTabBarTemplate(templates: [
             libraryTab,
@@ -163,6 +156,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate, NSF
         ])
         self.interfaceController?.setRootTemplate(tab, animated: true, completion: nil)
     }
+    
+    static let queueButtonText = NSLocalizedString("Queue", comment: "Button title on CarPlay player to display queue")
     
     private func configureNowPlayingTemplate() {
         CPNowPlayingTemplate.shared.updateNowPlayingButtons([
@@ -175,6 +170,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate, NSF
                 self.appDelegate.player.toggleShuffle()
             })
         ])
+        CPNowPlayingTemplate.shared.upNextTitle = Self.queueButtonText
+        CPNowPlayingTemplate.shared.isUpNextButtonEnabled = true
     }
     
     private func createLibrarySections() -> [CPListTemplateItem] {
@@ -571,4 +568,58 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate, NSF
         return listItem
     }
     
+    private func createDetailTemplate(for playable: AbstractPlayable, playerIndex: PlayerIndex) -> CPListItem {
+        let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
+        let image = playable.image(setting: artworkDisplayPreference)
+        let listItem = CPListItem(text: playable.title, detailText: playable.subtitle, image: image.carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: accessoryType)
+        listItem.handler = { [weak self] item, completion in
+            guard let `self` = self else { completion(); return }
+            self.appDelegate.player.play(playerIndex: playerIndex)
+            self.interfaceController?.popTemplate(animated: true) { _,_ in }
+            completion()
+        }
+        return listItem
+    }
+    
+}
+
+extension CarPlaySceneDelegate: NSFetchedResultsControllerDelegate {
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if let playlistFetchController = playlistFetchController, controller == playlistFetchController.fetchResultsController {
+            playlistTab.updateSections([CPListSection(items: createPlaylistsSections(treeDepth: 1))])
+        }
+        if let podcastFetchController = podcastFetchController, controller == podcastFetchController.fetchResultsController {
+            podcastTab.updateSections([CPListSection(items: createPodcastsSections(treeDepth: 1))])
+        }
+    }
+}
+
+extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
+    func nowPlayingTemplateUpNextButtonTapped(_ nowPlayingTemplate: CPNowPlayingTemplate) {
+        var playableItems = [CPListItem]()
+        
+        for (index, userQueueItem) in appDelegate.player.userQueue.enumerated() {
+            let playerIndex = PlayerIndex(queueType: .user, index: index)
+            let listItem = self.createDetailTemplate(for: userQueueItem, playerIndex: playerIndex)
+            playableItems.append(listItem)
+            if playableItems.count >= CPListTemplate.maximumItemCount-1 {
+                break
+            }
+        }
+        if playableItems.count < CPListTemplate.maximumItemCount-1 {
+            for (index, userQueueItem) in appDelegate.player.nextQueue.enumerated() {
+                let playerIndex = PlayerIndex(queueType: .next, index: index)
+                let listItem = self.createDetailTemplate(for: userQueueItem, playerIndex: playerIndex)
+                playableItems.append(listItem)
+                if playableItems.count >= CPListTemplate.maximumItemCount-1 {
+                    break
+                }
+            }
+        }
+
+        let queueTemplate = CPListTemplate(title: Self.queueButtonText, sections: [
+            CPListSection(items: playableItems)
+        ])
+        self.interfaceController?.pushTemplate(queueTemplate, animated: true, completion: nil)
+    }
 }

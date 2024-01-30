@@ -132,6 +132,11 @@ public struct PlayerIndex: Equatable {
     let queueType: PlayerQueueType
     let index: Int
     
+    public init(queueType: PlayerQueueType, index: Int) {
+        self.queueType = queueType
+        self.index = index
+    }
+    
     public static func create(from indexPath: IndexPath) -> PlayerIndex? {
         guard let queueType = PlayerQueueType(rawValue: indexPath.section) else { return nil }
         return PlayerIndex(queueType: queueType, index: indexPath.row)
