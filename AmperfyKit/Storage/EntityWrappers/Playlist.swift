@@ -82,7 +82,6 @@ public class Playlist: Identifyable {
         updateSortedPlaylistItems()
         updateSortedCachedPlaylistItems()
         updateInternalPlayables()
-        updateArtworkItems(isInitialUpdate: false)
     }
     private func updateSortedPlaylistItems() {
         guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else { return }
@@ -138,7 +137,6 @@ public class Playlist: Identifyable {
                 for item in updatedArtworkItems {
                     managedObject.addToArtworkItems(item.managedObject)
                 }
-                library.saveContext()
             }
         }
     }
@@ -335,6 +333,7 @@ public class Playlist: Identifyable {
         songCount += playablesToInsert.count
         updateChangeDate()
         updateDuration(byIncreasingDuration: playablesToInsert.reduce(0){ $0 + $1.duration })
+        updateArtworkItems(isInitialUpdate: false)
         library.saveContext()
         isInternalArrayUpdateNeeded = true
     }
@@ -344,6 +343,7 @@ public class Playlist: Identifyable {
         songCount += 1
         updateChangeDate()
         updateDuration(byIncreasingDuration: playable.duration)
+        updateArtworkItems(isInitialUpdate: false)
         library.saveContext()
         isInternalArrayUpdateNeeded = true
     }
@@ -355,6 +355,7 @@ public class Playlist: Identifyable {
         songCount += playablesToAppend.count
         updateChangeDate()
         updateDuration(byIncreasingDuration: playablesToAppend.reduce(0){ $0 + $1.duration })
+        updateArtworkItems(isInitialUpdate: false)
         library.saveContext()
         isInternalArrayUpdateNeeded = true
     }
@@ -391,6 +392,7 @@ public class Playlist: Identifyable {
         localSortedPlaylistItems[fromIndex].order = targetOrder
         
         updateChangeDate()
+        updateArtworkItems(isInitialUpdate: false)
         library.saveContext()
         isInternalArrayUpdateNeeded = true
     }
@@ -407,6 +409,7 @@ public class Playlist: Identifyable {
             songCount -= 1
             updateChangeDate()
             updateDuration(byReducingDuration: itemToBeRemoved.playable?.duration ?? 0)
+            updateArtworkItems(isInitialUpdate: false)
             library.saveContext()
             isInternalArrayUpdateNeeded = true
         }
@@ -438,6 +441,7 @@ public class Playlist: Identifyable {
         }
         songCount = 0
         updateChangeDate()
+        updateArtworkItems(isInitialUpdate: false)
         managedObject.duration = 0
         managedObject.remoteDuration = 0
         library.saveContext()
