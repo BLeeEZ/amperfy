@@ -32,11 +32,13 @@ public protocol MusicPlayable {
     func didArtworkChange()
     func didShuffleChange()
     func didRepeatChange()
+    func didPlaybackRateChange()
 }
 
 extension MusicPlayable {
     func didShuffleChange() {}
     func didRepeatChange() {}
+    func didPlaybackRateChange() {}
     func errorOccured(error: Error) {}
 }
 
@@ -110,6 +112,76 @@ public enum RepeatMode: Int16 {
             return .all
         case .off:
             return .off
+        }
+    }
+}
+
+public enum PlaybackRate: Int, CaseIterable {
+    case dot5 = 0
+    case dot75
+    case one
+    case oneDot25
+    case oneDot5
+    case oneDot75
+    case two
+    
+    public static func create(from playbackRate: Double) -> PlaybackRate {
+        var rate = PlaybackRate.one
+        if (playbackRate < 0.4) {
+            rate = .one
+        } else if (playbackRate < 0.6) {
+            rate = .dot5
+        } else if (playbackRate < 0.8) {
+            rate = .dot75
+        } else if (playbackRate < 1.1) {
+            rate = .one
+        } else if (playbackRate < 1.3) {
+            rate = .oneDot25
+        } else if (playbackRate < 1.6) {
+            rate = .oneDot5
+        } else if (playbackRate < 1.8) {
+            rate = .oneDot75
+        } else if (playbackRate < 2.1) {
+            rate = .two
+        } else {
+            rate = .one
+        }
+        return rate
+    }
+    
+    public var asDouble : Double {
+        switch self {
+        case .dot5:     return 0.5
+        case .dot75:    return 0.75
+        case .one:      return 1
+        case .oneDot25: return 1.25
+        case .oneDot5:  return 1.5
+        case .oneDot75: return 1.75
+        case .two:      return 2
+        }
+    }
+    
+    public var description : String {
+        switch self {
+        case .dot5:     return "0.5x"
+        case .dot75:    return "0.75x"
+        case .one:      return "1x"
+        case .oneDot25: return "1.25x"
+        case .oneDot5:  return "1.5x"
+        case .oneDot75: return "1.75x"
+        case .two:      return "2x"
+        }
+    }
+    
+    public var icon : UIImage {
+        switch self {
+        case .dot5:     return UIImage.gaugeDown.withRenderingMode(.alwaysTemplate)
+        case .dot75:    return UIImage.gaugeDown.withRenderingMode(.alwaysTemplate)
+        case .one:      return UIImage.gauge.withRenderingMode(.alwaysTemplate)
+        case .oneDot25: return UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
+        case .oneDot5:  return UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
+        case .oneDot75: return UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
+        case .two:      return UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
         }
     }
 }

@@ -92,6 +92,14 @@ class RemoteCommandCenterHandler {
         remoteCommandCenter.skipForwardCommand.addTarget(handler: { (event) in
             self.musicPlayer.skipForward(interval: self.musicPlayer.skipForwardPodcastInterval)
             return .success})
+        
+        remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
+        remoteCommandCenter.changePlaybackRateCommand.supportedPlaybackRates = PlaybackRate.allCases.map { NSNumber(value: $0.asDouble) }
+        remoteCommandCenter.changePlaybackRateCommand.addTarget(handler: { (event) in
+            guard let command = event as? MPChangePlaybackRateCommandEvent else { return .noSuchContent}
+            let playbackRate = PlaybackRate.create(from: Double(command.playbackRate))
+            self.musicPlayer.setPlaybackRate(playbackRate)
+            return .success})
     }
 
     private func changeRemoteCommandCenterControlsBasedOnCurrentPlayableType() {
@@ -103,6 +111,7 @@ class RemoteCommandCenterHandler {
             remoteCommandCenter.skipForwardCommand.isEnabled = false
             remoteCommandCenter.changeShuffleModeCommand.isEnabled = true
             remoteCommandCenter.changeRepeatModeCommand.isEnabled = true
+            remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
         } else if currentItem.isPodcastEpisode {
             remoteCommandCenter.previousTrackCommand.isEnabled = false
             remoteCommandCenter.nextTrackCommand.isEnabled = false
@@ -110,6 +119,7 @@ class RemoteCommandCenterHandler {
             remoteCommandCenter.skipForwardCommand.isEnabled = true
             remoteCommandCenter.changeShuffleModeCommand.isEnabled = false
             remoteCommandCenter.changeRepeatModeCommand.isEnabled = false
+            remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
         }
         updateShuffle()
         updateRepeat()

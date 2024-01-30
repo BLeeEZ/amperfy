@@ -31,9 +31,9 @@ protocol PlayerStatusPersistent {
     var playerMode: PlayerMode { get set }
     var isShuffle: Bool { get set }
     var repeatMode: RepeatMode { get set }
-    var playbackRate: Double { get set }
-    var musicPlaybackRate: Double { get set }
-    var podcastPlaybackRate: Double { get set }
+    var playbackRate: PlaybackRate { get set }
+    var musicPlaybackRate: PlaybackRate { get set }
+    var podcastPlaybackRate: PlaybackRate { get set }
 }
 
 protocol PlayerQueuesPersistent {
@@ -170,48 +170,42 @@ extension PlayerData: PlayerStatusPersistent {
         }
     }
     
-    var playbackRate: Double {
+    var playbackRate: PlaybackRate {
         get {
             switch playerMode {
             case .music:
-                return managedObject.musicPlaybackRate
+                return PlaybackRate.create(from: managedObject.musicPlaybackRate)
             case .podcast:
-                return managedObject.podcastPlaybackRate
+                return PlaybackRate.create(from: managedObject.podcastPlaybackRate)
             }
         }
         set {
             switch playerMode {
             case .music:
-                managedObject.musicPlaybackRate = newValue
+                managedObject.musicPlaybackRate = newValue.asDouble
             case .podcast:
-                managedObject.podcastPlaybackRate = newValue
+                managedObject.podcastPlaybackRate = newValue.asDouble
             }
             library.saveContext()
         }
     }
     
-    var musicPlaybackRate: Double {
+    var musicPlaybackRate: PlaybackRate {
         get {
-            if (managedObject.musicPlaybackRate < 0.1) {
-                return 1.0
-            }
-            return managedObject.musicPlaybackRate
+            return PlaybackRate.create(from: managedObject.musicPlaybackRate)
         }
         set {
-            managedObject.musicPlaybackRate = newValue
+            managedObject.musicPlaybackRate = newValue.asDouble
             library.saveContext()
         }
     }
     
-    var podcastPlaybackRate: Double {
+    var podcastPlaybackRate: PlaybackRate {
         get {
-            if (managedObject.podcastPlaybackRate < 0.1) {
-                return 1.0
-            }
-            return managedObject.podcastPlaybackRate
+            return PlaybackRate.create(from: managedObject.podcastPlaybackRate)
         }
         set {
-            managedObject.podcastPlaybackRate = newValue
+            managedObject.podcastPlaybackRate = newValue.asDouble
             library.saveContext()
         }
     }

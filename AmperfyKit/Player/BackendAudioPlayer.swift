@@ -50,7 +50,7 @@ class BackendAudioPlayer {
     private let eventLogger: EventLogger
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     
-    private var userDefinedPlaybackRate: Double = 1.0
+    private var userDefinedPlaybackRate: PlaybackRate = .one
     
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
@@ -77,6 +77,9 @@ class BackendAudioPlayer {
             return 0.0
         }
         return duration
+    }
+    var playbackRate: PlaybackRate {
+        return userDefinedPlaybackRate
     }
     var canBeContinued: Bool {
         return player.currentItem != nil
@@ -105,7 +108,7 @@ class BackendAudioPlayer {
     func continuePlay() {
         isPlaying = true
         player.play()
-        player.playImmediately(atRate: Float(userDefinedPlaybackRate))
+        player.playImmediately(atRate: Float(userDefinedPlaybackRate.asDouble))
     }
     
     func pause() {
@@ -118,16 +121,16 @@ class BackendAudioPlayer {
         clearPlayer()
     }
     
-    func setPlaybackRate(_ newValue: Double) {
+    func setPlaybackRate(_ newValue: PlaybackRate) {
         userDefinedPlaybackRate = newValue
-        player.playImmediately(atRate: Float(newValue))
+        player.playImmediately(atRate: Float(newValue.asDouble))
     }
     
     func seek(toSecond: Double) {
         player.seek(to: CMTime(seconds: toSecond, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
     }
     
-    func requestToPlay(playable: AbstractPlayable, playbackRate: Double) {
+    func requestToPlay(playable: AbstractPlayable, playbackRate: PlaybackRate) {
         userDefinedPlaybackRate = playbackRate
         if !playable.isPlayableOniOS, let contentType = playable.contentType {
             clearPlayer()

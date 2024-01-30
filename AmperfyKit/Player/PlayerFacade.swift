@@ -90,8 +90,8 @@ public protocol PlayerFacade {
     var duration: Double { get }
     var isShuffle: Bool { get }
     func toggleShuffle()
-    var playbackRate: Double { get }
-    func setPlaybackRate(_: Double)
+    var playbackRate: PlaybackRate { get }
+    func setPlaybackRate(_: PlaybackRate)
     var repeatMode: RepeatMode { get }
     func setRepeatMode(_: RepeatMode)
     var isOfflineMode: Bool { get set }
@@ -198,12 +198,13 @@ class PlayerFacadeImpl: PlayerFacade {
         musicPlayer.notifyShuffleUpdated()
         musicPlayer.notifyPlaylistUpdated()
     }
-    var playbackRate: Double {
-        return playerStatus.playbackRate
+    var playbackRate: PlaybackRate {
+        return  playerStatus.playbackRate
     }
-    func setPlaybackRate(_ newValue: Double) {
+    func setPlaybackRate(_ newValue: PlaybackRate) {
         playerStatus.playbackRate = newValue
         backendAudioPlayer.setPlaybackRate(newValue)
+        musicPlayer.notifyPlaybackRateUpdated()
     }
     var repeatMode: RepeatMode {
         return playerStatus.repeatMode

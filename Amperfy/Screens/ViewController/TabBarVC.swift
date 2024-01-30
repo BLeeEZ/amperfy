@@ -150,4 +150,5 @@ extension TabBarVC: MusicPlayable {
     func didArtworkChange() { }
     func didShuffleChange() { }
     func didRepeatChange() { }
+    func didPlaybackRateChange() { }
 }

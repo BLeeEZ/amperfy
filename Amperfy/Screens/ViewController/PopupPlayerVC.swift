@@ -362,32 +362,16 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 }
 
 extension PopupPlayerVC: MusicPlayable {
-    func didShuffleChange() {
-    }
-    
-    func didRepeatChange() {
-    }
-    
-
     func didStartPlaying() {
         self.reloadData()
-    }
-    
-    func didPause() {
     }
     
     func didStopPlaying() {
         self.reloadData()
     }
 
-    func didElapsedTimeChange() {
-    }
-    
     func didPlaylistChange() {
         self.reloadData()
-    }
-    
-    func didArtworkChange() {
     }
     
     func closePopupPlayerAndDisplayInLibraryTab(vc: UIViewController) {
@@ -401,5 +385,11 @@ extension PopupPlayerVC: MusicPlayable {
             }
         })
     }
-
+    
+    func didPause() {}
+    func didElapsedTimeChange() {}
+    func didArtworkChange() {}
+    func didShuffleChange() {}
+    func didRepeatChange() {}
+    func didPlaybackRateChange() {}
 }

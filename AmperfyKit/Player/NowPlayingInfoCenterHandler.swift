@@ -40,12 +40,20 @@ class NowPlayingInfoCenterHandler {
         let albumTitle = playable.asSong?.album?.name ?? ""
         let artwork = playable.image(setting: storage.settings.artworkDisplayPreference)
         nowPlayingInfoCenter.nowPlayingInfo = [
+            MPNowPlayingInfoPropertyMediaType: NSNumber(value: MPNowPlayingInfoMediaType.audio.rawValue),
+            MPNowPlayingInfoPropertyServiceIdentifier: AmperKit.name,
+            
             MPMediaItemPropertyIsCloudItem: !playable.isCached,
             MPMediaItemPropertyTitle: playable.title,
             MPMediaItemPropertyAlbumTitle: albumTitle,
             MPMediaItemPropertyArtist: playable.creatorName,
+            
             MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
+            
+            MPNowPlayingInfoPropertyDefaultPlaybackRate: NSNumber(value: 1.0),
+            MPNowPlayingInfoPropertyPlaybackRate: NSNumber(value: backendAudioPlayer.playbackRate.asDouble),
+            
             MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: artwork.size, requestHandler: { (size) -> UIImage in
                 // this completion handler is not called in main thread!
                 return artwork

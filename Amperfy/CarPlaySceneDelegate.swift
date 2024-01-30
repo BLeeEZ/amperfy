@@ -168,6 +168,25 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             CPNowPlayingShuffleButton(handler: { [weak self] button in
                 guard let `self` = self else { return }
                 self.appDelegate.player.toggleShuffle()
+            }),
+            CPNowPlayingPlaybackRateButton(handler: { [weak self] button in
+                guard let `self` = self else { return }
+                let playerPlaybackRate = self.appDelegate.player.playbackRate
+                let availablePlaybackRates: [CPListItem] = PlaybackRate.allCases.compactMap { playbackRate in
+                    let listItem = CPListItem(text: playbackRate.description, detailText: nil)
+                    listItem.handler = { [weak self] item, completion in
+                        guard let `self` = self else { completion(); return }
+                        self.appDelegate.player.setPlaybackRate(playbackRate)
+                        self.interfaceController?.popTemplate(animated: true) { _,_ in }
+                        completion()
+                    }
+                    return listItem
+                }
+                let playbackRateTemplate = CPListTemplate(title: "Playback Rate", sections: [
+                    CPListSection(items: availablePlaybackRates)
+                ])
+                self.interfaceController?.pushTemplate(playbackRateTemplate, animated: true, completion: nil)
+                
             })
         ])
         CPNowPlayingTemplate.shared.upNextTitle = Self.queueButtonText

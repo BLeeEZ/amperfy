@@ -280,5 +280,11 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
             notifier.didRepeatChange()
         }
     }
+    
+    func notifyPlaybackRateUpdated() {
+        for notifier in notifierList {
+            notifier.didPlaybackRateChange()
+        }
+    }
 
 }
