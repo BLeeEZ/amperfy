@@ -83,7 +83,7 @@ public class AmperKit {
         audioSessionHandler?.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
         let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(), storage: storage)
         curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
-        let remoteCommandCenterHandler = RemoteCommandCenterHandler(musicPlayer: facadeImpl, backendAudioPlayer: backendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter.shared())
+        let remoteCommandCenterHandler = RemoteCommandCenterHandler(musicPlayer: facadeImpl, backendAudioPlayer: backendAudioPlayer, librarySyncer: librarySyncer, eventLogger: eventLogger, remoteCommandCenter: MPRemoteCommandCenter.shared())
         remoteCommandCenterHandler.configureRemoteCommands()
         curPlayer.addNotifier(notifier: remoteCommandCenterHandler)
         let notificationAdapter = PlayerNotificationAdapter(notificationHandler: notificationHandler)

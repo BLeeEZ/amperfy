@@ -21,16 +21,21 @@
 
 import Foundation
 import MediaPlayer
+import PromiseKit
 
 class RemoteCommandCenterHandler {
     
     private var musicPlayer: PlayerFacade
     private let backendAudioPlayer: BackendAudioPlayer
+    private let librarySyncer: LibrarySyncer
+    private let eventLogger: EventLogger
     private let remoteCommandCenter: MPRemoteCommandCenter
 
-    init(musicPlayer: PlayerFacade, backendAudioPlayer: BackendAudioPlayer, remoteCommandCenter: MPRemoteCommandCenter) {
+    init(musicPlayer: PlayerFacade, backendAudioPlayer: BackendAudioPlayer, librarySyncer: LibrarySyncer, eventLogger: EventLogger, remoteCommandCenter: MPRemoteCommandCenter) {
         self.musicPlayer = musicPlayer
         self.backendAudioPlayer = backendAudioPlayer
+        self.librarySyncer = librarySyncer
+        self.eventLogger = eventLogger
         self.remoteCommandCenter = remoteCommandCenter
     }
     
@@ -100,6 +105,52 @@ class RemoteCommandCenterHandler {
             let playbackRate = PlaybackRate.create(from: Double(command.playbackRate))
             self.musicPlayer.setPlaybackRate(playbackRate)
             return .success})
+        
+        remoteCommandCenter.changePlaybackPositionCommand.isEnabled = true
+        remoteCommandCenter.changePlaybackPositionCommand.addTarget(handler: { (event) in
+            guard let command = event as? MPChangePlaybackPositionCommandEvent else { return .noSuchContent}
+            let cmTime = CMTime(seconds: command.positionTime, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+            self.musicPlayer.seek(toSecond: cmTime.seconds)
+            return .success})
+        
+#if false // Deactivated => How to test rating change on simulater/real device?
+        remoteCommandCenter.ratingCommand.isEnabled = true
+        remoteCommandCenter.ratingCommand.minimumRating = 0.0
+        remoteCommandCenter.ratingCommand.maximumRating = 5.0
+        remoteCommandCenter.ratingCommand.addTarget(handler: { (event) in
+            guard let command = event as? MPRatingCommandEvent,
+                  let currentItem = self.musicPlayer.currentlyPlaying,
+                  currentItem.isRateable,
+                  let song = currentItem.asSong
+            else { return .noSuchContent}
+            
+            let rating = Int(command.rating)
+            firstly {
+                self.librarySyncer.setRating(song: song, rating: rating)
+            }.catch { error in
+                self.eventLogger.report(topic: "Song Rating Sync", error: error)
+            }
+            return .success})
+#endif
+        
+        remoteCommandCenter.likeCommand.isEnabled = true
+        remoteCommandCenter.likeCommand.localizedTitle = NSLocalizedString("Favorite", comment: "Marks the currently playing element as favorite")
+        remoteCommandCenter.likeCommand.addTarget(handler: { (event) in
+            guard let command = event as? MPFeedbackCommandEvent,
+                  let currentItem = self.musicPlayer.currentlyPlaying,
+                  currentItem.isFavoritable
+            else { return .noSuchContent}
+            guard command.isNegative == currentItem.isFavorite else {
+                self.remoteCommandCenter.likeCommand.isActive = currentItem.isFavorite
+                return .success
+            }
+            self.remoteCommandCenter.likeCommand.isActive = !command.isNegative
+            firstly {
+                currentItem.remoteToggleFavorite(syncer: self.librarySyncer)
+            }.catch { error in
+                self.eventLogger.report(topic: "Toggle Favorite", error: error)
+            }
+            return .success})
     }
 
     private func changeRemoteCommandCenterControlsBasedOnCurrentPlayableType() {
@@ -111,7 +162,8 @@ class RemoteCommandCenterHandler {
             remoteCommandCenter.skipForwardCommand.isEnabled = false
             remoteCommandCenter.changeShuffleModeCommand.isEnabled = true
             remoteCommandCenter.changeRepeatModeCommand.isEnabled = true
-            remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
+            remoteCommandCenter.likeCommand.isEnabled = true
+            remoteCommandCenter.likeCommand.isActive = currentItem.isFavorite
         } else if currentItem.isPodcastEpisode {
             remoteCommandCenter.previousTrackCommand.isEnabled = false
             remoteCommandCenter.nextTrackCommand.isEnabled = false
@@ -119,7 +171,8 @@ class RemoteCommandCenterHandler {
             remoteCommandCenter.skipForwardCommand.isEnabled = true
             remoteCommandCenter.changeShuffleModeCommand.isEnabled = false
             remoteCommandCenter.changeRepeatModeCommand.isEnabled = false
-            remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
+            remoteCommandCenter.likeCommand.isEnabled = false
+            remoteCommandCenter.likeCommand.isActive = false
         }
         updateShuffle()
         updateRepeat()
