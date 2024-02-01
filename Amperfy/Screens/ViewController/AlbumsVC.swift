@@ -47,6 +47,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             libraryElementDetailTableHeaderView.prepare(
                 playContextCb: self.handleHeaderPlay,
                 with: appDelegate.player,
+                isShuffleOnContextNeccessary: false,
                 shuffleContextCb: self.handleHeaderShuffle)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
@@ -213,30 +214,20 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         tableView.reloadData()
     }
     
-    private var displayedSongs: [AbstractPlayable] {
-        guard let displayedAlbumsMO = self.fetchedResultsController.fetchedObjects else { return [] }
-        let displayedAlbums = displayedAlbumsMO.compactMap{ Album(managedObject: $0) }
-        var songs = [AbstractPlayable]()
-        displayedAlbums.forEach { songs.append(contentsOf: $0.playables) }
-        return songs
-    }
-    
     private func handleHeaderPlay() -> PlayContext {
-        let songs = displayedSongs
-        if songs.count > appDelegate.player.maxSongsToAddOnce {
-            return PlayContext(name: filterTitle, playables: Array(songs.prefix(appDelegate.player.maxSongsToAddOnce)))
-        } else {
-            return PlayContext(name: filterTitle, playables: songs)
-        }
+        guard let displayedAlbumsMO = self.fetchedResultsController.fetchedObjects else { return PlayContext(name: filterTitle, playables: []) }
+        let firstAlbums = displayedAlbumsMO.prefix(5).compactMap{ Album(managedObject: $0) }
+        var songs = [AbstractPlayable]()
+        firstAlbums.forEach { songs.append(contentsOf: $0.playables) }
+        return PlayContext(name: filterTitle, playables: Array(songs.prefix(appDelegate.player.maxSongsToAddOnce)))
     }
     
     private func handleHeaderShuffle() -> PlayContext {
-        let songs = displayedSongs
-        if songs.count > appDelegate.player.maxSongsToAddOnce {
-            return PlayContext(name: filterTitle, playables: songs[randomPick: appDelegate.player.maxSongsToAddOnce])
-        } else {
-            return PlayContext(name: filterTitle, playables: songs)
-        }
+        guard let displayedAlbumsMO = self.fetchedResultsController.fetchedObjects else { return PlayContext(name: filterTitle, playables: []) }
+        let randomAlbums = displayedAlbumsMO[randomPick: 5].compactMap{ Album(managedObject: $0) }
+        var songs = [AbstractPlayable]()
+        randomAlbums.forEach { songs.append(contentsOf: $0.playables) }
+        return PlayContext(name: filterTitle, playables: Array(songs.prefix(appDelegate.player.maxSongsToAddOnce)))
     }
     
     private func createSortButtonMenu() -> UIMenu {

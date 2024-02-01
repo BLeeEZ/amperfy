@@ -205,21 +205,23 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     private func handleHeaderPlay() -> PlayContext {
         guard let displayedSongsMO = self.fetchedResultsController.fetchedObjects else { return PlayContext(name: filterTitle, playables: []) }
-        let displayedSongs = displayedSongsMO.compactMap{ Song(managedObject: $0) }
-        if displayedSongs.count > appDelegate.player.maxSongsToAddOnce {
-            return PlayContext(name: filterTitle, playables: Array(displayedSongs.prefix(appDelegate.player.maxSongsToAddOnce)))
+        if displayedSongsMO.count > appDelegate.player.maxSongsToAddOnce {
+            let songsToPlay = displayedSongsMO.prefix(appDelegate.player.maxSongsToAddOnce).compactMap{ Song(managedObject: $0) }
+            return PlayContext(name: filterTitle, playables: songsToPlay)
         } else {
-            return PlayContext(name: filterTitle, playables: displayedSongs)
+            let songsToPlay = displayedSongsMO.compactMap{ Song(managedObject: $0) }
+            return PlayContext(name: filterTitle, playables: songsToPlay)
         }
     }
     
     private func handleHeaderShuffle() -> PlayContext {
         guard let displayedSongsMO = self.fetchedResultsController.fetchedObjects else { return PlayContext(name: filterTitle, playables: []) }
-        let displayedSongs = displayedSongsMO.compactMap{ Song(managedObject: $0) }
-        if displayedSongs.count > appDelegate.player.maxSongsToAddOnce {
-            return PlayContext(name: filterTitle, playables: displayedSongs[randomPick: appDelegate.player.maxSongsToAddOnce])
+        if displayedSongsMO.count > appDelegate.player.maxSongsToAddOnce {
+            let songsToPlay = displayedSongsMO[randomPick: appDelegate.player.maxSongsToAddOnce].compactMap{ Song(managedObject: $0) }
+            return PlayContext(name: filterTitle, playables: songsToPlay)
         } else {
-            return PlayContext(name: filterTitle, playables: displayedSongs)
+            let songsToPlay = displayedSongsMO.compactMap{ Song(managedObject: $0) }
+            return PlayContext(name: filterTitle, playables: songsToPlay)
         }
     }
     

@@ -33,6 +33,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     private var appDelegate: AppDelegate!
     private var playContextCb: GetPlayContextCallback?
     private var shuffleContextCb: GetPlayContextCallback?
+    private var isShuffleOnContextNeccessary: Bool = true
     private var player: PlayerFacade?
     
     required init?(coder aDecoder: NSCoder) {
@@ -61,15 +62,21 @@ class LibraryElementDetailTableHeaderView: UIView {
     private func shuffle() {
         guard let player = player else { return }
         if let shuffleContext = shuffleContextCb?() {
-            player.playShuffled(context: shuffleContext)
+            if isShuffleOnContextNeccessary {
+                player.playShuffled(context: shuffleContext)
+            } else {
+                player.play(context: shuffleContext)
+            }
         } else {
             play(isShuffled: true)
         }
     }
     
-    func prepare(playContextCb: GetPlayContextCallback?, with player: PlayerFacade, shuffleContextCb: GetPlayContextCallback? = nil) {
+    /// isShuffleOnContextNeccessary: In AlbumsVC the albums are shuffled, keep the order when shuffle button is pressed
+    func prepare(playContextCb: GetPlayContextCallback?, with player: PlayerFacade, isShuffleOnContextNeccessary: Bool = true, shuffleContextCb: GetPlayContextCallback? = nil) {
         self.playContextCb = playContextCb
         self.player = player
+        self.isShuffleOnContextNeccessary = isShuffleOnContextNeccessary
         self.shuffleContextCb = shuffleContextCb
         playAllButton.setImage(UIImage.play.invertedImage(), for: .normal)
         playAllButton.imageView?.contentMode = .scaleAspectFit

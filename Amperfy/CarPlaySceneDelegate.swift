@@ -120,6 +120,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
                 createLibraryItem(text: "Recently Added", icon: UIImage.clock, sectionToDisplay: songsRecentlyAddedSection)
             ], header: "Songs", sectionIndexTitle: nil),
             CPListSection(items: [
+                createPlayRandomAlbumsItem(),
                 createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: albumsFavoriteSection),
                 createLibraryItem(text: "Recently Added", icon: UIImage.clock, sectionToDisplay: albumsRecentlyAddedSection)
             ], header: "Albums", sectionIndexTitle: nil),
@@ -208,9 +209,24 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         let item =  CPListItem(text: "Play Random Songs", detailText: nil, image: img, accessoryImage: nil, accessoryType: .disclosureIndicator)
         item.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
-            let songs = self.appDelegate.storage.main.library.getSongs().filterCached(dependigOn: isOfflineMode)
-            let playContext = PlayContext(name: "Song Collection", playables: songs[randomPick: LibraryStorage.carPlayMaxElements])
+            let songs = self.appDelegate.storage.main.library.getRandomSongs(onlyCached: isOfflineMode)
+            let playContext = PlayContext(name: "Random Songs", playables: songs)
             self.appDelegate.player.playShuffled(context: playContext)
+            self.displayNowPlaying { completion() }
+        }
+        return item
+    }
+    
+    func createPlayRandomAlbumsItem() -> CPListItem {
+        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits)
+        let item =  CPListItem(text: "Play Random Albums", detailText: nil, image: img, accessoryImage: nil, accessoryType: .disclosureIndicator)
+        item.handler = { [weak self] item, completion in
+            guard let `self` = self else { completion(); return }
+            let randomAlbums = self.appDelegate.storage.main.library.getRandomAlbums(count: 5, onlyCached: isOfflineMode)
+            var songs = [AbstractPlayable]()
+            randomAlbums.forEach { songs.append(contentsOf: $0.playables) }
+            let playContext = PlayContext(name: "Random Albums", playables: songs)
+            self.appDelegate.player.play(context: playContext)
             self.displayNowPlaying { completion() }
         }
         return item
