@@ -176,7 +176,7 @@ public class PodcastEpisodesReleaseDateFetchedResultsController: BasicFetchedRes
 
 public class PodcastEpisodesFetchedResultsController: BasicFetchedResultsController<PodcastEpisodeMO> {
     
-    let podcast: Podcast
+    public let podcast: Podcast
     
     public init(forPodcast podcast: Podcast, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.podcast = podcast
@@ -560,7 +560,7 @@ public class AlbumSongsFetchedResultsController: BasicFetchedResultsController<S
 
 public class PlaylistItemsFetchedResultsController: BasicFetchedResultsController<PlaylistItemMO> {
 
-    let playlist: Playlist
+    public let playlist: Playlist
     
     public init(forPlaylist playlist: Playlist, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.playlist = playlist

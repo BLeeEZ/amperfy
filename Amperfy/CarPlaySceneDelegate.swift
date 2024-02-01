@@ -24,6 +24,7 @@ import UIKit
 import CarPlay
 import CoreData
 import OSLog
+import PromiseKit
 import AmperfyKit
 
 class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
@@ -49,386 +50,271 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     /// CarPlay connected
     func templateApplicationScene(_ templateApplicationScene: CPTemplateApplicationScene, didConnect interfaceController: CPInterfaceController) {
-        os_log("didConnect CarPlay", log: self.log, type: .info)
+        os_log("CarPlay: didConnect", log: self.log, type: .info)
         appDelegate.notificationHandler.register(self, selector: #selector(refreshSort), name: .fetchControllerSortChanged, object: nil)
+        appDelegate.notificationHandler.register(self, selector: #selector(refreshOfflineMode),name: .offlineModeChanged, object: nil)
+        appDelegate.player.addNotifier(notifier: self)
         CPNowPlayingTemplate.shared.add(self)
-              
-        createPlaylistFetchController()
-        createPodcastFetchController()
-        //
-        createArtistsFavoritesFetchController()
-        createAlbumsFavoritesFetchController()
-        createAlbumsRecentlyAddedFetchController()
-        createSongsFavoritesFetchController()
-        createSongsRecentlyAddedFetchController()
         
         self.interfaceController = interfaceController
+        self.interfaceController?.delegate = self
         self.configureNowPlayingTemplate()
-        self.displayInitTabTemplate()
+        
+        self.interfaceController?.setRootTemplate(rootBarTemplate, animated: true, completion: nil)
     }
     
     /// CarPlay disconnected
-    func templateApplicationScene(_ templateApplicationScene: CPTemplateApplicationScene, didDisconnect interfaceController: CPInterfaceController, from window: CPWindow) {
-        os_log("didDisconnect CarPlay", log: self.log, type: .info)
-        CPNowPlayingTemplate.shared.remove(self)
+    func templateApplicationScene( _ templateApplicationScene: CPTemplateApplicationScene, didDisconnectInterfaceController interfaceController: CPInterfaceController) {
+        os_log("CarPlay: didDisconnect", log: self.log, type: .info)
         self.interfaceController = nil
-    }
-    
-    @objc private func refreshSort() {
-        if playlistFetchController?.sortType != appDelegate.storage.settings.playlistsSortSetting {
-            os_log("RefreshSort: PlaylistFetchController", log: self.log, type: .info)
-            createPlaylistFetchController()
-            playlistTab.updateSections([CPListSection(items: createPlaylistsSections(treeDepth: 1))])
-        }
-        if artistsFavoritesFetchController?.sortType != appDelegate.storage.settings.artistsSortSetting {
-            os_log("RefreshSort: ArtistsFavoritesFetchController", log: self.log, type: .info)
-            createArtistsFavoritesFetchController()
-        }
-        if albumsFavoritesFetchController?.sortType != appDelegate.storage.settings.albumsSortSetting {
-            os_log("RefreshSort: AlbumsFavoritesFetchController", log: self.log, type: .info)
-            createAlbumsFavoritesFetchController()
-        }
-        if songsFavoritesFetchController?.sortType != appDelegate.storage.settings.songsSortSetting {
-            os_log("RefreshSort: SongsFavoritesFetchController", log: self.log, type: .info)
-            createSongsFavoritesFetchController()
-        }
+        appDelegate.notificationHandler.remove(self, name: .fetchControllerSortChanged, object: nil)
+        appDelegate.notificationHandler.remove(self, name: .offlineModeChanged, object: nil)
+        CPNowPlayingTemplate.shared.remove(self)
+        
+        playlistFetchController = nil
+        podcastFetchController = nil
+        artistsFavoritesFetchController = nil
+        albumsFavoritesFetchController = nil
+        albumsRecentlyAddedFetchController = nil
+        songsFavoritesFetchController = nil
+        songsRecentlyAddedFetchController = nil
+        playlistDetailFetchController = nil
+        podcastDetailFetchController = nil
     }
 
-    
-    lazy var libraryTab = {
-        return self.createLibraryTab()
+    lazy var playerQueueSection = {
+        let queueTemplate = CPListTemplate(title: Self.queueButtonText, sections: [CPListSection]())
+        return queueTemplate
     }()
-    lazy var playlistTab = {
-        return self.createPlaylistsTab()
-    }()
-    lazy var podcastTab = {
-        return self.createPodcastsTab()
-    }()
-    
-    var playlistFetchController: PlaylistFetchedResultsController?
-    func createPlaylistFetchController() {
-        playlistFetchController = PlaylistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.playlistsSortSetting, isGroupedInAlphabeticSections: false)
-        playlistFetchController?.delegate = self
-        playlistFetchController?.fetch()
-    }
-    var podcastFetchController: PodcastFetchedResultsController?
-    func createPodcastFetchController() {
-        podcastFetchController = PodcastFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
-        podcastFetchController?.delegate = self
-        podcastFetchController?.fetch()
-    }
-    var artistsFavoritesFetchController: ArtistFetchedResultsController?
-    func createArtistsFavoritesFetchController() {
-        artistsFavoritesFetchController = ArtistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.artistsSortSetting, isGroupedInAlphabeticSections: false)
-        artistsFavoritesFetchController?.delegate = self
-        artistsFavoritesFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .favorites)
-    }
-    var albumsFavoritesFetchController: AlbumFetchedResultsController?
-    func createAlbumsFavoritesFetchController() {
-        albumsFavoritesFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.albumsSortSetting, isGroupedInAlphabeticSections: false)
-        albumsFavoritesFetchController?.delegate = self
-        albumsFavoritesFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .favorites)
-    }
-    var albumsRecentlyAddedFetchController: AlbumFetchedResultsController?
-    func createAlbumsRecentlyAddedFetchController() {
-        albumsRecentlyAddedFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .recentlyAddedIndex, isGroupedInAlphabeticSections: false)
-        albumsRecentlyAddedFetchController?.delegate = self
-        albumsRecentlyAddedFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .recentlyAdded)
-    }
-    var songsFavoritesFetchController: SongsFetchedResultsController?
-    func createSongsFavoritesFetchController() {
-        songsFavoritesFetchController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.songsSortSetting, isGroupedInAlphabeticSections: false)
-        songsFavoritesFetchController?.delegate = self
-        songsFavoritesFetchController?.search(searchText: "", onlyCachedSongs: isOfflineMode, displayFilter: .favorites)
-    }
-    var songsRecentlyAddedFetchController: SongsFetchedResultsController?
-    func createSongsRecentlyAddedFetchController() {
-        songsRecentlyAddedFetchController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .recentlyAddedIndex, isGroupedInAlphabeticSections: false)
-        songsRecentlyAddedFetchController?.delegate = self
-        songsRecentlyAddedFetchController?.search(searchText: "", onlyCachedSongs: isOfflineMode, displayFilter: .recentlyAdded)
-    }
-    
-    private func displayInitTabTemplate() {
-        let tab = CPTabBarTemplate(templates: [
+
+    lazy var rootBarTemplate = {
+        let bar = CPTabBarTemplate(templates: [
             libraryTab,
             playlistTab,
             podcastTab
         ])
-        self.interfaceController?.setRootTemplate(tab, animated: true, completion: nil)
-    }
-    
-    static let queueButtonText = NSLocalizedString("Queue", comment: "Button title on CarPlay player to display queue")
-    
-    private func configureNowPlayingTemplate() {
-        CPNowPlayingTemplate.shared.updateNowPlayingButtons([
-            CPNowPlayingRepeatButton(handler: { [weak self] button in
-                guard let `self` = self else { return }
-                self.appDelegate.player.setRepeatMode(self.appDelegate.player.repeatMode.nextMode)
-            }),
-            CPNowPlayingShuffleButton(handler: { [weak self] button in
-                guard let `self` = self else { return }
-                self.appDelegate.player.toggleShuffle()
-            }),
-            CPNowPlayingPlaybackRateButton(handler: { [weak self] button in
-                guard let `self` = self else { return }
-                let playerPlaybackRate = self.appDelegate.player.playbackRate
-                let availablePlaybackRates: [CPListItem] = PlaybackRate.allCases.compactMap { playbackRate in
-                    let listItem = CPListItem(text: playbackRate.description, detailText: nil)
-                    listItem.handler = { [weak self] item, completion in
-                        guard let `self` = self else { completion(); return }
-                        self.appDelegate.player.setPlaybackRate(playbackRate)
-                        self.interfaceController?.popTemplate(animated: true) { _,_ in }
-                        completion()
-                    }
-                    return listItem
-                }
-                let playbackRateTemplate = CPListTemplate(title: "Playback Rate", sections: [
-                    CPListSection(items: availablePlaybackRates)
-                ])
-                self.interfaceController?.pushTemplate(playbackRateTemplate, animated: true, completion: nil)
-                
-            })
-        ])
-        CPNowPlayingTemplate.shared.upNextTitle = Self.queueButtonText
-        CPNowPlayingTemplate.shared.isUpNextButtonEnabled = true
-    }
-    
-    private func createLibrarySections() -> [CPListTemplateItem] {
-        let playlistSection = CPListItem(text: "Playlists", detailText: nil, image: nil, accessoryImage: nil, accessoryType: .disclosureIndicator)
-        playlistSection.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            let sections = self.createPlaylistsSections(treeDepth: 1)
-            let playlistTemplate = CPListTemplate(title: "Playlists", sections: [
-                CPListSection(items: sections)
-            ])
-            self.interfaceController?.pushTemplate(playlistTemplate, animated: true, completion: nil)
-            completion()
-        }
-        
-        let artistsSection = CPListItem(text: "Artists", detailText: nil, image: nil, accessoryImage: nil, accessoryType: .disclosureIndicator)
-        artistsSection.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            let sections = self.createArtistsSections(treeDepth: 1)
-            let playlistTemplate = CPListTemplate(title: "Artists", sections: [
-                CPListSection(items: sections)
-            ])
-            self.interfaceController?.pushTemplate(playlistTemplate, animated: true, completion: nil)
-            completion()
-        }
-        
-        let albumsSection = CPListItem(text: "Albums", detailText: nil, image: nil, accessoryImage: nil, accessoryType: .disclosureIndicator)
-        albumsSection.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            let sections = self.createAlbumsSections(treeDepth: 1)
-            let playlistTemplate = CPListTemplate(title: "Albums", sections: [
-                CPListSection(items: sections)
-            ])
-            self.interfaceController?.pushTemplate(playlistTemplate, animated: true, completion: nil)
-            completion()
-        }
-        
-        let songsSection = CPListItem(text: "Songs", detailText: nil, image: nil, accessoryImage: nil, accessoryType: .disclosureIndicator)
-        songsSection.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            let sections = self.createSongsSections(treeDepth: 1)
-            let playlistTemplate = CPListTemplate(title: "Songs", sections: [
-                CPListSection(items: sections)
-            ])
-            self.interfaceController?.pushTemplate(playlistTemplate, animated: true, completion: nil)
-            completion()
-        }
-        
-        let podcastSection = CPListItem(text: "Podcasts", detailText: nil, image: nil, accessoryImage: nil, accessoryType: .disclosureIndicator)
-        podcastSection.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            let sections = self.createPodcastsSections(treeDepth: 1)
-            let playlistTemplate = CPListTemplate(title: "Podcasts", sections: [
-                CPListSection(items: sections)
-            ])
-            self.interfaceController?.pushTemplate(playlistTemplate, animated: true, completion: nil)
-            completion()
-        }
-        
-        let sections = [
-            playlistSection,
-            artistsSection,
-            albumsSection,
-            songsSection,
-            podcastSection
-        ]
-        return sections
-    }
-    
-    private func createLibraryTab() -> CPListTemplate {
-        let libraryTab = CPListTemplate(title: "Library", sections: [CPListSection(items: createLibrarySections() )])
+        return bar
+    }()
+    lazy var playlistTab = {
+        let playlistTab = CPListTemplate(title: "Playlists", sections: [CPListSection]())
+        playlistTab.tabImage = UIImage.playlist
+        return playlistTab
+    }()
+    lazy var podcastTab = {
+        let podcastsTab = CPListTemplate(title: "Podcasts", sections: [CPListSection]())
+        podcastsTab.tabImage = UIImage.podcast
+        return podcastsTab
+    }()
+    lazy var libraryTab = {
+        let libraryTab = CPListTemplate(title: "Library", sections: createLibrarySections())
         libraryTab.tabImage = UIImage.musicLibrary
         libraryTab.assistantCellConfiguration = CarPlaySceneDelegate.assistantConfig
         return libraryTab
+    }()
+    func createLibrarySections() -> [CPListSection] {
+        let continuePlayingItems = createContinePlayingItems()
+        var librarySections = [
+            CPListSection(items: [
+                createPlayRandomSongsItem(),
+                createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: songsFavoriteSection),
+                createLibraryItem(text: "Recently Added", icon: UIImage.clock, sectionToDisplay: songsRecentlyAddedSection)
+            ], header: "Songs", sectionIndexTitle: nil),
+            CPListSection(items: [
+                createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: albumsFavoriteSection),
+                createLibraryItem(text: "Recently Added", icon: UIImage.clock, sectionToDisplay: albumsRecentlyAddedSection)
+            ], header: "Albums", sectionIndexTitle: nil),
+            CPListSection(items: [
+                createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: artistsFavoriteSection)
+            ], header: "Artists", sectionIndexTitle: nil)
+        ]
+        if continuePlayingItems.count > 0 {
+            let continuePlayingSection = CPListSection(items: continuePlayingItems, header: "Continue Playing", sectionIndexTitle: nil)
+            librarySections.insert(continuePlayingSection, at: 0)
+        }
+        return librarySections
+    }
+    lazy var artistsFavoriteSection = {
+        let template = CPListTemplate(title: "Favorite Artists", sections: [
+            CPListSection(items: [CPListTemplateItem]())
+        ])
+        return template
+    }()
+    lazy var albumsFavoriteSection = {
+        let template = CPListTemplate(title: "Favorite Albums", sections: [
+            CPListSection(items: [CPListTemplateItem]())
+        ])
+        return template
+    }()
+    lazy var albumsRecentlyAddedSection = {
+        let template = CPListTemplate(title: "Recent Albums", sections: [
+            CPListSection(items: [CPListTemplateItem]())
+        ])
+        return template
+    }()
+    lazy var songsFavoriteSection = {
+        let template = CPListTemplate(title: "Favorite Songs", sections: [
+            CPListSection(items: [CPListTemplateItem]())
+        ])
+        return template
+    }()
+    lazy var songsRecentlyAddedSection = {
+        let template = CPListTemplate(title: "Recent Songs", sections: [
+            CPListSection(items: [CPListTemplateItem]())
+        ])
+        return template
+    }()
+    var playlistDetailSection: CPListTemplate?
+    var podcastDetailSection: CPListTemplate?
+    
+    
+    func createLibraryItem(text: String, icon: UIImage, sectionToDisplay: CPListTemplate) -> CPListItem {
+        let item =  CPListItem(text: text, detailText: nil, image: UIImage.createArtwork(with: icon, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        item.handler = { [weak self] item, completion in
+            guard let `self` = self else { completion(); return }
+            self.interfaceController?.pushTemplate(sectionToDisplay, animated: true) { _,_ in
+                completion()
+            }
+        }
+        return item
     }
     
-    private func createPlaylistsTab() -> CPListTemplate {
-        let sections = createPlaylistsSections(treeDepth: 1)
-        let playlistTab = CPListTemplate(title: "Playlists", sections: [CPListSection(items: sections)])
-        playlistTab.tabImage = UIImage.playlist
-        return playlistTab
+    func createContinePlayingItems() -> [CPListItem] {
+        var continuePlayingItems = [CPListItem]()
+        if appDelegate.player.musicItemCount > 0 {
+            let item = CPListItem(text: "Music", detailText: "", image: UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .none)
+            item.handler = { [weak self] item, completion in
+                guard let `self` = self else { completion(); return }
+                appDelegate.player.setPlayerMode(.music)
+                appDelegate.player.play()
+                self.displayNowPlaying { completion() }
+            }
+            continuePlayingItems.append(item)
+        }
+        if appDelegate.player.podcastItemCount > 0 {
+            let item = CPListItem(text: "Podcasts", detailText: "", image: UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .none)
+            item.handler = { [weak self] item, completion in
+                guard let `self` = self else { completion(); return }
+                appDelegate.player.setPlayerMode(.podcast)
+                appDelegate.player.play()
+                self.displayNowPlaying { completion() }
+            }
+            continuePlayingItems.append(item)
+        }
+        return continuePlayingItems
     }
     
-    private func createPodcastsTab() -> CPListTemplate {
-        let sections = createPodcastsSections(treeDepth: 1)
-        let podcastsTab = CPListTemplate(title: "Podcasts", sections: [CPListSection(items: sections)])
-        podcastsTab.tabImage = UIImage.podcast
-        return podcastsTab
+    func createPlayRandomSongsItem() -> CPListItem {
+        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits)
+        let item =  CPListItem(text: "Play Random Songs", detailText: nil, image: img, accessoryImage: nil, accessoryType: .disclosureIndicator)
+        item.handler = { [weak self] item, completion in
+            guard let `self` = self else { completion(); return }
+            let songs = self.appDelegate.storage.main.library.getSongs().filterCached(dependigOn: isOfflineMode)
+            let playContext = PlayContext(name: "Song Collection", playables: songs[randomPick: LibraryStorage.carPlayMaxElements])
+            self.appDelegate.player.playShuffled(context: playContext)
+            self.displayNowPlaying { completion() }
+        }
+        return item
     }
+    
+    
+    var playlistFetchController: PlaylistFetchedResultsController?
+    var podcastFetchController: PodcastFetchedResultsController?
+    //
+    var artistsFavoritesFetchController: ArtistFetchedResultsController?
+    var albumsFavoritesFetchController: AlbumFetchedResultsController?
+    var albumsRecentlyAddedFetchController: AlbumFetchedResultsController?
+    var songsFavoritesFetchController: SongsFetchedResultsController?
+    var songsRecentlyAddedFetchController: SongsFetchedResultsController?
+    //
+    var playlistDetailFetchController: PlaylistItemsFetchedResultsController?
+    var podcastDetailFetchController: PodcastEpisodesFetchedResultsController?
+    
+    static let queueButtonText = NSLocalizedString("Queue", comment: "Button title on CarPlay player to display queue")
+    
 
-    private func createArtistsSections(treeDepth: Int) -> [CPListTemplateItem] {
-        let favoritesSection = CPListItem(text: "Favorites", detailText: nil, image: UIImage.createArtwork(with: UIImage.heartFill, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
-        favoritesSection.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            var favoriteSections = [CPListTemplateItem]()
-            
-            if let fetchedArtistsFavorites = artistsFavoritesFetchController?.fetchedObjects {
-                let sectionCount = min(fetchedArtistsFavorites.count, CPListTemplate.maximumSectionCount)
-                if sectionCount > 0 {
-                    for artistsFavoritesIndex in 0...(sectionCount-1) {
-                        let artistsFavoriteMO = fetchedArtistsFavorites[artistsFavoritesIndex]
-                        let artistsFavorite = Artist(managedObject: artistsFavoriteMO)
-                        let section = self.createDetailTemplate(for: artistsFavorite, treeDepth: treeDepth+1)
-                        favoriteSections.append(section)
-                    }
-                }
-            }
-            let favoriteTemplate = CPListTemplate(title: "Favorites", sections: [
-                CPListSection(items: favoriteSections)
-            ])
-            self.interfaceController?.pushTemplate(favoriteTemplate, animated: true, completion: nil)
-            completion()
+    private func createArtistItems(from fetchedController: BasicFetchedResultsController<ArtistMO>?) -> [CPListTemplateItem] {
+        var items = [CPListTemplateItem]()
+        guard let fetchedController = fetchedController else { return items }
+        for index in 0...(CPListTemplate.maximumSectionCount-1) {
+            guard let entity = fetchedController.getWrappedEntity(at: index) else { break }
+            let detailTemplate = self.createDetailTemplate(for: entity)
+            items.append(detailTemplate)
         }
-        return [favoritesSection]
+        return items
+    }
+    private func createAlbumItems(from fetchedController: BasicFetchedResultsController<AlbumMO>?) -> [CPListTemplateItem] {
+        var items = [CPListTemplateItem]()
+        guard let fetchedController = fetchedController else { return items }
+        for index in 0...(CPListTemplate.maximumSectionCount-1) {
+            guard let entity = fetchedController.getWrappedEntity(at: index) else { break }
+            let detailTemplate = self.createDetailTemplate(for: entity)
+            items.append(detailTemplate)
+        }
+        return items
+    }
+    private func createSongItems(from fetchedController: BasicFetchedResultsController<SongMO>?) -> [CPListTemplateItem] {
+        var items = [CPListTemplateItem]()
+        var playables = [AbstractPlayable]()
+        guard let fetchedController = fetchedController else { return items }
+        for index in 0...(CPListTemplate.maximumSectionCount-2) {
+            guard let entity = fetchedController.getWrappedEntity(at: index) else { break }
+            playables.append(entity)
+
+        }
+        if playables.count > 0 {
+            items.append(self.createPlayShuffledListItem(playContext: PlayContext(name: "Favorite Songs", playables: playables)))
+        }
+        for (index, playable) in playables.enumerated() {
+            let detailTemplate = self.createDetailTemplate(for: playable, playContext: PlayContext(name: "Favorite Songs", index: index, playables: playables))
+            items.append(detailTemplate)
+        }
+        return items
+    }
+    private func createPlaylistDetailItems(from fetchedController: PlaylistItemsFetchedResultsController) -> [CPListTemplateItem] {
+        let playlist = fetchedController.playlist
+        var items = [CPListItem]()
+        
+        guard let playables = fetchedController.getContextSongs(onlyCachedSongs: isOfflineMode)
+        else { return items }
+        
+        items.append(self.createPlayShuffledListItem(playContext: PlayContext(containable: playlist, playables: playlist.playables.filterCached(dependigOn: self.isOfflineMode))))
+        let displayedSongs = playables.prefix(CPListTemplate.maximumSectionCount-2)
+        for (index, song) in displayedSongs.enumerated() {
+            let listItem = self.createDetailTemplate(for: song, playContext: PlayContext(containable: playlist, index: index, playables: playables))
+            items.append(listItem)
+            if index >= CPListTemplate.maximumItemCount-1 {
+                break
+            }
+        }
+        return items
+    }
+    private func createPodcastDetailItems(from fetchedController: PodcastEpisodesFetchedResultsController) -> [CPListTemplateItem] {
+        let podcast = fetchedController.podcast
+        var items = [CPListItem]()
+        
+        var playables = [AbstractPlayable]()
+        for index in 0...(CPListTemplate.maximumSectionCount-2) {
+            guard let entity = fetchedController.getWrappedEntity(at: index) else { break }
+            playables.append(entity)
+        }
+        for (index, song) in playables.enumerated() {
+            let listItem = self.createDetailTemplate(for: song, playContext: PlayContext(containable: podcast, index: index, playables: playables))
+            items.append(listItem)
+        }
+        return items
     }
     
-    private func createAlbumsSections(treeDepth: Int) -> [CPListTemplateItem] {
-        let favoritesSection = CPListItem(text: "Favorites", detailText: nil, image: UIImage.createArtwork(with: UIImage.heartFill, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
-        favoritesSection.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            var favoriteSections = [CPListTemplateItem]()
-            
-            if let fetchedAlbumsFavorites = albumsFavoritesFetchController?.fetchedObjects {
-                let sectionCount = min(fetchedAlbumsFavorites.count, CPListTemplate.maximumSectionCount)
-                if sectionCount > 0 {
-                    for albumsFavoritesIndex in 0...(sectionCount-1) {
-                        let albumFavoriteMO = fetchedAlbumsFavorites[albumsFavoritesIndex]
-                        let albumFavorite = Album(managedObject: albumFavoriteMO)
-                        let section = self.createDetailTemplate(for: albumFavorite, treeDepth: treeDepth+1)
-                        favoriteSections.append(section)
-                    }
-                }
-            }
-            let favoriteTemplate = CPListTemplate(title: "Favorites", sections: [
-                CPListSection(items: favoriteSections)
-            ])
-            self.interfaceController?.pushTemplate(favoriteTemplate, animated: true, completion: nil)
-            completion()
-        }
-        
-        let recentlyAddedSection = CPListItem(text: "Recently added", detailText: nil, image: UIImage.createArtwork(with: UIImage.clock, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
-        recentlyAddedSection.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            var recentlyAddedSections = [CPListTemplateItem]()
-            
-            if let fetchedAlbumsRecentlyAdded = albumsRecentlyAddedFetchController?.fetchedObjects {
-                let sectionCount = min(fetchedAlbumsRecentlyAdded.count, CPListTemplate.maximumSectionCount)
-                if sectionCount > 0 {
-                    for albumsRecentlyAddedIndex in 0...(sectionCount-1) {
-                        let albumRecentlyAddedMO = fetchedAlbumsRecentlyAdded[albumsRecentlyAddedIndex]
-                        let albumRecentlyAdded = Album(managedObject: albumRecentlyAddedMO)
-                        let section = self.createDetailTemplate(for: albumRecentlyAdded, treeDepth: treeDepth+1)
-                        recentlyAddedSections.append(section)
-                    }
-                }
-            }
-            
-            let recentlyAddedTemplate = CPListTemplate(title: "Recently added", sections: [
-                CPListSection(items: recentlyAddedSections)
-            ])
-            self.interfaceController?.pushTemplate(recentlyAddedTemplate, animated: true, completion: nil)
-            completion()
-        }
-        return [favoritesSection, recentlyAddedSection]
-    }
     
-    private func createSongsSections(treeDepth: Int) -> [CPListTemplateItem] {
-        let favoritesSection = CPListItem(text: "Favorites", detailText: nil, image: UIImage.createArtwork(with: UIImage.heartFill, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
-        favoritesSection.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            var favoriteSections = [CPListTemplateItem]()
-            
-            if let fetchedSongsFavorites = songsFavoritesFetchController?.fetchedObjects {
-                if fetchedSongsFavorites.count > 0 {
-                    var favoritePlayables = [Song]()
-                    for (index, songFavoriteMO) in fetchedSongsFavorites.enumerated() {
-                        favoritePlayables.append(Song(managedObject: songFavoriteMO))
-                        if index >= CPListTemplate.maximumItemCount-1 {
-                            break
-                        }
-                    }
-                    favoriteSections.append(self.createPlayShuffledListItem(playContext: PlayContext(name: "All favorite songs", playables: favoritePlayables), treeDepth: treeDepth+1))
-                    for (index, songFavorite) in favoritePlayables.enumerated() {
-                        let section = self.createDetailTemplate(for: songFavorite, playContext: PlayContext(name: "All favorite songs", index: index, playables: favoritePlayables), treeDepth: treeDepth+1)
-                        favoriteSections.append(section)
-                    }
-                }
-            }
-            let favoriteTemplate = CPListTemplate(title: "Favorites", sections: [
-                CPListSection(items: favoriteSections)
-            ])
-            self.interfaceController?.pushTemplate(favoriteTemplate, animated: true, completion: nil)
-            completion()
-        }
-        
-        let recentlyAddedSection = CPListItem(text: "Recently added", detailText: nil, image: UIImage.createArtwork(with: UIImage.clock, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
-        recentlyAddedSection.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            var recentlyAddedSections = [CPListTemplateItem]()
-            
-            if let fetchedSongsRecentlyAdded = songsRecentlyAddedFetchController?.fetchedObjects {
-                if fetchedSongsRecentlyAdded.count > 0 {
-                    var recentlyAddedPlayables = [Song]()
-                    for (index, songRecentlyAddedMO) in fetchedSongsRecentlyAdded.enumerated() {
-                        recentlyAddedPlayables.append(Song(managedObject: songRecentlyAddedMO))
-                        if index >= CPListTemplate.maximumItemCount-1 {
-                            break
-                        }
-                    }
-                    recentlyAddedSections.append(self.createPlayShuffledListItem(playContext: PlayContext(name: "All recent songs", playables: recentlyAddedPlayables), treeDepth: treeDepth+1))
-                    for (index, songRecentlyAdded) in recentlyAddedPlayables.enumerated() {
-                        let section = self.createDetailTemplate(for: songRecentlyAdded, playContext: PlayContext(name: "All recent songs", index: index, playables: recentlyAddedPlayables), treeDepth: treeDepth+1)
-                        recentlyAddedSections.append(section)
-                    }
-                }
-            }
-            let recentlyAddedTemplate = CPListTemplate(title: "Recently added", sections: [
-                CPListSection(items: recentlyAddedSections)
-            ])
-            self.interfaceController?.pushTemplate(recentlyAddedTemplate, animated: true, completion: nil)
-            completion()
-        }
-        
-        let songs = self.appDelegate.storage.main.library.getSongs().filterCached(dependigOn: isOfflineMode)
-        let playRandomSongsSection = self.createPlayShuffledListItem(playContext: PlayContext(name: "Song Collection", playables: songs[randomPick: LibraryStorage.carPlayMaxElements]), treeDepth: treeDepth+1, text: "Play random songs")
-        
-        return [favoritesSection, recentlyAddedSection, playRandomSongsSection]
-    }
-    
-    private func createDetailTemplate(for artist: Artist, treeDepth: Int) -> CPListItem {
+    private func createDetailTemplate(for artist: Artist) -> CPListItem {
         let section = CPListItem(text: artist.name, detailText: artist.subtitle, image: artist.image(setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var albumItems = [CPListItem]()
-            albumItems.append(self.createPlayShuffledListItem(playContext: PlayContext(containable: artist, playables: artist.playables.filterCached(dependigOn: self.isOfflineMode)), treeDepth: treeDepth+1))
-            albumItems.append(self.createDetailAllSongsTemplate(for: artist, treeDepth: treeDepth+1))
+            albumItems.append(self.createPlayShuffledListItem(playContext: PlayContext(containable: artist, playables: artist.playables.filterCached(dependigOn: self.isOfflineMode))))
+            albumItems.append(self.createDetailAllSongsTemplate(for: artist))
             let artistAlbums = self.appDelegate.storage.main.library.getAlbums(whichContainsSongsWithArtist: artist, onlyCached: self.isOfflineMode).prefix(LibraryStorage.carPlayMaxElements)
             for album in artistAlbums {
-                let listItem = self.createDetailTemplate(for: album, treeDepth: treeDepth+1)
+                let listItem = self.createDetailTemplate(for: album)
                 albumItems.append(listItem)
             }
             let artistTemplate = CPListTemplate(title: artist.name, sections: [
@@ -440,15 +326,15 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         return section
     }
     
-    private func createDetailAllSongsTemplate(for artist: Artist, treeDepth: Int) -> CPListItem {
-        let section = CPListItem(text: "All songs", detailText: nil, image: UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
+    private func createDetailAllSongsTemplate(for artist: Artist) -> CPListItem {
+        let section = CPListItem(text: "All Songs", detailText: nil, image: UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var songItems = [CPListItem]()
-            songItems.append(self.createPlayShuffledListItem(playContext: PlayContext(containable: artist, playables: artist.playables.filterCached(dependigOn: self.isOfflineMode)), treeDepth: treeDepth+1))
+            songItems.append(self.createPlayShuffledListItem(playContext: PlayContext(containable: artist, playables: artist.playables.filterCached(dependigOn: self.isOfflineMode))))
             let artistSongs = artist.playables.filterCached(dependigOn: self.isOfflineMode).sortByTitle().prefix(LibraryStorage.carPlayMaxElements)
             for (index, song) in artistSongs.enumerated() {
-                let listItem = self.createDetailTemplate(for: song, playContext: PlayContext(containable: artist, index: index, playables: Array(artistSongs)), treeDepth: treeDepth+1)
+                let listItem = self.createDetailTemplate(for: song, playContext: PlayContext(containable: artist, index: index, playables: Array(artistSongs)))
                 songItems.append(listItem)
             }
             let albumTemplate = CPListTemplate(title: artist.name, sections: [
@@ -460,15 +346,15 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         return section
     }
     
-    private func createDetailTemplate(for album: Album, treeDepth: Int) -> CPListItem {
+    private func createDetailTemplate(for album: Album) -> CPListItem {
         let section = CPListItem(text: album.name, detailText: album.subtitle, image: album.image(setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var songItems = [CPListItem]()
-            songItems.append(self.createPlayShuffledListItem(playContext: PlayContext(containable: album, playables: album.playables.filterCached(dependigOn: self.isOfflineMode)), treeDepth: treeDepth+1))
+            songItems.append(self.createPlayShuffledListItem(playContext: PlayContext(containable: album, playables: album.playables.filterCached(dependigOn: self.isOfflineMode))))
             let albumSongs = album.playables.filterCached(dependigOn: self.isOfflineMode).prefix(LibraryStorage.carPlayMaxElements)
             for (index, song) in albumSongs.enumerated() {
-                let listItem = self.createDetailTemplate(for: song, playContext: PlayContext(containable: album, index: index, playables: Array(albumSongs)), treeDepth: treeDepth+1, isTrackDisplayed: true)
+                let listItem = self.createDetailTemplate(for: song, playContext: PlayContext(containable: album, index: index, playables: Array(albumSongs)), isTrackDisplayed: true)
                 songItems.append(listItem)
             }
             let albumTemplate = CPListTemplate(title: album.name, sections: [
@@ -480,7 +366,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         return section
     }
     
-    private func createPlaylistsSections(treeDepth: Int) -> [CPListTemplateItem] {
+    private func createPlaylistsSections() -> [CPListTemplateItem] {
         var sections = [CPListTemplateItem]()
 
         guard let fetchedPlaylists = playlistFetchController?.fetchedObjects else { return sections }
@@ -493,20 +379,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             let section = CPListItem(text: playlist.name, detailText: playlist.subtitle, image: nil, accessoryImage: nil, accessoryType: .disclosureIndicator)
             section.handler = { [weak self] item, completion in
                 guard let `self` = self else { completion(); return }
-                var songItems = [CPListItem]()
-                songItems.append(self.createPlayShuffledListItem(playContext: PlayContext(containable: playlist, playables: playlist.playables.filterCached(dependigOn: self.isOfflineMode)), treeDepth: treeDepth+1))
-                let allSongs = playlist.playables.filterCached(dependigOn: self.isOfflineMode)
-                for (index, song) in allSongs.enumerated() {
-                    let listItem = self.createDetailTemplate(for: song, playContext: PlayContext(containable: playlist, index: index, playables: allSongs), treeDepth: treeDepth+1)
-                    songItems.append(listItem)
-                    if index >= CPListTemplate.maximumItemCount-1 {
-                        break
-                    }
-                }
-                let playlistTemplate = CPListTemplate(title: playlist.name, sections: [
-                    CPListSection(items: songItems)
+                let playlistDetailTemplate = CPListTemplate(title: playlist.name, sections: [
+                    CPListSection(items: [CPListTemplateItem]())
                 ])
-                self.interfaceController?.pushTemplate(playlistTemplate, animated: true, completion: nil)
+                self.playlistDetailSection = playlistDetailTemplate
+                createPlaylistDetailFetchController(playlist: playlist)
+                self.interfaceController?.pushTemplate(playlistDetailTemplate, animated: true, completion: nil)
                 completion()
             }
             sections.append(section)
@@ -514,7 +392,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         return sections
     }
     
-    private func createPodcastsSections(treeDepth: Int) -> [CPListTemplateItem] {
+    private func createPodcastsSections() -> [CPListTemplateItem] {
         var sections = [CPListTemplateItem]()
         
         guard let fetchedPodcasts = podcastFetchController?.fetchedObjects else { return sections }
@@ -527,16 +405,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             let section = CPListItem(text: podcast.title, detailText: podcast.subtitle, image: podcast.image(setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
             section.handler = { [weak self] item, completion in
                 guard let `self` = self else { completion(); return }
-                var episodeItems = [CPListItem]()
-                let allEpisodes = podcast.episodes.filterCached(dependigOn: self.isOfflineMode)
-                for episode in allEpisodes {
-                    let listItem = self.createDetailTemplate(for: episode, treeDepth: treeDepth+1)
-                    episodeItems.append(listItem)
-                }
-                let podcastTemplate = CPListTemplate(title: podcast.title, sections: [
-                    CPListSection(items: episodeItems)
+                let podcastDetailTemplate = CPListTemplate(title: podcast.name, sections: [
+                    CPListSection(items: [CPListTemplateItem]())
                 ])
-                self.interfaceController?.pushTemplate(podcastTemplate, animated: true, completion: nil)
+                self.podcastDetailSection = podcastDetailTemplate
+                createPodcastDetailFetchController(podcast: podcast)
+                self.interfaceController?.pushTemplate(podcastDetailTemplate, animated: true, completion: nil)
                 completion()
             }
             sections.append(section)
@@ -544,101 +418,245 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         return sections
     }
 
-    private func createPlayShuffledListItem(playContext: PlayContext, treeDepth: Int, text: String = "Shuffle") -> CPListItem {
+    private func createPlayShuffledListItem(playContext: PlayContext, text: String = "Shuffle") -> CPListItem {
         let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, switchColors: true).carPlayImage(carTraitCollection: traits)
         let listItem = CPListItem(text: text, detailText: nil, image: img)
         listItem.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             self.appDelegate.player.playShuffled(context: playContext)
-            if treeDepth < Self.maxTreeDepth {
-                self.interfaceController?.pushTemplate(CPNowPlayingTemplate.shared, animated: true, completion: nil)
+            self.displayNowPlaying() {
+                completion()
             }
-            completion()
         }
         return listItem
     }
     
-    private func createDetailTemplate(for episode: PodcastEpisode, treeDepth: Int) -> CPListItem {
+    private func createDetailTemplate(for episode: PodcastEpisode) -> CPListItem {
         let accessoryType: CPListItemAccessoryType = episode.isCached ? .cloud : .none
         let listItem = CPListItem(text: episode.title, detailText: nil, image: nil, accessoryImage: nil, accessoryType: accessoryType)
         listItem.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             self.appDelegate.player.play(context: PlayContext(containable: episode))
-            if treeDepth < Self.maxTreeDepth {
-                self.interfaceController?.pushTemplate(CPNowPlayingTemplate.shared, animated: true, completion: nil)
+            self.displayNowPlaying() {
+                completion()
             }
-            completion()
         }
         return listItem
     }
     
-    private func createDetailTemplate(for playable: AbstractPlayable, playContext: PlayContext, treeDepth: Int, isTrackDisplayed: Bool = false) -> CPListItem {
+    private func createDetailTemplate(for playable: AbstractPlayable, playContext: PlayContext, isTrackDisplayed: Bool = false) -> CPListItem {
         let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
         let image = isTrackDisplayed ? UIImage.numberToImage(number: playable.track) : playable.image(setting: artworkDisplayPreference)
         let listItem = CPListItem(text: playable.title, detailText: playable.subtitle, image: image.carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: accessoryType)
         listItem.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             self.appDelegate.player.play(context: playContext)
-            if treeDepth < Self.maxTreeDepth {
-                self.interfaceController?.pushTemplate(CPNowPlayingTemplate.shared, animated: true, completion: nil)
+            self.displayNowPlaying() {
+                completion()
             }
-            completion()
         }
         return listItem
     }
-    
-    private func createDetailTemplate(for playable: AbstractPlayable, playerIndex: PlayerIndex) -> CPListItem {
-        let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
-        let image = playable.image(setting: artworkDisplayPreference)
-        let listItem = CPListItem(text: playable.title, detailText: playable.subtitle, image: image.carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: accessoryType)
-        listItem.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            self.appDelegate.player.play(playerIndex: playerIndex)
-            self.interfaceController?.popTemplate(animated: true) { _,_ in }
-            completion()
+
+    @objc private func refreshSort() {
+        guard let templates = self.interfaceController?.templates else { return }
+        if let root = self.interfaceController?.rootTemplate as? CPTabBarTemplate,
+           root.selectedTemplate == playlistTab,
+           playlistFetchController?.sortType != appDelegate.storage.settings.playlistsSortSetting {
+            os_log("CarPlay: RefreshSort: PlaylistFetchController", log: self.log, type: .info)
+            createPlaylistFetchController()
+            playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
         }
-        return listItem
+        if artistsFavoritesFetchController?.sortType != appDelegate.storage.settings.artistsSortSetting {
+            os_log("CarPlay: RefreshSort: ArtistsFavoritesFetchController", log: self.log, type: .info)
+            createArtistsFavoritesFetchController()
+            artistsFavoriteSection.updateSections([CPListSection(items: createArtistItems(from: artistsFavoritesFetchController))])
+        }
+        if templates.contains(albumsFavoriteSection), albumsFavoritesFetchController?.sortType != appDelegate.storage.settings.albumsSortSetting {
+            os_log("CarPlay: RefreshSort: AlbumsFavoritesFetchController", log: self.log, type: .info)
+            createAlbumsFavoritesFetchController()
+            albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(from: albumsFavoritesFetchController))])
+        }
+        if templates.contains(songsFavoriteSection), songsFavoritesFetchController?.sortType != appDelegate.storage.settings.songsSortSetting {
+            os_log("CarPlay: RefreshSort: SongsFavoritesFetchController", log: self.log, type: .info)
+            createSongsFavoritesFetchController()
+            songsFavoriteSection.updateSections([CPListSection(items: createSongItems(from: songsFavoritesFetchController))])
+        }
+    }
+    
+    @objc private func refreshOfflineMode() {
+        os_log("CarPlay: OfflineModeChanged", log: self.log, type: .info)
+        guard let templates = self.interfaceController?.templates else { return }
+        
+        if let root = self.interfaceController?.rootTemplate as? CPTabBarTemplate,
+           root.selectedTemplate == playlistTab  {
+            os_log("CarPlay: OfflineModeChanged: playlistFetchController", log: self.log, type: .info)
+            createPlaylistFetchController()
+            playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
+        }
+        if let root = self.interfaceController?.rootTemplate as? CPTabBarTemplate,
+           root.selectedTemplate == podcastTab {
+            os_log("CarPlay: OfflineModeChanged: podcastFetchController", log: self.log, type: .info)
+            createPodcastFetchController()
+            podcastTab.updateSections([CPListSection(items: createPodcastsSections())])
+        }
+        if templates.contains(artistsFavoriteSection) {
+            os_log("CarPlay: OfflineModeChanged: artistsFavoritesFetchController", log: self.log, type: .info)
+            createArtistsFavoritesFetchController()
+            artistsFavoriteSection.updateSections([CPListSection(items: createArtistItems(from: artistsFavoritesFetchController))])
+        }
+        if templates.contains(albumsFavoriteSection) {
+            os_log("CarPlay: OfflineModeChanged: albumsFavoritesFetchController", log: self.log, type: .info)
+            createAlbumsFavoritesFetchController()
+            albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(from: albumsFavoritesFetchController))])
+        }
+        if templates.contains(albumsRecentlyAddedSection) {
+            os_log("CarPlay: OfflineModeChanged: albumsRecentlyAddedFetchController", log: self.log, type: .info)
+            createAlbumsRecentlyAddedFetchController()
+            albumsRecentlyAddedSection.updateSections([CPListSection(items: createAlbumItems(from: albumsRecentlyAddedFetchController))])
+        }
+        if templates.contains(songsFavoriteSection) {
+            os_log("CarPlay: OfflineModeChanged: songsFavoritesFetchController", log: self.log, type: .info)
+            createSongsFavoritesFetchController()
+            songsFavoriteSection.updateSections([CPListSection(items: createSongItems(from: songsFavoritesFetchController))])
+        }
+        if templates.contains(songsRecentlyAddedSection) {
+            os_log("CarPlay: OfflineModeChanged: songsRecentlyAddedFetchController", log: self.log, type: .info)
+            createSongsRecentlyAddedFetchController()
+            songsRecentlyAddedSection.updateSections([CPListSection(items: createSongItems(from: songsRecentlyAddedFetchController))])
+        }
+        if let playlistDetailSection = playlistDetailSection, templates.contains(playlistDetailSection), let playlistDetailFetchController = playlistDetailFetchController {
+            os_log("CarPlay: OfflineModeChanged: playlistDetailSection", log: self.log, type: .info)
+            playlistDetailFetchController.search(onlyCachedSongs: isOfflineMode)
+            playlistDetailSection.updateSections([CPListSection(items: createPlaylistDetailItems(from: playlistDetailFetchController))])
+        }
+        if let podcastDetailSection = podcastDetailSection, templates.contains(podcastDetailSection), let podcastDetailFetchController = podcastDetailFetchController {
+            os_log("CarPlay: OfflineModeChanged: podcastDetailSection", log: self.log, type: .info)
+            podcastDetailFetchController.search(searchText: "", onlyCachedSongs: isOfflineMode)
+            podcastDetailSection.updateSections([CPListSection(items: createPodcastDetailItems(from: podcastDetailFetchController))])
+        }
     }
     
 }
 
 extension CarPlaySceneDelegate: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if let playlistFetchController = playlistFetchController, controller == playlistFetchController.fetchResultsController {
-            playlistTab.updateSections([CPListSection(items: createPlaylistsSections(treeDepth: 1))])
+        guard let templates = self.interfaceController?.templates else { return }
+        if let root = self.interfaceController?.rootTemplate as? CPTabBarTemplate,
+           root.selectedTemplate == playlistTab,
+           let playlistFetchController = playlistFetchController, controller == playlistFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: playlistFetchController", log: self.log, type: .info)
+            playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
         }
-        if let podcastFetchController = podcastFetchController, controller == podcastFetchController.fetchResultsController {
-            podcastTab.updateSections([CPListSection(items: createPodcastsSections(treeDepth: 1))])
+        if let root = self.interfaceController?.rootTemplate as? CPTabBarTemplate,
+           root.selectedTemplate == podcastTab,
+           let podcastFetchController = podcastFetchController, controller == podcastFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: podcastFetchController", log: self.log, type: .info)
+            podcastTab.updateSections([CPListSection(items: createPodcastsSections())])
+        }
+        
+        if templates.contains(artistsFavoriteSection), let artistsFavoritesFetchController = artistsFavoritesFetchController, controller == artistsFavoritesFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: artistsFavoritesFetchController", log: self.log, type: .info)
+            artistsFavoriteSection.updateSections([CPListSection(items: createArtistItems(from: artistsFavoritesFetchController))])
+        }
+        if templates.contains(albumsFavoriteSection), let albumsFavoritesFetchController = albumsFavoritesFetchController, controller == albumsFavoritesFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: albumsFavoritesFetchController", log: self.log, type: .info)
+            albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(from: albumsFavoritesFetchController))])
+        }
+        if templates.contains(albumsRecentlyAddedSection), let albumsRecentlyAddedFetchController = albumsRecentlyAddedFetchController, controller == albumsRecentlyAddedFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: albumsRecentlyAddedFetchController", log: self.log, type: .info)
+            albumsRecentlyAddedSection.updateSections([CPListSection(items: createAlbumItems(from: albumsRecentlyAddedFetchController))])
+        }
+        if templates.contains(songsFavoriteSection), let songsFavoritesFetchController = songsFavoritesFetchController, controller == songsFavoritesFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: songsFavoritesFetchController", log: self.log, type: .info)
+            songsFavoriteSection.updateSections([CPListSection(items: createSongItems(from: songsFavoritesFetchController))])
+        }
+        if templates.contains(songsRecentlyAddedSection), let songsRecentlyAddedFetchController = songsRecentlyAddedFetchController, controller == songsRecentlyAddedFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: songsRecentlyAddedFetchController", log: self.log, type: .info)
+            songsRecentlyAddedSection.updateSections([CPListSection(items: createSongItems(from: songsRecentlyAddedFetchController))])
+        }
+        if let playlistDetailSection = playlistDetailSection, templates.contains(playlistDetailSection), let playlistDetailFetchController = playlistDetailFetchController, controller == playlistDetailFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: playlistDetailSection", log: self.log, type: .info)
+            playlistDetailSection.updateSections([CPListSection(items: createPlaylistDetailItems(from: playlistDetailFetchController))])
+        }
+        if let podcastDetailSection = podcastDetailSection, templates.contains(podcastDetailSection), let podcastDetailFetchController = podcastDetailFetchController, controller == podcastDetailFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: podcastDetailSection", log: self.log, type: .info)
+            podcastDetailSection.updateSections([CPListSection(items: createPodcastDetailItems(from: podcastDetailFetchController))])
         }
     }
 }
 
-extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
-    func nowPlayingTemplateUpNextButtonTapped(_ nowPlayingTemplate: CPNowPlayingTemplate) {
-        var playableItems = [CPListItem]()
-        
-        for (index, userQueueItem) in appDelegate.player.userQueue.enumerated() {
-            let playerIndex = PlayerIndex(queueType: .user, index: index)
-            let listItem = self.createDetailTemplate(for: userQueueItem, playerIndex: playerIndex)
-            playableItems.append(listItem)
-            if playableItems.count >= CPListTemplate.maximumItemCount-1 {
-                break
-            }
-        }
-        if playableItems.count < CPListTemplate.maximumItemCount-1 {
-            for (index, userQueueItem) in appDelegate.player.nextQueue.enumerated() {
-                let playerIndex = PlayerIndex(queueType: .next, index: index)
-                let listItem = self.createDetailTemplate(for: userQueueItem, playerIndex: playerIndex)
-                playableItems.append(listItem)
-                if playableItems.count >= CPListTemplate.maximumItemCount-1 {
-                    break
-                }
-            }
-        }
 
-        let queueTemplate = CPListTemplate(title: Self.queueButtonText, sections: [
-            CPListSection(items: playableItems)
-        ])
-        self.interfaceController?.pushTemplate(queueTemplate, animated: true, completion: nil)
+extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
+    func templateWillAppear(_ aTemplate: CPTemplate, animated: Bool) {
+        if aTemplate == playerQueueSection {
+            os_log("CarPlay: templateWillAppear playerQueueSection", log: self.log, type: .info)
+            playerQueueSection.updateSections(createPlayerQueueSections())
+        } else if aTemplate == libraryTab {
+            os_log("CarPlay: templateWillAppear libraryTab", log: self.log, type: .info)
+            libraryTab.updateSections(createLibrarySections())
+        } else if aTemplate == playlistTab {
+            os_log("CarPlay: templateWillAppear playlistTab", log: self.log, type: .info)
+            if playlistFetchController == nil { createPlaylistFetchController() }
+            playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
+        } else if aTemplate == podcastTab {
+            os_log("CarPlay: templateWillAppear podcastTab", log: self.log, type: .info)
+            if podcastFetchController == nil { createPodcastFetchController() }
+            podcastTab.updateSections([CPListSection(items: createPodcastsSections())])
+        } else if aTemplate == artistsFavoriteSection {
+            os_log("CarPlay: templateWillAppear artistsFavoriteSection", log: self.log, type: .info)
+            if artistsFavoritesFetchController == nil { createArtistsFavoritesFetchController() }
+            artistsFavoriteSection.updateSections([CPListSection(items: createArtistItems(from: artistsFavoritesFetchController))])
+        } else if aTemplate == albumsFavoriteSection {
+            os_log("CarPlay: templateWillAppear albumsFavoriteSection", log: self.log, type: .info)
+            if albumsFavoritesFetchController == nil { createAlbumsFavoritesFetchController() }
+            albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(from: albumsFavoritesFetchController))])
+        } else if aTemplate == albumsRecentlyAddedSection {
+            os_log("CarPlay: templateWillAppear albumsRecentlyAddedSection", log: self.log, type: .info)
+            if albumsRecentlyAddedFetchController == nil { createAlbumsRecentlyAddedFetchController() }
+            albumsRecentlyAddedSection.updateSections([CPListSection(items: createAlbumItems(from: albumsRecentlyAddedFetchController))])
+        } else if aTemplate == songsFavoriteSection {
+            os_log("CarPlay: templateWillAppear songsFavoriteSection", log: self.log, type: .info)
+            if songsFavoritesFetchController == nil { createSongsFavoritesFetchController() }
+            songsFavoriteSection.updateSections([CPListSection(items: createSongItems(from: songsFavoritesFetchController))])
+        } else if aTemplate == songsRecentlyAddedSection {
+            os_log("CarPlay: templateWillAppear songsRecentlyAddedSection", log: self.log, type: .info)
+            if songsRecentlyAddedFetchController == nil { createSongsRecentlyAddedFetchController() }
+            songsRecentlyAddedSection.updateSections([CPListSection(items: createSongItems(from: songsRecentlyAddedFetchController))])
+        } else if aTemplate == playlistDetailSection, let playlistDetailFetchController = playlistDetailFetchController {
+            os_log("CarPlay: templateWillAppear playlistDetailSection", log: self.log, type: .info)
+            firstly {
+                playlistDetailFetchController.playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
+            }
+            playlistDetailSection?.updateSections([CPListSection(items: createPlaylistDetailItems(from: playlistDetailFetchController))])
+        } else if aTemplate == podcastDetailSection, let podcastDetailFetchController = podcastDetailFetchController {
+            os_log("CarPlay: templateWillAppear podcastDetailSection", log: self.log, type: .info)
+            firstly {
+                podcastDetailFetchController.podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
+            }
+            podcastDetailSection?.updateSections([CPListSection(items: createPodcastDetailItems(from: podcastDetailFetchController))])
+        }
+    }
+    
+    func templateDidAppear(_ aTemplate: CPTemplate, animated: Bool) {
+    }
+    
+    func templateWillDisappear(_ aTemplate: CPTemplate, animated: Bool) {
+    }
+    
+    func templateDidDisappear(_ aTemplate: CPTemplate, animated: Bool) {
+        if aTemplate == playlistDetailSection {
+            os_log("CarPlay: templateDidDisappear playlistDetailSection", log: self.log, type: .info)
+            playlistDetailFetchController = nil
+            playlistDetailSection = nil
+        } else if aTemplate == podcastDetailSection {
+            os_log("CarPlay: templateDidDisappear podcastDetailSection", log: self.log, type: .info)
+            podcastDetailFetchController = nil
+            podcastDetailSection = nil
+        }
     }
 }

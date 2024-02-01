@@ -27,6 +27,7 @@ extension Notification.Name {
     public static var playerPause = Notification.Name(rawValue: "de.amperfy.player.pause")
     public static var playerStop = Notification.Name(rawValue: "de.amperfy.player.stop")
     public static var fetchControllerSortChanged = Notification.Name(rawValue: "de.amperfy.fetchController.sort.change")
+    public static var offlineModeChanged = Notification.Name(rawValue: "de.amperfy.settings.offline-mode")
 }
 
 public struct DownloadNotification {

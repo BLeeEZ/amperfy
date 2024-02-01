@@ -98,6 +98,8 @@ public protocol PlayerFacade {
     var isShouldPauseAfterFinishedPlaying: Bool { get set }
     var isAutoCachePlayedItems: Bool { get set }
     var isPopupBarAllowedToHide: Bool { get }
+    var musicItemCount: Int { get }
+    var podcastItemCount: Int { get }
     var playerMode: PlayerMode { get }
     func setPlayerMode(_ newValue: PlayerMode)
 
@@ -230,6 +232,12 @@ class PlayerFacadeImpl: PlayerFacade {
     }
     var isPopupBarAllowedToHide: Bool {
         return playerStatus.isPopupBarAllowedToHide
+    }
+    var musicItemCount: Int {
+        return playerStatus.musicItemCount
+    }
+    var podcastItemCount: Int {
+        return playerStatus.podcastItemCount
     }
     var playerMode: PlayerMode {
         return playerStatus.playerMode

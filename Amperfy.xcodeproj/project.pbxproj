@@ -87,6 +87,8 @@
 		508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E721C5965B00C4BB32 /* AppDelegate.swift */; };
 		508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E921C5965B00C4BB32 /* LoginVC.swift */; };
 		508385ED21C5965B00C4BB32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 508385EB21C5965B00C4BB32 /* Main.storyboard */; };
+		508AA57B2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508AA57A2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift */; };
+		508AA57D2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508AA57C2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift */; };
 		508EBB282850C8D90053D9F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 508385EE21C5965E00C4BB32 /* Assets.xcassets */; };
 		508EBB292850C8DF0053D9F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 508385EE21C5965E00C4BB32 /* Assets.xcassets */; };
 		508EBB322850C9460053D9F0 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508EBB312850C9460053D9F0 /* IntentHandler.swift */; };
@@ -663,6 +665,8 @@
 		5086F886223BD68B00546F5A /* SsArtistParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SsArtistParserDelegate.swift; sourceTree = "<group>"; };
 		5086F88A223E867500546F5A /* SsAlbumParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserDelegate.swift; sourceTree = "<group>"; };
 		5088A8A426A955AD00B4C8C6 /* DownloadProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadProtocols.swift; sourceTree = "<group>"; };
+		508AA57A2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayNowPlayingExtension.swift; sourceTree = "<group>"; };
+		508AA57C2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayFetchControllerExtension.swift; sourceTree = "<group>"; };
 		508EBB2E2850C9460053D9F0 /* AmperfyIntents.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AmperfyIntents.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		508EBB312850C9460053D9F0 /* IntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentHandler.swift; sourceTree = "<group>"; };
 		508EBB332850C9460053D9F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1135,6 +1139,7 @@
 				50C9D716285075E3007F18D0 /* UtilitiesExtensions.swift */,
 				50BA92F421CC2C4800E5901D /* Screens */,
 				50E77DB528D2160800BDF882 /* SwiftUI */,
+				508AA5792B6A3D7E00BE8117 /* CarPlay */,
 				508385F321C5965E00C4BB32 /* Info.plist */,
 				5078AFB32B44AE260038FD17 /* AppIntentVocabulary.plist */,
 				50ACAF1327B277B50039913C /* Amperfy.entitlements */,
@@ -1184,6 +1189,15 @@
 				50E964A925E8E20E00E3210F /* SubsonicVersion.swift */,
 			);
 			path = Subsonic;
+			sourceTree = "<group>";
+		};
+		508AA5792B6A3D7E00BE8117 /* CarPlay */ = {
+			isa = PBXGroup;
+			children = (
+				508AA57A2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift */,
+				508AA57C2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift */,
+			);
+			path = CarPlay;
 			sourceTree = "<group>";
 		};
 		508EBB302850C9460053D9F0 /* AmperfyIntents */ = {
@@ -2031,6 +2045,7 @@
 				5078AFB22B40CA5E0038FD17 /* DisplaySettingsView.swift in Sources */,
 				50DEEE07265E27070073FF20 /* DirectoryTableCell.swift in Sources */,
 				50C16C1821E704CE00F086F0 /* AlbumsVC.swift in Sources */,
+				508AA57D2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift in Sources */,
 				5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */,
 				509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */,
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
@@ -2043,6 +2058,7 @@
 				50CFB59428D4846300A47D44 /* SwipeCellView.swift in Sources */,
 				5005938F28E2EDDB008C8DF6 /* BasicCollectionViewController.swift in Sources */,
 				504B441728D6EB370033982C /* ArtworkDisplaySettings.swift in Sources */,
+				508AA57B2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift in Sources */,
 				504B442028D8E7880033982C /* SupportSettingsView.swift in Sources */,
 				50C9D7082850759B007F18D0 /* SpinnerViewController.swift in Sources */,
 				508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */,

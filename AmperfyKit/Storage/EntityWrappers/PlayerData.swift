@@ -28,6 +28,8 @@ protocol PlayerStatusPersistent {
     func stop()
     var isAutoCachePlayedItems: Bool { get set }
     var isPopupBarAllowedToHide: Bool { get }
+    var musicItemCount: Int { get }
+    var podcastItemCount: Int { get }
     var playerMode: PlayerMode { get set }
     var isShuffle: Bool { get set }
     var repeatMode: RepeatMode { get set }
@@ -119,7 +121,12 @@ extension PlayerData: PlayerStatusPersistent {
     var isPopupBarAllowedToHide: Bool {
         return podcastPlaylist.songCount == 0 && contextPlaylist.songCount == 0 && userQueuePlaylistInternal.songCount == 0
     }
-    
+    var musicItemCount: Int {
+        return contextPlaylist.songCount + userQueuePlaylistInternal.songCount
+    }
+    var podcastItemCount: Int {
+        return podcastPlaylist.songCount
+    }
     
     var playerMode: PlayerMode {
         get { return PlayerMode(rawValue: managedObject.playerMode) ?? .music }

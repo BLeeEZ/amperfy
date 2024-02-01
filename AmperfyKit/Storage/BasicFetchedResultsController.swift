@@ -258,6 +258,14 @@ extension BasicFetchedResultsController where ResultType == ArtistMO {
         let artistMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Artist(managedObject: artistMO)
     }
+    
+    public func getWrappedEntity(at index: Int) -> Artist? {
+        guard let fetchedObjects = fetchResultsController.fetchedObjects,
+              index < fetchedObjects.count
+        else { return nil }
+        let managedObject = fetchedObjects[index] as! ResultType
+        return Artist(managedObject: managedObject)
+    }
 }
 
 extension BasicFetchedResultsController where ResultType == AlbumMO {
@@ -265,12 +273,28 @@ extension BasicFetchedResultsController where ResultType == AlbumMO {
         let albumMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Album(managedObject: albumMO)
     }
+
+    public func getWrappedEntity(at index: Int) -> Album? {
+        guard let fetchedObjects = fetchResultsController.fetchedObjects,
+              index < fetchedObjects.count
+        else { return nil }
+        let managedObject = fetchedObjects[index] as! ResultType
+        return Album(managedObject: managedObject)
+    }
 }
 
 extension BasicFetchedResultsController where ResultType == SongMO {
     public func getWrappedEntity(at indexPath: IndexPath) -> Song {
         let songMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Song(managedObject: songMO)
+    }
+    
+    public func getWrappedEntity(at index: Int) -> Song? {
+        guard let fetchedObjects = fetchResultsController.fetchedObjects,
+              index < fetchedObjects.count
+        else { return nil }
+        let managedObject = fetchedObjects[index] as! ResultType
+        return Song(managedObject: managedObject)
     }
     
     public func getContextSongs(onlyCachedSongs: Bool) -> [AbstractPlayable]? {
@@ -344,6 +368,14 @@ extension BasicFetchedResultsController where ResultType == PodcastEpisodeMO {
     public func getWrappedEntity(at indexPath: IndexPath) -> PodcastEpisode {
         let podcastEpisodeMO = fetchResultsController.object(at: indexPath) as! ResultType
         return PodcastEpisode(managedObject: podcastEpisodeMO)
+    }
+    
+    public func getWrappedEntity(at index: Int) -> PodcastEpisode? {
+        guard let fetchedObjects = fetchResultsController.fetchedObjects,
+              index < fetchedObjects.count
+        else { return nil }
+        let managedObject = fetchedObjects[index] as! ResultType
+        return PodcastEpisode(managedObject: managedObject)
     }
 }
 
