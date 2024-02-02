@@ -31,6 +31,17 @@ public enum ArtworkIconSizeType: CGFloat {
 }
 
 extension UIImage {
+    public static let systemPlus = UIImage(systemName: "plus") ?? UIImage()
+    public static let check = UIImage(systemName: "checkmark") ?? UIImage()
+    public static let backwardFill = UIImage(systemName: "backward.fill") ?? UIImage()
+    public static let forwardFill = UIImage(systemName: "forward.fill") ?? UIImage()
+    public static let goBackward15 = UIImage(systemName: "gobackward.15") ?? UIImage()
+    public static let goForward30 = UIImage(systemName: "goforward.30") ?? UIImage()
+    public static let redo = UIImage(systemName: "gobackward") ?? UIImage()
+    public static let clear = UIImage(systemName: "clear") ?? UIImage()
+    public static let cancleDownloads = UIImage(systemName: "xmark.icloud") ?? UIImage()
+    public static let startDownload = UIImage(systemName: "arrow.down.circle") ?? UIImage()
+    public static let systemTrash = UIImage(systemName: "trash") ?? UIImage()
     
     public static var amperfyMosaicArtwork: UIImage = { return UIImage.create("song") }()
     public static var appIcon: UIImage = { return UIImage.create("Icon-1024") }()
@@ -108,4 +119,39 @@ extension UIImage {
         return buildView.screenshot ?? UIImage()
     }
     
+    private static func createEmptyImage(with size: CGSize) -> UIImage?
+    {
+        UIGraphicsBeginImageContext(size)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
+    }
+    
+    public static func numberToImage(number: Int) -> UIImage {
+        let fontSize = 40.0
+        let textFont = UIFont(name: "Helvetica Bold", size: fontSize)!
+
+        let image = createEmptyImage(with: CGSize(width: 100.0, height: 100.0)) ?? UIImage()
+        let scale = UIScreen.main.scale
+        UIGraphicsBeginImageContextWithOptions(image.size, false, scale)
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        
+        let textFontAttributes = [
+            NSAttributedString.Key.font: textFont,
+            NSAttributedString.Key.paragraphStyle: paragraphStyle,
+            NSAttributedString.Key.foregroundColor: UIColor.lightGray,
+        ] as [NSAttributedString.Key : Any]
+        image.draw(in: CGRect(origin: CGPoint.zero, size: image.size))
+
+        let textPoint = CGPoint(x: 0.0, y: 50.0-(fontSize/2))
+        let rect = CGRect(origin: textPoint, size: image.size)
+        number.description.draw(in: rect, withAttributes: textFontAttributes)
+
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage!
+    }
 }

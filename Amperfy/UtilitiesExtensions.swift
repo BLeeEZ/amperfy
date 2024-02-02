@@ -213,54 +213,6 @@ extension UIApplication {
     }
 }
 
-extension UIImage {
-    static let plus = UIImage(systemName: "plus") ?? UIImage()
-    static let check = UIImage(systemName: "checkmark") ?? UIImage()
-    static let backwardFill = UIImage(systemName: "backward.fill") ?? UIImage()
-    static let forwardFill = UIImage(systemName: "forward.fill") ?? UIImage()
-    static let goBackward15 = UIImage(systemName: "gobackward.15") ?? UIImage()
-    static let goForward30 = UIImage(systemName: "goforward.30") ?? UIImage()
-    static let redo = UIImage(systemName: "gobackward") ?? UIImage()
-    static let clear = UIImage(systemName: "clear") ?? UIImage()
-    static let cancleDownloads = UIImage(systemName: "xmark.icloud") ?? UIImage()
-    
-    private static func createEmptyImage(with size: CGSize) -> UIImage?
-    {
-        UIGraphicsBeginImageContext(size)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return image
-    }
-    
-    static func numberToImage(number: Int) -> UIImage {
-        let fontSize = 40.0
-        let textFont = UIFont(name: "Helvetica Bold", size: fontSize)!
-
-        let image = createEmptyImage(with: CGSize(width: 100.0, height: 100.0)) ?? UIImage()
-        let scale = UIScreen.main.scale
-        UIGraphicsBeginImageContextWithOptions(image.size, false, scale)
-
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .center
-        
-        let textFontAttributes = [
-            NSAttributedString.Key.font: textFont,
-            NSAttributedString.Key.paragraphStyle: paragraphStyle,
-            NSAttributedString.Key.foregroundColor: UIColor.lightGray,
-        ] as [NSAttributedString.Key : Any]
-        image.draw(in: CGRect(origin: CGPoint.zero, size: image.size))
-
-        let textPoint = CGPoint(x: 0.0, y: 50.0-(fontSize/2))
-        let rect = CGRect(origin: textPoint, size: image.size)
-        number.description.draw(in: rect, withAttributes: textFontAttributes)
-
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-
-        return newImage!
-    }
-}
-
 extension UITraitCollection {
     static let maxDisplayScale = UITraitCollection(displayScale: 3.0)
 }

@@ -201,7 +201,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     }
     
     private func createActionButtonMenu() -> UIMenu {
-        let action = UIAction(title: "Download \(filterTitle)", handler: { _ in
+        let action = UIAction(title: "Download \(filterTitle)", image: UIImage.startDownload, handler: { _ in
             var artists = [Artist]()
             switch self.displayFilter {
             case .all:

@@ -316,7 +316,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="Yn5-c3-LL4"/>
                                             </constraints>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="8" maxX="6" maxY="8"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="3" maxY="10"/>
                                             <state key="normal" title="Play" image="play"/>
                                             <connections>
                                                 <action selector="pressedPlay:" destination="-1" eventType="touchUpInside" id="gFi-Ep-1tY"/>
@@ -328,7 +328,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="Zw7-lt-bM2"/>
                                             </constraints>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="8" maxX="6" maxY="8"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="5" maxY="10"/>
                                             <state key="normal" title="Play Shuffled" image="shuffle"/>
                                             <connections>
                                                 <action selector="pressPlayShuffled:" destination="-1" eventType="touchUpInside" id="ESg-bw-nRp"/>
@@ -340,9 +340,10 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="csB-P8-wd3"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" title="Add to Playlist"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Add to Playlist">
+                                                <imageReference key="image" image="text.badge.plus" catalog="system" symbolScale="medium"/>
+                                            </state>
                                             <connections>
                                                 <action selector="pressedAddToPlaylist:" destination="-1" eventType="touchUpInside" id="SZD-ge-Zvr"/>
                                             </connections>
@@ -353,9 +354,10 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="FdU-Oz-KAU"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" title="Download"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Download">
+                                                <imageReference key="image" image="arrow.down.circle" catalog="system" symbolScale="medium"/>
+                                            </state>
                                             <connections>
                                                 <action selector="pressedDownload:" destination="-1" eventType="touchUpInside" id="GCD-zo-O2p"/>
                                             </connections>
@@ -366,9 +368,10 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="34k-6a-iTB"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" title="Remove from Cache"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Remove from Cache">
+                                                <imageReference key="image" image="trash" catalog="system" symbolScale="medium"/>
+                                            </state>
                                             <connections>
                                                 <action selector="pressedDeleteCache:" destination="-1" eventType="touchUpInside" id="gt2-RZ-7gd"/>
                                             </connections>
@@ -379,9 +382,10 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="WRY-gO-2JQ"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" title="Delete on Server"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Delete on Server">
+                                                <imageReference key="image" image="xmark.icloud" catalog="system" symbolScale="medium"/>
+                                            </state>
                                             <connections>
                                                 <action selector="pressedDeleteOnServer:" destination="-1" eventType="touchUpInside" id="luM-R5-mVF"/>
                                             </connections>
@@ -406,9 +410,10 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="YZZ-LH-4bA"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" title="Copy ID to Clipboard"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Copy ID to Clipboard">
+                                                <imageReference key="image" image="doc.on.doc" catalog="system" symbolScale="medium"/>
+                                            </state>
                                             <connections>
                                                 <action selector="pressedCopyIdToClipboard:" destination="-1" eventType="touchUpInside" id="UU7-5s-kXW"/>
                                             </connections>
@@ -437,9 +442,10 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="W3U-Um-gR7"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" title="Clear Player"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Clear Player">
+                                                <imageReference key="image" image="clear" catalog="system" symbolScale="medium"/>
+                                            </state>
                                             <connections>
                                                 <action selector="pressedClearPlayer:" destination="-1" eventType="touchUpInside" id="290-bg-YO1"/>
                                             </connections>
@@ -450,9 +456,10 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="EPT-Qv-4us"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" title="Clear User Queue"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Clear User Queue">
+                                                <imageReference key="image" image="text.badge.xmark" catalog="system" symbolScale="medium"/>
+                                            </state>
                                             <connections>
                                                 <action selector="pressedClearUserQueue:" destination="-1" eventType="touchUpInside" id="mmp-pr-I9n"/>
                                             </connections>
@@ -463,9 +470,10 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="2sq-0l-0Qb"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" title="Add Context Queue to Playlist"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Add Context Queue to Playlist">
+                                                <imageReference key="image" image="text.badge.plus" catalog="system" symbolScale="medium"/>
+                                            </state>
                                             <connections>
                                                 <action selector="pressedAddContextQueueToPlaylist:" destination="-1" eventType="touchUpInside" id="q3b-cb-fff"/>
                                             </connections>
@@ -541,15 +549,22 @@
         </designable>
     </designables>
     <resources>
+        <image name="arrow.down.circle" catalog="system" width="128" height="123"/>
+        <image name="clear" catalog="system" width="128" height="114"/>
         <image name="context_queue_append" width="30" height="30"/>
         <image name="context_queue_insert" width="30" height="30"/>
+        <image name="doc.on.doc" catalog="system" width="116" height="128"/>
         <image name="info.circle" catalog="system" width="128" height="123"/>
         <image name="play" width="30" height="30"/>
         <image name="podcast_queue_append" width="30" height="30"/>
         <image name="podcast_queue_insert" width="30" height="30"/>
         <image name="shuffle" width="30" height="30"/>
+        <image name="text.badge.plus" catalog="system" width="128" height="107"/>
+        <image name="text.badge.xmark" catalog="system" width="128" height="107"/>
+        <image name="trash" catalog="system" width="117" height="128"/>
         <image name="user_queue_append" width="30" height="30"/>
         <image name="user_queue_insert" width="30" height="30"/>
+        <image name="xmark.icloud" catalog="system" width="128" height="90"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

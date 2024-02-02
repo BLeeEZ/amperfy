@@ -248,7 +248,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     }
     
     private func createActionButtonMenu() -> UIMenu {
-        let action = UIAction(title: "Download \(filterTitle)", handler: { _ in
+        let action = UIAction(title: "Download \(filterTitle)", image: UIImage.startDownload, handler: { _ in
             var songs = [Song]()
             switch self.displayFilter {
             case .all:
