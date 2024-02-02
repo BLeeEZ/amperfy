@@ -65,6 +65,7 @@ class LibraryEntityDetailVC: UIViewController {
     @IBOutlet weak var downloadButton: UIButton!
     @IBOutlet weak var deleteCacheButton: UIButton!
     @IBOutlet weak var deleteOnServerButton: UIButton!
+    @IBOutlet weak var showPodcastDetailsButton: UIButton!
     @IBOutlet weak var copyIdToClipboardButton: UIButton!
     private var buttonsOfMainCluster: [UIButton] {
         return [
@@ -74,6 +75,7 @@ class LibraryEntityDetailVC: UIViewController {
             downloadButton,
             deleteCacheButton,
             deleteOnServerButton,
+            showPodcastDetailsButton,
             copyIdToClipboardButton,
         ]
     }
@@ -302,6 +304,7 @@ class LibraryEntityDetailVC: UIViewController {
         deleteCacheButton.isHidden = !entityContainer.playables.hasCachedItems
         
         deleteOnServerButton.isHidden = true
+        showPodcastDetailsButton.isHidden = true
         copyIdToClipboardButton.isHidden = !appDelegate.storage.settings.isShowDetailedInfo
 
         if let playable = entityContainer as? AbstractPlayable {
@@ -338,6 +341,8 @@ class LibraryEntityDetailVC: UIViewController {
     }
     
     private func configureFor(podcast: Podcast) {
+        showPodcastDetailsButton.isHidden = false
+        showPodcastDetailsButton.setTitle("Show Podcast Description", for: .normal)
         addToPlaylistButton.isHidden = true
         playShuffledButton.isHidden = true
     }
@@ -374,6 +379,8 @@ class LibraryEntityDetailVC: UIViewController {
            (!podcastEpisode.isCached && appDelegate.storage.settings.isOfflineMode)
         addToPlaylistButton.isHidden = true
         deleteOnServerButton.isHidden = podcastEpisode.podcastStatus == .deleted || appDelegate.storage.settings.isOfflineMode
+        showPodcastDetailsButton.isHidden = false
+        showPodcastDetailsButton.setTitle("Show Episode Description", for: .normal)
         clearUserQueueButton.isHidden = true
         addContextQueueToPlaylistButton.isHidden = true
         configurePlayerStack()
@@ -460,6 +467,24 @@ class LibraryEntityDetailVC: UIViewController {
             return self.appDelegate.librarySyncer.sync(podcast: podcast)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Podcast Episode Sync Delete", error: error)
+        }
+    }
+    
+    @IBAction func pressedShowPodcastDetails(_ sender: Any) {
+        guard let rootView = rootView else { return }
+        var descriptionVC: PodcastDescriptionVC?
+        if let playable = entityContainer as? AbstractPlayable, let podcastEpisode = playable.asPodcastEpisode {
+            descriptionVC = PodcastDescriptionVC()
+            descriptionVC?.display(podcastEpisode: podcastEpisode, on: rootView)
+        } else if let podcast = entityContainer as? Podcast {
+            descriptionVC = PodcastDescriptionVC()
+            descriptionVC?.display(podcast: podcast, on: rootView)
+        }
+        
+        if let descriptionVC = descriptionVC {
+            dismiss(animated: true) {
+                rootView.present(descriptionVC, animated: true)
+            }
         }
     }
     

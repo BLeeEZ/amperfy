@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="ipad12_9rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -55,6 +56,7 @@
                 <outlet property="ratingPlaceholderView" destination="Ms2-ug-0W5" id="aGe-eH-y39"/>
                 <outlet property="showAlbumButton" destination="AeI-2x-Stq" id="G9k-St-EVA"/>
                 <outlet property="showArtistButton" destination="RYw-hT-MnF" id="rqs-ew-lyG"/>
+                <outlet property="showPodcastDetailsButton" destination="kLf-4t-8Mf" id="qaH-e3-WXz"/>
                 <outlet property="superView" destination="wqe-oZ-YvP" id="UW0-XB-IzB"/>
                 <outlet property="titleLabel" destination="KnP-8k-7qE" id="4FX-nq-vVd"/>
                 <outlet property="topMarginSpaceConstraint" destination="ToC-pk-Kf9" id="6Yk-QQ-Kgm"/>
@@ -72,7 +74,7 @@
                     <rect key="frame" x="20" y="0.0" width="984" height="1330"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Z3t-pV-Lbw" userLabel="Main Stack View">
-                            <rect key="frame" x="0.0" y="0.0" width="984" height="1355"/>
+                            <rect key="frame" x="0.0" y="0.0" width="984" height="1395"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="J91-VR-QdL" userLabel="ElementInfo Stack View">
                                     <rect key="frame" x="0.0" y="0.0" width="984" height="90"/>
@@ -306,7 +308,7 @@
                                     </constraints>
                                 </view>
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="qzF-wh-zOU" userLabel="MainStackCluster">
-                                    <rect key="frame" x="0.0" y="358" width="984" height="310"/>
+                                    <rect key="frame" x="0.0" y="358" width="984" height="350"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XDf-oc-z0s">
                                             <rect key="frame" x="0.0" y="0.0" width="984" height="40"/>
@@ -321,7 +323,7 @@
                                             </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SOj-o1-qLh" userLabel="PlayShuffled">
-                                            <rect key="frame" x="0.0" y="45" width="984" height="40"/>
+                                            <rect key="frame" x="0.0" y="44.5" width="984" height="40"/>
                                             <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="Zw7-lt-bM2"/>
@@ -333,7 +335,7 @@
                                             </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QhC-Il-SGI" userLabel="AddToPlaylist">
-                                            <rect key="frame" x="0.0" y="90" width="984" height="40"/>
+                                            <rect key="frame" x="0.0" y="88.5" width="984" height="40"/>
                                             <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="csB-P8-wd3"/>
@@ -346,7 +348,7 @@
                                             </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XcM-qv-zHW" userLabel="Download">
-                                            <rect key="frame" x="0.0" y="135" width="984" height="40"/>
+                                            <rect key="frame" x="0.0" y="133" width="984" height="40"/>
                                             <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="FdU-Oz-KAU"/>
@@ -359,7 +361,7 @@
                                             </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qeo-wc-t8G" userLabel="DeleteCache">
-                                            <rect key="frame" x="0.0" y="180" width="984" height="40"/>
+                                            <rect key="frame" x="0.0" y="177" width="984" height="40"/>
                                             <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="34k-6a-iTB"/>
@@ -372,7 +374,7 @@
                                             </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o9z-34-kMZ" userLabel="DeleteOnServer">
-                                            <rect key="frame" x="0.0" y="225" width="984" height="40"/>
+                                            <rect key="frame" x="0.0" y="221.5" width="984" height="40"/>
                                             <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="WRY-gO-2JQ"/>
@@ -384,8 +386,22 @@
                                                 <action selector="pressedDeleteOnServer:" destination="-1" eventType="touchUpInside" id="luM-R5-mVF"/>
                                             </connections>
                                         </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kLf-4t-8Mf" userLabel="PodcastDetails">
+                                            <rect key="frame" x="0.0" y="265.5" width="984" height="40"/>
+                                            <color key="backgroundColor" systemColor="systemFillColor"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="40" id="1Ug-2n-BLX"/>
+                                            </constraints>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Show Podcast Details">
+                                                <imageReference key="image" image="info.circle" catalog="system" symbolScale="medium"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="pressedShowPodcastDetails:" destination="-1" eventType="touchUpInside" id="CQm-v2-VAm"/>
+                                            </connections>
+                                        </button>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5rj-fD-Icd" userLabel="CopyIdToClipboard">
-                                            <rect key="frame" x="0.0" y="270" width="984" height="40"/>
+                                            <rect key="frame" x="0.0" y="310" width="984" height="40"/>
                                             <color key="backgroundColor" systemColor="systemFillColor"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="YZZ-LH-4bA"/>
@@ -400,11 +416,11 @@
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
-                                        <constraint firstAttribute="height" constant="310" id="FlB-wv-mVd"/>
+                                        <constraint firstAttribute="height" constant="350" id="FlB-wv-mVd"/>
                                     </constraints>
                                 </stackView>
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="seo-iu-BAW" userLabel="Player Stack View">
-                                    <rect key="frame" x="0.0" y="676" width="984" height="163"/>
+                                    <rect key="frame" x="0.0" y="716" width="984" height="163"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Player Actions" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5DK-wY-WrQ">
                                             <rect key="frame" x="0.0" y="0.0" width="984" height="40"/>
@@ -461,7 +477,7 @@
                                     </constraints>
                                 </stackView>
                                 <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZeO-Lx-9J7">
-                                    <rect key="frame" x="0.0" y="847" width="984" height="508"/>
+                                    <rect key="frame" x="0.0" y="887" width="984" height="508"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jma-L5-peG" userLabel="Cancel" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="468" width="984" height="40"/>
@@ -527,6 +543,7 @@
     <resources>
         <image name="context_queue_append" width="30" height="30"/>
         <image name="context_queue_insert" width="30" height="30"/>
+        <image name="info.circle" catalog="system" width="128" height="123"/>
         <image name="play" width="30" height="30"/>
         <image name="podcast_queue_append" width="30" height="30"/>
         <image name="podcast_queue_insert" width="30" height="30"/>
@@ -534,19 +551,19 @@
         <image name="user_queue_append" width="30" height="30"/>
         <image name="user_queue_insert" width="30" height="30"/>
         <systemColor name="labelColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemFillColor">
-            <color red="0.47058823529411764" green="0.47058823529411764" blue="0.50196078431372548" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.47058823529999999" green="0.47058823529999999" blue="0.50196078430000002" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="tintColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

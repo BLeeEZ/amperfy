@@ -394,6 +394,8 @@
 		50C9D71A28508803007F18D0 /* EntityImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504AE7B327BECFF300571BA5 /* EntityImageView.swift */; };
 		50C9D71D2850880A007F18D0 /* EntityImageView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 504AE7B127BECFDD00571BA5 /* EntityImageView.xib */; };
 		50C9D71E285088DA007F18D0 /* RoundedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F95222283FED0099CA91 /* RoundedImage.swift */; };
+		50CCD0572B6C38670073793B /* PodcastDescriptionVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50CCD0562B6C38670073793B /* PodcastDescriptionVC.xib */; };
+		50CCD0592B6C388B0073793B /* PodcastDescriptionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CCD0582B6C388B0073793B /* PodcastDescriptionVC.swift */; };
 		50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50CF3CEE28A4F83100263F7C /* CryptoKit.framework */; };
 		50CFB59228D483AD00A47D44 /* AddSwipeActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CFB59128D483AD00A47D44 /* AddSwipeActionView.swift */; };
 		50CFB59428D4846300A47D44 /* SwipeCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CFB59328D4846300A47D44 /* SwipeCellView.swift */; };
@@ -802,6 +804,8 @@
 		50C9D6EF28506EBC007F18D0 /* AmperfyKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmperfyKit.swift; sourceTree = "<group>"; };
 		50C9D716285075E3007F18D0 /* UtilitiesExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilitiesExtensions.swift; sourceTree = "<group>"; };
 		50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentTaskGroup.swift; sourceTree = "<group>"; };
+		50CCD0562B6C38670073793B /* PodcastDescriptionVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastDescriptionVC.xib; sourceTree = "<group>"; };
+		50CCD0582B6C388B0073793B /* PodcastDescriptionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastDescriptionVC.swift; sourceTree = "<group>"; };
 		50CDF201264BB1C000F83EF6 /* EventLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventLogger.swift; sourceTree = "<group>"; };
 		50CDF207264BC6BB00F83EF6 /* LogEntryMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogEntryMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50CDF208264BC6BB00F83EF6 /* LogEntryMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogEntryMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -1416,6 +1420,8 @@
 				501DBE9E2632D2CF00B31128 /* GenreDetailVC.swift */,
 				501A7D4C26820B080055A51B /* PodcastsVC.swift */,
 				501A7D4E26820B3F0055A51B /* PodcastDetailVC.swift */,
+				50CCD0562B6C38670073793B /* PodcastDescriptionVC.xib */,
+				50CCD0582B6C388B0073793B /* PodcastDescriptionVC.swift */,
 				50C16C0F21E5463E00F086F0 /* ArtistsVC.swift */,
 				50C16C1921E704EC00F086F0 /* ArtistDetailVC.swift */,
 				50C16C1721E704CE00F086F0 /* AlbumsVC.swift */,
@@ -1901,6 +1907,7 @@
 				5043714F27C23C0C008358AC /* FullWidthDescriptionView.xib in Resources */,
 				508FDE3821F1E14F005A0724 /* NewPlaylistTableHeader.xib in Resources */,
 				5007CE4521EF639200BC5CBA /* PlaylistTableCell.xib in Resources */,
+				50CCD0572B6C38670073793B /* PodcastDescriptionVC.xib in Resources */,
 				5045C7502850A2730095FF09 /* Font Awesome 5 Free-Solid-900.otf in Resources */,
 				5045C7512850A2770095FF09 /* fa-regular-400.ttf in Resources */,
 				508EBB282850C8D90053D9F0 /* Assets.xcassets in Resources */,
@@ -1986,6 +1993,7 @@
 				5005939128E42F66008C8DF6 /* BasicCollectionCell.swift in Sources */,
 				5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */,
 				500B7D4721EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift in Sources */,
+				50CCD0592B6C388B0073793B /* PodcastDescriptionVC.swift in Sources */,
 				509001B82716C8F400A8056D /* AppDelegateNotificationExtensions.swift in Sources */,
 				50C9D717285075E3007F18D0 /* UtilitiesExtensions.swift in Sources */,
 				50791E8928D3BC4D006CE6E5 /* SwipeSettingsView.swift in Sources */,

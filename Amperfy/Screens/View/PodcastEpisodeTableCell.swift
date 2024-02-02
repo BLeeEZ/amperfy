@@ -30,6 +30,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var playEpisodeButton: UIButton!
     @IBOutlet weak var optionsButton: UIButton!
+    @IBOutlet weak var showDescriptionButton: UIButton!
     @IBOutlet weak var cacheIconImage: UIImageView!
     @IBOutlet weak var playProgressBar: UIProgressView!
     @IBOutlet weak var playProgressLabel: UILabel!
@@ -127,6 +128,15 @@ class PodcastEpisodeTableCell: BasicTableCell {
             on: rootView,
             playContextCb: {() in PlayContext(containable: episode)})
         rootView.present(detailVC, animated: true)
+    }
+    
+    @IBAction func showDescriptionButtonPressed(_ sender: Any) {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        guard let episode = self.episode, let rootView = rootView else { return }
+        let showDescriptionVC = PodcastDescriptionVC()
+        showDescriptionVC.display(podcastEpisode: episode, on: rootView)
+        rootView.present(showDescriptionVC, animated: true)
     }
 
 }
