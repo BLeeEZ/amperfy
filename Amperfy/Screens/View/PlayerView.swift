@@ -59,6 +59,7 @@ class PlayerView: UIView {
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var repeatButton: UIButton!
     @IBOutlet weak var shuffleButton: UIButton!
+    @IBOutlet weak var showPodcastDescriptionButton: UIButton!
     @IBOutlet weak var skipBackwardButton: UIButton!
     @IBOutlet weak var skipForwardButton: UIButton!
     
@@ -137,6 +138,15 @@ class PlayerView: UIView {
         player.toggleShuffle()
         refreshShuffleButton()
         rootView?.scrollToNextPlayingRow()
+    }
+    
+    @IBAction func showPodcastDescriptionButtonPushed(_ sender: Any) {
+        guard let rootView = rootView,
+              let podcastEpisode = player.currentlyPlaying?.asPodcastEpisode
+        else { return }
+        let descriptionVC = PodcastDescriptionVC()
+        descriptionVC.display(podcastEpisode: podcastEpisode, on: rootView)
+        rootView.present(descriptionVC, animated: true)
     }
     
     @IBAction func skipBackwardButtonPushed(_ sender: Any) {
@@ -486,6 +496,7 @@ class PlayerView: UIView {
         case .music:
             repeatButton.isHidden = false
             shuffleButton.isHidden = false
+            showPodcastDescriptionButton.isHidden = true
             skipBackwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
             skipForwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
             skipBackwardButton.alpha = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons ? 0.0 : 1.0
@@ -493,6 +504,7 @@ class PlayerView: UIView {
         case .podcast:
             repeatButton.isHidden = true
             shuffleButton.isHidden = true
+            showPodcastDescriptionButton.isHidden = false
             skipBackwardButton.isHidden = true
             skipForwardButton.isHidden = true
         }
@@ -562,6 +574,7 @@ class PlayerView: UIView {
         refreshPrevNextButtons()
         refreshRepeatButton()
         refreshShuffleButton()
+        refreshShowPodcastDescriptionButton()
         refreshPlaybackRateButton()
         refreshSleepTimerButton()
         refreshDisplayPlaylistButton()
@@ -607,6 +620,14 @@ class PlayerView: UIView {
             shuffleButton.setImage(UIImage.shuffleOff.withRenderingMode(.alwaysTemplate), for: .normal)
             shuffleButton.tintColor = .labelColor
         }
+    }
+    
+    func refreshShowPodcastDescriptionButton() {
+        showPodcastDescriptionButton.imageView?.contentMode = .scaleAspectFit
+        showPodcastDescriptionButton.setImage(UIImage.info.withRenderingMode(.alwaysTemplate), for: .normal)
+        showPodcastDescriptionButton.tintColor = .labelColor
+        showPodcastDescriptionButton.contentVerticalAlignment = .fill
+        showPodcastDescriptionButton.contentHorizontalAlignment = .fill
     }
     
     func refreshPlaybackRateButton() {

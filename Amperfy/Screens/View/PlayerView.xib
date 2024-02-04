@@ -260,6 +260,7 @@
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="Jhy-pc-jwZ" secondAttribute="height" multiplier="1:1" id="2mK-6O-AxP"/>
                                 <constraint firstAttribute="width" constant="45" id="PyV-kc-2dQ"/>
+                                <constraint firstAttribute="width" secondItem="Jhy-pc-jwZ" secondAttribute="height" multiplier="1:1" id="ydG-kH-ICv"/>
                             </constraints>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal" image="backward.fill" catalog="system">
@@ -301,6 +302,7 @@
                             <constraints>
                                 <constraint firstAttribute="width" constant="35" id="0VR-ye-vad"/>
                                 <constraint firstAttribute="width" secondItem="QO0-Ep-X2s" secondAttribute="height" multiplier="1:1" id="6c5-IH-Mtg"/>
+                                <constraint firstAttribute="width" secondItem="QO0-Ep-X2s" secondAttribute="height" multiplier="1:1" id="PW0-dC-xsa"/>
                             </constraints>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
@@ -315,6 +317,23 @@
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jwJ-pR-7DE">
                             <rect key="frame" x="293" y="14" width="50" height="22"/>
                             <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="O8u-Ea-HfT" userLabel="Show Podcast Description Button">
+                                    <rect key="frame" x="14" y="0.0" width="22" height="22"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="O8u-Ea-HfT" secondAttribute="height" multiplier="1:1" id="Ktg-j2-iQF"/>
+                                        <constraint firstAttribute="width" secondItem="O8u-Ea-HfT" secondAttribute="height" multiplier="1:1" id="Mpt-Ub-6cH"/>
+                                        <constraint firstAttribute="width" constant="22" id="V4Y-km-vhQ"/>
+                                    </constraints>
+                                    <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <inset key="imageEdgeInsets" minX="-6" minY="0.0" maxX="-6" maxY="-6"/>
+                                    <state key="normal">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                        <imageReference key="image" image="info.circle" catalog="system" symbolScale="large"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="showPodcastDescriptionButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="bPf-Ow-GWL"/>
+                                    </connections>
+                                </button>
                                 <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhL-mu-zks" userLabel="Shuffle Button">
                                     <rect key="frame" x="14" y="0.0" width="22" height="22"/>
                                     <constraints>
@@ -332,19 +351,21 @@
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
+                                <constraint firstItem="mhL-mu-zks" firstAttribute="trailing" secondItem="O8u-Ea-HfT" secondAttribute="trailing" id="3wJ-tw-qbs"/>
                                 <constraint firstItem="mhL-mu-zks" firstAttribute="centerX" secondItem="jwJ-pR-7DE" secondAttribute="centerX" id="7ua-xO-HaF"/>
                                 <constraint firstItem="mhL-mu-zks" firstAttribute="height" secondItem="jwJ-pR-7DE" secondAttribute="height" id="9kY-6Z-TqL"/>
+                                <constraint firstItem="mhL-mu-zks" firstAttribute="top" secondItem="O8u-Ea-HfT" secondAttribute="top" id="OUS-Oa-hH9"/>
                                 <constraint firstAttribute="width" constant="50" id="Ucr-DK-qWr"/>
+                                <constraint firstItem="mhL-mu-zks" firstAttribute="bottom" secondItem="O8u-Ea-HfT" secondAttribute="bottom" id="Zlw-wG-TLj"/>
                                 <constraint firstItem="mhL-mu-zks" firstAttribute="centerY" secondItem="jwJ-pR-7DE" secondAttribute="centerY" id="fHf-eB-IFU"/>
+                                <constraint firstItem="mhL-mu-zks" firstAttribute="leading" secondItem="O8u-Ea-HfT" secondAttribute="leading" id="qKM-Au-IxG"/>
                             </constraints>
                         </view>
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstItem="QO0-Ep-X2s" firstAttribute="width" secondItem="QO0-Ep-X2s" secondAttribute="height" multiplier="1:1" id="PW0-dC-xsa"/>
                         <constraint firstAttribute="width" relation="lessThanOrEqual" constant="500" id="VIl-zL-YGC"/>
                         <constraint firstAttribute="height" constant="50" id="dq3-fM-BgC"/>
-                        <constraint firstItem="Jhy-pc-jwZ" firstAttribute="width" secondItem="Jhy-pc-jwZ" secondAttribute="height" multiplier="1:1" id="ydG-kH-ICv"/>
                     </constraints>
                 </stackView>
                 <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MoM-N8-wb9" userLabel="Playback Rate Button">
@@ -469,6 +490,7 @@
                 <outlet property="remainingTimeLabel" destination="t1c-hF-UMw" id="hPl-lK-efe"/>
                 <outlet property="remainingTimeToArtworkDistanceConstraint" destination="MnT-rV-Opr" id="qal-ry-Pge"/>
                 <outlet property="repeatButton" destination="zaZ-s9-erE" id="GdF-O9-5q9"/>
+                <outlet property="showPodcastDescriptionButton" destination="O8u-Ea-HfT" id="aWQ-ik-gTI"/>
                 <outlet property="shuffleButton" destination="mhL-mu-zks" id="GGU-BH-0MG"/>
                 <outlet property="skipBackwardButton" destination="PZj-JS-NGq" id="q0L-Ve-YvK"/>
                 <outlet property="skipForwardButton" destination="QO0-Ep-X2s" id="idR-HQ-cSv"/>
@@ -508,6 +530,7 @@
         <image name="gauge" width="168" height="145"/>
         <image name="gobackward.10" catalog="system" width="119" height="128"/>
         <image name="goforward.10" catalog="system" width="119" height="128"/>
+        <image name="info.circle" catalog="system" width="128" height="123"/>
         <image name="moon.zzz.fill" catalog="system" width="117" height="128"/>
         <image name="musical_notes" width="30" height="30"/>
         <image name="player_style_compact" width="16.425800323486328" height="20.947299957275391"/>

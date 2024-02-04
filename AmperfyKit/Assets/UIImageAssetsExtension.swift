@@ -42,6 +42,7 @@ extension UIImage {
     public static let cancleDownloads = UIImage(systemName: "xmark.icloud") ?? UIImage()
     public static let startDownload = UIImage(systemName: "arrow.down.circle") ?? UIImage()
     public static let systemTrash = UIImage(systemName: "trash") ?? UIImage()
+    public static let info = UIImage(systemName: "info.circle") ?? UIImage()
     
     public static var amperfyMosaicArtwork: UIImage = { return UIImage.create("song") }()
     public static var appIcon: UIImage = { return UIImage.create("Icon-1024") }()

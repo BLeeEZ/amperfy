@@ -32,6 +32,7 @@ class PodcastDescriptionVC: UIViewController {
     @IBOutlet weak var showArtistButton: UIButton!
     @IBOutlet weak var infoLabel: MarqueeLabel!
     @IBOutlet weak var entityImageView: EntityImageView!
+    @IBOutlet weak var playButton: BasicButton!
     @IBOutlet weak var descriptionTextView: UITextView!
     
     private var rootView: UIViewController?
@@ -55,6 +56,7 @@ class PodcastDescriptionVC: UIViewController {
         titleLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()
         infoLabel.applyAmperfyStyle()
+        playButton.imageView?.contentMode = .scaleAspectFit
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -81,6 +83,12 @@ class PodcastDescriptionVC: UIViewController {
         
         infoLabel.text = entityContainer.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .long, settings: appDelegate.storage.settings))
         
+        if let _ = self.rootView as? PopupPlayerVC {
+            playButton.isHidden = true
+        } else {
+            playButton.isHidden = false
+        }
+        
         if let podcast = podcast {
             descriptionTextView.text = podcast.depiction
         } else if let podcastEpisode = podcastEpisode {
@@ -103,6 +111,11 @@ class PodcastDescriptionVC: UIViewController {
                 }
             }
         }
+    }
+    
+    @IBAction func pressedPlayButton(_ sender: Any) {
+        guard let entityContainer = entityContainer else { return }
+        self.appDelegate.player.play(context: PlayContext(containable: entityContainer))
     }
     
     @IBAction func pressedCancel(_ sender: Any) {
