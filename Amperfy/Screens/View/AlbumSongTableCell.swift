@@ -43,6 +43,9 @@ class AlbumSongTableCell: SongTableCell {
         titleLabel.attributedText = NSMutableAttributedString(string: song.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
         artistLabel.text = song.creatorName
         refreshCacheAndDuration()
+        if let artwork = song.artwork {
+            appDelegate.artworkDownloadManager.download(object: artwork)
+        }
     }
     
     private func configureTrackNumberLabel() {
