@@ -119,6 +119,8 @@ public class Playlist: Identifyable {
         
         if isInitialUpdate {
             updateSortedPlaylistItems()
+        } else if internalSortedPlaylistItems == nil || (internalSortedPlaylistItems?.count ?? 0) == 0, songCount < 100 {
+            updateSortedPlaylistItems()
         }
         
         if let internalSortedPlaylistItems = internalSortedPlaylistItems {

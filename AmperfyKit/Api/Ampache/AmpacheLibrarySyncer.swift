@@ -490,6 +490,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 let parserDelegate = PlaylistSongsParserDelegate(playlist: playlistAsync, library: asyncCompanion.library)
                 try self.parse(response: response, delegate: parserDelegate)
                 playlistAsync.ensureConsistentItemOrder()
+                playlistAsync.updateArtworkItems(isInitialUpdate: false)
             }
         }
     }
