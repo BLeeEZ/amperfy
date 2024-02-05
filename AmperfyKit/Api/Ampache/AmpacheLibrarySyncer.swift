@@ -149,7 +149,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                     let oldAlbums = Set(artistAsync.albums)
                     let parserDelegate = AlbumParserDelegate(library: asyncCompanion.library)
                     try self.parse(response: response, delegate: parserDelegate)
-                    let removedAlbums = oldAlbums.subtracting(parserDelegate.albumsParsed)
+                    let removedAlbums = oldAlbums.subtracting(parserDelegate.albumsParsedSet)
                     for album in removedAlbums {
                         os_log("Album <%s> is remote deleted", log: self.log, type: .info, album.name)
                         album.remoteStatus = .deleted
@@ -379,34 +379,22 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func syncRecentSongs() -> Promise<Void> {
+    func syncNewestAlbums(offset: Int, count: Int) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
-        os_log("Sync recently added songs", log: log, type: .info)
+        os_log("Sync newest albums: offset: %i count: %i", log: log, type: .info, offset, count)
         return firstly {
-            ampacheXmlServerApi.requestRecentSongs(count: 50)
+            ampacheXmlServerApi.requestNewestAlbums(offset: offset, count: count)
         }.then { response in
             self.storage.async.perform { asyncCompanion in
-                let oldRecentSongs = Set(asyncCompanion.library.getRecentSongs())
-                let oldRecentAlbums = Set(asyncCompanion.library.getRecentAlbums())
-                oldRecentAlbums.forEach{ $0.markAsNotRecentAnymore() }
-                
-                let parserDelegate = SongParserDelegate(library: asyncCompanion.library)
+                let parserDelegate = AlbumParserDelegate(library: asyncCompanion.library)
                 try self.parse(response: response, delegate: parserDelegate)
-                
-                parserDelegate.parsedSongs.sortById().reversed().enumerated().forEach { (index, song) in
-                    song.recentlyAddedIndex = index
-                    if let album = song.album, album.recentlyAddedIndex == 0 {
-                        album.recentlyAddedIndex = index
-                    }
+                let oldNewestAlbums = asyncCompanion.library.getNewestAlbums(offset: offset, count: count)
+                oldNewestAlbums.forEach { $0.markAsNotNewAnymore() }
+                parserDelegate.albumsParsedArray.enumerated().forEach { (index, album) in
+                    album.updateIsNewestInfo(index: index+1+offset)
                 }
-                let notRecentSongsAnymore = oldRecentSongs.subtracting(parserDelegate.parsedSongs)
-                notRecentSongsAnymore.forEach { $0.markAsNotRecentAnymore() }
             }
         }
-    }
-    
-    func syncLatestLibraryElements() -> Promise<Void> {
-        return syncRecentSongs()
     }
     
     func syncFavoriteLibraryElements() -> Promise<Void> {
@@ -434,7 +422,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                 let parserDelegate = AlbumParserDelegate(library: asyncCompanion.library)
                 try self.parse(response: response, delegate: parserDelegate)
                 
-                let notFavoriteAlbumsAnymore = oldFavoriteAlbums.subtracting(parserDelegate.albumsParsed)
+                let notFavoriteAlbumsAnymore = oldFavoriteAlbums.subtracting(parserDelegate.albumsParsedSet)
                 notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false }
             }
         }.then {

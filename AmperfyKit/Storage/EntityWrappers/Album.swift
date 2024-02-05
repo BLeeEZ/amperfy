@@ -114,14 +114,11 @@ public class Album: AbstractLibraryEntity {
         get { return managedObject.isSongsMetaDataSynced }
         set { managedObject.isSongsMetaDataSynced = newValue }
     }
-    public var recentlyAddedIndex: Int {
-        get { return Int(managedObject.recentlyAddedIndex) }
-        set {
-            guard Int16.isValid(value: newValue), managedObject.recentlyAddedIndex != Int16(newValue) else { return }
-            managedObject.recentlyAddedIndex = Int16(newValue)
-        }
+    public func updateIsNewestInfo(index: Int) {
+        guard Int16.isValid(value: index), managedObject.recentlyAddedIndex != index else { return }
+        managedObject.recentlyAddedIndex = Int16(index)
     }
-    public func markAsNotRecentAnymore() {
+    public func markAsNotNewAnymore() {
         managedObject.recentlyAddedIndex = 0
     }
     public var songCount: Int {

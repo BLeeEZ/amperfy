@@ -33,6 +33,8 @@ public class AmperKit {
         return (Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String) ?? ""
     }
     
+    public static let newestElementsFetchCount = 50
+        
     private static var inst: AmperKit?
     public static var shared: AmperKit {
         if inst == nil { inst = AmperKit() }

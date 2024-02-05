@@ -22,9 +22,11 @@
 import Foundation
 import CoreData
 import PromiseKit
+import OSLog
 
 public class AutoDownloadLibrarySyncer {
     
+    private let log = OSLog(subsystem: "Amperfy", category: "AutoDownloadLibrarySyncer")
     private let storage: PersistentStorage
     private let librarySyncer: LibrarySyncer
     private let playableDownloadManager: DownloadManageable
@@ -35,16 +37,38 @@ public class AutoDownloadLibrarySyncer {
         self.playableDownloadManager = playableDownloadManager
     }
     
-    public func syncLatestLibraryElements() -> Promise<Void> {
-        let oldRecentSongs = Set(storage.main.library.getRecentSongs())
+    public func syncNewestLibraryElements(offset: Int = 0, count: Int = AmperKit.newestElementsFetchCount) -> Promise<Void> {
+        let oldNewestAlbums = Set(storage.main.library.getNewestAlbums(offset: 0, count: count))
+        var newNewestAlbums = Set<Album>()
+        var fetchNeededNewestAlbums = Set<Album>()
         
         return firstly {
-            self.librarySyncer.syncLatestLibraryElements()
+            self.librarySyncer.syncNewestAlbums(offset: offset, count: count)
         }.get {
-            if self.storage.settings.isAutoDownloadLatestSongsActive {
-                let updatedRecentSongs = Set(self.storage.main.library.getRecentSongs())
-                let newAddedRecentSongs = updatedRecentSongs.subtracting(oldRecentSongs)
-                self.playableDownloadManager.download(objects: Array(newAddedRecentSongs))
+            let updatedNewestAlbums = Set(self.storage.main.library.getNewestAlbums(offset: 0, count: count))
+            newNewestAlbums = updatedNewestAlbums.subtracting(oldNewestAlbums)
+            if offset == 0 {
+                if newNewestAlbums.isEmpty {
+                    os_log("No new albums", log: self.log, type: .info)
+                } else {
+                    os_log("%i new albums", log: self.log, type: .info, newNewestAlbums.count)
+                }
+            }
+            fetchNeededNewestAlbums = newNewestAlbums.filter { !$0.isSongsMetaDataSynced }
+        }.then { () -> Promise<Void> in
+            let albumPromises = fetchNeededNewestAlbums.compactMap { album -> (() ->Promise<Void>) in return {
+                return firstly {
+                    self.librarySyncer.sync(album: album)
+                }
+            }}
+            return albumPromises.resolveSequentially()
+        }.get {
+            if !oldNewestAlbums.isEmpty, !newNewestAlbums.isEmpty, self.storage.settings.isAutoDownloadLatestSongsActive {
+                var newestSongs = [AbstractPlayable]()
+                for album in newNewestAlbums {
+                    newestSongs.append(contentsOf: album.songs)
+                }
+                self.playableDownloadManager.download(objects: newestSongs)
             }
         }
     }

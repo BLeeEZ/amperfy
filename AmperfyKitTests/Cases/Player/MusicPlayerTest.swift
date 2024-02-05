@@ -85,7 +85,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func sync(album: Album) -> Promise<Void> { return Promise.value }
     func sync(song: Song) -> Promise<Void> { return Promise.value }
     func sync(podcast: Podcast) -> Promise<Void> { return Promise.value }
-    func syncLatestLibraryElements() -> Promise<Void> { return Promise.value }
+    func syncNewestAlbums(offset: Int, count: Int) -> Promise<Void> { return Promise.value }
     func syncFavoriteLibraryElements() -> Promise<Void> { return Promise.value }
     func syncDownPlaylistsWithoutSongs() -> Promise<Void> { return Promise.value }
     func syncDown(playlist: Playlist) -> Promise<Void> { return Promise.value }

@@ -136,13 +136,13 @@ struct LibrarySettingsView: View {
                 
                 Section(content: {
                     HStack {
-                        Text("Latest Songs")
+                        Text("Newest Songs")
                         Spacer()
                         Toggle(isOn: $settings.isAutoCacheLatestSongs) {
                         }
                     }
                     HStack {
-                        Text("Latest Podcast Episodes")
+                        Text("Newest Podcast Episodes")
                         Spacer()
                         Toggle(isOn: $settings.isAutoCacheLatestPodcastEpisodes) {
                         }

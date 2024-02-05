@@ -64,8 +64,8 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         switch displayFilter {
         case .all:
             self.filterTitle = "Artists"
-        case .recentlyAdded:
-            self.filterTitle = "Recent Artists"
+        case .newest:
+            self.filterTitle = "Newest Artists"
         case .favorites:
             self.filterTitle = "Favorite Artists"
         }
@@ -105,7 +105,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         switch displayFilter {
         case .all:
             break
-        case .recentlyAdded:
+        case .newest:
             break
         case .favorites:
             firstly {
@@ -131,7 +131,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             return 0.0
         case .rating:
             return CommonScreenOperations.tableSectionHeightLarge
-        case .recentlyAddedIndex:
+        case .newest:
             return 0.0
         case .duration:
             return 0.0
@@ -148,7 +148,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             } else {
                 return "Not rated"
             }
-        case .recentlyAddedIndex:
+        case .newest:
             return super.tableView(tableView, titleForHeaderInSection: section)
         case .duration:
             return nil
@@ -206,7 +206,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             switch self.displayFilter {
             case .all:
                 artists = self.appDelegate.storage.main.library.getArtists()
-            case .recentlyAdded:
+            case .newest:
                 break
             case .favorites:
                 artists = self.appDelegate.storage.main.library.getFavoriteArtists()
@@ -233,9 +233,9 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         }
         firstly {
             AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                .syncLatestLibraryElements()
+                .syncNewestLibraryElements()
         }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Artists Latest Elements Sync", error: error)
+            self.appDelegate.eventLogger.report(topic: "Artists Newest Elements Sync", error: error)
         }.finally {
             self.refreshControl?.endRefreshing()
         }

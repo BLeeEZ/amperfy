@@ -422,14 +422,14 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestRecentSongs(count: Int) -> Promise<APIDataResponse> {
+    func requestNewestAlbums(offset: Int, count: Int) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
-            urlComp.addQueryItem(name: "action", value: "advanced_search")
-            urlComp.addQueryItem(name: "rule_1", value: "recent_added")
-            urlComp.addQueryItem(name: "rule_1_operator", value: 0)
-            urlComp.addQueryItem(name: "rule_1_input", value: count)
-            urlComp.addQueryItem(name: "type", value: "song")
+            urlComp.addQueryItem(name: "action", value: "stats")
+            urlComp.addQueryItem(name: "type", value: "album")
+            urlComp.addQueryItem(name: "filter", value: "newest")
+            urlComp.addQueryItem(name: "limit", value: count)
+            urlComp.addQueryItem(name: "offset", value: offset)
             return try self.createUrl(from: urlComp)
         }
     }

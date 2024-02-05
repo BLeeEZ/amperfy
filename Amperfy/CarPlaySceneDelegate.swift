@@ -77,7 +77,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         albumsFavoritesFetchController = nil
         albumsRecentlyAddedFetchController = nil
         songsFavoritesFetchController = nil
-        songsRecentlyAddedFetchController = nil
         playlistDetailFetchController = nil
         podcastDetailFetchController = nil
     }
@@ -116,13 +115,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         var librarySections = [
             CPListSection(items: [
                 createPlayRandomSongsItem(),
-                createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: songsFavoriteSection),
-                createLibraryItem(text: "Recently Added", icon: UIImage.clock, sectionToDisplay: songsRecentlyAddedSection)
+                createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: songsFavoriteSection)
             ], header: "Songs", sectionIndexTitle: nil),
             CPListSection(items: [
                 createPlayRandomAlbumsItem(),
                 createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: albumsFavoriteSection),
-                createLibraryItem(text: "Recently Added", icon: UIImage.clock, sectionToDisplay: albumsRecentlyAddedSection)
+                createLibraryItem(text: "Newest", icon: UIImage.clock, sectionToDisplay: albumsRecentlyAddedSection)
             ], header: "Albums", sectionIndexTitle: nil),
             CPListSection(items: [
                 createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: artistsFavoriteSection)
@@ -147,19 +145,13 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         return template
     }()
     lazy var albumsRecentlyAddedSection = {
-        let template = CPListTemplate(title: "Recent Albums", sections: [
+        let template = CPListTemplate(title: "Newest Albums", sections: [
             CPListSection(items: [CPListTemplateItem]())
         ])
         return template
     }()
     lazy var songsFavoriteSection = {
         let template = CPListTemplate(title: "Favorite Songs", sections: [
-            CPListSection(items: [CPListTemplateItem]())
-        ])
-        return template
-    }()
-    lazy var songsRecentlyAddedSection = {
-        let template = CPListTemplate(title: "Recent Songs", sections: [
             CPListSection(items: [CPListTemplateItem]())
         ])
         return template
@@ -240,7 +232,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     var albumsFavoritesFetchController: AlbumFetchedResultsController?
     var albumsRecentlyAddedFetchController: AlbumFetchedResultsController?
     var songsFavoritesFetchController: SongsFetchedResultsController?
-    var songsRecentlyAddedFetchController: SongsFetchedResultsController?
     //
     var playlistDetailFetchController: PlaylistItemsFetchedResultsController?
     var podcastDetailFetchController: PodcastEpisodesFetchedResultsController?
@@ -536,11 +527,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             createSongsFavoritesFetchController()
             songsFavoriteSection.updateSections([CPListSection(items: createSongItems(from: songsFavoritesFetchController))])
         }
-        if templates.contains(songsRecentlyAddedSection) {
-            os_log("CarPlay: OfflineModeChanged: songsRecentlyAddedFetchController", log: self.log, type: .info)
-            createSongsRecentlyAddedFetchController()
-            songsRecentlyAddedSection.updateSections([CPListSection(items: createSongItems(from: songsRecentlyAddedFetchController))])
-        }
         if let playlistDetailSection = playlistDetailSection, templates.contains(playlistDetailSection), let playlistDetailFetchController = playlistDetailFetchController {
             os_log("CarPlay: OfflineModeChanged: playlistDetailSection", log: self.log, type: .info)
             playlistDetailFetchController.search(onlyCachedSongs: isOfflineMode)
@@ -587,10 +573,6 @@ extension CarPlaySceneDelegate: NSFetchedResultsControllerDelegate {
             os_log("CarPlay: FetchedResults: songsFavoritesFetchController", log: self.log, type: .info)
             songsFavoriteSection.updateSections([CPListSection(items: createSongItems(from: songsFavoritesFetchController))])
         }
-        if templates.contains(songsRecentlyAddedSection), let songsRecentlyAddedFetchController = songsRecentlyAddedFetchController, controller == songsRecentlyAddedFetchController.fetchResultsController {
-            os_log("CarPlay: FetchedResults: songsRecentlyAddedFetchController", log: self.log, type: .info)
-            songsRecentlyAddedSection.updateSections([CPListSection(items: createSongItems(from: songsRecentlyAddedFetchController))])
-        }
         if let playlistDetailSection = playlistDetailSection, templates.contains(playlistDetailSection), let playlistDetailFetchController = playlistDetailFetchController, controller == playlistDetailFetchController.fetchResultsController {
             os_log("CarPlay: FetchedResults: playlistDetailSection", log: self.log, type: .info)
             playlistDetailSection.updateSections([CPListSection(items: createPlaylistDetailItems(from: playlistDetailFetchController))])
@@ -635,10 +617,6 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
             os_log("CarPlay: templateWillAppear songsFavoriteSection", log: self.log, type: .info)
             if songsFavoritesFetchController == nil { createSongsFavoritesFetchController() }
             songsFavoriteSection.updateSections([CPListSection(items: createSongItems(from: songsFavoritesFetchController))])
-        } else if aTemplate == songsRecentlyAddedSection {
-            os_log("CarPlay: templateWillAppear songsRecentlyAddedSection", log: self.log, type: .info)
-            if songsRecentlyAddedFetchController == nil { createSongsRecentlyAddedFetchController() }
-            songsRecentlyAddedSection.updateSections([CPListSection(items: createSongItems(from: songsRecentlyAddedFetchController))])
         } else if aTemplate == playlistDetailSection, let playlistDetailFetchController = playlistDetailFetchController {
             os_log("CarPlay: templateWillAppear playlistDetailSection", log: self.log, type: .info)
             firstly {

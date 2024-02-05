@@ -69,10 +69,10 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             self.filterTitle = "Songs"
             self.isIndexTitelsHidden = false
             change(sortType: appDelegate.storage.settings.songsSortSetting)
-        case .recentlyAdded:
-            self.filterTitle = "Recent Songs"
+        case .newest:
+            self.filterTitle = "Newest Songs"
             self.isIndexTitelsHidden = true
-            change(sortType: .recentlyAddedIndex)
+            change(sortType: .newest)
         case .favorites:
             self.filterTitle = "Favorite Songs"
             self.isIndexTitelsHidden = false
@@ -85,7 +85,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         self.sortType = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType != .recentlyAddedIndex)
+        fetchedResultsController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType != .newest)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
@@ -102,7 +102,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
         actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
 
-        if sortType == .recentlyAddedIndex {
+        if sortType == .newest {
             navigationItem.rightBarButtonItems = []
         } else {
             navigationItem.rightBarButtonItems = [sortButton]
@@ -117,15 +117,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         switch displayFilter {
         case .all:
             break
-        case .recentlyAdded:
-            firstly {
-                AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                    .syncLatestLibraryElements()
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Recent Songs Sync", error: error)
-            }.finally {
-                self.updateSearchResults(for: self.searchController)
-            }
+        case .newest:
+            break
         case .favorites:
             firstly {
                 self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
@@ -150,7 +143,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             return 0.0
         case .rating:
             return CommonScreenOperations.tableSectionHeightLarge
-        case .recentlyAddedIndex:
+        case .newest:
             return 0.0
         case .duration:
             return 0.0
@@ -167,7 +160,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             } else {
                 return "Not rated"
             }
-        case .recentlyAddedIndex:
+        case .newest:
             return super.tableView(tableView, titleForHeaderInSection: section)
         case .duration:
             return nil
@@ -253,8 +246,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             switch self.displayFilter {
             case .all:
                 songs = self.appDelegate.storage.main.library.getSongs()
-            case .recentlyAdded:
-                songs = self.appDelegate.storage.main.library.getRecentSongs()
+            case .newest:
+                break
             case .favorites:
                 songs = self.appDelegate.storage.main.library.getFavoriteSongs()
             }
@@ -279,9 +272,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         }
         firstly {
             AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                .syncLatestLibraryElements()
+                .syncNewestLibraryElements()
         }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Songs Latest Elements Sync", error: error)
+            self.appDelegate.eventLogger.report(topic: "Songs Newest Elements Sync", error: error)
         }.finally {
             self.refreshControl?.endRefreshing()
         }

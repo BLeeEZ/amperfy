@@ -243,72 +243,22 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func syncLatestLibraryElements() -> Promise<Void> {
+    func syncNewestAlbums(offset: Int, count: Int) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
-        os_log("Sync newest albums", log: log, type: .info)
-        let oldRecentAlbumsMain = Set(storage.main.library.getRecentAlbums())
-        let oldRecentSongsMain = Set(storage.main.library.getRecentSongs())
-        var recentSongsMain: Set<Song> = Set()
-        var parsedAlbumsCDIDs = [NSManagedObjectID]()
-        var parsedSongsCDIDs = [NSManagedObjectID]()
+        os_log("Sync newest albums: offset: %i count: %i", log: log, type: .info, offset, count)
         
         return firstly {
-            subsonicServerApi.requestLatestAlbums()
+            subsonicServerApi.requestNewestAlbums(offset: offset, count: count)
         }.then { response in
             self.storage.async.perform { asyncCompanion in
                 let parserDelegate = SsAlbumParserDelegate(library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                 try self.parse(response: response, delegate: parserDelegate)
+                let oldNewestAlbums = asyncCompanion.library.getNewestAlbums(offset: offset, count: count)
+                oldNewestAlbums.forEach { $0.markAsNotNewAnymore() }
                 parserDelegate.parsedAlbums.enumerated().forEach { (index, album) in
-                    album.recentlyAddedIndex = index + 1
-                }
-                parsedAlbumsCDIDs = parserDelegate.parsedAlbums.compactMap {
-                    $0.managedObject.objectID
+                    album.updateIsNewestInfo(index: index+1+offset)
                 }
             }
-        }.get {
-            let parsedAlbumsMain = parsedAlbumsCDIDs.compactMap {
-                Album(managedObject: self.storage.main.context.object(with: $0) as! AlbumMO)
-            }
-            let notRecentAlbumsAnymore = oldRecentAlbumsMain.subtracting(parsedAlbumsMain)
-            notRecentAlbumsAnymore.filter{ !$0.id.isEmpty }.forEach { $0.markAsNotRecentAnymore() }
-        }.then { () -> Promise<Void> in
-            os_log("Sync songs of newest albums", log: self.log, type: .info)
-            let parsedAlbumsMain = parsedAlbumsCDIDs.compactMap {
-                Album(managedObject: self.storage.main.context.object(with: $0) as! AlbumMO)
-            }
-            let albumPromises = parsedAlbumsMain.compactMap { album -> (() ->Promise<Void>) in return {
-                return firstly {
-                    self.subsonicServerApi.requestAlbum(id: album.id)
-                }.then { response in
-                    self.storage.async.perform { asyncCompanion in
-                        let parserDelegate = SsSongParserDelegate(library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
-                        try self.parse(response: response, delegate: parserDelegate)
-                        parsedSongsCDIDs = parserDelegate.parsedSongs.compactMap {
-                            $0.managedObject.objectID
-                        }
-                    }
-                }.get {
-                    let parsedSongsMain = parsedSongsCDIDs.compactMap {
-                        Song(managedObject: self.storage.main.context.object(with: $0) as! SongMO)
-                    }
-                    recentSongsMain = recentSongsMain.union(Set(parsedSongsMain))
-                    album.isSongsMetaDataSynced = true
-                    self.storage.main.saveContext()
-                }
-            }}
-            return albumPromises.resolveSequentially()
-        }.get {
-            os_log("%i newest Albums synced", log: self.log, type: .info, parsedAlbumsCDIDs.count)
-            let notRecentSongsAnymore = oldRecentSongsMain.subtracting(recentSongsMain)
-            notRecentSongsAnymore.filter{ !$0.id.isEmpty }.forEach { $0.markAsNotRecentAnymore() }
-            recentSongsMain.filter{ !$0.id.isEmpty }.forEach { song in
-                if let album = song.album {
-                    song.recentlyAddedIndex = album.recentlyAddedIndex
-                } else {
-                    song.markAsNotRecentAnymore()
-                }
-            }
-            self.storage.main.saveContext()
         }
     }
     

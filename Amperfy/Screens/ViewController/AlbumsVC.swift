@@ -32,6 +32,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     public var displayFilter: DisplayCategoryFilter = .all
     private var sortType: AlbumElementSortType = .name
     private var filterTitle = "Albums"
+    private var newestElementsOffsetsSynced = Set<Int>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,10 +76,10 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             self.filterTitle = "Albums"
             self.isIndexTitelsHidden = false
             change(sortType: appDelegate.storage.settings.albumsSortSetting)
-        case .recentlyAdded:
-            self.filterTitle = "Recent Albums"
+        case .newest:
+            self.filterTitle = "Newest Albums"
             self.isIndexTitelsHidden = true
-            change(sortType: .recentlyAddedIndex)
+            change(sortType: .newest)
         case .favorites:
             self.filterTitle = "Favorite Albums"
             self.isIndexTitelsHidden = false
@@ -91,7 +92,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         self.sortType = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType != .recentlyAddedIndex)
+        fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType != .newest)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
@@ -108,7 +109,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
         actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
 
-        if sortType == .recentlyAddedIndex {
+        if sortType == .newest {
             navigationItem.rightBarButtonItems = []
         } else {
             navigationItem.rightBarButtonItems = [sortButton]
@@ -118,17 +119,17 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         }
     }
     
-    func updateFromRemote() {
+    func updateFromRemote(offset: Int = 0, count: Int = AmperKit.newestElementsFetchCount) {
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
         switch displayFilter {
         case .all:
             break
-        case .recentlyAdded:
+        case .newest:
             firstly {
                 AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                    .syncLatestLibraryElements()
+                    .syncNewestLibraryElements(offset: offset, count: count)
             }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
+                self.appDelegate.eventLogger.report(topic: "Newest Albums Sync", error: error)
             }.finally {
                 self.updateSearchResults(for: self.searchController)
             }
@@ -140,6 +141,20 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             }.finally {
                 self.updateSearchResults(for: self.searchController)
             }
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard let elementCount = fetchedResultsController.fetchResultsController.fetchedObjects?.count else { return}
+        if sortType == .newest,
+           (searchController.searchBar.text ?? "").isEmpty,
+           indexPath.row > 0,
+           // fetch each 20th row or on last element
+           indexPath.row == elementCount-1 || (indexPath.row % 20 == 0),
+           // this offset has not been synced yet
+           !newestElementsOffsetsSynced.contains(indexPath.row) {
+            newestElementsOffsetsSynced.insert(indexPath.row)
+            updateFromRemote(offset: indexPath.row, count: AmperKit.newestElementsFetchCount)
         }
     }
 
@@ -156,7 +171,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             return 0.0
         case .rating:
             return CommonScreenOperations.tableSectionHeightLarge
-        case .recentlyAddedIndex:
+        case .newest:
             return 0.0
         case .artist:
             return 0.0
@@ -177,7 +192,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             } else {
                 return "Not rated"
             }
-        case .recentlyAddedIndex:
+        case .newest:
             return super.tableView(tableView, titleForHeaderInSection: section)
         case .artist:
             return super.tableView(tableView, titleForHeaderInSection: section)
@@ -270,8 +285,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             switch self.displayFilter {
             case .all:
                 albums = self.appDelegate.storage.main.library.getAlbums()
-            case .recentlyAdded:
-                albums = self.appDelegate.storage.main.library.getRecentAlbums()
+            case .newest:
+                albums = self.appDelegate.storage.main.library.getNewestAlbums()
             case .favorites:
                 albums = self.appDelegate.storage.main.library.getFavoriteAlbums()
             }
@@ -297,9 +312,9 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         }
         firstly {
             AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                .syncLatestLibraryElements()
+                .syncNewestLibraryElements()
         }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Albums Latest Elements Sync", error: error)
+            self.appDelegate.eventLogger.report(topic: "Albums Newest Elements Sync", error: error)
         }.finally {
             self.refreshControl?.endRefreshing()
         }

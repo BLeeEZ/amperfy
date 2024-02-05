@@ -89,9 +89,9 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         }
         firstly {
             AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                .syncLatestLibraryElements()
+                .syncNewestLibraryElements()
         }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Genres Latest Elements Sync", error: error)
+            self.appDelegate.eventLogger.report(topic: "Genres Newest Elements Sync", error: error)
         }.finally {
             self.refreshControl?.endRefreshing()
         }

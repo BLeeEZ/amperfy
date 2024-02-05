@@ -70,7 +70,7 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
             if self.isRunning, self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
                 firstlyOnMain {
                     AutoDownloadLibrarySyncer(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
-                        .syncLatestLibraryElements()
+                        .syncNewestLibraryElements(offset: 0, count: AmperKit.newestElementsFetchCount)
                 }.catch { error in
                     self.eventLogger.report(topic: "Latest Library Elements Background Sync", error: error, displayPopup: false)
                 }.finally {

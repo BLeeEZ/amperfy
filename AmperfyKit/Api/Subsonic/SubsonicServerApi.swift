@@ -376,11 +376,12 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    func requestLatestAlbums() -> Promise<APIDataResponse> {
+    func requestNewestAlbums(offset: Int, count: Int) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getAlbumList2")
             urlComp.addQueryItem(name: "type", value: "newest")
-            urlComp.addQueryItem(name: "size", value: 20)
+            urlComp.addQueryItem(name: "size", value: count)
+            urlComp.addQueryItem(name: "offset", value: offset)
             return try self.createUrl(from: urlComp)
         }
     }

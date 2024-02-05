@@ -194,15 +194,12 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         return false
     }
 
-    public var recentlyAddedIndex: Int {
-        get { return Int(playableManagedObject.recentlyAddedIndex) }
-        set {
-            guard Int16.isValid(value: newValue), playableManagedObject.recentlyAddedIndex != Int16(newValue) else { return }
-            playableManagedObject.recentlyAddedIndex = Int16(newValue)
-        }
+    public func updateIsNewestInfo(index: Int) {
+        guard Int16.isValid(value: index), playableManagedObject.recentlyAddedIndex != index else { return }
+        playableManagedObject.recentlyAddedIndex = Int16(index)
     }
     
-    public func markAsNotRecentAnymore() {
+    public func markAsNotNewAnymore() {
         playableManagedObject.recentlyAddedIndex = 0
     }
     

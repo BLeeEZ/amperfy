@@ -75,7 +75,7 @@ extension SongMO: CoreDataIdentifyable {
         return fetchRequest
     }
     
-    static var recentlyAddedSortedFetchRequest: NSFetchRequest<SongMO> {
+    static var newestSortedFetchRequest: NSFetchRequest<SongMO> {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(SongMO.recentlyAddedIndex), ascending: true),

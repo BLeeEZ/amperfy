@@ -54,19 +54,14 @@ extension CarPlaySceneDelegate {
         albumsFavoritesFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .favorites)
     }
     func createAlbumsRecentlyAddedFetchController() {
-        albumsRecentlyAddedFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .recentlyAddedIndex, isGroupedInAlphabeticSections: false)
+        albumsRecentlyAddedFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .newest, isGroupedInAlphabeticSections: false)
         albumsRecentlyAddedFetchController?.delegate = self
-        albumsRecentlyAddedFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .recentlyAdded)
+        albumsRecentlyAddedFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .newest)
     }
     func createSongsFavoritesFetchController() {
         songsFavoritesFetchController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.songsSortSetting, isGroupedInAlphabeticSections: false)
         songsFavoritesFetchController?.delegate = self
         songsFavoritesFetchController?.search(searchText: "", onlyCachedSongs: isOfflineMode, displayFilter: .favorites)
-    }
-    func createSongsRecentlyAddedFetchController() {
-        songsRecentlyAddedFetchController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .recentlyAddedIndex, isGroupedInAlphabeticSections: false)
-        songsRecentlyAddedFetchController?.delegate = self
-        songsRecentlyAddedFetchController?.search(searchText: "", onlyCachedSongs: isOfflineMode, displayFilter: .recentlyAdded)
     }
     func createPlaylistDetailFetchController(playlist: Playlist) {
         playlistDetailFetchController = PlaylistItemsFetchedResultsController(forPlaylist: playlist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)

@@ -25,7 +25,7 @@ import CoreData
 public enum ArtistElementSortType: Int {
     case name = 0
     case rating = 1
-    case recentlyAddedIndex = 2
+    case newest = 2
     case duration = 3
     
     public static let defaultValue: ArtistElementSortType = .name
@@ -36,8 +36,8 @@ public enum ArtistElementSortType: Int {
             return .alphabet
         case .rating:
             return .rating
-        case .recentlyAddedIndex:
-            return .recentlyAddedIndex
+        case .newest:
+            return .newest
         case .duration:
             return .durationArtist
         }
@@ -47,7 +47,7 @@ public enum ArtistElementSortType: Int {
 public enum AlbumElementSortType: Int {
     case name = 0
     case rating = 1
-    case recentlyAddedIndex = 2
+    case newest = 2
     case artist = 3
     case duration = 4
     case year = 5
@@ -60,8 +60,8 @@ public enum AlbumElementSortType: Int {
             return .alphabet
         case .rating:
             return .rating
-        case .recentlyAddedIndex:
-            return .recentlyAddedIndex
+        case .newest:
+            return .newest
         case .artist:
             return .alphabet
         case .duration:
@@ -97,7 +97,7 @@ public enum PlaylistSortType: Int {
 public enum SongElementSortType: Int {
     case name = 0
     case rating = 1
-    case recentlyAddedIndex = 2
+    case newest = 2
     case duration = 3
     
     public static let defaultValue: SongElementSortType = .name
@@ -108,8 +108,8 @@ public enum SongElementSortType: Int {
             return .alphabet
         case .rating:
             return .rating
-        case .recentlyAddedIndex:
-            return .recentlyAddedIndex
+        case .newest:
+            return .newest
         case .duration:
             return .durationSong
         }
@@ -118,7 +118,7 @@ public enum SongElementSortType: Int {
 
 public enum DisplayCategoryFilter {
     case all
-    case recentlyAdded
+    case newest
     case favorites
 }
 
@@ -339,7 +339,7 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
             fetchRequest = ArtistMO.alphabeticSortedFetchRequest
         case .rating:
             fetchRequest = ArtistMO.ratingSortedFetchRequest
-        case .recentlyAddedIndex:
+        case .newest:
             // artist currently does not support recentlyAdded
             fetchRequest = ArtistMO.identifierSortedFetchRequest
         case .duration:
@@ -455,8 +455,8 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
             fetchRequest = AlbumMO.alphabeticSortedFetchRequest
         case .rating:
             fetchRequest = AlbumMO.ratingSortedFetchRequest
-        case .recentlyAddedIndex:
-            fetchRequest = AlbumMO.recentlyAddedSortedFetchRequest
+        case .newest:
+            fetchRequest = AlbumMO.newestSortedFetchRequest
         case .artist:
             fetchRequest = AlbumMO.artistNameSortedFetchRequest
         case .duration:
@@ -502,8 +502,8 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
             fetchRequest = SongMO.alphabeticSortedFetchRequest
         case .rating:
             fetchRequest = SongMO.ratingSortedFetchRequest
-        case .recentlyAddedIndex:
-            fetchRequest = SongMO.recentlyAddedSortedFetchRequest
+        case .newest:
+            fetchRequest = SongMO.newestSortedFetchRequest
         case .duration:
             fetchRequest = SongMO.durationSortedFetchRequest
         }
