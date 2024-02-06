@@ -53,10 +53,15 @@ extension CarPlaySceneDelegate {
         albumsFavoritesFetchController?.delegate = self
         albumsFavoritesFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .favorites)
     }
-    func createAlbumsRecentlyAddedFetchController() {
-        albumsRecentlyAddedFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .newest, isGroupedInAlphabeticSections: false)
-        albumsRecentlyAddedFetchController?.delegate = self
-        albumsRecentlyAddedFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .newest)
+    func createAlbumsNewestFetchController() {
+        albumsNewestFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .newest, isGroupedInAlphabeticSections: false)
+        albumsNewestFetchController?.delegate = self
+        albumsNewestFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .newest)
+    }
+    func createAlbumsRecentFetchController() {
+        albumsRecentFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .recent, isGroupedInAlphabeticSections: false)
+        albumsRecentFetchController?.delegate = self
+        albumsRecentFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .recent)
     }
     func createSongsFavoritesFetchController() {
         songsFavoritesFetchController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.songsSortSetting, isGroupedInAlphabeticSections: false)

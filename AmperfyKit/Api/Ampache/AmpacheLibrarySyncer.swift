@@ -397,6 +397,24 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
+    func syncRecentAlbums(offset: Int, count: Int) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        os_log("Sync recent albums: offset: %i count: %i", log: log, type: .info, offset, count)
+        return firstly {
+            ampacheXmlServerApi.requestRecentAlbums(offset: offset, count: count)
+        }.then { response in
+            self.storage.async.perform { asyncCompanion in
+                let parserDelegate = AlbumParserDelegate(library: asyncCompanion.library)
+                try self.parse(response: response, delegate: parserDelegate)
+                let oldRecentAlbums = asyncCompanion.library.getRecentAlbums(offset: offset, count: count)
+                oldRecentAlbums.forEach { $0.markAsNotRecentAnymore() }
+                parserDelegate.albumsParsedArray.enumerated().forEach { (index, album) in
+                    album.updateIsRecentInfo(index: index+1+offset)
+                }
+            }
+        }
+    }
+    
     func syncFavoriteLibraryElements() -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {

@@ -37,7 +37,7 @@ public enum ArtistElementSortType: Int {
         case .rating:
             return .rating
         case .newest:
-            return .newest
+            return .newestOrRecent
         case .duration:
             return .durationArtist
         }
@@ -51,6 +51,7 @@ public enum AlbumElementSortType: Int {
     case artist = 3
     case duration = 4
     case year = 5
+    case recent = 6
     
     public static let defaultValue: AlbumElementSortType = .name
     
@@ -61,13 +62,15 @@ public enum AlbumElementSortType: Int {
         case .rating:
             return .rating
         case .newest:
-            return .newest
+            return .newestOrRecent
         case .artist:
             return .alphabet
         case .duration:
             return .durationAlbum
         case .year:
             return .year
+        case .recent:
+            return .newestOrRecent
         }
     }
 }
@@ -97,7 +100,6 @@ public enum PlaylistSortType: Int {
 public enum SongElementSortType: Int {
     case name = 0
     case rating = 1
-    case newest = 2
     case duration = 3
     
     public static let defaultValue: SongElementSortType = .name
@@ -108,8 +110,6 @@ public enum SongElementSortType: Int {
             return .alphabet
         case .rating:
             return .rating
-        case .newest:
-            return .newest
         case .duration:
             return .durationSong
         }
@@ -119,6 +119,7 @@ public enum SongElementSortType: Int {
 public enum DisplayCategoryFilter {
     case all
     case newest
+    case recent
     case favorites
 }
 
@@ -457,6 +458,8 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
             fetchRequest = AlbumMO.ratingSortedFetchRequest
         case .newest:
             fetchRequest = AlbumMO.newestSortedFetchRequest
+        case .recent:
+            fetchRequest = AlbumMO.recentSortedFetchRequest
         case .artist:
             fetchRequest = AlbumMO.artistNameSortedFetchRequest
         case .duration:
@@ -502,8 +505,6 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
             fetchRequest = SongMO.alphabeticSortedFetchRequest
         case .rating:
             fetchRequest = SongMO.ratingSortedFetchRequest
-        case .newest:
-            fetchRequest = SongMO.newestSortedFetchRequest
         case .duration:
             fetchRequest = SongMO.durationSortedFetchRequest
         }

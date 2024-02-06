@@ -434,6 +434,18 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
+    func requestRecentAlbums(offset: Int, count: Int) -> Promise<APIDataResponse> {
+        return request { auth in
+            var urlComp = try self.createAuthApiUrlComponent(auth: auth)
+            urlComp.addQueryItem(name: "action", value: "stats")
+            urlComp.addQueryItem(name: "type", value: "album")
+            urlComp.addQueryItem(name: "filter", value: "recent")
+            urlComp.addQueryItem(name: "limit", value: count)
+            urlComp.addQueryItem(name: "offset", value: offset)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
     func requestPlaylists() -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)

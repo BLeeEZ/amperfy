@@ -74,19 +74,7 @@ extension SongMO: CoreDataIdentifyable {
         ]
         return fetchRequest
     }
-    
-    static var newestSortedFetchRequest: NSFetchRequest<SongMO> {
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(SongMO.recentlyAddedIndex), ascending: true),
-            NSSortDescriptor(key: #keyPath(SongMO.disk), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: #keyPath(SongMO.track), ascending: true),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
-    
+
     static var durationSortedFetchRequest: NSFetchRequest<SongMO> {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
         fetchRequest.sortDescriptors = [

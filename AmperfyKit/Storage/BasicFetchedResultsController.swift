@@ -42,7 +42,7 @@ extension NSFetchedResultsController {
 public enum SectionIndexType: Int {
     case alphabet = 0
     case rating = 1
-    case newest = 2
+    case newestOrRecent = 2
     case durationSong = 3
     case durationAlbum = 4
     case durationArtist = 5
@@ -70,7 +70,7 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
             return sectionName
         case .rating:
             return sortByRating(forSectionName: sectionName)
-        case .newest:
+        case .newestOrRecent:
             return nil
         case .durationSong:
             return sortByDurationSong(forSectionName: sectionName)

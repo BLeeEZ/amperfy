@@ -602,10 +602,8 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(songsDisplayFilter: DisplayCategoryFilter) -> NSPredicate {
         switch songsDisplayFilter {
-        case .all:
+        case .all, .newest, .recent:
             return NSPredicate.alwaysTrue
-        case .newest:
-            return NSPredicate(format: "%K > 0", #keyPath(SongMO.recentlyAddedIndex))
         case .favorites:
             return NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isFavorite))
         }
@@ -616,7 +614,9 @@ public class LibraryStorage: PlayableFileCachable {
         case .all:
             return NSPredicate.alwaysTrue
         case .newest:
-            return NSPredicate(format: "%K > 0", #keyPath(AlbumMO.recentlyAddedIndex))
+            return NSPredicate(format: "%K > 0", #keyPath(AlbumMO.newestIndex))
+        case .recent:
+            return NSPredicate(format: "%K > 0", #keyPath(AlbumMO.recentIndex))
         case .favorites:
             return NSPredicate(format: "%K == TRUE", #keyPath(AlbumMO.isFavorite))
         }
@@ -624,7 +624,7 @@ public class LibraryStorage: PlayableFileCachable {
 
     func getFetchPredicate(artistsDisplayFilter: DisplayCategoryFilter) -> NSPredicate {
         switch artistsDisplayFilter {
-        case .all, .newest:
+        case .all, .newest, .recent:
             return NSPredicate.alwaysTrue
         case .favorites:
             return NSPredicate(format: "%K == TRUE", #keyPath(ArtistMO.isFavorite))
@@ -678,6 +678,16 @@ public class LibraryStorage: PlayableFileCachable {
     public func getNewestAlbums(offset: Int = 0, count: Int = 50) -> [Album] {
         let fetchRequest = AlbumMO.newestSortedFetchRequest
         fetchRequest.predicate = getFetchPredicate(albumsDisplayFilter: .newest)
+        fetchRequest.fetchOffset = offset
+        fetchRequest.fetchLimit = count
+        let foundAlbums = try? context.fetch(fetchRequest)
+        let albums = foundAlbums?.compactMap{ Album(managedObject: $0) }
+        return albums ?? [Album]()
+    }
+    
+    public func getRecentAlbums(offset: Int = 0, count: Int = 50) -> [Album] {
+        let fetchRequest = AlbumMO.recentSortedFetchRequest
+        fetchRequest.predicate = getFetchPredicate(albumsDisplayFilter: .recent)
         fetchRequest.fetchOffset = offset
         fetchRequest.fetchLimit = count
         let foundAlbums = try? context.fetch(fetchRequest)

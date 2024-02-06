@@ -69,10 +69,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             self.filterTitle = "Songs"
             self.isIndexTitelsHidden = false
             change(sortType: appDelegate.storage.settings.songsSortSetting)
-        case .newest:
-            self.filterTitle = "Newest Songs"
-            self.isIndexTitelsHidden = true
-            change(sortType: .newest)
+        case .newest, .recent:
+            break
         case .favorites:
             self.filterTitle = "Favorite Songs"
             self.isIndexTitelsHidden = false
@@ -85,7 +83,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         self.sortType = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType != .newest)
+        fetchedResultsController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: true)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
@@ -101,12 +99,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     func updateRightBarButtonItems() {
         sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
         actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
+        navigationItem.rightBarButtonItems = [sortButton]
 
-        if sortType == .newest {
-            navigationItem.rightBarButtonItems = []
-        } else {
-            navigationItem.rightBarButtonItems = [sortButton]
-        }
         if appDelegate.storage.settings.isOnlineMode {
             navigationItem.rightBarButtonItems?.insert(actionButton, at: 0)
         }
@@ -117,7 +111,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         switch displayFilter {
         case .all:
             break
-        case .newest:
+        case .newest, .recent:
             break
         case .favorites:
             firstly {
@@ -143,8 +137,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             return 0.0
         case .rating:
             return CommonScreenOperations.tableSectionHeightLarge
-        case .newest:
-            return 0.0
         case .duration:
             return 0.0
         }
@@ -160,8 +152,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             } else {
                 return "Not rated"
             }
-        case .newest:
-            return super.tableView(tableView, titleForHeaderInSection: section)
         case .duration:
             return nil
         }
@@ -246,7 +236,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             switch self.displayFilter {
             case .all:
                 songs = self.appDelegate.storage.main.library.getSongs()
-            case .newest:
+            case .newest, .recent:
                 break
             case .favorites:
                 songs = self.appDelegate.storage.main.library.getFavoriteSongs()

@@ -386,6 +386,16 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
+    func requestRecentAlbums(offset: Int, count: Int) -> Promise<APIDataResponse> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getAlbumList2")
+            urlComp.addQueryItem(name: "type", value: "recent")
+            urlComp.addQueryItem(name: "size", value: count)
+            urlComp.addQueryItem(name: "offset", value: offset)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
     func requestRandomSongs(count: Int) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getRandomSongs")

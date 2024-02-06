@@ -35,7 +35,6 @@ extension AbstractPlayableMO {
     @NSManaged public var combinedDuration: Int16
     @NSManaged public var playDuration: Int16
     @NSManaged public var playProgress: Int16
-    @NSManaged public var recentlyAddedIndex: Int16
     @NSManaged public var remoteDuration: Int16
     @NSManaged public var size: Int32
     @NSManaged public var title: String?

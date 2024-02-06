@@ -32,7 +32,8 @@ extension AlbumMO {
     @NSManaged public var duration: Int16
     @NSManaged public var isSongsMetaDataSynced: Bool
     @NSManaged public var name: String?
-    @NSManaged public var recentlyAddedIndex: Int16
+    @NSManaged public var recentIndex: Int16
+    @NSManaged public var newestIndex: Int16
     @NSManaged public var remoteDuration: Int16
     @NSManaged public var songCount: Int16
     @NSManaged public var year: Int16

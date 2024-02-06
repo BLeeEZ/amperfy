@@ -75,7 +75,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         podcastFetchController = nil
         artistsFavoritesFetchController = nil
         albumsFavoritesFetchController = nil
-        albumsRecentlyAddedFetchController = nil
+        albumsNewestFetchController = nil
+        albumsRecentFetchController = nil
         songsFavoritesFetchController = nil
         playlistDetailFetchController = nil
         podcastDetailFetchController = nil
@@ -120,7 +121,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             CPListSection(items: [
                 createPlayRandomAlbumsItem(),
                 createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: albumsFavoriteSection),
-                createLibraryItem(text: "Newest", icon: UIImage.clock, sectionToDisplay: albumsRecentlyAddedSection)
+                createLibraryItem(text: "Newest", icon: UIImage.clock, sectionToDisplay: albumsNewestSection),
+                createLibraryItem(text: "Recently Played", icon: UIImage.clock, sectionToDisplay: albumsRecentSection)
             ], header: "Albums", sectionIndexTitle: nil),
             CPListSection(items: [
                 createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: artistsFavoriteSection)
@@ -144,8 +146,14 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         ])
         return template
     }()
-    lazy var albumsRecentlyAddedSection = {
+    lazy var albumsNewestSection = {
         let template = CPListTemplate(title: "Newest Albums", sections: [
+            CPListSection(items: [CPListTemplateItem]())
+        ])
+        return template
+    }()
+    lazy var albumsRecentSection = {
+        let template = CPListTemplate(title: "Recently Played Albums", sections: [
             CPListSection(items: [CPListTemplateItem]())
         ])
         return template
@@ -230,7 +238,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     //
     var artistsFavoritesFetchController: ArtistFetchedResultsController?
     var albumsFavoritesFetchController: AlbumFetchedResultsController?
-    var albumsRecentlyAddedFetchController: AlbumFetchedResultsController?
+    var albumsNewestFetchController: AlbumFetchedResultsController?
+    var albumsRecentFetchController: AlbumFetchedResultsController?
     var songsFavoritesFetchController: SongsFetchedResultsController?
     //
     var playlistDetailFetchController: PlaylistItemsFetchedResultsController?
@@ -517,10 +526,15 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             createAlbumsFavoritesFetchController()
             albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(from: albumsFavoritesFetchController))])
         }
-        if templates.contains(albumsRecentlyAddedSection) {
-            os_log("CarPlay: OfflineModeChanged: albumsRecentlyAddedFetchController", log: self.log, type: .info)
-            createAlbumsRecentlyAddedFetchController()
-            albumsRecentlyAddedSection.updateSections([CPListSection(items: createAlbumItems(from: albumsRecentlyAddedFetchController))])
+        if templates.contains(albumsNewestSection) {
+            os_log("CarPlay: OfflineModeChanged: albumsNewestFetchController", log: self.log, type: .info)
+            createAlbumsNewestFetchController()
+            albumsNewestSection.updateSections([CPListSection(items: createAlbumItems(from: albumsNewestFetchController))])
+        }
+        if templates.contains(albumsRecentSection) {
+            os_log("CarPlay: OfflineModeChanged: albumsRecentFetchController", log: self.log, type: .info)
+            createAlbumsRecentFetchController()
+            albumsRecentSection.updateSections([CPListSection(items: createAlbumItems(from: albumsRecentFetchController))])
         }
         if templates.contains(songsFavoriteSection) {
             os_log("CarPlay: OfflineModeChanged: songsFavoritesFetchController", log: self.log, type: .info)
@@ -565,9 +579,13 @@ extension CarPlaySceneDelegate: NSFetchedResultsControllerDelegate {
             os_log("CarPlay: FetchedResults: albumsFavoritesFetchController", log: self.log, type: .info)
             albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(from: albumsFavoritesFetchController))])
         }
-        if templates.contains(albumsRecentlyAddedSection), let albumsRecentlyAddedFetchController = albumsRecentlyAddedFetchController, controller == albumsRecentlyAddedFetchController.fetchResultsController {
-            os_log("CarPlay: FetchedResults: albumsRecentlyAddedFetchController", log: self.log, type: .info)
-            albumsRecentlyAddedSection.updateSections([CPListSection(items: createAlbumItems(from: albumsRecentlyAddedFetchController))])
+        if templates.contains(albumsNewestSection), let albumsNewestFetchController = albumsNewestFetchController, controller == albumsNewestFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: albumsNewestFetchController", log: self.log, type: .info)
+            albumsNewestSection.updateSections([CPListSection(items: createAlbumItems(from: albumsNewestFetchController))])
+        }
+        if templates.contains(albumsRecentSection), let albumsRecentFetchController = albumsRecentFetchController, controller == albumsRecentFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: albumsRecentFetchController", log: self.log, type: .info)
+            albumsRecentSection.updateSections([CPListSection(items: createAlbumItems(from: albumsRecentFetchController))])
         }
         if templates.contains(songsFavoriteSection), let songsFavoritesFetchController = songsFavoritesFetchController, controller == songsFavoritesFetchController.fetchResultsController {
             os_log("CarPlay: FetchedResults: songsFavoritesFetchController", log: self.log, type: .info)
@@ -609,10 +627,19 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
             os_log("CarPlay: templateWillAppear albumsFavoriteSection", log: self.log, type: .info)
             if albumsFavoritesFetchController == nil { createAlbumsFavoritesFetchController() }
             albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(from: albumsFavoritesFetchController))])
-        } else if aTemplate == albumsRecentlyAddedSection {
-            os_log("CarPlay: templateWillAppear albumsRecentlyAddedSection", log: self.log, type: .info)
-            if albumsRecentlyAddedFetchController == nil { createAlbumsRecentlyAddedFetchController() }
-            albumsRecentlyAddedSection.updateSections([CPListSection(items: createAlbumItems(from: albumsRecentlyAddedFetchController))])
+        } else if aTemplate == albumsNewestSection {
+            os_log("CarPlay: templateWillAppear albumsNewestSection", log: self.log, type: .info)
+            if albumsNewestFetchController == nil { createAlbumsNewestFetchController() }
+            albumsNewestSection.updateSections([CPListSection(items: createAlbumItems(from: albumsNewestFetchController))])
+        } else if aTemplate == albumsRecentSection {
+            os_log("CarPlay: templateWillAppear albumsRecentSection", log: self.log, type: .info)
+            firstly {
+                self.appDelegate.librarySyncer.syncRecentAlbums(offset: 0, count: AmperKit.newestElementsFetchCount)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
+            }
+            if albumsRecentFetchController == nil { createAlbumsRecentFetchController() }
+            albumsRecentSection.updateSections([CPListSection(items: createAlbumItems(from: albumsRecentFetchController))])
         } else if aTemplate == songsFavoriteSection {
             os_log("CarPlay: templateWillAppear songsFavoriteSection", log: self.log, type: .info)
             if songsFavoritesFetchController == nil { createSongsFavoritesFetchController() }

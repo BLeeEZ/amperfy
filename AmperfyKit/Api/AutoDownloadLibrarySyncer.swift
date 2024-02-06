@@ -63,7 +63,7 @@ public class AutoDownloadLibrarySyncer {
             }}
             return albumPromises.resolveSequentially()
         }.get {
-            if !oldNewestAlbums.isEmpty, !newNewestAlbums.isEmpty, self.storage.settings.isAutoDownloadLatestSongsActive {
+            if offset == 0, !oldNewestAlbums.isEmpty, !newNewestAlbums.isEmpty, self.storage.settings.isAutoDownloadLatestSongsActive {
                 var newestSongs = [AbstractPlayable]()
                 for album in newNewestAlbums {
                     newestSongs.append(contentsOf: album.songs)

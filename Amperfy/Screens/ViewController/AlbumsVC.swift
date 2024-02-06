@@ -80,6 +80,10 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             self.filterTitle = "Newest Albums"
             self.isIndexTitelsHidden = true
             change(sortType: .newest)
+        case .recent:
+            self.filterTitle = "Recently Played Albums"
+            self.isIndexTitelsHidden = true
+            change(sortType: .recent)
         case .favorites:
             self.filterTitle = "Favorite Albums"
             self.isIndexTitelsHidden = false
@@ -92,7 +96,15 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         self.sortType = sortType
         singleFetchedResultsController?.clearResults()
         tableView.reloadData()
-        fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType != .newest)
+        var isGroupedInAlphabeticSections = false
+        switch sortType {
+        case .name, .rating, .artist, .duration, .year:
+            isGroupedInAlphabeticSections = true
+        case .newest, .recent:
+            isGroupedInAlphabeticSections = false
+        }
+        
+        fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
         tableView.reloadData()
@@ -109,11 +121,13 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
         actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
 
-        if sortType == .newest {
-            navigationItem.rightBarButtonItems = []
-        } else {
+        switch sortType {
+        case .name, .rating, .artist, .duration, .year:
             navigationItem.rightBarButtonItems = [sortButton]
+        case .newest, .recent:
+            navigationItem.rightBarButtonItems = []
         }
+
         if appDelegate.storage.settings.isOnlineMode {
             navigationItem.rightBarButtonItems?.insert(actionButton, at: 0)
         }
@@ -133,6 +147,14 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             }.finally {
                 self.updateSearchResults(for: self.searchController)
             }
+        case .recent:
+            firstly {
+                self.appDelegate.librarySyncer.syncRecentAlbums(offset: offset, count: count)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
+            }.finally {
+                self.updateSearchResults(for: self.searchController)
+            }
         case .favorites:
             firstly {
                 self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
@@ -146,7 +168,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard let elementCount = fetchedResultsController.fetchResultsController.fetchedObjects?.count else { return}
-        if sortType == .newest,
+        if sortType == .newest || sortType == .recent,
            (searchController.searchBar.text ?? "").isEmpty,
            indexPath.row > 0,
            // fetch each 20th row or on last element
@@ -171,7 +193,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             return 0.0
         case .rating:
             return CommonScreenOperations.tableSectionHeightLarge
-        case .newest:
+        case .newest, .recent:
             return 0.0
         case .artist:
             return 0.0
@@ -192,7 +214,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             } else {
                 return "Not rated"
             }
-        case .newest:
+        case .newest, .recent:
             return super.tableView(tableView, titleForHeaderInSection: section)
         case .artist:
             return super.tableView(tableView, titleForHeaderInSection: section)
@@ -287,6 +309,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
                 albums = self.appDelegate.storage.main.library.getAlbums()
             case .newest:
                 albums = self.appDelegate.storage.main.library.getNewestAlbums()
+            case .recent:
+                albums = self.appDelegate.storage.main.library.getRecentAlbums()
             case .favorites:
                 albums = self.appDelegate.storage.main.library.getFavoriteAlbums()
             }
@@ -311,8 +335,12 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             return
         }
         firstly {
-            AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                .syncNewestLibraryElements()
+            if self.displayFilter == .recent {
+                return self.appDelegate.librarySyncer.syncRecentAlbums(offset: 0, count: AmperKit.newestElementsFetchCount)
+            } else {
+                return AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    .syncNewestLibraryElements()
+            }
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Albums Newest Elements Sync", error: error)
         }.finally {

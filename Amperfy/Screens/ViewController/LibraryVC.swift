@@ -109,6 +109,8 @@ class LibraryVC: UITableViewController {
             performSegue(withIdentifier: LibraryDisplayType.albums.segueName, sender: LibraryDisplayType.favoriteAlbums)
         case .newestAlbums:
             performSegue(withIdentifier: LibraryDisplayType.albums.segueName, sender: LibraryDisplayType.newestAlbums)
+        case .recentAlbums:
+            performSegue(withIdentifier: LibraryDisplayType.albums.segueName, sender: LibraryDisplayType.recentAlbums)
         case .favoriteSongs:
             performSegue(withIdentifier: LibraryDisplayType.songs.segueName, sender: LibraryDisplayType.favoriteSongs)
         default:
@@ -129,6 +131,10 @@ class LibraryVC: UITableViewController {
         if segue.identifier == LibraryDisplayType.albums.segueName, let type = sender as? LibraryDisplayType, type == .newestAlbums {
             let vc = segue.destination as! AlbumsVC
             vc.displayFilter = .newest
+        }
+        if segue.identifier == LibraryDisplayType.albums.segueName, let type = sender as? LibraryDisplayType, type == .recentAlbums {
+            let vc = segue.destination as! AlbumsVC
+            vc.displayFilter = .recent
         }
         
         if segue.identifier == LibraryDisplayType.songs.segueName, let type = sender as? LibraryDisplayType, type == .favoriteSongs {

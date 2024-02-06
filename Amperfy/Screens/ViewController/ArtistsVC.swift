@@ -66,6 +66,8 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             self.filterTitle = "Artists"
         case .newest:
             self.filterTitle = "Newest Artists"
+        case .recent:
+            self.filterTitle = "Recent Artists"
         case .favorites:
             self.filterTitle = "Favorite Artists"
         }
@@ -103,9 +105,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     func updateFromRemote() {
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
         switch displayFilter {
-        case .all:
-            break
-        case .newest:
+        case .all, .newest, .recent:
             break
         case .favorites:
             firstly {
@@ -206,7 +206,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             switch self.displayFilter {
             case .all:
                 artists = self.appDelegate.storage.main.library.getArtists()
-            case .newest:
+            case .newest, .recent:
                 break
             case .favorites:
                 artists = self.appDelegate.storage.main.library.getFavoriteArtists()

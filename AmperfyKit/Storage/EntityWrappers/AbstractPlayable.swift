@@ -193,15 +193,6 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         }
         return false
     }
-
-    public func updateIsNewestInfo(index: Int) {
-        guard Int16.isValid(value: index), playableManagedObject.recentlyAddedIndex != index else { return }
-        playableManagedObject.recentlyAddedIndex = Int16(index)
-    }
-    
-    public func markAsNotNewAnymore() {
-        playableManagedObject.recentlyAddedIndex = 0
-    }
     
     public var isSong: Bool {
         return playableManagedObject is SongMO
