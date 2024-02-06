@@ -19,6 +19,15 @@
       }
     },
     {
+      "identity" : "fuse-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krisk/fuse-swift",
+      "state" : {
+        "revision" : "26ba868691b2d8b7bf2b1322951eb591be70ccca",
+        "version" : "1.4.0"
+      }
+    },
+    {
       "identity" : "id3tageditor",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/chicio/ID3TagEditor",
