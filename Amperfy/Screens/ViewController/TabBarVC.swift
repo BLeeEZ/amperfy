@@ -39,7 +39,7 @@ class TabBarVC: UITabBarController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        self.popupPlayer = PopupPlayerVC.instantiateFromAppStoryboard()
+        self.popupPlayer = PopupPlayerVC()
         popupPlayer?.hostingTabBarVC = self
         self.popupBar.tintColor = UIColor.defaultBlue
         self.popupBar.imageView.layer.cornerRadius = 5

@@ -38,6 +38,7 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     let backgroundGradientDelayTime: UInt32 = 2
     var sectionViews = [PopupPlayerSectionHeader]()
     var nextViewSizeDueToDeviceRotation: CGSize?
+    var isBackgroundBlurConfigured = false
     
     var nextSectionName: String {
         "Next from: \(player.contextName)"
@@ -54,12 +55,6 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         player = appDelegate.player
         player.addNotifier(notifier: self)
-        
-        let blurEffect = UIBlurEffect(style: .systemThinMaterial)
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-        // BlurEffect rect is a square to avoid rerendering during iPad device rotation
-        blurEffectView.frame = CGRect(x: 0, y: 0, width: max(self.view.frame.width, self.view.frame.height), height: max(self.view.frame.width, self.view.frame.height))
-        self.backgroundImage.insertSubview(blurEffectView, at: 0)
         
         backgroundColorGradient = PopupAnimatedGradientLayer(view: view)
         backgroundColorGradient?.changeBackground(withStyleAndRandomColor: self.traitCollection.userInterfaceStyle)
@@ -83,6 +78,18 @@ class PopupPlayerVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 }
                 sectionViews.append(sectionView)
             }
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if !isBackgroundBlurConfigured {
+            isBackgroundBlurConfigured = true
+            let blurEffect = UIBlurEffect(style: .systemThinMaterial)
+            let blurEffectView = UIVisualEffectView(effect: blurEffect)
+            // BlurEffect rect is a square to avoid rerendering during iPad device rotation
+            blurEffectView.frame = CGRect(x: 0, y: 0, width: max(self.view.frame.width, self.view.frame.height), height: max(self.view.frame.width, self.view.frame.height))
+            self.backgroundImage.insertSubview(blurEffectView, at: 0)
         }
     }
     

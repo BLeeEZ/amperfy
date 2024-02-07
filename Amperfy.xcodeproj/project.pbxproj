@@ -34,6 +34,7 @@
 		502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */; };
 		5043714E27C23BF4008358AC /* FullWidthDescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5043714C27C23BF4008358AC /* FullWidthDescriptionView.swift */; };
 		5043714F27C23C0C008358AC /* FullWidthDescriptionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5043714D27C23BF4008358AC /* FullWidthDescriptionView.xib */; };
+		504627EA2B73B44C00F481F8 /* PopupPlayerVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 504627E92B73B44C00F481F8 /* PopupPlayerVC.xib */; };
 		504B441728D6EB370033982C /* ArtworkDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441628D6EB370033982C /* ArtworkDisplaySettings.swift */; };
 		504B441928D6F0920033982C /* LicenseSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441828D6F0920033982C /* LicenseSettingsView.swift */; };
 		504B441D28D7A6330033982C /* XCallbackURLsSetttingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441C28D7A6330033982C /* XCallbackURLsSetttingsView.swift */; };
@@ -584,6 +585,7 @@
 		5040B2C5269D947F00911451 /* BackgroundFetchTriggeredSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundFetchTriggeredSyncer.swift; sourceTree = "<group>"; };
 		5043714C27C23BF4008358AC /* FullWidthDescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullWidthDescriptionView.swift; sourceTree = "<group>"; };
 		5043714D27C23BF4008358AC /* FullWidthDescriptionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FullWidthDescriptionView.xib; sourceTree = "<group>"; };
+		504627E92B73B44C00F481F8 /* PopupPlayerVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PopupPlayerVC.xib; sourceTree = "<group>"; };
 		5046DAF02689A66E00B3C37E /* Amperfy v11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v11.xcdatamodel"; sourceTree = "<group>"; };
 		5046DAF12689B97600B3C37E /* AbstractPlayableMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AbstractPlayableMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		5046DAF22689B97600B3C37E /* AbstractPlayableMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AbstractPlayableMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -1054,6 +1056,19 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
+		504627EB2B73C1E600F481F8 /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				504627E92B73B44C00F481F8 /* PopupPlayerVC.xib */,
+				5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */,
+				500631FE23A1747B000F75A3 /* PlayerView.xib */,
+				5006320023A174C0000F75A3 /* PlayerView.swift */,
+				502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */,
+				502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
 		504B441E28D8E7480033982C /* Support */ = {
 			isa = PBXGroup;
 			children = (
@@ -1383,6 +1398,7 @@
 				508FDE4B21F58AFC005A0724 /* AppStoryboard.swift */,
 				50722746286794FC00910574 /* MainWindow.swift */,
 				5009863A2208CB170057A1A6 /* Basics */,
+				504627EB2B73C1E600F481F8 /* Player */,
 				50C16C0E21E533E800F086F0 /* View */,
 				50C16C0D21E533B600F086F0 /* ViewController */,
 			);
@@ -1423,7 +1439,6 @@
 				5007CE4621EF6A8E00BC5CBA /* PlaylistDetailVC.swift */,
 				50065EB321F0584D0066FC32 /* PlaylistSelectorVC.swift */,
 				50C16C0521E241B200F086F0 /* SearchVC.swift */,
-				5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */,
 				5077F935221E6D0E0099CA91 /* DownloadsVC.swift */,
 				50C16C1F21E7A37000F086F0 /* Segues.swift */,
 				508385E921C5965B00C4BB32 /* LoginVC.swift */,
@@ -1469,12 +1484,8 @@
 				50A85EF12689E8DC00FB3E31 /* PlayableTableCell.swift */,
 				508FDE3721F1E14F005A0724 /* NewPlaylistTableHeader.xib */,
 				508FDE3521F1E130005A0724 /* NewPlaylistTableHeader.swift */,
-				502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */,
-				502E56BB27561AD900638BD2 /* PopupPlayerSectionHeader.swift */,
 				50ACAF0E27B112A10039913C /* IconLabelTableCell.xib */,
 				50ACAF0D27B112A10039913C /* IconLabelTableCell.swift */,
-				500631FE23A1747B000F75A3 /* PlayerView.xib */,
-				5006320023A174C0000F75A3 /* PlayerView.swift */,
 				504CE14D27920965005E0DE7 /* RatingView.xib */,
 				504CE14F27920988005E0DE7 /* RatingView.swift */,
 			);
@@ -1888,6 +1899,7 @@
 				50C16C0C21E52BBB00F086F0 /* SongTableCell.xib in Resources */,
 				508FDE3E21F2FA44005A0724 /* PlaylistDetailTableHeader.xib in Resources */,
 				50A85EF32689E95300FB3E31 /* PlayableTableCell.xib in Resources */,
+				504627EA2B73B44C00F481F8 /* PopupPlayerVC.xib in Resources */,
 				5005938928E2D4EF008C8DF6 /* CommonCollectionSectionHeader.xib in Resources */,
 				43FBE27F250D4DFD00D5F9B3 /* LaunchScreen.storyboard in Resources */,
 				504CE14E27920965005E0DE7 /* RatingView.xib in Resources */,
