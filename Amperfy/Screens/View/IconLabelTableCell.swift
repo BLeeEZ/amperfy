@@ -28,17 +28,9 @@ class IconLabelTableCell: BasicTableCell {
     @IBOutlet weak var nameLabel: MarqueeLabel!
     @IBOutlet weak var actionImage: UIImageView!
     
-    private var action: SwipeActionType?
     private var libraryDisplayType: LibraryDisplayType?
     
     static let rowHeight: CGFloat = 60.0
-    
-    func display(action: SwipeActionType) {
-        self.action = action
-        nameLabel.applyAmperfyStyle()
-        nameLabel.text = action.settingsName
-        refreshStyle()
-    }
     
     func display(libraryDisplayType: LibraryDisplayType) {
         self.libraryDisplayType = libraryDisplayType
@@ -48,16 +40,8 @@ class IconLabelTableCell: BasicTableCell {
     }
     
     func refreshStyle() {
-        if let action = action {
-            if traitCollection.userInterfaceStyle == .dark {
-                actionImage.image = action.image.invertedImage()
-            } else {
-                actionImage.image = action.image
-            }
-            nameLabel.font = nameLabel.font.withSize(16)
-            self.accessoryType = .none
-        } else if let libraryDisplayType = libraryDisplayType {
-            actionImage.image = libraryDisplayType.image.withTintColor(.defaultBlue)
+        if let libraryDisplayType = libraryDisplayType {
+            actionImage.image = libraryDisplayType.image
             self.accessoryType = .disclosureIndicator
             nameLabel.font = nameLabel.font.withSize(20)
         }

@@ -31,81 +31,90 @@ public enum ArtworkIconSizeType: CGFloat {
 }
 
 extension UIImage {
-    public static let systemPlus = UIImage(systemName: "plus") ?? UIImage()
-    public static let check = UIImage(systemName: "checkmark") ?? UIImage()
-    public static let backwardFill = UIImage(systemName: "backward.fill") ?? UIImage()
-    public static let forwardFill = UIImage(systemName: "forward.fill") ?? UIImage()
-    public static let goBackward15 = UIImage(systemName: "gobackward.15") ?? UIImage()
-    public static let goForward30 = UIImage(systemName: "goforward.30") ?? UIImage()
-    public static let redo = UIImage(systemName: "gobackward") ?? UIImage()
-    public static let clear = UIImage(systemName: "clear") ?? UIImage()
-    public static let cancleDownloads = UIImage(systemName: "xmark.icloud") ?? UIImage()
-    public static let startDownload = UIImage(systemName: "arrow.down.circle") ?? UIImage()
-    public static let systemTrash = UIImage(systemName: "trash") ?? UIImage()
-    public static let info = UIImage(systemName: "info.circle") ?? UIImage()
+    public static let appIcon = UIImage.create("Icon-1024")
+        
+    public static let systemPlus = UIImage.create(systemName: "plus")
+    public static let check = UIImage.create(systemName: "checkmark")
+    public static let backwardFill = UIImage.create(systemName: "backward.fill")
+    public static let forwardFill = UIImage.create(systemName: "forward.fill")
+    public static let goBackward15 = UIImage.create(systemName: "gobackward.15")
+    public static let goForward30 = UIImage.create(systemName: "goforward.30")
+    public static let redo = UIImage.create(systemName: "gobackward")
+    public static let clear = UIImage.create(systemName: "clear")
+    public static let cancleDownloads = UIImage.create(systemName: "xmark.icloud")
+    public static let startDownload = UIImage.create(systemName: "arrow.down.circle")
+    public static let systemTrash = UIImage.create(systemName: "trash")
+    public static let info = UIImage.create(systemName: "info.circle")
+    public static let ban = UIImage.create(systemName: "circle.slash")
+    public static let starEmpty = UIImage.create(systemName: "star")
+    public static let starFill = UIImage.create(systemName: "star.fill")
+    public static let bars = UIImage.create(systemName: "line.3.horizontal")
+    public static let triangleDown = UIImage.create(systemName: "arrowtriangle.down.fill")
     
-    public static var amperfyMosaicArtwork: UIImage = { return UIImage.create("song") }()
-    public static var appIcon: UIImage = { return UIImage.create("Icon-1024") }()
-    
-    public static var ellipsis: UIImage = { return UIImage.create("ellipsis") }() // SF-Symbols 3.2 Regular: ellipsis
-    public static var playerStyleCompact: UIImage = { return UIImage.create("player_style_compact") }() // SF-Symbols 3.2 Regular: rectangle.portrait.inset.filled
-    public static var playerStyleLarge: UIImage = { return UIImage.create("player_style_large") }() // SF-Symbols 3.2 Regular:  rectangle.portrait.topthird.inset.filled
-    
-    public static var songArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small) }()
-    public static var genre: UIImage = { return UIImage.create("genre") }()  // SF-Symbols 3.2 Regular:  guitars.fill
-    public static var genreArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.genre, iconSizeType: .big) }()
-    public static var artist: UIImage = { return UIImage.create("artist") }()
-    public static var artistArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.artist, iconSizeType: .big) }()
-    public static var album: UIImage = { return UIImage.create("album") }()
-    public static var albumArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.album, iconSizeType: .big) }()
-    public static var albumCarplay: UIImage = { return UIImage.create("album_carplay") }()
-    public static var podcast: UIImage = { return UIImage.create("podcast") }()
-    public static var podcastArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .big) }()
-    public static var podcastCarplay: UIImage = { return UIImage.create("podcast_carplay") }()
-    public static var podcastEpisode: UIImage = { return UIImage.create("podcast") }()
-    public static var podcastEpisodeArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.podcastEpisode, iconSizeType: .small) }()
-    public static var folder: UIImage = { return UIImage.create("folder") }() // SF-Symbols 3.2 Regular:  foldes.fill
-    public static var playlist: UIImage = { return UIImage.create("playlist_svg") }()
-    public static var playlistArtwork: UIImage = { return UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, switchColors: true) }()
-    public static var playlistCarplay: UIImage = { return UIImage.create("playlist_carplay") }()
-    public static var playlistBlack: UIImage = { return UIImage.create("playlist") }()
-    public static var musicLibrary: UIImage = { return UIImage.create("music_library") }()
-    public static var musicalNotes: UIImage = { return UIImage.create("musical_notes_svg") }()
-    public static var musicalNotesCarplay: UIImage = { return UIImage.create("musical_notes_carplay") }()
-    
-    public static var userQueueInsert: UIImage = { return UIImage.create("user_queue_insert") }()
-    public static var userQueueAppend: UIImage = { return UIImage.create("user_queue_append") }()
-    public static var contextQueueInsert: UIImage = { return UIImage.create("context_queue_insert") }()
-    public static var contextQueueAppend: UIImage = { return UIImage.create("context_queue_append") }()
-    public static var podcastQueueInsert: UIImage = { return UIImage.create("podcast_queue_insert") }()
-    public static var podcastQueueAppend: UIImage = { return UIImage.create("podcast_queue_append") }()
-    public static var download: UIImage = { return UIImage.create("download") }()
-    public static var trash: UIImage = { return UIImage.create("trash") }()
-    public static var plus: UIImage = { return UIImage.create("plus") }()  // SF-Symbols 3.2 Regular:  plus
+    public static let ellipsis = UIImage.create(systemName: "ellipsis")
+    public static let playerStyleCompact = UIImage.create(systemName: "rectangle.portrait.inset.filled")
+    public static let playerStyleLarge = UIImage.create(systemName: "rectangle.portrait.topthird.inset.filled")
+    public static let genre = UIImage.create(systemName: "guitars.fill")
+    public static let artist = UIImage.create(systemName: "music.mic")
+    public static let album = UIImage.create(systemName: "rectangle.stack")
+    public static let folder = UIImage.create(systemName: "folder.fill")
+    public static let playlist = UIImage.create(systemName: "music.note.list")
+    public static let musicLibrary = UIImage.create(systemName: "music.note.house")
+    public static let musicalNotes = UIImage.create(systemName: "music.note")
+    public static let download = UIImage.create(systemName: "arrow.down.circle")
+    public static let trash = UIImage.create(systemName: "trash")
+    public static let plus = UIImage.create(systemName: "plus")
+    public static let play = UIImage.create(systemName: "play.fill")
+    public static let pause = UIImage.create(systemName: "pause.fill")
+    public static let sleep = UIImage.create(systemName: "moon.zzz")
+    public static let sleepFill = UIImage.create(systemName: "moon.zzz.fill")
+    public static let cache = download
+    public static let forward = UIImage.create(systemName: "forward.filled")
+    public static let backward = UIImage.create(systemName: "backward.filled")
+    public static let skipForward30 = UIImage.create(systemName: "goforward.30")
+    public static let skipBackward15 = UIImage.create(systemName: "gobackward.15")
+    public static let repeatAll = UIImage.create(systemName: "repeat.circle.fill")
+    public static let repeatOne = UIImage.create(systemName: "repeat.1.circle.fill")
+    public static let repeatOff = UIImage.create(systemName: "repeat.circle")
+    public static let shuffle = UIImage.create(systemName: "shuffle")
+    public static let shuffleOn = UIImage.create(systemName: "shuffle.circle.fill")
+    public static let shuffleOff = UIImage.create(systemName: "shuffle.circle")
+    public static let airplayaudio = UIImage.create(systemName: "airplayaudio")
+    public static let sort = UIImage.create(systemName: "arrow.up.arrow.down")
+    public static let filter = UIImage.create(systemName: "line.3.horizontal.decrease.circle")
+    public static let filterActive = UIImage.create(systemName: "line.3.horizontal.decrease.circle.fill")
+    public static let heartFill = UIImage.create(systemName: "heart.fill")
+    public static let heartEmpty = UIImage.create(systemName: "heart")
+    public static let clock = UIImage.create(systemName: "clock")
+    public static let refresh = UIImage.create(systemName: "arrow.triangle.2.circlepath")
+    public static let exclamation = UIImage.create(systemName: "exclamationmark")
+    public static let bell = UIImage.create(systemName: "bell.fill")
 
-    public static var play: UIImage = { return UIImage.create("play") }()
-    public static var pause: UIImage = { return UIImage.create("pause") }()
-    public static var gauge: UIImage = { return UIImage.create("gauge") }() // SF-Symbols 5 Regular: gauge.open.with.lines.needle.33percent
-    public static var gaugeDown: UIImage = { return UIImage.create("gauge_down") }() // SF-Symbols 5 Regular:  gauge.open.with.lines.needle.33percent.badge.arrow.down
-    public static var gaugeUp: UIImage = { return UIImage.create("gauge_up") }() // SF-Symbols 5 Regular: gauge.open.with.lines.needle.33percent.badge.arrow.up
-    public static var sleep: UIImage = { return UIImage(systemName: "moon.zzz") ?? clock }()
-    public static var sleepFill: UIImage = { return UIImage(systemName: "moon.zzz.fill") ?? clock }()
-    public static var cache: UIImage = { return UIImage.create("cache") }() // Font Awesome 6.1.1 Solid: cloud-arrow-down
-    public static var forward: UIImage = { return UIImage.create("forward") }()  // SF-Symbols 3.2 Regular:  forward.filled
-    public static var backward: UIImage = { return UIImage.create("backward") }()  // SF-Symbols 3.2 Regular:  backward.filled
-    public static var skipForward30: UIImage = { return UIImage.create("skip_forward_30") }()  // SF-Symbols 3.2 Regular:  goforward.30
-    public static var skipBackward15: UIImage = { return UIImage.create("skip_backward_15") }()  // SF-Symbols 3.2 Regular:  gobackward.15
-    public static var shuffle: UIImage = { return UIImage.create("shuffle") }()
-    public static var shuffleOff: UIImage = { return UIImage.create("shuffle_off") }() // custom mix of shuffle
-    public static var sort: UIImage = { return UIImage.create("sort") }()  // SF-Symbols 3.2 Regular:  arrow.up.arrow.down
-    public static var filter: UIImage = { return UIImage.create("filter") }()  // SF-Symbols 3.2 Regular:  line.3.horizontal.decrease.circle
-    public static var filterActive: UIImage = { return UIImage.create("filter_active") }()  // SF-Symbols 3.2 Regular:  line.3.horizontal.decrease.circle.fill
-    public static var heartFill: UIImage = { return UIImage.create("heart_fill") }()  // SF-Symbols 3.2 Regular:  heart.fill
-    public static var heartEmpty: UIImage = { return UIImage.create("heart_empty") }()  // SF-Symbols 3.2 Regular:  heart
-    public static var clock: UIImage = { return UIImage.create("clock") }()  // SF-Symbols 3.2 Regular:  clock
+    public static let gauge = UIImage.create("gauge") // SF-Symbols 5 Regular:  gauge.open.with.lines.needle.33percent.badge.arrow.down
+    public static let gaugeDown = UIImage.create("gauge_down") // SF-Symbols 5 Regular:  gauge.open.with.lines.needle.33percent.badge.arrow.down
+    public static let gaugeUp = UIImage.create("gauge_up") // SF-Symbols 5 Regular: gauge.open.with.lines.needle.33percent.badge.arrow.up
+    public static let podcast = UIImage.create("podcast").withTintColor(.defaultBlue)
+    public static let podcastEpisode: UIImage = podcast
+    public static let userQueueInsert = UIImage.create("user_queue_insert") // SF-Symbols 5 Regular: custom.text.line.first.and.arrowtriangle.forward.badge.person.crop
+    public static let userQueueAppend = UIImage.create("user_queue_append") // SF-Symbols 5 Regular: custom.text.line.last.and.arrowtriangle.forward.badge.person.crop
+    public static let contextQueueInsert = UIImage.create("context_queue_insert") // SF-Symbols 5 Regular: custom.text.line.first.and.arrowtriangle.forward
+    public static let contextQueueAppend = UIImage.create("context_queue_append") // SF-Symbols 5 Regular: custom.text.line.last.and.arrowtriangle.forward
+    public static let podcastQueueInsert = contextQueueInsert
+    public static let podcastQueueAppend = contextQueueAppend
+    
+    public static let songArtwork = UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small)
+    public static let albumArtwork = UIImage.createArtwork(with: UIImage.album, iconSizeType: .big)
+    public static let genreArtwork = UIImage.createArtwork(with: UIImage.genre, iconSizeType: .big)
+    public static let artistArtwork = UIImage.createArtwork(with: UIImage.artist, iconSizeType: .big)
+    public static let podcastArtwork = UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .big)
+    public static let podcastEpisodeArtwork = UIImage.createArtwork(with: UIImage.podcastEpisode, iconSizeType: .small)
+    public static let playlistArtwork = UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, switchColors: true)
     
     private static func create(_ named: String) -> UIImage {
         return UIImage(named: named) ?? UIImage()
+    }
+    private static func create(systemName: String) -> UIImage {
+        return UIImage(systemName: systemName) ?? UIImage()
     }
     
     public static func createArtwork(with image: UIImage, iconSizeType: ArtworkIconSizeType, switchColors: Bool = false) -> UIImage {

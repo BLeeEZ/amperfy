@@ -109,7 +109,7 @@ public enum SwipeActionType: Int, CaseIterable {
         case .removeFromCache:
             return UIImage.trash
         case .addToPlaylist:
-            return UIImage.playlistBlack
+            return UIImage.playlist
         case .play:
             return UIImage.play
         case .playShuffled:

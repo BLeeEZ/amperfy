@@ -32,7 +32,7 @@ class PlayableTableCell: BasicTableCell {
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var downloadProgress: UIProgressView!
-    @IBOutlet weak var reorderLabel: UILabel?
+    @IBOutlet weak var reorderImage: UIImageView?
     @IBOutlet weak var cacheIconImage: UIImageView!
     @IBOutlet weak var artistLabelLeadingConstraint: NSLayoutConstraint!
     
@@ -75,16 +75,16 @@ class PlayableTableCell: BasicTableCell {
         entityImage.display(container: playable)
         
         if playerIndexCb != nil {
-            self.reorderLabel?.isHidden = false
-            self.reorderLabel?.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Bars.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
+            self.reorderImage?.isHidden = false
+            self.reorderImage?.image = .bars
         } else if download?.error != nil {
-            self.reorderLabel?.isHidden = false
-            self.reorderLabel?.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Exclamation.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 25)!])
+            self.reorderImage?.isHidden = false
+            self.reorderImage?.image = .exclamation
         } else if download?.isFinishedSuccessfully ?? false {
-            self.reorderLabel?.isHidden = false
-            self.reorderLabel?.attributedText = NSMutableAttributedString(string: FontAwesomeIcon.Check.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName, size: 17)!])
+            self.reorderImage?.isHidden = false
+            self.reorderImage?.image = .check
         } else {
-            self.reorderLabel?.isHidden = true
+            self.reorderImage?.isHidden = true
         }
         
         refreshSubtitleColor()

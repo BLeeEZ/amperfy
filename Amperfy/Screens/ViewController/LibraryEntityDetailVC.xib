@@ -281,7 +281,7 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="984" height="50"/>
                                                     <color key="backgroundColor" systemColor="systemFillColor"/>
                                                     <inset key="imageEdgeInsets" minX="0.0" minY="8" maxX="24" maxY="8"/>
-                                                    <state key="normal" title="Insert Podcast Queue" image="podcast_queue_insert"/>
+                                                    <state key="normal" title="Insert Podcast Queue" image="context_queue_insert"/>
                                                     <connections>
                                                         <action selector="pressedInsertPodcastQueue:" destination="-1" eventType="touchUpInside" id="ZZG-cG-Poc"/>
                                                     </connections>
@@ -290,7 +290,7 @@
                                                     <rect key="frame" x="0.0" y="51" width="984" height="50"/>
                                                     <color key="backgroundColor" systemColor="systemFillColor"/>
                                                     <inset key="imageEdgeInsets" minX="0.0" minY="8" maxX="10" maxY="8"/>
-                                                    <state key="normal" title="Append Podcast Queue" image="podcast_queue_append"/>
+                                                    <state key="normal" title="Append Podcast Queue" image="context_queue_append"/>
                                                     <connections>
                                                         <action selector="pressedAppendPodcastQueue:" destination="-1" eventType="touchUpInside" id="gOQ-tT-W17"/>
                                                     </connections>
@@ -316,8 +316,10 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="Yn5-c3-LL4"/>
                                             </constraints>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="3" maxY="10"/>
-                                            <state key="normal" title="Play" image="play"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Play">
+                                                <imageReference key="image" image="play.fill" catalog="system" symbolScale="medium"/>
+                                            </state>
                                             <connections>
                                                 <action selector="pressedPlay:" destination="-1" eventType="touchUpInside" id="gFi-Ep-1tY"/>
                                             </connections>
@@ -328,8 +330,10 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="Zw7-lt-bM2"/>
                                             </constraints>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="5" maxY="10"/>
-                                            <state key="normal" title="Play Shuffled" image="shuffle"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                            <state key="normal" title="Play Shuffled">
+                                                <imageReference key="image" image="shuffle" catalog="system" symbolScale="medium"/>
+                                            </state>
                                             <connections>
                                                 <action selector="pressPlayShuffled:" destination="-1" eventType="touchUpInside" id="ESg-bw-nRp"/>
                                             </connections>
@@ -551,34 +555,32 @@
     <resources>
         <image name="arrow.down.circle" catalog="system" width="128" height="123"/>
         <image name="clear" catalog="system" width="128" height="114"/>
-        <image name="context_queue_append" width="30" height="30"/>
-        <image name="context_queue_insert" width="30" height="30"/>
+        <image name="context_queue_append" width="14" height="10"/>
+        <image name="context_queue_insert" width="14" height="10"/>
         <image name="doc.on.doc" catalog="system" width="116" height="128"/>
         <image name="info.circle" catalog="system" width="128" height="123"/>
-        <image name="play" width="30" height="30"/>
-        <image name="podcast_queue_append" width="30" height="30"/>
-        <image name="podcast_queue_insert" width="30" height="30"/>
-        <image name="shuffle" width="30" height="30"/>
+        <image name="play.fill" catalog="system" width="117" height="128"/>
+        <image name="shuffle" catalog="system" width="128" height="95"/>
         <image name="text.badge.plus" catalog="system" width="128" height="107"/>
         <image name="text.badge.xmark" catalog="system" width="128" height="107"/>
         <image name="trash" catalog="system" width="117" height="128"/>
-        <image name="user_queue_append" width="30" height="30"/>
-        <image name="user_queue_insert" width="30" height="30"/>
+        <image name="user_queue_append" width="17" height="12"/>
+        <image name="user_queue_insert" width="17" height="13"/>
         <image name="xmark.icloud" catalog="system" width="128" height="90"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemFillColor">
-            <color red="0.47058823529999999" green="0.47058823529999999" blue="0.50196078430000002" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.47058823529411764" green="0.47058823529411764" blue="0.50196078431372548" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="tintColor">
-            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

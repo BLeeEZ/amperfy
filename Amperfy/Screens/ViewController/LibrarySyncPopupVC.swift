@@ -31,7 +31,7 @@ enum PopupIconAnimation {
 
 class LibrarySyncPopupVC: UIViewController {
     
-    @IBOutlet weak var iconLabel: UILabel!
+    @IBOutlet weak var iconImage: UIImageView!
     @IBOutlet weak var iconBackgroundLabel: UILabel!
     @IBOutlet weak var titelLabel: UILabel!
     @IBOutlet weak var infoLabel: UILabel!
@@ -46,7 +46,7 @@ class LibrarySyncPopupVC: UIViewController {
     var logType = LogEntryType.info
     var onClose: (() -> Void)?
     private var popupColor = UIColor.systemBlue
-    private var icon = FontAwesomeIcon.Sync
+    private var icon = UIImage.refresh
     private var iconAnimation = PopupIconAnimation.zoomInZoomOut
     private var closeButtonOnPressed: ((Bool) -> Void)?
     private var optionalButtonText: String?
@@ -63,17 +63,17 @@ class LibrarySyncPopupVC: UIViewController {
         } else {
             optionalButton.removeFromSuperview()
         }
-        iconLabel.layer.cornerRadius = iconLabel.frame.width / 2
-        iconLabel.layer.masksToBounds = true
-        iconBackgroundLabel.layer.cornerRadius = iconLabel.frame.width / 2
+        iconImage.layer.cornerRadius = iconImage.frame.width / 2
+        iconImage.layer.masksToBounds = true
+        iconBackgroundLabel.layer.cornerRadius = iconImage.frame.width / 2
         iconBackgroundLabel.layer.masksToBounds = true
         contentView.layer.cornerRadius = 15
         
         self.contentView.backgroundColor = popupColor
-        self.iconLabel.backgroundColor = .clear
+        self.iconImage.backgroundColor = .clear
         self.iconBackgroundLabel.backgroundColor = popupColor
         
-        iconLabel.text = icon.asString
+        iconImage.image = icon
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -125,7 +125,7 @@ class LibrarySyncPopupVC: UIViewController {
         }
     }
     
-    func setContent(topic: String, shortMessage: String?, detailMessage: String, clipboardContent: String?, type: LogEntryType, customIcon: FontAwesomeIcon? = nil, customAnimation: PopupIconAnimation? = nil, onClosePressed: ((Bool) -> Void)? = nil) {
+    func setContent(topic: String, shortMessage: String?, detailMessage: String, clipboardContent: String?, type: LogEntryType, customIcon: UIImage? = nil, customAnimation: PopupIconAnimation? = nil, onClosePressed: ((Bool) -> Void)? = nil) {
         self.topic = topic
         self.shortMessage = shortMessage ?? ""
         self.message = detailMessage
@@ -143,16 +143,16 @@ class LibrarySyncPopupVC: UIViewController {
         switch type {
         case .apiError:
             popupColor = .red
-            self.icon = customIcon != nil ? customIcon! : .Exclamation
+            self.icon = customIcon != nil ? customIcon! : .exclamation
         case .error:
             popupColor = .red
-            self.icon = customIcon != nil ? customIcon! : .Exclamation
+            self.icon = customIcon != nil ? customIcon! : .exclamation
         case .info:
             popupColor = .defaultBlue
-            self.icon = customIcon != nil ? customIcon! : .Info
+            self.icon = customIcon != nil ? customIcon! : .info
         case .debug:
             popupColor = .systemGray
-            self.icon = customIcon != nil ? customIcon! : .Info
+            self.icon = customIcon != nil ? customIcon! : .info
         }
     }
     
@@ -163,26 +163,26 @@ class LibrarySyncPopupVC: UIViewController {
     
     private func animateIconRotation() {
         UIView.animate(withDuration: 5, delay: 0, options: .repeat, animations: ({
-            self.iconLabel.transform = CGAffineTransform(rotationAngle: CGFloat.pi)
+            self.iconImage.transform = CGAffineTransform(rotationAngle: CGFloat.pi)
         }), completion: nil)
     }
     
     private func animateIconZoomInZoomOut() {
         UIView.animate(withDuration: 3, delay: 0, options: [], animations: ({
-            self.iconLabel.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+            self.iconImage.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
         }), completion: nil)
         UIView.animate(withDuration: 3, delay: 3, options: [.repeat, .autoreverse], animations: ({
-            self.iconLabel.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+            self.iconImage.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
         }), completion: nil)
     }
     
     private func animateSwing() {
         let rotationAngle = 0.18*CGFloat.pi
         UIView.animate(withDuration: 1.5, delay: 0, options: [], animations: ({
-            self.iconLabel.transform = CGAffineTransform(rotationAngle: rotationAngle)
+            self.iconImage.transform = CGAffineTransform(rotationAngle: rotationAngle)
         }), completion: nil)
         UIView.animate(withDuration: 3, delay: 1.5, options: [.repeat, .autoreverse], animations: ({
-            self.iconLabel.transform = CGAffineTransform(rotationAngle: -rotationAngle)
+            self.iconImage.transform = CGAffineTransform(rotationAngle: -rotationAngle)
         }), completion: nil)
     }
     

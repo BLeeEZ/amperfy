@@ -27,7 +27,7 @@ class DirectoryTableCell: BasicTableCell {
     
     @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var artworkImage: LibraryEntityImage!
-    @IBOutlet weak var iconLabel: UILabel!
+    @IBOutlet weak var iconImage: UIImageView!
     
     static let rowHeight: CGFloat = 40.0 + margin.bottom + margin.top
     
@@ -70,7 +70,7 @@ class DirectoryTableCell: BasicTableCell {
     }
     
     private func refresh() {
-        iconLabel.isHidden = true
+        iconImage.isHidden = true
         artworkImage.isHidden = true
         
         if let directory = directory {
@@ -79,11 +79,11 @@ class DirectoryTableCell: BasicTableCell {
             if let artwork = directory.artwork, let directoryImage = artwork.image, directoryImage != directory.defaultImage {
                 artworkImage.isHidden = false
             } else {
-                iconLabel.isHidden = false
+                iconImage.isHidden = false
             }
         } else if let folder = folder {
             infoLabel.text = folder.name
-            iconLabel.isHidden = false
+            iconImage.isHidden = false
         }
     }
 

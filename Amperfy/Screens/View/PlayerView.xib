@@ -9,11 +9,6 @@
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="Font Awesome 5 Free-Solid-900.otf">
-            <string>FontAwesome5FreeSolid</string>
-        </array>
-    </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -112,8 +107,9 @@
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <color key="tintColor" systemColor="labelColor"/>
                     <inset key="contentEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
-                    <state key="normal" image="player_style_compact">
+                    <state key="normal">
                         <color key="titleColor" systemColor="labelColor"/>
+                        <imageReference key="image" image="rectangle.portrait.inset.filled" catalog="system" symbolScale="medium"/>
                     </state>
                     <connections>
                         <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
@@ -127,8 +123,9 @@
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <color key="tintColor" systemColor="labelColor"/>
-                    <state key="normal" image="airplay">
+                    <state key="normal">
                         <color key="titleColor" systemColor="labelColor"/>
+                        <imageReference key="image" image="airplayaudio" catalog="system" symbolScale="medium"/>
                     </state>
                     <connections>
                         <action selector="airplayButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YPY-8P-oS2"/>
@@ -141,8 +138,9 @@
                         <constraint firstAttribute="width" secondItem="0xq-hb-FZa" secondAttribute="height" multiplier="1:1" id="ND9-Bu-dGG"/>
                     </constraints>
                     <color key="tintColor" systemColor="labelColor"/>
-                    <state key="normal" image="ellipsis">
+                    <state key="normal">
                         <color key="titleColor" systemColor="labelColor"/>
+                        <imageReference key="image" image="ellipsis" catalog="system" symbolScale="medium"/>
                     </state>
                     <connections>
                         <action selector="optionsPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="GoF-SV-ZGx"/>
@@ -165,8 +163,9 @@
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <color key="tintColor" systemColor="labelColor"/>
                     <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
-                    <state key="normal" image="musical_notes">
+                    <state key="normal">
                         <color key="titleColor" systemColor="labelColor"/>
+                        <imageReference key="image" image="music.note" catalog="system" symbolScale="medium"/>
                     </state>
                     <connections>
                         <action selector="playerModeChangePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="WMf-zb-HxJ"/>
@@ -213,17 +212,18 @@
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="w3n-lC-0kw">
                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                             <subviews>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zaZ-s9-erE" userLabel="Repeat Button">
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zaZ-s9-erE" userLabel="Repeat Button">
                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="50" id="VJG-iL-rq6"/>
                                     </constraints>
-                                    <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="18"/>
-                                    <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    <state key="normal" title="">
+                                    <color key="tintColor" systemColor="labelColor"/>
+                                    <state key="normal">
                                         <color key="titleColor" systemColor="labelColor"/>
+                                        <imageReference key="image" image="repeat.circle" catalog="system" symbolScale="default"/>
+                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="25"/>
                                     </state>
-                                    <state key="selected" title=" all">
+                                    <state key="selected">
                                         <color key="titleColor" systemColor="labelColor"/>
                                     </state>
                                     <connections>
@@ -265,17 +265,19 @@
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal" image="backward.fill" catalog="system">
                                 <color key="titleColor" systemColor="labelColor"/>
-                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="45"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="30"/>
                             </state>
                             <connections>
                                 <action selector="previousButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="UBQ-J2-BCO"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Byk-rx-3Lv">
-                            <rect key="frame" x="151.5" y="0.0" width="40" height="50"/>
-                            <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
-                            <state key="normal" title="">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Byk-rx-3Lv">
+                            <rect key="frame" x="152" y="3.5" width="39.5" height="43.5"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="play.fill" catalog="system" symbolScale="default"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="45"/>
                             </state>
                             <connections>
                                 <action selector="playButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="x3u-6i-ytK"/>
@@ -291,7 +293,7 @@
                             <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
                                 <imageReference key="image" image="forward.fill" catalog="system" symbolScale="default" variableValue="1"/>
-                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="45"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="30"/>
                             </state>
                             <connections>
                                 <action selector="nextButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="aSu-T2-0y0"/>
@@ -315,34 +317,37 @@
                             </connections>
                         </button>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jwJ-pR-7DE">
-                            <rect key="frame" x="293" y="14" width="50" height="22"/>
+                            <rect key="frame" x="293" y="0.0" width="50" height="50"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="O8u-Ea-HfT" userLabel="Show Podcast Description Button">
-                                    <rect key="frame" x="14" y="0.0" width="22" height="22"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="O8u-Ea-HfT" secondAttribute="height" multiplier="1:1" id="Ktg-j2-iQF"/>
                                         <constraint firstAttribute="width" secondItem="O8u-Ea-HfT" secondAttribute="height" multiplier="1:1" id="Mpt-Ub-6cH"/>
-                                        <constraint firstAttribute="width" constant="22" id="V4Y-km-vhQ"/>
+                                        <constraint firstAttribute="width" constant="50" id="V4Y-km-vhQ"/>
                                     </constraints>
-                                    <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="tintColor" systemColor="labelColor"/>
                                     <inset key="imageEdgeInsets" minX="-6" minY="0.0" maxX="-6" maxY="-6"/>
                                     <state key="normal">
                                         <color key="titleColor" systemColor="labelColor"/>
-                                        <imageReference key="image" image="info.circle" catalog="system" symbolScale="large"/>
+                                        <imageReference key="image" image="info.circle" catalog="system" symbolScale="default"/>
+                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="25"/>
                                     </state>
                                     <connections>
                                         <action selector="showPodcastDescriptionButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="bPf-Ow-GWL"/>
                                     </connections>
                                 </button>
                                 <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhL-mu-zks" userLabel="Shuffle Button">
-                                    <rect key="frame" x="14" y="0.0" width="22" height="22"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="mhL-mu-zks" secondAttribute="height" multiplier="1:1" id="2P5-5Q-SoR"/>
-                                        <constraint firstAttribute="width" constant="22" id="Uch-8S-cDq"/>
+                                        <constraint firstAttribute="width" constant="50" id="Uch-8S-cDq"/>
                                     </constraints>
-                                    <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    <state key="normal" image="shuffle">
+                                    <color key="tintColor" systemColor="labelColor"/>
+                                    <state key="normal">
                                         <color key="titleColor" systemColor="labelColor"/>
+                                        <imageReference key="image" image="shuffle.circle" catalog="system" symbolScale="default"/>
+                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="25"/>
                                     </state>
                                     <connections>
                                         <action selector="shuffleButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="s11-0d-7rF"/>
@@ -368,16 +373,17 @@
                         <constraint firstAttribute="height" constant="50" id="dq3-fM-BgC"/>
                     </constraints>
                 </stackView>
-                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MoM-N8-wb9" userLabel="Playback Rate Button">
+                <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="leading" contentVerticalAlignment="top" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MoM-N8-wb9" userLabel="Playback Rate Button">
                     <rect key="frame" x="223" y="15" width="40" height="40"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="MoM-N8-wb9" secondAttribute="height" multiplier="1:1" id="A0O-7N-2HB"/>
                         <constraint firstAttribute="width" constant="40" id="iqC-rY-gI6"/>
                     </constraints>
                     <color key="tintColor" systemColor="labelColor"/>
-                    <inset key="contentEdgeInsets" minX="10" minY="11" maxX="8" maxY="7"/>
-                    <state key="normal" image="gauge">
-                        <color key="titleColor" systemColor="labelColor"/>
+                    <inset key="imageEdgeInsets" minX="12" minY="9" maxX="0.0" maxY="0.0"/>
+                    <state key="normal">
+                        <imageReference key="image" image="gauge" symbolScale="medium"/>
+                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="20"/>
                     </state>
                 </button>
                 <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FVB-BI-Jue" userLabel="Sleep Timer Button">
@@ -389,8 +395,9 @@
                     </constraints>
                     <color key="tintColor" systemColor="labelColor"/>
                     <inset key="contentEdgeInsets" minX="8" minY="8" maxX="8" maxY="8"/>
-                    <state key="normal" image="moon.zzz.fill" catalog="system">
+                    <state key="normal">
                         <color key="titleColor" systemColor="labelColor"/>
+                        <imageReference key="image" image="moon.zzz.fill" catalog="system" symbolScale="medium"/>
                     </state>
                 </button>
             </subviews>
@@ -523,18 +530,20 @@
         </designable>
     </designables>
     <resources>
-        <image name="airplay" width="20" height="20"/>
+        <image name="airplayaudio" catalog="system" width="128" height="123"/>
         <image name="backward.fill" catalog="system" width="128" height="77"/>
-        <image name="ellipsis" width="18.417999267578125" height="3.9160199165344238"/>
+        <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="forward.fill" catalog="system" width="128" height="77"/>
-        <image name="gauge" width="168" height="145"/>
+        <image name="gauge" width="11" height="9"/>
         <image name="gobackward.10" catalog="system" width="119" height="128"/>
         <image name="goforward.10" catalog="system" width="119" height="128"/>
         <image name="info.circle" catalog="system" width="128" height="123"/>
         <image name="moon.zzz.fill" catalog="system" width="117" height="128"/>
-        <image name="musical_notes" width="30" height="30"/>
-        <image name="player_style_compact" width="16.425800323486328" height="20.947299957275391"/>
-        <image name="shuffle" width="30" height="30"/>
+        <image name="music.note" catalog="system" width="96" height="128"/>
+        <image name="play.fill" catalog="system" width="117" height="128"/>
+        <image name="rectangle.portrait.inset.filled" catalog="system" width="115" height="128"/>
+        <image name="repeat.circle" catalog="system" width="128" height="123"/>
+        <image name="shuffle.circle" catalog="system" width="128" height="123"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

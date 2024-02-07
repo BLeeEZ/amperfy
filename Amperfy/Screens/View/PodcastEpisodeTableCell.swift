@@ -101,13 +101,13 @@ class PodcastEpisodeTableCell: BasicTableCell {
     private func configurePlayEpisodeButton() {
         guard let episode = self.episode else { return }
         if episode == appDelegate.player.currentlyPlaying {
-            playEpisodeButton.setTitle("", for: .normal)
+            playEpisodeButton.setImage(nil, for: .normal)
             playEpisodeButton.isEnabled = false
         } else if episode.isAvailableToUser {
-            playEpisodeButton.setTitle(FontAwesomeIcon.Play.asString, for: .normal)
+            playEpisodeButton.setImage(.play, for: .normal)
             playEpisodeButton.isEnabled = true
         } else {
-            playEpisodeButton.setTitle(FontAwesomeIcon.Ban.asString, for: .normal)
+            playEpisodeButton.setImage(.ban, for: .normal)
             playEpisodeButton.isEnabled = false
         }
         

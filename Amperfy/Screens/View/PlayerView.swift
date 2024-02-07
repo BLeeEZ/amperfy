@@ -108,7 +108,7 @@ class PlayerView: UIView {
     
     @IBAction func playButtonPushed(_ sender: Any) {
         player.togglePlayPause()
-        refreshPlayButtonTitle()
+        refreshPlayButton()
     }
     
     @IBAction func previousButtonPushed(_ sender: Any) {
@@ -431,18 +431,15 @@ class PlayerView: UIView {
         refreshLabelColor()
     }
     
-    func refreshPlayButtonTitle() {
-        var title = ""
+    func refreshPlayButton() {
         var buttonImg = UIImage()
         if player.isPlaying {
-            title = FontAwesomeIcon.Pause.asString
             buttonImg = UIImage.pause
         } else {
-            title = FontAwesomeIcon.Play.asString
             buttonImg = UIImage.play
         }
         
-        playButton.setTitle(title, for: UIControl.State.normal)
+        playButton.setImage(buttonImg, for: UIControl.State.normal)
         let barButtonItem = UIBarButtonItem(image: buttonImg, style: .plain, target: self, action: #selector(PlayerView.playButtonPushed))
         rootView?.popupItem.trailingBarButtonItems = [ barButtonItem ]
     }
@@ -569,7 +566,7 @@ class PlayerView: UIView {
     
     func refreshPlayer() {
         refreshCurrentlyPlayingInfo()
-        refreshPlayButtonTitle()
+        refreshPlayButton()
         refreshTimeInfo()
         refreshPrevNextButtons()
         refreshRepeatButton()
@@ -598,13 +595,13 @@ class PlayerView: UIView {
         UIView.performWithoutAnimation {
             switch player.repeatMode {
             case .off:
-                repeatButton.setTitle(FontAwesomeIcon.Redo.asString, for: UIControl.State.normal)
+                repeatButton.setImage(.repeatOff, for: .normal)
                 repeatButton.isSelected = false
             case .all:
-                repeatButton.setTitle(FontAwesomeIcon.Redo.asString + " all", for: UIControl.State.selected)
+                repeatButton.setImage(.repeatAll, for: .selected)
                 repeatButton.isSelected = true
             case .single:
-                repeatButton.setTitle(FontAwesomeIcon.Redo.asString + " 1", for: UIControl.State.selected)
+                repeatButton.setImage(.repeatOne, for: .selected)
                 repeatButton.isSelected = true
             }
             repeatButton.layoutIfNeeded()
@@ -614,20 +611,17 @@ class PlayerView: UIView {
     func refreshShuffleButton() {
         shuffleButton.imageView?.contentMode = .scaleAspectFit
         if player.isShuffle {
-            shuffleButton.setImage(UIImage.shuffle.withRenderingMode(.alwaysTemplate), for: .normal)
+            shuffleButton.setImage(UIImage.shuffleOn, for: .normal)
             shuffleButton.tintColor = .labelColor
         } else {
-            shuffleButton.setImage(UIImage.shuffleOff.withRenderingMode(.alwaysTemplate), for: .normal)
+            shuffleButton.setImage(UIImage.shuffleOff, for: .normal)
             shuffleButton.tintColor = .labelColor
         }
     }
     
     func refreshShowPodcastDescriptionButton() {
-        showPodcastDescriptionButton.imageView?.contentMode = .scaleAspectFit
-        showPodcastDescriptionButton.setImage(UIImage.info.withRenderingMode(.alwaysTemplate), for: .normal)
+        showPodcastDescriptionButton.setImage(.info, for: .normal)
         showPodcastDescriptionButton.tintColor = .labelColor
-        showPodcastDescriptionButton.contentVerticalAlignment = .fill
-        showPodcastDescriptionButton.contentHorizontalAlignment = .fill
     }
     
     func refreshPlaybackRateButton() {

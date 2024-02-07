@@ -96,9 +96,9 @@ class RatingView: UIView {
             let isFavorite = ratingSong?.isFavorite ?? ratingAlbum?.isFavorite ?? ratingArtist?.isFavorite ?? false
             for (index, button) in stars.enumerated() {
                 if index < rating {
-                    button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameSolid, size: 30)!]), for: .normal)
+                    button.setImage(UIImage.starFill, for: .normal)
                 } else {
-                    button.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Star.asString, attributes: [NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontNameRegular, size: 30)!]), for: .normal)
+                    button.setImage(UIImage.starEmpty, for: .normal)
                 }
                 button.isEnabled = self.appDelegate.storage.settings.isOnlineMode
                 button.setTitleColor(self.appDelegate.storage.settings.isOnlineMode ? activeStarColor : inactiveStarColor, for: .normal)
@@ -107,8 +107,8 @@ class RatingView: UIView {
             }
             clearRatingButton.isEnabled = self.appDelegate.storage.settings.isOnlineMode
             
-            let favoriteActiveFontName = isFavorite ? FontAwesomeIcon.fontNameSolid : FontAwesomeIcon.fontNameRegular
-            favorite.setAttributedTitle(NSMutableAttributedString(string: FontAwesomeIcon.Heart.asString, attributes: [NSAttributedString.Key.font: UIFont(name: favoriteActiveFontName, size: 30)!]), for: .normal)
+            let favoriteIcon = isFavorite ? UIImage.heartFill : UIImage.heartEmpty
+            favorite.setImage(favoriteIcon, for: .normal)
             favorite.isEnabled = self.appDelegate.storage.settings.isOnlineMode
             favorite.setTitleColor(self.appDelegate.storage.settings.isOnlineMode ? activeFavoriteColor : inactiveStarColor, for: .normal)
             favorite.tintColor = self.appDelegate.storage.settings.isOnlineMode ? activeFavoriteColor : inactiveStarColor

@@ -146,7 +146,7 @@ extension BasicTableViewController {
         if actionType == .favorite {
             action.image = preCbContainable.isFavorite ? UIImage.heartFill : UIImage.heartEmpty
         } else {
-            action.image = actionType.image.invertedImage()
+            action.image = actionType.image
         }
         return action
     }
@@ -154,7 +154,7 @@ extension BasicTableViewController {
 
 class BasicTableViewController: UITableViewController {
     
-    private static let swipeButtonColors: [UIColor] = [.defaultBlue, .systemOrange, .systemGreen, .systemGray]
+    private static let swipeButtonColors: [UIColor] = [.defaultBlue, .systemOrange, .systemPurple, .systemGray]
     
     var appDelegate: AppDelegate!
     let searchController = UISearchController(searchResultsController: nil)

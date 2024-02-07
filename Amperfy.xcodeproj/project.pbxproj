@@ -34,8 +34,6 @@
 		502E56BD27561C2700638BD2 /* PopupPlayerSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* PopupPlayerSectionHeader.xib */; };
 		5043714E27C23BF4008358AC /* FullWidthDescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5043714C27C23BF4008358AC /* FullWidthDescriptionView.swift */; };
 		5043714F27C23C0C008358AC /* FullWidthDescriptionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5043714D27C23BF4008358AC /* FullWidthDescriptionView.xib */; };
-		5045C7502850A2730095FF09 /* Font Awesome 5 Free-Solid-900.otf in Resources */ = {isa = PBXBuildFile; fileRef = 50BA932021DA4D0B00E5901D /* Font Awesome 5 Free-Solid-900.otf */; };
-		5045C7512850A2770095FF09 /* fa-regular-400.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5006BCB327959FD000D3C961 /* fa-regular-400.ttf */; };
 		504B441728D6EB370033982C /* ArtworkDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441628D6EB370033982C /* ArtworkDisplaySettings.swift */; };
 		504B441928D6F0920033982C /* LicenseSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441828D6F0920033982C /* LicenseSettingsView.swift */; };
 		504B441D28D7A6330033982C /* XCallbackURLsSetttingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441C28D7A6330033982C /* XCallbackURLsSetttingsView.swift */; };
@@ -370,10 +368,7 @@
 		50C9D6DD284FAB88007F18D0 /* BackendAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */; };
 		50C9D6DE284FAB88007F18D0 /* PlayQueueHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011712B2744FDD700B7C08D /* PlayQueueHandler.swift */; };
 		50C9D6E0284FAB96007F18D0 /* UIColorAssetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509D55EA2810086E00E0E0B5 /* UIColorAssetsExtension.swift */; };
-		50C9D6E1284FAB96007F18D0 /* FontAwesomeIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA932221DA6AFA00E5901D /* FontAwesomeIcon.swift */; };
-		50C9D6E2284FAB96007F18D0 /* Font Awesome 5 Free-Solid-900.otf in Resources */ = {isa = PBXBuildFile; fileRef = 50BA932021DA4D0B00E5901D /* Font Awesome 5 Free-Solid-900.otf */; };
 		50C9D6E3284FAB96007F18D0 /* UIImageAssetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B053AC27BFADB200D9C1ED /* UIImageAssetsExtension.swift */; };
-		50C9D6E4284FAB96007F18D0 /* fa-regular-400.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5006BCB327959FD000D3C961 /* fa-regular-400.ttf */; };
 		50C9D6E6284FABCB007F18D0 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6E5284FABCB007F18D0 /* AudioPlayer.swift */; };
 		50C9D6E9284FACAF007F18D0 /* ArtworkCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6E8284FACAF007F18D0 /* ArtworkCollection.swift */; };
 		50C9D6EB284FAD51007F18D0 /* PodcastsShowType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6EA284FAD51007F18D0 /* PodcastsShowType.swift */; };
@@ -513,7 +508,6 @@
 		500631FE23A1747B000F75A3 /* PlayerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlayerView.xib; sourceTree = "<group>"; };
 		5006320023A174C0000F75A3 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		50065EB321F0584D0066FC32 /* PlaylistSelectorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSelectorVC.swift; sourceTree = "<group>"; };
-		5006BCB327959FD000D3C961 /* fa-regular-400.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fa-regular-400.ttf"; sourceTree = "<group>"; };
 		50073BDE22301D9A000130D8 /* DownloadRequestManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadRequestManager.swift; sourceTree = "<group>"; };
 		50073BE02230245D000130D8 /* DownloadManagerSessionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManagerSessionExtension.swift; sourceTree = "<group>"; };
 		50073BE222319868000130D8 /* PlayableDownloadDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayableDownloadDelegate.swift; sourceTree = "<group>"; };
@@ -772,8 +766,6 @@
 		50BA930321D10F0000E5901D /* SyncVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncVC.swift; sourceTree = "<group>"; };
 		50BA930521D5715D00E5901D /* LibraryStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStorage.swift; sourceTree = "<group>"; };
 		50BA930721D75C5600E5901D /* AuthentificationHandshake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthentificationHandshake.swift; sourceTree = "<group>"; };
-		50BA932021DA4D0B00E5901D /* Font Awesome 5 Free-Solid-900.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font Awesome 5 Free-Solid-900.otf"; sourceTree = "<group>"; };
-		50BA932221DA6AFA00E5901D /* FontAwesomeIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesomeIcon.swift; sourceTree = "<group>"; };
 		50BE5D442850EFE100156FC6 /* AmperfyIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmperfyIntentHandler.swift; sourceTree = "<group>"; };
 		50BE5D9D2851D5DE00156FC6 /* IntentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentManager.swift; sourceTree = "<group>"; };
 		50C16BEF21E0A3B500F086F0 /* PlayerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerData.swift; sourceTree = "<group>"; };
@@ -1400,10 +1392,7 @@
 		50BA931F21DA4CEF00E5901D /* Assets */ = {
 			isa = PBXGroup;
 			children = (
-				50BA932021DA4D0B00E5901D /* Font Awesome 5 Free-Solid-900.otf */,
-				5006BCB327959FD000D3C961 /* fa-regular-400.ttf */,
 				508385EE21C5965E00C4BB32 /* Assets.xcassets */,
-				50BA932221DA6AFA00E5901D /* FontAwesomeIcon.swift */,
 				50B053AC27BFADB200D9C1ED /* UIImageAssetsExtension.swift */,
 				509D55EA2810086E00E0E0B5 /* UIColorAssetsExtension.swift */,
 			);
@@ -1913,8 +1902,6 @@
 				508FDE3821F1E14F005A0724 /* NewPlaylistTableHeader.xib in Resources */,
 				5007CE4521EF639200BC5CBA /* PlaylistTableCell.xib in Resources */,
 				50CCD0572B6C38670073793B /* PodcastDescriptionVC.xib in Resources */,
-				5045C7502850A2730095FF09 /* Font Awesome 5 Free-Solid-900.otf in Resources */,
-				5045C7512850A2770095FF09 /* fa-regular-400.ttf in Resources */,
 				508EBB282850C8D90053D9F0 /* Assets.xcassets in Resources */,
 				508385ED21C5965B00C4BB32 /* Main.storyboard in Resources */,
 			);
@@ -1932,9 +1919,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				50C9D71D2850880A007F18D0 /* EntityImageView.xib in Resources */,
-				50C9D6E2284FAB96007F18D0 /* Font Awesome 5 Free-Solid-900.otf in Resources */,
 				508EBB292850C8DF0053D9F0 /* Assets.xcassets in Resources */,
-				50C9D6E4284FAB96007F18D0 /* fa-regular-400.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2212,7 +2197,6 @@
 				50C9D64D284FAA02007F18D0 /* SubsonicArtworkDownloadDelegate.swift in Sources */,
 				50C9D6D0284FAB0C007F18D0 /* ConcurrentTaskGroup.swift in Sources */,
 				50BE5D9828511C3800156FC6 /* Amperfy.xcdatamodeld in Sources */,
-				50C9D6E1284FAB96007F18D0 /* FontAwesomeIcon.swift in Sources */,
 				50C9D65B284FAA0B007F18D0 /* PodcastParserDelegate.swift in Sources */,
 				50C9D6CC284FAB0C007F18D0 /* Intents.intentdefinition in Sources */,
 				50C9D67F284FAA6C007F18D0 /* LogEntryMO+CoreDataProperties.swift in Sources */,

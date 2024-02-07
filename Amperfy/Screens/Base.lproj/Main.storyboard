@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="Font Awesome 5 Free-Solid-900.otf">
-            <string>FontAwesome5FreeSolid</string>
-        </array>
-    </customFonts>
     <scenes>
         <!--LoginVC-->
         <scene sceneID="tne-QT-ifu">
@@ -113,9 +109,10 @@
                                     <constraint firstAttribute="height" constant="30" id="Y5U-L5-OQV"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="tintColor" systemColor="labelColor"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="11" maxX="4" maxY="11"/>
                                 <state key="normal" title="ApiType">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <imageReference key="image" image="arrowtriangle.down.fill" catalog="system" symbolScale="small"/>
                                 </state>
                                 <connections>
                                     <action selector="apiSelectorPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="eXq-Bl-Gd8"/>
@@ -380,9 +377,9 @@
         <scene sceneID="2oE-zy-AcU">
             <objects>
                 <navigationController id="Xme-l1-fiY" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Search" image="search" selectedImage="search" id="6F7-ce-EiN"/>
+                    <tabBarItem key="tabBarItem" title="Search" image="magnifyingglass" catalog="system" selectedImage="magnifyingglass" id="6F7-ce-EiN"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="q5a-rn-qe1">
-                        <rect key="frame" x="0.0" y="48" width="414" height="96"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -440,10 +437,10 @@
         <scene sceneID="04c-tK-1Hj">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hgg-wk-1fD" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Library" image="music_library" selectedImage="music_library" id="wHf-aA-izU"/>
+                    <tabBarItem key="tabBarItem" title="Library" image="music.note.house" catalog="system" selectedImage="music.note.house" id="wHf-aA-izU"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="VnR-3z-lih">
-                        <rect key="frame" x="0.0" y="48" width="414" height="96"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textAttributes key="largeTitleTextAttributes">
                             <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
@@ -560,18 +557,28 @@
                                             <constraint firstAttribute="width" secondItem="3k1-vq-TUe" secondAttribute="height" multiplier="1:1" id="WGU-mK-IIK"/>
                                             <constraint firstAttribute="height" constant="100" id="c3O-6Q-w1o"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="45"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ycx-rF-ag8" userLabel="Icon Label">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LaP-GD-BAs">
+                                        <rect key="frame" x="105" y="-23.5" width="100" height="87"/>
+                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="100" id="4zW-ma-IiG"/>
+                                            <constraint firstAttribute="width" constant="100" id="GEN-0c-Nli"/>
+                                        </constraints>
+                                        <imageReference key="image" image="arrow.triangle.2.circlepath" catalog="system" symbolScale="small"/>
+                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="50"/>
+                                    </imageView>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ycx-rF-ag8" userLabel="Icon Label">
                                         <rect key="frame" x="105" y="-30" width="100" height="100"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="100" id="M75-dZ-Hrf"/>
+                                            <constraint firstAttribute="width" secondItem="Ycx-rF-ag8" secondAttribute="height" multiplier="1:1" id="Jli-3c-8Xi"/>
                                             <constraint firstAttribute="height" constant="100" id="ZwS-fP-UEt"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="45"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="45"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
@@ -595,9 +602,11 @@
                                     <constraint firstItem="Jwb-Ck-Kjx" firstAttribute="centerX" secondItem="a7T-Uc-nlO" secondAttribute="centerX" id="I1v-ZT-Xyj"/>
                                     <constraint firstAttribute="height" constant="360" id="IUC-UO-cZW"/>
                                     <constraint firstItem="3k1-vq-TUe" firstAttribute="centerY" secondItem="Ycx-rF-ag8" secondAttribute="centerY" id="JZw-uQ-58i"/>
+                                    <constraint firstItem="LaP-GD-BAs" firstAttribute="centerX" secondItem="a7T-Uc-nlO" secondAttribute="centerX" id="QNX-vS-Ud7"/>
                                     <constraint firstItem="RpK-J6-8f1" firstAttribute="topMargin" secondItem="bih-od-ZMX" secondAttribute="bottomMargin" constant="20" id="VjD-SV-cP4"/>
                                     <constraint firstAttribute="width" constant="310" id="ZSr-Sn-Zqg"/>
                                     <constraint firstItem="3k1-vq-TUe" firstAttribute="centerX" secondItem="Ycx-rF-ag8" secondAttribute="centerX" id="c2s-gx-8NX"/>
+                                    <constraint firstItem="bih-od-ZMX" firstAttribute="top" secondItem="LaP-GD-BAs" secondAttribute="bottom" constant="-10" id="diV-Zc-5v4"/>
                                     <constraint firstAttribute="trailingMargin" secondItem="RpK-J6-8f1" secondAttribute="trailingMargin" constant="10" id="gHO-TN-izc"/>
                                     <constraint firstItem="Ycx-rF-ag8" firstAttribute="centerX" secondItem="a7T-Uc-nlO" secondAttribute="centerX" id="ghe-J7-mg2"/>
                                     <constraint firstItem="Jwb-Ck-Kjx" firstAttribute="top" secondItem="RpK-J6-8f1" secondAttribute="bottom" constant="10" id="hQB-Jm-ThM"/>
@@ -619,7 +628,7 @@
                     <connections>
                         <outlet property="contentView" destination="a7T-Uc-nlO" id="2cL-fE-b6Q"/>
                         <outlet property="iconBackgroundLabel" destination="3k1-vq-TUe" id="ASH-QP-SiO"/>
-                        <outlet property="iconLabel" destination="Ycx-rF-ag8" id="aAS-6r-g5c"/>
+                        <outlet property="iconImage" destination="LaP-GD-BAs" id="IQD-A3-7og"/>
                         <outlet property="infoLabel" destination="RpK-J6-8f1" id="gLZ-ks-2pz"/>
                         <outlet property="optionalButton" destination="Jwb-Ck-Kjx" id="iyn-by-SNQ"/>
                         <outlet property="titelLabel" destination="bih-od-ZMX" id="Th8-2y-rmp"/>
@@ -638,7 +647,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Syncing" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Hu-Ks-SWY">
-                                <rect key="frame" x="176.5" y="153" width="61" height="21"/>
+                                <rect key="frame" x="176.5" y="105" width="61" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="uSi-BX-2HO"/>
                                 </constraints>
@@ -647,12 +656,12 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="npf-bB-pkf">
-                                <rect key="frame" x="25" y="262" width="364" height="4"/>
+                                <rect key="frame" x="25" y="214" width="364" height="4"/>
                                 <color key="progressTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="trackTintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </progressView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100.0%" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KKh-tQ-byV">
-                                <rect key="frame" x="329" y="274" width="60" height="21"/>
+                                <rect key="frame" x="329" y="226" width="60" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="hbQ-OO-Ail"/>
                                 </constraints>
@@ -661,7 +670,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qe5-xR-nU8">
-                                <rect key="frame" x="25" y="274" width="29" height="21"/>
+                                <rect key="frame" x="25" y="226" width="29" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -760,7 +769,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bcG-FU-Xh9">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="813"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="847"/>
                                 <connections>
                                     <segue destination="Wdk-bS-aW2" kind="embed" destinationCreationSelector="segueToSwiftUI:" id="rgx-91-t0t"/>
                                 </connections>
@@ -775,7 +784,7 @@
                             <constraint firstItem="bcG-FU-Xh9" firstAttribute="top" secondItem="hwu-20-I2H" secondAttribute="top" id="hpc-ft-5Pw"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Settings" image="settings" selectedImage="settings" id="mhi-Cu-jvN"/>
+                    <tabBarItem key="tabBarItem" title="Settings" image="gear" catalog="system" selectedImage="gear" id="mhi-Cu-jvN"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3VL-ED-PZd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -948,17 +957,16 @@
         <segue reference="qYo-eV-9nj"/>
     </inferredMetricsTieBreakers>
     <resources>
-        <image name="music_library" width="30" height="30"/>
-        <image name="search" width="30" height="30"/>
-        <image name="settings" width="30" height="30"/>
+        <image name="arrow.triangle.2.circlepath" catalog="system" width="128" height="104"/>
+        <image name="arrowtriangle.down.fill" catalog="system" width="128" height="120"/>
+        <image name="gear" catalog="system" width="128" height="122"/>
+        <image name="magnifyingglass" catalog="system" width="128" height="117"/>
+        <image name="music.note.house" catalog="system" width="128" height="104"/>
         <namedColor name="PopupRootOverlayColor">
             <color red="0.36000001430511475" green="0.36000001430511475" blue="0.36000001430511475" alpha="0.80299997329711914" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="darkTextColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="labelColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

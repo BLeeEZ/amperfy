@@ -4,14 +4,10 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="Font Awesome 5 Free-Solid-900.otf">
-            <string>FontAwesome5FreeSolid</string>
-        </array>
-    </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -45,14 +41,15 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Eiy-n7-Hlt" userLabel="Play Eplisode Button">
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Eiy-n7-Hlt" userLabel="Play Eplisode Button">
                         <rect key="frame" x="16" y="131" width="25" height="25"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="25" id="Wkx-xZ-M9e"/>
                             <constraint firstAttribute="width" secondItem="Eiy-n7-Hlt" secondAttribute="height" multiplier="1:1" id="pIS-Fi-88w"/>
                         </constraints>
-                        <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="19"/>
-                        <state key="normal" title=""/>
+                        <state key="normal">
+                            <imageReference key="image" image="play.fill" catalog="system" symbolScale="large"/>
+                        </state>
                         <connections>
                             <action selector="playEpisodeButtonPressed:" destination="gve-H7-PxP" eventType="touchUpInside" id="sQI-48-6VK"/>
                         </connections>
@@ -60,10 +57,14 @@
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ulS-LU-PlW" userLabel="Options Button">
                         <rect key="frame" x="334" y="131" width="25" height="25"/>
                         <constraints>
+                            <constraint firstAttribute="height" constant="25" id="6Sd-nA-zgD"/>
                             <constraint firstAttribute="width" secondItem="ulS-LU-PlW" secondAttribute="height" multiplier="1:1" id="ccQ-ba-Jr0"/>
                         </constraints>
-                        <state key="normal" image="ellipsis">
+                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                        <color key="tintColor" systemColor="labelColor"/>
+                        <state key="normal">
                             <color key="titleColor" systemColor="secondaryLabelColor"/>
+                            <imageReference key="image" image="ellipsis" catalog="system" symbolScale="medium"/>
                         </state>
                         <connections>
                             <action selector="optionsButtonPressed:" destination="gve-H7-PxP" eventType="touchUpInside" id="6ZB-H8-twC"/>
@@ -86,7 +87,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1h 30m 19s left" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wFl-mR-cDH" userLabel="Play Progress Label">
-                        <rect key="frame" x="137" y="135.5" width="135" height="16"/>
+                        <rect key="frame" x="137" y="135.5" width="130" height="16"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="16" id="bAn-R3-YQV"/>
                         </constraints>
@@ -94,22 +95,25 @@
                         <color key="textColor" systemColor="secondaryLabelColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cache" translatesAutoresizingMaskIntoConstraints="NO" id="iVr-ga-N6L" userLabel="Cache Icon">
-                        <rect key="frame" x="280" y="136" width="15" height="15"/>
-                        <color key="tintColor" systemColor="secondaryLabelColor"/>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.down.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="iVr-ga-N6L" userLabel="Cache Icon">
+                        <rect key="frame" x="275" y="134" width="20" height="19"/>
+                        <color key="tintColor" systemColor="labelColor"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="iVr-ga-N6L" secondAttribute="height" multiplier="1:1" id="KsA-iR-iOB"/>
                             <constraint firstAttribute="width" secondItem="iVr-ga-N6L" secondAttribute="height" multiplier="1:1" id="Nw7-GZ-mvu"/>
-                            <constraint firstAttribute="height" constant="15" id="xwG-Wj-Yzy"/>
+                            <constraint firstAttribute="height" constant="20" id="VDa-Rm-PND"/>
                         </constraints>
                     </imageView>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yxO-LC-wiR" userLabel="Show Description Button">
                         <rect key="frame" x="303" y="131" width="25" height="25"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="yxO-LC-wiR" secondAttribute="height" multiplier="1:1" id="5Eu-fJ-yAO"/>
+                            <constraint firstAttribute="width" secondItem="yxO-LC-wiR" secondAttribute="height" multiplier="1:1" id="QfP-kA-mw1"/>
                         </constraints>
                         <color key="tintColor" systemColor="labelColor"/>
-                        <state key="normal" image="info.circle" catalog="system"/>
+                        <state key="normal">
+                            <imageReference key="image" image="info.circle" catalog="system" symbolScale="medium"/>
+                        </state>
                         <connections>
                             <action selector="showDescriptionButtonPressed:" destination="gve-H7-PxP" eventType="touchUpInside" id="IA6-8b-cpi"/>
                         </connections>
@@ -132,7 +136,6 @@
                     <constraint firstItem="ulS-LU-PlW" firstAttribute="height" secondItem="yxO-LC-wiR" secondAttribute="height" id="NXh-KT-86q"/>
                     <constraint firstAttribute="trailingMargin" secondItem="GdC-Xn-gpu" secondAttribute="trailing" id="NhM-JY-DGW"/>
                     <constraint firstItem="Eiy-n7-Hlt" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="PEc-3D-EOs"/>
-                    <constraint firstItem="yxO-LC-wiR" firstAttribute="width" secondItem="yxO-LC-wiR" secondAttribute="height" multiplier="1:1" id="QfP-kA-mw1"/>
                     <constraint firstItem="JqZ-Gw-nZk" firstAttribute="leading" secondItem="Eiy-n7-Hlt" secondAttribute="trailing" constant="8" id="Sem-h3-7qU"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="top" secondItem="g7h-Ca-aH3" secondAttribute="bottom" id="ZXs-eS-5vO"/>
                     <constraint firstItem="Eiy-n7-Hlt" firstAttribute="centerY" secondItem="wFl-mR-cDH" secondAttribute="centerY" id="Zck-Kj-YzB"/>
@@ -161,14 +164,15 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="cache" width="640" height="512"/>
-        <image name="ellipsis" width="18.417999267578125" height="3.9160199165344238"/>
+        <image name="arrow.down.circle" catalog="system" width="128" height="123"/>
+        <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="info.circle" catalog="system" width="128" height="123"/>
+        <image name="play.fill" catalog="system" width="117" height="128"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

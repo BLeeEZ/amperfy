@@ -100,7 +100,7 @@ class TabBarVC: UITabBarController {
             detailMessage: "Your music collection is constantly updating. Already synced library items are offline available. If library items (artists/albums/songs) are not shown in your  collection please use the various search functionalities to synchronize with the server.",
             clipboardContent: nil,
             type: .info,
-            customIcon: .Sync,
+            customIcon: .refresh,
             customAnimation: .rotate,
             onClosePressed: { _ in
                 self.appDelegate.storage.isLibrarySyncInfoReadByUser = true
@@ -120,7 +120,7 @@ class TabBarVC: UITabBarController {
                     detailMessage: "Amperfy can inform you about the latest podcast episodes. If you want to, please authorize Amperfy to send you notifications.",
                     clipboardContent: nil,
                     type: .info,
-                    customIcon: .Bell,
+                    customIcon: .bell,
                     customAnimation: .swing,
                     onClosePressed: { _ in
                         self.appDelegate.localNotificationManager.requestAuthorization()

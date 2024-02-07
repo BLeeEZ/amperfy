@@ -139,8 +139,8 @@
                                     <constraints>
                                         <constraint firstAttribute="height" constant="40" id="Lxb-XF-Qa6"/>
                                     </constraints>
-                                    <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="3" maxY="10"/>
-                                    <state key="normal" title="Play" image="play"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="12" maxY="10"/>
+                                    <state key="normal" title="Play" image="play.fill" catalog="system"/>
                                     <connections>
                                         <action selector="pressedPlayButton:" destination="-1" eventType="touchUpInside" id="ED4-AA-sFB"/>
                                     </connections>
@@ -191,7 +191,7 @@
         </designable>
     </designables>
     <resources>
-        <image name="play" width="30" height="30"/>
+        <image name="play.fill" catalog="system" width="117" height="128"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

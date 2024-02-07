@@ -137,20 +137,7 @@ class LoginVC: UIViewController {
     }
     
     func updateApiSelectorText() {
-        let text = NSMutableAttributedString()
-        text.append( NSMutableAttributedString(string: "\(selectedApiType.selectorDescription) ",
-            attributes: [
-                NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0),
-                NSAttributedString.Key.foregroundColor: UIColor.white
-            ]
-        ) )
-        text.append( NSMutableAttributedString(string: FontAwesomeIcon.SortDown.asString,
-            attributes: [
-                NSAttributedString.Key.font: UIFont(name: FontAwesomeIcon.fontName,size: 17)!,
-                NSAttributedString.Key.foregroundColor: UIColor.white
-            ]
-        ) )
-        apiSelectorButton.setAttributedTitle(text, for: .normal)
+        apiSelectorButton.setTitle("\(selectedApiType.selectorDescription)", for: .normal)
     }
 
 }
