@@ -82,7 +82,7 @@ public class AutoDownloadLibrarySyncer {
             return Guarantee<[PodcastEpisode]> { seal in
                 let updatedEpisodes = Set(podcast.episodes)
                 let newAddedRecentEpisodes = updatedEpisodes.subtracting(oldRecentEpisodes)
-                if self.storage.settings.isAutoDownloadLatestSongsActive {
+                if !oldRecentEpisodes.isEmpty, !newAddedRecentEpisodes.isEmpty, self.storage.settings.isAutoDownloadLatestPodcastEpisodesActive {
                     self.playableDownloadManager.download(objects: Array(newAddedRecentEpisodes))
                 }
                 if !oldRecentEpisodes.isEmpty {
