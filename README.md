@@ -59,8 +59,7 @@ For more information, and to participate in the public beta releases, please vis
 - [Alamofire](https://github.com/Alamofire/Alamofire) by [Alamofire](https://github.com/Alamofire) is licensed under [MIT License](https://github.com/Alamofire/Alamofire/blob/master/LICENSE)
 - [PromiseKit](https://github.com/mxcl/PromiseKit) by [Max Howell](https://github.com/mxcl) is licensed under [MIT License](https://github.com/mxcl/PromiseKit/blob/master/LICENSE)
 - [PMKAlamofire](https://github.com/PromiseKit/PMKAlamofire) by [Max Howell](https://github.com/mxcl) is licensed under [MIT License](https://github.com/PromiseKit/PMKAlamofire/blob/master/LICENSE)
-- [Font Awesome](https://fontawesome.com/) by [Font Awesome](https://fontawesome.com/) is licensed under [Font Awesome Free License](https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt)
-- [iOS 11 Glyphs](https://icons8.com/ios) by [Icons8](https://icons8.com) is licensed under [Good Boy License](https://icons8.com/good-boy-license/)
+- [Fuse](https://github.com/krisk/fuse-swift) by [Kiro Risk](https://github.com/krisk) is licensed under [MIT License](https://github.com/krisk/fuse-swift/blob/master/LICENSE)
 
 **Amperfy license:** [GPLv3](https://github.com/BLeeEZ/Amperfy/blob/master/LICENSE)
 
