@@ -96,9 +96,9 @@ public enum LibraryDisplayType: Int, CaseIterable {
         case .favoriteArtists:
             return UIImage.heartFill
         case .newestAlbums:
-            return UIImage.clock
+            return UIImage.albumNewest
         case .recentAlbums:
-            return UIImage.clock
+            return UIImage.albumRecent
         }
     }
     

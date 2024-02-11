@@ -58,7 +58,7 @@ extension UIImage {
     public static let ellipsis = UIImage.create(systemName: "ellipsis")
     public static let genre = UIImage.create(systemName: "guitars.fill")
     public static let artist = UIImage.create(systemName: "music.mic")
-    public static let album = UIImage.create(systemName: "rectangle.stack")
+    public static let album = UIImage.create(systemName: "square.stack")
     public static let folder = UIImage.create(systemName: "folder.fill")
     public static let playlist = UIImage.create(systemName: "music.note.list")
     public static let musicLibrary = UIImage.create(systemName: "music.note.house")
@@ -95,6 +95,8 @@ extension UIImage {
     public static let gaugeUp = UIImage.create("gauge_up") // SF-Symbols 5 Regular: gauge.open.with.lines.needle.33percent.badge.arrow.up
     public static let podcast = UIImage.create("podcast").withTintColor(.defaultBlue)
     public static let podcastEpisode: UIImage = podcast
+    public static let albumNewest = UIImage.create("album_newest")
+    public static let albumRecent = UIImage.create("album_recent")
     public static let userQueueInsert = UIImage.create("user_queue_insert") // SF-Symbols 5 Regular: custom.text.line.first.and.arrowtriangle.forward.badge.person.crop
     public static let userQueueAppend = UIImage.create("user_queue_append") // SF-Symbols 5 Regular: custom.text.line.last.and.arrowtriangle.forward.badge.person.crop
     public static let contextQueueInsert = UIImage.create("context_queue_insert") // SF-Symbols 5 Regular: custom.text.line.first.and.arrowtriangle.forward

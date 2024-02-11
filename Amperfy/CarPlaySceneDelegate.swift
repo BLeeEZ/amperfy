@@ -121,8 +121,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             CPListSection(items: [
                 createPlayRandomAlbumsItem(),
                 createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: albumsFavoriteSection),
-                createLibraryItem(text: "Newest", icon: UIImage.clock, sectionToDisplay: albumsNewestSection),
-                createLibraryItem(text: "Recently Played", icon: UIImage.clock, sectionToDisplay: albumsRecentSection)
+                createLibraryItem(text: "Newest", icon: UIImage.albumNewest, sectionToDisplay: albumsNewestSection),
+                createLibraryItem(text: "Recently Played", icon: UIImage.albumRecent, sectionToDisplay: albumsRecentSection)
             ], header: "Albums", sectionIndexTitle: nil),
             CPListSection(items: [
                 createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: artistsFavoriteSection)
