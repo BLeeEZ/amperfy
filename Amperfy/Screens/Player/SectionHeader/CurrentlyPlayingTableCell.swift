@@ -53,6 +53,7 @@ class CurrentlyPlayingTableCell: BasicTableCell {
             titleLabel: titleLabel,
             artistLabel: artistLabel)
         rootView?.refreshFavoriteButton(button: favoriteButton)
+        rootView?.refreshOptionButton(button: optionsButton)
     }
     
     func refreshArtwork() {

@@ -25,8 +25,13 @@ public class RoundedImage: UIImageView {
     
     public static let cornerRadius: CGFloat = 5.0
 
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        configureStyle()
+    }
+    
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
         configureStyle()
     }
     

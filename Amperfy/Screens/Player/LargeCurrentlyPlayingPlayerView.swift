@@ -34,6 +34,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     private var rootView: PopupPlayerVC?
     
     @IBOutlet weak var artworkImage: LibraryEntityImage!
+    @IBOutlet weak var detailsContainer: UIView!
     @IBOutlet weak var titleLabel: MarqueeLabel!
     @IBOutlet weak var albumLabel: MarqueeLabel!
     @IBOutlet weak var albumButton: UIButton!
@@ -65,6 +66,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
             albumButton: albumButton,
             albumContainerView: albumContainerView)
         rootView?.refreshFavoriteButton(button: favoriteButton)
+        rootView?.refreshOptionButton(button: optionsButton)
     }
     
     func refreshArtwork() {

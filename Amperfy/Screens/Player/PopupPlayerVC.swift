@@ -40,6 +40,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     var hostingTabBarVC: TabBarVC?
     var isBackgroundBlurConfigured = false
     
+    var currentlyPlayingTableCell: CurrentlyPlayingTableCell?
     var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
     var userQueueSectionHeader: UserQueueSectionHeader?
     var contextNextQueueSectionHeader: ContextQueueNextSectionHeader?

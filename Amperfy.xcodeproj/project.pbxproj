@@ -28,6 +28,7 @@
 		501944182B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501944172B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift */; };
 		501944192B78F9B800082D2E /* LargeCurrentlyPlayingPlayerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 501944162B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.xib */; };
 		5019441B2B7A049A00082D2E /* PopupPlayer+Visuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5019441A2B7A049A00082D2E /* PopupPlayer+Visuals.swift */; };
+		5019441D2B7ACB0800082D2E /* PopupPlayer+Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5019441C2B7ACB0800082D2E /* PopupPlayer+Animations.swift */; };
 		501A7D4D26820B080055A51B /* PodcastsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501A7D4C26820B080055A51B /* PodcastsVC.swift */; };
 		501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501A7D4E26820B3F0055A51B /* PodcastDetailVC.swift */; };
 		501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501DBE9E2632D2CF00B31128 /* GenreDetailVC.swift */; };
@@ -554,6 +555,7 @@
 		501944162B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LargeCurrentlyPlayingPlayerView.xib; sourceTree = "<group>"; };
 		501944172B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeCurrentlyPlayingPlayerView.swift; sourceTree = "<group>"; };
 		5019441A2B7A049A00082D2E /* PopupPlayer+Visuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PopupPlayer+Visuals.swift"; sourceTree = "<group>"; };
+		5019441C2B7ACB0800082D2E /* PopupPlayer+Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PopupPlayer+Animations.swift"; sourceTree = "<group>"; };
 		501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationBannerCustomization.swift; sourceTree = "<group>"; };
 		501A7D1E26808A9D0055A51B /* podcast_episodes.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = podcast_episodes.xml; sourceTree = "<group>"; };
 		501A7D1F26808A9D0055A51B /* podcasts.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = podcasts.xml; sourceTree = "<group>"; };
@@ -1083,6 +1085,7 @@
 				5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */,
 				50A30E5B2B7556FB00722894 /* PopupPlayer+TableViewExtension.swift */,
 				5019441A2B7A049A00082D2E /* PopupPlayer+Visuals.swift */,
+				5019441C2B7ACB0800082D2E /* PopupPlayer+Animations.swift */,
 				50A30E572B7501E600722894 /* SectionHeader */,
 				501944162B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.xib */,
 				501944172B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift */,
@@ -2091,6 +2094,7 @@
 				50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */,
 				50A30E542B7408DB00722894 /* ContextQueueNextSectionHeader.swift in Sources */,
 				50791E8528D36F1F006CE6E5 /* LibrarySettingsView.swift in Sources */,
+				5019441D2B7ACB0800082D2E /* PopupPlayer+Animations.swift in Sources */,
 				508FDE3C21F2FA3A005A0724 /* PlaylistDetailTableHeader.swift in Sources */,
 				50BA92F821CC318D00E5901D /* SongTableCell.swift in Sources */,
 				50791E8128D365E9006CE6E5 /* UpdatePasswordView.swift in Sources */,

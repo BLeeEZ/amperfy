@@ -67,70 +67,35 @@ extension PopupPlayerVC {
         }
     }
     
-    func changeDisplayStyle(to displayStyle: PlayerDisplayStyle, animated: Bool = true) {
-        var viewToDisapper: UIView?
-        var viewToApper: UIView?
-        
-        switch displayStyle {
-        case .compact:
-            viewToDisapper = largePlayerPlaceholderView
-            viewToApper = tableView
-            scrollToCurrentlyPlayingRow()
-            for visibleCell in self.tableView.visibleCells {
-                if let currentlyPlayingCell = visibleCell as? CurrentlyPlayingTableCell {
-                    currentlyPlayingCell.refresh()
-                    break
-                }
-            }
-            
-        case .large:
-            viewToDisapper = tableView
-            viewToApper = largePlayerPlaceholderView
-            largeCurrentlyPlayingView?.refresh()
-        }
-        
-        guard let viewToDisapper = viewToDisapper,
-              let viewToApper = viewToApper
-        else { return }
-        
-        if animated {
-            viewToDisapper.isHidden = false
-            viewToApper.isHidden = false
-            
-            let animationDuration = TimeInterval(0.5)
-            UIView.animate(withDuration: animationDuration/2, delay: 0, options: .curveLinear, animations: ({
-                viewToDisapper.alpha = 0.0
-            }), completion: nil)
-            UIView.animate(withDuration: animationDuration, delay: animationDuration/2, options: .curveLinear, animations: ({
-                viewToApper.alpha = 1.0
-            }), completion: nil)
-        } else {
-            viewToDisapper.alpha = 0.0
-            viewToApper.alpha = 1.0
-            
-            viewToDisapper.isHidden = true
-            viewToApper.isHidden = false
-        }
+    func refreshOptionButton(button: UIButton) {
+        var config = getPlayerRoundButtonConfiguration()
+        config.image = .ellipsis
+        config.baseForegroundColor = .label
+        button.isEnabled = true
+        button.configuration = config
     }
     
     func refreshFavoriteButton(button: UIButton) {
+        var config = getPlayerRoundButtonConfiguration()
         switch player.playerMode {
         case .music:
             if let playableInfo = player.currentlyPlaying {
-                button.setImage(playableInfo.isFavorite ? .heartFill : .heartEmpty, for: .normal)
+                config.image = playableInfo.isFavorite ? .heartFill : .heartEmpty
+                config.baseForegroundColor = appDelegate.storage.settings.isOnlineMode ? .redHeart : .label
                 button.isEnabled = appDelegate.storage.settings.isOnlineMode
-                button.tintColor = appDelegate.storage.settings.isOnlineMode ? .redHeart : .label
             } else {
-                button.setImage(.heartEmpty, for: .normal)
+                config.image = .heartEmpty
+                config.baseForegroundColor = .redHeart
                 button.isEnabled = false
-                button.tintColor = .redHeart
             }
             
         case .podcast:
-            button.setImage(.info, for: .normal)
+            config.image = .info
+            config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .large)
+            config.baseForegroundColor = .label
             button.isEnabled = true
-            button.tintColor = .label
         }
+        button.configuration = config
     }
     
     func refreshCurrentlyPlayingPopupItem() {
@@ -202,15 +167,22 @@ extension PopupPlayerVC {
         } else {
             switch player.playerMode {
             case .music:
-                artworkImage.display(image: UIImage.songArtwork)
+                artworkImage.display(image: .songArtwork)
             case .podcast:
-                artworkImage.display(image: UIImage.podcastArtwork)
+                artworkImage.display(image: .podcastArtwork)
             }
         }
     }
     
     func refreshLabelColor(label: UILabel) {
         label.textColor = subtitleColor(style: traitCollection.userInterfaceStyle)
+    }
+    
+    func getPlayerRoundButtonConfiguration() -> UIButton.Configuration {
+        var config = UIButton.Configuration.gray()
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
+        config.buttonSize = .small
+        return config
     }
     
     func getPlayerButtonConfiguration(isSelected: Bool) -> UIButton.Configuration {

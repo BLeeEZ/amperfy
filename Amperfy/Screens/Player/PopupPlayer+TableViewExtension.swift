@@ -169,10 +169,15 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
             cell.maskCell(fromTop: 0.0)
             return cell
         case .currentlyPlaying:
-            let cell: CurrentlyPlayingTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
-            cell.backgroundColor = UIColor.clear
-            cell.prepare(toWorkOnRootView: self)
-            return cell
+            if let currentlyPlayingTableCell = currentlyPlayingTableCell {
+                return currentlyPlayingTableCell
+            } else {
+                let cell: CurrentlyPlayingTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
+                cell.backgroundColor = UIColor.clear
+                cell.prepare(toWorkOnRootView: self)
+                self.currentlyPlayingTableCell = cell
+                return cell
+            }
         case .none:
             return UITableViewCell()
         }

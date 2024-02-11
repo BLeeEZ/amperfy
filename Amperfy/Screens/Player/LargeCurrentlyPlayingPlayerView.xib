@@ -36,7 +36,7 @@
                                 <constraint firstItem="4sr-YU-gYi" firstAttribute="centerY" secondItem="ia9-ph-a9C" secondAttribute="centerY" id="dVP-va-0hv"/>
                             </constraints>
                         </view>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="syN-Kp-zH0">
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="syN-Kp-zH0" userLabel="Details View">
                             <rect key="frame" x="0.0" y="567" width="375" height="100"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5ux-aQ-e6U" userLabel="Favorite">
@@ -194,6 +194,7 @@
                 <outlet property="albumLabel" destination="BQj-am-zrx" id="rbP-MC-OnP"/>
                 <outlet property="artistLabel" destination="tbp-Kj-JSG" id="07s-rG-KVY"/>
                 <outlet property="artworkImage" destination="4sr-YU-gYi" id="Ln2-PH-VFz"/>
+                <outlet property="detailsContainer" destination="syN-Kp-zH0" id="ZIp-y8-gCh"/>
                 <outlet property="favoriteButton" destination="5ux-aQ-e6U" id="DB3-56-C7w"/>
                 <outlet property="optionsButton" destination="cYG-VG-BvQ" id="074-0X-dKf"/>
                 <outlet property="titleLabel" destination="B6V-RA-yV3" id="yUd-j1-8AA"/>
