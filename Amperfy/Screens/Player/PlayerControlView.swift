@@ -66,6 +66,7 @@ class PlayerControlView: UIView {
     @IBAction func playButtonPushed(_ sender: Any) {
         player.togglePlayPause()
         refreshPlayButton()
+        refreshPopupBarButtonItmes()
     }
     
     @IBAction func previousButtonPushed(_ sender: Any) {
@@ -169,10 +170,29 @@ class PlayerControlView: UIView {
         } else {
             buttonImg = UIImage.play
         }
-        
         playButton.setImage(buttonImg, for: UIControl.State.normal)
-        let barButtonItem = UIBarButtonItem(image: buttonImg, style: .plain, target: self, action: #selector(PlayerControlView.playButtonPushed))
-        rootView?.popupItem.trailingBarButtonItems = [ barButtonItem ]
+    }
+    
+    func refreshPopupBarButtonItmes() {
+        var barButtonItems = [UIBarButtonItem]()
+        if player.currentlyPlaying != nil {
+            var buttonImg = UIImage()
+            if player.isPlaying {
+                buttonImg = .pause
+            } else {
+                buttonImg = .play
+            }
+            barButtonItems.append( UIBarButtonItem(image: buttonImg, style: .plain, target: self, action: #selector(PlayerControlView.playButtonPushed)) )
+            
+            switch player.playerMode {
+            case .music:
+                buttonImg = .forwardFill
+            case .podcast:
+                buttonImg = .goForward30
+            }
+            barButtonItems.append( UIBarButtonItem(image: buttonImg, style: .plain, target: self, action: #selector(PlayerControlView.nextButtonPushed)) )
+        }
+        rootView?.popupItem.trailingBarButtonItems = barButtonItems
     }
     
     func refreshCurrentlyPlayingInfo() {
@@ -213,6 +233,7 @@ class PlayerControlView: UIView {
     func refreshPlayer() {
         refreshCurrentlyPlayingInfo()
         refreshPlayButton()
+        refreshPopupBarButtonItmes()
         refreshTimeInfo()
         refreshPrevNextButtons()
         refreshPlaybackRateButton()

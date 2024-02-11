@@ -63,6 +63,8 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         player = appDelegate.player
         player.addNotifier(notifier: self)
         
+        refreshCurrentlyPlayingPopupItem()
+        
         controlPlaceholderHeightConstraint.constant = PlayerControlView.frameHeight + safetyMarginOnBottom
         if let createdPlayerControlView = ViewBuilder<PlayerControlView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: controlPlaceholderView.bounds.size.width, height: controlPlaceholderView.bounds.size.height)) {
             controlView = createdPlayerControlView
