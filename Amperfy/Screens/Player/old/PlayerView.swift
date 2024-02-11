@@ -137,7 +137,7 @@ class PlayerView: UIView {
     @IBAction func shuffleButtonPushed(_ sender: Any) {
         player.toggleShuffle()
         refreshShuffleButton()
-        rootView?.scrollToNextPlayingRow()
+        rootView?.scrollToCurrentlyPlayingRow()
     }
     
     @IBAction func showPodcastDescriptionButtonPushed(_ sender: Any) {
@@ -188,7 +188,7 @@ class PlayerView: UIView {
     }
     
     @IBAction func optionsPressed(_ sender: Any) {
-        self.rootView?.optionsPressed()
+        self.rootView?.displayCurrentlyPlayingDetailInfo()
     }
     
     @IBAction private func displayPlaylistPressed() {
@@ -258,7 +258,7 @@ class PlayerView: UIView {
     
     func renderAnimation(animationDuration: TimeInterval = defaultAnimationDuration) {
         if displayStyle == .compact {
-            rootView?.scrollToNextPlayingRow()
+            rootView?.scrollToCurrentlyPlayingRow()
             renderAnimationSwitchToCompact(animationDuration: animationDuration)
         } else {
             renderAnimationSwitchToLarge(animationDuration: animationDuration)
@@ -266,7 +266,6 @@ class PlayerView: UIView {
     }
     
     private func renderAnimationSwitchToCompact(animationDuration: TimeInterval = defaultAnimationDuration) {
-        guard let rootView = self.rootView else { return }
         artworkWidthConstraint.constant = 70
         infoLargeToProgressDistanceConstraint.constant = -30
         bottomControlToProgressDistanceConstraint.constant = 5
@@ -311,7 +310,7 @@ class PlayerView: UIView {
             self.artistNameLargeButton.isHidden = true
         }), completion: nil)
         
-        rootView.renderAnimationForCompactPlayer(ofHight: PlayerView.frameHeightCompact, animationDuration: animationDuration)
+        //rootView.renderAnimationForCompactPlayer(ofHight: PlayerView.frameHeightCompact, animationDuration: animationDuration)
 
         UIView.animate(withDuration: animationDuration) {
             self.layoutIfNeeded()
@@ -334,7 +333,7 @@ class PlayerView: UIView {
         bottomSpaceHeight = Self.minLargeBottomMargin
 
         let availableRootWidth = rootView.frameSizeWithRotationAdjusment.width - PlayerView.margin.left -  PlayerView.margin.right
-        let availableRootHeight = rootView.availableFrameHeightForLargePlayer
+        let availableRootHeight = 10.0 // Only to let it compile !!!
 
         var elementsBelowArtworkHeight = timeSliderToArtworkDistanceConstraint.constant
         elementsBelowArtworkHeight += timeSlider.frame.size.height
@@ -398,7 +397,7 @@ class PlayerView: UIView {
             self.artistNameLargeButton.isHidden = false
         }), completion: nil)
         
-        rootView.renderAnimationForLargePlayer(animationDuration: animationDuration)
+        //rootView.renderAnimationForLargePlayer(animationDuration: animationDuration)
 
         UIView.animate(withDuration: animationDuration) {
             self.layoutIfNeeded()
@@ -611,10 +610,10 @@ class PlayerView: UIView {
     func refreshShuffleButton() {
         shuffleButton.imageView?.contentMode = .scaleAspectFit
         if player.isShuffle {
-            shuffleButton.setImage(UIImage.shuffleOn, for: .normal)
-            shuffleButton.tintColor = .labelColor
+            shuffleButton.setImage(UIImage.shuffle, for: .normal)
+            shuffleButton.tintColor = .red
         } else {
-            shuffleButton.setImage(UIImage.shuffleOff, for: .normal)
+            shuffleButton.setImage(UIImage.shuffle, for: .normal)
             shuffleButton.tintColor = .labelColor
         }
     }

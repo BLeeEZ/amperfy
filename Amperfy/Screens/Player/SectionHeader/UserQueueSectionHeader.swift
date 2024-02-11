@@ -1,5 +1,5 @@
 //
-//  PopupPlayerSectionHeader.swift
+//  UserQueueSectionHeader.swift
 //  Amperfy
 //
 //  Created by Maximilian Bauer on 22.11.21.
@@ -22,16 +22,14 @@
 import UIKit
 import MarqueeLabel
 
-class PopupPlayerSectionHeader: UIView {
+class UserQueueSectionHeader: UIView {
 
     @IBOutlet weak var nameLabel: MarqueeLabel!
     @IBOutlet weak var rightButton: UIButton!
     
-    @IBOutlet weak var labelTrailingToSuperviewTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var rightButtonWidthConstraint: NSLayoutConstraint!
     
-    static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
-    static let margin = UIEdgeInsets(top: 8, left: UIView.defaultMarginX, bottom: 0, right: UIView.defaultMarginX)
+    static let frameHeight: CGFloat = 28.0 + margin.top + margin.bottom
+    static let margin = UIEdgeInsets(top: 8, left: UIView.defaultMarginX, bottom: 8, right: UIView.defaultMarginX)
     
     private var appDelegate: AppDelegate!
     private var buttonPressAction: (() -> Void)?
@@ -46,30 +44,20 @@ class PopupPlayerSectionHeader: UIView {
         self.layoutMargins = Self.margin
     }
     
-    func display(name: String, buttonTitle: String = "", buttonPressAction: (() -> Void)? = nil) {
-        nameLabel.text = name
-        nameLabel.isHidden = false
-        nameLabel.applyAmperfyStyle()
-        rightButton.setTitle("", for: .disabled)
-        rightButton.setTitle(buttonTitle, for: .normal)
-        self.buttonPressAction = buttonPressAction
-        rightButton.isHidden = buttonPressAction == nil
-        rightButton.isEnabled = buttonPressAction != nil
-        rightButton.backgroundColor = buttonPressAction != nil ? UIColor.defaultBlue : UIColor.clear
-        if buttonPressAction != nil {
-            labelTrailingToSuperviewTrailingConstraint.constant = rightButtonWidthConstraint.constant + 16.0
-        } else {
-            labelTrailingToSuperviewTrailingConstraint.constant = 0
-        }
-    }
-    
     func hide() {
         nameLabel.text = ""
         nameLabel.isHidden = true
         rightButton.isHidden = true
         rightButton.isEnabled = false
-        rightButton.backgroundColor =  UIColor.clear
-        labelTrailingToSuperviewTrailingConstraint.constant = 0
+    }
+    
+    func display(name: String, buttonPressAction: @escaping (() -> Void)) {
+        nameLabel.text = name
+        nameLabel.isHidden = false
+        nameLabel.applyAmperfyStyle()
+        rightButton.isHidden = false
+        rightButton.isEnabled = true
+        self.buttonPressAction = buttonPressAction
     }
 
     @IBAction func rightButtonPressed(_ sender: Any) {

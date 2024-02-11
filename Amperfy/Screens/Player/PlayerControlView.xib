@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="PlayerControlView" customModule="Amperfy">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" continuous="NO" translatesAutoresizingMaskIntoConstraints="NO" id="42q-l9-IXM" userLabel="Progress" customClass="PlaytimeSlider" customModule="Amperfy" customModuleProvider="target">
+                    <rect key="frame" x="14" y="36" width="347" height="31"/>
+                    <color key="tintColor" systemColor="labelColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="KQ1-7I-Fbo"/>
+                    </constraints>
+                    <connections>
+                        <action selector="timeSliderChanged:" destination="iN0-l3-epB" eventType="valueChanged" id="adh-M6-kZp"/>
+                        <action selector="timeSliderIsChanging:" destination="iN0-l3-epB" eventType="touchDragOutside" id="azr-FZ-dLl"/>
+                        <action selector="timeSliderIsChanging:" destination="iN0-l3-epB" eventType="touchDragInside" id="nz0-Yy-zFt"/>
+                    </connections>
+                </slider>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0:15" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="okd-ac-nGY" userLabel="Elapsed time">
+                    <rect key="frame" x="16" y="59" width="159" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="20" id="CEf-3e-Vt5"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-5:30" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t1c-hF-UMw" userLabel="Remaining time">
+                    <rect key="frame" x="200" y="59" width="159" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="20" id="Sij-WA-5X1"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="SoI-ny-Hw0" userLabel="Control  Stack">
+                    <rect key="frame" x="22.5" y="116" width="330" height="50"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Skip Backward Button">
+                            <rect key="frame" x="0.0" y="6.5" width="66" height="37.5"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal" image="gobackward.10" catalog="system">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="30"/>
+                            </state>
+                            <connections>
+                                <action selector="skipBackwardButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="GNs-ds-sdw"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jhy-pc-jwZ" userLabel="Previous Button">
+                            <rect key="frame" x="66" y="11" width="66" height="28"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal" image="backward.fill" catalog="system">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="30"/>
+                            </state>
+                            <connections>
+                                <action selector="previousButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="UBQ-J2-BCO"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Byk-rx-3Lv">
+                            <rect key="frame" x="132" y="3.5" width="66" height="43.5"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="play.fill" catalog="system" symbolScale="default"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="45"/>
+                            </state>
+                            <connections>
+                                <action selector="playButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="x3u-6i-ytK"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E3q-DK-jgm" userLabel="Next Button">
+                            <rect key="frame" x="198" y="11" width="66" height="28"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="forward.fill" catalog="system" symbolScale="default" variableValue="1"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="30"/>
+                            </state>
+                            <connections>
+                                <action selector="nextButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="aSu-T2-0y0"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QO0-Ep-X2s" userLabel="Skip Forward Button">
+                            <rect key="frame" x="264" y="6.5" width="66" height="37.5"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="goforward.10" catalog="system" symbolScale="default" variableValue="1"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="30"/>
+                            </state>
+                            <connections>
+                                <action selector="skipForwardButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Mbv-5W-tEf"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="330" id="dJo-pc-EQZ"/>
+                        <constraint firstAttribute="height" constant="50" id="dq3-fM-BgC"/>
+                    </constraints>
+                </stackView>
+                <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="xXq-r4-gI6">
+                    <rect key="frame" x="37.5" y="186" width="300" height="40"/>
+                    <subviews>
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
+                            <rect key="frame" x="0.0" y="0.0" width="50" height="40"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="50" id="5uL-80-PHj"/>
+                                <constraint firstAttribute="height" constant="40" id="dOb-nc-wBt"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <inset key="contentEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="rectangle.portrait.inset.filled" catalog="system" symbolScale="medium"/>
+                            </state>
+                            <connections>
+                                <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change">
+                            <rect key="frame" x="93.5" y="0.0" width="40" height="40"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="Iye-f4-Rd2"/>
+                                <constraint firstAttribute="width" constant="40" id="O0l-F2-ebZ"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="music.note" catalog="system" symbolScale="large" variableValue="0.60000000000000009"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" weight="bold"/>
+                            </state>
+                            <connections>
+                                <action selector="playerModeChangePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="WMf-zb-HxJ"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l5j-2I-Ltc" userLabel="Airplay Button">
+                            <rect key="frame" x="176.5" y="0.0" width="40" height="40"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="40" id="4pS-66-grn"/>
+                                <constraint firstAttribute="width" secondItem="l5j-2I-Ltc" secondAttribute="height" multiplier="1:1" id="NI7-38-OSx"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="airplayaudio" catalog="system" symbolScale="large"/>
+                            </state>
+                            <connections>
+                                <action selector="airplayButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YPY-8P-oS2"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0xq-hb-FZa" userLabel="Options Button">
+                            <rect key="frame" x="260" y="0.0" width="40" height="40"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="Ble-C9-owO"/>
+                                <constraint firstAttribute="width" secondItem="0xq-hb-FZa" secondAttribute="height" multiplier="1:1" id="ND9-Bu-dGG"/>
+                            </constraints>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="ellipsis" catalog="system" symbolScale="large"/>
+                            </state>
+                        </button>
+                    </subviews>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="300" id="dMH-9W-9do"/>
+                    </constraints>
+                </stackView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dNu-q7-Vtb" userLabel="Sleep Timer Button">
+                    <rect key="frame" x="103.5" y="64" width="28" height="28"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="28" id="Dpt-Vx-nwj"/>
+                        <constraint firstAttribute="width" secondItem="dNu-q7-Vtb" secondAttribute="height" multiplier="1:1" id="t0n-6J-qRS"/>
+                    </constraints>
+                    <color key="tintColor" systemColor="labelColor"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="gray" cornerStyle="medium" buttonSize="small">
+                        <imageReference key="image" image="moon.zzz.fill" catalog="system" symbolScale="small"/>
+                        <backgroundConfiguration key="background" strokeWidth="1">
+                            <color key="strokeColor" systemColor="labelColor"/>
+                        </backgroundConfiguration>
+                    </buttonConfiguration>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f7L-lf-lJ6" userLabel="Playback Rate Button">
+                    <rect key="frame" x="230" y="64" width="55" height="28"/>
+                    <color key="tintColor" systemColor="labelColor"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="gray" title="1,75x" cornerStyle="medium" buttonSize="small">
+                        <backgroundConfiguration key="background" strokeWidth="1"/>
+                    </buttonConfiguration>
+                </button>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <constraints>
+                <constraint firstItem="42q-l9-IXM" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="3yB-kd-VKC"/>
+                <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="4ed-LA-PXc"/>
+                <constraint firstItem="f7L-lf-lJ6" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="70" id="6j6-pM-uFw"/>
+                <constraint firstItem="SoI-ny-Hw0" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="8yb-bt-h2J"/>
+                <constraint firstAttribute="trailingMargin" secondItem="SoI-ny-Hw0" secondAttribute="trailing" priority="999" id="9wH-XK-zJU"/>
+                <constraint firstAttribute="trailingMargin" secondItem="t1c-hF-UMw" secondAttribute="trailing" id="QUi-S2-Eme"/>
+                <constraint firstItem="dNu-q7-Vtb" firstAttribute="top" secondItem="okd-ac-nGY" secondAttribute="bottom" constant="-15" id="S7u-07-1uM"/>
+                <constraint firstItem="dNu-q7-Vtb" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="-70" id="bW8-ea-8Uu"/>
+                <constraint firstItem="t1c-hF-UMw" firstAttribute="centerY" secondItem="okd-ac-nGY" secondAttribute="centerY" id="lCh-dw-03A"/>
+                <constraint firstItem="42q-l9-IXM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="msH-gV-d4u"/>
+                <constraint firstItem="xXq-r4-gI6" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="nkB-6e-9fV"/>
+                <constraint firstItem="t1c-hF-UMw" firstAttribute="top" secondItem="42q-l9-IXM" secondAttribute="bottom" constant="-7" id="pOd-F6-MOG"/>
+                <constraint firstItem="SoI-ny-Hw0" firstAttribute="top" secondItem="42q-l9-IXM" secondAttribute="bottom" constant="50" id="rmF-Wl-3ol"/>
+                <constraint firstItem="t1c-hF-UMw" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" constant="-159" id="sAk-2J-JEK"/>
+                <constraint firstItem="okd-ac-nGY" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="tbM-wh-ia0"/>
+                <constraint firstItem="f7L-lf-lJ6" firstAttribute="centerY" secondItem="dNu-q7-Vtb" secondAttribute="centerY" id="uYa-sw-bOQ"/>
+                <constraint firstAttribute="leadingMargin" secondItem="okd-ac-nGY" secondAttribute="trailing" constant="-159" id="vQu-6h-oG4"/>
+                <constraint firstItem="xXq-r4-gI6" firstAttribute="top" secondItem="SoI-ny-Hw0" secondAttribute="bottom" constant="20" id="zg3-MD-JbT"/>
+            </constraints>
+            <connections>
+                <outlet property="displayPlaylistButton" destination="ZVN-JG-VAA" id="2Rh-6V-CMd"/>
+                <outlet property="elapsedTimeLabel" destination="okd-ac-nGY" id="MFD-Qa-B7r"/>
+                <outlet property="nextButton" destination="E3q-DK-jgm" id="MGI-Lm-8TL"/>
+                <outlet property="optionsButton" destination="0xq-hb-FZa" id="5AH-yU-Tbd"/>
+                <outlet property="playButton" destination="Byk-rx-3Lv" id="03r-73-6Na"/>
+                <outlet property="playbackRateButton" destination="f7L-lf-lJ6" id="IC6-o7-Eax"/>
+                <outlet property="playerModeButton" destination="7xb-YR-9X6" id="yNk-04-nkT"/>
+                <outlet property="previousButton" destination="Jhy-pc-jwZ" id="3vl-Xj-JHn"/>
+                <outlet property="remainingTimeLabel" destination="t1c-hF-UMw" id="hPl-lK-efe"/>
+                <outlet property="skipBackwardButton" destination="PZj-JS-NGq" id="q0L-Ve-YvK"/>
+                <outlet property="skipForwardButton" destination="QO0-Ep-X2s" id="idR-HQ-cSv"/>
+                <outlet property="sleepTimerButton" destination="dNu-q7-Vtb" id="zWZ-5a-1Pb"/>
+                <outlet property="timeSlider" destination="42q-l9-IXM" id="Uit-8D-ekQ"/>
+            </connections>
+            <point key="canvasLocation" x="138.40000000000001" y="99.400299850074973"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="airplayaudio" catalog="system" width="128" height="123"/>
+        <image name="backward.fill" catalog="system" width="128" height="77"/>
+        <image name="ellipsis" catalog="system" width="128" height="37"/>
+        <image name="forward.fill" catalog="system" width="128" height="77"/>
+        <image name="gobackward.10" catalog="system" width="119" height="128"/>
+        <image name="goforward.10" catalog="system" width="119" height="128"/>
+        <image name="moon.zzz.fill" catalog="system" width="117" height="128"/>
+        <image name="music.note" catalog="system" width="96" height="128"/>
+        <image name="play.fill" catalog="system" width="117" height="128"/>
+        <image name="rectangle.portrait.inset.filled" catalog="system" width="115" height="128"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

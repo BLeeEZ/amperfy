@@ -80,20 +80,6 @@ class LibraryEntityDetailVC: UIViewController {
         ]
     }
 
-    @IBOutlet weak var playerStackView: UIStackView!
-    @IBOutlet weak var playerStackHeaderLabel: UILabel!
-    @IBOutlet weak var clearPlayerButton: UIButton!
-    @IBOutlet weak var clearUserQueueButton: UIButton!
-    @IBOutlet weak var addContextQueueToPlaylistButton: UIButton!
-
-    private var playerControlButtons: [UIButton] {
-        return [
-            clearPlayerButton,
-            clearUserQueueButton,
-            addContextQueueToPlaylistButton
-        ]
-    }
-
     @IBOutlet weak var cancelButton: UIButton!
     
     static let detailLabelsClusterNormalHeight = 90.0
@@ -148,7 +134,6 @@ class LibraryEntityDetailVC: UIViewController {
         ratingPlaceholderView.backgroundColor = .clear
         ratingPlaceholderView.layer.borderColor = UIColor.fillColor.cgColor
         ratingPlaceholderView.layer.borderWidth = 2.5
-        playerStackView.isHidden = true
         refresh()
 
         Self.configureRoundQueueButton(button: podcastQueueInsertButton, corner: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
@@ -185,10 +170,6 @@ class LibraryEntityDetailVC: UIViewController {
             remainingSpace -= Self.compactMainStackSpacing
         }
         remainingSpace -= mainStackClusterHeightConstraint.constant
-        if !playerStackView.isHidden {
-            remainingSpace -= playerStackClusterHeightConstraint.constant
-            remainingSpace -= Self.compactMainStackSpacing
-        }
         remainingSpace -= cancelButtonHeightConstraint.constant
         remainingSpace -= Self.compactMainStackSpacing
         // Big Artwork
@@ -362,10 +343,6 @@ class LibraryEntityDetailVC: UIViewController {
             (playContextCb == nil) ||
             playerIndexCb != nil ||
             (!song.isCached && appDelegate.storage.settings.isOfflineMode)
-        
-        clearUserQueueButton.isHidden = appDelegate.player.userQueue.isEmpty
-        addContextQueueToPlaylistButton.isHidden = appDelegate.storage.settings.isOfflineMode
-        configurePlayerStack()
     }
     
     private func configureFor(podcastEpisode: PodcastEpisode) {
@@ -381,29 +358,6 @@ class LibraryEntityDetailVC: UIViewController {
         deleteOnServerButton.isHidden = podcastEpisode.podcastStatus == .deleted || appDelegate.storage.settings.isOfflineMode
         showPodcastDetailsButton.isHidden = false
         showPodcastDetailsButton.setTitle("Show Episode Description", for: .normal)
-        clearUserQueueButton.isHidden = true
-        addContextQueueToPlaylistButton.isHidden = true
-        configurePlayerStack()
-    }
-    
-    func configurePlayerStack() {
-        guard playContextCb == nil else {
-            playerStackView.isHidden = true
-            return
-        }
-        
-        playerStackView.isHidden = false
-        clearPlayerButton.isHidden = false
-        switch appDelegate.player.playerMode {
-        case .music:
-            playerStackHeaderLabel.text = "Music Player"
-            clearPlayerButton.setTitle("Clear Music Player", for: .normal)
-        case .podcast:
-            playerStackHeaderLabel.text = "Podcast Player"
-            clearPlayerButton.setTitle("Clear Podcast Player", for: .normal)
-        }
-
-        Self.configureRoundButtonCluster(buttons: playerControlButtons, containerView: playerStackView, hightConstraint: playerStackClusterHeightConstraint, buttonHeight: playButtonHeightConstraint.constant, offsetHeight: playerActionsLabelHeightConstraint.constant + 1.0)
     }
     
     @IBAction func pressedPlay(_ sender: Any) {
@@ -573,35 +527,6 @@ class LibraryEntityDetailVC: UIViewController {
         dismiss(animated: true)
         guard !entityPlayables.isEmpty else { return }
         self.appDelegate.player.appendPodcastQueue(playables: entityPlayables)
-    }
-    
-    @IBAction func pressedClearPlayer(_ sender: Any) {
-        dismiss(animated: true)
-        self.appDelegate.player.clearQueues()
-        if let popupPlayer = self.rootView as? PopupPlayerVC {
-            popupPlayer.reloadData()
-            popupPlayer.playerView?.refreshPlayer()
-        }
-    }
-    
-    @IBAction func pressedClearUserQueue(_ sender: Any) {
-        dismiss(animated: true)
-        if let popupPlayer = self.rootView as? PopupPlayerVC {
-            popupPlayer.clearUserQueue()
-        }
-    }
-    
-    @IBAction func pressedAddContextQueueToPlaylist(_ sender: Any) {
-        dismiss(animated: true)
-        let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-        var itemsToAdd = self.appDelegate.player.prevQueue.filterSongs()
-        if let currentlyPlaying = self.appDelegate.player.currentlyPlaying, currentlyPlaying.isSong {
-            itemsToAdd.append(currentlyPlaying)
-        }
-        itemsToAdd.append(contentsOf: self.appDelegate.player.nextQueue.filterSongs())
-        selectPlaylistVC.itemsToAdd = itemsToAdd
-        let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-        rootView?.present(selectPlaylistNav, animated: true, completion: nil)
     }
     
     @IBAction func pressedCancel(_ sender: Any) {

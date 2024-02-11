@@ -1,0 +1,278 @@
+//
+//  PopupPlayer+TableViewExtension.swift
+//  Amperfy
+//
+//  Created by Maximilian Bauer on 08.02.24.
+//  Copyright (c) 2024 Maximilian Bauer. All rights reserved.
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+import UIKit
+import AmperfyKit
+
+enum PlayerSectionCategory: Int, CaseIterable {
+    case contextPrev = 0
+    case currentlyPlaying
+    case userQueue
+    case contextNext
+}
+
+extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
+    
+    func setupTableView() {
+        tableView.register(nibName: PlayableTableCell.typeName)
+        tableView.register(nibName: CurrentlyPlayingTableCell.typeName)
+        tableView.rowHeight = PlayableTableCell.rowHeight
+        tableView.backgroundColor = UIColor.clear
+        tableView.sectionHeaderTopPadding = 0.0
+    }
+    
+    func clearUserQueue() {
+        guard self.player.userQueue.count > 0 else { return }
+        tableView.beginUpdates()
+        var indexPaths = [IndexPath]()
+        for i in 0...self.player.userQueue.count-1 {
+            indexPaths.append(IndexPath(row: i, section: PlayerSectionCategory.userQueue.rawValue))
+        }
+        tableView.deleteRows(at: indexPaths, with: .fade)
+        appDelegate.player.clearUserQueue()
+        tableView.endUpdates()
+        refreshUserQueueSectionHeader()
+    }
+    
+    func convertCellViewToPlayerIndex(cell: PlayableTableCell) -> PlayerIndex? {
+        guard let indexPath = tableView.indexPath(for: cell),
+              let playerIndex = PlayerIndex.create(from: indexPath) else { return nil }
+        return playerIndex
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return PlayerSectionCategory.allCases.count
+    }
+
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return nil
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        guard let category = PlayerSectionCategory(rawValue: section) else { return }
+        activeDisplayedSectionHeader.insert(category)
+    }
+    
+    func tableView(_ tableView: UITableView, didEndDisplayingHeaderView view: UIView, forSection section: Int) {
+        guard let category = PlayerSectionCategory(rawValue: section) else { return }
+        activeDisplayedSectionHeader.remove(category)
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let sectionCategors = PlayerSectionCategory(rawValue: section)
+        switch sectionCategors {
+        case .contextPrev:
+            return contextPrevQueueSectionHeader
+        case .currentlyPlaying:
+            return nil
+        case .userQueue:
+            refreshUserQueueSectionHeader()
+            return userQueueSectionHeader
+        case .contextNext:
+            return contextNextQueueSectionHeader
+        case .none:
+            return nil
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        switch PlayerSectionCategory(rawValue: section) {
+        case .contextPrev:
+            return ContextQueuePrevSectionHeader.frameHeight
+        case .currentlyPlaying:
+            return 0.0
+        case .userQueue:
+            if player.userQueue.isEmpty {
+                return CGFloat.leastNormalMagnitude
+            } else {
+                return UserQueueSectionHeader.frameHeight
+            }
+        case .contextNext:
+            return ContextQueueNextSectionHeader.frameHeight
+        case .none:
+            return 0.0
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        switch PlayerSectionCategory(rawValue: section) {
+        case .contextPrev, .contextNext:
+            return clearEmptySectionFooter
+        case .currentlyPlaying, .userQueue, .none:
+            return nil
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        switch PlayerSectionCategory(rawValue: section) {
+        case .contextPrev: return 30.0 // bottom padding of prev section (space above currently playing cell)
+        case .currentlyPlaying, .userQueue, .none: return 0.0
+        case .contextNext: // calculate footer height to keep currently playing row on top of table view
+            let heightOfContextNextRows = tableView.frame.height - CurrentlyPlayingTableCell.rowHeight - ContextQueueNextSectionHeader.frameHeight
+            let contextNextRowOccupiedHeight = CGFloat(player.nextQueue.count) * PlayableTableCell.rowHeight
+            let offset = heightOfContextNextRows - contextNextRowOccupiedHeight
+            return offset > 0.0 ? offset : 0.0
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        switch PlayerSectionCategory(rawValue: section) {
+        case .contextPrev: return player.prevQueue.count
+        case .currentlyPlaying: return 1
+        case .userQueue: return player.userQueue.count
+        case .contextNext: return player.nextQueue.count
+        case .none: return 0
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let sectionCategors = PlayerSectionCategory(rawValue: indexPath.section)
+        switch sectionCategors {
+        case .contextPrev, .userQueue, .contextNext, .none:
+            return PlayableTableCell.rowHeight
+        case .currentlyPlaying:
+            return CurrentlyPlayingTableCell.rowHeight
+        }
+   }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch PlayerSectionCategory(rawValue: indexPath.section) {
+        case .contextPrev, .userQueue, .contextNext:
+            let cell: PlayableTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
+            guard let playerIndex = PlayerIndex.create(from: indexPath) else { return cell }
+            let playable = player.getPlayable(at: playerIndex)
+            cell.backgroundColor = UIColor.clear
+            cell.display(
+                playable: playable,
+                playContextCb: {(_) in PlayContext()},
+                rootView: self,
+                playerIndexCb: convertCellViewToPlayerIndex,
+                subtitleColor: self.subtitleColor(style: traitCollection.userInterfaceStyle))
+            cell.maskCell(fromTop: 0.0)
+            return cell
+        case .currentlyPlaying:
+            let cell: CurrentlyPlayingTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
+            cell.backgroundColor = UIColor.clear
+            cell.prepare(toWorkOnRootView: self)
+            return cell
+        case .none:
+            return UITableViewCell()
+        }
+
+    }
+    
+    // Override to allow editing only for certain rows
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        switch PlayerSectionCategory(rawValue: indexPath.section) {
+        case .contextPrev, .userQueue, .contextNext: return true
+        case .currentlyPlaying, .none: return false
+        }
+    }
+    
+    // Override to support editing the table view.
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            guard let playerIndex = PlayerIndex.create(from: indexPath) else { return }
+            player.removePlayable(at: playerIndex)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            if PlayerSectionCategory(rawValue: indexPath.section) == .userQueue {
+                refreshUserQueueSectionHeader()
+            }
+        }
+    }
+    
+    // Override to support rearranging the table view.
+    func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+        refreshCellMasks()
+        guard fromIndexPath != to,
+            let fromPlayerIndex = PlayerIndex.create(from: fromIndexPath),
+            let toPlayerIndex = PlayerIndex.create(from: to)
+        else { return }
+        player.movePlayable(from: fromPlayerIndex, to: toPlayerIndex)
+        if PlayerSectionCategory(rawValue: fromIndexPath.section) == .userQueue ||
+           PlayerSectionCategory(rawValue: to.section) == .userQueue {
+            refreshUserQueueSectionHeader()
+        }
+    }
+    
+    // Override to deny movment of rows to specific sections
+    func tableView(_ tableView: UITableView, targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath, toProposedIndexPath targetIndexPath: IndexPath) -> IndexPath {
+        refreshCellMasks()
+        // deny moving rows to currently playing section
+        if PlayerSectionCategory(rawValue: targetIndexPath.section) == .currentlyPlaying {
+            return sourceIndexPath
+        } else {
+            return targetIndexPath
+        }
+    }
+    
+    // Override to support conditional rearranging of the table view.
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        // Return false if you do not want the item to be re-orderable.
+        switch PlayerSectionCategory(rawValue: indexPath.section) {
+        case .contextPrev, .userQueue, .contextNext: return true
+        case .currentlyPlaying, .none: return false
+        }
+    }
+}
+
+extension PopupPlayerVC: UITableViewDragDelegate {
+    func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        // Create empty DragItem -> we are using tableView(_:moveRowAt:to:) method
+        return [UIDragItem]()
+    }
+}
+
+extension PopupPlayerVC: UITableViewDropDelegate {
+    func tableView(_ tableView: UITableView, canHandle session: UIDropSession) -> Bool {
+        return false
+    }
+
+    func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
+        // Local drags with one item go through the existing tableView(_:moveRowAt:to:) method on the data source
+        return
+    }
+    
+    func tableView(_ tableView: UITableView, dropSessionDidEnd session: UIDropSession) {
+        refreshCellMasks()
+        return
+    }
+}
+
+extension PlayableTableCell {
+    public func maskCell(fromTop margin: CGFloat) {
+        if margin > 0 {
+            layer.mask = visibilityMask(withLocation: margin / frame.size.height)
+            layer.masksToBounds = true
+        } else {
+            layer.mask = nil
+        }
+    }
+
+    private func visibilityMask(withLocation location: CGFloat) -> CAGradientLayer {
+        let mask = CAGradientLayer()
+        mask.frame = bounds
+        mask.colors = [UIColor.white.withAlphaComponent(0).cgColor, UIColor.white.cgColor]
+        let num = location as NSNumber
+        mask.locations = [num, num]
+        return mask
+    }
+}

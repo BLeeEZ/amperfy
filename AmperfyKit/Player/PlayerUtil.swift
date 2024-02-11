@@ -188,8 +188,8 @@ public enum PlaybackRate: Int, CaseIterable {
 
 public enum PlayerQueueType: Int, CaseIterable {
     case prev = 0
-    case user
-    case next
+    case user = 2
+    case next = 3
     
     public var description : String {
         switch self {
