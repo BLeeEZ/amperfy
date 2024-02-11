@@ -113,70 +113,72 @@
                     </constraints>
                 </stackView>
                 <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="xXq-r4-gI6">
-                    <rect key="frame" x="37.5" y="186" width="300" height="40"/>
+                    <rect key="frame" x="37.5" y="186" width="300" height="28"/>
                     <subviews>
-                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
-                            <rect key="frame" x="0.0" y="0.0" width="50" height="40"/>
-                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="50" id="5uL-80-PHj"/>
-                                <constraint firstAttribute="height" constant="40" id="dOb-nc-wBt"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                            <color key="tintColor" systemColor="labelColor"/>
-                            <inset key="contentEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
-                            <state key="normal">
-                                <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="rectangle.portrait.inset.filled" catalog="system" symbolScale="medium"/>
-                            </state>
-                            <connections>
-                                <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change">
-                            <rect key="frame" x="93.5" y="0.0" width="40" height="40"/>
-                            <constraints>
-                                <constraint firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="Iye-f4-Rd2"/>
-                                <constraint firstAttribute="width" constant="40" id="O0l-F2-ebZ"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                            <color key="tintColor" systemColor="labelColor"/>
-                            <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
-                            <state key="normal">
-                                <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="music.note" catalog="system" symbolScale="large" variableValue="0.60000000000000009"/>
-                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" weight="bold"/>
-                            </state>
-                            <connections>
-                                <action selector="playerModeChangePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="WMf-zb-HxJ"/>
-                            </connections>
-                        </button>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l5j-2I-Ltc" userLabel="Airplay Button">
-                            <rect key="frame" x="176.5" y="0.0" width="40" height="40"/>
+                            <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                             <constraints>
-                                <constraint firstAttribute="width" constant="40" id="4pS-66-grn"/>
+                                <constraint firstAttribute="width" constant="28" id="4pS-66-grn"/>
                                 <constraint firstAttribute="width" secondItem="l5j-2I-Ltc" secondAttribute="height" multiplier="1:1" id="NI7-38-OSx"/>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="airplayaudio" catalog="system" symbolScale="large"/>
+                                <imageReference key="image" image="airplayaudio" catalog="system" symbolScale="medium"/>
                             </state>
                             <connections>
                                 <action selector="airplayButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YPY-8P-oS2"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0xq-hb-FZa" userLabel="Options Button">
-                            <rect key="frame" x="260" y="0.0" width="40" height="40"/>
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
+                            <rect key="frame" x="90.5" y="0.0" width="28" height="28"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="40" id="Ble-C9-owO"/>
+                                <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="dHI-Uf-EN9"/>
+                                <constraint firstAttribute="height" constant="28" id="dOb-nc-wBt"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="rectangle.portrait.inset.filled" catalog="system" symbolScale="medium"/>
+                            </state>
+                            <buttonConfiguration key="configuration" style="gray" cornerStyle="medium" buttonSize="small">
+                                <imageReference key="image" image="list.bullet" catalog="system" symbolScale="small"/>
+                                <backgroundConfiguration key="background"/>
+                            </buttonConfiguration>
+                            <connections>
+                                <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change">
+                            <rect key="frame" x="181.5" y="0.0" width="28" height="28"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="Iye-f4-Rd2"/>
+                                <constraint firstAttribute="width" constant="28" id="O0l-F2-ebZ"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <inset key="contentEdgeInsets" minX="4" minY="4" maxX="4" maxY="4"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="podcast" symbolScale="small" variableValue="0.60000000000000009"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" weight="bold"/>
+                            </state>
+                            <connections>
+                                <action selector="playerModeChangePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="WMf-zb-HxJ"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0xq-hb-FZa" userLabel="Options Button">
+                            <rect key="frame" x="272" y="0.0" width="28" height="28"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="28" id="Ble-C9-owO"/>
                                 <constraint firstAttribute="width" secondItem="0xq-hb-FZa" secondAttribute="height" multiplier="1:1" id="ND9-Bu-dGG"/>
                             </constraints>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="ellipsis" catalog="system" symbolScale="large"/>
+                                <imageReference key="image" image="ellipsis" catalog="system" symbolScale="medium"/>
                             </state>
                         </button>
                     </subviews>
@@ -194,9 +196,6 @@
                     <state key="normal" title="Button"/>
                     <buttonConfiguration key="configuration" style="gray" cornerStyle="medium" buttonSize="small">
                         <imageReference key="image" image="moon.zzz.fill" catalog="system" symbolScale="small"/>
-                        <backgroundConfiguration key="background" strokeWidth="1">
-                            <color key="strokeColor" systemColor="labelColor"/>
-                        </backgroundConfiguration>
                     </buttonConfiguration>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f7L-lf-lJ6" userLabel="Playback Rate Button">
@@ -254,9 +253,10 @@
         <image name="forward.fill" catalog="system" width="128" height="77"/>
         <image name="gobackward.10" catalog="system" width="119" height="128"/>
         <image name="goforward.10" catalog="system" width="119" height="128"/>
+        <image name="list.bullet" catalog="system" width="128" height="87"/>
         <image name="moon.zzz.fill" catalog="system" width="117" height="128"/>
-        <image name="music.note" catalog="system" width="96" height="128"/>
         <image name="play.fill" catalog="system" width="117" height="128"/>
+        <image name="podcast" width="448" height="512"/>
         <image name="rectangle.portrait.inset.filled" catalog="system" width="115" height="128"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

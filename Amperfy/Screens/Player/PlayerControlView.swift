@@ -2,7 +2,7 @@
 //  PlayerControlView.swift
 //  Amperfy
 //
-//  Created by Maximilian Bauer on 07.03.24.
+//  Created by Maximilian Bauer on 07.02.24.
 //  Copyright (c) 2024 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,6 @@ class PlayerControlView: UIView {
     private var appDelegate: AppDelegate!
     private var player: PlayerFacade!
     private var rootView: PopupPlayerVC?
-    private var displayStyle: PlayerDisplayStyle!
     
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var previousButton: UIButton!
@@ -54,7 +53,6 @@ class PlayerControlView: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        self.displayStyle = appDelegate.storage.settings.playerDisplayStyle
         self.layoutMargins = Self.margin
         player = appDelegate.player
         player.addNotifier(notifier: self)
@@ -128,9 +126,12 @@ class PlayerControlView: UIView {
     
     @IBAction private func displayPlaylistPressed() {
         appDelegate.userStatistics.usedAction(.changePlayerDisplayStyle)
+        var displayStyle = appDelegate.storage.settings.playerDisplayStyle
         displayStyle.switchToNextStyle()
         appDelegate.storage.settings.playerDisplayStyle = displayStyle
+        rootView?.changeDisplayStyle(to: displayStyle)
         refreshDisplayPlaylistButton()
+        refreshPlayerOptions()
     }
     
     @IBAction func playerModeChangePressed(_ sender: Any) {
@@ -219,7 +220,6 @@ class PlayerControlView: UIView {
         refreshDisplayPlaylistButton()
         refreshPlayerModeChangeButton()
         refreshPlayerOptions()
-        displayPlaylistButton.isHidden = true
     }
     
     func refreshPrevNextButtons() {
@@ -322,6 +322,7 @@ class PlayerControlView: UIView {
             })
             menuActions.append(clearUserQueue)
         }
+        
         switch player.playerMode {
         case .music:
             if player.currentlyPlaying != nil || player.prevQueue.count > 0 || player.nextQueue.count > 0 {
@@ -341,10 +342,15 @@ class PlayerControlView: UIView {
         case .podcast: break
         }
 
-        let scrollToCurrentlyPlaying = UIAction(title: "Scroll to currently playing", image: .squareArrow, handler: { _ in
-            self.rootView?.scrollToCurrentlyPlayingRow()
-        })
-        menuActions.append(scrollToCurrentlyPlaying)
+        switch self.appDelegate.storage.settings.playerDisplayStyle {
+        case .compact:
+            let scrollToCurrentlyPlaying = UIAction(title: "Scroll to currently playing", image: .squareArrow, handler: { _ in
+                self.rootView?.scrollToCurrentlyPlayingRow()
+            })
+            menuActions.append(scrollToCurrentlyPlaying)
+        case .large: break
+        }
+
         optionsButton.menu = UIMenu(title: "Player Options", children: menuActions)
         optionsButton.showsMenuAsPrimaryAction = true
     }
@@ -361,16 +367,15 @@ class PlayerControlView: UIView {
     }
     
     func refreshDisplayPlaylistButton() {
-        displayPlaylistButton.imageView?.contentMode = .scaleAspectFit
-        if displayStyle == .compact {
-            displayPlaylistButton.setImage(UIImage.playerStyleCompact, for: .normal)
-        } else {
-            displayPlaylistButton.setImage(UIImage.playerStyleLarge, for: .normal)
-        }
+        guard let rootView = rootView else { return }
+        let isSelected = appDelegate.storage.settings.playerDisplayStyle == .compact
+        var config = rootView.getPlayerButtonConfiguration(isSelected: isSelected)
+        config.image = .playlistDisplayStyle
+        displayPlaylistButton.isSelected = isSelected
+        displayPlaylistButton.configuration = config
     }
     
     func refreshPlayerModeChangeButton() {
-        playerModeButton.imageView?.contentMode = .scaleAspectFit
         switch player.playerMode {
         case .music:
             playerModeButton.setImage(UIImage.musicalNotes, for: .normal)

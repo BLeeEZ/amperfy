@@ -289,6 +289,10 @@ extension UIColor {
         }
     }
     
+    public static var redHeart: UIColor {
+        return .red.withAlphaComponent(0.8)
+    }
+    
     public static var fillColor: UIColor {
         if #available(iOS 13.0, *) {
             return UIColor.systemFill

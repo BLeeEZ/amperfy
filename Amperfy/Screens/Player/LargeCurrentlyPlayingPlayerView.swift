@@ -1,5 +1,5 @@
 //
-//  CurrentlyPlayingTableCell.swift
+//  LargeCurrentlyPlayingPlayerView.swift
 //  Amperfy
 //
 //  Created by Maximilian Bauer on 07.02.24.
@@ -20,29 +20,38 @@
 //
 
 import UIKit
+import MediaPlayer
+import MarqueeLabel
 import AmperfyKit
 import PromiseKit
-import MarqueeLabel
 
-class CurrentlyPlayingTableCell: BasicTableCell {
+class LargeCurrentlyPlayingPlayerView: UIView {
     
     static let rowHeight: CGFloat = 94.0
+    static private let margin = UIEdgeInsets(top: 0, left: UIView.defaultMarginX, bottom: 20, right: UIView.defaultMarginX)
     
+    private var appDelegate: AppDelegate!
     private var rootView: PopupPlayerVC?
     
     @IBOutlet weak var artworkImage: LibraryEntityImage!
     @IBOutlet weak var titleLabel: MarqueeLabel!
+    @IBOutlet weak var albumLabel: MarqueeLabel!
+    @IBOutlet weak var albumButton: UIButton!
+    @IBOutlet weak var albumContainerView: UIView!
     @IBOutlet weak var artistLabel: MarqueeLabel!
     @IBOutlet weak var favoriteButton: UIButton!
     @IBOutlet weak var optionsButton: UIButton!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        self.layoutMargins = Self.margin
     }
     
     func prepare(toWorkOnRootView: PopupPlayerVC? ) {
         self.rootView = toWorkOnRootView
         titleLabel.applyAmperfyStyle()
+        albumLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()
         refresh()
     }
@@ -51,7 +60,10 @@ class CurrentlyPlayingTableCell: BasicTableCell {
         rootView?.refreshCurrentlyPlayingInfo(
             artworkImage: artworkImage,
             titleLabel: titleLabel,
-            artistLabel: artistLabel)
+            artistLabel: artistLabel,
+            albumLabel: albumLabel,
+            albumButton: albumButton,
+            albumContainerView: albumContainerView)
         rootView?.refreshFavoriteButton(button: favoriteButton)
     }
     
@@ -60,6 +72,10 @@ class CurrentlyPlayingTableCell: BasicTableCell {
     }
 
     @IBAction func titlePressed(_ sender: Any) {
+        rootView?.displayAlbumDetail()
+        rootView?.displayPodcastDetail()
+    }
+    @IBAction func albumPressed(_ sender: Any) {
         rootView?.displayAlbumDetail()
         rootView?.displayPodcastDetail()
     }

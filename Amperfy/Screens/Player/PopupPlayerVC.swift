@@ -26,6 +26,7 @@ import PromiseKit
 class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var largePlayerPlaceholderView: UIView!
     @IBOutlet weak var controlPlaceholderView: UIView!
     @IBOutlet weak var backgroundImage: UIImageView!
     
@@ -35,8 +36,8 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     var appDelegate: AppDelegate!
     var player: PlayerFacade!
     var controlView: PlayerControlView?
+    var largeCurrentlyPlayingView: LargeCurrentlyPlayingPlayerView?
     var hostingTabBarVC: TabBarVC?
-    var nextViewSizeDueToDeviceRotation: CGSize?
     var isBackgroundBlurConfigured = false
     
     var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
@@ -68,8 +69,14 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             createdPlayerControlView.prepare(toWorkOnRootView: self)
             controlPlaceholderView.addSubview(createdPlayerControlView)
         }
+        if let createdLargeCurrentlyPlayingView = ViewBuilder<LargeCurrentlyPlayingPlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: largePlayerPlaceholderView.bounds.size.width, height: largePlayerPlaceholderView.bounds.size.height)) {
+            largeCurrentlyPlayingView = createdLargeCurrentlyPlayingView
+            createdLargeCurrentlyPlayingView.prepare(toWorkOnRootView: self)
+            largePlayerPlaceholderView.addSubview(createdLargeCurrentlyPlayingView)
+        }
         
         self.setupTableView()
+        self.fetchSongInfoAndUpdateViews()
         
         if let sectionView = ViewBuilder<ContextQueuePrevSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ContextQueuePrevSectionHeader.frameHeight)) {
             contextPrevQueueSectionHeader = sectionView
@@ -100,80 +107,100 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         appDelegate.userStatistics.visited(.popupPlayer)
+        changeDisplayStyle(to: appDelegate.storage.settings.playerDisplayStyle, animated: false)
         reloadData()
-        self.controlView?.refreshView()
         scrollToCurrentlyPlayingRow()
+        self.controlView?.refreshView()
+        refresh()
     }
     
-    // Detecet device (iPad) rotation
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        nextViewSizeDueToDeviceRotation = size
-    }
-    
-    override func didRotate(from fromInterfaceOrientation: UIInterfaceOrientation) {
-        nextViewSizeDueToDeviceRotation = nil
-    }
-    
-    func subtitleColor(style: UIUserInterfaceStyle) -> UIColor {
-        if let artwork = player.currentlyPlaying?.image(setting: appDelegate.storage.settings.artworkDisplayPreference), artwork != player.currentlyPlaying?.defaultImage {
-            let customColor: UIColor!
-            if traitCollection.userInterfaceStyle == .dark {
-                customColor = artwork.averageColor().getWithLightness(of: 0.8)
-            } else {
-                customColor = artwork.averageColor().getWithLightness(of: 0.2)
-            }
-            return customColor
-        } else {
-            return .labelColor
+    func fetchSongInfoAndUpdateViews() {
+        guard self.appDelegate.storage.settings.isOnlineMode,
+              let song = player.currentlyPlaying?.asSong
+        else { return }
+
+        firstly {
+            self.appDelegate.librarySyncer.sync(song: song)
+        }.done {
+            self.refreshCurrentlyPlayingInfoView()
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
         }
-    }
-    
-    func scrollToCurrentlyPlayingRow() {
-        return tableView.scrollToRow(at: IndexPath(row: 0, section: PlayerSectionCategory.currentlyPlaying.rawValue), at: .top, animated: false);
     }
     
     func reloadData() {
         tableView.reloadData()
         scrollToCurrentlyPlayingRow()
-        refresh()
     }
     
-    func refresh() {
-        refreshUserQueueSectionHeader()
-        refreshCellMasks()
+    func scrollToCurrentlyPlayingRow() {
+        return tableView.scrollToRow(at: IndexPath(row: 0, section: PlayerSectionCategory.currentlyPlaying.rawValue), at: .top, animated: false);
     }
-    
-    func changeBackgroundGradient(forPlayable playable: AbstractPlayable) {
-        let artwork = playable.image(setting: appDelegate.storage.settings.artworkDisplayPreference)
-        backgroundImage.image = artwork
-    }
-    
-    func getPlayerButtonConfiguration(isSelected: Bool) -> UIButton.Configuration {
-        var config = UIButton.Configuration.tinted()
-        if isSelected {
-            config.background.strokeColor = .label
-            config.background.strokeWidth = 1.0
-            config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
-        }
-        config.buttonSize = .small
-        config.baseForegroundColor = !isSelected ? .label : .systemBackground
-        config.baseBackgroundColor = !isSelected ? .clear : .label
-        config.cornerStyle = .medium
-        return config
-    }
-    
-    // handle dark/light mode change
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        let subtitleColor = self.subtitleColor(style: traitCollection.userInterfaceStyle)
-        tableView.visibleCells.forEach {
-            ($0 as? PlayableTableCell)?.updateSubtitleColor(color: subtitleColor)
+
+    func favoritePressed() {
+        switch player.playerMode {
+        case .music:
+            guard let playableInfo = player.currentlyPlaying else { return }
+            firstly {
+                playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+            }.finally {
+                self.refresh()
+            }
+        case .podcast:
+            guard let podcastEpisode = player.currentlyPlaying?.asPodcastEpisode
+            else { return }
+            let descriptionVC = PodcastDescriptionVC()
+            descriptionVC.display(podcastEpisode: podcastEpisode, on: self)
+            present(descriptionVC, animated: true)
         }
     }
     
-    var frameSizeWithRotationAdjusment: CGSize {
-        return nextViewSizeDueToDeviceRotation ?? view.frame.size
+    func displayArtistDetail() {
+        if let song = player.currentlyPlaying?.asSong, let artist = song.artist {
+            let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
+            artistDetailVC.artist = artist
+            closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
+        }
+    }
+    
+    func displayAlbumDetail() {
+        if let song = player.currentlyPlaying?.asSong, let album = song.album {
+            let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
+            albumDetailVC.album = album
+            albumDetailVC.songToScrollTo = song
+            closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
+        }
+    }
+    
+    func displayPodcastDetail() {
+        if let podcastEpisode = player.currentlyPlaying?.asPodcastEpisode, let podcast = podcastEpisode.podcast {
+            let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
+            podcastDetailVC.podcast = podcast
+            podcastDetailVC.episodeToScrollTo = podcastEpisode
+            closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
+        }
+    }
+    
+    func closePopupPlayerAndDisplayInLibraryTab(vc: UIViewController) {
+        guard let hostingTabBarVC = hostingTabBarVC else { return }
+        hostingTabBarVC.closePopup(animated: true, completion: { () in
+            if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
+               hostingTabViewControllers.count > 0,
+               let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
+                libraryTabNavVC.pushViewController(vc, animated: false)
+                hostingTabBarVC.selectedIndex = 0
+            }
+        })
+    }
+    
+    func displayCurrentlyPlayingDetailInfo() {
+        appDelegate.userStatistics.usedAction(.playerOptions)
+        guard let playable = self.player.currentlyPlaying else { return }
+        let detailVC = LibraryEntityDetailVC()
+        detailVC.display(container: playable, on: self, playContextCb: nil)
+        self.present(detailVC, animated: true)
     }
     
     func refreshUserQueueSectionHeader() {
@@ -206,45 +233,30 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             }
         }
     }
-    
-    func displayCurrentlyPlayingDetailInfo() {
-        appDelegate.userStatistics.usedAction(.playerOptions)
-        guard let playable = self.player.currentlyPlaying else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: playable, on: self, playContextCb: nil)
-        self.present(detailVC, animated: true)
-    }
 
 }
 
 extension PopupPlayerVC: MusicPlayable {
     func didStartPlaying() {
         self.reloadData()
+        refresh()
     }
     
     func didStopPlaying() {
         self.reloadData()
+        refresh()
     }
 
     func didPlaylistChange() {
         self.reloadData()
-    }
-    
-    func closePopupPlayerAndDisplayInLibraryTab(vc: UIViewController) {
-        guard let hostingTabBarVC = hostingTabBarVC else { return }
-        hostingTabBarVC.closePopup(animated: true, completion: { () in
-            if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
-               hostingTabViewControllers.count > 0,
-               let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
-                libraryTabNavVC.pushViewController(vc, animated: false)
-                hostingTabBarVC.selectedIndex = 0
-            }
-        })
+        refresh()
     }
     
     func didPause() {}
     func didElapsedTimeChange() {}
-    func didArtworkChange() {}
+    func didArtworkChange() {
+        self.refreshCurrentlyPlayingArtworks()
+    }
     func didShuffleChange() {}
     func didRepeatChange() {}
     func didPlaybackRateChange() {}

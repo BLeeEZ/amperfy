@@ -14,6 +14,7 @@
                 <outlet property="backgroundImage" destination="uc4-Rw-bKA" id="WkZ-wK-VH1"/>
                 <outlet property="controlPlaceholderHeightConstraint" destination="4Md-WZ-qJc" id="czl-9v-6th"/>
                 <outlet property="controlPlaceholderView" destination="B0Y-BS-JDd" id="vCd-rV-aRY"/>
+                <outlet property="largePlayerPlaceholderView" destination="lyG-pB-bha" id="s82-dZ-gRe"/>
                 <outlet property="tableView" destination="6gH-MH-Q1w" id="yVW-IT-Efj"/>
                 <outlet property="view" destination="9Ao-u1-xa1" id="qS4-gl-eGl"/>
             </connections>
@@ -26,6 +27,9 @@
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="uc4-Rw-bKA">
                     <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                 </imageView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lyG-pB-bha" userLabel="Large Player Placeholder">
+                    <rect key="frame" x="0.0" y="48" width="414" height="614"/>
+                </view>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" contentViewInsetsToSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6gH-MH-Q1w">
                     <rect key="frame" x="0.0" y="48" width="414" height="614"/>
                     <color key="sectionIndexBackgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -44,8 +48,10 @@
             <viewLayoutGuide key="safeArea" id="1MA-6G-aB5"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
+                <constraint firstItem="lyG-pB-bha" firstAttribute="top" secondItem="1MA-6G-aB5" secondAttribute="top" id="18e-Ia-XA9"/>
                 <constraint firstItem="B0Y-BS-JDd" firstAttribute="top" secondItem="6gH-MH-Q1w" secondAttribute="bottom" id="31P-Um-22E"/>
                 <constraint firstAttribute="bottom" secondItem="uc4-Rw-bKA" secondAttribute="bottom" id="BR3-r1-kqM"/>
+                <constraint firstAttribute="right" secondItem="lyG-pB-bha" secondAttribute="right" id="Bv5-GQ-NSk"/>
                 <constraint firstItem="6gH-MH-Q1w" firstAttribute="top" secondItem="1MA-6G-aB5" secondAttribute="top" id="CX2-Pe-eWy"/>
                 <constraint firstItem="6gH-MH-Q1w" firstAttribute="leading" secondItem="9Ao-u1-xa1" secondAttribute="leading" id="J6w-F0-q1Q"/>
                 <constraint firstItem="uc4-Rw-bKA" firstAttribute="trailing" secondItem="1MA-6G-aB5" secondAttribute="trailing" id="JKc-tO-MZO"/>
@@ -53,8 +59,10 @@
                 <constraint firstAttribute="trailing" secondItem="6gH-MH-Q1w" secondAttribute="trailing" id="SC7-8I-hah"/>
                 <constraint firstItem="uc4-Rw-bKA" firstAttribute="leading" secondItem="1MA-6G-aB5" secondAttribute="leading" id="eTE-g1-R4C"/>
                 <constraint firstAttribute="bottomMargin" secondItem="B0Y-BS-JDd" secondAttribute="bottom" id="eTW-73-QtE"/>
+                <constraint firstItem="B0Y-BS-JDd" firstAttribute="top" secondItem="lyG-pB-bha" secondAttribute="bottom" id="n3g-77-ORg"/>
                 <constraint firstItem="uc4-Rw-bKA" firstAttribute="top" secondItem="9Ao-u1-xa1" secondAttribute="top" id="vLW-rG-4pv"/>
                 <constraint firstItem="1MA-6G-aB5" firstAttribute="trailing" secondItem="B0Y-BS-JDd" secondAttribute="trailing" id="vbp-wW-JVG"/>
+                <constraint firstItem="lyG-pB-bha" firstAttribute="left" secondItem="9Ao-u1-xa1" secondAttribute="left" id="wBC-Wu-AKk"/>
             </constraints>
             <point key="canvasLocation" x="369.7265625" y="-1544.8023426061493"/>
         </view>
