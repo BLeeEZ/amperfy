@@ -104,6 +104,9 @@ extension PopupPlayerVC {
             config.baseForegroundColor = .label
             button.isEnabled = true
         }
+        if #available(iOS 17.0, *) {
+            button.isSymbolAnimationEnabled = true
+        }
         button.configuration = config
     }
     
