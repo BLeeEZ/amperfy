@@ -24,6 +24,8 @@
 		500B7D4521EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500B7D4421EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib */; };
 		500B7D4721EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */; };
 		500B7D4921EDD6250083ED6F /* ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4821EDD6250083ED6F /* ViewBuilder.swift */; };
+		500B97CD2B7BC680005554BF /* EntityPreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B97CC2B7BC67F005554BF /* EntityPreviewVC.swift */; };
+		500B97D02B7C9555005554BF /* EntityPreviewVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500B97CF2B7C9546005554BF /* EntityPreviewVC.xib */; };
 		50120A2526281C1900B037B1 /* BasicTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50120A2426281C1900B037B1 /* BasicTableViewController.swift */; };
 		501944182B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501944172B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift */; };
 		501944192B78F9B800082D2E /* LargeCurrentlyPlayingPlayerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 501944162B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.xib */; };
@@ -416,8 +418,6 @@
 		50DEEE0C265E3F9D0073FF20 /* DirectoriesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE0B265E3F9D0073FF20 /* DirectoriesVC.swift */; };
 		50DF1E5628DDE3FA00F3EA00 /* AlbumCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DF1E5428DDE3FA00F3EA00 /* AlbumCollectionCell.swift */; };
 		50DF1E5A28DDECEA00F3EA00 /* AlbumCollectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50DF1E5928DDECEA00F3EA00 /* AlbumCollectionCell.xib */; };
-		50E3D8D02796CB2B009A9680 /* LibraryEntityDetailVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50E3D8CF2796CB2B009A9680 /* LibraryEntityDetailVC.xib */; };
-		50E3D8D22796CB8A009A9680 /* LibraryEntityDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E3D8D12796CB8A009A9680 /* LibraryEntityDetailVC.swift */; };
 		50E77DB428D1B63200BDF882 /* LibraryDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */; };
 		50E77DB728D2163F00BDF882 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB628D2163F00BDF882 /* SettingsView.swift */; };
 		50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */; };
@@ -532,6 +532,8 @@
 		500B7D4421EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LibraryElementDetailTableHeaderView.xib; sourceTree = "<group>"; };
 		500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryElementDetailTableHeaderView.swift; sourceTree = "<group>"; };
 		500B7D4821EDD6250083ED6F /* ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewBuilder.swift; sourceTree = "<group>"; };
+		500B97CC2B7BC67F005554BF /* EntityPreviewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityPreviewVC.swift; sourceTree = "<group>"; };
+		500B97CF2B7C9546005554BF /* EntityPreviewVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EntityPreviewVC.xib; sourceTree = "<group>"; };
 		500BB45521CAA73700D367CF /* PersistentStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistentStorage.swift; sourceTree = "<group>"; };
 		500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Amperfy.xcdatamodel; sourceTree = "<group>"; };
 		500EB36725F8B3EB00B4B998 /* Corners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Corners.swift; sourceTree = "<group>"; };
@@ -875,8 +877,6 @@
 		50DF1E5928DDECEA00F3EA00 /* AlbumCollectionCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlbumCollectionCell.xib; sourceTree = "<group>"; };
 		50DF56C727C7753A00F106BA /* Amperfy v21.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v21.xcdatamodel"; sourceTree = "<group>"; };
 		50E15407261311590021F47D /* Amperfy v6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v6.xcdatamodel"; sourceTree = "<group>"; };
-		50E3D8CF2796CB2B009A9680 /* LibraryEntityDetailVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LibraryEntityDetailVC.xib; sourceTree = "<group>"; };
-		50E3D8D12796CB8A009A9680 /* LibraryEntityDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryEntityDetailVC.swift; sourceTree = "<group>"; };
 		50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryDisplaySettings.swift; sourceTree = "<group>"; };
 		50E77DB628D2163F00BDF882 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHostVC.swift; sourceTree = "<group>"; };
@@ -1462,6 +1462,8 @@
 				50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */,
 				50120A2426281C1900B037B1 /* BasicTableViewController.swift */,
 				5005938E28E2EDDB008C8DF6 /* BasicCollectionViewController.swift */,
+				500B97CF2B7C9546005554BF /* EntityPreviewVC.xib */,
+				500B97CC2B7BC67F005554BF /* EntityPreviewVC.swift */,
 				50DEEE03265E25A40073FF20 /* MusicFoldersVC.swift */,
 				50DEEE09265E392C0073FF20 /* IndexesVC.swift */,
 				50DEEE0B265E3F9D0073FF20 /* DirectoriesVC.swift */,
@@ -1487,8 +1489,6 @@
 				5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */,
 				508FDE4F21F64ED6005A0724 /* TabBarVC.swift */,
 				50BA92FF21CFDEBD00E5901D /* LibraryVC.swift */,
-				50E3D8CF2796CB2B009A9680 /* LibraryEntityDetailVC.xib */,
-				50E3D8D12796CB8A009A9680 /* LibraryEntityDetailVC.swift */,
 				50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */,
 			);
 			path = ViewController;
@@ -1948,7 +1948,6 @@
 				5005938928E2D4EF008C8DF6 /* CommonCollectionSectionHeader.xib in Resources */,
 				43FBE27F250D4DFD00D5F9B3 /* LaunchScreen.storyboard in Resources */,
 				504CE14E27920965005E0DE7 /* RatingView.xib in Resources */,
-				50E3D8D02796CB2B009A9680 /* LibraryEntityDetailVC.xib in Resources */,
 				50DEEE08265E27300073FF20 /* DirectoryTableCell.xib in Resources */,
 				500B7D4521EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib in Resources */,
 				50AFA14E2632E95900F198DD /* GenericDetailTableHeader.xib in Resources */,
@@ -1960,6 +1959,7 @@
 				50CCD0572B6C38670073793B /* PodcastDescriptionVC.xib in Resources */,
 				508EBB282850C8D90053D9F0 /* Assets.xcassets in Resources */,
 				508385ED21C5965B00C4BB32 /* Main.storyboard in Resources */,
+				500B97D02B7C9555005554BF /* EntityPreviewVC.xib in Resources */,
 				50A30E642B756CF100722894 /* CurrentlyPlayingTableCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2054,6 +2054,7 @@
 				50791E7828D25845006CE6E5 /* ServerSettingsView.swift in Sources */,
 				50791E8728D3B7BF006CE6E5 /* PlayerSettingsView.swift in Sources */,
 				50DEEE0C265E3F9D0073FF20 /* DirectoriesVC.swift in Sources */,
+				500B97CD2B7BC680005554BF /* EntityPreviewVC.swift in Sources */,
 				50791E7C28D32B8A006CE6E5 /* AlternativeURLAddDialogView.swift in Sources */,
 				502E56BC27561AD900638BD2 /* UserQueueSectionHeader.swift in Sources */,
 				50791E7A28D31090006CE6E5 /* ServerURLsSettingsView.swift in Sources */,
@@ -2113,7 +2114,6 @@
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
 				50C9D7142850759B007F18D0 /* Corners.swift in Sources */,
 				50AC4E5828D9D12D0091FF33 /* ObservableSettings.swift in Sources */,
-				50E3D8D22796CB8A009A9680 /* LibraryEntityDetailVC.swift in Sources */,
 				50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */,
 				50AC4E5628D99A410091FF33 /* ButtonStyles.swift in Sources */,
 				50C16C1C21E7051700F086F0 /* AlbumDetailVC.swift in Sources */,

@@ -62,6 +62,7 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
 
 public typealias ContainableAtIndexPathCallback = (IndexPath) -> PlayableContainable?
 public typealias SwipeActionCallback = (IndexPath, _ completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void ) -> Void
+public typealias PlayContextAtIndexPathCallback = (IndexPath) -> PlayContext?
 
 struct SwipeDisplaySettings {
     var playContextTypeOfElements: PlayerMode = .music
@@ -162,6 +163,7 @@ class BasicTableViewController: UITableViewController {
     var isRefreshAnimationOff = false
     var swipeDisplaySettings = SwipeDisplaySettings()
     var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
+    var playContextAtIndexPathCallback: PlayContextAtIndexPathCallback?
     var swipeCallback: SwipeActionCallback?
     private var isEditLockedDueToActiveSwipe = false
     
@@ -247,7 +249,35 @@ class BasicTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 0.0
     }
-
+    
+    override func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let containableCB = containableAtIndexPathCallback,
+              let containable = containableCB(indexPath)
+        else { return nil }
+        
+        let identifier = NSString(string: containable.containerIdentifierString)
+        return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
+            let vc = EntityPreviewVC()
+            vc.display(container: containable, on: self)
+            return vc
+        }) { suggestedActions in
+            var playIndexCB : (() -> PlayContext?)?
+            if let playContextAtIndexPathCP = self.playContextAtIndexPathCallback {
+                playIndexCB = { playContextAtIndexPathCP(indexPath) }
+            }
+            return EntityPreviewActionBuilder(container: containable, on: self, playContextCb: playIndexCB).createMenu()
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
+        animator.addCompletion {
+            if let identifierString = configuration.identifier as? String,
+               let container = PlayableContainerIdentifier.getContainer(library: self.appDelegate.storage.main.library, containerIdentifierString: identifierString) {
+                EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
+            }
+        }
+    }
+    
 }
 
 extension BasicTableViewController: NSFetchedResultsControllerDelegate {

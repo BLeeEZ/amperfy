@@ -198,14 +198,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         })
     }
     
-    func displayCurrentlyPlayingDetailInfo() {
-        appDelegate.userStatistics.usedAction(.playerOptions)
-        guard let playable = self.player.currentlyPlaying else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: playable, on: self, playContextCb: nil)
-        self.present(detailVC, animated: true)
-    }
-    
     func refreshUserQueueSectionHeader() {
         guard let userQueueSectionView = userQueueSectionHeader else { return }
         if player.userQueue.isEmpty {

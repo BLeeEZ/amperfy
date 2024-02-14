@@ -48,6 +48,8 @@ class PodcastEpisodeTableCell: BasicTableCell {
         }
         self.episode = episode
         self.rootView = rootView
+        optionsButton.showsMenuAsPrimaryAction = true
+        optionsButton.menu = EntityPreviewActionBuilder(container: episode, on: rootView, playContextCb: {() in PlayContext(containable: episode)}).createMenu()
         refresh()
     }
 
@@ -116,18 +118,6 @@ class PodcastEpisodeTableCell: BasicTableCell {
     @IBAction func playEpisodeButtonPressed(_ sender: Any) {
         guard let episode = self.episode else { return }
         appDelegate.player.play(context: PlayContext(containable: episode))
-    }
-    
-    @IBAction func optionsButtonPressed(_ sender: Any) {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let episode = self.episode, let rootView = rootView else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(
-            container: episode,
-            on: rootView,
-            playContextCb: {() in PlayContext(containable: episode)})
-        rootView.present(detailVC, animated: true)
     }
     
     @IBAction func showDescriptionButtonPressed(_ sender: Any) {

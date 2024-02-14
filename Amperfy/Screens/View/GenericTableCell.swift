@@ -36,12 +36,6 @@ class GenericTableCell: BasicTableCell {
     private var container: PlayableContainable?
     private var rootView: UITableViewController?
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
-        self.addGestureRecognizer(longPressGesture)
-    }
-    
     func display(container: PlayableContainable, rootView: UITableViewController) {
         self.container = container
         self.rootView = rootView
@@ -55,19 +49,4 @@ class GenericTableCell: BasicTableCell {
         favoriteIconImage.isHidden = !container.isFavorite
     }
 
-    @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {
-        if gesture.state == .began {
-            displayMenu()
-        }
-    }
-    
-    func displayMenu() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let container = container, let rootView = rootView else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: container, on: rootView)
-        rootView.present(detailVC, animated: true)
-    }
-    
 }

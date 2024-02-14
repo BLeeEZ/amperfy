@@ -54,11 +54,16 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         
-        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
+        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
+        optionsButton.menu = EntityPreviewActionBuilder(container: album, on: self).createMenu()
         navigationItem.rightBarButtonItem = optionsButton
         
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath)
+        }
+        playContextAtIndexPathCallback = { (indexPath) in
+            let entity = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            return PlayContext(containable: entity)
         }
         swipeCallback = { (indexPath, completionHandler) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
@@ -110,15 +115,6 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     override func updateSearchResults(for searchController: UISearchController) {
         fetchedResultsController.search(searchText: searchController.searchBar.text ?? "", onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1 )
         tableView.reloadData()
-    }
-    
-    @objc private func optionsPressed() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let album = self.album else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: album, on: self)
-        present(detailVC, animated: true)
     }
     
 }

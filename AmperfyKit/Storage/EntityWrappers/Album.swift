@@ -216,6 +216,7 @@ extension Album: PlayableContainable  {
     public var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
     }
+    public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .album, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
 }
 
 extension Album: Hashable, Equatable {

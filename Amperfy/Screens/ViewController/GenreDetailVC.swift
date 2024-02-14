@@ -61,7 +61,8 @@ class GenreDetailVC: BasicTableViewController {
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         
-        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
+        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
+        optionsButton.menu = EntityPreviewActionBuilder(container: genre, on: self).createMenu()
         navigationItem.rightBarButtonItem = optionsButton
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -72,6 +73,21 @@ class GenreDetailVC: BasicTableViewController {
                 return self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             case LibraryElement.Song.rawValue:
                 return self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            default:
+                return nil
+            }
+        }
+        playContextAtIndexPathCallback = { (indexPath) in
+            switch indexPath.section+1 {
+            case LibraryElement.Artist.rawValue:
+                let entity =  self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return PlayContext(containable: entity)
+            case LibraryElement.Album.rawValue:
+                let entity =  self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return PlayContext(containable: entity)
+            case LibraryElement.Song.rawValue:
+                let entity =  self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return PlayContext(containable: entity)
             default:
                 return nil
             }
@@ -274,15 +290,6 @@ class GenreDetailVC: BasicTableViewController {
     }
     
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-    }
-    
-    @objc private func optionsPressed() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let genre = self.genre else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: genre, on: self)
-        present(detailVC, animated: true)
     }
     
 }

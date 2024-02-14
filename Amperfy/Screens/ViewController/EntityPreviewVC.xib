@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="EntityPreviewVC" customModule="Amperfy">
+            <connections>
+                <outlet property="artistLabel" destination="wKh-7l-2Ni" id="W4w-67-gA2"/>
+                <outlet property="entityImageView" destination="mAm-Nt-stn" id="Xyk-qA-Yb8"/>
+                <outlet property="gotoDetailsSymbol" destination="its-Kk-hqs" id="2HX-bT-2Du"/>
+                <outlet property="infoLabel" destination="LoZ-YK-k9e" id="9Nr-jo-W8O"/>
+                <outlet property="titleLabel" destination="zf2-Rj-EC9" id="fot-PK-628"/>
+                <outlet property="view" destination="iN0-l3-epB" id="jnP-Cl-vBL"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="FTu-YN-bUM">
+                    <rect key="frame" x="16" y="386" width="361" height="80"/>
+                    <subviews>
+                        <view contentMode="scaleAspectFill" translatesAutoresizingMaskIntoConstraints="NO" id="mAm-Nt-stn" customClass="EntityImageView" customModule="AmperfyKit">
+                            <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="80" id="Tz7-Oa-1yt"/>
+                                <constraint firstAttribute="width" secondItem="mAm-Nt-stn" secondAttribute="height" multiplier="1:1" id="mtT-uW-ppg"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sTx-fW-CNa" userLabel="Details View">
+                            <rect key="frame" x="84" y="0.0" width="257" height="80"/>
+                            <subviews>
+                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="y6k-we-MVa">
+                                    <rect key="frame" x="8" y="0.0" width="249" height="80"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zf2-Rj-EC9" customClass="MarqueeLabel" customModule="MarqueeLabel">
+                                            <rect key="frame" x="0.0" y="0.0" width="249" height="24"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="24" id="iEo-4j-Wza"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wKh-7l-2Ni" customClass="MarqueeLabel" customModule="MarqueeLabel">
+                                            <rect key="frame" x="0.0" y="32" width="249" height="20"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="20" id="el7-Wu-jhv"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" systemColor="tintColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LoZ-YK-k9e" userLabel="Info" customClass="MarqueeLabel" customModule="MarqueeLabel">
+                                            <rect key="frame" x="0.0" y="60" width="249" height="20"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="20" id="JoK-0R-sub"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </stackView>
+                            </subviews>
+                            <viewLayoutGuide key="safeArea" id="xLr-6z-w1y"/>
+                            <constraints>
+                                <constraint firstItem="y6k-we-MVa" firstAttribute="leading" secondItem="sTx-fW-CNa" secondAttribute="leading" constant="8" id="E1L-ce-2Xu"/>
+                                <constraint firstAttribute="bottom" secondItem="y6k-we-MVa" secondAttribute="bottom" id="Pdh-h1-hLe"/>
+                                <constraint firstItem="y6k-we-MVa" firstAttribute="top" secondItem="sTx-fW-CNa" secondAttribute="top" id="QPl-Oa-LLN"/>
+                                <constraint firstAttribute="trailing" secondItem="y6k-we-MVa" secondAttribute="trailing" id="utV-UF-fZh"/>
+                            </constraints>
+                        </view>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="right" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="its-Kk-hqs">
+                            <rect key="frame" x="345" y="31.999999999999993" width="16" height="16.66666666666665"/>
+                            <color key="tintColor" systemColor="secondaryLabelColor"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="16" id="9Rs-PT-wAV"/>
+                            </constraints>
+                            <imageReference key="image" image="chevron.forward" catalog="system" symbolScale="medium"/>
+                        </imageView>
+                    </subviews>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <constraints>
+                <constraint firstItem="FTu-YN-bUM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="TgF-pc-RJe"/>
+                <constraint firstAttribute="trailingMargin" secondItem="FTu-YN-bUM" secondAttribute="trailing" id="WGV-ob-AxC"/>
+                <constraint firstItem="FTu-YN-bUM" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="nlI-ai-WsJ"/>
+            </constraints>
+            <point key="canvasLocation" x="0.76335877862595414" y="19.718309859154932"/>
+        </view>
+    </objects>
+    <designables>
+        <designable name="LoZ-YK-k9e">
+            <size key="intrinsicContentSize" width="27.333333333333332" height="19.333333333333332"/>
+        </designable>
+        <designable name="wKh-7l-2Ni">
+            <size key="intrinsicContentSize" width="41" height="20.333333333333332"/>
+        </designable>
+        <designable name="zf2-Rj-EC9">
+            <size key="intrinsicContentSize" width="36.666666666666664" height="23"/>
+        </designable>
+    </designables>
+    <resources>
+        <image name="chevron.forward" catalog="system" width="97" height="128"/>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="tintColor">
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

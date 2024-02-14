@@ -237,6 +237,28 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
         case .currentlyPlaying, .none: return false
         }
     }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let playerIndex = PlayerIndex.create(from: indexPath) else { return nil }
+        let containable = self.player.getPlayable(at: playerIndex)
+        let identifier = NSString(string: containable.containerIdentifierString)
+        return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
+            let vc = EntityPreviewVC()
+            vc.display(container: containable, on: self)
+            return vc
+        }) { suggestedActions in
+            return EntityPreviewActionBuilder(container: containable, on: self).createMenu()
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
+        animator.addCompletion {
+            if let identifierString = configuration.identifier as? String,
+               let container = PlayableContainerIdentifier.getContainer(library: self.appDelegate.storage.main.library, containerIdentifierString: identifierString) {
+                EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
+            }
+        }
+    }
 }
 
 extension PopupPlayerVC: UITableViewDragDelegate {

@@ -67,12 +67,21 @@ extension PopupPlayerVC {
         }
     }
     
-    func refreshOptionButton(button: UIButton) {
+    func refreshOptionButton(button: UIButton, rootView: UIViewController?) {
         var config = getPlayerRoundButtonConfiguration()
         config.image = .ellipsis
         config.baseForegroundColor = .label
         button.isEnabled = true
         button.configuration = config
+        
+        if let currentlyPlaying = appDelegate.player.currentlyPlaying,
+           let rootView = rootView {
+            button.showsMenuAsPrimaryAction = true
+            button.menu = EntityPreviewActionBuilder(container: currentlyPlaying, on: rootView).createMenu()
+            button.isEnabled = true
+        } else {
+            button.isEnabled = false
+        }
     }
     
     func refreshFavoriteButton(button: UIButton) {

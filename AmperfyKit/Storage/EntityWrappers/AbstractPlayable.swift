@@ -264,6 +264,7 @@ extension AbstractPlayable: PlayableContainable  {
     public var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
     }
+    public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: isSong ? .song : .podcastEpisode, objectID: playableManagedObject.objectID.uriRepresentation().absoluteString) }
 }
 
 extension AbstractPlayable: Hashable, Equatable {

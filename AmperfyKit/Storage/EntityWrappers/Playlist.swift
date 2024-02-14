@@ -544,6 +544,7 @@ extension Playlist: PlayableContainable  {
         lastTimePlayed = Date()
         playCount += 1
     }
+    public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .playlist, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
 }
 
 extension Playlist: Hashable, Equatable {

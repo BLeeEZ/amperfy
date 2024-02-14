@@ -48,14 +48,7 @@ class PlayableTableCell: BasicTableCell {
     private var playable: AbstractPlayable?
     private var download: Download?
     private var rootView: UIViewController?
-    private var isAlertPresented = false
     private var subtitleColor: UIColor?
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
-        self.addGestureRecognizer(longPressGesture)
-    }
     
     func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, download: Download? = nil, subtitleColor: UIColor? = nil) {
         self.playable = playable
@@ -146,42 +139,15 @@ class PlayableTableCell: BasicTableCell {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let playerIndex = playerIndexCb?(self), !isAlertPresented {
+        if let playerIndex = playerIndexCb?(self) {
             appDelegate.player.play(playerIndex: playerIndex)
         }
-        isAlertPresented = false
     }
     
     private func hideSearchBarKeyboardInRootView() {
         if let basicRootView = rootView as? BasicTableViewController {
             basicRootView.searchController.searchBar.endEditing(true)
         }
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        isAlertPresented = false
-    }
-    
-    @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {
-        if gesture.state == .began {
-            displayMenu()
-        }
-    }
-     
-    func displayMenu() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let playable = playable, let rootView = rootView else { return }
-        isAlertPresented = true
-        let detailVC = LibraryEntityDetailVC()
-        let playContextLambda = {() in self.playContextCb?(self)}
-        let playerIndexLambda = playerIndexCb != nil ? {() in self.playerIndexCb?(self)} : nil
-        detailVC.display(
-            container: playable,
-            on: rootView,
-            playContextCb: playContextLambda,
-            playerIndexCb: playerIndexLambda)
-        rootView.present(detailVC, animated: true)
     }
 
 }

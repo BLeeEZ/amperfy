@@ -170,6 +170,7 @@ extension Artist: PlayableContainable  {
     public var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
     }
+    public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .artist, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
 }
 
 extension Artist: Hashable, Equatable {

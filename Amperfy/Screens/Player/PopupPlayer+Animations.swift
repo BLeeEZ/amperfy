@@ -157,7 +157,7 @@ extension PopupPlayerVC {
     
     private func animateOptions(sourceView: UIView, targetView: UIView, sourceFrame: CGRect, targetFrame: CGRect) {
         let fakeButton = UIButton(frame: sourceFrame)
-        refreshOptionButton(button: fakeButton)
+        refreshOptionButton(button: fakeButton, rootView: self)
         animatePlayStyleObject(object: fakeButton, sourceView: sourceView, targetView: targetView, sourceFrame: sourceFrame, targetFrame: targetFrame)
     }
     

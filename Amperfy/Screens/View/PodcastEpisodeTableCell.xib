@@ -66,9 +66,6 @@
                             <color key="titleColor" systemColor="secondaryLabelColor"/>
                             <imageReference key="image" image="ellipsis" catalog="system" symbolScale="medium"/>
                         </state>
-                        <connections>
-                            <action selector="optionsButtonPressed:" destination="gve-H7-PxP" eventType="touchUpInside" id="6ZB-H8-twC"/>
-                        </connections>
                     </button>
                     <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="JqZ-Gw-nZk" userLabel="Play Progress">
                         <rect key="frame" x="49" y="141.5" width="80" height="4"/>
@@ -172,7 +169,7 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

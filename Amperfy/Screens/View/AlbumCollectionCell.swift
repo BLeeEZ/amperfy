@@ -33,12 +33,6 @@ class AlbumCollectionCell: BasicCollectionCell {
     private var container: PlayableContainable?
     private var rootView: UICollectionViewController?
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
-        self.addGestureRecognizer(longPressGesture)
-    }
-    
     func display(container: PlayableContainable, rootView: UICollectionViewController) {
         self.container = container
         self.rootView = rootView
@@ -46,21 +40,6 @@ class AlbumCollectionCell: BasicCollectionCell {
         subtitleLabel.isHidden = container.subtitle == nil
         subtitleLabel.text = container.subtitle
         entityImage.display(container: container)
-    }
-
-    @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {
-        if gesture.state == .began {
-            displayMenu()
-        }
-    }
-    
-    func displayMenu() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let container = container, let rootView = rootView else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: container, on: rootView)
-        rootView.present(detailVC, animated: true)
     }
     
 }

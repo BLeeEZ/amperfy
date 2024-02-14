@@ -53,6 +53,16 @@ class PodcastsVC: BasicTableViewController {
                 return self.episodesFetchedResultsController.getWrappedEntity(at: indexPath)
             }
         }
+        playContextAtIndexPathCallback = { (indexPath) in
+            switch self.showType {
+            case .podcasts:
+                let entity =  self.podcastsFetchedResultsController.getWrappedEntity(at: indexPath)
+                return PlayContext(containable: entity)
+            case .episodesSortedByReleaseDate:
+                let entity =  self.episodesFetchedResultsController.getWrappedEntity(at: indexPath)
+                return PlayContext(containable: entity)
+            }
+        }
         swipeCallback = { (indexPath, completionHandler) in
             switch self.showType {
             case .podcasts:

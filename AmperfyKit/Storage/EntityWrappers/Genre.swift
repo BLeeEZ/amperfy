@@ -121,4 +121,5 @@ extension Genre: PlayableContainable  {
     public var artworkCollection: ArtworkCollection {
         return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
     }
+    public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .genre, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
 }

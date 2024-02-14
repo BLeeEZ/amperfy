@@ -44,7 +44,8 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(startEditing))
         doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(endEditing))
-        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
+        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
+        optionsButton.menu = EntityPreviewActionBuilder(container: playlist, on: self).createMenu()
         
         let playlistTableHeaderFrameHeight = PlaylistDetailTableHeader.frameHeight
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: playlistTableHeaderFrameHeight + LibraryElementDetailTableHeaderView.frameHeight))
@@ -64,6 +65,9 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath).playable
+        }
+        playContextAtIndexPathCallback = { (indexPath) in
+            return self.convertIndexPathToPlayContext(songIndexPath: indexPath)
         }
         swipeCallback = { (indexPath, completionHandler) in
             let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
@@ -190,15 +194,6 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
             self.playlistOperationsView?.refresh()
             self.refreshControl?.endRefreshing()
         }
-    }
-    
-    @objc private func optionsPressed() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let playlist = self.playlist else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: playlist, on: self)
-        present(detailVC, animated: true)
     }
 
 }

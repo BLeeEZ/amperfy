@@ -63,7 +63,8 @@ class ArtistDetailVC: BasicTableViewController {
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         
-        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
+        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
+        optionsButton.menu = EntityPreviewActionBuilder(container: artist, on: self).createMenu()
         navigationItem.rightBarButtonItem = optionsButton
         
         containableAtIndexPathCallback = { (indexPath) in
@@ -72,6 +73,23 @@ class ArtistDetailVC: BasicTableViewController {
                 return self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             case LibraryElement.Song.rawValue:
                 return self.songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            default:
+                return nil
+            }
+        }
+        playContextAtIndexPathCallback = { (indexPath) in
+            switch indexPath.section+2 {
+            case LibraryElement.Album.rawValue:
+                let album = self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                firstly {
+                    album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+                }
+                return PlayContext(containable: album)
+            case LibraryElement.Song.rawValue:
+                let songIndexPath = IndexPath(row: indexPath.row, section: 0)
+                return self.convertIndexPathToPlayContext(songIndexPath: songIndexPath)
             default:
                 return nil
             }
@@ -249,15 +267,6 @@ class ArtistDetailVC: BasicTableViewController {
     }
     
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-    }
-    
-    @objc private func optionsPressed() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let artist = self.artist else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: artist, on: self)
-        present(detailVC, animated: true)
     }
     
 }

@@ -40,13 +40,10 @@ class SongTableCell: BasicTableCell {
     var rootView: UITableViewController?
     var playContextCb: GetPlayContextFromTableCellCallback?
     var playIndicator: PlayIndicator!
-    private var isAlertPresented = false
 
     override func awakeFromNib() {
         super.awakeFromNib()
         playContextCb = nil
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
-        self.addGestureRecognizer(longPressGesture)
     }
     
     func display(song: Song, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UITableViewController) {
@@ -102,39 +99,18 @@ class SongTableCell: BasicTableCell {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let song = song, let context = playContextCb?(self) else { return }
 
-        if !isAlertPresented && (song.isCached || appDelegate.storage.settings.isOnlineMode) {
+        if song.isCached || appDelegate.storage.settings.isOnlineMode {
             hideSearchBarKeyboardInRootView()
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             appDelegate.player.play(context: context)
         }
-        isAlertPresented = false
     }
     
     private func hideSearchBarKeyboardInRootView() {
         if let basicRootView = rootView as? BasicTableViewController {
             basicRootView.searchController.searchBar.endEditing(true)
         }
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        isAlertPresented = false
-    }
-    
-    @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {
-        if gesture.state == .began {
-            displayMenu()
-        }
-    }
-    
-    func displayMenu() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let song = song, let rootView = rootView else { return }
-        isAlertPresented = true
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: song, on: rootView, playContextCb: {() in self.playContextCb?(self)})
-        rootView.present(detailVC, animated: true)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

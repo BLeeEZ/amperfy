@@ -68,9 +68,6 @@
                                         <imageReference key="image" image="ellipsis" catalog="system" symbolScale="medium"/>
                                         <backgroundConfiguration key="background"/>
                                     </buttonConfiguration>
-                                    <connections>
-                                        <action selector="optionsPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="LH5-cY-B2o"/>
-                                    </connections>
                                 </button>
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="b5r-cU-1SI">
                                     <rect key="frame" x="16" y="13.5" width="265" height="73.5"/>

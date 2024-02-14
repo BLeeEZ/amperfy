@@ -25,7 +25,7 @@ import AmperfyKit
 import PromiseKit
 
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
-
+    
     private var fetchedResultsController: SongsFetchedResultsController!
     private var sortButton: UIBarButtonItem!
     private var actionButton: UIBarButtonItem!
@@ -56,6 +56,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath)
         }
+        playContextAtIndexPathCallback = convertIndexPathToPlayContext
         swipeCallback = { (indexPath, completionHandler) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
@@ -100,7 +101,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
         actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
         navigationItem.rightBarButtonItems = [sortButton]
-
+        
         if appDelegate.storage.settings.isOnlineMode {
             navigationItem.rightBarButtonItems?.insert(actionButton, at: 0)
         }
@@ -157,7 +158,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         }
     }
     
-    func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
+    func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext {
         let song = fetchedResultsController.getWrappedEntity(at: songIndexPath)
         return PlayContext(containable: song)
     }
@@ -271,4 +272,3 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     }
     
 }
-

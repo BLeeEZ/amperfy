@@ -55,12 +55,17 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
-        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: self, action: #selector(optionsPressed))
+        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
+        optionsButton.menu = EntityPreviewActionBuilder(container: podcast, on: self).createMenu()
         navigationItem.rightBarButtonItem = optionsButton
         
         swipeDisplaySettings.playContextTypeOfElements = .podcast
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath)
+        }
+        playContextAtIndexPathCallback = { (indexPath) in
+            let entity = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            return PlayContext(containable: entity)
         }
         swipeCallback = { (indexPath, completionHandler) in
             let episode = self.fetchedResultsController.getWrappedEntity(at: indexPath)
@@ -110,15 +115,6 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
             self.tableView.visibleCells.forEach{ ($0 as! PodcastEpisodeTableCell).refresh() }
             self.refreshControl?.endRefreshing()
         }
-    }
-    
-    @objc private func optionsPressed() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let podcast = self.podcast else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: podcast, on: self)
-        present(detailVC, animated: true)
     }
     
 }

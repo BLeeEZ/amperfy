@@ -84,9 +84,6 @@
                             <imageReference key="image" image="ellipsis" catalog="system" symbolScale="medium"/>
                             <backgroundConfiguration key="background"/>
                         </buttonConfiguration>
-                        <connections>
-                            <action selector="optionsPressed:" destination="gve-H7-PxP" eventType="touchUpInside" id="8iA-vh-eh2"/>
-                        </connections>
                     </button>
                 </subviews>
                 <constraints>

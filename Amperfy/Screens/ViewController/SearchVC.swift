@@ -64,6 +64,24 @@ class SearchVC: BasicTableViewController {
                 return nil
             }
         }
+        playContextAtIndexPathCallback = { (indexPath) in
+            switch indexPath.section {
+            case LibraryElement.Playlist.rawValue:
+                let entity =  self.playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return PlayContext(containable: entity)
+            case LibraryElement.Artist.rawValue:
+                let entity =  self.artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return PlayContext(containable: entity)
+            case LibraryElement.Album.rawValue:
+                let entity =  self.albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return PlayContext(containable: entity)
+            case LibraryElement.Song.rawValue:
+                let entity =  self.songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return PlayContext(containable: entity)
+            default:
+                return nil
+            }
+        }
         swipeCallback = { (indexPath, completionHandler) in
             self.determSwipeActionContext(at: indexPath) { actionContext in
                 completionHandler(actionContext)

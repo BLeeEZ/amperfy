@@ -42,7 +42,6 @@ struct LibraryDuplicateInfo {
 }
 
 public class LibraryStorage: PlayableFileCachable {
-    
     public static var carPlayMaxElements = 200
     
     static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName, ScrobbleEntry.typeName]
@@ -484,6 +483,32 @@ public class LibraryStorage: PlayableFileCachable {
     
     func deleteDownload(_ download: Download) {
         context.delete(download.managedObject)
+    }
+    
+    
+    public func getContainer(identifier: PlayableContainerIdentifier) -> PlayableContainable? {
+        guard let type = identifier.type,
+              let objectID = identifier.objectID,
+              let url = URL(string: objectID),
+              let managedObjectID = context.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: url)
+        else { return nil}
+
+        switch type {
+        case .song:
+            return Song(managedObject: context.object(with: managedObjectID) as! SongMO)
+        case .podcastEpisode:
+            return PodcastEpisode(managedObject: context.object(with: managedObjectID) as! PodcastEpisodeMO)
+        case .album:
+            return Album(managedObject: context.object(with: managedObjectID) as! AlbumMO)
+        case .artist:
+            return Artist(managedObject: context.object(with: managedObjectID) as! ArtistMO)
+        case .genre:
+            return Genre(managedObject: context.object(with: managedObjectID) as! GenreMO)
+        case .playlist:
+            return Playlist(library: self, managedObject: context.object(with: managedObjectID) as! PlaylistMO)
+        case .podcast:
+            return Podcast(managedObject: context.object(with: managedObjectID) as! PodcastMO)
+        }
     }
     
     func getFetchPredicate(forGenre genre: Genre) -> NSPredicate {

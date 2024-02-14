@@ -33,33 +33,12 @@ class PlaylistTableCell: BasicTableCell {
     private var playlist: Playlist?
     private var rootView: UITableViewController?
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
-        self.addGestureRecognizer(longPressGesture)
-    }
-    
     func display(playlist: Playlist, rootView: UITableViewController?) {
         self.playlist = playlist
         self.rootView = rootView
         nameLabel.text = playlist.name
         entityImage.display(container: playlist)
         infoLabel.text = playlist.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .short, settings: appDelegate.storage.settings))
-    }
-    
-    @objc func handleLongPressGesture(gesture: UILongPressGestureRecognizer) -> Void {
-        if gesture.state == .began {
-            displayMenu()
-        }
-    }
-    
-    func displayMenu() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-        guard let playlist = playlist, let rootView = rootView else { return }
-        let detailVC = LibraryEntityDetailVC()
-        detailVC.display(container: playlist, on: rootView)
-        rootView.present(detailVC, animated: true)
     }
     
 }

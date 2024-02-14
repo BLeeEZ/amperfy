@@ -43,6 +43,10 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath)
         }
+        playContextAtIndexPathCallback = { (indexPath) in
+            let entity = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+            return PlayContext(containable: entity)
+        }
         swipeCallback = { (indexPath, completionHandler) in
             let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             firstly {
