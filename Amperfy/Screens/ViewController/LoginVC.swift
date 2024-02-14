@@ -58,27 +58,6 @@ class LoginVC: UIViewController {
         passwordTF.resignFirstResponder()
         login()
     }
-    @IBAction func apiSelectorPressed(_ sender: Any) {
-        let alert = UIAlertController(title: "Select API", message: nil, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: BackenApiType.notDetected.selectorDescription, style: .default, handler: { _ in
-            self.selectedApiType = .notDetected
-            self.updateApiSelectorText()
-        }))
-        alert.addAction(UIAlertAction(title: BackenApiType.ampache.selectorDescription, style: .default, handler: { _ in
-            self.selectedApiType = .ampache
-            self.updateApiSelectorText()
-        }))
-        alert.addAction(UIAlertAction(title: BackenApiType.subsonic.selectorDescription, style: .default, handler: { _ in
-            self.selectedApiType = .subsonic
-            self.updateApiSelectorText()
-        }))
-        alert.addAction(UIAlertAction(title: BackenApiType.subsonic_legacy.selectorDescription, style: .default, handler: { _ in
-            self.selectedApiType = .subsonic_legacy
-            self.updateApiSelectorText()
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        self.present(alert, animated: true, completion: nil)
-    }
     
     func login() {
         guard let serverUrl = serverUrlTF.text?.trimmingCharacters(in: .whitespacesAndNewlines), !serverUrl.isEmpty else {
@@ -127,6 +106,26 @@ class LoginVC: UIViewController {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         backendApi = appDelegate.backendApi
         updateApiSelectorText()
+        
+        apiSelectorButton.showsMenuAsPrimaryAction = true
+        apiSelectorButton.menu = UIMenu(title: "Select API", children: [
+            UIAction(title: BackenApiType.notDetected.selectorDescription, handler: { _ in
+                self.selectedApiType = .notDetected
+                self.updateApiSelectorText()
+            }),
+            UIAction(title: BackenApiType.ampache.selectorDescription, handler: { _ in
+                self.selectedApiType = .ampache
+                self.updateApiSelectorText()
+            }),
+            UIAction(title: BackenApiType.subsonic.selectorDescription, handler: { _ in
+                self.selectedApiType = .subsonic
+                self.updateApiSelectorText()
+            }),
+            UIAction(title: BackenApiType.subsonic_legacy.selectorDescription, handler: { _ in
+                self.selectedApiType = .subsonic_legacy
+                self.updateApiSelectorText()
+            })
+        ])
     }
     
     override func viewDidAppear(_ animated: Bool) {
