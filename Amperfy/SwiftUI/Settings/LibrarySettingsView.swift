@@ -215,7 +215,7 @@ struct LibrarySettingsView: View {
                         Alert(title: Text("Delete Cache"), message: Text("Are you sure to delete all downloaded files from cache?"),
                         primaryButton: .destructive(Text("Delete")) {
                             self.appDelegate.player.stop()
-                            self.appDelegate.playableDownloadManager.stopAndWait()
+                            self.appDelegate.playableDownloadManager.stop()
                             self.appDelegate.storage.main.library.deleteCompleteSongCache()
                             self.appDelegate.storage.main.library.saveContext()
                             self.appDelegate.playableDownloadManager.start()

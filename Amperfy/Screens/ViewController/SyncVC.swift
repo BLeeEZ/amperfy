@@ -50,8 +50,8 @@ class SyncVC: UIViewController {
         self.appDelegate.eventLogger.supressAlerts = true
         self.appDelegate.scrobbleSyncer.stopAndWait()
         self.appDelegate.backgroundLibrarySyncer.stopAndWait()
-        self.appDelegate.artworkDownloadManager.stopAndWait()
-        self.appDelegate.playableDownloadManager.stopAndWait()
+        self.appDelegate.artworkDownloadManager.stop()
+        self.appDelegate.playableDownloadManager.stop()
         self.appDelegate.storage.isLibrarySynced = false
         self.appDelegate.storage.main.library.cleanStorage()
         self.appDelegate.reinit()

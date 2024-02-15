@@ -39,10 +39,10 @@ class DownloadManager: NSObject, DownloadManageable {
     private let downloadSlotCount: Int
     private let eventLogger: EventLogger
     private let urlCleanser: URLCleanser
-    private let activeDispatchGroup = DispatchGroup()
-    private let downloadPreperationSemaphore = DispatchSemaphore(value: 1)
+    private let activeTasks: DispatchSemaphore
     private var isRunning = false
-    private var isActive = false
+    private var sleepTimer: Timer?
+    private let timeInterval = TimeInterval(5) // time to check for available downloads to start
     
     init(name: String, storage: PersistentStorage, requestManager: DownloadRequestManager, downloadDelegate: DownloadManagerDelegate, notificationHandler: EventNotificationHandler, eventLogger: EventLogger, urlCleanser: URLCleanser) {
         log = OSLog(subsystem: "Amperfy", category: name)
@@ -53,12 +53,14 @@ class DownloadManager: NSObject, DownloadManageable {
         self.eventLogger = eventLogger
         self.urlCleanser = urlCleanser
         self.downloadSlotCount = downloadDelegate.parallelDownloadsCount
+        activeTasks = DispatchSemaphore(value: self.downloadSlotCount)
     }
     
     func download(object: Downloadable) {
         guard !object.isCached, storage.settings.isOnlineMode, (object is Artwork) || !storageExceedsCacheLimit() else { return }
         if let isValidCheck = preDownloadIsValidCheck, !isValidCheck(object) { return }
         self.requestManager.add(object: object)
+        triggerBackgroundDownload()
     }
     
     func download(objects: [Downloadable]) {
@@ -67,6 +69,7 @@ class DownloadManager: NSObject, DownloadManageable {
         if !downloadObjects.isEmpty {
             self.requestManager.add(objects: downloadObjects)
         }
+        triggerBackgroundDownload()
     }
     
     func removeFinishedDownload(for object: Downloadable) {
@@ -79,20 +82,18 @@ class DownloadManager: NSObject, DownloadManageable {
 
     func start() {
         isRunning = true
-        if !isActive {
-            isActive = true
-            downloadInBackground()
+        sleepTimer?.invalidate()
+        sleepTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { (t) in
+            self.triggerBackgroundDownload()
         }
+        triggerBackgroundDownload()
     }
 
-    private func stop() {
+    func stop() {
         isRunning = false
+        sleepTimer?.invalidate()
+        sleepTimer = nil
         cancelDownloads()
-    }
-
-    func stopAndWait() {
-        stop()
-        activeDispatchGroup.wait()
     }
     
     func cancelDownloads() {
@@ -119,42 +120,23 @@ class DownloadManager: NSObject, DownloadManageable {
         requestManager.cancelPlayablesDownloads()
     }
     
-    func isDownloadSlotAvailable() -> Bool {
-        var isAvailable = false
-        let sync = DispatchGroup()
-        sync.enter()
-        self.urlSession.getAllTasks { tasks in
-            isAvailable = tasks.count < self.downloadSlotCount
-            sync.leave()
+    private func triggerBackgroundDownload() {
+        DispatchQueue.global().async {
+            self.startAvailableDownload()
         }
-        sync.wait()
-        return isAvailable
     }
     
-    private func downloadInBackground() {
-        DispatchQueue.global().async {
-            self.activeDispatchGroup.enter()
-            os_log("DownloadManager start", log: self.log, type: .info)
-            
-            while self.isRunning {
-                self.downloadPreperationSemaphore.wait()
-                guard self.isDownloadSlotAvailable(),
-                      let nextDownload = self.requestManager.getNextRequestToDownload()
-                else {
-                    // wait some time, check if a download slot is available and poll for new requests
-                    sleep(1)
-                    self.downloadPreperationSemaphore.signal()
-                    continue
-                }
-                
-                self.manageDownload(download: nextDownload)
-                .finally {
-                    self.downloadPreperationSemaphore.signal()
-                }
+    private func startAvailableDownload() {
+        // A free download task is available
+        if self.activeTasks.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success {
+            // There is download to be started
+            if let nextDownload = self.requestManager.getNextRequestToDownload() {
+                // trigger an additional download
+                self.triggerBackgroundDownload()
+                self.manageDownload(download: nextDownload).finally { }
+            } else {
+                self.activeTasks.signal()
             }
-            os_log("DownloadManager stopped", log: self.log, type: .info)
-            self.isActive = false
-            self.activeDispatchGroup.leave()
         }
     }
     
@@ -179,6 +161,9 @@ class DownloadManager: NSObject, DownloadManageable {
       
     
     func finishDownload(download: Download, error: DownloadError) {
+        self.activeTasks.signal()
+        self.triggerBackgroundDownload()
+        
         if !download.isCanceled {
             download.error = error
             if error != .apiErrorResponse {
@@ -194,6 +179,9 @@ class DownloadManager: NSObject, DownloadManageable {
     }
     
     func finishDownload(download: Download, data: Data) {
+        self.activeTasks.signal()
+        self.triggerBackgroundDownload()
+        
         download.resumeData = data
         if let responseError = downloadDelegate.validateDownloadedData(download: download) {
             os_log("Fetching %s API-ERROR StatusCode: %d, Message: %s", log: log, type: .error, download.title, responseError.statusCode, responseError.message)
