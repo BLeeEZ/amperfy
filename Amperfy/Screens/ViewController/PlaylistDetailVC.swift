@@ -45,7 +45,9 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(startEditing))
         doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(endEditing))
         optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
-        optionsButton.menu = EntityPreviewActionBuilder(container: playlist, on: self).createMenu()
+        optionsButton.menu = UIMenu.lazyMenu {
+            EntityPreviewActionBuilder(container: self.playlist, on: self).createMenu()
+        }
         
         let playlistTableHeaderFrameHeight = PlaylistDetailTableHeader.frameHeight
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: playlistTableHeaderFrameHeight + LibraryElementDetailTableHeaderView.frameHeight))

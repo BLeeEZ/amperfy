@@ -56,7 +56,9 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
-        optionsButton.menu = EntityPreviewActionBuilder(container: podcast, on: self).createMenu()
+        optionsButton.menu = UIMenu.lazyMenu {
+            EntityPreviewActionBuilder(container: self.podcast, on: self).createMenu()
+        }
         navigationItem.rightBarButtonItem = optionsButton
         
         swipeDisplaySettings.playContextTypeOfElements = .podcast

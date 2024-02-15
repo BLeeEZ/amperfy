@@ -55,7 +55,9 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         }
         
         optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
-        optionsButton.menu = EntityPreviewActionBuilder(container: album, on: self).createMenu()
+        optionsButton.menu = UIMenu.lazyMenu {
+            EntityPreviewActionBuilder(container: self.album, on: self).createMenu()
+        }
         navigationItem.rightBarButtonItem = optionsButton
         
         containableAtIndexPathCallback = { (indexPath) in

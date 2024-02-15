@@ -64,7 +64,9 @@ class ArtistDetailVC: BasicTableViewController {
         }
         
         optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
-        optionsButton.menu = EntityPreviewActionBuilder(container: artist, on: self).createMenu()
+        optionsButton.menu = UIMenu.lazyMenu {
+            EntityPreviewActionBuilder(container: self.artist, on: self).createMenu()
+        }
         navigationItem.rightBarButtonItem = optionsButton
         
         containableAtIndexPathCallback = { (indexPath) in

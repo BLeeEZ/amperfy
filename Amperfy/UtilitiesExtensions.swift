@@ -217,6 +217,18 @@ extension UITraitCollection {
     static let maxDisplayScale = UITraitCollection(displayScale: 3.0)
 }
 
+extension UIMenu {
+    /// rebuilds menu on every access
+    static func lazyMenu(builder: @escaping () -> UIMenu) -> UIMenu {
+        return UIMenu(children: [
+                UIDeferredMenuElement.uncached { completion in
+                    let menu = builder()
+                    completion([menu])
+                }
+            ])
+    }
+}
+
 extension UIImage {
     func carPlayImage(carTraitCollection traits: UITraitCollection) -> UIImage {
         let imageAsset = UIImageAsset()

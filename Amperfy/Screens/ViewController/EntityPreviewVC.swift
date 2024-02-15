@@ -138,7 +138,7 @@ class EntityPreviewActionBuilder {
             menuActions.append(createCopyIdToClipboardAction())
         }
 
-        return UIMenu(title: "", children: menuActions)
+        return UIMenu(options: .displayInline, children: menuActions)
     }
     
     public func performPreviewTransition() {

@@ -259,6 +259,12 @@ class BasicTableViewController: UITableViewController {
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
             let vc = EntityPreviewVC()
             vc.display(container: containable, on: self)
+            containable.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            .catch { error in
+                self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
+            }.finally {
+                vc.refresh()
+            }
             return vc
         }) { suggestedActions in
             var playIndexCB : (() -> PlayContext?)?
