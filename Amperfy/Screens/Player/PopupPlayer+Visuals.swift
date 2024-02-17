@@ -77,7 +77,9 @@ extension PopupPlayerVC {
         if let currentlyPlaying = appDelegate.player.currentlyPlaying,
            let rootView = rootView {
             button.showsMenuAsPrimaryAction = true
-            button.menu = EntityPreviewActionBuilder(container: currentlyPlaying, on: rootView).createMenu()
+            button.menu = UIMenu.lazyMenu {
+                return EntityPreviewActionBuilder(container: currentlyPlaying, on: rootView).createMenu()
+            }
             button.isEnabled = true
         } else {
             button.isEnabled = false
