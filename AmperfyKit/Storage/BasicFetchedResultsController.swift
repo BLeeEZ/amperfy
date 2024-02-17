@@ -450,18 +450,23 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
         fetchResultsController.delegate = nil
         if isSearchActiveInternal {
             fetchResultsController = searchFetchResulsController
+            fetchResultsController.delegate = delegateInternal
         } else {
             fetchResultsController = allFetchResulsController
-        }
-        if isSearchActiveInternal || (!isSearchActiveInternal && keepAllResultsUpdated) {
-            fetchResultsController.delegate = delegateInternal
-        }
+            if keepAllResultsUpdated {
+                fetchResultsController.delegate = delegateInternal
+            }
+    }
     }
     
     public func hideResults() {
         isSearchActive = true
         searchFetchResulsController.fetchRequest.predicate = NSPredicate(format: "id == nil")
         searchFetchResulsController.fetch()
+    }
+    
+    public func isOneOfThis(_ controller: NSFetchedResultsController<NSFetchRequestResult>) -> Bool {
+        return (controller == allFetchResulsController) || (controller == searchFetchResulsController)
     }
     
 }

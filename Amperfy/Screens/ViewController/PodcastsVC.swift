@@ -36,9 +36,7 @@ class PodcastsVC: BasicTableViewController {
         appDelegate.userStatistics.visited(.podcasts)
         
         podcastsFetchedResultsController = PodcastFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
-        podcastsFetchedResultsController.delegate = self
         episodesFetchedResultsController = PodcastEpisodesReleaseDateFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
-        episodesFetchedResultsController.delegate = self
 
         configureSearchController(placeholder: "Search in \"Podcasts\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: GenericTableCell.typeName)
@@ -85,8 +83,21 @@ class PodcastsVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        switch self.showType {
+        case .podcasts:
+            podcastsFetchedResultsController?.delegate = self
+        case .episodesSortedByReleaseDate:
+            episodesFetchedResultsController?.delegate = self
+        }
+        
         updateRightBarButtonItems()
         syncFromServer()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        podcastsFetchedResultsController?.delegate = nil
+        episodesFetchedResultsController?.delegate = nil
     }
     
     func updateRightBarButtonItems() {
@@ -183,20 +194,37 @@ class PodcastsVC: BasicTableViewController {
         }
     }
     
+    override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        switch self.showType {
+        case .podcasts:
+            if podcastsFetchedResultsController.isOneOfThis(controller) {
+                super.controller(controller, didChange: anObject, at: indexPath, for: type, newIndexPath: newIndexPath)
+            }
+        case .episodesSortedByReleaseDate:
+            if episodesFetchedResultsController.fetchResultsController == controller {
+                super.controller(controller, didChange: anObject, at: indexPath, for: type, newIndexPath: newIndexPath)
+            }
+        }
+    }
+    
     private func createSortButtonMenu() -> UIMenu {
         let podcastsSortByName = UIAction(title: "Podcasts sorted by name", image: showType == .podcasts ? .check : nil, handler: { _ in
             self.showType = .podcasts
             self.appDelegate.storage.settings.podcastsShowSetting = .podcasts
             self.syncFromServer()
             self.updateRightBarButtonItems()
+            self.episodesFetchedResultsController.delegate = nil
             self.updateSearchResults(for: self.searchController)
+            self.podcastsFetchedResultsController.delegate = self
         })
         let episodesSortByReleaseDate = UIAction(title: "Episodes sorted by release date", image: showType == .episodesSortedByReleaseDate ? .check : nil, handler: { _ in
             self.showType = .episodesSortedByReleaseDate
             self.appDelegate.storage.settings.podcastsShowSetting = .episodesSortedByReleaseDate
             self.syncFromServer()
             self.updateRightBarButtonItems()
+            self.podcastsFetchedResultsController.delegate = nil
             self.updateSearchResults(for: self.searchController)
+            self.episodesFetchedResultsController.delegate = self
         })
         return UIMenu(children: [podcastsSortByName, episodesSortByReleaseDate])
     }

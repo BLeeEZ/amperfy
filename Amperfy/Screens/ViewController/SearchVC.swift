@@ -89,6 +89,24 @@ class SearchVC: BasicTableViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        playlistFetchedResultsController?.delegate = self
+        artistFetchedResultsController?.delegate = self
+        albumFetchedResultsController?.delegate = self
+        songFetchedResultsController?.delegate = self
+        
+        appDelegate.userStatistics.visited(.search)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        playlistFetchedResultsController?.delegate = nil
+        artistFetchedResultsController?.delegate = nil
+        albumFetchedResultsController?.delegate = nil
+        songFetchedResultsController?.delegate = nil
+    }
+    
     func determSwipeActionContext(at indexPath: IndexPath, completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void) {
         switch indexPath.section {
         case LibraryElement.Playlist.rawValue:
@@ -124,11 +142,6 @@ class SearchVC: BasicTableViewController {
         default:
             completionHandler(nil)
         }
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        appDelegate.userStatistics.visited(.search)
     }
 
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {

@@ -38,6 +38,16 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewControl
     
     var isIndexTitelsHidden = false
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        singleFetchController?.delegate = self
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        singleFetchController?.delegate = nil
+    }
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return singleFetchController?.numberOfSections ?? 0
     }
@@ -352,6 +362,7 @@ extension BasicTableViewController: NSFetchedResultsControllerDelegate {
 extension BasicTableViewController: UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {
+        
     }
     
 }

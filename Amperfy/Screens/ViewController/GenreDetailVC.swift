@@ -127,6 +127,10 @@ class GenreDetailVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        artistsFetchedResultsController?.delegate = self
+        albumsFetchedResultsController?.delegate = self
+        songsFetchedResultsController?.delegate = self
+        
         firstly {
             genre.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
         }.catch { error in
@@ -134,6 +138,13 @@ class GenreDetailVC: BasicTableViewController {
         }.finally {
             self.detailOperationsView?.refresh()
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        artistsFetchedResultsController?.delegate = nil
+        albumsFetchedResultsController?.delegate = nil
+        songsFetchedResultsController?.delegate = nil
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {

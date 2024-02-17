@@ -120,6 +120,9 @@ class ArtistDetailVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        albumsFetchedResultsController?.delegate = self
+        songsFetchedResultsController?.delegate = self
+        
         firstly {
             artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
         }.catch { error in
@@ -127,6 +130,12 @@ class ArtistDetailVC: BasicTableViewController {
         }.finally {
             self.detailOperationsView?.refresh()
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        albumsFetchedResultsController?.delegate = nil
+        songsFetchedResultsController?.delegate = nil
     }
     
     override func viewDidAppear(_ animated: Bool) {

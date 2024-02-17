@@ -68,12 +68,21 @@ class DirectoriesVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        subdirectoriesFetchedResultsController?.delegate = self
+        songsFetchedResultsController?.delegate = self
+        
         guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
             self.appDelegate.librarySyncer.sync(directory: directory)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Directories Sync", error: error)
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        subdirectoriesFetchedResultsController?.delegate = nil
+        songsFetchedResultsController?.delegate = nil
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
