@@ -43,7 +43,7 @@ class SearchVC: BasicTableViewController {
         songFetchedResultsController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .name, isGroupedInAlphabeticSections: false)
         songFetchedResultsController.delegate = self
         
-        configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"])
+        configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: GenericTableCell.typeName)

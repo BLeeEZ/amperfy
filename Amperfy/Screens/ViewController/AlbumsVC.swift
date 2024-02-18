@@ -39,7 +39,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         appDelegate.userStatistics.visited(.albums)
 
         applyFilter()
-        configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: false)
+        configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
         

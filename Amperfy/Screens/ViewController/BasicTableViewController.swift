@@ -241,14 +241,8 @@ class BasicTableViewController: UITableViewController {
         searchController.searchBar.scopeButtonTitles = scopeButtonTitles
         searchController.searchBar.placeholder = placeholder
         
-        if #available(iOS 11.0, *) {
-            // For iOS 11 and later, place the search bar in the navigation bar.
-            navigationItem.searchController = searchController
-            navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
-        } else {
-            // For iOS 10 and earlier, place the search controller's search bar in the table view's header.
-            tableView.tableHeaderView = searchController.searchBar
-        }
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
         
         searchController.delegate = self
         searchController.obscuresBackgroundDuringPresentation = false
