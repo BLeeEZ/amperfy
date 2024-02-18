@@ -54,7 +54,7 @@ public class Podcast: AbstractLibraryEntity {
     }
     public var episodes: [PodcastEpisode] {
         guard let episodesSet = managedObject.episodes, let episodesMO = episodesSet.array as? [PodcastEpisodeMO] else { return [PodcastEpisode]() }
-        return episodesMO.compactMap{ PodcastEpisode(managedObject: $0) }.filter{ $0.userStatus != .deleted }.sortByPublishDate()
+        return episodesMO.compactMap{ PodcastEpisode(managedObject: $0) }.filter{ $0.isAvailableToUser }.sortByPublishDate()
     }
     override public var defaultImage: UIImage {
         return UIImage.podcastArtwork
