@@ -523,6 +523,14 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
+    func requestNewestPodcasts() -> Promise<APIDataResponse> {
+        return request { version in
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getNewestPodcasts")
+            urlComp.addQueryItem(name: "count", value: 20)
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
     func requestMusicFolders() -> Promise<APIDataResponse> {
         return request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getMusicFolders")

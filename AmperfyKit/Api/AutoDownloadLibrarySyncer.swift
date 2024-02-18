@@ -74,19 +74,19 @@ public class AutoDownloadLibrarySyncer {
     }
     
     /// return: new synced podcast episodes if an initial sync already occued. If this is the initial sync no episods are returned
-    public func syncLatestPodcastEpisodes(podcast: Podcast) -> Promise<[PodcastEpisode]> {
-        let oldRecentEpisodes = Set(podcast.episodes)
+    public func syncNewestPodcastEpisodes() -> Promise<[PodcastEpisode]> {
+        let oldNewestEpisodes = Set(storage.main.library.getNewestPodcastEpisode(count: 20))
         return firstly {
-            self.librarySyncer.sync(podcast: podcast)
+            self.librarySyncer.syncNewestPodcastEpisodes()
         }.then {
             return Guarantee<[PodcastEpisode]> { seal in
-                let updatedEpisodes = Set(podcast.episodes)
-                let newAddedRecentEpisodes = updatedEpisodes.subtracting(oldRecentEpisodes)
-                if !oldRecentEpisodes.isEmpty, !newAddedRecentEpisodes.isEmpty, self.storage.settings.isAutoDownloadLatestPodcastEpisodesActive {
-                    self.playableDownloadManager.download(objects: Array(newAddedRecentEpisodes))
+                let updatedEpisodes = Set(self.storage.main.library.getNewestPodcastEpisode(count: 20))
+                let newAddedNewestEpisodes = updatedEpisodes.subtracting(oldNewestEpisodes)
+                if !oldNewestEpisodes.isEmpty, !newAddedNewestEpisodes.isEmpty, self.storage.settings.isAutoDownloadLatestPodcastEpisodesActive {
+                    self.playableDownloadManager.download(objects: Array(newAddedNewestEpisodes))
                 }
-                if !oldRecentEpisodes.isEmpty {
-                    seal(Array(newAddedRecentEpisodes))
+                if !oldNewestEpisodes.isEmpty {
+                    seal(Array(newAddedNewestEpisodes))
                 } else {
                     seal([PodcastEpisode]())
                 }

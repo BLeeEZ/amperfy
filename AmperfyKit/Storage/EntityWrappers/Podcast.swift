@@ -92,10 +92,7 @@ extension Podcast: PlayableContainable  {
     }
     public var playContextType: PlayerMode { return .podcast }
     public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
-        AutoDownloadLibrarySyncer(storage: storage,
-                                  librarySyncer: librarySyncer,
-                                  playableDownloadManager: playableDownloadManager)
-        .syncLatestPodcastEpisodes(podcast: self).asVoid()
+        return librarySyncer.sync(podcast: self)
     }
     public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
         return Promise<Void>(error: BackendError.notSupported)

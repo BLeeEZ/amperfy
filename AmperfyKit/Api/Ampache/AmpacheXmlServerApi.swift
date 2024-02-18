@@ -540,11 +540,14 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestPodcastEpisodes(id: String) -> Promise<APIDataResponse> {
+    func requestPodcastEpisodes(id: String, limit: Int? = nil) -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "podcast_episodes")
             urlComp.addQueryItem(name: "filter", value: id)
+            if let limit = limit {
+                urlComp.addQueryItem(name: "limit", value: limit)
+            }
             return try self.createUrl(from: urlComp)
         }
     }

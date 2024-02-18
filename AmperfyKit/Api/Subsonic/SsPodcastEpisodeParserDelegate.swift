@@ -26,11 +26,11 @@ import os.log
 
 class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
     
-    var podcast: Podcast
+    var podcast: Podcast?
     var episodeBuffer: PodcastEpisode?
     var parsedEpisodes = [PodcastEpisode]()
     
-    init(podcast: Podcast, library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator) {
+    init(podcast: Podcast?, library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator) {
         self.podcast = podcast
         super.init(library: library, subsonicUrlCreator: subsonicUrlCreator)
     }
@@ -48,7 +48,12 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
                 episodeBuffer?.id = episodeId
             }
             playableBuffer = episodeBuffer
-            episodeBuffer?.podcast = podcast
+            if let podcast = podcast {
+                episodeBuffer?.podcast = podcast
+            } else if let channelId = attributeDict["channelId"] {
+                let curPodcast = library.getPodcast(id: channelId)
+                episodeBuffer?.podcast = curPodcast
+            }
 
             if let description = attributeDict["description"] {
                 episodeBuffer?.depiction = description.html2String

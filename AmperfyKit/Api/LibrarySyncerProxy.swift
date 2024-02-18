@@ -70,6 +70,10 @@ extension LibrarySyncerProxy: LibrarySyncer {
         return activeSyncer.syncRecentAlbums(offset: offset, count: count)
     }
     
+    func syncNewestPodcastEpisodes() -> Promise<Void> {
+        return activeSyncer.syncNewestPodcastEpisodes()
+    }
+    
     func syncFavoriteLibraryElements() -> Promise<Void> {
         return activeSyncer.syncFavoriteLibraryElements()
     }

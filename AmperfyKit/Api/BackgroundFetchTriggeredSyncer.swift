@@ -42,25 +42,13 @@ public class BackgroundFetchTriggeredSyncer {
     public func syncAndNotifyPodcastEpisodes() -> Promise<Void> {
         os_log("Perform podcast episode sync", log: self.log, type: .info)
         return firstly {
-            self.librarySyncer.syncDownPodcastsWithoutEpisodes()
-        }.then { () -> Promise<Void> in
-            let podcasts = self.storage.main.library.getPodcasts()
-            let podcastNotificationPromises = podcasts.compactMap { podcast in return {
-                self.createPodcastNotificationPromise(podcast: podcast)
-            }}
-            return podcastNotificationPromises.resolveSequentially()
-        }
-    }
-    
-    private func createPodcastNotificationPromise(podcast: Podcast) -> Promise<Void> {
-        return firstly {
             AutoDownloadLibrarySyncer(storage: self.storage,
                                       librarySyncer: self.librarySyncer,
                                       playableDownloadManager: self.playableDownloadManager)
-            .syncLatestPodcastEpisodes(podcast: podcast)
-        }.then { addedPodcasts -> Guarantee<Void> in
-            for episodeToNotify in addedPodcasts {
-                os_log("Podcast: %s, New Episode: %s", log: self.log, type: .info, podcast.title, episodeToNotify.title)
+            .syncNewestPodcastEpisodes()
+        }.then { addedPodcastEpisodes -> Guarantee<Void> in
+            for episodeToNotify in addedPodcastEpisodes {
+                os_log("Podcast: %s, New Episode: %s", log: self.log, type: .info, episodeToNotify.podcast?.name ?? "", episodeToNotify.title)
                 self.notificationManager.notify(podcastEpisode: episodeToNotify)
             }
             return Guarantee<Void>.value

@@ -761,6 +761,15 @@ public class LibraryStorage: PlayableFileCachable {
         let podcasts = foundPodcasts?.compactMap{ Podcast(managedObject: $0) }
         return podcasts ?? [Podcast]()
     }
+    
+    public func getNewestPodcastEpisode(count: Int) -> [PodcastEpisode] {
+        let fetchRequest = PodcastEpisodeMO.publishedDateSortedFetchRequest
+        fetchRequest.predicate = getFetchPredicateForUserAvailableEpisodes()
+        fetchRequest.fetchLimit = count
+        let foundPodcastEpisodes = try? context.fetch(fetchRequest)
+        let podcastEpisodes = foundPodcastEpisodes?.compactMap{ PodcastEpisode(managedObject: $0) }
+        return podcastEpisodes ?? [PodcastEpisode]()
+    }
 
     public func getRemoteAvailablePodcasts() -> [Podcast] {
         let fetchRequest = PodcastMO.identifierSortedFetchRequest

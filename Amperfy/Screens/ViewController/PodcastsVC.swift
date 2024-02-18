@@ -107,25 +107,13 @@ class PodcastsVC: BasicTableViewController {
     
     func syncFromServer() {
         if appDelegate.storage.settings.isOnlineMode {
-            switch self.showType {
-            case .podcasts:
-                firstly {
-                    self.appDelegate.librarySyncer.syncDownPodcastsWithoutEpisodes()
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
-                }
-            case .episodesSortedByReleaseDate:
-                firstly {
-                    self.appDelegate.librarySyncer.syncDownPodcastsWithoutEpisodes()
-                }.then { () -> Promise<Void> in
-                    let podcasts = self.appDelegate.storage.main.library.getPodcasts().filter{ $0.remoteStatus == .available }
-                    let podcastFetchPromises = podcasts.compactMap { podcast in return {
-                        podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                    }}
-                    return podcastFetchPromises.resolveSequentially()
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
-                }
+            firstly {
+                AutoDownloadLibrarySyncer(storage: self.appDelegate.storage,
+                                          librarySyncer: self.appDelegate.librarySyncer,
+                                          playableDownloadManager: self.appDelegate.playableDownloadManager)
+                .syncNewestPodcastEpisodes().asVoid()
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
             }
         }
     }

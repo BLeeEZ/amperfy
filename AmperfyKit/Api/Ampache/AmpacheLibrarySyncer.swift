@@ -257,6 +257,34 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
+    func syncNewestPodcastEpisodes() -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        os_log("Sync newest podcast episodes", log: log, type: .info)
+        
+        return firstly {
+            ampacheXmlServerApi.requestServerPodcastSupport()
+        }.then { isSupported -> Promise<Void> in
+            guard isSupported else { return Promise.value }
+            return firstly {
+                self.syncDownPodcastsWithoutEpisodes()
+            }.then { () -> Promise<Void> in
+                let podcasts = self.storage.main.library.getPodcasts().filter{ $0.remoteStatus == .available }
+                let podcastFetchPromises = podcasts.compactMap { podcast in
+                    return { firstly {
+                        self.ampacheXmlServerApi.requestPodcastEpisodes(id: podcast.id, limit: 5)
+                    }.then { response in
+                        self.storage.async.perform { asyncCompanion in
+                            let podcastAsync = Podcast(managedObject: asyncCompanion.context.object(with: podcast.managedObject.objectID) as! PodcastMO)
+                            let parserDelegate = PodcastEpisodeParserDelegate(podcast: podcastAsync, library: asyncCompanion.library)
+                            try self.parse(response: response, delegate: parserDelegate)
+                        }
+                    }
+                    }}
+                return podcastFetchPromises.resolveSequentially()
+            }
+        }
+    }
+    
     func syncMusicFolders() -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {
@@ -414,7 +442,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             }
         }
     }
-    
+
     func syncFavoriteLibraryElements() -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {

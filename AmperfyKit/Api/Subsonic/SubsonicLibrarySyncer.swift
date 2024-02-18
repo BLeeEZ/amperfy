@@ -243,6 +243,27 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         }
     }
     
+    func syncNewestPodcastEpisodes() -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        os_log("Sync newest podcast episodes", log: log, type: .info)
+        
+        return firstly {
+            subsonicServerApi.requestServerPodcastSupport()
+        }.then { isSupported -> Promise<Void> in
+            guard isSupported else { return Promise.value }
+            return firstly {
+                self.syncDownPodcastsWithoutEpisodes()
+            }.then {
+                self.subsonicServerApi.requestNewestPodcasts()
+            }.then { response in
+                self.storage.async.perform { asyncCompanion in
+                    let parserDelegate = SsPodcastEpisodeParserDelegate(podcast: nil, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+                    try self.parse(response: response, delegate: parserDelegate)
+                }
+            }
+        }
+    }
+    
     func syncNewestAlbums(offset: Int, count: Int) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         os_log("Sync newest albums: offset: %i count: %i", log: log, type: .info, offset, count)
