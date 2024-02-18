@@ -25,6 +25,18 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
+public struct TableViewPreviewInfo: Codable {
+    public var playableContainerIdentifier: PlayableContainerIdentifier?
+    public var indexPath: IndexPath?
+    
+    static func create(fromIdentifier identifier: String) -> TableViewPreviewInfo? {
+        guard let identifierData = identifier.data(using: .utf8),
+              let tvIdentifier = try? JSONDecoder().decode(TableViewPreviewInfo.self, from: identifierData)
+        else { return nil }
+        return tvIdentifier
+    }
+}
+
 class SingleFetchedResultsTableViewController<ResultType>: BasicTableViewController where ResultType : NSFetchRequestResult {
     
     private var singleFetchController: BasicFetchedResultsController<ResultType>?
@@ -259,7 +271,7 @@ class BasicTableViewController: UITableViewController {
               let containable = containableCB(indexPath)
         else { return nil }
         
-        let identifier = NSString(string: containable.containerIdentifierString)
+        let identifier = NSString(string: TableViewPreviewInfo(playableContainerIdentifier: containable.containerIdentifier, indexPath: indexPath).asJSONString())
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
             let vc = EntityPreviewVC()
             vc.display(container: containable, on: self)
@@ -281,8 +293,10 @@ class BasicTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
         animator.addCompletion {
-            if let identifierString = configuration.identifier as? String,
-               let container = PlayableContainerIdentifier.getContainer(library: self.appDelegate.storage.main.library, containerIdentifierString: identifierString) {
+            if let identifier = configuration.identifier as? String,
+               let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
+               let containerIdentifier = tvPreviewInfo.playableContainerIdentifier,
+               let container = self.appDelegate.storage.main.library.getContainer(identifier: containerIdentifier) {
                 EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
             }
         }

@@ -237,11 +237,38 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
         case .currentlyPlaying, .none: return false
         }
     }
+
+    /// long press on cell animation (cell content gets smaller)
+    private func makeTargetedPreview(for configuration: UIContextMenuConfiguration, willBeShown: Bool) -> UITargetedPreview? {
+        guard let identifier = configuration.identifier as? String,
+              let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
+              let indexPath = tvPreviewInfo.indexPath,
+              let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell
+        else { return nil }
+        
+        let parameters = UIPreviewParameters()
+        parameters.backgroundColor = .clear
+        if willBeShown {
+            cell.maskCell(fromTop: 0)
+        } else {
+            self.refreshCellMasks()
+        }
+
+        return UITargetedPreview(view: cell, parameters: parameters)
+    }
+
+    func tableView(_ tableView: UITableView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+        return makeTargetedPreview(for: configuration, willBeShown: true)
+    }
+
+    func tableView(_ tableView: UITableView, previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+        return makeTargetedPreview(for: configuration, willBeShown: false)
+    }
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         guard let playerIndex = PlayerIndex.create(from: indexPath) else { return nil }
         let containable = self.player.getPlayable(at: playerIndex)
-        let identifier = NSString(string: containable.containerIdentifierString)
+        let identifier = NSString(string: TableViewPreviewInfo(playableContainerIdentifier: containable.containerIdentifier, indexPath: indexPath).asJSONString())
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
             let vc = EntityPreviewVC()
             vc.display(container: containable, on: self)
@@ -253,8 +280,10 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
         animator.addCompletion {
-            if let identifierString = configuration.identifier as? String,
-               let container = PlayableContainerIdentifier.getContainer(library: self.appDelegate.storage.main.library, containerIdentifierString: identifierString) {
+            if let identifier = configuration.identifier as? String,
+               let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
+               let containerIdentifier = tvPreviewInfo.playableContainerIdentifier,
+               let container = self.appDelegate.storage.main.library.getContainer(identifier: containerIdentifier) {
                 EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
             }
         }
@@ -265,6 +294,12 @@ extension PopupPlayerVC: UITableViewDragDelegate {
     func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
         // Create empty DragItem -> we are using tableView(_:moveRowAt:to:) method
         return [UIDragItem]()
+    }
+    
+    func tableView(_ tableView: UITableView, dragPreviewParametersForRowAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+        let parameter = UIDragPreviewParameters()
+        parameter.backgroundColor = .clear
+        return parameter
     }
 }
 
@@ -281,6 +316,13 @@ extension PopupPlayerVC: UITableViewDropDelegate {
     func tableView(_ tableView: UITableView, dropSessionDidEnd session: UIDropSession) {
         refreshCellMasks()
         return
+    }
+    
+    func tableView(_ tableView: UITableView, dropPreviewParametersForRowAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+        refreshCellMasks()
+        let parameter = UIDragPreviewParameters()
+        parameter.backgroundColor = .clear
+        return parameter
     }
 }
 

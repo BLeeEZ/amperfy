@@ -55,14 +55,6 @@ public enum PlayableContainerBaseType: Int, Codable {
 public struct PlayableContainerIdentifier: Codable {
     public var type: PlayableContainerBaseType?
     public var objectID: String?
-    
-    public static func getContainer(library: LibraryStorage, containerIdentifierString: String) -> PlayableContainable? {
-        guard let identifierData = containerIdentifierString.data(using: .utf8),
-              let containerIdentifier = try? JSONDecoder().decode(PlayableContainerIdentifier.self, from: identifierData),
-              let container = library.getContainer(identifier: containerIdentifier)
-        else { return nil }
-        return container
-    }
 }
 
 public protocol PlayableContainable {
@@ -110,7 +102,4 @@ extension PlayableContainable {
     public var isFavoritable: Bool { return false }
     public var isFavorite: Bool { return false }
     public var isDownloadAvailable: Bool { return true }
-    public var containerIdentifierString: String {
-        return self.containerIdentifier.asJSONString()
-    }
 }
