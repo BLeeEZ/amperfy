@@ -45,9 +45,11 @@ extension AppDelegate {
 
 extension AppDelegate: AlertDisplayable {
     func display(notificationBanner popupVC: UIViewController) {
-        guard let topView = Self.topViewController(),
+        guard NotificationBannerQueue.default.numberOfBanners < 1,
+              let topView = Self.topViewController(),
               topView.presentedViewController == nil,
-              let popupVC = popupVC as? LibrarySyncPopupVC
+              let popupVC = popupVC as? LibrarySyncPopupVC,
+              let _ = UIApplication.shared.mainWindow
               else { return }
 
         let banner = FloatingNotificationBanner(title: popupVC.topic, subtitle: popupVC.shortMessage, style: BannerStyle.from(logType: popupVC.logType), colors: AmperfyBannerColors())
@@ -55,15 +57,8 @@ extension AppDelegate: AlertDisplayable {
         banner.onTap = {
             self.display(popup: popupVC)
         }
-        banner.onSwipeUp = {
-            NotificationBannerQueue.default.removeAll()
-        }
         
         banner.show(queuePosition: QueuePosition.back, bannerPosition: BannerPosition.top, on: topView, cornerRadius: 20, shadowBlurRadius: 10)
-        if let keyWindow = UIApplication.shared.mainWindow {
-            keyWindow.addSubview(banner)
-            keyWindow.bringSubviewToFront(banner)
-        }
     }
     
     func display(popup popupVC: UIViewController) {
