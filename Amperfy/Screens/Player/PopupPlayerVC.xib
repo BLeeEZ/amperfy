@@ -28,10 +28,10 @@
                     <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                 </imageView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lyG-pB-bha" userLabel="Large Player Placeholder">
-                    <rect key="frame" x="0.0" y="48" width="414" height="614"/>
+                    <rect key="frame" x="0.0" y="68" width="414" height="594"/>
                 </view>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" contentViewInsetsToSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6gH-MH-Q1w">
-                    <rect key="frame" x="0.0" y="48" width="414" height="614"/>
+                    <rect key="frame" x="0.0" y="68" width="414" height="594"/>
                     <color key="sectionIndexBackgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="3lu-QN-yBq"/>
@@ -48,11 +48,11 @@
             <viewLayoutGuide key="safeArea" id="1MA-6G-aB5"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="lyG-pB-bha" firstAttribute="top" secondItem="1MA-6G-aB5" secondAttribute="top" id="18e-Ia-XA9"/>
+                <constraint firstItem="lyG-pB-bha" firstAttribute="top" secondItem="1MA-6G-aB5" secondAttribute="top" constant="20" id="18e-Ia-XA9"/>
                 <constraint firstItem="B0Y-BS-JDd" firstAttribute="top" secondItem="6gH-MH-Q1w" secondAttribute="bottom" id="31P-Um-22E"/>
                 <constraint firstAttribute="bottom" secondItem="uc4-Rw-bKA" secondAttribute="bottom" id="BR3-r1-kqM"/>
                 <constraint firstAttribute="right" secondItem="lyG-pB-bha" secondAttribute="right" id="Bv5-GQ-NSk"/>
-                <constraint firstItem="6gH-MH-Q1w" firstAttribute="top" secondItem="1MA-6G-aB5" secondAttribute="top" id="CX2-Pe-eWy"/>
+                <constraint firstItem="6gH-MH-Q1w" firstAttribute="top" secondItem="1MA-6G-aB5" secondAttribute="top" constant="20" id="CX2-Pe-eWy"/>
                 <constraint firstItem="6gH-MH-Q1w" firstAttribute="leading" secondItem="9Ao-u1-xa1" secondAttribute="leading" id="J6w-F0-q1Q"/>
                 <constraint firstItem="uc4-Rw-bKA" firstAttribute="trailing" secondItem="1MA-6G-aB5" secondAttribute="trailing" id="JKc-tO-MZO"/>
                 <constraint firstItem="B0Y-BS-JDd" firstAttribute="leading" secondItem="1MA-6G-aB5" secondAttribute="leading" id="Mss-gv-oXo"/>
