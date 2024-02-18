@@ -85,6 +85,8 @@ public protocol PlayerFacade {
     var isPlaying: Bool { get }
     func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable
     var currentlyPlaying: AbstractPlayable?  { get }
+    var currentMusicItem: AbstractPlayable? { get }
+    var currentPodcastItem: AbstractPlayable? { get }
     var contextName: String { get }
     var elapsedTime: Double { get }
     var duration: Double { get }
@@ -175,6 +177,12 @@ class PlayerFacadeImpl: PlayerFacade {
     }
     var currentlyPlaying: AbstractPlayable? {
         return musicPlayer.currentlyPlaying
+    }
+    var currentMusicItem: AbstractPlayable? {
+        return musicPlayer.currentMusicItem
+    }
+    var currentPodcastItem: AbstractPlayable? {
+        return musicPlayer.currentPodcastItem
     }
     var contextName: String {
         get {

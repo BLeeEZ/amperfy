@@ -51,6 +51,7 @@
 		5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */; };
 		5059A31C28A9ED680068E4D2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5059A31B28A9ED680068E4D2 /* SceneDelegate.swift */; };
 		5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5059A31D28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift */; };
+		505CA1F52B848B8300AA81CD /* QuickActionsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA1F42B848B8300AA81CD /* QuickActionsHandler.swift */; };
 		507148AD2B767FE200557904 /* ContextQueuePrevSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507148AC2B767FE200557904 /* ContextQueuePrevSectionHeader.swift */; };
 		507148AE2B76800A00557904 /* ContextQueuePrevSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507148AB2B767FE200557904 /* ContextQueuePrevSectionHeader.xib */; };
 		50722747286794FC00910574 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50722746286794FC00910574 /* MainWindow.swift */; };
@@ -625,6 +626,7 @@
 		505AD8712615B4D8001319B6 /* Amperfy v7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v7.xcdatamodel"; sourceTree = "<group>"; };
 		505AD87A2615C834001319B6 /* GenreMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenreMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		505AD87B2615C834001319B6 /* GenreMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenreMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		505CA1F42B848B8300AA81CD /* QuickActionsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsHandler.swift; sourceTree = "<group>"; };
 		506640D12B683AAF007434A8 /* Amperfy v33.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v33.xcdatamodel"; sourceTree = "<group>"; };
 		5067016125E3ADA200A3EF89 /* Amperfy v5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v5.xcdatamodel"; sourceTree = "<group>"; };
 		50675E6C25F61163005737FD /* BasicTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableCell.swift; sourceTree = "<group>"; };
@@ -1074,6 +1076,7 @@
 				5040B2C3269CD19600911451 /* LocalNotificationManager.swift */,
 				50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */,
 				50ED2B9027B7AE8500331BF7 /* EventNotificationHandler.swift */,
+				505CA1F42B848B8300AA81CD /* QuickActionsHandler.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -2246,6 +2249,7 @@
 				50C9D6A6284FAA7F007F18D0 /* CoreDataMigrationVersion.swift in Sources */,
 				50C9D692284FAA6C007F18D0 /* DownloadMO+CoreDataClass.swift in Sources */,
 				50C9D662284FAA0B007F18D0 /* AmpacheXmlServerApi.swift in Sources */,
+				505CA1F52B848B8300AA81CD /* QuickActionsHandler.swift in Sources */,
 				50C9D64A284FAA02007F18D0 /* SsPodcastParserDelegate.swift in Sources */,
 				50C9D6DC284FAB88007F18D0 /* RemoteCommandCenterHandler.swift in Sources */,
 				50C9D6D8284FAB88007F18D0 /* PlayerUtil.swift in Sources */,

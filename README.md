@@ -17,11 +17,12 @@ Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampa
 - CarPlay support
 - Syncing the database after first login
 - Update library in background
-- Siri voice commands: "play \<example artist\> in Amperfy"
+- Siri voice commands: "play \<example artist\>"
 - Siri shortcuts: play id, search and play
 - Player interaction from lock screen
 - Sleep timer
 - Adjustable playback rate
+- Home Screen Quick Actions
 - Remote controlable
 - Dark mode support
 

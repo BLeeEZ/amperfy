@@ -99,8 +99,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public lazy var intentManager = {
         return AmperKit.shared.intentManager
     }()
+    public lazy var quickActionsManager = {
+        return QuickActionsHandler(storage: self.storage, player: self.player, application: UIApplication.shared, displaySearchTabCB: self.displaySearchTab)
+    }()
     
     var sleepTimer: Timer?
+    var autoActivateSearchTabSearchBar = false
 
     var isKeepScreenAlive: Bool {
         get { return UIApplication.shared.isIdleTimerDisabled }

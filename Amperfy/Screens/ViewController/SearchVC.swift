@@ -25,7 +25,7 @@ import AmperfyKit
 import PromiseKit
 
 class SearchVC: BasicTableViewController {
-
+    
     private var playlistFetchedResultsController: PlaylistFetchedResultsController!
     private var artistFetchedResultsController: ArtistFetchedResultsController!
     private var albumFetchedResultsController: AlbumFetchedResultsController!
@@ -97,6 +97,22 @@ class SearchVC: BasicTableViewController {
         songFetchedResultsController?.delegate = self
         
         appDelegate.userStatistics.visited(.search)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
+            if self.appDelegate.autoActivateSearchTabSearchBar {
+                self.appDelegate.autoActivateSearchTabSearchBar = false
+                self.activateSearchBar()
+            }
+        }
+    }
+    
+    public func activateSearchBar() {
+        if self.viewIfLoaded?.window != nil {
+            // directly activate searchBar
+            self.searchController.searchBar.becomeFirstResponder()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {

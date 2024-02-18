@@ -32,6 +32,12 @@ public class PlayQueueHandler  {
     var currentlyPlaying: AbstractPlayable? {
         return playerQueues.currentItem
     }
+    var currentMusicItem: AbstractPlayable? {
+        return playerQueues.currentMusicItem
+    }
+    var currentPodcastItem: AbstractPlayable? {
+        return playerQueues.currentPodcastItem
+    }
     
     var prevQueue: [AbstractPlayable] {
         var played = [AbstractPlayable]()

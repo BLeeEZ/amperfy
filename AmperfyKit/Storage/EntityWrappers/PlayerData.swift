@@ -44,6 +44,8 @@ protocol PlayerQueuesPersistent {
 
     var currentIndex: Int { get set }
     var currentItem: AbstractPlayable? { get }
+    var currentMusicItem: AbstractPlayable? { get }
+    var currentPodcastItem: AbstractPlayable? { get }
     var activeQueue: Playlist { get }
     var inactiveQueue: Playlist { get }
     var contextQueue: Playlist { get }
@@ -256,15 +258,19 @@ extension PlayerData: PlayerQueuesPersistent {
         }
     }
     
+    var activeMusicQueue: Playlist {
+        if !isShuffle {
+            return contextPlaylist
+        } else {
+            return shuffledContextPlaylist
+        }
+    }
+    
     var activeQueue: Playlist {
         get {
             switch playerMode {
             case .music:
-                if !isShuffle {
-                    return contextPlaylist
-                } else {
-                    return shuffledContextPlaylist
-                }
+                return activeMusicQueue
             case .podcast:
                 return podcastPlaylist
             }
@@ -362,18 +368,30 @@ extension PlayerData: PlayerQueuesPersistent {
         get {
             switch playerMode {
             case .music:
-                if isUserQueuPlayingInternal, userQueuePlaylistInternal.songCount > 0 {
-                    return userQueuePlaylistInternal.playables.first
-                }
-                guard activeQueue.playables.count > 0 else { return nil }
-                guard currentMusicIndex >= 0, currentMusicIndex < activeQueue.playables.count else {
-                    return activeQueue.playables[0]
-                }
-                return activeQueue.playables[currentMusicIndex]
+                return getCurrentMusicPlayable(in: activeQueue)
             case .podcast:
                 return podcastPlaylist.playables.element(at: currentPodcastIndex)
             }
         }
+    }
+    
+    var currentMusicItem: AbstractPlayable? {
+        return getCurrentMusicPlayable(in: activeMusicQueue)
+    }
+
+    var currentPodcastItem: AbstractPlayable? {
+        return podcastPlaylist.playables.element(at: currentPodcastIndex)
+    }
+    
+    private func getCurrentMusicPlayable(in queue: Playlist) -> AbstractPlayable? {
+        if isUserQueuPlayingInternal, userQueuePlaylistInternal.songCount > 0 {
+            return userQueuePlaylistInternal.playables.first
+        }
+        guard queue.playables.count > 0 else { return nil }
+        guard currentMusicIndex >= 0, currentMusicIndex < queue.playables.count else {
+            return queue.playables[0]
+        }
+        return queue.playables[currentMusicIndex]
     }
 
     var userQueuePlaylist: Playlist {

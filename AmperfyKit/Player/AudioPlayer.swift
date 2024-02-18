@@ -33,6 +33,12 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     var currentlyPlaying: AbstractPlayable? {
         return queueHandler.currentlyPlaying
     }
+    var currentMusicItem: AbstractPlayable? {
+        return queueHandler.currentMusicItem
+    }
+    var currentPodcastItem: AbstractPlayable? {
+        return queueHandler.currentPodcastItem
+    }
     var isShouldPauseAfterFinishedPlaying = false
 
     private var playerStatus: PlayerStatusPersistent

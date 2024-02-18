@@ -20,6 +20,7 @@
 //
 
 import SwiftUI
+import AmperfyKit
 
 struct ServerSettingsView: View {
     
@@ -31,6 +32,8 @@ struct ServerSettingsView: View {
         self.appDelegate.storage.loginCredentials = nil
         // force resync after login
         self.appDelegate.storage.isLibrarySynced = false
+        // reset quick actions
+        self.appDelegate.quickActionsManager.configureQuickActions()
         self.appDelegate.restartByUser()
     }
     

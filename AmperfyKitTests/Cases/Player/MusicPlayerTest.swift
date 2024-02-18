@@ -53,6 +53,7 @@ class MOCK_AVPlayer: AVPlayer {
 }
 
 class MOCK_SongDownloader: DownloadManageable {
+    
     var downloadables = [Downloadable]()
     func isNoDownloadRequested() -> Bool {
         return downloadables.count == 0
@@ -67,7 +68,7 @@ class MOCK_SongDownloader: DownloadManageable {
     func resetFailedDownloads() {}
     func cancelDownloads() {}
     func start() {}
-    func stopAndWait() {}
+    func stop() {}
     func cancelPlayableDownloads() {}
     func storageExceedsCacheLimit() -> Bool { return false }
 }
@@ -85,7 +86,9 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func sync(album: Album) -> Promise<Void> { return Promise.value }
     func sync(song: Song) -> Promise<Void> { return Promise.value }
     func sync(podcast: Podcast) -> Promise<Void> { return Promise.value }
+    func syncNewestPodcastEpisodes() -> Promise<Void> { return Promise.value }
     func syncNewestAlbums(offset: Int, count: Int) -> Promise<Void> { return Promise.value }
+    func syncRecentAlbums(offset: Int, count: Int) -> Promise<Void> { return Promise.value }
     func syncFavoriteLibraryElements() -> Promise<Void> { return Promise.value }
     func syncDownPlaylistsWithoutSongs() -> Promise<Void> { return Promise.value }
     func syncDown(playlist: Playlist) -> Promise<Void> { return Promise.value }

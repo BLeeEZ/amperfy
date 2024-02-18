@@ -66,4 +66,32 @@ extension AppDelegate: UNUserNotificationCenterDelegate
             hostingTabBarVC.selectedIndex = 0
         }
     }
+    
+    func displaySearchTab() {
+        guard let topView = Self.topViewController(),
+              storage.isLibrarySynced
+        else { return }
+        
+        if let presentedViewController = topView.presentedViewController {
+            presentedViewController.dismiss(animated: false)
+        }
+        guard let hostingTabBarVC = topView as? UITabBarController else { return }
+        
+        if hostingTabBarVC.popupPresentationState == .open,
+           let _ = hostingTabBarVC.popupContent as? PopupPlayerVC {
+            hostingTabBarVC.closePopup(animated: false)
+        }
+        
+        if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
+           hostingTabViewControllers.count >= 2,
+           let searchTabNavVC = hostingTabViewControllers[1] as? UINavigationController {
+            hostingTabBarVC.selectedIndex = 1
+            if let searchTabVC = searchTabNavVC.visibleViewController as? SearchVC, searchTabVC.viewIfLoaded?.window != nil {
+                searchTabVC.activateSearchBar()
+            } else {
+                autoActivateSearchTabSearchBar = true
+            }
+        }
+           
+    }
 }
