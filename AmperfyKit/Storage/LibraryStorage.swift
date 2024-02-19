@@ -508,6 +508,8 @@ public class LibraryStorage: PlayableFileCachable {
             return Playlist(library: self, managedObject: context.object(with: managedObjectID) as! PlaylistMO)
         case .podcast:
             return Podcast(managedObject: context.object(with: managedObjectID) as! PodcastMO)
+        case .directory:
+            return Directory(managedObject: context.object(with: managedObjectID) as! DirectoryMO)
         }
     }
     

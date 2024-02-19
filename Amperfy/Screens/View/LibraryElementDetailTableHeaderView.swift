@@ -82,6 +82,22 @@ class LibraryElementDetailTableHeaderView: UIView {
         playAllButton.imageView?.contentMode = .scaleAspectFit
         playShuffledButton.setImage(UIImage.shuffle.invertedImage(), for: .normal)
         playShuffledButton.imageView?.contentMode = .scaleAspectFit
+        activate()
+    }
+    
+    func activate() {
+        playAllButton.isEnabled = true
+        playAllButton.backgroundColor = .defaultBlue
+        playShuffledButton.isEnabled = true
+        playShuffledButton.backgroundColor = .defaultBlue
+    }
+    
+    func deactivate() {
+        playAllButton.isEnabled = false
+        playAllButton.backgroundColor = .lightGray
+        playShuffledButton.isEnabled = false
+        playShuffledButton.backgroundColor = .lightGray
+        
     }
     
 }

@@ -20,6 +20,7 @@
 //
 
 import Foundation
+import PromiseKit
 
 public class Directory: AbstractLibraryEntity {
     
@@ -46,6 +47,57 @@ public class Directory: AbstractLibraryEntity {
         return managedObject.subdirectories?.compactMap{ Directory(managedObject: $0 as! DirectoryMO) } ?? [Directory]()
     }
 
+}
+
+extension Directory: PlayableContainable  {
+    public var subtitle: String? { return nil }
+    public var subsubtitle: String? { return nil }
+    public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
+        var infoContent = [String]()
+        if subdirectories.count == 1 {
+            infoContent.append("1 Subdirectory")
+        } else if subdirectories.count > 1 {
+            infoContent.append("\(subdirectories.count) Subdirectory")
+        }
+        
+        if songs.count == 1 {
+            infoContent.append("1 Song")
+        } else if songs.count > 1 {
+            infoContent.append("\(songs.count) Songs")
+        }
+        
+        if details.type == .long {
+            if isCompletelyCached {
+                infoContent.append("Cached")
+            }
+            if duration > 0 {
+                infoContent.append("\(duration.asDurationString)")
+            }
+            if details.isShowDetailedInfo {
+                infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
+            }
+        }
+        return infoContent
+    }
+    public var playables: [AbstractPlayable] {
+        return songs
+    }
+    public var playContextType: PlayerMode { return .music }
+    public var isRateable: Bool { return false }
+    public var isFavoritable: Bool { return false }
+    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
+        return Promise<Void>(error: BackendError.notSupported)
+    }
+    public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
+        return librarySyncer.sync(directory: self)
+    }
+    public var artworkCollection: ArtworkCollection {
+        return ArtworkCollection(defaultImage: .folderArtwork, singleImageEntity: self)
+    }
+    public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .directory, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
+    public var duration: Int {
+        playables.reduce(0){ $0 + $1.duration }
+    }
 }
 
 extension Directory: Hashable, Equatable {

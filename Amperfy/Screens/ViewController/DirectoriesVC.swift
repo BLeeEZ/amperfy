@@ -29,6 +29,7 @@ class DirectoriesVC: BasicTableViewController {
     var directory: Directory!
     private var subdirectoriesFetchedResultsController: DirectorySubdirectoriesFetchedResultsController!
     private var songsFetchedResultsController: DirectorySongsFetchedResultsController!
+    private var headerView: LibraryElementDetailTableHeaderView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,14 +39,27 @@ class DirectoriesVC: BasicTableViewController {
         subdirectoriesFetchedResultsController.delegate = self
         songsFetchedResultsController = DirectorySongsFetchedResultsController(for: directory, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         songsFetchedResultsController.delegate = self
-        tableView.register(nibName: DirectoryTableCell.typeName)
-        tableView.register(nibName: SongTableCell.typeName)
         
         configureSearchController(placeholder: "Directories and Songs", scopeButtonTitles: ["All", "Cached"])
         navigationItem.title = directory.name
+        tableView.register(nibName: DirectoryTableCell.typeName)
+        tableView.register(nibName: SongTableCell.typeName)
+        
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
+        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
+            libraryElementDetailTableHeaderView.prepare(
+                playContextCb: {() in PlayContext(containable: self.directory, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
+                with: appDelegate.player)
+            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
+            headerView = libraryElementDetailTableHeaderView
+            self.refreshHeaderView()
+        }
         
         containableAtIndexPathCallback = { (indexPath) in
             switch indexPath.section {
+            case 0:
+                let subdirectoryIndexPath = IndexPath(row: indexPath.row, section: 0)
+                return self.subdirectoriesFetchedResultsController.getWrappedEntity(at: subdirectoryIndexPath)
             case 1:
                 let songIndexPath = IndexPath(row: indexPath.row, section: 0)
                 return self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
@@ -53,8 +67,37 @@ class DirectoriesVC: BasicTableViewController {
                 return nil
             }
         }
+        playContextAtIndexPathCallback = { (indexPath) in
+            switch indexPath.section {
+            case 0:
+                let subdirectory = self.subdirectoriesFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                firstly {
+                    subdirectory.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Directory Sync", error: error)
+                }.finally {
+                    self.refreshHeaderView()
+                }
+                return PlayContext(containable: subdirectory)
+            case 1:
+                let songIndexPath = IndexPath(row: indexPath.row, section: 0)
+                return self.convertIndexPathToPlayContext(songIndexPath: songIndexPath)
+            default:
+                return nil
+            }
+        }
         swipeCallback = { (indexPath, completionHandler) in
             switch indexPath.section {
+            case 0:
+                let subdirectory = self.subdirectoriesFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                firstly {
+                    subdirectory.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Directory Sync", error: error)
+                }.finally {
+                    completionHandler(SwipeActionContext(containable: subdirectory))
+                    self.refreshHeaderView()
+                }
             case 1:
                 let songIndexPath = IndexPath(row: indexPath.row, section: 0)
                 let song = self.songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
@@ -63,6 +106,14 @@ class DirectoriesVC: BasicTableViewController {
             default:
                 completionHandler(nil)
             }
+        }
+    }
+    
+    func refreshHeaderView() {
+        if !directory.songs.isEmpty {
+            headerView?.activate()
+        } else {
+            headerView?.deactivate()
         }
     }
     
@@ -76,6 +127,8 @@ class DirectoriesVC: BasicTableViewController {
             self.appDelegate.librarySyncer.sync(directory: directory)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Directories Sync", error: error)
+        }.finally {
+            self.refreshHeaderView()
         }
     }
     

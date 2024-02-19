@@ -178,6 +178,12 @@ class EntityPreviewActionBuilder {
             if let navController = self.rootView.navigationController {
                 navController.pushViewController(detailVC, animated: true)
             }
+        } else if let directory = entityContainer as? Directory {
+            let detailVC = DirectoriesVC.instantiateFromAppStoryboard()
+            detailVC.directory = directory
+            if let navController = self.rootView.navigationController {
+                navController.pushViewController(detailVC, animated: true)
+            }
         }
     }
     
@@ -198,6 +204,8 @@ class EntityPreviewActionBuilder {
             configureFor(playlist: playlist)
         } else if let podcast = entityContainer as? Podcast {
             configureFor(podcast: podcast)
+        } else if let directory = entityContainer as? Directory {
+            configureFor(directory: directory)
         }
     }
     
@@ -291,6 +299,18 @@ class EntityPreviewActionBuilder {
         isShowAlbum = false
         isShowArtist = !(rootView is ArtistDetailVC)
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
+        isDeleteOnServer = false
+        isShowPodcastDetails = false
+    }
+    
+    private func configureFor(directory: Directory) {
+        isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+        isShuffle = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+        isMusicQueue = true
+        isPodcastQueue = false
+        isShowAlbum = false
+        isShowArtist = false
+        isAddToPlaylist = appDelegate.storage.settings.isOnlineMode && !entityContainer.playables.isEmpty
         isDeleteOnServer = false
         isShowPodcastDetails = false
     }

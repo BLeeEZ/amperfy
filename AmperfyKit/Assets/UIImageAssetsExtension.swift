@@ -114,6 +114,7 @@ extension UIImage {
     public static let podcastArtwork = UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .big)
     public static let podcastEpisodeArtwork = UIImage.createArtwork(with: UIImage.podcastEpisode, iconSizeType: .small)
     public static let playlistArtwork = UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, switchColors: true)
+    public static let folderArtwork = UIImage.createArtwork(with: UIImage.folder, iconSizeType: .big)
     
     private static func create(_ named: String) -> UIImage {
         return UIImage(named: named) ?? UIImage()
