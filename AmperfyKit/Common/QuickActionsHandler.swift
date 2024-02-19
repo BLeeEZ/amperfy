@@ -101,7 +101,7 @@ public class QuickActionsHandler {
                 }
                 player.play()
             case .playPodcastAction:
-                if player.playerMode != .music {
+                if player.playerMode != .podcast {
                     player.setPlayerMode(.podcast)
                 }
                 player.play()
