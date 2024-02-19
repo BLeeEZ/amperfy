@@ -98,19 +98,10 @@ class SearchVC: BasicTableViewController {
         
         appDelegate.userStatistics.visited(.search)
     }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
-            if self.appDelegate.autoActivateSearchTabSearchBar {
-                self.appDelegate.autoActivateSearchTabSearchBar = false
-                self.activateSearchBar()
-            }
-        }
-    }
-    
+
     public func activateSearchBar() {
-        if self.viewIfLoaded?.window != nil {
-            // directly activate searchBar
+        if self.isViewLoaded {
+            // activate searchBar
             self.searchController.searchBar.becomeFirstResponder()
         }
     }
