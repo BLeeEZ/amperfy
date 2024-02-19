@@ -91,6 +91,11 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.player.isAutoCachePlayedItems = newValue
         }))
         
+        settings.isScrobbleStreamedItems = self.appDelegate.storage.settings.isScrobbleStreamedItems
+        changesAgent.append(settings.$isScrobbleStreamedItems.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.isScrobbleStreamedItems = newValue
+        }))
+        
         settings.swipeActionSettings = self.appDelegate.storage.settings.swipeActionSettings
         changesAgent.append(settings.$swipeActionSettings.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.swipeActionSettings = newValue

@@ -67,14 +67,14 @@ public class AmperKit {
     }()
     private var audioSessionHandler: AudioSessionHandler?
     public lazy var player: PlayerFacade = {
-        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
+       let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
         let playerData = storage.main.library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
         let curPlayer = AudioPlayer(coreData: playerData, queueHandler: queueHandler, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
         
         let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(playerStatus: playerData, queueHandler: queueHandler, playableDownloadManager: playableDownloadManager)
         curPlayer.addNotifier(notifier:  playerDownloadPreparationHandler)
-        let songPlayedSyncer = SongPlayedSyncer(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, scrobbleSyncer: scrobbleSyncer)
+        let songPlayedSyncer = SongPlayedSyncer(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, storage: storage, scrobbleSyncer: scrobbleSyncer)
         curPlayer.addNotifier(notifier: songPlayedSyncer)
 
         let facadeImpl = PlayerFacadeImpl(playerStatus: playerData, queueHandler: queueHandler, musicPlayer: curPlayer, library: storage.main.library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)

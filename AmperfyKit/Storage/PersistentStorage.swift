@@ -155,6 +155,7 @@ public class PersistentStorage {
         case IsOfflineMode = "isOfflineMode"
         case IsAutoDownloadLatestSongsActive = "isAutoDownloadLatestSongsActive"
         case IsAutoDownloadLatestPodcastEpisodesActive = "isAutoDownloadLatestPodcastEpisodesActive"
+        case IsScrobbleStreamedItems = "isScrobbleStreamedItems"
         case LibrarySyncVersion = "librarySyncVersion"
         
         case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
@@ -316,6 +317,11 @@ public class PersistentStorage {
         public var isAutoDownloadLatestPodcastEpisodesActive: Bool {
             get { return UserDefaults.standard.object(forKey: UserDefaultsKey.IsAutoDownloadLatestPodcastEpisodesActive.rawValue) as? Bool ?? false }
             set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsAutoDownloadLatestPodcastEpisodesActive.rawValue) }
+        }
+        
+        public var isScrobbleStreamedItems: Bool {
+            get { return UserDefaults.standard.object(forKey: UserDefaultsKey.IsScrobbleStreamedItems.rawValue) as? Bool ?? false }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsScrobbleStreamedItems.rawValue) }
         }
         
         public var isOnlineMode: Bool {

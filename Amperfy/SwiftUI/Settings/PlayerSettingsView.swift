@@ -37,9 +37,21 @@ struct PlayerSettingsView: View {
                     }
                 }, header: {
                 })
+                
+                Section(content: {
+                    HStack {
+                        Text("Scrobble streamed Songs or Podcast Episodes")
+                        Spacer()
+                        Toggle(isOn: $settings.isScrobbleStreamedItems) {}
+                            .frame(width: 130)
+                    }
+                }
+                , footer: {
+                    Text("Some server count streamed items already as played. When active streamed Songs/Podcast Episodes are getting always scrobbled.")
+                })
             }
         }
-        .navigationTitle("Player")
+        .navigationTitle("Player & Scrobble")
         .onAppear {
             appDelegate.userStatistics.visited(.settingsPlayer)
         }
