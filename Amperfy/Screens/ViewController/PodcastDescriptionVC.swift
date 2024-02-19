@@ -52,14 +52,13 @@ class PodcastDescriptionVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        self.view.setBackgroundBlur(style: .prominent)
         titleLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()
         infoLabel.applyAmperfyStyle()
-        playButton.imageView?.contentMode = .scaleAspectFit
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        self.view.setBackgroundBlur(style: .prominent)
         refresh()
     }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
@@ -22,11 +22,11 @@
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
-            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="FTu-YN-bUM">
-                    <rect key="frame" x="16" y="386" width="361" height="80"/>
+                    <rect key="frame" x="16" y="293.5" width="343" height="80"/>
                     <subviews>
                         <view contentMode="scaleAspectFill" translatesAutoresizingMaskIntoConstraints="NO" id="mAm-Nt-stn" customClass="EntityImageView" customModule="AmperfyKit">
                             <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
@@ -37,13 +37,13 @@
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sTx-fW-CNa" userLabel="Details View">
-                            <rect key="frame" x="84" y="0.0" width="257" height="80"/>
+                            <rect key="frame" x="84" y="0.0" width="239" height="80"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="y6k-we-MVa">
-                                    <rect key="frame" x="8" y="0.0" width="249" height="80"/>
+                                    <rect key="frame" x="8" y="0.0" width="231" height="80"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zf2-Rj-EC9" customClass="MarqueeLabel" customModule="MarqueeLabel">
-                                            <rect key="frame" x="0.0" y="0.0" width="249" height="24"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="231" height="24"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="24" id="iEo-4j-Wza"/>
                                             </constraints>
@@ -52,7 +52,7 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wKh-7l-2Ni" customClass="MarqueeLabel" customModule="MarqueeLabel">
-                                            <rect key="frame" x="0.0" y="32" width="249" height="20"/>
+                                            <rect key="frame" x="0.0" y="32" width="231" height="20"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="20" id="el7-Wu-jhv"/>
                                             </constraints>
@@ -61,7 +61,7 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LoZ-YK-k9e" userLabel="Info" customClass="MarqueeLabel" customModule="MarqueeLabel">
-                                            <rect key="frame" x="0.0" y="60" width="249" height="20"/>
+                                            <rect key="frame" x="0.0" y="60" width="231" height="20"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="20" id="JoK-0R-sub"/>
                                             </constraints>
@@ -81,7 +81,7 @@
                             </constraints>
                         </view>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="right" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="its-Kk-hqs">
-                            <rect key="frame" x="345" y="31.999999999999993" width="16" height="16.66666666666665"/>
+                            <rect key="frame" x="327" y="32" width="16" height="16.5"/>
                             <color key="tintColor" systemColor="secondaryLabelColor"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="16" id="9Rs-PT-wAV"/>
@@ -102,25 +102,25 @@
     </objects>
     <designables>
         <designable name="LoZ-YK-k9e">
-            <size key="intrinsicContentSize" width="27.333333333333332" height="19.333333333333332"/>
+            <size key="intrinsicContentSize" width="27.5" height="19.5"/>
         </designable>
         <designable name="wKh-7l-2Ni">
-            <size key="intrinsicContentSize" width="41" height="20.333333333333332"/>
+            <size key="intrinsicContentSize" width="41" height="20.5"/>
         </designable>
         <designable name="zf2-Rj-EC9">
-            <size key="intrinsicContentSize" width="36.666666666666664" height="23"/>
+            <size key="intrinsicContentSize" width="36.5" height="23"/>
         </designable>
     </designables>
     <resources>
         <image name="chevron.forward" catalog="system" width="97" height="128"/>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="tintColor">
-            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

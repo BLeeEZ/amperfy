@@ -595,7 +595,6 @@ class EntityPreviewVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-        self.view.setBackgroundBlur(style: .prominent)
         self.view.backgroundColor = .clear
         titleLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()
@@ -612,6 +611,7 @@ class EntityPreviewVC: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        self.view.setBackgroundBlur(style: .prominent)
         refresh()
     }
 
