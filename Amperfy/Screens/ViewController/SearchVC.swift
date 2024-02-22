@@ -24,24 +24,46 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
+public enum SearchSection: Int, CaseIterable {
+    case Artist = 0
+    case Album = 1
+    case Playlist = 2
+    case Song = 3
+}
+
+
 class SearchVC: BasicTableViewController {
     
-    private var playlistFetchedResultsController: PlaylistFetchedResultsController!
+    private static let fetchLimit = 3
+    
     private var artistFetchedResultsController: ArtistFetchedResultsController!
     private var albumFetchedResultsController: AlbumFetchedResultsController!
+    private var playlistFetchedResultsController: PlaylistFetchedResultsController!
     private var songFetchedResultsController: SongsFetchedResultsController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        playlistFetchedResultsController = PlaylistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .name, isGroupedInAlphabeticSections: false)
-        playlistFetchedResultsController.delegate = self
-        artistFetchedResultsController = ArtistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .name, isGroupedInAlphabeticSections: false)
-        artistFetchedResultsController.delegate = self
-        albumFetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .name, isGroupedInAlphabeticSections: false)
-        albumFetchedResultsController.delegate = self
-        songFetchedResultsController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .name, isGroupedInAlphabeticSections: false)
-        songFetchedResultsController.delegate = self
+        playlistFetchedResultsController = PlaylistFetchedResultsController(
+            coreDataCompanion: appDelegate.storage.main,
+            sortType: .name,
+            isGroupedInAlphabeticSections: false,
+            fetchLimit: Self.fetchLimit)
+        artistFetchedResultsController = ArtistFetchedResultsController(
+            coreDataCompanion: appDelegate.storage.main,
+            sortType: .name,
+            isGroupedInAlphabeticSections: false,
+            fetchLimit: Self.fetchLimit)
+        albumFetchedResultsController = AlbumFetchedResultsController(
+            coreDataCompanion: appDelegate.storage.main,
+            sortType: .name,
+            isGroupedInAlphabeticSections: false,
+            fetchLimit: Self.fetchLimit)
+        songFetchedResultsController = SongsFetchedResultsController(
+            coreDataCompanion: appDelegate.storage.main,
+            sortType: .name,
+            isGroupedInAlphabeticSections: false,
+            fetchLimit: Self.fetchLimit)
         
         configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: PlaylistTableCell.typeName)
@@ -49,16 +71,17 @@ class SearchVC: BasicTableViewController {
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
         tableView.separatorStyle = .none
+        tableView.sectionHeaderTopPadding = 0
         
         containableAtIndexPathCallback = { (indexPath) in
             switch indexPath.section {
-            case LibraryElement.Playlist.rawValue:
+            case SearchSection.Playlist.rawValue:
                 return self.playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            case LibraryElement.Artist.rawValue:
+            case SearchSection.Artist.rawValue:
                 return self.artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            case LibraryElement.Album.rawValue:
+            case SearchSection.Album.rawValue:
                 return self.albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            case LibraryElement.Song.rawValue:
+            case SearchSection.Song.rawValue:
                 return self.songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             default:
                 return nil
@@ -66,16 +89,16 @@ class SearchVC: BasicTableViewController {
         }
         playContextAtIndexPathCallback = { (indexPath) in
             switch indexPath.section {
-            case LibraryElement.Playlist.rawValue:
+            case SearchSection.Playlist.rawValue:
                 let entity =  self.playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
                 return PlayContext(containable: entity)
-            case LibraryElement.Artist.rawValue:
+            case SearchSection.Artist.rawValue:
                 let entity =  self.artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
                 return PlayContext(containable: entity)
-            case LibraryElement.Album.rawValue:
+            case SearchSection.Album.rawValue:
                 let entity =  self.albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
                 return PlayContext(containable: entity)
-            case LibraryElement.Song.rawValue:
+            case SearchSection.Song.rawValue:
                 let entity =  self.songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
                 return PlayContext(containable: entity)
             default:
@@ -91,11 +114,6 @@ class SearchVC: BasicTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        playlistFetchedResultsController?.delegate = self
-        artistFetchedResultsController?.delegate = self
-        albumFetchedResultsController?.delegate = self
-        songFetchedResultsController?.delegate = self
-        
         appDelegate.userStatistics.visited(.search)
     }
 
@@ -106,17 +124,9 @@ class SearchVC: BasicTableViewController {
         }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        playlistFetchedResultsController?.delegate = nil
-        artistFetchedResultsController?.delegate = nil
-        albumFetchedResultsController?.delegate = nil
-        songFetchedResultsController?.delegate = nil
-    }
-    
     func determSwipeActionContext(at indexPath: IndexPath, completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void) {
         switch indexPath.section {
-        case LibraryElement.Playlist.rawValue:
+        case SearchSection.Playlist.rawValue:
             let playlist = playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             firstly {
                 playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
@@ -125,7 +135,7 @@ class SearchVC: BasicTableViewController {
             }.finally {
                 completionHandler(SwipeActionContext(containable: playlist))
             }
-        case LibraryElement.Artist.rawValue:
+        case SearchSection.Artist.rawValue:
             let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             firstly {
                 artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
@@ -134,7 +144,7 @@ class SearchVC: BasicTableViewController {
             }.finally {
                 completionHandler(SwipeActionContext(containable: artist))
             }
-        case LibraryElement.Album.rawValue:
+        case SearchSection.Album.rawValue:
             let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             firstly {
                 album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
@@ -143,7 +153,7 @@ class SearchVC: BasicTableViewController {
             }.finally {
                 completionHandler(SwipeActionContext(containable: album))
             }
-        case LibraryElement.Song.rawValue:
+        case SearchSection.Song.rawValue:
             let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             completionHandler(SwipeActionContext(containable: song))
         default:
@@ -152,7 +162,7 @@ class SearchVC: BasicTableViewController {
     }
 
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
-        guard let indexPath = tableView.indexPath(for: cell), indexPath.section == LibraryElement.Song.rawValue else { return nil }
+        guard let indexPath = tableView.indexPath(for: cell), indexPath.section == SearchSection.Song.rawValue else { return nil }
         let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
         return PlayContext(containable: song)
     }
@@ -160,18 +170,18 @@ class SearchVC: BasicTableViewController {
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return LibraryElement.allCases.count
+        return SearchSection.allCases.count
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
-        case LibraryElement.Playlist.rawValue:
+        case SearchSection.Playlist.rawValue:
             return "Playlists"
-        case LibraryElement.Artist.rawValue:
+        case SearchSection.Artist.rawValue:
             return "Artists"
-        case LibraryElement.Album.rawValue:
+        case SearchSection.Album.rawValue:
             return "Albums"
-        case LibraryElement.Song.rawValue:
+        case SearchSection.Song.rawValue:
             return "Songs"
         default:
             return ""
@@ -180,13 +190,13 @@ class SearchVC: BasicTableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case LibraryElement.Playlist.rawValue:
+        case SearchSection.Playlist.rawValue:
             return playlistFetchedResultsController.sections?[0].numberOfObjects ?? 0
-        case LibraryElement.Artist.rawValue:
+        case SearchSection.Artist.rawValue:
             return artistFetchedResultsController.sections?[0].numberOfObjects ?? 0
-        case LibraryElement.Album.rawValue:
+        case SearchSection.Album.rawValue:
             return albumFetchedResultsController.sections?[0].numberOfObjects ?? 0
-        case LibraryElement.Song.rawValue:
+        case SearchSection.Song.rawValue:
             return songFetchedResultsController.sections?[0].numberOfObjects ?? 0
         default:
             return 0
@@ -195,22 +205,22 @@ class SearchVC: BasicTableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section {
-        case LibraryElement.Playlist.rawValue:
+        case SearchSection.Playlist.rawValue:
             let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
             let playlist = playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             cell.display(playlist: playlist, rootView: self)
             return cell
-        case LibraryElement.Artist.rawValue:
+        case SearchSection.Artist.rawValue:
             let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
             let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             cell.display(container: artist, rootView: self)
             return cell
-        case LibraryElement.Album.rawValue:
+        case SearchSection.Album.rawValue:
             let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
             let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             cell.display(container: album, rootView: self)
             return cell
-        case LibraryElement.Song.rawValue:
+        case SearchSection.Song.rawValue:
             let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
             let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
@@ -222,13 +232,13 @@ class SearchVC: BasicTableViewController {
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         switch section {
-        case LibraryElement.Playlist.rawValue:
+        case SearchSection.Playlist.rawValue:
             return playlistFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
-        case LibraryElement.Artist.rawValue:
+        case SearchSection.Artist.rawValue:
             return artistFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
-        case LibraryElement.Album.rawValue:
+        case SearchSection.Album.rawValue:
             return albumFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
-        case LibraryElement.Song.rawValue:
+        case SearchSection.Song.rawValue:
             return songFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
         default:
             return 0.0
@@ -237,13 +247,13 @@ class SearchVC: BasicTableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch indexPath.section {
-        case LibraryElement.Playlist.rawValue:
+        case SearchSection.Playlist.rawValue:
             return PlaylistTableCell.rowHeight
-        case LibraryElement.Artist.rawValue:
+        case SearchSection.Artist.rawValue:
             return GenericTableCell.rowHeight
-        case LibraryElement.Album.rawValue:
+        case SearchSection.Album.rawValue:
             return GenericTableCell.rowHeight
-        case LibraryElement.Song.rawValue:
+        case SearchSection.Song.rawValue:
             return SongTableCell.rowHeight
         default:
             return 0.0
@@ -252,16 +262,16 @@ class SearchVC: BasicTableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.section {
-        case LibraryElement.Playlist.rawValue:
+        case SearchSection.Playlist.rawValue:
             let playlist = playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             performSegue(withIdentifier: Segues.toPlaylistDetail.rawValue, sender: playlist)
-        case LibraryElement.Artist.rawValue:
+        case SearchSection.Artist.rawValue:
             let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
-        case LibraryElement.Album.rawValue:
+        case SearchSection.Album.rawValue:
             let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
-        case LibraryElement.Song.rawValue: break
+        case SearchSection.Song.rawValue: break
         default: break
         }
     }
@@ -330,13 +340,13 @@ class SearchVC: BasicTableViewController {
         var section: Int = 0
         switch controller {
         case playlistFetchedResultsController.fetchResultsController:
-            section = LibraryElement.Playlist.rawValue
+            section = SearchSection.Playlist.rawValue
         case artistFetchedResultsController.fetchResultsController:
-            section = LibraryElement.Artist.rawValue
+            section = SearchSection.Artist.rawValue
         case albumFetchedResultsController.fetchResultsController:
-            section = LibraryElement.Album.rawValue
+            section = SearchSection.Album.rawValue
         case songFetchedResultsController.fetchResultsController:
-            section = LibraryElement.Song.rawValue
+            section = SearchSection.Song.rawValue
         default:
             return
         }

@@ -332,7 +332,7 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
     
     public private(set) var sortType: ArtistElementSortType
     
-    public init(coreDataCompanion: CoreDataCompanion, sortType: ArtistElementSortType, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, sortType: ArtistElementSortType, isGroupedInAlphabeticSections: Bool, fetchLimit: Int? = nil) {
         self.sortType = sortType
         var fetchRequest = ArtistMO.alphabeticSortedFetchRequest
         switch sortType {
@@ -346,6 +346,7 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
         case .duration:
             fetchRequest = ArtistMO.durationSortedFetchRequest
         }
+        fetchRequest.fetchLimit = fetchLimit ?? 0
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: true)
@@ -448,7 +449,7 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
     
     public private(set) var sortType: AlbumElementSortType
     
-    public init(coreDataCompanion: CoreDataCompanion, sortType: AlbumElementSortType, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, sortType: AlbumElementSortType, isGroupedInAlphabeticSections: Bool, fetchLimit: Int? = nil) {
         self.sortType = sortType
         var fetchRequest = AlbumMO.alphabeticSortedFetchRequest
         switch sortType {
@@ -467,6 +468,7 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
         case .year:
             fetchRequest = AlbumMO.yearSortedFetchRequest
         }
+        fetchRequest.fetchLimit = fetchLimit ?? 0
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true)
@@ -497,7 +499,7 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
     
     public private(set) var sortType: SongElementSortType
     
-    public init(coreDataCompanion: CoreDataCompanion, sortType: SongElementSortType, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, sortType: SongElementSortType, isGroupedInAlphabeticSections: Bool, fetchLimit: Int? = nil) {
         self.sortType = sortType
         var fetchRequest = SongMO.alphabeticSortedFetchRequest
         switch sortType {
@@ -508,6 +510,7 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
         case .duration:
             fetchRequest = SongMO.durationSortedFetchRequest
         }
+        fetchRequest.fetchLimit = fetchLimit ?? 0
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         keepAllResultsUpdated = false
@@ -588,7 +591,7 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
 
     public private(set) var sortType: PlaylistSortType
     
-    public init(coreDataCompanion: CoreDataCompanion, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool) {
+    public init(coreDataCompanion: CoreDataCompanion, sortType: PlaylistSortType, isGroupedInAlphabeticSections: Bool, fetchLimit: Int? = nil) {
         self.sortType = sortType
         var fetchRequest = PlaylistMO.alphabeticSortedFetchRequest
         switch sortType {
@@ -601,6 +604,7 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
         case .duration:
             fetchRequest = PlaylistMO.durationFetchRequest
         }
+        fetchRequest.fetchLimit = fetchLimit ?? 0
         fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
