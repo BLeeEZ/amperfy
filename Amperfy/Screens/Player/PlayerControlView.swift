@@ -219,7 +219,8 @@ class PlayerControlView: UIView {
                 remainingTimeLabel.text = remainingTime.asShortString()
                 timeSlider.value = Float(player.elapsedTime)
             }
-            rootView?.popupItem.progress = Float(player.elapsedTime / player.duration)
+            let progress = Float(player.elapsedTime / player.duration)
+            rootView?.popupItem.progress = progress.isNormal ? progress : 0.0
         } else {
             elapsedTimeLabel.text = "--:--"
             remainingTimeLabel.text = "--:--"
