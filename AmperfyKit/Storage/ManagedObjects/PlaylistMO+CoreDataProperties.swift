@@ -45,6 +45,7 @@ extension PlaylistMO {
     @NSManaged public var playersShuffledContextPlaylist: PlayerMO?
     @NSManaged public var playersUserQueuePlaylist: PlayerMO?
     @NSManaged public var artworkItems: NSSet?
+    @NSManaged public var searchHistory: SearchHistoryItemMO?
 
 }
 

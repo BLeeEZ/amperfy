@@ -33,7 +33,7 @@ extension NSFetchedResultsController {
     
     @objc func clearResults() {
         let oldPredicate = fetchRequest.predicate
-        fetchRequest.predicate = NSPredicate(format: "id == nil")
+        fetchRequest.predicate = NSPredicate.alwaysFalse
         fetch()
         fetchRequest.predicate = oldPredicate
     }
@@ -244,6 +244,13 @@ public class BasicFetchedResultsController<ResultType>: NSObject where ResultTyp
         return fetchResultsController.section(forSectionIndexTitle: title, at: index)
     }
     
+}
+
+extension BasicFetchedResultsController where ResultType == SearchHistoryItemMO {
+    public func getWrappedEntity(at indexPath: IndexPath) -> SearchHistoryItem {
+        let searchHistoryItemMO = fetchResultsController.object(at: indexPath) as! ResultType
+        return SearchHistoryItem(managedObject: searchHistoryItemMO)
+    }
 }
 
 extension BasicFetchedResultsController where ResultType == GenreMO {

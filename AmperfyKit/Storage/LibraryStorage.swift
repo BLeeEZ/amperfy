@@ -44,7 +44,7 @@ struct LibraryDuplicateInfo {
 public class LibraryStorage: PlayableFileCachable {
     public static var carPlayMaxElements = 200
     
-    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName, ScrobbleEntry.typeName]
+    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName, ScrobbleEntry.typeName, SearchHistoryItem.typeName]
     private let log = OSLog(subsystem: "Amperfy", category: "LibraryStorage")
     private var context: NSManagedObjectContext
     
@@ -511,6 +511,45 @@ public class LibraryStorage: PlayableFileCachable {
         case .directory:
             return Directory(managedObject: context.object(with: managedObjectID) as! DirectoryMO)
         }
+    }
+    
+    public func createOrUpdateSearchHistory(container: PlayableContainable) -> SearchHistoryItem {
+        let fetchRequest: NSFetchRequest<SearchHistoryItemMO> = SearchHistoryItemMO.fetchRequest()
+        var predicate: NSPredicate?
+        
+        if let song = container as? Song {
+            predicate = NSPredicate(format: "%K == %@", #keyPath(SearchHistoryItemMO.searchedLibraryEntity), song.managedObject)
+        } else if let episode = container as? PodcastEpisode {
+            predicate = NSPredicate(format: "%K == %@", #keyPath(SearchHistoryItemMO.searchedLibraryEntity), episode.managedObject)
+        } else if let album = container as? Album {
+            predicate = NSPredicate(format: "%K == %@", #keyPath(SearchHistoryItemMO.searchedLibraryEntity), album.managedObject)
+        } else if let artist = container as? Artist {
+            predicate = NSPredicate(format: "%K == %@", #keyPath(SearchHistoryItemMO.searchedLibraryEntity), artist.managedObject)
+        } else if let podcast = container as? Podcast {
+            predicate = NSPredicate(format: "%K == %@", #keyPath(SearchHistoryItemMO.searchedLibraryEntity), podcast.managedObject)
+        } else if let playlist = container as? Playlist {
+            predicate = NSPredicate(format: "%K == %@", #keyPath(SearchHistoryItemMO.searchedPlaylist), playlist.managedObject)
+        }
+        
+        fetchRequest.predicate = predicate
+        fetchRequest.fetchLimit = 1
+        let searchHistoryMO = try? context.fetch(fetchRequest)
+        if let searchHistory = searchHistoryMO?.lazy.compactMap({ SearchHistoryItem(managedObject: $0) }).first {
+            // update the existing one
+            searchHistory.date = Date()
+            return searchHistory
+        } else {
+            // create a new item
+            let itemMO = SearchHistoryItemMO(context: context)
+            let item = SearchHistoryItem(managedObject: itemMO)
+            item.date = Date()
+            item.searchedPlayableContainable = container
+            return item
+        }
+    }
+    
+    public func deleteSearchHistory() {
+        clearStorage(ofType: SearchHistoryItem.typeName)
     }
     
     func getFetchPredicate(forGenre genre: Genre) -> NSPredicate {

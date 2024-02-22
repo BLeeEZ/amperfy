@@ -576,6 +576,7 @@ extension UIImage {
 
 extension NSPredicate {
     public static var alwaysTrue = NSPredicate(format: "nil == nil")
+    public static var alwaysFalse = NSPredicate(format: "nil != nil")
 }
 
 extension UIDevice {

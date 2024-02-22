@@ -57,6 +57,7 @@ class PlayableTableCell: BasicTableCell {
         self.rootView = rootView
         self.download = download
         self.subtitleColor = subtitleColor
+        self.selectionStyle = .none
         refresh()
     }
     
@@ -139,6 +140,7 @@ class PlayableTableCell: BasicTableCell {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
         if let playerIndex = playerIndexCb?(self) {
             appDelegate.player.play(playerIndex: playerIndex)
         }

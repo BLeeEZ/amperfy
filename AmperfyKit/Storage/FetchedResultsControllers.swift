@@ -123,6 +123,16 @@ public enum DisplayCategoryFilter {
     case favorites
 }
 
+public class SearchHistoryFetchedResultsController: BasicFetchedResultsController<SearchHistoryItemMO> {
+
+    public init(coreDataCompanion: CoreDataCompanion) {
+        let fetchRequest = SearchHistoryItemMO.searchDateFetchRequest
+        fetchRequest.predicate = SearchHistoryItemMO.excludeEmptyItemsFetchPredicate
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: false)
+    }
+
+}
+
 public class PodcastFetchedResultsController: CachedFetchedResultsController<PodcastMO> {
     
     public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {

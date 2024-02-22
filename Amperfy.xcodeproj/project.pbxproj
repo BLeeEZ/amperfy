@@ -52,6 +52,9 @@
 		5059A31C28A9ED680068E4D2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5059A31B28A9ED680068E4D2 /* SceneDelegate.swift */; };
 		5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5059A31D28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift */; };
 		505CA1F52B848B8300AA81CD /* QuickActionsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA1F42B848B8300AA81CD /* QuickActionsHandler.swift */; };
+		505CA1FA2B87387600AA81CD /* SearchHistoryItemMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA1F72B87387600AA81CD /* SearchHistoryItemMO+CoreDataClass.swift */; };
+		505CA1FC2B87387600AA81CD /* SearchHistoryItemMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA1F82B87387600AA81CD /* SearchHistoryItemMO+CoreDataProperties.swift */; };
+		505CA1FE2B8739AE00AA81CD /* SearchHistoryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA1FD2B8739AE00AA81CD /* SearchHistoryItem.swift */; };
 		507148AD2B767FE200557904 /* ContextQueuePrevSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507148AC2B767FE200557904 /* ContextQueuePrevSectionHeader.swift */; };
 		507148AE2B76800A00557904 /* ContextQueuePrevSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507148AB2B767FE200557904 /* ContextQueuePrevSectionHeader.xib */; };
 		50722747286794FC00910574 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50722746286794FC00910574 /* MainWindow.swift */; };
@@ -627,6 +630,10 @@
 		505AD87A2615C834001319B6 /* GenreMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenreMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		505AD87B2615C834001319B6 /* GenreMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenreMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		505CA1F42B848B8300AA81CD /* QuickActionsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsHandler.swift; sourceTree = "<group>"; };
+		505CA1F62B8730D100AA81CD /* Amperfy v35.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v35.xcdatamodel"; sourceTree = "<group>"; };
+		505CA1F72B87387600AA81CD /* SearchHistoryItemMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SearchHistoryItemMO+CoreDataClass.swift"; sourceTree = "<group>"; };
+		505CA1F82B87387600AA81CD /* SearchHistoryItemMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SearchHistoryItemMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		505CA1FD2B8739AE00AA81CD /* SearchHistoryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchHistoryItem.swift; sourceTree = "<group>"; };
 		506640D12B683AAF007434A8 /* Amperfy v33.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v33.xcdatamodel"; sourceTree = "<group>"; };
 		5067016125E3ADA200A3EF89 /* Amperfy v5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v5.xcdatamodel"; sourceTree = "<group>"; };
 		50675E6C25F61163005737FD /* BasicTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableCell.swift; sourceTree = "<group>"; };
@@ -1038,6 +1045,8 @@
 				50F81ECF23BF6B1D00EAAC3E /* PlayableFileMO+CoreDataProperties.swift */,
 				50814C9F27D9FF660072738F /* ScrobbleEntryMO+CoreDataClass.swift */,
 				50814CA027D9FF660072738F /* ScrobbleEntryMO+CoreDataProperties.swift */,
+				505CA1F72B87387600AA81CD /* SearchHistoryItemMO+CoreDataClass.swift */,
+				505CA1F82B87387600AA81CD /* SearchHistoryItemMO+CoreDataProperties.swift */,
 				50F81ED223BF6B1D00EAAC3E /* PlayerMO+CoreDataClass.swift */,
 				50F81ED323BF6B1D00EAAC3E /* PlayerMO+CoreDataProperties.swift */,
 				50F81ED423BF6B1D00EAAC3E /* AlbumMO+CoreDataClass.swift */,
@@ -1366,6 +1375,7 @@
 				50B798A823B6E5FF00551E62 /* PlaylistItem.swift */,
 				50F81E9323BE1AFD00EAAC3E /* PlayableFile.swift */,
 				50947E0227DA011F00C368D7 /* ScrobbleEntry.swift */,
+				505CA1FD2B8739AE00AA81CD /* SearchHistoryItem.swift */,
 				505905BB261D980C007C34CB /* PlayableContainable.swift */,
 				50CDF20B264BC72800F83EF6 /* LogEntry.swift */,
 				5029288A26579DA900DA3A8F /* UserStatistics.swift */,
@@ -2188,6 +2198,7 @@
 				50C9D6A0284FAA6C007F18D0 /* ScrobbleEntryMO+CoreDataProperties.swift in Sources */,
 				50C9D6E9284FACAF007F18D0 /* ArtworkCollection.swift in Sources */,
 				50C9D658284FAA02007F18D0 /* SsXmlParser.swift in Sources */,
+				505CA1FA2B87387600AA81CD /* SearchHistoryItemMO+CoreDataClass.swift in Sources */,
 				50C9D67B284FAA6C007F18D0 /* PodcastMO+CoreDataProperties.swift in Sources */,
 				50C9D65E284FAA0B007F18D0 /* AmpacheArtworkDownloadDelegate.swift in Sources */,
 				50C9D6D3284FAB0C007F18D0 /* JSONConverter.swift in Sources */,
@@ -2234,8 +2245,10 @@
 				50C9D651284FAA02007F18D0 /* SsPodcastEpisodeParserDelegate.swift in Sources */,
 				50C9D660284FAA0B007F18D0 /* AuthParserDelegate.swift in Sources */,
 				50C9D6E3284FAB96007F18D0 /* UIImageAssetsExtension.swift in Sources */,
+				505CA1FE2B8739AE00AA81CD /* SearchHistoryItem.swift in Sources */,
 				50C9D69B284FAA6C007F18D0 /* PlayerMO+CoreDataClass.swift in Sources */,
 				50C9D69E284FAA6C007F18D0 /* AbstractLibraryEntityMO+CoreDataProperties.swift in Sources */,
+				505CA1FC2B87387600AA81CD /* SearchHistoryItemMO+CoreDataProperties.swift in Sources */,
 				50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */,
 				50C9D642284FA9C7007F18D0 /* GenericXmlParser.swift in Sources */,
 				50C9D683284FAA6C007F18D0 /* PlaylistItemMO+CoreDataClass.swift in Sources */,
@@ -3027,6 +3040,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				505CA1F62B8730D100AA81CD /* Amperfy v35.xcdatamodel */,
 				509B430C2B72631A005E8130 /* Amperfy v34.xcdatamodel */,
 				506640D12B683AAF007434A8 /* Amperfy v33.xcdatamodel */,
 				5013DC8D2B4EC02A00EC191E /* Amperfy v32.xcdatamodel */,
@@ -3062,7 +3076,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 509B430C2B72631A005E8130 /* Amperfy v34.xcdatamodel */;
+			currentVersion = 505CA1F62B8730D100AA81CD /* Amperfy v35.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

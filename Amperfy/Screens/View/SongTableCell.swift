@@ -53,6 +53,7 @@ class SongTableCell: BasicTableCell {
         self.song = song
         self.playContextCb = playContextCb
         self.rootView = rootView
+        self.selectionStyle = .none
         refresh()
     }
     
@@ -97,14 +98,32 @@ class SongTableCell: BasicTableCell {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let song = song, let context = playContextCb?(self) else { return }
+        super.touchesEnded(touches, with: event)
+        playThisSong()
+        
+        // Dont't show animations due to changing table view cells during play
+        // (especially for artist songs and album songs)
+        #if false
+        let touchAnimation = 0.4
+        self.selectionStyle = .default
+        UIView.animate(withDuration: touchAnimation, delay: 0, animations: {
+            self.selectionStyle = .none
+        }, completion: { _ in
+            self.selectionStyle = .none
+        })
+        #endif
+    }
+    
+    private func playThisSong() {
+        guard let song = song,
+              let context = playContextCb?(self),
+              song.isCached || appDelegate.storage.settings.isOnlineMode
+        else { return }
 
-        if song.isCached || appDelegate.storage.settings.isOnlineMode {
-            hideSearchBarKeyboardInRootView()
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
-            appDelegate.player.play(context: context)
-        }
+        hideSearchBarKeyboardInRootView()
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+        appDelegate.player.play(context: context)
     }
     
     private func hideSearchBarKeyboardInRootView() {

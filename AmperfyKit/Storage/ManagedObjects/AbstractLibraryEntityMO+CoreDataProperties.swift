@@ -37,5 +37,6 @@ extension AbstractLibraryEntityMO {
     @NSManaged public var playCount: Int32
     @NSManaged public var lastPlayedDate: Date?
     @NSManaged public var artwork: ArtworkMO?
+    @NSManaged public var searchHistory: SearchHistoryItemMO?
 
 }
