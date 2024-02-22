@@ -35,6 +35,7 @@ class SongTableCell: BasicTableCell {
     @IBOutlet weak var titleLabelTrailingConstraint: NSLayoutConstraint!
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
+    private static let touchAnimation = 0.4
     
     var song: Song?
     var rootView: UITableViewController?
@@ -99,19 +100,15 @@ class SongTableCell: BasicTableCell {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        playThisSong()
         
-        // Dont't show animations due to changing table view cells during play
-        // (especially for artist songs and album songs)
-        #if false
-        let touchAnimation = 0.4
         self.selectionStyle = .default
-        UIView.animate(withDuration: touchAnimation, delay: 0, animations: {
+        UIView.animate(withDuration: Self.touchAnimation, delay: 0, animations: {
             self.selectionStyle = .none
         }, completion: { _ in
             self.selectionStyle = .none
         })
-        #endif
+        
+        playThisSong()
     }
     
     private func playThisSong() {

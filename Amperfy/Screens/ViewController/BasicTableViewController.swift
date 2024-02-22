@@ -346,7 +346,7 @@ extension BasicTableViewController: NSFetchedResultsControllerDelegate {
             }
         case .update:
             if !isEditLockedDueToActiveSwipe {
-                tableView.reloadRows(at: [indexPath!], with: .none)
+                tableView.reconfigureRows(at: [indexPath!])
             }
         @unknown default:
             break
