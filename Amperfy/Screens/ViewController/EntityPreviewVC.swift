@@ -582,7 +582,6 @@ class EntityPreviewVC: UIViewController {
     @IBOutlet weak var gotoDetailsSymbol: UIImageView!
     
     private var rootView: UIViewController?
-    private var appDelegate: AppDelegate!
     private var entityContainer: PlayableContainable?
     
     var isNavigationDisallowed: Bool {
@@ -594,7 +593,6 @@ class EntityPreviewVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         self.view.backgroundColor = .clear
         titleLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()

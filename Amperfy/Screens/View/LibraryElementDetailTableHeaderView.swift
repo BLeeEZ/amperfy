@@ -30,7 +30,6 @@ class LibraryElementDetailTableHeaderView: UIView {
     static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginMiddleElement
     
-    private var appDelegate: AppDelegate!
     private var playContextCb: GetPlayContextCallback?
     private var shuffleContextCb: GetPlayContextCallback?
     private var isShuffleOnContextNeccessary: Bool = true
@@ -38,7 +37,6 @@ class LibraryElementDetailTableHeaderView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         self.layoutMargins = Self.margin
     }
     

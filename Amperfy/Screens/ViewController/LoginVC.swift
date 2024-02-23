@@ -31,7 +31,6 @@ extension String {
 
 class LoginVC: UIViewController {
 
-    var appDelegate: AppDelegate!
     var backendApi: BackendApi!
     var selectedApiType: BackenApiType = .notDetected
     
@@ -103,7 +102,6 @@ class LoginVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         backendApi = appDelegate.backendApi
         updateApiSelectorText()
         

@@ -25,10 +25,6 @@ class BasicCollectionCell: UICollectionViewCell {
 
     static let margin = UIView.defaultMarginCell
     
-    var appDelegate: AppDelegate {
-        return (UIApplication.shared.delegate as! AppDelegate)
-    }
-    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.layoutMargins = BasicTableCell.margin

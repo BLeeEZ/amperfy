@@ -24,14 +24,12 @@ import CoreData
 
 class BasicCollectionViewController: UICollectionViewController {
     
-    var appDelegate: AppDelegate!
     let searchController = UISearchController(searchResultsController: nil)
     var blockOperations: [BlockOperation] = []
     var isIndexTitelsHidden = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         self.collectionView.keyboardDismissMode = .onDrag
     }
     

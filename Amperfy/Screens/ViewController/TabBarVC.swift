@@ -26,14 +26,12 @@ import AmperfyKit
 
 class TabBarVC: UITabBarController {
     
-    var appDelegate: AppDelegate!
     var popupPlayer: PopupPlayerVC?
     var isPopupPlayerInitialized = false
     var isPopupBarDisplayed = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         appDelegate.player.addNotifier(notifier: self)
     }
 

@@ -22,8 +22,43 @@
 import UIKit
 import AmperfyKit
 import PromiseKit
+import CoreData
 
-class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> {
+class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
+    
+    var playlist: Playlist!
+    
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        exectueAfterAnimation {
+            self.playlist?.movePlaylistItem(fromIndex: sourceIndexPath.row, to: destinationIndexPath.row)
+            
+            guard self.appDelegate.storage.settings.isOnlineMode else { return }
+            firstly {
+                self.appDelegate.librarySyncer.syncUpload(playlistToUpdateOrder: self.playlist)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Playlist Upload Order Update", error: error)
+            }
+        }
+        super.tableView(tableView, moveRowAt: sourceIndexPath, to: destinationIndexPath)
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        guard editingStyle == .delete else { return }
+        exectueAfterAnimation {
+            self.playlist?.remove(at: indexPath.row)
+            guard self.appDelegate.storage.settings.isOnlineMode else { return }
+            firstly {
+                self.appDelegate.librarySyncer.syncUpload(playlistToDeleteSong: self.playlist, index: indexPath.row)
+            }.catch { error in
+                self.appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
+            }
+        }
+        super.tableView(tableView, commit: editingStyle, forRowAt: indexPath)
+    }
+    
+}
+
+class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<PlaylistItemMO> {
 
     private var fetchedResultsController: PlaylistItemsFetchedResultsController!
     var playlist: Playlist!
@@ -33,11 +68,27 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
     private var optionsButton: UIBarButtonItem!
     var playlistOperationsView: PlaylistDetailTableHeader?
     
+    override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+        let source = PlaylistDetailDiffableDataSource(tableView: tableView) { (tableView, indexPath, objectID) -> UITableViewCell? in
+            guard let object = try? self.appDelegate.storage.main.context.existingObject(with: objectID),
+                  let playlistItemMO = object as? PlaylistItemMO
+            else {
+                fatalError("Managed object should be available")
+            }
+            let playlistItem = PlaylistItem(library: self.appDelegate.storage.main.library, managedObject: playlistItemMO)
+            return self.createCell(tableView, forRowAt: indexPath, playlistItem: playlistItem)
+        }
+        source.playlist = playlist
+        return source
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.playlistDetail)
         fetchedResultsController = PlaylistItemsFetchedResultsController(forPlaylist: playlist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
+        singleFetchedResultsController?.delegate = self
+        singleFetchedResultsController?.fetch()
         
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
@@ -131,9 +182,8 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
         refreshBarButtons()
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, playlistItem: PlaylistItem) -> UITableViewCell {
         let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
-        let playlistItem = fetchedResultsController.getWrappedEntity(at: indexPath)
         if let playable = playlistItem.playable, let song = playable.asSong {
             cell.display(song: song, playContextCb: convertCellViewToPlayContext, rootView: self)
         }
@@ -145,41 +195,6 @@ class PlaylistDetailVC: SingleFetchedResultsTableViewController<PlaylistItemMO> 
             return .delete
         }
         return .none
-    }
-    
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        guard editingStyle == .delete else { return }
-        playlist.remove(at: indexPath.row)
-        self.playlistOperationsView?.refresh()
-        guard appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.syncUpload(playlistToDeleteSong: playlist, index: indexPath.row)
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
-        }
-    }
-    
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        isRefreshAnimationOff = true
-        playlist.movePlaylistItem(fromIndex: fromIndexPath.row, to: to.row)
-        exectueAfterAnimation {
-            self.refreshAllVisibleCells()
-            self.isRefreshAnimationOff = false
-        }
-        guard appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.syncUpload(playlistToUpdateOrder: playlist)
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Playlist Upload Order Update", error: error)
-        }
-    }
-    
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
     }
     
     override func updateSearchResults(for searchController: UISearchController) {

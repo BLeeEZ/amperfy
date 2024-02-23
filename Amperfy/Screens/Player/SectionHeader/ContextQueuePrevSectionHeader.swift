@@ -29,15 +29,12 @@ class ContextQueuePrevSectionHeader: UIView {
     static let frameHeight: CGFloat = 20.5 + margin.top + margin.bottom
     static let margin = UIEdgeInsets(top: 8, left: UIView.defaultMarginX, bottom: 8, right: UIView.defaultMarginX)
     
-    private var appDelegate: AppDelegate!
-
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         self.layoutMargins = Self.margin
     }
     

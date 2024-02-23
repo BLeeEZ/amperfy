@@ -26,7 +26,6 @@ import PromiseKit
 
 class SyncVC: UIViewController {
 
-    var appDelegate: AppDelegate!
     var state: ParsedObjectType = .genre
     let syncSemaphore = DispatchSemaphore(value: 1)
     var parsedObjectCount: Int = 0
@@ -39,7 +38,6 @@ class SyncVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         progressBar.setProgress(0.0, animated: true)
         progressInfo.text = ""
         progressLabel.text = String(format: "%.1f", 0.0) + "%"

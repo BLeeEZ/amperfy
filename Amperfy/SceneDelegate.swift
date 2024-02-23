@@ -25,9 +25,6 @@ import AmperfyKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
-    public lazy var appDelegate = {
-        return UIApplication.shared.delegate as! AppDelegate
-    }()
     public lazy var log = {
         return AmperKit.shared.log
     }()

@@ -34,12 +34,10 @@ class PlaylistDetailTableHeader: UIView {
     static let margin = UIView.defaultMarginTopElement
     
     private var playlist: Playlist?
-    private var appDelegate: AppDelegate!
     private var rootView: PlaylistDetailVC?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         self.layoutMargins = Self.margin
     }
     

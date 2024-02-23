@@ -24,7 +24,7 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
-class GenreDetailVC: BasicTableViewController {
+class GenreDetailVC: MultiSourceTableViewController {
 
     var genre: Genre!
     private var artistsFetchedResultsController: GenreArtistsFetchedResultsController!
@@ -299,7 +299,7 @@ class GenreDetailVC: BasicTableViewController {
             return
         }
         
-        super.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
+        resultUpdateHandler?.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
     }
     
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {

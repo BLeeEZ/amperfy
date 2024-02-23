@@ -27,10 +27,6 @@ import Combine
 
 class SettingsHostVC: UIViewController {
     
-    lazy var appDelegate: AppDelegate = {
-        return (UIApplication.shared.delegate as! AppDelegate)
-    }()
-    
     lazy var settings: Settings = {
        return Settings()
     }()

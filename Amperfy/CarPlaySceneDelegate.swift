@@ -31,9 +31,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     static let maxTreeDepth = 4
     
-    lazy var appDelegate = {
-        return UIApplication.shared.delegate as! AppDelegate
-    }()
     private let log = OSLog(subsystem: "Amperfy", category: "CarPlay")
     private static let assistantConfig = CPAssistantCellConfiguration(position: .top, visibility: .always, assistantAction: .playMedia)
     var isOfflineMode: Bool {

@@ -24,7 +24,7 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
-class ArtistDetailVC: BasicTableViewController {
+class ArtistDetailVC: MultiSourceTableViewController {
 
     var artist: Artist!
     var albumToScrollTo: Album?
@@ -274,7 +274,7 @@ class ArtistDetailVC: BasicTableViewController {
             return
         }
         
-        super.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
+        resultUpdateHandler?.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
     }
     
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {

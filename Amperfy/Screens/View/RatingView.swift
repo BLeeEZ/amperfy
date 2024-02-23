@@ -35,7 +35,6 @@ class RatingView: UIView {
     
     static let frameHeight: CGFloat = 35.0
 
-    private var appDelegate: AppDelegate!
     private var libraryEntity: AbstractLibraryEntity?
     
     var activeStarColor: UIColor = .gold
@@ -54,7 +53,6 @@ class RatingView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
     }
     
     func display(entity: AbstractLibraryEntity?) {

@@ -36,7 +36,6 @@ class PodcastDescriptionVC: UIViewController {
     @IBOutlet weak var descriptionTextView: UITextView!
     
     private var rootView: UIViewController?
-    private var appDelegate: AppDelegate!
     private var podcast: Podcast?
     private var podcastEpisode: PodcastEpisode?
     
@@ -51,7 +50,6 @@ class PodcastDescriptionVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         titleLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()
         infoLabel.applyAmperfyStyle()

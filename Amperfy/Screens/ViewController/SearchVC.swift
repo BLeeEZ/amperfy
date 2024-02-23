@@ -32,7 +32,7 @@ public enum SearchSection: Int, CaseIterable {
     case Song
 }
 
-class SearchVC: BasicTableViewController {
+class SearchVC: MultiSourceTableViewController {
     
     private static let fetchLimit = 10
     
@@ -451,7 +451,7 @@ class SearchVC: BasicTableViewController {
             return
         }
         
-        super.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
+        resultUpdateHandler?.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
     }
     
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {

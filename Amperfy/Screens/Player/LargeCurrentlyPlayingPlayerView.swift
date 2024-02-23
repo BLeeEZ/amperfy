@@ -30,7 +30,6 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     static let rowHeight: CGFloat = 94.0
     static private let margin = UIEdgeInsets(top: 0, left: UIView.defaultMarginX, bottom: 20, right: UIView.defaultMarginX)
     
-    private var appDelegate: AppDelegate!
     private var rootView: PopupPlayerVC?
     
     @IBOutlet weak var artworkImage: LibraryEntityImage!
@@ -45,7 +44,6 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         self.layoutMargins = Self.margin
     }
     

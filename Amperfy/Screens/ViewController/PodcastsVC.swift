@@ -24,7 +24,7 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
-class PodcastsVC: BasicTableViewController {
+class PodcastsVC: MultiSourceTableViewController {
 
     private var podcastsFetchedResultsController: PodcastFetchedResultsController!
     private var episodesFetchedResultsController: PodcastEpisodesReleaseDateFetchedResultsController!

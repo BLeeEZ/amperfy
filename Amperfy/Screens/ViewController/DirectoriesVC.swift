@@ -24,7 +24,7 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
-class DirectoriesVC: BasicTableViewController {
+class DirectoriesVC: MultiSourceTableViewController {
     
     var directory: Directory!
     private var subdirectoriesFetchedResultsController: DirectorySubdirectoriesFetchedResultsController!
@@ -243,7 +243,7 @@ class DirectoriesVC: BasicTableViewController {
             return
         }
         
-        super.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
+        resultUpdateHandler?.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
     }
     
     override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {

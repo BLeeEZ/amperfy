@@ -179,7 +179,7 @@ extension UITableViewController {
     
     func refreshAllVisibleCells() {
         let visibleIndexPaths = tableView.visibleCells.compactMap{ tableView.indexPath(for: $0) }
-        tableView.reloadRows(at: visibleIndexPaths, with: .none)
+        tableView.reconfigureRows(at: visibleIndexPaths)
     }
     
     func exectueAfterAnimation(body: @escaping () -> Void) {
@@ -194,6 +194,12 @@ extension UITableViewController {
 extension UIViewController {
     var typeName: String {
         return Self.typeName
+    }
+}
+
+extension NSObject {
+    var appDelegate: AppDelegate {
+        return (UIApplication.shared.delegate as! AppDelegate)
     }
 }
 

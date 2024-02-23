@@ -31,7 +31,6 @@ class UserQueueSectionHeader: UIView {
     static let frameHeight: CGFloat = 28.0 + margin.top + margin.bottom
     static let margin = UIEdgeInsets(top: 8, left: UIView.defaultMarginX, bottom: 8, right: UIView.defaultMarginX)
     
-    private var appDelegate: AppDelegate!
     private var buttonPressAction: (() -> Void)?
 
     override init(frame: CGRect) {
@@ -40,7 +39,6 @@ class UserQueueSectionHeader: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         self.layoutMargins = Self.margin
     }
     

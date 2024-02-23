@@ -30,7 +30,6 @@ class PlayerControlView: UIView {
     static let frameHeight: CGFloat = 210
     static private let margin = UIEdgeInsets(top: 0, left: UIView.defaultMarginX, bottom: 20, right: UIView.defaultMarginX)
     
-    private var appDelegate: AppDelegate!
     private var player: PlayerFacade!
     private var rootView: PopupPlayerVC?
     
@@ -52,7 +51,6 @@ class PlayerControlView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         self.layoutMargins = Self.margin
         player = appDelegate.player
         player.addNotifier(notifier: self)

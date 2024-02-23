@@ -25,13 +25,11 @@ import AmperfyKit
 
 class LibraryVC: UITableViewController {
     
-    var appDelegate: AppDelegate!
     private var librarySettings = LibraryDisplaySettings.defaultSettings
     private var editButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         
         tableView.register(nibName: IconLabelTableCell.typeName)
         tableView.rowHeight = IconLabelTableCell.rowHeight

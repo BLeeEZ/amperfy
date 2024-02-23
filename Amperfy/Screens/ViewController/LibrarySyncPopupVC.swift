@@ -38,7 +38,6 @@ class LibrarySyncPopupVC: UIViewController {
     @IBOutlet weak var optionalButton: BasicButton!
     @IBOutlet weak var contentView: UIView!
     
-    var appDelegate: AppDelegate!
     var topic = ""
     var shortMessage = ""
     var message = ""
@@ -54,7 +53,6 @@ class LibrarySyncPopupVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         
         titelLabel.text = topic
         infoLabel.text = message

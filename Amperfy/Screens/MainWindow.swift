@@ -23,10 +23,6 @@ import UIKit
 
 class MainWindow: UIWindow {
     
-    public lazy var appDelegate: AppDelegate = {
-        return (UIApplication.shared.delegate as! AppDelegate)
-    }()
-    
     override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
         guard appDelegate.storage.isLibrarySynced else {
             super.pressesBegan(presses, with: event)

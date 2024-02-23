@@ -34,12 +34,10 @@ class GenericDetailTableHeader: UIView {
     static let margin = UIView.defaultMarginTopElement
     
     private var entityContainer: PlayableContainable?
-    private var appDelegate: AppDelegate!
     private var rootView: BasicTableViewController?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         self.layoutMargins = Self.margin
     }
     

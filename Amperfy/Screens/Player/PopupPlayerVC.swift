@@ -33,7 +33,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var controlPlaceholderHeightConstraint: NSLayoutConstraint!
     private let safetyMarginOnBottom = 20.0
     
-    var appDelegate: AppDelegate!
     var player: PlayerFacade!
     var controlView: PlayerControlView?
     var largeCurrentlyPlayingView: LargeCurrentlyPlayingPlayerView?
@@ -60,7 +59,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         self.tableView.dropDelegate = self
         self.tableView.dragInteractionEnabled = true
             
-        appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         player = appDelegate.player
         player.addNotifier(notifier: self)
         
