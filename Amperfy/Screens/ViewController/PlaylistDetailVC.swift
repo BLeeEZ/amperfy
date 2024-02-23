@@ -133,6 +133,9 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if appDelegate.storage.settings.isOfflineMode {
+            tableView.isEditing = false
+        }
         refreshBarButtons()
         firstly {
             playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)

@@ -81,6 +81,9 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if appDelegate.storage.settings.isOfflineMode {
+            isEditing = false
+        }
         updateRightBarButtonItems()
         guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
@@ -91,8 +94,13 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
     
     func updateRightBarButtonItems() {
+        var barButtons = [UIBarButtonItem]()
+        if appDelegate.storage.settings.isOnlineMode {
+            barButtons.append(editButtonItem)
+        }
         sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
-        navigationItem.rightBarButtonItems = [editButtonItem, sortButton]
+        barButtons.append(sortButton)
+        navigationItem.rightBarButtonItems = barButtons
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
