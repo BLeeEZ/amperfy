@@ -73,6 +73,7 @@ class SingleSnapshotFetchedResultsTableViewController<ResultType>:
     where ResultType : NSFetchRequestResult {
     
     var diffableDataSource: BasicUITableViewDiffableDataSource?
+    var snapshotDidChange: (() -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -106,6 +107,7 @@ class SingleSnapshotFetchedResultsTableViewController<ResultType>:
         snapshot.reloadItems(reloadIdentifiers)
 
         dataSource.apply(snapshot as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>, animatingDifferences: false)
+        self.snapshotDidChange?()
     }
 }
 

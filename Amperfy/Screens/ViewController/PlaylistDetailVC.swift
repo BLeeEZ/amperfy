@@ -116,6 +116,8 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
+        snapshotDidChange = self.playlistOperationsView?.refresh
+        
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath).playable
         }
