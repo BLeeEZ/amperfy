@@ -50,13 +50,23 @@ class PodcastDescriptionVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.setBackgroundBlur(style: .prominent)
         titleLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()
         infoLabel.applyAmperfyStyle()
+        
+        if let presentationController = presentationController as? UISheetPresentationController {
+            presentationController.detents = [
+                .large()
+            ]
+            if traitCollection.userInterfaceIdiom == .phone {
+                presentationController.detents.append(.medium())
+            }
+            presentationController.prefersGrabberVisible = true
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.view.setBackgroundBlur(style: .prominent)
         refresh()
     }
 

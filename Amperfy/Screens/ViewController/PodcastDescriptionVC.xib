@@ -27,24 +27,8 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="voa-Ru-9L6" userLabel="Cancel" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="16" y="607" width="343" height="40"/>
-                    <color key="backgroundColor" systemColor="systemFillColor"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="40" id="AOi-n7-40M"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                    <color key="tintColor" systemColor="secondaryLabelColor"/>
-                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                    <state key="normal" title="Cancel">
-                        <color key="titleColor" systemColor="labelColor"/>
-                    </state>
-                    <connections>
-                        <action selector="pressedCancel:" destination="-1" eventType="touchUpInside" id="KVO-ht-Bth"/>
-                    </connections>
-                </button>
                 <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JQO-fn-jd5">
-                    <rect key="frame" x="16" y="36" width="343" height="555"/>
+                    <rect key="frame" x="16" y="36" width="343" height="631"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="chG-g3-PeX">
                             <rect key="frame" x="0.0" y="0.0" width="343" height="478"/>
@@ -136,18 +120,30 @@
                                                 <constraint firstAttribute="trailing" secondItem="y6k-we-MVa" secondAttribute="trailing" id="utV-UF-fZh"/>
                                             </constraints>
                                         </view>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eNP-Kb-8du" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rgh-PL-gn1">
                                             <rect key="frame" x="0.0" y="230" width="343" height="40"/>
-                                            <color key="backgroundColor" systemColor="systemFillColor"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eNP-Kb-8du" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                                    <rect key="frame" x="71.5" y="0.0" width="200" height="40"/>
+                                                    <color key="backgroundColor" systemColor="systemFillColor"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="40" id="Lxb-XF-Qa6"/>
+                                                        <constraint firstAttribute="width" constant="200" id="Zzw-qx-4fA"/>
+                                                    </constraints>
+                                                    <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="12" maxY="10"/>
+                                                    <state key="normal" title="Play" image="play.fill" catalog="system"/>
+                                                    <connections>
+                                                        <action selector="pressedPlayButton:" destination="-1" eventType="touchUpInside" id="ED4-AA-sFB"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="40" id="Lxb-XF-Qa6"/>
+                                                <constraint firstAttribute="bottom" secondItem="eNP-Kb-8du" secondAttribute="bottom" id="e8m-oL-596"/>
+                                                <constraint firstItem="eNP-Kb-8du" firstAttribute="top" secondItem="Rgh-PL-gn1" secondAttribute="top" id="mqm-bI-qd8"/>
+                                                <constraint firstAttribute="height" constant="40" id="ovt-QS-Ox0"/>
+                                                <constraint firstItem="eNP-Kb-8du" firstAttribute="centerX" secondItem="Rgh-PL-gn1" secondAttribute="centerX" id="rRA-tJ-nFo"/>
                                             </constraints>
-                                            <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="12" maxY="10"/>
-                                            <state key="normal" title="Play" image="play.fill" catalog="system"/>
-                                            <connections>
-                                                <action selector="pressedPlayButton:" destination="-1" eventType="touchUpInside" id="ED4-AA-sFB"/>
-                                            </connections>
-                                        </button>
+                                        </view>
                                         <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Xq9-7l-e3O">
                                             <rect key="frame" x="0.0" y="278" width="343" height="200"/>
                                             <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
@@ -181,12 +177,9 @@
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
                 <constraint firstAttribute="rightMargin" secondItem="JQO-fn-jd5" secondAttribute="right" id="KO9-KY-aE9"/>
-                <constraint firstAttribute="bottomMargin" secondItem="voa-Ru-9L6" secondAttribute="bottom" constant="20" id="LBo-eF-SKv"/>
                 <constraint firstItem="JQO-fn-jd5" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" constant="16" id="aXp-PQ-TAY"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="JQO-fn-jd5" secondAttribute="bottom" id="hlv-fU-Xoc"/>
                 <constraint firstItem="JQO-fn-jd5" firstAttribute="left" secondItem="iN0-l3-epB" secondAttribute="leftMargin" id="kwH-dv-NhG"/>
-                <constraint firstItem="voa-Ru-9L6" firstAttribute="top" secondItem="JQO-fn-jd5" secondAttribute="bottom" constant="16" id="mNu-9q-zyO"/>
-                <constraint firstAttribute="leftMargin" secondItem="voa-Ru-9L6" secondAttribute="left" id="yCi-b2-jO7"/>
-                <constraint firstAttribute="rightMargin" secondItem="voa-Ru-9L6" secondAttribute="right" id="yya-Yq-s8K"/>
             </constraints>
             <point key="canvasLocation" x="0.76335877862595414" y="19.718309859154932"/>
         </view>

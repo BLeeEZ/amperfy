@@ -593,7 +593,7 @@ class EntityPreviewVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .clear
+        self.view.setBackgroundBlur(style: .prominent)
         titleLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()
         infoLabel.applyAmperfyStyle()
@@ -609,7 +609,6 @@ class EntityPreviewVC: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.view.setBackgroundBlur(style: .prominent)
         refresh()
     }
 
