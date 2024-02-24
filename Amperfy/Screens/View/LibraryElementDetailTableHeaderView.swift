@@ -76,10 +76,9 @@ class LibraryElementDetailTableHeaderView: UIView {
         self.player = player
         self.isShuffleOnContextNeccessary = isShuffleOnContextNeccessary
         self.shuffleContextCb = shuffleContextCb
-        playAllButton.setImage(UIImage.play.invertedImage(), for: .normal)
-        playAllButton.imageView?.contentMode = .scaleAspectFit
-        playShuffledButton.setImage(UIImage.shuffle.invertedImage(), for: .normal)
-        playShuffledButton.imageView?.contentMode = .scaleAspectFit
+        playAllButton.setImage(.play, for: .normal)
+        playShuffledButton.setImage(.shuffle, for: .normal)
+        playShuffledButton.setTitle(isShuffleOnContextNeccessary ? "Shuffle" : "Random", for: .normal)
         activate()
     }
     

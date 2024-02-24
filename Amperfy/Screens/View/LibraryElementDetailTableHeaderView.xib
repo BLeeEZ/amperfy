@@ -15,55 +15,66 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aFp-vU-e7e" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="16" y="20" width="140" height="40"/>
-                    <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AxT-eO-awB">
+                    <rect key="frame" x="16" y="20" width="343" height="40"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="VUg-eX-qWb">
+                            <rect key="frame" x="0.0" y="0.0" width="343" height="40"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aFp-vU-e7e" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="156.5" height="40"/>
+                                    <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                    <state key="normal" title="Play" image="play.fill" catalog="system"/>
+                                    <state key="selected">
+                                        <color key="titleColor" systemColor="systemGrayColor"/>
+                                    </state>
+                                    <state key="highlighted">
+                                        <color key="titleColor" systemColor="systemGrayColor"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="playAllButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="phc-Oa-Z7W"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bqP-jY-7uf" userLabel="Add All To Play Next Button" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
+                                    <rect key="frame" x="186.5" y="0.0" width="156.5" height="40"/>
+                                    <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
+                                    <state key="normal" title="Shuffle" image="shuffle" catalog="system">
+                                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </state>
+                                    <state key="selected">
+                                        <color key="titleColor" systemColor="systemGrayColor"/>
+                                    </state>
+                                    <state key="highlighted">
+                                        <color key="titleColor" systemColor="systemGrayColor"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="addAllShuffledButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="jJy-6e-BVq"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
+                    </subviews>
                     <constraints>
-                        <constraint firstAttribute="width" constant="140" id="wMX-TZ-gTK"/>
-                        <constraint firstAttribute="height" constant="40" id="zRv-bG-E8F"/>
+                        <constraint firstAttribute="trailing" secondItem="VUg-eX-qWb" secondAttribute="trailing" id="JYv-cq-XfG"/>
+                        <constraint firstAttribute="width" relation="lessThanOrEqual" constant="430" id="Osj-8v-D7i"/>
+                        <constraint firstItem="VUg-eX-qWb" firstAttribute="top" secondItem="AxT-eO-awB" secondAttribute="top" id="WID-xz-zLr"/>
+                        <constraint firstAttribute="bottom" secondItem="VUg-eX-qWb" secondAttribute="bottom" id="py6-sC-BPu"/>
+                        <constraint firstAttribute="height" constant="40" id="xQd-dD-DyR"/>
+                        <constraint firstItem="VUg-eX-qWb" firstAttribute="leading" secondItem="AxT-eO-awB" secondAttribute="leading" id="z8d-nY-Ew9"/>
                     </constraints>
-                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
-                    <inset key="imageEdgeInsets" minX="38" minY="12" maxX="46" maxY="12"/>
-                    <state key="normal" title="Play" image="play.fill" catalog="system"/>
-                    <state key="selected">
-                        <color key="titleColor" systemColor="systemGrayColor"/>
-                    </state>
-                    <state key="highlighted">
-                        <color key="titleColor" systemColor="systemGrayColor"/>
-                    </state>
-                    <connections>
-                        <action selector="playAllButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="phc-Oa-Z7W"/>
-                    </connections>
-                </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bqP-jY-7uf" userLabel="Add All To Play Next Button" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="219" y="20" width="140" height="40"/>
-                    <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
-                    <inset key="imageEdgeInsets" minX="29" minY="12" maxX="94" maxY="12"/>
-                    <state key="normal" title="Shuffle" image="shuffle" catalog="system">
-                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    </state>
-                    <state key="selected">
-                        <color key="titleColor" systemColor="systemGrayColor"/>
-                    </state>
-                    <state key="highlighted">
-                        <color key="titleColor" systemColor="systemGrayColor"/>
-                    </state>
-                    <connections>
-                        <action selector="addAllShuffledButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="jJy-6e-BVq"/>
-                    </connections>
-                </button>
+                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
-                <constraint firstItem="aFp-vU-e7e" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="2Yr-YR-hF8"/>
-                <constraint firstItem="aFp-vU-e7e" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="HJm-oF-A1z"/>
-                <constraint firstItem="bqP-jY-7uf" firstAttribute="width" secondItem="aFp-vU-e7e" secondAttribute="width" id="bXO-4e-2vP"/>
-                <constraint firstItem="bqP-jY-7uf" firstAttribute="height" secondItem="aFp-vU-e7e" secondAttribute="height" id="cbL-m0-n79"/>
-                <constraint firstAttribute="trailingMargin" secondItem="bqP-jY-7uf" secondAttribute="trailing" id="dQR-cD-vQF"/>
-                <constraint firstItem="bqP-jY-7uf" firstAttribute="centerY" secondItem="aFp-vU-e7e" secondAttribute="centerY" id="knR-BP-snu"/>
+                <constraint firstItem="AxT-eO-awB" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" id="KTM-eu-T1w"/>
+                <constraint firstItem="AxT-eO-awB" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="Mws-jS-lNp"/>
+                <constraint firstItem="AxT-eO-awB" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" priority="999" id="ZWn-U2-h0p"/>
             </constraints>
             <connections>
                 <outlet property="playAllButton" destination="aFp-vU-e7e" id="pTl-kf-Ow2"/>
