@@ -70,6 +70,10 @@ protocol PlayerQueuesPersistent {
 public enum PlayerMode: Int16 {
     case music = 0
     case podcast = 1
+    
+    public var nextMode: PlayerMode {
+        return self == .music ? .podcast : .music
+    }
 }
 
 public class PlayerData: NSObject {

@@ -200,7 +200,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         configureBackgroundFetch()
         configureNotificationHandling()
         initEventLogger()
-        self.window = MainWindow(frame: UIScreen.main.bounds)
+        self.window = UIWindow(frame: UIScreen.main.bounds)
         
         guard let credentials = storage.loginCredentials else {
             return true
