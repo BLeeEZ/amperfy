@@ -23,7 +23,7 @@ import Foundation
 import UIKit
 import AmperfyKit
 
-class LibraryVC: UITableViewController {
+class LibraryVC: KeyCommandTableViewController {
     
     private var librarySettings = LibraryDisplaySettings.defaultSettings
     private var editButton: UIBarButtonItem!

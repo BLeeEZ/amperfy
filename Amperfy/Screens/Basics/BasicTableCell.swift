@@ -31,5 +31,10 @@ class BasicTableCell: UITableViewCell {
     }
     
     override var layoutMargins: UIEdgeInsets { get { return BasicTableCell.margin } set { } }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.markAsUnfocused()
+    }
 
 }

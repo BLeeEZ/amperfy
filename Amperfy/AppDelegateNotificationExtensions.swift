@@ -51,9 +51,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate
     }
     
     private func displayInLibraryTab(vc: UIViewController) {
-        guard let topView = Self.topViewController(),
-              topView.presentedViewController == nil,
-              let hostingTabBarVC = topView as? UITabBarController
+        guard let hostingTabBarVC = hostingTabBarVC
         else { return }
         
         if hostingTabBarVC.popupPresentationState == .open,
@@ -67,32 +65,56 @@ extension AppDelegate: UNUserNotificationCenterDelegate
         }
     }
     
-    func displaySearchTab() {
+    var hostingTabBarVC: UITabBarController? {
+        guard let topView = Self.topViewController(),
+              storage.isLibrarySynced,
+              let tabBarVC = topView as? UITabBarController
+        else { return nil }
+        return tabBarVC
+    }
+    
+    enum PopupPlayerDirection {
+        case open
+        case close
+        case toggle
+    }
+    
+    func visualizePopupPlayer(direction: PopupPlayerDirection, animated: Bool, completion completionBlock: (()->Void)? = nil) {
         guard let topView = Self.topViewController(),
               storage.isLibrarySynced,
               let hostingTabBarVC = topView as? UITabBarController
         else { return }
         
         if let presentedViewController = topView.presentedViewController {
-            presentedViewController.dismiss(animated: true) {
-                hidePopupPlayer ()
+            presentedViewController.dismiss(animated: animated) {
+                togglePopupPlayer()
             }
         } else {
-            hidePopupPlayer ()
+            togglePopupPlayer()
         }
         
-        func hidePopupPlayer () {
+        func togglePopupPlayer() {
             if hostingTabBarVC.popupPresentationState == .open,
-               let _ = hostingTabBarVC.popupContent as? PopupPlayerVC {
-                hostingTabBarVC.closePopup(animated: true) {
-                    switchTabBar()
+               let _ = hostingTabBarVC.popupContent as? PopupPlayerVC,
+               direction != .open {
+                hostingTabBarVC.closePopup(animated: animated) {
+                    completionBlock?()
+                }
+            } else if hostingTabBarVC.popupPresentationState == .barPresented,
+                      direction != .close {
+                hostingTabBarVC.openPopup(animated: true) {
+                    completionBlock?()
                 }
             } else {
-                switchTabBar()
+                completionBlock?()
             }
         }
-        func switchTabBar() {
-            if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
+    }
+    
+    func displaySearchTab() {
+        visualizePopupPlayer(direction: .close, animated: true) {
+            if let hostingTabBarVC = self.hostingTabBarVC,
+               let hostingTabViewControllers = hostingTabBarVC.viewControllers,
                hostingTabViewControllers.count >= 2,
                let searchTabNavVC = hostingTabViewControllers[1] as? UINavigationController {
                 hostingTabBarVC.selectedIndex = 1

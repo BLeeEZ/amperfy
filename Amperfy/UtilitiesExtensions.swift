@@ -171,6 +171,10 @@ extension UITableView {
         }
         return cell
     }
+    
+    func hasRowAt(indexPath: IndexPath) -> Bool {
+        return indexPath.section < self.numberOfSections && indexPath.row < self.numberOfRows(inSection: indexPath.section)
+    }
 }
 
 extension UITableViewController {
@@ -222,6 +226,29 @@ extension UIApplication {
 
 extension UITraitCollection {
     static let maxDisplayScale = UITraitCollection(displayScale: 3.0)
+}
+
+extension UITableViewCell {
+    func animateActivation() {
+        UIView.animate(withDuration: 0.2, animations: {
+            self.markAsFocused()
+        }, completion: { _ in
+            self.markAsFocused()
+            UIView.animate(withDuration: 0.2, animations: {
+                self.markAsUnfocused()
+            }, completion: { _ in
+                self.markAsUnfocused()
+            })
+        })
+    }
+    
+    func markAsFocused() {
+        self.backgroundColor = .systemGray4
+    }
+    
+    func markAsUnfocused() {
+        self.backgroundColor = .clear
+    }
 }
 
 extension UIMenu {

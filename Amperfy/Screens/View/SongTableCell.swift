@@ -100,22 +100,16 @@ class SongTableCell: BasicTableCell {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        
-        self.selectionStyle = .default
-        UIView.animate(withDuration: Self.touchAnimation, delay: 0, animations: {
-            self.selectionStyle = .none
-        }, completion: { _ in
-            self.selectionStyle = .none
-        })
-        
         playThisSong()
     }
     
-    private func playThisSong() {
+    func playThisSong() {
         guard let song = song,
               let context = playContextCb?(self),
               song.isCached || appDelegate.storage.settings.isOnlineMode
         else { return }
+        
+        animateActivation()
 
         hideSearchBarKeyboardInRootView()
         let generator = UINotificationFeedbackGenerator()

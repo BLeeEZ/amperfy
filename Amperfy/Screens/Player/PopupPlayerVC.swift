@@ -33,6 +33,8 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var controlPlaceholderHeightConstraint: NSLayoutConstraint!
     private let safetyMarginOnBottom = 20.0
     
+    lazy var tableViewKeyCommandsController = TableViewKeyCommandsController(tableView: tableView, overrideFirstLastIndexPath: IndexPath(row: 0, section: PlayerSectionCategory.currentlyPlaying.rawValue))
+    
     var player: PlayerFacade!
     var controlView: PlayerControlView?
     var largeCurrentlyPlayingView: LargeCurrentlyPlayingPlayerView?
@@ -107,12 +109,19 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         appDelegate.userStatistics.visited(.popupPlayer)
+        self.becomeFirstResponder()
         changeDisplayStyle(to: appDelegate.storage.settings.playerDisplayStyle, animated: false)
         reloadData()
         scrollToCurrentlyPlayingRow()
         self.controlView?.refreshView()
         refresh()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.resignFirstResponder()
     }
     
     func fetchSongInfoAndUpdateViews() {

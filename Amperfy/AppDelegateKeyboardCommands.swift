@@ -35,6 +35,7 @@ enum KeyboardCommands: CaseIterable {
     case repeatPlayback
     case shuffle
     case musicPodcastMode
+    case openClosePlayer
     
     var name: String {
         switch self {
@@ -52,6 +53,8 @@ enum KeyboardCommands: CaseIterable {
             return "Shuffle"
         case .musicPodcastMode:
             return "Switch between Music and Podcast mode"
+        case .openClosePlayer:
+            return "Open/Close Player"
         }
     }
     
@@ -71,6 +74,8 @@ enum KeyboardCommands: CaseIterable {
             return KeyboardCommand(input: "s", modifierFlags: [])
         case .musicPodcastMode:
             return KeyboardCommand(input: "m", modifierFlags: [])
+        case .openClosePlayer:
+            return KeyboardCommand(input: "p", modifierFlags: [])
         }
     }
     
@@ -127,8 +132,152 @@ extension AppDelegate {
             self.player.toggleShuffle()
         case .musicPodcastMode:
             self.player.setPlayerMode(self.player.playerMode.nextMode)
+        case .openClosePlayer:
+            visualizePopupPlayer(direction: .toggle, animated: true)
         }
     }
     
 }
 
+extension KeyCommandTableViewController {
+
+    override var keyCommands: [UIKeyCommand]? {
+        return [
+            //select
+            UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(selectKeyTapped)), // enter
+            UIKeyCommand(input: "l", modifierFlags: [], action: #selector(selectKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputRightArrow, modifierFlags: .shift, action: #selector(selectKeyTapped)),
+            // remove selection
+            UIKeyCommand(input: UIKeyCommand.inputEscape, modifierFlags: .shift, action: #selector(escapeKeyTapped)),
+            // navigation
+            UIKeyCommand(input: "h", modifierFlags: [], action: #selector(goBackKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputLeftArrow, modifierFlags: .shift, action: #selector(goBackKeyTapped)),
+            UIKeyCommand(input: "k", modifierFlags: [], action: #selector(previousKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: .shift, action: #selector(previousKeyTapped)),
+            UIKeyCommand(input: "j", modifierFlags: [], action: #selector(nextKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: .shift, action: #selector(nextKeyTapped))
+        ]
+    }
+
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+
+    @objc func goBackKeyTapped() {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func escapeKeyTapped() {
+        tableViewKeyCommandsController.removeFocus()
+    }
+
+    @objc func selectKeyTapped() {
+        tableViewKeyCommandsController.interactWithFocus()
+    }
+
+    @objc func nextKeyTapped() {
+        tableViewKeyCommandsController.moveFocusToNext()
+    }
+
+    @objc func previousKeyTapped() {
+        tableViewKeyCommandsController.moveFocusToPrevious()
+    }
+}
+
+extension BasicTableViewController {
+    
+    override var keyCommands: [UIKeyCommand]? {
+        var commands = super.keyCommands ?? [UIKeyCommand]()
+        commands.append(contentsOf:
+        [
+            UIKeyCommand(input: "f", modifierFlags: [], action: #selector(searchKeyTapped))
+        ])
+        return commands
+    }
+
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
+    @objc func searchKeyTapped() {
+        self.searchController.searchBar.becomeFirstResponder()
+    }
+}
+
+extension PopupPlayerVC {
+
+    override var keyCommands: [UIKeyCommand]? {
+        return [
+            //select
+            UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(selectKeyTapped)), // enter
+            UIKeyCommand(input: "l", modifierFlags: [], action: #selector(selectKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputRightArrow, modifierFlags: .shift, action: #selector(selectKeyTapped)),
+            // remove selection
+            UIKeyCommand(input: UIKeyCommand.inputEscape, modifierFlags: .shift, action: #selector(escapeKeyTapped)),
+            // navigation
+            UIKeyCommand(input: "h", modifierFlags: [], action: #selector(goBackKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputLeftArrow, modifierFlags: .shift, action: #selector(goBackKeyTapped)),
+            UIKeyCommand(input: "k", modifierFlags: [], action: #selector(previousKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: .shift, action: #selector(previousKeyTapped)),
+            UIKeyCommand(input: "j", modifierFlags: [], action: #selector(nextKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: .shift, action: #selector(nextKeyTapped))
+        ]
+    }
+
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+
+    @objc func goBackKeyTapped() {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func escapeKeyTapped() {
+        tableViewKeyCommandsController.removeFocus()
+    }
+
+    @objc func selectKeyTapped() {
+        tableViewKeyCommandsController.interactWithFocus()
+    }
+
+    @objc func nextKeyTapped() {
+        tableViewKeyCommandsController.moveFocusToNext()
+    }
+
+    @objc func previousKeyTapped() {
+        tableViewKeyCommandsController.moveFocusToPrevious()
+    }
+}
+
+extension TabBarVC {
+    
+    override var keyCommands: [UIKeyCommand]? {
+        return [
+            UIKeyCommand(input: "1", modifierFlags: [], action: #selector(moveToTab1)),
+            UIKeyCommand(input: "2", modifierFlags: [], action: #selector(moveToTab2)),
+            UIKeyCommand(input: "3", modifierFlags: [], action: #selector(moveToTab3))
+        ]
+    }
+    
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
+    @objc func moveToTab1() {
+        moveToIndex(index: 0)
+    }
+    
+    @objc func moveToTab2() {
+        moveToIndex(index: 1)
+    }
+    
+    @objc func moveToTab3() {
+        moveToIndex(index: 2)
+    }
+        
+    func moveToIndex(index: Int) {
+        if (self.viewControllers?.count ?? 0) > index {
+            self.selectedIndex = index
+        }
+    }
+}

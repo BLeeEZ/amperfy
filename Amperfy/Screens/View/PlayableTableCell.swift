@@ -139,11 +139,15 @@ class PlayableTableCell: BasicTableCell {
         }
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
+    func playThisSong() {
         if let playerIndex = playerIndexCb?(self) {
             appDelegate.player.play(playerIndex: playerIndex)
         }
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        playThisSong()
     }
     
     private func hideSearchBarKeyboardInRootView() {

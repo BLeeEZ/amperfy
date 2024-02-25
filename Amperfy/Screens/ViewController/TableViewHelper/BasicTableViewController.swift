@@ -71,7 +71,7 @@ struct SwipeDisplaySettings {
     }
 }
 
-class BasicTableViewController: UITableViewController {
+class BasicTableViewController: KeyCommandTableViewController {
     
     private static let swipeButtonColors: [UIColor] = [.defaultBlue, .systemOrange, .systemPurple, .systemGray]
     

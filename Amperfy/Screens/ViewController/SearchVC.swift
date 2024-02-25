@@ -341,7 +341,7 @@ class SearchVC: MultiSourceTableViewController {
         }
     }
     
-    override func tableView(_ tableView: UITableView, performPrimaryActionForRowAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch SearchSection(rawValue: indexPath.section) {
         case .History:
             let history = searchHistoryFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
