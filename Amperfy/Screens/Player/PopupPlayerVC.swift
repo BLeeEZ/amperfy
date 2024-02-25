@@ -39,7 +39,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     var controlView: PlayerControlView?
     var largeCurrentlyPlayingView: LargeCurrentlyPlayingPlayerView?
     var hostingTabBarVC: TabBarVC?
-    var isBackgroundBlurConfigured = false
     
     var currentlyPlayingTableCell: CurrentlyPlayingTableCell?
     var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
@@ -64,6 +63,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         player = appDelegate.player
         player.addNotifier(notifier: self)
         
+        self.backgroundImage.setBackgroundBlur(style: .prominent)
         refreshCurrentlyPlayingPopupItem()
         
         controlPlaceholderHeightConstraint.constant = PlayerControlView.frameHeight + safetyMarginOnBottom
@@ -97,14 +97,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        if !isBackgroundBlurConfigured {
-            isBackgroundBlurConfigured = true
-            let blurEffect = UIBlurEffect(style: .systemThinMaterial)
-            let blurEffectView = UIVisualEffectView(effect: blurEffect)
-            // BlurEffect rect is a square to avoid rerendering during iPad device rotation
-            blurEffectView.frame = CGRect(x: 0, y: 0, width: max(self.view.frame.width, self.view.frame.height), height: max(self.view.frame.width, self.view.frame.height))
-            self.backgroundImage.insertSubview(blurEffectView, at: 0)
-        }
         refreshCellMasks()
     }
     
