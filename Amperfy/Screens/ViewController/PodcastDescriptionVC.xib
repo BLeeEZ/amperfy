@@ -173,15 +173,25 @@
                     <viewLayoutGuide key="contentLayoutGuide" id="Y1l-QN-6kv"/>
                     <viewLayoutGuide key="frameLayoutGuide" id="lAO-TS-9XO"/>
                 </scrollView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="close" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JHZ-kb-Qyt" userLabel="Close Button">
+                    <rect key="frame" x="331" y="36" width="28" height="28"/>
+                    <color key="tintColor" systemColor="secondaryLabelColor"/>
+                    <buttonConfiguration key="configuration" style="gray" cornerStyle="capsule" buttonSize="small"/>
+                    <connections>
+                        <action selector="pressedClose:" destination="-1" eventType="touchUpInside" id="bQ6-rx-9my"/>
+                    </connections>
+                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
                 <constraint firstAttribute="rightMargin" secondItem="JQO-fn-jd5" secondAttribute="right" id="KO9-KY-aE9"/>
+                <constraint firstItem="JQO-fn-jd5" firstAttribute="trailing" secondItem="JHZ-kb-Qyt" secondAttribute="trailing" id="UUn-ik-ndw"/>
                 <constraint firstItem="JQO-fn-jd5" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" constant="16" id="aXp-PQ-TAY"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="JQO-fn-jd5" secondAttribute="bottom" id="hlv-fU-Xoc"/>
                 <constraint firstItem="JQO-fn-jd5" firstAttribute="left" secondItem="iN0-l3-epB" secondAttribute="leftMargin" id="kwH-dv-NhG"/>
+                <constraint firstItem="JHZ-kb-Qyt" firstAttribute="top" secondItem="JQO-fn-jd5" secondAttribute="top" id="n9A-cS-QH5"/>
             </constraints>
-            <point key="canvasLocation" x="0.76335877862595414" y="19.718309859154932"/>
+            <point key="canvasLocation" x="-0.80000000000000004" y="19.340329835082461"/>
         </view>
     </objects>
     <designables>

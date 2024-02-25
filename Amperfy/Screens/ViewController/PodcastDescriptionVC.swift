@@ -125,7 +125,7 @@ class PodcastDescriptionVC: UIViewController {
         self.appDelegate.player.play(context: PlayContext(containable: entityContainer))
     }
     
-    @IBAction func pressedCancel(_ sender: Any) {
+    @IBAction func pressedClose(_ sender: Any) {
         self.dismiss(animated: true)
     }
 
