@@ -22,11 +22,28 @@
 import UIKit
 import AmperfyKit
 
-struct Item: Hashable {
+class Item: Hashable {
     let id = UUID()
     let title: String
     var library: LibraryDisplayType?
+    var isSelected = false
     var tab: SideBarItems?
+    
+    init(title: String, library: LibraryDisplayType? = nil, isSelected: Bool = false, tab: SideBarItems? = nil) {
+        self.title = title
+        self.library = library
+        self.isSelected = isSelected
+        self.tab = tab
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: Item,
+                    rhs: Item) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 enum SideBarItems: Int, Hashable, CaseIterable {
@@ -140,11 +157,26 @@ class SideBarVC: UIViewController {
             snapshot.append(libraryNotUsed)
             dataSource.apply(snapshot, to: 0, animatingDifferences: true)
         } else {
-            let indexPaths = collectionView.indexPathsForSelectedItems?.filter({ $0.row >= SideBarItems.offset }).sorted()
             collectionView.isEditing.toggle()
             var snapshot = dataSource.snapshot(for: 0)
+            let inUse = snapshot.items.filter({ $0.isSelected && ($0.library != nil)}).compactMap({ $0 })
+            struct Temp {
+                let indexPath: IndexPath
+                let item: Item
+            }
+            let inUseItems = inUse.compactMap({
+                if let indexPath = dataSource.indexPath(for: $0) {
+                    return Temp(indexPath: indexPath, item: $0)
+                } else {
+                    return nil
+                }
+                
+            })
+            .sorted(by: { $0.indexPath < $1.indexPath })
+            .compactMap({ $0.item })
+            libraryInUse = inUseItems
+            
             var snapshot2 = dataSource.snapshot(for: 0)
-            libraryInUse = indexPaths?.compactMap({ snapshot.items[$0.row] }) ?? [Item]()
             let offsetItems = Array(snapshot.items[0...SideBarItems.allCases.count])
             snapshot2.delete(offsetItems)
             snapshot2.delete(libraryInUse)
@@ -191,6 +223,7 @@ class SideBarVC: UIViewController {
                     .multiselect(),
                     .disclosureIndicator(displayed: .whenNotEditing),
                     .reorder()]
+                cell.isSelected = item.isSelected
             } else if let tabItem = item.tab {
                 content.text = tabItem.title
                 content.image = tabItem.icon
@@ -224,7 +257,7 @@ class SideBarVC: UIViewController {
         snapshot.appendSections([0])
         dataSource.apply(snapshot, animatingDifferences: false)
         
-        let libraryItems = librarySettings.inUse.map { Item(title: $0.displayName, library: $0) }
+        let libraryItems = librarySettings.inUse.map { Item(title: $0.displayName, library: $0, isSelected: true) }
         data.append(contentsOf: libraryItems)
         
         var outlineSnapshot = NSDiffableDataSourceSectionSnapshot<Item>()
@@ -262,6 +295,11 @@ extension SideBarVC: UICollectionViewDelegate {
                         didSelectItemAt indexPath: IndexPath) {
         // handel selection
         guard !collectionView.isEditing else {
+            guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
+            var snapshot = dataSource.snapshot()
+            item.isSelected = true
+            snapshot.reloadItems([item])
+            dataSource.apply(snapshot, animatingDifferences: true)
             return
         }
         // Retrieve the item identifier using index path.
@@ -285,6 +323,18 @@ extension SideBarVC: UICollectionViewDelegate {
             } else {
                 splitVC.setViewController(UINavigationController(rootViewController: libraryItem.controller), for: .secondary)
             }
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        didDeselectItemAt indexPath: IndexPath) {
+        guard !collectionView.isEditing else {
+            guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
+            var snapshot = dataSource.snapshot()
+            item.isSelected = false
+            snapshot.reloadItems([item])
+            dataSource.apply(snapshot, animatingDifferences: true)
+            return
         }
     }
 }
