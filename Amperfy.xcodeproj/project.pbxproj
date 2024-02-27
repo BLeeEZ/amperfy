@@ -420,6 +420,7 @@
 		50CFB59428D4846300A47D44 /* SwipeCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CFB59328D4846300A47D44 /* SwipeCellView.swift */; };
 		50CFB59728D4FC0100A47D44 /* ArtworkSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CFB59628D4FC0100A47D44 /* ArtworkSettingsView.swift */; };
 		50CFB59A28D5009200A47D44 /* ArtworkDownloadSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CFB59928D5009200A47D44 /* ArtworkDownloadSettingsView.swift */; };
+		50DE29E92B8F347300ABA78E /* BarPlayerHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DE29E82B8F347300ABA78E /* BarPlayerHandler.swift */; };
 		50DEEE04265E25A40073FF20 /* MusicFoldersVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE03265E25A40073FF20 /* MusicFoldersVC.swift */; };
 		50DEEE07265E27070073FF20 /* DirectoryTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE05265E27070073FF20 /* DirectoryTableCell.swift */; };
 		50DEEE08265E27300073FF20 /* DirectoryTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50DEEE06265E27070073FF20 /* DirectoryTableCell.xib */; };
@@ -428,6 +429,8 @@
 		50DF1E5628DDE3FA00F3EA00 /* AlbumCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DF1E5428DDE3FA00F3EA00 /* AlbumCollectionCell.swift */; };
 		50DF1E5A28DDECEA00F3EA00 /* AlbumCollectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50DF1E5928DDECEA00F3EA00 /* AlbumCollectionCell.xib */; };
 		50E1D3982B8A82BB0001A572 /* KeyCommandTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E1D3972B8A82BA0001A572 /* KeyCommandTableViewController.swift */; };
+		50E1D39A2B8BEA540001A572 /* SplitVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E1D3992B8BEA540001A572 /* SplitVC.swift */; };
+		50E1D39C2B8BED4C0001A572 /* SideBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E1D39B2B8BED4C0001A572 /* SideBarVC.swift */; };
 		50E77DB428D1B63200BDF882 /* LibraryDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */; };
 		50E77DB728D2163F00BDF882 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB628D2163F00BDF882 /* SettingsView.swift */; };
 		50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */; };
@@ -880,6 +883,7 @@
 		50DB11B0266537C30033BFFA /* SsPingParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPingParserTest.swift; sourceTree = "<group>"; };
 		50DB11B226653A670033BFFA /* genres_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = genres_example_1.xml; sourceTree = "<group>"; };
 		50DB11B626653B3A0033BFFA /* SsGenreParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsGenreParserTest.swift; sourceTree = "<group>"; };
+		50DE29E82B8F347300ABA78E /* BarPlayerHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarPlayerHandler.swift; sourceTree = "<group>"; };
 		50DEEDFF265D46CB0073FF20 /* SsMusicFolderParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsMusicFolderParserDelegate.swift; sourceTree = "<group>"; };
 		50DEEE01265D4AB30073FF20 /* SsDirectoryParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsDirectoryParserDelegate.swift; sourceTree = "<group>"; };
 		50DEEE03265E25A40073FF20 /* MusicFoldersVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicFoldersVC.swift; sourceTree = "<group>"; };
@@ -898,6 +902,8 @@
 		50DF56C727C7753A00F106BA /* Amperfy v21.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v21.xcdatamodel"; sourceTree = "<group>"; };
 		50E15407261311590021F47D /* Amperfy v6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v6.xcdatamodel"; sourceTree = "<group>"; };
 		50E1D3972B8A82BA0001A572 /* KeyCommandTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCommandTableViewController.swift; sourceTree = "<group>"; };
+		50E1D3992B8BEA540001A572 /* SplitVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitVC.swift; sourceTree = "<group>"; };
+		50E1D39B2B8BED4C0001A572 /* SideBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideBarVC.swift; sourceTree = "<group>"; };
 		50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryDisplaySettings.swift; sourceTree = "<group>"; };
 		50E77DB628D2163F00BDF882 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHostVC.swift; sourceTree = "<group>"; };
@@ -1115,6 +1121,7 @@
 				501944172B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift */,
 				50A30E4E2B73DDC800722894 /* PlayerControlView.xib */,
 				50A30E4D2B73DDC800722894 /* PlayerControlView.swift */,
+				50DE29E82B8F347300ABA78E /* BarPlayerHandler.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -1534,9 +1541,11 @@
 				508385E921C5965B00C4BB32 /* LoginVC.swift */,
 				50BA930321D10F0000E5901D /* SyncVC.swift */,
 				5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */,
+				50E1D3992B8BEA540001A572 /* SplitVC.swift */,
 				508FDE4F21F64ED6005A0724 /* TabBarVC.swift */,
 				50BA92FF21CFDEBD00E5901D /* LibraryVC.swift */,
 				50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */,
+				50E1D39B2B8BED4C0001A572 /* SideBarVC.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -2084,6 +2093,7 @@
 				50C16C1A21E704EC00F086F0 /* ArtistDetailVC.swift in Sources */,
 				50DEEE04265E25A40073FF20 /* MusicFoldersVC.swift in Sources */,
 				50DEEE0A265E392C0073FF20 /* IndexesVC.swift in Sources */,
+				50E1D39A2B8BEA540001A572 /* SplitVC.swift in Sources */,
 				50CFB59728D4FC0100A47D44 /* ArtworkSettingsView.swift in Sources */,
 				5005939128E42F66008C8DF6 /* BasicCollectionCell.swift in Sources */,
 				5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */,
@@ -2113,6 +2123,7 @@
 				50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */,
 				501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */,
 				5059A31C28A9ED680068E4D2 /* SceneDelegate.swift in Sources */,
+				50E1D39C2B8BED4C0001A572 /* SideBarVC.swift in Sources */,
 				505CA20E2B88EB9A00AA81CD /* BasicFetchedResultsTableViewController.swift in Sources */,
 				508FDE5021F64ED6005A0724 /* TabBarVC.swift in Sources */,
 				50C16C2821E8680A00F086F0 /* CommonScreenOperations.swift in Sources */,
@@ -2121,6 +2132,7 @@
 				50AFA1492632E83100F198DD /* GenericDetailTableHeader.swift in Sources */,
 				504B442228D8EBB20033982C /* MailView.swift in Sources */,
 				50C16C2021E7A37000F086F0 /* Segues.swift in Sources */,
+				50DE29E92B8F347300ABA78E /* BarPlayerHandler.swift in Sources */,
 				5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */,
 				50CFB59A28D5009200A47D44 /* ArtworkDownloadSettingsView.swift in Sources */,
 				50DF1E5628DDE3FA00F3EA00 /* AlbumCollectionCell.swift in Sources */,

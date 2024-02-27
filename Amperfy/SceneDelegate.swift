@@ -54,7 +54,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } else if !AmperKit.shared.storage.isLibrarySynced {
             initialViewController = SyncVC.instantiateFromAppStoryboard()
         } else {
-            initialViewController = TabBarVC.instantiateFromAppStoryboard()
+            initialViewController = SplitVC.instantiateFromAppStoryboard()
         }
         
         self.window?.rootViewController = initialViewController

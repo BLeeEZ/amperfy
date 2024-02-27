@@ -38,7 +38,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     var player: PlayerFacade!
     var controlView: PlayerControlView?
     var largeCurrentlyPlayingView: LargeCurrentlyPlayingPlayerView?
-    var hostingTabBarVC: TabBarVC?
+    var hostingSplitVC: SplitVC?
     
     var currentlyPlayingTableCell: CurrentlyPlayingTableCell?
     var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
@@ -186,14 +186,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     }
     
     func closePopupPlayerAndDisplayInLibraryTab(vc: UIViewController) {
-        guard let hostingTabBarVC = hostingTabBarVC else { return }
-        hostingTabBarVC.closePopup(animated: true, completion: { () in
-            if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
-               hostingTabViewControllers.count > 0,
-               let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
-                libraryTabNavVC.pushViewController(vc, animated: false)
-                hostingTabBarVC.selectedIndex = 0
-            }
+        guard let hostingSplitVC = hostingSplitVC else { return }
+        hostingSplitVC.closePopup(animated: true, completion: { () in
+            hostingSplitVC.display(vc: vc)
         })
     }
     

@@ -121,15 +121,15 @@ public enum LibraryDisplayType: Int, CaseIterable {
         case .downloads:
             return "toDownloads"
         case .favoriteSongs:
-            return "toFavoriteSongs"
+            return "toSongs"
         case .favoriteAlbums:
-            return "toFavoriteAlbums"
+            return "toAlbums"
         case .favoriteArtists:
-            return "toFavoriteArtists"
+            return "toArtists"
         case .newestAlbums:
-            return "toNewestAlbums"
+            return "toAlbums"
         case .recentAlbums:
-            return "toRecentAlbums"
+            return "toAlbums"
         }
     }
     

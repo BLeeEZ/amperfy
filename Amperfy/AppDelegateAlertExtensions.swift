@@ -33,8 +33,11 @@ extension AppDelegate {
         if let nav = base as? UINavigationController {
             return topViewController(base: nav.visibleViewController)
         }
-        if let tab = base as? UITabBarController {
-            return tab
+        if let tab = base as? TabBarVC {
+            return tab.parent
+        }
+        if let splitVC = base as? SplitVC {
+            return splitVC
         }
         if let presented = base?.presentedViewController {
             return topViewController(base: presented)

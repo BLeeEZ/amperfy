@@ -23,6 +23,12 @@ import Foundation
 import UIKit
 import AmperfyKit
 
+enum PopupPlayerDirection {
+    case open
+    case close
+    case toggle
+}
+
 extension AppDelegate: UNUserNotificationCenterDelegate
 {
     func configureNotificationHandling() {
@@ -51,80 +57,24 @@ extension AppDelegate: UNUserNotificationCenterDelegate
     }
     
     private func displayInLibraryTab(vc: UIViewController) {
-        guard let hostingTabBarVC = hostingTabBarVC
-        else { return }
-        
-        if hostingTabBarVC.popupPresentationState == .open,
-           let popupPlayerVC = hostingTabBarVC.popupContent as? PopupPlayerVC {
-            popupPlayerVC.closePopupPlayerAndDisplayInLibraryTab(vc: vc)
-        } else if let hostingTabViewControllers = hostingTabBarVC.viewControllers,
-           hostingTabViewControllers.count > 0,
-           let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
-            libraryTabNavVC.pushViewController(vc, animated: false)
-            hostingTabBarVC.selectedIndex = 0
-        }
+        hostingSplitVC?.displayInLibraryTab(vc: vc)
     }
     
-    var hostingTabBarVC: UITabBarController? {
+    var hostingSplitVC: SplitVC? {
         guard let topView = Self.topViewController(),
               storage.isLibrarySynced,
-              let tabBarVC = topView as? UITabBarController
+              let splitVC = topView as? SplitVC
         else { return nil }
-        return tabBarVC
+        return splitVC
     }
-    
-    enum PopupPlayerDirection {
-        case open
-        case close
-        case toggle
-    }
-    
+
     func visualizePopupPlayer(direction: PopupPlayerDirection, animated: Bool, completion completionBlock: (()->Void)? = nil) {
-        guard let topView = Self.topViewController(),
-              storage.isLibrarySynced,
-              let hostingTabBarVC = topView as? UITabBarController
-        else { return }
+        hostingSplitVC?.visualizePopupPlayer(direction: direction, animated: animated, completion: completionBlock)
         
-        if let presentedViewController = topView.presentedViewController {
-            presentedViewController.dismiss(animated: animated) {
-                togglePopupPlayer()
-            }
-        } else {
-            togglePopupPlayer()
-        }
-        
-        func togglePopupPlayer() {
-            if hostingTabBarVC.popupPresentationState == .open,
-               let _ = hostingTabBarVC.popupContent as? PopupPlayerVC,
-               direction != .open {
-                hostingTabBarVC.closePopup(animated: animated) {
-                    completionBlock?()
-                }
-            } else if hostingTabBarVC.popupPresentationState == .barPresented,
-                      direction != .close {
-                hostingTabBarVC.openPopup(animated: true) {
-                    completionBlock?()
-                }
-            } else {
-                completionBlock?()
-            }
-        }
     }
     
     func displaySearchTab() {
-        visualizePopupPlayer(direction: .close, animated: true) {
-            if let hostingTabBarVC = self.hostingTabBarVC,
-               let hostingTabViewControllers = hostingTabBarVC.viewControllers,
-               hostingTabViewControllers.count >= 2,
-               let searchTabNavVC = hostingTabViewControllers[1] as? UINavigationController {
-                hostingTabBarVC.selectedIndex = 1
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
-                    if let searchTabVC = searchTabNavVC.visibleViewController as? SearchVC {
-                        searchTabVC.activateSearchBar()
-                    }
-                }
-            }
-        }
+        hostingSplitVC?.displaySearch()
     }
     
 }

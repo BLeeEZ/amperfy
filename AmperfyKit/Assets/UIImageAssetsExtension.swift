@@ -31,8 +31,14 @@ public enum ArtworkIconSizeType: CGFloat {
 }
 
 extension UIImage {
+    public static func symbolImageSize(scale: UIImage.SymbolScale) -> CGSize {
+        let config = UIImage.SymbolConfiguration(scale: .large)
+        let image = UIImage(systemName: "plus", withConfiguration: config)!
+        return image.size
+    }
+    
     public static let appIcon = UIImage.create("Icon-1024")
-        
+    
     public static let systemPlus = UIImage.create(systemName: "plus")
     public static let check = UIImage.create(systemName: "checkmark")
     public static let backwardFill = UIImage.create(systemName: "backward.fill")
@@ -57,6 +63,8 @@ extension UIImage {
     public static let squareArrow = UIImage.create(systemName: "arrow.forward.square")
     
     public static let ellipsis = UIImage.create(systemName: "ellipsis")
+    public static let settings = UIImage.create(systemName: "gear")
+    public static let search = UIImage.create(systemName: "magnifyingglass")
     public static let genre = UIImage.create(systemName: "guitars.fill")
     public static let artist = UIImage.create(systemName: "music.mic")
     public static let album = UIImage.create(systemName: "square.stack")

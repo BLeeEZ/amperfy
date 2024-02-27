@@ -11,6 +11,71 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--Amperfy-->
+        <scene sceneID="NYM-e7-Lch">
+            <objects>
+                <viewController id="IFc-oa-9T4" customClass="SideBarVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="imV-mM-LlG">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="w6f-Oe-Gvt">
+                                <rect key="frame" x="0.0" y="96" width="414" height="800"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="QJ0-2K-tGA">
+                                    <size key="itemSize" width="128" height="128"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells/>
+                            </collectionView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="pdm-Tp-Nm6"/>
+                        <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="w6f-Oe-Gvt" firstAttribute="top" secondItem="pdm-Tp-Nm6" secondAttribute="top" id="1Kr-DJ-iNg"/>
+                            <constraint firstAttribute="bottom" secondItem="w6f-Oe-Gvt" secondAttribute="bottom" id="CNj-ug-xM6"/>
+                            <constraint firstAttribute="trailing" secondItem="w6f-Oe-Gvt" secondAttribute="trailing" id="UP2-ph-WoC"/>
+                            <constraint firstItem="w6f-Oe-Gvt" firstAttribute="leading" secondItem="imV-mM-LlG" secondAttribute="leading" id="dUm-hZ-OPI"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Amperfy" largeTitleDisplayMode="always" id="Y09-bS-nvq"/>
+                    <connections>
+                        <outlet property="collectionView" destination="w6f-Oe-Gvt" id="I5w-L4-gOz"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Rin-j9-xhx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2102.898550724638" y="-1331.25"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="crl-uR-tK4">
+            <objects>
+                <navigationController id="Im4-0j-icf" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="NeG-lD-bG9">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ygn-Iq-30O" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1194" y="-593"/>
+        </scene>
+        <!--SplitVC-->
+        <scene sceneID="Vro-PU-fi2">
+            <objects>
+                <splitViewController storyboardIdentifier="SplitVC" allowDoubleColumnStyle="YES" primaryBackgroundStyle="sidebar" id="gSJ-HJ-kXz" customClass="SplitVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <connections>
+                        <segue destination="Odu-0e-SfH" kind="relationship" relationship="compactViewController" id="hjS-Sj-wjB"/>
+                        <segue destination="0kE-xi-dh6" kind="relationship" relationship="masterViewController" id="4ai-j3-sse"/>
+                        <segue destination="Im4-0j-icf" kind="relationship" relationship="detailViewController" id="pCI-0c-KDF"/>
+                    </connections>
+                </splitViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ZUG-Sf-L7w" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-29" y="-215"/>
+        </scene>
         <!--LoginVC-->
         <scene sceneID="tne-QT-ifu">
             <objects>
@@ -170,12 +235,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-547.82608695652175" y="154.01785714285714"/>
+            <point key="canvasLocation" x="-1841" y="-215"/>
         </scene>
         <!--Playlists-->
         <scene sceneID="Zt1-92-WKW">
             <objects>
-                <tableViewController title="Playlists" id="1iw-qc-oYh" customClass="PlaylistsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="PlaylistsVC" title="Playlists" id="1iw-qc-oYh" customClass="PlaylistsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="wvP-mD-HIZ">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -251,12 +316,12 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1s6-dv-ao6" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5778" y="-1595"/>
+            <point key="canvasLocation" x="6686.9565217391309" y="-1595.0892857142856"/>
         </scene>
         <!--Artists-->
         <scene sceneID="Yf4-Mh-ZX3">
             <objects>
-                <tableViewController title="Artists" id="ZGw-SA-mia" customClass="ArtistsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="ArtistsVC" title="Artists" id="ZGw-SA-mia" customClass="ArtistsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="lfA-ZU-K5x">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -277,7 +342,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8U9-U1-Tcd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3918" y="-1331"/>
+            <point key="canvasLocation" x="4827.536231884058" y="-1331.25"/>
         </scene>
         <!--Artist detail-->
         <scene sceneID="t3a-Jy-hNf">
@@ -299,12 +364,12 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oMv-HQ-UkV" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4708" y="-1331"/>
+            <point key="canvasLocation" x="5617.3913043478269" y="-1331.25"/>
         </scene>
         <!--Albums-->
         <scene sceneID="lgQ-R5-DqE">
             <objects>
-                <tableViewController title="Albums" id="w9f-yb-ooi" customClass="AlbumsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="AlbumsVC" title="Albums" id="w9f-yb-ooi" customClass="AlbumsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="ili-jA-D28">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -349,7 +414,7 @@
         <!--Songs-->
         <scene sceneID="Ex6-Jn-ywD">
             <objects>
-                <tableViewController title="Songs" id="PdJ-u4-MrR" customClass="SongsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="SongsVC" title="Songs" id="PdJ-u4-MrR" customClass="SongsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Kcs-9P-3Bf">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -390,7 +455,7 @@
         <!--Search-->
         <scene sceneID="zL3-uO-Cp3">
             <objects>
-                <tableViewController id="xQ3-ra-8Di" customClass="SearchVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="SearchVC" id="xQ3-ra-8Di" customClass="SearchVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="TW7-aC-UCo">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -582,7 +647,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cuw-Xt-sld" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1531.8840579710145" y="-897.32142857142856"/>
+            <point key="canvasLocation" x="3031.884057971015" y="-1896.4285714285713"/>
         </scene>
         <!--SyncVC-->
         <scene sceneID="2mS-PW-dbY">
@@ -641,12 +706,12 @@
                         <outlet property="progressBar" destination="npf-bB-pkf" id="C83-ms-bZn"/>
                         <outlet property="progressInfo" destination="qe5-xR-nU8" id="9mn-5u-yc5"/>
                         <outlet property="progressLabel" destination="KKh-tQ-byV" id="Wib-rh-Gpj"/>
-                        <segue destination="Odu-0e-SfH" kind="presentation" identifier="toLibrary" modalPresentationStyle="fullScreen" id="n3S-Ug-p4Z"/>
+                        <segue destination="gSJ-HJ-kXz" kind="presentation" identifier="toLibrary" modalPresentationStyle="fullScreen" id="iFD-hc-3S7"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="M3f-FL-42B" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="351" y="154"/>
+            <point key="canvasLocation" x="-958" y="-215"/>
         </scene>
         <!--Library-->
         <scene sceneID="JuN-6z-FHK">
@@ -681,7 +746,7 @@
         <!--Downloads-->
         <scene sceneID="6gv-xD-OeS">
             <objects>
-                <tableViewController title="Downloads" id="0yB-ih-px5" userLabel="Downloads" customClass="DownloadsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="DownloadsVC" title="Downloads" id="0yB-ih-px5" userLabel="Downloads" customClass="DownloadsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="BWe-SW-JDn">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -709,7 +774,7 @@
         <!--Settings-->
         <scene sceneID="JOx-4q-Kjd">
             <objects>
-                <viewController id="hqa-F9-lNZ" customClass="SettingsHostVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SettingsHostVC" id="hqa-F9-lNZ" customClass="SettingsHostVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="hwu-20-I2H">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -739,7 +804,7 @@
         <!--Genres-->
         <scene sceneID="Fhr-H0-ODs">
             <objects>
-                <tableViewController title="Genres" id="aeq-6R-iJo" userLabel="Genres" customClass="GenresVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="GenresVC" title="Genres" id="aeq-6R-iJo" userLabel="Genres" customClass="GenresVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="f5t-tw-JHM">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -788,7 +853,7 @@
         <!--MusicFolders-->
         <scene sceneID="Nu1-Pv-7Tn">
             <objects>
-                <tableViewController title="MusicFolders" id="abK-SC-K8I" customClass="MusicFoldersVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="MusicFoldersVC" title="MusicFolders" id="abK-SC-K8I" customClass="MusicFoldersVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="wfa-EF-89p">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -854,7 +919,7 @@
         <!--Podcasts-->
         <scene sceneID="KeG-0i-7dF">
             <objects>
-                <tableViewController title="Podcasts" id="cJ5-gG-DGL" customClass="PodcastsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="PodcastsVC" title="Podcasts" id="cJ5-gG-DGL" customClass="PodcastsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="4lq-IF-nZ5">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -896,11 +961,30 @@
             </objects>
             <point key="canvasLocation" x="4706" y="-4156"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="wYa-w2-eIy">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="0kE-xi-dh6" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="j6n-0F-S2J">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="96"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="IFc-oa-9T4" kind="relationship" relationship="rootViewController" id="DqD-zi-0Hz"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gVg-z5-aHh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1192.753623188406" y="-1331.25"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="qeK-6j-t1f"/>
-        <segue reference="JPy-r0-4uB"/>
-        <segue reference="qYo-eV-9nj"/>
+        <segue reference="axa-3B-EfE"/>
+        <segue reference="tfW-38-Y3k"/>
+        <segue reference="whh-XI-a5P"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.triangle.2.circlepath" catalog="system" width="128" height="104"/>
@@ -914,11 +998,14 @@
         <systemColor name="darkTextColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
+        <systemColor name="secondarySystemBackgroundColor">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemBlueColor">
-            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
