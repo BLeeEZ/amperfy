@@ -57,7 +57,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate
     }
     
     private func displayInLibraryTab(vc: UIViewController) {
-        hostingSplitVC?.displayInLibraryTab(vc: vc)
+        hostingSplitVC?.pushNavLibrary(vc: vc)
     }
     
     var hostingSplitVC: SplitVC? {

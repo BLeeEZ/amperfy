@@ -421,6 +421,8 @@
 		50CFB59728D4FC0100A47D44 /* ArtworkSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CFB59628D4FC0100A47D44 /* ArtworkSettingsView.swift */; };
 		50CFB59A28D5009200A47D44 /* ArtworkDownloadSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CFB59928D5009200A47D44 /* ArtworkDownloadSettingsView.swift */; };
 		50DE29E92B8F347300ABA78E /* BarPlayerHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DE29E82B8F347300ABA78E /* BarPlayerHandler.swift */; };
+		50DE29EB2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DE29EA2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift */; };
+		50DE29ED2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DE29EC2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift */; };
 		50DEEE04265E25A40073FF20 /* MusicFoldersVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE03265E25A40073FF20 /* MusicFoldersVC.swift */; };
 		50DEEE07265E27070073FF20 /* DirectoryTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE05265E27070073FF20 /* DirectoryTableCell.swift */; };
 		50DEEE08265E27300073FF20 /* DirectoryTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50DEEE06265E27070073FF20 /* DirectoryTableCell.xib */; };
@@ -884,6 +886,8 @@
 		50DB11B226653A670033BFFA /* genres_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = genres_example_1.xml; sourceTree = "<group>"; };
 		50DB11B626653B3A0033BFFA /* SsGenreParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsGenreParserTest.swift; sourceTree = "<group>"; };
 		50DE29E82B8F347300ABA78E /* BarPlayerHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarPlayerHandler.swift; sourceTree = "<group>"; };
+		50DE29EA2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryNavigatorConfigurator.swift; sourceTree = "<group>"; };
+		50DE29EC2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LibraryDisplayType+Extension.swift"; sourceTree = "<group>"; };
 		50DEEDFF265D46CB0073FF20 /* SsMusicFolderParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsMusicFolderParserDelegate.swift; sourceTree = "<group>"; };
 		50DEEE01265D4AB30073FF20 /* SsDirectoryParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsDirectoryParserDelegate.swift; sourceTree = "<group>"; };
 		50DEEE03265E25A40073FF20 /* MusicFoldersVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicFoldersVC.swift; sourceTree = "<group>"; };
@@ -1233,6 +1237,7 @@
 				509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */,
 				50722746286794FC00910574 /* AppDelegateKeyboardCommands.swift */,
 				50C9D716285075E3007F18D0 /* UtilitiesExtensions.swift */,
+				50DE29EC2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift */,
 				50BA92F421CC2C4800E5901D /* Screens */,
 				50E77DB528D2160800BDF882 /* SwiftUI */,
 				508AA5792B6A3D7E00BE8117 /* CarPlay */,
@@ -1516,6 +1521,7 @@
 			children = (
 				505CA20B2B88E95400AA81CD /* TableViewHelper */,
 				50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */,
+				50DE29EA2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift */,
 				500B97CF2B7C9546005554BF /* EntityPreviewVC.xib */,
 				500B97CC2B7BC67F005554BF /* EntityPreviewVC.swift */,
 				50DEEE03265E25A40073FF20 /* MusicFoldersVC.swift */,
@@ -2158,6 +2164,7 @@
 				50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */,
 				50A30E542B7408DB00722894 /* ContextQueueNextSectionHeader.swift in Sources */,
 				50791E8528D36F1F006CE6E5 /* LibrarySettingsView.swift in Sources */,
+				50DE29ED2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift in Sources */,
 				5019441D2B7ACB0800082D2E /* PopupPlayer+Animations.swift in Sources */,
 				508FDE3C21F2FA3A005A0724 /* PlaylistDetailTableHeader.swift in Sources */,
 				50BA92F821CC318D00E5901D /* SongTableCell.swift in Sources */,
@@ -2189,6 +2196,7 @@
 				50C9D7082850759B007F18D0 /* SpinnerViewController.swift in Sources */,
 				505CA20C2B88E9D300AA81CD /* FetchUpdateHandler.swift in Sources */,
 				508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */,
+				50DE29EB2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

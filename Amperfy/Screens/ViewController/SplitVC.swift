@@ -29,7 +29,7 @@ class SplitVC: UISplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.delegate = self
-        setViewController(UINavigationController(rootViewController: SideBarItems.search.controller), for: .secondary)
+        setViewController(UINavigationController(rootViewController: TabNavigatorItem.search.controller), for: .secondary)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -107,21 +107,35 @@ class SplitVC: UISplitViewController {
         return nil
     }
     
-    public func displayInLibraryTab(vc: UIViewController) {
+    public func pushNavLibrary(vc: UIViewController) {
         if self.isCollapsed,
            let tabBar = self.viewController(for: .compact) as? TabBarVC {
            if tabBar.popupPresentationState == .open,
               let popupPlayerVC = tabBar.popupContent as? PopupPlayerVC {
                popupPlayerVC.closePopupPlayerAndDisplayInLibraryTab(vc: vc)
            } else {
-               display(vc: vc)
+               push(vc: vc)
            }
         } else if !self.isCollapsed {
-            display(vc: vc)
+            push(vc: vc)
         }
     }
     
-    public func display(vc: UIViewController) {
+    public func pushReplaceNavLibrary(vc: UIViewController) {
+        if self.isCollapsed {
+           if let tabBar = self.viewController(for: .compact) as? TabBarVC,
+              let hostingTabViewControllers = tabBar.viewControllers,
+              hostingTabViewControllers.count > 0,
+              let libraryTabNavVC = hostingTabViewControllers[0] as? UINavigationController {
+               tabBar.selectedIndex = 0
+               libraryTabNavVC.pushViewController(vc, animated: true)
+           }
+        } else if !self.isCollapsed {
+            setViewController(UINavigationController(rootViewController: vc), for: .secondary)
+        }
+    }
+    
+    public func push(vc: UIViewController) {
         if self.isCollapsed {
             if let tabBar = self.viewController(for: .compact) as? TabBarVC,
                let hostingTabViewControllers = tabBar.viewControllers,
@@ -183,7 +197,7 @@ class SplitVC: UISplitViewController {
                     }
                 }
             } else {
-                let searchVC = SideBarItems.search.controller
+                let searchVC = TabNavigatorItem.search.controller
                 self.setViewController(UINavigationController(rootViewController: searchVC), for: .secondary)
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
                     if let activeSearchVC = searchVC as? SearchVC {

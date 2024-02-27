@@ -188,7 +188,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     func closePopupPlayerAndDisplayInLibraryTab(vc: UIViewController) {
         guard let hostingSplitVC = hostingSplitVC else { return }
         hostingSplitVC.closePopup(animated: true, completion: { () in
-            hostingSplitVC.display(vc: vc)
+            hostingSplitVC.push(vc: vc)
         })
     }
     

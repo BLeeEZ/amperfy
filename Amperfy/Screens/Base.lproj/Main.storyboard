@@ -12,42 +12,30 @@
     </dependencies>
     <scenes>
         <!--Amperfy-->
-        <scene sceneID="NYM-e7-Lch">
+        <scene sceneID="mrX-Zz-Ebp">
             <objects>
-                <viewController id="IFc-oa-9T4" customClass="SideBarVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="imV-mM-LlG">
+                <collectionViewController id="Hcv-qR-IhX" customClass="SideBarVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="e1Y-U4-xQV">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="w6f-Oe-Gvt">
-                                <rect key="frame" x="0.0" y="96" width="414" height="800"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="QJ0-2K-tGA">
-                                    <size key="itemSize" width="128" height="128"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
-                                <cells/>
-                            </collectionView>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="pdm-Tp-Nm6"/>
-                        <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="w6f-Oe-Gvt" firstAttribute="top" secondItem="pdm-Tp-Nm6" secondAttribute="top" id="1Kr-DJ-iNg"/>
-                            <constraint firstAttribute="bottom" secondItem="w6f-Oe-Gvt" secondAttribute="bottom" id="CNj-ug-xM6"/>
-                            <constraint firstAttribute="trailing" secondItem="w6f-Oe-Gvt" secondAttribute="trailing" id="UP2-ph-WoC"/>
-                            <constraint firstItem="w6f-Oe-Gvt" firstAttribute="leading" secondItem="imV-mM-LlG" secondAttribute="leading" id="dUm-hZ-OPI"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" title="Amperfy" largeTitleDisplayMode="always" id="Y09-bS-nvq"/>
-                    <connections>
-                        <outlet property="collectionView" destination="w6f-Oe-Gvt" id="I5w-L4-gOz"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Rin-j9-xhx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="ybH-cr-Au5">
+                            <size key="itemSize" width="128" height="128"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                        <cells/>
+                        <connections>
+                            <outlet property="dataSource" destination="Hcv-qR-IhX" id="Bw1-wZ-Iwm"/>
+                            <outlet property="delegate" destination="Hcv-qR-IhX" id="bN3-IE-Vp4"/>
+                        </connections>
+                    </collectionView>
+                    <navigationItem key="navigationItem" title="Amperfy" id="Hqn-0C-F2J"/>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="D8u-ln-OeP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2102.898550724638" y="-1331.25"/>
+            <point key="canvasLocation" x="2122" y="-1331"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="crl-uR-tK4">
@@ -342,14 +330,14 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8U9-U1-Tcd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4827.536231884058" y="-1331.25"/>
+            <point key="canvasLocation" x="3914" y="-1331"/>
         </scene>
         <!--Artist detail-->
         <scene sceneID="t3a-Jy-hNf">
             <objects>
                 <tableViewController storyboardIdentifier="ArtistDetailVC" title="Artist detail" id="CbP-zj-PDn" customClass="ArtistDetailVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="91F-6S-6y1">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="886"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <connections>
@@ -364,7 +352,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oMv-HQ-UkV" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5617.3913043478269" y="-1331.25"/>
+            <point key="canvasLocation" x="4706" y="-1331"/>
         </scene>
         <!--Albums-->
         <scene sceneID="lgQ-R5-DqE">
@@ -397,7 +385,7 @@
             <objects>
                 <tableViewController storyboardIdentifier="AlbumDetailVC" title="Album name" id="CiG-al-lkI" customClass="AlbumDetailVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="oZh-fj-3uQ">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="886"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <connections>
@@ -510,12 +498,38 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="mI9-cX-lTQ" kind="relationship" relationship="rootViewController" id="MBD-0W-bSU"/>
+                        <segue destination="Rsr-FU-pgx" kind="relationship" relationship="rootViewController" id="aCv-Ro-CBS"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ANa-aq-bwU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2123" y="155"/>
+        </scene>
+        <!--Library-->
+        <scene sceneID="6Ir-Gm-Emb">
+            <objects>
+                <collectionViewController id="Rsr-FU-pgx" customClass="LibraryVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="dye-y7-xj0">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Uwm-IA-oOc">
+                            <size key="itemSize" width="128" height="128"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                        <cells/>
+                        <connections>
+                            <outlet property="dataSource" destination="Rsr-FU-pgx" id="fjD-HA-oHY"/>
+                            <outlet property="delegate" destination="Rsr-FU-pgx" id="fZU-l2-vBe"/>
+                        </connections>
+                    </collectionView>
+                    <navigationItem key="navigationItem" title="Library" largeTitleDisplayMode="always" id="XAe-Yp-u2h"/>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VLy-uR-yTs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2974" y="155"/>
         </scene>
         <!--Library Sync PopupVC-->
         <scene sceneID="eYN-tJ-QKO">
@@ -713,36 +727,6 @@
             </objects>
             <point key="canvasLocation" x="-958" y="-215"/>
         </scene>
-        <!--Library-->
-        <scene sceneID="JuN-6z-FHK">
-            <objects>
-                <tableViewController title="Library" id="mI9-cX-lTQ" userLabel="Library" customClass="LibraryVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="60" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="3EG-cp-kZR">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <sections/>
-                        <connections>
-                            <outlet property="dataSource" destination="mI9-cX-lTQ" id="iUD-p5-5s3"/>
-                            <outlet property="delegate" destination="mI9-cX-lTQ" id="Z4t-ey-l7L"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Library" largeTitleDisplayMode="always" id="Vhe-33-MAT"/>
-                    <connections>
-                        <segue destination="0yB-ih-px5" kind="show" identifier="toDownloads" id="c7D-dJ-Bg5"/>
-                        <segue destination="aeq-6R-iJo" kind="show" identifier="toGenres" id="zy9-BB-rGu"/>
-                        <segue destination="1iw-qc-oYh" kind="show" identifier="toPlaylists" id="kZn-x5-f4e"/>
-                        <segue destination="abK-SC-K8I" kind="show" identifier="toDirectories" id="nwc-WO-tbD"/>
-                        <segue destination="cJ5-gG-DGL" kind="show" identifier="toPodcasts" id="Xiq-DP-96p"/>
-                        <segue destination="ZGw-SA-mia" kind="show" identifier="toArtists" id="vLO-F3-007"/>
-                        <segue destination="w9f-yb-ooi" kind="show" identifier="toAlbums" id="GEw-MS-cJL"/>
-                        <segue destination="PdJ-u4-MrR" kind="show" identifier="toSongs" id="XzL-3u-R9K"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="uW8-CC-aBP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2973.913043478261" y="152.67857142857142"/>
-        </scene>
         <!--Downloads-->
         <scene sceneID="6gv-xD-OeS">
             <objects>
@@ -832,7 +816,7 @@
             <objects>
                 <tableViewController storyboardIdentifier="GenreDetailVC" title="Artist detail" id="noZ-Ok-RcV" userLabel="Genre detail" customClass="GenreDetailVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="znq-mO-hXT">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="886"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <connections>
@@ -877,7 +861,7 @@
             <objects>
                 <tableViewController title="Indexes" id="3rD-M7-zZU" customClass="IndexesVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="HeN-MG-BHK">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="886"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <connections>
@@ -899,7 +883,7 @@
             <objects>
                 <tableViewController storyboardIdentifier="DirectoriesVC" title="Directories" id="GWk-0G-KgA" customClass="DirectoriesVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="RUT-m8-Qq3">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="886"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <connections>
@@ -943,7 +927,7 @@
             <objects>
                 <tableViewController storyboardIdentifier="PodcastDetailVC" id="Bk4-m4-eoF" customClass="PodcastDetailVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="PWZ-ta-hZB">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="886"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <connections>
@@ -973,7 +957,7 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="IFc-oa-9T4" kind="relationship" relationship="rootViewController" id="DqD-zi-0Hz"/>
+                        <segue destination="Hcv-qR-IhX" kind="relationship" relationship="rootViewController" id="wHC-2c-8Jg"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gVg-z5-aHh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -982,8 +966,8 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="axa-3B-EfE"/>
-        <segue reference="tfW-38-Y3k"/>
+        <segue reference="kw4-13-m0t"/>
+        <segue reference="PtL-O3-n85"/>
         <segue reference="whh-XI-a5P"/>
     </inferredMetricsTieBreakers>
     <resources>
