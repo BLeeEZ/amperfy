@@ -26,7 +26,12 @@ class LibraryVC: KeyCommandCollectionViewController {
     
     private var offsetData = [LibraryNavigatorItem]()
     
-    lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(offsetData: offsetData, librarySettings: appDelegate.storage.settings.libraryDisplaySettings, pressedOnLibraryItemCB: self.pushedOn)
+    lazy var layoutConfig = {
+        var config = UICollectionLayoutListConfiguration(appearance: .sidebarPlain)
+        config.backgroundColor = .systemBackground
+        return config
+    }()
+    lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(offsetData: offsetData, librarySettings: appDelegate.storage.settings.libraryDisplaySettings, layoutConfig: self.layoutConfig, pressedOnLibraryItemCB: self.pushedOn)
 
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -30,7 +30,11 @@ class SideBarVC: KeyCommandCollectionViewController {
                 LibraryNavigatorItem(title: "Library", isInteractable: false)]
     }()
     
-    lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(offsetData: offsetData, librarySettings: appDelegate.storage.settings.libraryDisplaySettings, pressedOnLibraryItemCB: self.pushedOn)
+    lazy var layoutConfig = {
+        var config = UICollectionLayoutListConfiguration(appearance: .sidebar)
+        return config
+    }()
+    lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(offsetData: offsetData, librarySettings: appDelegate.storage.settings.libraryDisplaySettings, layoutConfig: self.layoutConfig, pressedOnLibraryItemCB: self.pushedOn)
 
     override func viewDidLoad() {
         super.viewDidLoad()

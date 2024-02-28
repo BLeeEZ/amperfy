@@ -77,6 +77,7 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
 class SideBarDiffableDataSource: UICollectionViewDiffableDataSource<Int, LibraryNavigatorItem> {
     
     let offsetDataCount: Int
+    var isEdit = false
     
     init(offsetDataCount: Int, collectionView: UICollectionView, cellProvider: @escaping UICollectionViewDiffableDataSource<Int, LibraryNavigatorItem>.CellProvider) {
         self.offsetDataCount = offsetDataCount
@@ -84,7 +85,7 @@ class SideBarDiffableDataSource: UICollectionViewDiffableDataSource<Int, Library
     }
     
     override func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
-        return (indexPath.row >= offsetDataCount)
+        return isEdit && (indexPath.row >= offsetDataCount)
     }
     
     override func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
@@ -118,6 +119,7 @@ class LibraryNavigatorConfigurator: NSObject {
     private let offsetData: [LibraryNavigatorItem]
     private var collectionView: UICollectionView!
     private var dataSource: SideBarDiffableDataSource!
+    private let layoutConfig: UICollectionLayoutListConfiguration
     private let pressedOnLibraryItemCB: ((_: LibraryNavigatorItem) -> Void)
     
     private var editButton: UIBarButtonItem!
@@ -125,9 +127,10 @@ class LibraryNavigatorConfigurator: NSObject {
     private var libraryInUse = [LibraryNavigatorItem]()
     private var libraryNotUsed = [LibraryNavigatorItem]()
     
-    init(offsetData: [LibraryNavigatorItem], librarySettings: LibraryDisplaySettings, pressedOnLibraryItemCB: @escaping ((_: LibraryNavigatorItem) -> Void)) {
+    init(offsetData: [LibraryNavigatorItem], librarySettings: LibraryDisplaySettings, layoutConfig: UICollectionLayoutListConfiguration, pressedOnLibraryItemCB: @escaping ((_: LibraryNavigatorItem) -> Void)) {
         self.offsetData = offsetData
         self.librarySettings = librarySettings
+        self.layoutConfig = layoutConfig
         self.pressedOnLibraryItemCB = pressedOnLibraryItemCB
     }
     
@@ -148,6 +151,7 @@ class LibraryNavigatorConfigurator: NSObject {
         let isInEditMode = !collectionView.isEditing
         editButton.title = isInEditMode ? "Done" : "Edit"
         editButton.style = isInEditMode ? .done : .plain
+        dataSource.isEdit = isInEditMode
         
         if isInEditMode {
             collectionView.isEditing.toggle()
@@ -188,8 +192,7 @@ class LibraryNavigatorConfigurator: NSObject {
     
     private func createLayout() -> UICollectionViewLayout {
         let sectionProvider = { (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
-            let layoutConfig = UICollectionLayoutListConfiguration(appearance: .sidebar)
-            let section = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: layoutEnvironment)
+            let section = NSCollectionLayoutSection.list(using: self.layoutConfig, layoutEnvironment: layoutEnvironment)
             let headerFooterSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                                           heightDimension: .estimated(.leastNonzeroMagnitude))
             let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
