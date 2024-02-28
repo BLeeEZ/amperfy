@@ -22,7 +22,7 @@
 import UIKit
 import AmperfyKit
 
-class SideBarVC: UICollectionViewController {
+class SideBarVC: KeyCommandCollectionViewController {
     
     private var offsetData: [LibraryNavigatorItem] = {
         return [LibraryNavigatorItem(title: "Search", tab: .search),
@@ -35,6 +35,14 @@ class SideBarVC: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         libraryItemConfigurator.viewDidLoad(navigationItem: navigationItem, collectionView: collectionView)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        self.becomeFirstResponder()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        self.resignFirstResponder()
     }
     
     public func pushedOn(selectedItem: LibraryNavigatorItem) {

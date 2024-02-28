@@ -22,7 +22,7 @@
 import UIKit
 import AmperfyKit
 
-class LibraryVC: UICollectionViewController {
+class LibraryVC: KeyCommandCollectionViewController {
     
     private var offsetData = [LibraryNavigatorItem]()
     

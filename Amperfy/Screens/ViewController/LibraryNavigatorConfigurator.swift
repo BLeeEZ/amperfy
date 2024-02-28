@@ -296,7 +296,7 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
                         didSelectItemAt indexPath: IndexPath) {
         // handel selection
         guard !collectionView.isEditing else {
-            collectionView.deselectItem(at: indexPath, animated: false)
+            collectionView.deselectItem(at: indexPath, animated: true)
             guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
             var snapshot = dataSource.snapshot()
             item.isSelected.toggle()
@@ -307,9 +307,10 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
         // Retrieve the item identifier using index path.
         // The item identifier we get will be the selected data item
         guard let selectedItem = dataSource.itemIdentifier(for: indexPath) else {
-            collectionView.deselectItem(at: indexPath, animated: false)
+            collectionView.deselectItem(at: indexPath, animated: true)
             return
         }
+        collectionView.deselectItem(at: indexPath, animated: false)
         
         pressedOnLibraryItemCB(selectedItem)
     }

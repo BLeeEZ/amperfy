@@ -177,6 +177,12 @@ extension UITableView {
     }
 }
 
+extension UICollectionView {
+    func hasItemAt(indexPath: IndexPath) -> Bool {
+        return indexPath.section < self.numberOfSections && indexPath.row < self.numberOfItems(inSection: indexPath.section)
+    }
+}
+
 extension UITableViewController {
     func dequeueCell<CellType: UITableViewCell>(for tableView: UITableView, at indexPath: IndexPath) -> CellType {
         return self.tableView.dequeueCell(for: tableView, at: indexPath)
@@ -248,6 +254,31 @@ extension UITableViewCell {
     
     func markAsUnfocused() {
         self.backgroundColor = .clear
+    }
+}
+
+extension UICollectionViewCell {
+    func animateActivation() {
+        UIView.animate(withDuration: 0.2, animations: {
+            self.markAsFocused()
+        }, completion: { _ in
+            self.markAsFocused()
+            UIView.animate(withDuration: 0.2, animations: {
+                self.markAsUnfocused()
+            }, completion: { _ in
+                self.markAsUnfocused()
+            })
+        })
+    }
+    
+    func markAsFocused() {
+        let focuseBackground = UIView(frame: self.bounds)
+        focuseBackground.backgroundColor = .systemGray4
+        self.backgroundView = focuseBackground
+    }
+    
+    func markAsUnfocused() {
+        self.backgroundView = nil
     }
 }
 

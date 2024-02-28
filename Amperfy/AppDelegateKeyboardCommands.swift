@@ -164,6 +164,16 @@ extension KeyCommandTableViewController {
     }
 
     @objc func goBackKeyTapped() {
+        // if the navigation stack is empty and iPad -> go to sidebar
+        if let splitVC = self.splitViewController,
+           let navVC = self.navigationController {
+            if !splitVC.isCollapsed {
+                if navVC.viewControllers.count == 1 {
+                    splitVC.show(.primary)
+                    splitVC.viewController(for: .primary)?.becomeFirstResponder()
+                }
+            }
+        }
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -184,6 +194,60 @@ extension KeyCommandTableViewController {
     }
 }
 
+extension KeyCommandCollectionViewController {
+
+    open override var keyCommands: [UIKeyCommand]? {
+        return [
+            //select
+            UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(selectKeyTapped)), // enter
+            UIKeyCommand(input: "l", modifierFlags: [], action: #selector(selectKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputRightArrow, modifierFlags: .shift, action: #selector(selectKeyTapped)),
+            // remove selection
+            UIKeyCommand(input: UIKeyCommand.inputEscape, modifierFlags: .shift, action: #selector(escapeKeyTapped)),
+            // navigation
+            UIKeyCommand(input: "h", modifierFlags: [], action: #selector(goBackKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputLeftArrow, modifierFlags: .shift, action: #selector(goBackKeyTapped)),
+            UIKeyCommand(input: "k", modifierFlags: [], action: #selector(previousKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: .shift, action: #selector(previousKeyTapped)),
+            UIKeyCommand(input: "j", modifierFlags: [], action: #selector(nextKeyTapped)),
+            UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: .shift, action: #selector(nextKeyTapped))
+        ]
+    }
+
+    open override var canBecomeFirstResponder: Bool {
+        return true
+    }
+
+    @objc func goBackKeyTapped() {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func escapeKeyTapped() {
+        collectionViewKeyCommandsController.removeFocus()
+    }
+
+    @objc func selectKeyTapped() {
+        collectionViewKeyCommandsController.interactWithFocus()
+        
+        if let splitVC = self.splitViewController,
+           !splitVC.isCollapsed {
+            if splitVC.displayMode == .oneOverSecondary {
+                splitVC.hide(.primary)
+            }
+            splitVC.viewController(for: .secondary)?.becomeFirstResponder()
+        }
+    }
+
+    @objc func nextKeyTapped() {
+        collectionViewKeyCommandsController.moveFocusToNext()
+    }
+
+    @objc func previousKeyTapped() {
+        collectionViewKeyCommandsController.moveFocusToPrevious()
+    }
+}
+
+
 extension BasicTableViewController {
     
     override var keyCommands: [UIKeyCommand]? {
@@ -202,6 +266,7 @@ extension BasicTableViewController {
     @objc func searchKeyTapped() {
         self.searchController.searchBar.becomeFirstResponder()
     }
+
 }
 
 extension PopupPlayerVC {
