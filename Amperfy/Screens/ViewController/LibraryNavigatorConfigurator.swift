@@ -139,7 +139,6 @@ class LibraryNavigatorConfigurator: NSObject {
         libraryNotUsed = librarySettings.notUsed.map { LibraryNavigatorItem(title: $0.displayName, library: $0) }
         
         self.collectionView.delegate = self
-        self.collectionView.allowsMultipleSelectionDuringEditing = true
         self.collectionView.collectionViewLayout = createLayout() // 1 Configure the layout
         configureDataSource() // 2 configure the data Source
         applyInitialSnapshots() // 3 Apply the snapshots.
@@ -153,12 +152,6 @@ class LibraryNavigatorConfigurator: NSObject {
         if isInEditMode {
             collectionView.isEditing.toggle()
             var snapshot = dataSource.snapshot(for: 0)
-            for (index, _) in snapshot.items.enumerated() {
-                if index >= offsetData.count {
-                    collectionView.selectItem(at: IndexPath(row: index, section: 0), animated: false, scrollPosition: .centeredHorizontally)
-                }
-                
-            }
             snapshot.append(libraryNotUsed)
             dataSource.apply(snapshot, to: 0, animatingDifferences: true)
         } else {
@@ -226,10 +219,13 @@ class LibraryNavigatorConfigurator: NSObject {
                     content.imageProperties.reservedLayoutSize = imageSize
                 }
                 cell.accessories = [
-                    .multiselect(),
                     .disclosureIndicator(displayed: .whenNotEditing),
                     .reorder()]
-                cell.isSelected = item.isSelected
+                if item.isSelected {
+                    cell.accessories.append(.customView(configuration: .createIsSelected()))
+                } else {
+                    cell.accessories.append(.customView(configuration: .createUnSelected()))
+                }
             } else if let tabItem = item.tab {
                 content.text = tabItem.title
                 content.image = tabItem.icon
@@ -300,32 +296,22 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
                         didSelectItemAt indexPath: IndexPath) {
         // handel selection
         guard !collectionView.isEditing else {
+            collectionView.deselectItem(at: indexPath, animated: false)
             guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
             var snapshot = dataSource.snapshot()
-            item.isSelected = true
-            snapshot.reloadItems([item])
-            dataSource.apply(snapshot, animatingDifferences: true)
+            item.isSelected.toggle()
+            snapshot.reconfigureItems([item])
+            dataSource.apply(snapshot, animatingDifferences: false)
             return
         }
         // Retrieve the item identifier using index path.
         // The item identifier we get will be the selected data item
         guard let selectedItem = dataSource.itemIdentifier(for: indexPath) else {
-            collectionView.deselectItem(at: indexPath, animated: true)
+            collectionView.deselectItem(at: indexPath, animated: false)
             return
         }
         
         pressedOnLibraryItemCB(selectedItem)
     }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        didDeselectItemAt indexPath: IndexPath) {
-        guard !collectionView.isEditing else {
-            guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
-            var snapshot = dataSource.snapshot()
-            item.isSelected = false
-            snapshot.reloadItems([item])
-            dataSource.apply(snapshot, animatingDifferences: true)
-            return
-        }
-    }
+
 }

@@ -39,6 +39,8 @@ extension UIImage {
     
     public static let appIcon = UIImage.create("Icon-1024")
     
+    public static let unSelected = UIImage.create(systemName: "circle")
+    public static let isSelected = UIImage.create(systemName: "checkmark.circle.fill")
     public static let systemPlus = UIImage.create(systemName: "plus")
     public static let check = UIImage.create(systemName: "checkmark")
     public static let backwardFill = UIImage.create(systemName: "backward.fill")
