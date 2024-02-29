@@ -29,7 +29,10 @@ class SplitVC: UISplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.delegate = self
-        setViewController(UINavigationController(rootViewController: TabNavigatorItem.search.controller), for: .secondary)
+        
+        if !isCollapsed {
+            pushReplaceNavLibrary(vc: TabNavigatorItem.search.controller)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -130,8 +133,10 @@ class SplitVC: UISplitViewController {
                tabBar.selectedIndex = 0
                libraryTabNavVC.pushViewController(vc, animated: true)
            }
-        } else if !self.isCollapsed {
-            setViewController(UINavigationController(rootViewController: vc), for: .secondary)
+        } else {
+            let nav = UINavigationController(rootViewController: vc)
+            nav.navigationBar.prefersLargeTitles = true
+            setViewController(nav, for: .secondary)
         }
     }
     
