@@ -216,11 +216,13 @@ class LibraryNavigatorConfigurator: NSObject {
             } else if let libraryItem = item.library {
                 content.text = libraryItem.displayName
                 content.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
+                var imageSize = CGSize(width: 35.0, height: 25.0)
                 if !libraryItem.image.isSymbolImage {
-                    let imageSize = UIImage.symbolImageSize(scale: .large)
-                    content.imageProperties.maximumSize = imageSize
-                    content.imageProperties.reservedLayoutSize = imageSize
+                    // special case for podcast icon
+                    imageSize = CGSize(width: imageSize.width, height: imageSize.height-2)
                 }
+                content.imageProperties.maximumSize = imageSize
+                content.imageProperties.reservedLayoutSize = imageSize
                 cell.accessories = [
                     .disclosureIndicator(displayed: .whenNotEditing),
                     .reorder()]

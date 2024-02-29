@@ -32,7 +32,7 @@ public enum ArtworkIconSizeType: CGFloat {
 
 extension UIImage {
     public static func symbolImageSize(scale: UIImage.SymbolScale) -> CGSize {
-        let config = UIImage.SymbolConfiguration(scale: .large)
+        let config = UIImage.SymbolConfiguration(scale: scale)
         let image = UIImage(systemName: "plus", withConfiguration: config)!
         return image.size
     }
