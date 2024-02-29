@@ -159,6 +159,8 @@ class PlayerControlView: UIView {
         super.traitCollectionDidChange(previousTraitCollection)
         timeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
         timeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
+        
+        refreshPopupBarButtonItmes()
     }
     
     func refreshPlayButton() {
@@ -175,6 +177,18 @@ class PlayerControlView: UIView {
         var barButtonItems = [UIBarButtonItem]()
         if player.currentlyPlaying != nil {
             var buttonImg = UIImage()
+            if traitCollection.horizontalSizeClass == .regular {
+                switch player.playerMode {
+                case .music:
+                    let shuffleButton = UIBarButtonItem(image: .shuffle, style: .plain, target: rootView?.contextNextQueueSectionHeader, action: #selector(ContextQueueNextSectionHeader.pressedShuffle))
+                    shuffleButton.isSelected = player.isShuffle
+                    barButtonItems.append( shuffleButton )
+                    barButtonItems.append( UIBarButtonItem(image: .backwardFill, style: .plain, target: self, action: #selector(PlayerControlView.previousButtonPushed)) )
+                case .podcast:
+                    barButtonItems.append( UIBarButtonItem(image: .goBackward15, style: .plain, target: self, action: #selector(PlayerControlView.previousButtonPushed)) )
+                }
+            }
+            
             if player.isPlaying {
                 buttonImg = .pause
             } else {
@@ -189,6 +203,25 @@ class PlayerControlView: UIView {
                 buttonImg = .goForward30
             }
             barButtonItems.append( UIBarButtonItem(image: buttonImg, style: .plain, target: self, action: #selector(PlayerControlView.nextButtonPushed)) )
+            
+            if traitCollection.horizontalSizeClass == .regular {
+                switch player.playerMode {
+                case .music:
+                    switch player.repeatMode {
+                    case .off:
+                        buttonImg = .repeatOff
+                    case .all:
+                        buttonImg = .repeatAll
+                    case .single:
+                        buttonImg = .repeatOne
+                    }
+                    let repeatButton = UIBarButtonItem(image: buttonImg, style: .plain, target: rootView?.contextNextQueueSectionHeader, action: #selector(ContextQueueNextSectionHeader.pressedRepeat))
+                    repeatButton.isSelected = player.repeatMode != .off
+                    barButtonItems.append( repeatButton )
+                case .podcast:
+                    break
+                }
+            }
         }
         rootView?.popupItem.trailingBarButtonItems = barButtonItems
     }
@@ -433,9 +466,11 @@ extension PlayerControlView: MusicPlayable {
     }
     
     func didShuffleChange() {
+        refreshPopupBarButtonItmes()
     }
     
     func didRepeatChange() {
+        refreshPopupBarButtonItmes()
     }
     
     func didPlaybackRateChange() {
