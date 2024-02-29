@@ -451,9 +451,12 @@ public class IntentManager {
 #endif
         
         var playableContainer: PlayableContainable?
+        var playableElements: [AbstractPlayable]?
         let playableContainerType = PlayableContainerType.fromINMediaItemType(type: mediaSearch.mediaType)
-        if playableContainerType != .unknown {
+        if playableContainerType != .unknown || mediaSearch.mediaType == .music {
             // media type is provided by user
+            // "play music" => mediaType: 18
+            // "play podcasts" => mediaType: 6
             // "play song <blub> by <artist>" => mediaType: 1; mediaName: blub; artistNames: artist
             // "play song <blub>" => mediaType: 1; mediaName: blub; artistNames: -
             // "play album <blub>" => mediaType: 2; mediaName: blub; artistNames: -
@@ -464,6 +467,15 @@ public class IntentManager {
             if let mediaName = mediaSearch.mediaName {
                 os_log("Search explicitly in %ss: <%s>", log: self.log, type: .info, playableContainerType.description, mediaName)
                 playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: playableContainerType)
+            } else if mediaSearch.mediaType == .music {
+                os_log("Play Music", log: self.log, type: .info)
+                playableElements = library.getRandomSongs(onlyCached: storage.settings.isOfflineMode)
+            } else if mediaSearch.mediaType == .podcastShow ||
+                      mediaSearch.mediaType == .podcastEpisode ||
+                      mediaSearch.mediaType == .podcastStation ||
+                      mediaSearch.mediaType == .podcastPlaylist {
+                os_log("Play Podcasts", log: self.log, type: .info)
+                playableElements = library.getNewestPodcastEpisode(count: 1)
             } else if let genres = mediaSearch.genreNames {
                 os_log("Search explicitly in genres: <%s>", log: self.log, type: .info, genres.joined(separator: ", "))
                 for genre in genres {
@@ -515,16 +527,20 @@ public class IntentManager {
             }
         }
         
-        guard let playableContainer = playableContainer else {
-            os_log("No playable container found", log: self.log, type: .error)
-            return false
-        }
-        
         let shuffleOption = playMediaIntent.playShuffled ?? false
         let repeatOption = RepeatMode.fromINPlaybackRepeatMode(mode: playMediaIntent.playbackRepeatMode)
-        os_log("Play container <%s> (shuffle: %s, repeat: %s)", log: self.log, type: .info, playableContainer.name, shuffleOption.description, repeatOption.description)
-        play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
-        return true
+        
+        if let playableContainer = playableContainer {
+            os_log("Play container <%s> (shuffle: %s, repeat: %s)", log: self.log, type: .info, playableContainer.name, shuffleOption.description, repeatOption.description)
+            play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            return true
+        } else if let playableElements = playableElements{
+            os_log("Play Music (shuffle: %s, repeat: %s)", log: self.log, type: .info, shuffleOption.description, repeatOption.description)
+            play(context: PlayContext(name: "Siri Command", playables: playableElements), shuffleOption: shuffleOption, repeatOption: repeatOption)
+            return true
+        }
+        os_log("No playable container found", log: self.log, type: .error)
+        return false
     }
     
     public func handleIncomingIntent(userActivity: NSUserActivity) -> Bool {
@@ -660,10 +676,14 @@ public class IntentManager {
 
     private func play(container: PlayableContainable?, shuffleOption: Bool, repeatOption: RepeatMode) {
         guard let container = container else { return }
+        play(context: PlayContext(containable: container), shuffleOption: shuffleOption, repeatOption: repeatOption)
+    }
+    
+    private func play(context: PlayContext, shuffleOption: Bool, repeatOption: RepeatMode) {
         if shuffleOption {
-            player.playShuffled(context: PlayContext(containable: container))
+            player.playShuffled(context: context)
         } else {
-            player.play(context: PlayContext(containable: container))
+            player.play(context: context)
         }
         player.setRepeatMode(repeatOption)
     }
