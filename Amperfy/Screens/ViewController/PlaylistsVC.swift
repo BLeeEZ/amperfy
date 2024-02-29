@@ -27,7 +27,7 @@ import PromiseKit
 class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
     private var fetchedResultsController: PlaylistFetchedResultsController!
-    private var sortButton: UIBarButtonItem!
+    private var optionsButton: UIBarButtonItem!
     private var sortType: PlaylistSortType = .name
     
     override func viewDidLoad() {
@@ -95,11 +95,12 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     func updateRightBarButtonItems() {
         var barButtons = [UIBarButtonItem]()
+        optionsButton = SortBarButton()
+        optionsButton.menu = createSortButtonMenu()
+        barButtons.append(optionsButton)
         if appDelegate.storage.settings.isOnlineMode {
             barButtons.append(editButtonItem)
         }
-        sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
-        barButtons.append(sortButton)
         navigationItem.rightBarButtonItems = barButtons
     }
 
@@ -158,7 +159,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
             self.updateSearchResults(for: self.searchController)
             self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
-        return UIMenu(children: [sortByName, sortByLastTimePlayed, sortByChangeDate, sortByDuration])
+        return UIMenu(title: "Sort", image: .sort, options: [.displayInline], children: [sortByName, sortByLastTimePlayed, sortByChangeDate, sortByDuration])
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {

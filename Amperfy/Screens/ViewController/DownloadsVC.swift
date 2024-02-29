@@ -26,7 +26,7 @@ import AmperfyKit
 class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
     
     private var fetchedResultsController: DownloadsFetchedResultsController!
-    private var actionButton: UIBarButtonItem!
+    private var optionsButton: UIBarButtonItem!
     private var downloadManager: DownloadManageable!
     
     override func viewDidLoad() {
@@ -40,8 +40,9 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
         
-        actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
-        navigationItem.rightBarButtonItem = actionButton
+        optionsButton = OptionsBarButton()
+        optionsButton.menu = createActionButtonMenu()
+        navigationItem.rightBarButtonItem = optionsButton
     }
     
     private func createActionButtonMenu() -> UIMenu {

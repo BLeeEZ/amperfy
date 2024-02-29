@@ -30,8 +30,8 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
     private var sortType: PlaylistSortType = .name
-    
-    @IBOutlet weak var sortButton: UIBarButtonItem!
+    var optionsButton: UIBarButtonItem!
+    var closeButton: UIBarButtonItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,7 +72,10 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
     
     func updateRightBarButtonItems() {
-        sortButton.menu = createSortButtonMenu()
+        closeButton = CloseBarButton(target: self, selector: #selector(cancelBarButtonPressed))
+        optionsButton = SortBarButton()
+        optionsButton.menu = createSortButtonMenu()
+        navigationItem.rightBarButtonItems = [closeButton, optionsButton]
     }
     
     private func createSortButtonMenu() -> UIMenu {
@@ -96,7 +99,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
             self.updateSearchResults(for: self.searchController)
             self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
-        return UIMenu(children: [sortByName, sortByLastTimePlayed, sortByChangeDate, sortByDuration])
+        return UIMenu(title: "Sort", image: .sort, options: [], children: [sortByName, sortByLastTimePlayed, sortByChangeDate, sortByDuration])
     }
     
     @IBAction func cancelBarButtonPressed(_ sender: UIBarButtonItem) {

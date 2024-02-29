@@ -79,7 +79,7 @@ class SearchVC: MultiSourceTableViewController {
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 0
         
-        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
+        optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu(children: [
             UIAction(title: "Clear Search History", image: .clear, handler: { _ in
                 self.appDelegate.storage.main.library.deleteSearchHistory()

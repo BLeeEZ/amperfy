@@ -36,3 +36,79 @@ class OptionsButton: UIButton {
     }
 
 }
+
+class CloseBarButton: UIBarButtonItem {
+
+    init(target: AnyObject, selector: Selector) {
+        super.init()
+        var config = UIButton.Configuration.gray()
+        config.buttonSize = .small
+        config.cornerStyle = .capsule
+        let button = UIButton(configuration: config)
+        button.addTarget(target, action: selector, for: .primaryActionTriggered)
+        button.setImage(.xmark, for: .normal)
+        button.showsMenuAsPrimaryAction = true
+        self.customView = button
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+}
+
+class OptionsBarButton: UIBarButtonItem {
+    
+    lazy var inUIButton = {
+        var config = UIButton.Configuration.gray()
+        config.buttonSize = .small
+        config.cornerStyle = .capsule
+        let button = UIButton(configuration: config)
+        button.setImage(.ellipsis, for: .normal)
+        button.showsMenuAsPrimaryAction = true
+        return button
+    }()
+    
+    override init() {
+        super.init()
+        self.customView = inUIButton
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var menu: UIMenu? {
+        set { inUIButton.menu = newValue }
+        get { return inUIButton.menu }
+    }
+    
+}
+
+class SortBarButton: UIBarButtonItem {
+    
+    lazy var inUIButton = {
+        var config = UIButton.Configuration.gray()
+        config.buttonSize = .small
+        config.cornerStyle = .capsule
+        let button = UIButton(configuration: config)
+        button.setImage(.filter, for: .normal)
+        button.showsMenuAsPrimaryAction = true
+        return button
+    }()
+    
+    override init() {
+        super.init()
+        self.customView = inUIButton
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var menu: UIMenu? {
+        set { inUIButton.menu = newValue }
+        get { return inUIButton.menu }
+    }
+    
+}

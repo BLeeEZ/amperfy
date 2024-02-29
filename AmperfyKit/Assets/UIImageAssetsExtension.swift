@@ -39,6 +39,7 @@ extension UIImage {
     
     public static let appIcon = UIImage.create("Icon-1024")
     
+    public static let xmark = UIImage.create(systemName: "xmark")
     public static let unSelected = UIImage.create(systemName: "circle")
     public static let isSelected = UIImage.create(systemName: "checkmark.circle.fill")
     public static let systemPlus = UIImage.create(systemName: "plus")
@@ -65,6 +66,7 @@ extension UIImage {
     public static let squareArrow = UIImage.create(systemName: "arrow.forward.square")
     
     public static let ellipsis = UIImage.create(systemName: "ellipsis")
+    public static let filter = UIImage.create(systemName: "line.3.horizontal.decrease")
     public static let settings = UIImage.create(systemName: "gear")
     public static let search = UIImage.create(systemName: "magnifyingglass")
     public static let genre = UIImage.create(systemName: "guitars.fill")
@@ -93,8 +95,6 @@ extension UIImage {
     public static let shuffle = UIImage.create(systemName: "shuffle")
     public static let airplayaudio = UIImage.create(systemName: "airplayaudio")
     public static let sort = UIImage.create(systemName: "arrow.up.arrow.down")
-    public static let filter = UIImage.create(systemName: "line.3.horizontal.decrease.circle")
-    public static let filterActive = UIImage.create(systemName: "line.3.horizontal.decrease.circle.fill")
     public static let heartFill = UIImage.create(systemName: "heart.fill")
     public static let heartEmpty = UIImage.create(systemName: "heart")
     public static let heartSlash = UIImage.create(systemName: "heart.slash")

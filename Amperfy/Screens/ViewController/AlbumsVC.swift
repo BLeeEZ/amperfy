@@ -27,8 +27,7 @@ import PromiseKit
 class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
 
     private var fetchedResultsController: AlbumFetchedResultsController!
-    private var sortButton: UIBarButtonItem!
-    private var actionButton: UIBarButtonItem!
+    private var optionsButton: UIBarButtonItem!
     public var displayFilter: DisplayCategoryFilter = .all
     private var sortType: AlbumElementSortType = .name
     private var filterTitle = "Albums"
@@ -122,18 +121,25 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     }
     
     func updateRightBarButtonItems() {
-        sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
-        actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
+        var actions = [UIMenu]()
 
         switch sortType {
         case .name, .rating, .artist, .duration, .year:
-            navigationItem.rightBarButtonItems = [sortButton]
+            actions.append(createSortButtonMenu())
         case .newest, .recent:
-            navigationItem.rightBarButtonItems = []
+            break
         }
 
         if appDelegate.storage.settings.isOnlineMode {
-            navigationItem.rightBarButtonItems?.insert(actionButton, at: 0)
+            actions.append(createActionButtonMenu())
+        }
+            
+        if !actions.isEmpty {
+            optionsButton = OptionsBarButton()
+            optionsButton.menu = UIMenu(children: actions)
+            navigationItem.rightBarButtonItems = [optionsButton]
+        } else {
+            navigationItem.rightBarButtonItems = []
         }
     }
     
@@ -302,7 +308,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             self.updateSearchResults(for: self.searchController)
             self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
-        return UIMenu(children: [sortByName, sortByRating, sortByArtist, sortByDuration, sortByYear])
+        return UIMenu(title: "Sort", image: .sort, options: [], children: [sortByName, sortByRating, sortByArtist, sortByDuration, sortByYear])
     }
     
     private func createActionButtonMenu() -> UIMenu {
@@ -330,7 +336,7 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
                 self.appDelegate.playableDownloadManager.download(objects: albumSongs)
             }
         })
-        return UIMenu(children: [action])
+        return UIMenu(options: [.displayInline], children: [action])
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {

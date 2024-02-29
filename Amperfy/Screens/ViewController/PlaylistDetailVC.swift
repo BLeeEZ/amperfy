@@ -95,7 +95,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(startEditing))
         doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(endEditing))
-        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
+        optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu.lazyMenu {
             EntityPreviewActionBuilder(container: self.playlist, on: self).createMenu()
         }

@@ -288,19 +288,7 @@
                             <outlet property="delegate" destination="4rB-Ko-4wo" id="1sW-W6-7Qp"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Add to playlist" id="Pg3-E2-61S">
-                        <rightBarButtonItems>
-                            <barButtonItem systemItem="cancel" id="gTQ-0E-9Gk">
-                                <connections>
-                                    <action selector="cancelBarButtonPressed:" destination="4rB-Ko-4wo" id="ZWF-SU-5xR"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem title="Sort" id="JE3-ch-0t4"/>
-                        </rightBarButtonItems>
-                    </navigationItem>
-                    <connections>
-                        <outlet property="sortButton" destination="JE3-ch-0t4" id="AOl-DV-Blu"/>
-                    </connections>
+                    <navigationItem key="navigationItem" title="Add to playlist" id="Pg3-E2-61S"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1s6-dv-ao6" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

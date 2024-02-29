@@ -63,7 +63,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
         }
         
-        optionsButton = UIBarButtonItem(image: UIImage.ellipsis, style: .plain, target: nil, action: nil)
+        optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu.lazyMenu {
             EntityPreviewActionBuilder(container: self.artist, on: self).createMenu()
         }

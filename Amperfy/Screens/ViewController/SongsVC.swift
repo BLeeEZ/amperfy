@@ -27,8 +27,7 @@ import PromiseKit
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     private var fetchedResultsController: SongsFetchedResultsController!
-    private var sortButton: UIBarButtonItem!
-    private var actionButton: UIBarButtonItem!
+    private var optionsButton: UIBarButtonItem!
     public var displayFilter: DisplayCategoryFilter = .all
     private var sortType: SongElementSortType = .name
     private var filterTitle = "Songs"
@@ -98,13 +97,14 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     }
     
     func updateRightBarButtonItems() {
-        sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
-        actionButton = UIBarButtonItem(image: UIImage.ellipsis, primaryAction: nil, menu: createActionButtonMenu())
-        navigationItem.rightBarButtonItems = [sortButton]
-        
+        var actions = [UIMenu]()
+        actions.append(createSortButtonMenu())
         if appDelegate.storage.settings.isOnlineMode {
-            navigationItem.rightBarButtonItems?.insert(actionButton, at: 0)
+            actions.append(createActionButtonMenu())
         }
+        optionsButton = OptionsBarButton()
+        optionsButton.menu = UIMenu(children: actions)
+        navigationItem.rightBarButtonItems = [optionsButton]
     }
     
     func updateFromRemote() {
@@ -228,7 +228,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             self.updateSearchResults(for: self.searchController)
             self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
-        return UIMenu(children: [sortByName, sortByRating, sortByDuration])
+        return UIMenu(title: "Sort", image: .sort, options: [], children: [sortByName, sortByRating, sortByDuration])
     }
     
     private func createActionButtonMenu() -> UIMenu {
@@ -253,7 +253,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                 self.appDelegate.playableDownloadManager.download(objects: songs)
             }
         })
-        return UIMenu(children: [action])
+        return UIMenu(options: [.displayInline], children: [action])
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {

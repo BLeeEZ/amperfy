@@ -28,7 +28,7 @@ class PodcastsVC: MultiSourceTableViewController {
 
     private var podcastsFetchedResultsController: PodcastFetchedResultsController!
     private var episodesFetchedResultsController: PodcastEpisodesReleaseDateFetchedResultsController!
-    private var sortButton: UIBarButtonItem!
+    private var optionsButton: UIBarButtonItem!
     private var showType: PodcastsShowType = .podcasts
     
     override func viewDidLoad() {
@@ -101,8 +101,9 @@ class PodcastsVC: MultiSourceTableViewController {
     }
     
     func updateRightBarButtonItems() {
-        sortButton = UIBarButtonItem(title: "Sort", primaryAction: nil, menu: createSortButtonMenu())
-        navigationItem.rightBarButtonItem = sortButton
+        optionsButton = SortBarButton()
+        optionsButton.menu = createSortButtonMenu()
+        navigationItem.rightBarButtonItem = optionsButton
     }
     
     func syncFromServer() {
