@@ -32,6 +32,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
     private var songsFetchedResultsController: ArtistSongsItemsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var detailOperationsView: GenericDetailTableHeader?
+    private var playShuffleInfoHeader: LibraryElementDetailTableHeaderView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,6 +54,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
+                infoCB: { "\(self.artist.albumCount) Album\(self.artist.albumCount == 1 ? "" : "s") \(CommonString.oneMiddleDot) \(self.artist.songCount) Song\(self.artist.songCount == 1 ? "" : "s")" },
                 playContextCb: {() in
                     let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
                     let sortedSongs = songs.compactMap{ $0.asSong }.sortByAlbum()
@@ -61,6 +63,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
                 with: appDelegate.player
             )
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
+            playShuffleInfoHeader = libraryElementDetailTableHeaderView
         }
         
         optionsButton = OptionsBarButton()
@@ -129,6 +132,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
             self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
         }.finally {
             self.detailOperationsView?.refresh()
+            self.playShuffleInfoHeader?.refresh()
         }
     }
     

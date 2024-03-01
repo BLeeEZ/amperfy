@@ -34,9 +34,10 @@ class CommonCollectionSectionHeader: UICollectionReusableView {
         titleLabel.text = title
     }
     
-    func displayPlayHeader(playContextCb: GetPlayContextCallback?, with player: PlayerFacade, shuffleContextCb: GetPlayContextCallback? = nil) {
+    func displayPlayHeader(infoCB: GetInfoCallback?, playContextCb: GetPlayContextCallback?, with player: PlayerFacade, shuffleContextCb: GetPlayContextCallback? = nil) {
         detailHeader = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
         detailHeader?.prepare(
+            infoCB: infoCB,
             playContextCb: playContextCb,
             with: player,
             shuffleContextCb: shuffleContextCb)

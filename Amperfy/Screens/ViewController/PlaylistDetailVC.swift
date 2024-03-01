@@ -67,6 +67,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     private var doneButton: UIBarButtonItem!
     private var optionsButton: UIBarButtonItem!
     var playlistOperationsView: PlaylistDetailTableHeader?
+    var playShuffleInfoHeader: LibraryElementDetailTableHeaderView?
     
     override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
         let source = PlaylistDetailDiffableDataSource(tableView: tableView) { (tableView, indexPath, objectID) -> UITableViewCell? in
@@ -110,9 +111,11 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         }
         if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: playlistTableHeaderFrameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
             libraryElementDetailTableHeaderView.prepare(
+                infoCB: { "\(self.playlist.songCount) Song\(self.playlist.songCount == 1 ? "" : "s")" },
                 playContextCb: {() in PlayContext(containable: self.playlist, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
                 with: appDelegate.player)
             tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
+            playShuffleInfoHeader = libraryElementDetailTableHeaderView
         }
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
@@ -145,6 +148,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
             self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
         }.finally {
             self.playlistOperationsView?.refresh()
+            self.playShuffleInfoHeader?.refresh()
         }
     }
     
@@ -214,6 +218,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
             self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
         }.finally {
             self.playlistOperationsView?.refresh()
+            self.playShuffleInfoHeader?.refresh()
             self.refreshControl?.endRefreshing()
         }
     }

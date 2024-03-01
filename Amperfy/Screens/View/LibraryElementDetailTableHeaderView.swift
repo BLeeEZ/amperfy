@@ -22,14 +22,19 @@
 import UIKit
 import AmperfyKit
 
+typealias GetInfoCallback = () -> String
+
 class LibraryElementDetailTableHeaderView: UIView {
     
     @IBOutlet weak var playAllButton: UIButton!
     @IBOutlet weak var playShuffledButton: UIButton!
+    @IBOutlet weak var infoContainerView: UIView!
+    @IBOutlet weak var infoLabel: UILabel!
     
     static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginMiddleElement
     
+    private var infoCB: GetInfoCallback?
     private var playContextCb: GetPlayContextCallback?
     private var shuffleContextCb: GetPlayContextCallback?
     private var isShuffleOnContextNeccessary: Bool = true
@@ -38,6 +43,16 @@ class LibraryElementDetailTableHeaderView: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.layoutMargins = Self.margin
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        refresh()
+    }
+    
+    func refresh() {
+        infoContainerView.isHidden = (traitCollection.horizontalSizeClass == .compact)
+        infoLabel.text = infoCB?() ?? ""
     }
     
     @IBAction func playAllButtonPressed(_ sender: Any) {
@@ -71,30 +86,24 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     /// isShuffleOnContextNeccessary: In AlbumsVC the albums are shuffled, keep the order when shuffle button is pressed
-    func prepare(playContextCb: GetPlayContextCallback?, with player: PlayerFacade, isShuffleOnContextNeccessary: Bool = true, shuffleContextCb: GetPlayContextCallback? = nil) {
+    func prepare(infoCB: GetInfoCallback?, playContextCb: GetPlayContextCallback?, with player: PlayerFacade, isShuffleOnContextNeccessary: Bool = true, shuffleContextCb: GetPlayContextCallback? = nil) {
+        self.infoCB = infoCB
         self.playContextCb = playContextCb
         self.player = player
         self.isShuffleOnContextNeccessary = isShuffleOnContextNeccessary
         self.shuffleContextCb = shuffleContextCb
-        playAllButton.setImage(.play, for: .normal)
-        playShuffledButton.setImage(.shuffle, for: .normal)
         playShuffledButton.setTitle(isShuffleOnContextNeccessary ? "Shuffle" : "Random", for: .normal)
         activate()
     }
     
     func activate() {
         playAllButton.isEnabled = true
-        playAllButton.backgroundColor = .defaultBlue
         playShuffledButton.isEnabled = true
-        playShuffledButton.backgroundColor = .defaultBlue
     }
     
     func deactivate() {
         playAllButton.isEnabled = false
-        playAllButton.backgroundColor = .lightGray
         playShuffledButton.isEnabled = false
-        playShuffledButton.backgroundColor = .lightGray
-        
     }
     
 }
