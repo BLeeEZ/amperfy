@@ -35,7 +35,7 @@
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
-                <constraint firstItem="j9L-PC-uFW" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="1FA-EV-ugn"/>
+                <constraint firstItem="j9L-PC-uFW" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="1FA-EV-ugn"/>
                 <constraint firstItem="it5-EQ-Gry" firstAttribute="leadingMargin" secondItem="j9L-PC-uFW" secondAttribute="trailing" constant="8" id="51h-hM-OSe"/>
                 <constraint firstItem="j9L-PC-uFW" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="Erw-ZL-R0E"/>
                 <constraint firstItem="it5-EQ-Gry" firstAttribute="centerY" secondItem="j9L-PC-uFW" secondAttribute="centerY" id="GmP-Dq-z22"/>

@@ -26,27 +26,35 @@ class SplitVC: UISplitViewController {
     
     lazy var barPlayer = BarPlayerHandler(player: appDelegate.player, splitVC: self)
     
+    var isCompact: Bool {
+        return (traitCollection.horizontalSizeClass == .compact)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.delegate = self
-        
-        if !isCollapsed {
-            pushReplaceNavLibrary(vc: TabNavigatorItem.search.controller)
-        }
+        let nav = UINavigationController(rootViewController: TabNavigatorItem.search.controller)
+        nav.navigationBar.prefersLargeTitles = true
+        setViewController(nav, for: .secondary)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        if !self.isCollapsed {
-            // if it is collapsed -> the delegate callback sets the player bar
-            setCorrectPlayerBarView(collapseMode: false)
-        }
-        
+        setCorrectPlayerBarView(collapseMode: isCompact)
         if !appDelegate.storage.isLibrarySyncInfoReadByUser {
             displaySyncInfo()
         } else {
             displayNotificationAuthorization()
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        guard traitCollection.horizontalSizeClass != previousTraitCollection?.horizontalSizeClass else { return }
+        if traitCollection.horizontalSizeClass == .regular {
+            setCorrectPlayerBarView(collapseMode: false)
+        } else {
+            setCorrectPlayerBarView(collapseMode: true)
         }
     }
     
@@ -100,7 +108,7 @@ class SplitVC: UISplitViewController {
     }
     
     private var popupBarContainerVC: UIViewController? {
-        if self.isCollapsed {
+        if isCompact {
             if  let tabBar = self.viewController(for: .compact) as? TabBarVC {
                 return tabBar
             }
@@ -111,7 +119,7 @@ class SplitVC: UISplitViewController {
     }
     
     public func pushNavLibrary(vc: UIViewController) {
-        if self.isCollapsed,
+        if isCompact,
            let tabBar = self.viewController(for: .compact) as? TabBarVC {
            if tabBar.popupPresentationState == .open,
               let popupPlayerVC = tabBar.popupContent as? PopupPlayerVC {
@@ -119,13 +127,13 @@ class SplitVC: UISplitViewController {
            } else {
                push(vc: vc)
            }
-        } else if !self.isCollapsed {
+        } else if !isCompact {
             push(vc: vc)
         }
     }
     
     public func pushReplaceNavLibrary(vc: UIViewController) {
-        if self.isCollapsed {
+        if isCompact {
            if let tabBar = self.viewController(for: .compact) as? TabBarVC,
               let hostingTabViewControllers = tabBar.viewControllers,
               hostingTabViewControllers.count > 0,
@@ -141,7 +149,7 @@ class SplitVC: UISplitViewController {
     }
     
     public func push(vc: UIViewController) {
-        if self.isCollapsed {
+        if isCompact {
             if let tabBar = self.viewController(for: .compact) as? TabBarVC,
                let hostingTabViewControllers = tabBar.viewControllers,
                hostingTabViewControllers.count > 0,
@@ -189,7 +197,7 @@ class SplitVC: UISplitViewController {
     
     func displaySearch() {
         visualizePopupPlayer(direction: .close, animated: true) {
-            if self.isCollapsed {
+            if self.isCompact {
                 if let tabBar = self.viewController(for: .compact) as? TabBarVC,
                    let hostingTabViewControllers = tabBar.viewControllers,
                    hostingTabViewControllers.count >= 2,
@@ -213,14 +221,4 @@ class SplitVC: UISplitViewController {
         }
     }
     
-}
-
-extension SplitVC: UISplitViewControllerDelegate {
-    func splitViewControllerDidCollapse(_ svc: UISplitViewController) {
-        setCorrectPlayerBarView(collapseMode: true)
-    }
-    
-    func splitViewControllerDidExpand(_ svc: UISplitViewController) {
-        setCorrectPlayerBarView(collapseMode: false)
-    }
 }
