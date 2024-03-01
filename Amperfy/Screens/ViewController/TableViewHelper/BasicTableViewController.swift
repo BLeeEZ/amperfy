@@ -140,6 +140,9 @@ class BasicTableViewController: KeyCommandTableViewController {
         
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
+        if #available(iOS 16.0, *) {
+            navigationItem.preferredSearchBarPlacement = .stacked
+        }
         
         searchController.delegate = self
         searchController.obscuresBackgroundDuringPresentation = false
