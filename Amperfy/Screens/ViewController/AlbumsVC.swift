@@ -24,7 +24,10 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
-class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
+class AlbumsDiffableDataSource: BasicUITableViewDiffableDataSource {
+}
+
+class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
 
     private var fetchedResultsController: AlbumFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
@@ -33,6 +36,19 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     private var filterTitle = "Albums"
     private var newestElementsOffsetsSynced = Set<Int>()
     
+    override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+        let source = AlbumsDiffableDataSource(tableView: tableView) { (tableView, indexPath, objectID) -> UITableViewCell? in
+            guard let object = try? self.appDelegate.storage.main.context.existingObject(with: objectID),
+                  let albumMO = object as? AlbumMO
+            else {
+                fatalError("Managed object should be available")
+            }
+            let album = Album(managedObject: albumMO)
+            return self.createCell(tableView, forRowAt: indexPath, album: album)
+        }
+        return source
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.albums)
@@ -98,7 +114,6 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
     func change(sortType: AlbumElementSortType) {
         self.sortType = sortType
         singleFetchedResultsController?.clearResults()
-        tableView.reloadData()
         var isGroupedInAlphabeticSections = false
         switch sortType {
         case .name, .rating, .artist, .duration, .year:
@@ -110,7 +125,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
         fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController
-        tableView.reloadData()
+        singleFetchedResultsController?.delegate = self
+        singleFetchedResultsController?.fetch()
         updateRightBarButtonItems()
     }
     
@@ -189,8 +205,8 @@ class AlbumsVC: SingleFetchedResultsTableViewController<AlbumMO> {
             updateFromRemote(offset: indexPath.row, count: AmperKit.newestElementsFetchCount)
         }
     }
-
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    
+    func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, album: Album) -> UITableViewCell {
         let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
         let album = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(container: album, rootView: self)
