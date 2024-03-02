@@ -53,6 +53,10 @@ class SideBarVC: KeyCommandCollectionViewController {
         guard let splitVC = self.splitViewController as? SplitVC,
               !splitVC.isCollapsed
         else { return }
+        
+        if splitVC.displayMode == .oneOverSecondary {
+            splitVC.hide(.primary)
+        }
 
         if let libraryItem = selectedItem.library {
             splitVC.pushReplaceNavLibrary(vc: libraryItem.controller)
