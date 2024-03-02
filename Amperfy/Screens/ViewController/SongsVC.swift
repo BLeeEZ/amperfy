@@ -41,16 +41,13 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.register(nibName: SongTableCell.typeName)
         tableView.rowHeight = SongTableCell.rowHeight
         
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
-        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(
-                infoCB: { "\(self.fetchedResultsController.fetchedObjects?.count ?? 0) Song\((self.fetchedResultsController.fetchedObjects?.count ?? 0) == 1 ? "" : "s")" },
-                playContextCb: self.handleHeaderPlay,
-                with: appDelegate.player,
-                shuffleContextCb: self.handleHeaderShuffle)
-            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
-        }
-        
+        let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
+            infoCB: { "\(self.fetchedResultsController.fetchedObjects?.count ?? 0) Song\((self.fetchedResultsController.fetchedObjects?.count ?? 0) == 1 ? "" : "s")" },
+            playContextCb: self.handleHeaderPlay,
+            player: appDelegate.player,
+            isInfoAlwaysHidden: false,
+            shuffleContextCb: self.handleHeaderShuffle)
+        _ = LibraryElementDetailTableHeaderView.createTableHeader(rootView: self, configuration: playShuffleInfoConfig)
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in

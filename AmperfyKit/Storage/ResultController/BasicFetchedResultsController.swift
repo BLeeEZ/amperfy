@@ -384,6 +384,18 @@ extension BasicFetchedResultsController where ResultType == PodcastEpisodeMO {
         let managedObject = fetchedObjects[index] as! ResultType
         return PodcastEpisode(managedObject: managedObject)
     }
+    
+    public func getContextPodcastEpisodes(onlyCachedSongs: Bool) -> [AbstractPlayable]? {
+        guard let basicPredicate = defaultPredicate else { return nil }
+        let cachedFetchRequest = fetchResultsController.fetchRequest.copy() as! NSFetchRequest<PodcastEpisodeMO>
+        cachedFetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            basicPredicate,
+            coreDataCompanion.library.getFetchPredicate(onlyCachedPlaylistItems: onlyCachedSongs)
+        ])
+        let podcastEpisodesMO = try? coreDataCompanion.context.fetch(cachedFetchRequest)
+        let playables = podcastEpisodesMO?.compactMap{ PodcastEpisode(managedObject: $0) }
+        return playables
+    }
 }
 
 extension BasicFetchedResultsController where ResultType == DownloadMO {

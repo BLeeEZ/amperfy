@@ -30,7 +30,6 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     private var fetchedResultsController: AlbumSongsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var detailOperationsView: GenericDetailTableHeader?
-    private var playShuffleInfoHeader: LibraryElementDetailTableHeaderView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,20 +41,13 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.register(nibName: AlbumSongTableCell.typeName)
         tableView.rowHeight = AlbumSongTableCell.albumSongRowHeight
         
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
-        if let genericDetailTableHeaderView = ViewBuilder<GenericDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight)) {
-            genericDetailTableHeaderView.prepare(toWorkOn: album, rootView: self)
-            tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
-            detailOperationsView = genericDetailTableHeaderView
-        }
-        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(
-                infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },
-                playContextCb: {() in PlayContext(containable: self.album, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
-                with: appDelegate.player)
-            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
-            playShuffleInfoHeader = libraryElementDetailTableHeaderView
-        }
+        let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
+            infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },
+            playContextCb: {() in PlayContext(containable: self.album, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
+            player: appDelegate.player,
+            isInfoAlwaysHidden: true)
+        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: album, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
+        detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
         
         optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu.lazyMenu {
@@ -85,7 +77,6 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
             self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
         }.finally {
             self.detailOperationsView?.refresh()
-            self.playShuffleInfoHeader?.refresh()
         }
     }
     

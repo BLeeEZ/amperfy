@@ -45,16 +45,13 @@ class DirectoriesVC: MultiSourceTableViewController {
         tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.register(nibName: SongTableCell.typeName)
         
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
-        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(
-                infoCB: { "\(self.directory.songs.count) Song\(self.directory.songs.count == 1 ? "" : "s")" },
-                playContextCb: {() in PlayContext(containable: self.directory, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
-                with: appDelegate.player)
-            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
-            headerView = libraryElementDetailTableHeaderView
-            self.refreshHeaderView()
-        }
+        let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
+            infoCB: { "\(self.directory.songs.count) Song\(self.directory.songs.count == 1 ? "" : "s")" },
+            playContextCb: {() in PlayContext(containable: self.directory, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
+            player: appDelegate.player,
+            isInfoAlwaysHidden: false)
+        headerView = LibraryElementDetailTableHeaderView.createTableHeader(rootView: self, configuration: playShuffleInfoConfig)
+        self.refreshHeaderView()
         
         containableAtIndexPathCallback = { (indexPath) in
             switch indexPath.section {

@@ -66,8 +66,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     private var editButton: UIBarButtonItem!
     private var doneButton: UIBarButtonItem!
     private var optionsButton: UIBarButtonItem!
-    var playlistOperationsView: PlaylistDetailTableHeader?
-    var playShuffleInfoHeader: LibraryElementDetailTableHeaderView?
+    var detailOperationsView: GenericDetailTableHeader?
     
     override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
         let source = PlaylistDetailDiffableDataSource(tableView: tableView) { (tableView, indexPath, objectID) -> UITableViewCell? in
@@ -101,25 +100,16 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
             EntityPreviewActionBuilder(container: self.playlist, on: self).createMenu()
         }
         
-        let playlistTableHeaderFrameHeight = PlaylistDetailTableHeader.frameHeight
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: playlistTableHeaderFrameHeight + LibraryElementDetailTableHeaderView.frameHeight))
-
-        if let playlistDetailTableHeaderView = ViewBuilder<PlaylistDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: playlistTableHeaderFrameHeight)) {
-            playlistDetailTableHeaderView.prepare(toWorkOnPlaylist: playlist, rootView: self)
-            tableView.tableHeaderView?.addSubview(playlistDetailTableHeaderView)
-            playlistOperationsView = playlistDetailTableHeaderView
-        }
-        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: playlistTableHeaderFrameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(
-                infoCB: { "\(self.playlist.songCount) Song\(self.playlist.songCount == 1 ? "" : "s")" },
-                playContextCb: {() in PlayContext(containable: self.playlist, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
-                with: appDelegate.player)
-            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
-            playShuffleInfoHeader = libraryElementDetailTableHeaderView
-        }
+        let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
+            infoCB: { "\(self.playlist.songCount) Song\(self.playlist.songCount == 1 ? "" : "s")" },
+            playContextCb: {() in PlayContext(containable: self.playlist, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
+            player: appDelegate.player,
+            isInfoAlwaysHidden: true)
+        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: playlist, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
+        detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
-        snapshotDidChange = self.playlistOperationsView?.refresh
+        snapshotDidChange = self.detailOperationsView?.refresh
         
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath).playable
@@ -147,8 +137,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
         }.finally {
-            self.playlistOperationsView?.refresh()
-            self.playShuffleInfoHeader?.refresh()
+            self.detailOperationsView?.refresh()
         }
     }
     
@@ -181,13 +170,13 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
     @objc private func startEditing() {
         tableView.isEditing = true
-        playlistOperationsView?.startEditing()
+        detailOperationsView?.startEditing()
         refreshBarButtons()
     }
     
     @objc private func endEditing() {
         tableView.isEditing = false
-        playlistOperationsView?.endEditing()
+        detailOperationsView?.endEditing()
         refreshBarButtons()
     }
     
@@ -217,8 +206,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
         }.finally {
-            self.playlistOperationsView?.refresh()
-            self.playShuffleInfoHeader?.refresh()
+            self.detailOperationsView?.refresh()
             self.refreshControl?.endRefreshing()
         }
     }

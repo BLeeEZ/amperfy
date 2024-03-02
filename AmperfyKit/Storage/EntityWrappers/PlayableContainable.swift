@@ -26,6 +26,7 @@ import PromiseKit
 public enum DetailType {
     case short
     case long
+    case noCountInfo
 }
 
 public struct DetailInfoType {

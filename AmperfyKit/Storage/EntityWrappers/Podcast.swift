@@ -68,12 +68,14 @@ extension Podcast: PlayableContainable  {
     public var subsubtitle: String? { return nil }
     public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
-        if episodes.count == 1 {
-            infoContent.append("1 Episode")
-        } else if episodes.count > 1 {
-            infoContent.append("\(episodes.count) Episodes")
+        if details.type != .noCountInfo {
+            if episodes.count == 1 {
+                infoContent.append("1 Episode")
+            } else if episodes.count > 1 {
+                infoContent.append("\(episodes.count) Episodes")
+            }
         }
-        if details.type == .long {
+        if details.type == .long || details.type == .noCountInfo {
             if isCompletelyCached {
                 infoContent.append("Cached")
             }

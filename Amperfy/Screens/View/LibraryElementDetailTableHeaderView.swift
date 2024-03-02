@@ -24,6 +24,18 @@ import AmperfyKit
 
 typealias GetInfoCallback = () -> String
 
+
+struct PlayShuffleInfoConfiguration {
+    var infoCB: GetInfoCallback?
+    var playContextCb: GetPlayContextCallback?
+    var player: PlayerFacade
+    let isInfoAlwaysHidden: Bool
+    var customPlayName: String? = nil
+    var isShuffleHidden = false
+    var isShuffleOnContextNeccessary: Bool = true
+    var shuffleContextCb: GetPlayContextCallback? = nil
+}
+
 class LibraryElementDetailTableHeaderView: UIView {
     
     @IBOutlet weak var playAllButton: UIButton!
@@ -34,15 +46,19 @@ class LibraryElementDetailTableHeaderView: UIView {
     static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginMiddleElement
     
-    private var infoCB: GetInfoCallback?
-    private var playContextCb: GetPlayContextCallback?
-    private var shuffleContextCb: GetPlayContextCallback?
-    private var isShuffleOnContextNeccessary: Bool = true
-    private var player: PlayerFacade?
+    private var config: PlayShuffleInfoConfiguration?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.layoutMargins = Self.margin
+        self.layoutMargins = UIEdgeInsets(top: 0.0, left: UIView.defaultMarginX, bottom: 0.0, right: UIView.defaultMarginX)
+    }
+    
+    public static func createTableHeader(rootView: BasicTableViewController, configuration: PlayShuffleInfoConfiguration) -> LibraryElementDetailTableHeaderView? {
+        rootView.tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: rootView.view.bounds.size.width, height: Self.frameHeight))
+        let genericDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: rootView.view.bounds.size.width, height: Self.frameHeight))!
+        genericDetailTableHeaderView.prepare(configuration: configuration)
+        rootView.tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
+        return genericDetailTableHeaderView
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -51,8 +67,8 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     func refresh() {
-        infoContainerView.isHidden = (traitCollection.horizontalSizeClass == .compact)
-        infoLabel.text = infoCB?() ?? ""
+        infoContainerView.isHidden = (config?.isInfoAlwaysHidden ?? true) || (traitCollection.horizontalSizeClass == .compact)
+        infoLabel.text = config?.infoCB?() ?? ""
     }
     
     @IBAction func playAllButtonPressed(_ sender: Any) {
@@ -68,14 +84,14 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     private func play(isShuffled: Bool) {
-        guard let playContext = playContextCb?(), let player = player else { return }
+        guard let playContext = config?.playContextCb?(), let player = config?.player else { return }
         isShuffled ? player.playShuffled(context: playContext) : player.play(context: playContext)
     }
     
     private func shuffle() {
-        guard let player = player else { return }
-        if let shuffleContext = shuffleContextCb?() {
-            if isShuffleOnContextNeccessary {
+        guard let player = config?.player else { return }
+        if let shuffleContext = config?.shuffleContextCb?() {
+            if config?.isShuffleOnContextNeccessary ?? true {
                 player.playShuffled(context: shuffleContext)
             } else {
                 player.play(context: shuffleContext)
@@ -86,13 +102,11 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     /// isShuffleOnContextNeccessary: In AlbumsVC the albums are shuffled, keep the order when shuffle button is pressed
-    func prepare(infoCB: GetInfoCallback?, playContextCb: GetPlayContextCallback?, with player: PlayerFacade, isShuffleOnContextNeccessary: Bool = true, shuffleContextCb: GetPlayContextCallback? = nil) {
-        self.infoCB = infoCB
-        self.playContextCb = playContextCb
-        self.player = player
-        self.isShuffleOnContextNeccessary = isShuffleOnContextNeccessary
-        self.shuffleContextCb = shuffleContextCb
-        playShuffledButton.setTitle(isShuffleOnContextNeccessary ? "Shuffle" : "Random", for: .normal)
+    func prepare(configuration: PlayShuffleInfoConfiguration) {
+        self.config = configuration
+        playAllButton.setTitle(config?.customPlayName ?? "Play", for: .normal)
+        playShuffledButton.setTitle(configuration.isShuffleOnContextNeccessary ? "Shuffle" : "Random", for: .normal)
+        playShuffledButton.isHidden = configuration.isShuffleHidden
         activate()
     }
     

@@ -32,7 +32,6 @@ class ArtistDetailVC: MultiSourceTableViewController {
     private var songsFetchedResultsController: ArtistSongsItemsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var detailOperationsView: GenericDetailTableHeader?
-    private var playShuffleInfoHeader: LibraryElementDetailTableHeaderView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,25 +45,17 @@ class ArtistDetailVC: MultiSourceTableViewController {
         tableView.register(nibName: SongTableCell.typeName)
         
         configureSearchController(placeholder: "Albums and Songs", scopeButtonTitles: ["All", "Cached"])
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight + LibraryElementDetailTableHeaderView.frameHeight))
-        if let genericDetailTableHeaderView = ViewBuilder<GenericDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight)) {
-            genericDetailTableHeaderView.prepare(toWorkOn: artist, rootView: self)
-            tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
-            detailOperationsView = genericDetailTableHeaderView
-        }
-        if let libraryElementDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight)) {
-            libraryElementDetailTableHeaderView.prepare(
-                infoCB: { "\(self.artist.albumCount) Album\(self.artist.albumCount == 1 ? "" : "s") \(CommonString.oneMiddleDot) \(self.artist.songCount) Song\(self.artist.songCount == 1 ? "" : "s")" },
-                playContextCb: {() in
-                    let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
-                    let sortedSongs = songs.compactMap{ $0.asSong }.sortByAlbum()
-                    return PlayContext(containable: self.artist, playables: sortedSongs)
-                },
-                with: appDelegate.player
-            )
-            tableView.tableHeaderView?.addSubview(libraryElementDetailTableHeaderView)
-            playShuffleInfoHeader = libraryElementDetailTableHeaderView
-        }
+        let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
+            infoCB: { "\(self.artist.albumCount) Album\(self.artist.albumCount == 1 ? "" : "s") \(CommonString.oneMiddleDot) \(self.artist.songCount) Song\(self.artist.songCount == 1 ? "" : "s")" },
+            playContextCb: {() in
+                let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
+                let sortedSongs = songs.compactMap{ $0.asSong }.sortByAlbum()
+                return PlayContext(containable: self.artist, playables: sortedSongs)
+            },
+            player: appDelegate.player,
+            isInfoAlwaysHidden: true)
+        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: artist, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
+        detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
         
         optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu.lazyMenu {
@@ -132,7 +123,6 @@ class ArtistDetailVC: MultiSourceTableViewController {
             self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
         }.finally {
             self.detailOperationsView?.refresh()
-            self.playShuffleInfoHeader?.refresh()
         }
     }
     

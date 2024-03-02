@@ -30,7 +30,6 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     private var fetchedResultsController: PodcastEpisodesFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var detailOperationsView: GenericDetailTableHeader?
-    private var descriptionView: FullWidthDescriptionView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,18 +40,22 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         configureSearchController(placeholder: "Search in \"Podcast\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: PodcastEpisodeTableCell.typeName)
         tableView.rowHeight = PodcastEpisodeTableCell.rowHeight
-
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight + FullWidthDescriptionView.frameHeight))
-        if let genericDetailTableHeaderView = ViewBuilder<GenericDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: GenericDetailTableHeader.frameHeight)) {
-            genericDetailTableHeaderView.prepare(toWorkOn: podcast, rootView: self)
-            tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
-            detailOperationsView = genericDetailTableHeaderView
-        }
-        if let fullWidthDescriptionView = ViewBuilder<FullWidthDescriptionView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: GenericDetailTableHeader.frameHeight, width: view.bounds.size.width, height: FullWidthDescriptionView.frameHeight)) {
-            fullWidthDescriptionView.descriptionLabel.text = podcast.depiction
-            tableView.tableHeaderView?.addSubview(fullWidthDescriptionView)
-            descriptionView = fullWidthDescriptionView
-        }
+         
+        let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
+            infoCB: { "\(self.podcast.episodes.count) Episode\(self.podcast.episodes.count == 1 ? "" : "s")" },
+            playContextCb: {() in
+                let context =  self.fetchedResultsController.getContextPodcastEpisodes(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
+                let newestEpisode = context?.first
+                let playables = newestEpisode != nil ? [newestEpisode!] :  [AbstractPlayable]()
+                return PlayContext(containable: self.podcast, playables:  playables)
+            },
+            player: appDelegate.player,
+            isInfoAlwaysHidden: false,
+            customPlayName: "Newest Episode",
+            isShuffleHidden: true
+        )
+        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: podcast, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig, descriptionText: podcast.depiction)
+        detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         optionsButton = OptionsBarButton()
