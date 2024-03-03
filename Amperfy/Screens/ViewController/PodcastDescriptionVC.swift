@@ -26,34 +26,15 @@ import MarqueeLabel
 
 class PodcastDescriptionVC: UIViewController {
     
-    @IBOutlet weak var titleLabel: MarqueeLabel!
-    @IBOutlet weak var artistContainerView: UIView!
-    @IBOutlet weak var artistLabel: MarqueeLabel!
-    @IBOutlet weak var showArtistButton: UIButton!
-    @IBOutlet weak var infoLabel: MarqueeLabel!
-    @IBOutlet weak var entityImageView: EntityImageView!
-    @IBOutlet weak var playButton: BasicButton!
     @IBOutlet weak var descriptionTextView: UITextView!
     
     private var rootView: UIViewController?
     private var podcast: Podcast?
     private var podcastEpisode: PodcastEpisode?
     
-    private var entityContainer: PlayableContainable? {
-        if let podcast = podcast {
-            return podcast
-        } else if let podcastEpisode = podcastEpisode {
-            return podcastEpisode
-        }
-        return nil
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.setBackgroundBlur(style: .prominent)
-        titleLabel.applyAmperfyStyle()
-        artistLabel.applyAmperfyStyle()
-        infoLabel.applyAmperfyStyle()
         
         if let presentationController = presentationController as? UISheetPresentationController {
             presentationController.detents = [
@@ -82,47 +63,11 @@ class PodcastDescriptionVC: UIViewController {
     }
 
     func refresh() {
-        guard let entityContainer = entityContainer else { return }
-        entityImageView.display(container: entityContainer)
-        titleLabel.text = entityContainer.name
-        artistLabel.text = entityContainer.subtitle
-        artistContainerView.isHidden = entityContainer.subtitle == nil
-        
-        infoLabel.text = entityContainer.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .long, settings: appDelegate.storage.settings))
-        
-        if let _ = self.rootView as? PopupPlayerVC {
-            playButton.isHidden = true
-        } else {
-            playButton.isHidden = false
-        }
-        
         if let podcast = podcast {
             descriptionTextView.text = podcast.depiction
         } else if let podcastEpisode = podcastEpisode {
             descriptionTextView.text = podcastEpisode.depiction
         }
-    }
-
-    @IBAction func pressedShowArtist(_ sender: Any) {
-        dismiss(animated: true) {
-            let playable = self.entityContainer as? AbstractPlayable
-            if let podcast = playable?.asPodcastEpisode?.podcast {
-                self.appDelegate.userStatistics.usedAction(.alertGoToPodcast)
-                let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
-                podcastDetailVC.podcast = podcast
-                podcastDetailVC.episodeToScrollTo = playable?.asPodcastEpisode
-                if let popupPlayer = self.rootView as? PopupPlayerVC {
-                    popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
-                } else if let navController = self.rootView?.navigationController {
-                    navController.pushViewController(podcastDetailVC, animated: true)
-                }
-            }
-        }
-    }
-    
-    @IBAction func pressedPlayButton(_ sender: Any) {
-        guard let entityContainer = entityContainer else { return }
-        self.appDelegate.player.play(context: PlayContext(containable: entityContainer))
     }
     
     @IBAction func pressedClose(_ sender: Any) {
