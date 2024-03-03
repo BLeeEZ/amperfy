@@ -25,7 +25,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="1162" height="456"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="msp-9G-tOz">
-                                            <rect key="frame" x="20" y="0.0" width="1122" height="436"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="1162" height="436"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rst-3T-hzJ">
                                                     <rect key="frame" x="0.0" y="0.0" width="436" height="436"/>
@@ -77,19 +77,19 @@
                                                     </variation>
                                                 </view>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ulT-f1-D2c">
-                                                    <rect key="frame" x="460" y="0.0" width="662" height="436"/>
+                                                    <rect key="frame" x="460" y="0.0" width="702" height="436"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="hN4-ai-kZb">
-                                                            <rect key="frame" x="0.0" y="0.0" width="662" height="436"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="702" height="436"/>
                                                             <subviews>
                                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ecX-JW-F45">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="662" height="396"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="702" height="396"/>
                                                                     <subviews>
                                                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="7J5-ll-b5d">
-                                                                            <rect key="frame" x="0.0" y="149.5" width="642" height="97.5"/>
+                                                                            <rect key="frame" x="0.0" y="149.5" width="682" height="97.5"/>
                                                                             <subviews>
                                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XhW-hw-pIz" userLabel="Title Label">
-                                                                                    <rect key="frame" x="0.0" y="0.0" width="642" height="24.5"/>
+                                                                                    <rect key="frame" x="0.0" y="0.0" width="682" height="24.5"/>
                                                                                     <attributedString key="attributedText">
                                                                                         <fragment content="Title">
                                                                                             <attributes>
@@ -101,7 +101,7 @@
                                                                                     <nil key="highlightedColor"/>
                                                                                 </label>
                                                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="PlaylistName" adjustsFontSizeToFit="NO" minimumFontSize="19" translatesAutoresizingMaskIntoConstraints="NO" id="5tB-lt-aqS" userLabel="Playlist Name Text Field">
-                                                                                    <rect key="frame" x="0.0" y="24.5" width="642" height="27"/>
+                                                                                    <rect key="frame" x="0.0" y="24.5" width="682" height="27"/>
                                                                                     <constraints>
                                                                                         <constraint firstAttribute="height" constant="27" id="Ubl-nF-7GN"/>
                                                                                     </constraints>
@@ -109,10 +109,10 @@
                                                                                     <textInputTraits key="textInputTraits"/>
                                                                                 </textField>
                                                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qob-Cu-9TI" userLabel="Subtitle View">
-                                                                                    <rect key="frame" x="0.0" y="51.5" width="642" height="30"/>
+                                                                                    <rect key="frame" x="0.0" y="51.5" width="682" height="30"/>
                                                                                     <subviews>
                                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mie-tL-VVX" userLabel="Subtitle Label">
-                                                                                            <rect key="frame" x="0.0" y="0.0" width="642" height="30"/>
+                                                                                            <rect key="frame" x="0.0" y="0.0" width="682" height="30"/>
                                                                                             <attributedString key="attributedText">
                                                                                                 <fragment content="Subtitle">
                                                                                                     <attributes>
@@ -125,7 +125,7 @@
                                                                                             <nil key="highlightedColor"/>
                                                                                         </label>
                                                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="875-8v-N94">
-                                                                                            <rect key="frame" x="0.0" y="0.0" width="642" height="30"/>
+                                                                                            <rect key="frame" x="0.0" y="0.0" width="682" height="30"/>
                                                                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                                                             <connections>
                                                                                                 <action selector="subtitleButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="QLk-th-AbQ"/>
@@ -146,7 +146,7 @@
                                                                                     </constraints>
                                                                                 </view>
                                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iPX-Fa-tH3" userLabel="Info Label">
-                                                                                    <rect key="frame" x="0.0" y="81.5" width="642" height="16"/>
+                                                                                    <rect key="frame" x="0.0" y="81.5" width="682" height="16"/>
                                                                                     <attributedString key="attributedText">
                                                                                         <fragment content="3 Artists 4 Albums 152 Songs">
                                                                                             <attributes>
@@ -178,10 +178,10 @@
                                                                     </constraints>
                                                                 </view>
                                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qxL-Fz-Vwm">
-                                                                    <rect key="frame" x="0.0" y="396" width="662" height="40"/>
+                                                                    <rect key="frame" x="0.0" y="396" width="702" height="40"/>
                                                                     <subviews>
                                                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="3ks-ab-Tsv">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="662" height="40"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="702" height="40"/>
                                                                         </stackView>
                                                                     </subviews>
                                                                     <constraints>
@@ -215,9 +215,9 @@
                                         </stackView>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstAttribute="trailing" secondItem="msp-9G-tOz" secondAttribute="trailing" constant="20" id="2nb-nG-cA6"/>
+                                        <constraint firstAttribute="trailing" secondItem="msp-9G-tOz" secondAttribute="trailing" id="2nb-nG-cA6"/>
                                         <constraint firstAttribute="bottom" secondItem="msp-9G-tOz" secondAttribute="bottom" constant="20" id="5ta-OT-dmF"/>
-                                        <constraint firstItem="msp-9G-tOz" firstAttribute="leading" secondItem="IRW-3q-GDh" secondAttribute="leading" constant="20" id="6WR-2D-RRd"/>
+                                        <constraint firstItem="msp-9G-tOz" firstAttribute="leading" secondItem="IRW-3q-GDh" secondAttribute="leading" id="6WR-2D-RRd"/>
                                         <constraint firstItem="msp-9G-tOz" firstAttribute="top" secondItem="IRW-3q-GDh" secondAttribute="top" id="NUk-PC-JVY"/>
                                     </constraints>
                                 </view>

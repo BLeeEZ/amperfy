@@ -70,6 +70,7 @@ class GenericDetailTableHeader: UIView {
         nameTextField.setContentCompressionResistancePriority(.required, for: .vertical)
         subtitleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         infoLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        self.layoutMargins = UIView.defaultMarginTopElement
         if let playShuffleInfoConfig = configuration.playShuffleInfoConfig {
             playShuffleInfoView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib()
             playShuffleInfoPlaceholderStack.addArrangedSubview(playShuffleInfoView!)
