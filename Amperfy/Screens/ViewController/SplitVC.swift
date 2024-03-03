@@ -32,9 +32,7 @@ class SplitVC: UISplitViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let nav = UINavigationController(rootViewController: TabNavigatorItem.search.controller)
-        nav.navigationBar.prefersLargeTitles = true
-        setViewController(nav, for: .secondary)
+        setViewController(defaultSecondaryVC, for: .secondary)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -47,14 +45,111 @@ class SplitVC: UISplitViewController {
         }
     }
     
+    func embeddInNavigation(vc: UIViewController) -> UINavigationController {
+        let nav = UINavigationController(rootViewController: vc)
+        if vc is SettingsHostVC {
+            nav.navigationBar.prefersLargeTitles = false
+        } else {
+            nav.navigationBar.prefersLargeTitles = true
+        }
+        return nav
+    }
+    
+    var defaultSecondaryVC: UINavigationController {
+        return embeddInNavigation(vc: TabNavigatorItem.search.controller)
+    }
+    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
         guard traitCollection.horizontalSizeClass != previousTraitCollection?.horizontalSizeClass else { return }
-        if traitCollection.horizontalSizeClass == .regular {
-            setCorrectPlayerBarView(collapseMode: false)
-        } else {
+        if isCompact {
             setCorrectPlayerBarView(collapseMode: true)
+            guard let secondaryVC = viewController(for: .secondary),
+                  let compactVC = viewController(for: .compact)
+            else { return }
+            collapseSecondary(secondaryViewController: secondaryVC, onto: compactVC)
+        } else {
+            setCorrectPlayerBarView(collapseMode: false)
+            guard let compactVC = viewController(for: .compact) else { return }
+            let vc = separateSecondary(from: compactVC)
+            setViewController(vc, for: .secondary)
+        }
+    }
+    
+    private func collapseSecondary(secondaryViewController: UIViewController, onto primaryViewController: UIViewController) {
+        if let navBar = secondaryViewController as? UINavigationController,
+           let rootVC = navBar.viewControllers.first,
+           let tabBar = self.viewController(for: .compact) as? TabBarVC,
+           let hostingTabViewControllers = tabBar.viewControllers,
+           hostingTabViewControllers.count >= 2 {
+            if rootVC is SettingsHostVC {
+                tabBar.viewControllers?[2].loadViewIfNeeded()
+                navBar.viewControllers = [UIViewController]()
+                secondaryViewController.view.layoutIfNeeded()
+                var curTabVC = hostingTabViewControllers
+                curTabVC.insert(rootVC, at: 2)
+                curTabVC.remove(at: 3)
+                tabBar.setViewControllers(curTabVC, animated: false)
+                tabBar.selectedIndex = 2
+            } else if rootVC is SearchVC {
+                tabBar.viewControllers?[1].loadViewIfNeeded()
+                if let nav = tabBar.viewControllers?[1] as? UINavigationController {
+                    let navBarVCs = navBar.viewControllers
+                    navBar.viewControllers = [UIViewController]()
+                    secondaryViewController.view.layoutIfNeeded()
+                    nav.setViewControllers(navBarVCs, animated: false)
+                    tabBar.selectedIndex = 1
+                }
+            } else {
+                tabBar.viewControllers?[0].loadViewIfNeeded()
+                if let nav = tabBar.viewControllers?[0] as? UINavigationController {
+                    var navBarVCs = navBar.viewControllers
+                    navBar.viewControllers = [UIViewController]()
+                    secondaryViewController.view.layoutIfNeeded()
+                    navBarVCs.insert(LibraryVC.instantiateFromAppStoryboard(), at: 0)
+                    nav.setViewControllers(navBarVCs, animated: false)
+                    tabBar.selectedIndex = 0
+                }
+            }
+        }
+    }
+
+    private func separateSecondary(from primaryViewController: UIViewController) -> UIViewController? {
+        guard let tabBar = primaryViewController as? TabBarVC,
+              let tabVCs = tabBar.viewControllers,
+              tabVCs.count >= 2
+        else { return nil }
+        if tabBar.selectedIndex == 0,
+           let navBar = tabVCs[0] as? UINavigationController {
+            if navBar.viewControllers.count > 1 {
+                let vcs = Array(navBar.viewControllers.dropFirst())
+                navBar.viewControllers = [LibraryVC.instantiateFromAppStoryboard()]
+                primaryViewController.view.layoutIfNeeded()
+                let secondaryVC = UINavigationController(rootViewController: UIViewController())
+                secondaryVC.setViewControllers(vcs, animated: false)
+                return secondaryVC
+            } else {
+                return defaultSecondaryVC
+            }
+        } else if tabBar.selectedIndex == 1,
+                  let navBar = tabVCs[1] as? UINavigationController {
+            let vcs = navBar.viewControllers
+            navBar.viewControllers = [TabNavigatorItem.search.controller]
+            primaryViewController.view.layoutIfNeeded()
+            let secondaryVC = UINavigationController(rootViewController: UIViewController())
+            secondaryVC.setViewControllers(vcs, animated: false)
+            return secondaryVC
+        } else if tabBar.selectedIndex == 2,
+                  let settingsVC = tabVCs[2] as? SettingsHostVC {
+            let nav = UINavigationController(rootViewController: settingsVC)
+            var curTabVC = tabVCs
+            curTabVC.insert(TabNavigatorItem.settings.controller, at: 2)
+            curTabVC.remove(at: 3)
+            tabBar.setViewControllers(curTabVC, animated: false)
+            primaryViewController.view.layoutIfNeeded()
+            return nav
+        } else {
+            return nil
         }
     }
     
@@ -142,9 +237,7 @@ class SplitVC: UISplitViewController {
                libraryTabNavVC.pushViewController(vc, animated: true)
            }
         } else {
-            let nav = UINavigationController(rootViewController: vc)
-            nav.navigationBar.prefersLargeTitles = true
-            setViewController(nav, for: .secondary)
+            setViewController(embeddInNavigation(vc: vc), for: .secondary)
         }
     }
     
