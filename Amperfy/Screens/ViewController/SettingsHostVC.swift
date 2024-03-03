@@ -35,6 +35,11 @@ class SettingsHostVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+        
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        changesAgent = [AnyCancellable]()
         
         settings.isOfflineMode = self.appDelegate.storage.settings.isOfflineMode
         changesAgent.append(settings.$isOfflineMode.sink(receiveValue: { newValue in

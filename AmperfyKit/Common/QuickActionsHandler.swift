@@ -43,6 +43,8 @@ public class QuickActionsHandler {
         case searchAction = "SearchAction"
         case playMusicAction = "PlayMusicAction"
         case playPodcastAction = "PlayPodcastAction"
+        case onlineModeAction = "OnlineModeAction"
+        case offlineModeAction = "OfflineModeAction"
     }
     
     public func savedShortCutItemForLaterUse(savedShortCutItem: UIApplicationShortcutItem) {
@@ -87,6 +89,21 @@ public class QuickActionsHandler {
                 icon: UIApplicationShortcutIcon(systemImageName: "play.circle"),
                 userInfo: nil))
         }
+        if storage.settings.isOfflineMode {
+            quickActions.append(UIApplicationShortcutItem(
+                type: QuickActionType.onlineModeAction.rawValue,
+                localizedTitle: "Start in Online Mode",
+                localizedSubtitle: nil,
+                icon: UIApplicationShortcutIcon(systemImageName: "network"),
+                userInfo: nil))
+        } else {
+            quickActions.append(UIApplicationShortcutItem(
+                type: QuickActionType.offlineModeAction.rawValue,
+                localizedTitle: "Start in Offline Mode",
+                localizedSubtitle: nil,
+                icon: UIApplicationShortcutIcon(systemImageName: "network.slash"),
+                userInfo: nil))
+        }
         application.shortcutItems = quickActions
     }
     
@@ -105,6 +122,10 @@ public class QuickActionsHandler {
                     player.setPlayerMode(.podcast)
                 }
                 player.play()
+            case .offlineModeAction:
+                storage.settings.isOfflineMode = true
+            case .onlineModeAction:
+                storage.settings.isOfflineMode = false
             }
         }
         return true
