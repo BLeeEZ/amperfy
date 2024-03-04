@@ -153,9 +153,6 @@ public class AmperKit {
     public lazy var backgroundFetchTriggeredSyncer = {
         return BackgroundFetchTriggeredSyncer(storage: storage, librarySyncer: librarySyncer, notificationManager: localNotificationManager, playableDownloadManager: playableDownloadManager)
     }()
-    public lazy var popupDisplaySemaphore = {
-        return DispatchSemaphore(value: 1)
-    }()
     public lazy var intentManager = {
         return IntentManager(storage: self.storage, library: storage.main.library, player: self.player)
     }()

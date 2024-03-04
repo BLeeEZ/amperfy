@@ -39,11 +39,8 @@ class LibrarySyncPopupVC: UIViewController {
     @IBOutlet weak var contentView: UIView!
     
     var topic = ""
-    var shortMessage = ""
     var message = ""
-    var clipboardContent: String?
     var logType = LogEntryType.info
-    var onClose: (() -> Void)?
     private var popupColor = UIColor.systemBlue
     private var icon = UIImage.refresh
     private var iconAnimation = PopupIconAnimation.zoomInZoomOut
@@ -104,11 +101,7 @@ class LibrarySyncPopupVC: UIViewController {
         UIView.animate(withDuration: 0.25, animations: {
             self.view.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
             self.view.alpha = 0.0;
-            }, completion: { (finished : Bool) in
-                if (finished) {
-                    self.onClose?()
-                }
-        });
+            }, completion: nil);
     }
     
     @IBAction func closeButtonPressed(_ sender: Any) {
@@ -123,35 +116,14 @@ class LibrarySyncPopupVC: UIViewController {
         }
     }
     
-    func setContent(topic: String, shortMessage: String?, detailMessage: String, clipboardContent: String?, type: LogEntryType, customIcon: UIImage? = nil, customAnimation: PopupIconAnimation? = nil, onClosePressed: ((Bool) -> Void)? = nil) {
+    func setContent(topic: String, detailMessage: String, customIcon: UIImage? = nil, customAnimation: PopupIconAnimation? = nil, onClosePressed: ((Bool) -> Void)? = nil) {
         self.topic = topic
-        self.shortMessage = shortMessage ?? ""
         self.message = detailMessage
-        self.clipboardContent = clipboardContent
-        self.logType = type
         self.closeButtonOnPressed = onClosePressed
         
-        if let clipboardContent = clipboardContent {
-            useOptionalButton(text: "Copy to Clipboard", onPressed: {_ in 
-                UIPasteboard.general.string = clipboardContent
-            })
-        }
-        
         self.iconAnimation = customAnimation != nil ? customAnimation! : .zoomInZoomOut
-        switch type {
-        case .apiError:
-            popupColor = .red
-            self.icon = customIcon != nil ? customIcon! : .exclamation
-        case .error:
-            popupColor = .red
-            self.icon = customIcon != nil ? customIcon! : .exclamation
-        case .info:
-            popupColor = .defaultBlue
-            self.icon = customIcon != nil ? customIcon! : .info
-        case .debug:
-            popupColor = .systemGray
-            self.icon = customIcon != nil ? customIcon! : .info
-        }
+        popupColor = .defaultBlue
+        self.icon = customIcon != nil ? customIcon! : .info
     }
     
     func useOptionalButton(text: String, onPressed: ((Bool) -> Void)? = nil) {

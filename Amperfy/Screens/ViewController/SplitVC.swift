@@ -34,7 +34,7 @@ class SplitVC: UISplitViewController {
         super.viewDidLoad()
         setViewController(defaultSecondaryVC, for: .secondary)
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setCorrectPlayerBarView(collapseMode: isCompact)
@@ -157,10 +157,7 @@ class SplitVC: UISplitViewController {
         let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
         popupVC.setContent(
             topic: "Synchronization",
-            shortMessage: nil,
             detailMessage: "Your music collection is constantly updating. Already synced library items are offline available. If library items (artists/albums/songs) are not shown in your  collection please use the various search functionalities to synchronize with the server.",
-            clipboardContent: nil,
-            type: .info,
             customIcon: .refresh,
             customAnimation: .rotate,
             onClosePressed: { _ in
@@ -177,10 +174,7 @@ class SplitVC: UISplitViewController {
                 let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
                 popupVC.setContent(
                     topic: "Notifications",
-                    shortMessage: nil,
                     detailMessage: "Amperfy can inform you about the latest podcast episodes. If you want to, please authorize Amperfy to send you notifications.",
-                    clipboardContent: nil,
-                    type: .info,
                     customIcon: .bell,
                     customAnimation: .swing,
                     onClosePressed: { _ in

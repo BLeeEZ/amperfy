@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NotificationDetailVC" customModule="Amperfy" customModuleProvider="target">
+            <connections>
+                <outlet property="descriptionTextView" destination="Xq9-7l-e3O" id="Qo0-Qm-fYT"/>
+                <outlet property="titleLabel" destination="uHP-qw-pjW" id="LoN-MW-arI"/>
+                <outlet property="view" destination="iN0-l3-epB" id="jnP-Cl-vBL"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uHP-qw-pjW">
+                    <rect key="frame" x="137.5" y="35" width="100.5" height="24"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JQO-fn-jd5">
+                    <rect key="frame" x="16" y="65" width="343" height="602"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="chG-g3-PeX">
+                            <rect key="frame" x="0.0" y="0.0" width="343" height="200"/>
+                            <subviews>
+                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="fZ9-fY-fhZ">
+                                    <rect key="frame" x="0.0" y="0.0" width="343" height="200"/>
+                                    <subviews>
+                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xq9-7l-e3O">
+                                            <rect key="frame" x="0.0" y="0.0" width="343" height="200"/>
+                                            <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                            <color key="textColor" systemColor="labelColor"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                            <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                                        </textView>
+                                    </subviews>
+                                </stackView>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="fZ9-fY-fhZ" firstAttribute="leading" secondItem="chG-g3-PeX" secondAttribute="leading" id="H8j-3h-Ofl"/>
+                                <constraint firstAttribute="trailing" secondItem="fZ9-fY-fhZ" secondAttribute="trailing" id="HCw-gl-Eou"/>
+                                <constraint firstItem="fZ9-fY-fhZ" firstAttribute="top" secondItem="chG-g3-PeX" secondAttribute="top" id="Qdq-sP-OKY"/>
+                                <constraint firstAttribute="bottom" secondItem="fZ9-fY-fhZ" secondAttribute="bottom" id="alR-5m-DU6"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="chG-g3-PeX" firstAttribute="leading" secondItem="JQO-fn-jd5" secondAttribute="leading" id="DI0-H6-03e"/>
+                        <constraint firstAttribute="trailing" secondItem="chG-g3-PeX" secondAttribute="trailing" id="GRv-BE-c5E"/>
+                        <constraint firstItem="chG-g3-PeX" firstAttribute="top" secondItem="JQO-fn-jd5" secondAttribute="top" id="mbe-cy-Zey"/>
+                        <constraint firstAttribute="bottom" secondItem="chG-g3-PeX" secondAttribute="bottom" id="nxC-nl-pRV"/>
+                        <constraint firstItem="chG-g3-PeX" firstAttribute="width" secondItem="JQO-fn-jd5" secondAttribute="width" id="xwY-rz-axX"/>
+                    </constraints>
+                    <viewLayoutGuide key="contentLayoutGuide" id="Y1l-QN-6kv"/>
+                    <viewLayoutGuide key="frameLayoutGuide" id="lAO-TS-9XO"/>
+                </scrollView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="close" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JHZ-kb-Qyt" userLabel="Close Button">
+                    <rect key="frame" x="331" y="30" width="28" height="28"/>
+                    <color key="tintColor" systemColor="secondaryLabelColor"/>
+                    <buttonConfiguration key="configuration" style="gray" cornerStyle="capsule" buttonSize="small"/>
+                    <connections>
+                        <action selector="pressedClose:" destination="-1" eventType="touchUpInside" id="bQ6-rx-9my"/>
+                    </connections>
+                </button>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <constraints>
+                <constraint firstAttribute="rightMargin" secondItem="JQO-fn-jd5" secondAttribute="right" id="KO9-KY-aE9"/>
+                <constraint firstItem="uHP-qw-pjW" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" constant="15" id="TYa-dn-8dk"/>
+                <constraint firstItem="JQO-fn-jd5" firstAttribute="trailing" secondItem="JHZ-kb-Qyt" secondAttribute="trailing" id="UUn-ik-ndw"/>
+                <constraint firstItem="JQO-fn-jd5" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" constant="45" id="aXp-PQ-TAY"/>
+                <constraint firstItem="uHP-qw-pjW" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="hPn-k6-ygs"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="JQO-fn-jd5" secondAttribute="bottom" id="hlv-fU-Xoc"/>
+                <constraint firstItem="JQO-fn-jd5" firstAttribute="left" secondItem="iN0-l3-epB" secondAttribute="leftMargin" id="kwH-dv-NhG"/>
+                <constraint firstItem="JHZ-kb-Qyt" firstAttribute="top" secondItem="uHP-qw-pjW" secondAttribute="top" constant="-5" id="n9A-cS-QH5"/>
+            </constraints>
+            <point key="canvasLocation" x="-0.80000000000000004" y="19.340329835082461"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

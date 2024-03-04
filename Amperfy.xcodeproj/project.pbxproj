@@ -58,6 +58,8 @@
 		505CA20E2B88EB9A00AA81CD /* BasicFetchedResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA20D2B88EB9900AA81CD /* BasicFetchedResultsTableViewController.swift */; };
 		505CA2112B88ECC700AA81CD /* SingleFetchedResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA2102B88ECC700AA81CD /* SingleFetchedResultsTableViewController.swift */; };
 		505CA2142B88ED6100AA81CD /* SingleSnapshotFetchedResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA2132B88ED6100AA81CD /* SingleSnapshotFetchedResultsTableViewController.swift */; };
+		5064F3982B96FBAE00DE61C1 /* NotificationDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5064F3972B96FBAE00DE61C1 /* NotificationDetailVC.swift */; };
+		5064F3992B96FBD600DE61C1 /* NotificationDetailVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5064F3962B96FBAE00DE61C1 /* NotificationDetailVC.xib */; };
 		507148AD2B767FE200557904 /* ContextQueuePrevSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507148AC2B767FE200557904 /* ContextQueuePrevSectionHeader.swift */; };
 		507148AE2B76800A00557904 /* ContextQueuePrevSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507148AB2B767FE200557904 /* ContextQueuePrevSectionHeader.xib */; };
 		50722747286794FC00910574 /* AppDelegateKeyboardCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50722746286794FC00910574 /* AppDelegateKeyboardCommands.swift */; };
@@ -646,6 +648,8 @@
 		505CA20D2B88EB9900AA81CD /* BasicFetchedResultsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicFetchedResultsTableViewController.swift; sourceTree = "<group>"; };
 		505CA2102B88ECC700AA81CD /* SingleFetchedResultsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleFetchedResultsTableViewController.swift; sourceTree = "<group>"; };
 		505CA2132B88ED6100AA81CD /* SingleSnapshotFetchedResultsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleSnapshotFetchedResultsTableViewController.swift; sourceTree = "<group>"; };
+		5064F3962B96FBAE00DE61C1 /* NotificationDetailVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NotificationDetailVC.xib; sourceTree = "<group>"; };
+		5064F3972B96FBAE00DE61C1 /* NotificationDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDetailVC.swift; sourceTree = "<group>"; };
 		506640D12B683AAF007434A8 /* Amperfy v33.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v33.xcdatamodel"; sourceTree = "<group>"; };
 		5067016125E3ADA200A3EF89 /* Amperfy v5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v5.xcdatamodel"; sourceTree = "<group>"; };
 		50675E6C25F61163005737FD /* BasicTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableCell.swift; sourceTree = "<group>"; };
@@ -1522,6 +1526,8 @@
 				50DE29EA2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift */,
 				500B97CF2B7C9546005554BF /* EntityPreviewVC.xib */,
 				500B97CC2B7BC67F005554BF /* EntityPreviewVC.swift */,
+				5064F3962B96FBAE00DE61C1 /* NotificationDetailVC.xib */,
+				5064F3972B96FBAE00DE61C1 /* NotificationDetailVC.swift */,
 				50DEEE03265E25A40073FF20 /* MusicFoldersVC.swift */,
 				50DEEE09265E392C0073FF20 /* IndexesVC.swift */,
 				50DEEE0B265E3F9D0073FF20 /* DirectoriesVC.swift */,
@@ -1996,6 +2002,7 @@
 				501944192B78F9B800082D2E /* LargeCurrentlyPlayingPlayerView.xib in Resources */,
 				5055AA5826835AB000096B8D /* PodcastEpisodeTableCell.xib in Resources */,
 				50C16C0C21E52BBB00F086F0 /* SongTableCell.xib in Resources */,
+				5064F3992B96FBD600DE61C1 /* NotificationDetailVC.xib in Resources */,
 				50A85EF32689E95300FB3E31 /* PlayableTableCell.xib in Resources */,
 				507148AE2B76800A00557904 /* ContextQueuePrevSectionHeader.xib in Resources */,
 				504627EA2B73B44C00F481F8 /* PopupPlayerVC.xib in Resources */,
@@ -2084,6 +2091,7 @@
 				50791E7F28D363F0006CE6E5 /* InfoBannerView.swift in Sources */,
 				50C16C1E21E7A35C00F086F0 /* GenericTableCell.swift in Sources */,
 				505CA2092B88E8F400AA81CD /* BasicCollectionViewController.swift in Sources */,
+				5064F3982B96FBAE00DE61C1 /* NotificationDetailVC.swift in Sources */,
 				5003D8FB267B3390006946BF /* LibrarySyncPopupVC.swift in Sources */,
 				501944182B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift in Sources */,
 				5007CE4121EF5F4300BC5CBA /* PlaylistsVC.swift in Sources */,

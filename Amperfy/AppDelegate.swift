@@ -93,9 +93,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public lazy var backgroundFetchTriggeredSyncer = {
         return AmperKit.shared.backgroundFetchTriggeredSyncer
     }()
-    public lazy var popupDisplaySemaphore = {
-        return AmperKit.shared.popupDisplaySemaphore
-    }()
     public lazy var intentManager = {
         return AmperKit.shared.intentManager
     }()

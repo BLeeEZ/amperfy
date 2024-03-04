@@ -47,40 +47,37 @@ extension AppDelegate {
 }
 
 extension AppDelegate: AlertDisplayable {
-    func display(notificationBanner popupVC: UIViewController) {
+    func display(title: String, subtitle: String, style: LogEntryType, notificationBanner popupVC: UIViewController) {
         guard NotificationBannerQueue.default.numberOfBanners < 1,
               let topView = Self.topViewController(),
               topView.presentedViewController == nil,
-              let popupVC = popupVC as? LibrarySyncPopupVC,
               let _ = UIApplication.shared.mainWindow
               else { return }
 
-        let banner = FloatingNotificationBanner(title: popupVC.topic, subtitle: popupVC.shortMessage, style: BannerStyle.from(logType: popupVC.logType), colors: AmperfyBannerColors())
+        let banner = FloatingNotificationBanner(title: title, subtitle: subtitle, style: BannerStyle.from(logType: style), colors: AmperfyBannerColors())
         
         banner.onTap = {
-            self.display(popup: popupVC)
+            guard let topView = Self.topViewController(),
+                  topView.presentedViewController == nil
+            else { return }
+            topView.present(popupVC, animated: true, completion: nil)
         }
         
-        banner.show(queuePosition: QueuePosition.back, bannerPosition: BannerPosition.top, on: topView, cornerRadius: 20, shadowBlurRadius: 10)
+        banner.show(queuePosition: QueuePosition.back, bannerPosition: BannerPosition.top, on: topView, cornerRadius: 15, shadowBlurRadius: 10)
     }
     
     func display(popup popupVC: UIViewController) {
         guard let topView = Self.topViewController(),
-              topView.presentedViewController == nil,
-              self.popupDisplaySemaphore.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success,
-              let popupVC = popupVC as? LibrarySyncPopupVC
-              else { return }
-        popupVC.onClose = {
-            self.popupDisplaySemaphore.signal()
-        }
+              topView.presentedViewController == nil
+        else { return }
         popupVC.modalPresentationStyle = .overCurrentContext
         popupVC.modalTransitionStyle = .crossDissolve
         topView.present(popupVC, animated: true, completion: nil)
     }
     
-    func createPopupVC(topic: String, shortMessage: String, detailMessage: String, clipboardContent: String?, logType: LogEntryType) -> UIViewController {
-        let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
-        popupVC.setContent(topic: topic, shortMessage: shortMessage, detailMessage: detailMessage, clipboardContent: clipboardContent, type: logType)
+    func createPopupVC(topic: String, shortMessage: String, detailMessage: String, logType: LogEntryType) -> UIViewController {
+        let popupVC = NotificationDetailVC()
+        popupVC.display(title: topic, message: detailMessage, type: logType)
         return popupVC
     }
 }

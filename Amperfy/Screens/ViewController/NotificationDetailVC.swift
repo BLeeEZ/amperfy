@@ -1,8 +1,8 @@
 //
-//  PodcastDescriptionVC.swift
+//  NotificationDetailVC.swift
 //  Amperfy
 //
-//  Created by Maximilian Bauer on 01.02.24.
+//  Created by Maximilian Bauer on 04.03.24.
 //  Copyright (c) 2024 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -24,13 +24,14 @@ import UIKit
 import AmperfyKit
 import MarqueeLabel
 
-class PodcastDescriptionVC: UIViewController {
+class NotificationDetailVC: UIViewController {
     
+    @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var descriptionTextView: UITextView!
     
-    private var rootView: UIViewController?
-    private var podcast: Podcast?
-    private var podcastEpisode: PodcastEpisode?
+    var topic = ""
+    var message = ""
+    var logType = LogEntryType.info
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,23 +51,14 @@ class PodcastDescriptionVC: UIViewController {
         refresh()
     }
 
-    func display(podcast: Podcast, on rootView: UIViewController) {
-        self.rootView = rootView
-        self.podcast = podcast
-        self.podcastEpisode = nil
-    }
-    func display(podcastEpisode: PodcastEpisode, on rootView: UIViewController) {
-        self.rootView = rootView
-        self.podcast = nil
-        self.podcastEpisode = podcastEpisode
+    func display(title: String, message: String, type: LogEntryType) {
+        self.topic = title
+        self.message = message
     }
 
     func refresh() {
-        if let podcast = podcast {
-            descriptionTextView.text = podcast.depiction
-        } else if let podcastEpisode = podcastEpisode {
-            descriptionTextView.text = podcastEpisode.depiction
-        }
+        titleLabel.text = self.topic
+        descriptionTextView.text = self.message
     }
     
     @IBAction func pressedClose(_ sender: Any) {

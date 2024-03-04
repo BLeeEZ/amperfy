@@ -74,9 +74,9 @@ class MOCK_SongDownloader: DownloadManageable {
 }
 
 class MOCK_AlertDisplayable: AlertDisplayable {
-    func display(notificationBanner popupVC: UIViewController) {}
+    func display(title: String, subtitle: String, style: LogEntryType, notificationBanner popupVC: UIViewController) {}
     func display(popup popupVC: UIViewController) {}
-    func createPopupVC(topic: String, shortMessage: String, detailMessage: String, clipboardContent: String?, logType: AmperfyKit.LogEntryType) -> UIViewController { return UIViewController() }
+    func createPopupVC(topic: String, shortMessage: String, detailMessage: String, logType: AmperfyKit.LogEntryType) -> UIViewController { return UIViewController() }
 }
 
 class MOCK_LibrarySyncer: LibrarySyncer {
