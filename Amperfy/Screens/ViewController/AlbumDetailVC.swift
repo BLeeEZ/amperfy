@@ -23,7 +23,10 @@ import UIKit
 import AmperfyKit
 import PromiseKit
 
-class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
+class AlbumDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
+}
+
+class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
 
     var album: Album!
     var songToScrollTo: Song?
@@ -31,11 +34,26 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
     private var optionsButton: UIBarButtonItem!
     private var detailOperationsView: GenericDetailTableHeader?
 
+    override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+        let source = AlbumDetailDiffableDataSource(tableView: tableView) { (tableView, indexPath, objectID) -> UITableViewCell? in
+            guard let object = try? self.appDelegate.storage.main.context.existingObject(with: objectID),
+                  let songMO = object as? SongMO
+            else {
+                fatalError("Managed object should be available")
+            }
+            let song = Song(managedObject: songMO)
+            return self.createCell(tableView, forRowAt: indexPath, song: song)
+        }
+        return source
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.albumDetail)
         fetchedResultsController = AlbumSongsFetchedResultsController(forAlbum: album, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
+        singleFetchedResultsController?.delegate = self
+        singleFetchedResultsController?.fetch()
         
         configureSearchController(placeholder: "Search in \"Album\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: AlbumSongTableCell.typeName)
@@ -102,9 +120,8 @@ class AlbumDetailVC: SingleFetchedResultsTableViewController<SongMO> {
         return convertIndexPathToPlayContext(songIndexPath: indexPath)
     }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, song: Song) -> UITableViewCell {
         let cell: AlbumSongTableCell = dequeueCell(for: tableView, at: indexPath)
-        let song = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(song: song, playContextCb: convertCellViewToPlayContext, rootView: self)
         return cell
     }
