@@ -149,7 +149,7 @@ class PlayableTableCell: BasicTableCell {
     
     func refreshCacheAndDuration() {
         guard let playable = playable else { return }
-        let isDurationVisible = appDelegate.storage.settings.isShowSongDuration
+        let isDurationVisible = appDelegate.storage.settings.isShowSongDuration || (traitCollection.horizontalSizeClass == .regular)
         if playable.isCached {
             cacheIconImage.isHidden = false
             labelTrailingCacheConstraint.priority = .defaultHigh
