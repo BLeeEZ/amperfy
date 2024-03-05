@@ -73,7 +73,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
             guard let object = try? self.appDelegate.storage.main.context.existingObject(with: objectID),
                   let playlistItemMO = object as? PlaylistItemMO
             else {
-                fatalError("Managed object should be available")
+                return UITableViewCell()
             }
             let playlistItem = PlaylistItem(library: self.appDelegate.storage.main.library, managedObject: playlistItemMO)
             return self.createCell(tableView, forRowAt: indexPath, playlistItem: playlistItem)
@@ -90,8 +90,8 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         singleFetchedResultsController?.delegate = self
         singleFetchedResultsController?.fetch()
         
-        tableView.register(nibName: SongTableCell.typeName)
-        tableView.rowHeight = SongTableCell.rowHeight
+        tableView.register(nibName: PlayableTableCell.typeName)
+        tableView.rowHeight = PlayableTableCell.rowHeight
         
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(startEditing))
         doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(endEditing))
@@ -181,9 +181,9 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     }
     
     func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, playlistItem: PlaylistItem) -> UITableViewCell {
-        let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
+        let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
         if let playable = playlistItem.playable, let song = playable.asSong {
-            cell.display(song: song, playContextCb: convertCellViewToPlayContext, rootView: self)
+            cell.display(playable: song, playContextCb: convertCellViewToPlayContext, rootView: self)
         }
         return cell
     }

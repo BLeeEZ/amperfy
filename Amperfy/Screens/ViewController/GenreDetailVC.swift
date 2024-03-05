@@ -45,7 +45,7 @@ class GenreDetailVC: MultiSourceTableViewController {
         songsFetchedResultsController.delegate = self
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: GenericTableCell.typeName)
-        tableView.register(nibName: SongTableCell.typeName)
+        tableView.register(nibName: PlayableTableCell.typeName)
         
         configureSearchController(placeholder: "Artists, Albums and Songs", scopeButtonTitles: ["All", "Cached"])
         
@@ -203,9 +203,9 @@ class GenreDetailVC: MultiSourceTableViewController {
             cell.display(container: album, rootView: self)
             return cell
         case LibraryElement.Song.rawValue:
-            let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
+            let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
             let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
+            cell.display(playable: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
             return cell
         default:
             return UITableViewCell()
@@ -232,7 +232,7 @@ class GenreDetailVC: MultiSourceTableViewController {
         case LibraryElement.Album.rawValue:
             return GenericTableCell.rowHeight
         case LibraryElement.Song.rawValue:
-            return SongTableCell.rowHeight
+            return PlayableTableCell.rowHeight
         default:
             return 0.0
         }

@@ -1,5 +1,5 @@
 //
-//  PlayableTableCell.swift
+//  SongTableCell.swift
 //  Amperfy
 //
 //  Created by Maximilian Bauer on 09.03.19.
@@ -31,17 +31,23 @@ class PlayableTableCell: BasicTableCell {
     @IBOutlet weak var artistLabel: UILabel!
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var entityImage: EntityImageView!
+    @IBOutlet weak var trackNumberLabel: UILabel!
     @IBOutlet weak var downloadProgress: UIProgressView!
-    @IBOutlet weak var reorderImage: UIImageView?
-    @IBOutlet weak var cacheIconImage: UIImageView!
-    @IBOutlet weak var artistLabelLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak private var cacheIconImage: UIImageView!
+    @IBOutlet weak private var favoriteIconImage: UIImageView!
     
-    @IBOutlet weak var titleLabelTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var labelTrailingCacheConstraint: NSLayoutConstraint!
+    @IBOutlet weak var labelTrailingDurationConstraint: NSLayoutConstraint!
+    @IBOutlet weak var labelTrailingCellConstraint: NSLayoutConstraint!
     
-    @IBOutlet weak var artistLabelTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var trackNumberTrailingTitleConstaint: NSLayoutConstraint!
+    @IBOutlet weak var artworkTrailingTitleConstaint: NSLayoutConstraint!
     
+    @IBOutlet weak var cacheTrailingDurationConstaint: NSLayoutConstraint!
+    @IBOutlet weak var cacheTrailingCellConstaint: NSLayoutConstraint!
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
+    private static let touchAnimation = 0.4
     
     private var playerIndexCb: GetPlayerIndexFromTableCellCallback?
     private var playContextCb: GetPlayContextFromTableCellCallback?
@@ -49,36 +55,80 @@ class PlayableTableCell: BasicTableCell {
     private var download: Download?
     private var rootView: UIViewController?
     private var subtitleColor: UIColor?
+    private var playIndicator: PlayIndicator!
+    private var isDislayAlbumTrackNumberStyle: Bool = false
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        playContextCb = nil
+    }
     
-    func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, download: Download? = nil, subtitleColor: UIColor? = nil) {
+    func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, isDislayAlbumTrackNumberStyle: Bool = false, download: Download? = nil, subtitleColor: UIColor? = nil) {
+        if playIndicator == nil {
+            playIndicator = PlayIndicator(rootViewTypeName: rootView.typeName)
+        }
         self.playable = playable
         self.playContextCb = playContextCb
         self.playerIndexCb = playerIndexCb
         self.rootView = rootView
+        self.isDislayAlbumTrackNumberStyle = isDislayAlbumTrackNumberStyle
         self.download = download
         self.subtitleColor = subtitleColor
         self.selectionStyle = .none
         refresh()
     }
-    
+
     func refresh() {
         guard let playable = playable else { return }
-        titleLabel.attributedText = NSMutableAttributedString(string: playable.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
-        
+        titleLabel.text = playable.title
         artistLabel.text = playable.creatorName
         entityImage.display(container: playable)
         
-        if playerIndexCb != nil {
-            self.reorderImage?.isHidden = false
-            self.reorderImage?.image = .bars
-        } else if download?.error != nil {
-            self.reorderImage?.isHidden = false
-            self.reorderImage?.image = .exclamation
-        } else if download?.isFinishedSuccessfully ?? false {
-            self.reorderImage?.isHidden = false
-            self.reorderImage?.image = .check
+        if self.isDislayAlbumTrackNumberStyle {
+            configureTrackNumberLabel()
+            playIndicator.willDisplayIndicatorCB = { [weak self] () in
+                guard let self = self else { return }
+                self.trackNumberLabel.text = ""
+            }
+            playIndicator.willHideIndicatorCB = { [weak self] () in
+                guard let self = self else { return }
+                self.configureTrackNumberLabel()
+            }
+            
+            playIndicator.display(playable: playable, rootView: self.trackNumberLabel)
+            trackNumberLabel.isHidden = false
+            entityImage.isHidden = true
+            trackNumberTrailingTitleConstaint.priority = .defaultHigh
+            artworkTrailingTitleConstaint.priority = .defaultLow
         } else {
-            self.reorderImage?.isHidden = true
+            playIndicator.willDisplayIndicatorCB = nil
+            playIndicator.willHideIndicatorCB = nil
+            if self.playerIndexCb == nil {
+                playIndicator.display(playable: playable, rootView: self.entityImage, isOnImage: true)
+            } else {
+                // don't show play indicator on PopupPlayer
+                playIndicator.reset()
+            }
+            trackNumberLabel.isHidden = true
+            entityImage.isHidden = false
+            trackNumberTrailingTitleConstaint.priority = .defaultLow
+            artworkTrailingTitleConstaint.priority = .defaultHigh
+        }
+        
+        if playerIndexCb != nil {
+            let img = UIImageView(image: .bars)
+            img.tintColor = .labelColor
+            accessoryView = img
+        } else if download?.error != nil {
+            let img = UIImageView(image: .exclamation)
+            img.tintColor = .labelColor
+            accessoryView = img
+        } else if download?.isFinishedSuccessfully ?? false {
+            let img = UIImageView(image: .check)
+            img.tintColor = .labelColor
+            accessoryView = img
+        } else {
+            accessoryView = nil
         }
         
         refreshSubtitleColor()
@@ -92,27 +142,41 @@ class PlayableTableCell: BasicTableCell {
         }
     }
     
+    private func configureTrackNumberLabel() {
+        guard let playable = playable else { return }
+        trackNumberLabel.text = playable.track > 0 ? "\(playable.track)" : ""
+    }
+    
     func refreshCacheAndDuration() {
         guard let playable = playable else { return }
-
+        let isDurationVisible = appDelegate.storage.settings.isShowSongDuration
         if playable.isCached {
             cacheIconImage.isHidden = false
-            artistLabelLeadingConstraint.constant = 20
+            labelTrailingCacheConstraint.priority = .defaultHigh
+            labelTrailingDurationConstraint.priority = .defaultLow
+            labelTrailingCellConstraint.priority = .defaultLow
+        } else if isDurationVisible {
+            cacheIconImage.isHidden = true
+            labelTrailingCacheConstraint.priority = .defaultLow
+            labelTrailingDurationConstraint.priority = .defaultHigh
+            labelTrailingCellConstraint.priority = .defaultLow
         } else {
             cacheIconImage.isHidden = true
-            artistLabelLeadingConstraint.constant = 0
+            labelTrailingCacheConstraint.priority = .defaultLow
+            labelTrailingDurationConstraint.priority = .defaultLow
+            labelTrailingCellConstraint.priority = .defaultHigh
         }
         
-        let isDurationVisible = appDelegate.storage.settings.isShowSongDuration && (playable.duration > 0)
+        favoriteIconImage.isHidden = !playable.isFavorite
+        
         durationLabel.isHidden = !isDurationVisible
         if isDurationVisible {
             durationLabel.text = playable.duration.asColonDurationString
-            durationLabel.layoutIfNeeded()
-            artistLabelTrailingConstraint.constant = durationLabel.frame.width + 16
-            titleLabelTrailingConstraint.constant = durationLabel.frame.width + 16
+            cacheTrailingDurationConstaint.priority = .defaultHigh
+            cacheTrailingCellConstaint.priority = .defaultLow
         } else {
-            artistLabelTrailingConstraint.constant = 8
-            titleLabelTrailingConstraint.constant = 8
+            cacheTrailingDurationConstaint.priority = .defaultLow
+            cacheTrailingCellConstaint.priority = .defaultHigh
         }
     }
     
@@ -139,10 +203,9 @@ class PlayableTableCell: BasicTableCell {
         }
     }
     
-    func playThisSong() {
-        if let playerIndex = playerIndexCb?(self) {
-            appDelegate.player.play(playerIndex: playerIndex)
-        }
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        playIndicator.reset()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -150,10 +213,28 @@ class PlayableTableCell: BasicTableCell {
         playThisSong()
     }
     
+    func playThisSong() {
+        guard let playable = playable else { return }
+        if let playerIndex = playerIndexCb?(self) {
+            appDelegate.player.play(playerIndex: playerIndex)
+        } else if let context = playContextCb?(self),
+            playable.isCached || appDelegate.storage.settings.isOnlineMode {
+             animateActivation()
+             hideSearchBarKeyboardInRootView()
+             let generator = UINotificationFeedbackGenerator()
+             generator.notificationOccurred(.success)
+             appDelegate.player.play(context: context)
+         }
+    }
+    
     private func hideSearchBarKeyboardInRootView() {
         if let basicRootView = rootView as? BasicTableViewController {
             basicRootView.searchController.searchBar.endEditing(true)
         }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        playIndicator.applyStyle()
     }
 
 }

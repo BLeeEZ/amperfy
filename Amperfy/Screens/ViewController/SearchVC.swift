@@ -75,7 +75,7 @@ class SearchVC: MultiSourceTableViewController {
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: GenericTableCell.typeName)
-        tableView.register(nibName: SongTableCell.typeName)
+        tableView.register(nibName: PlayableTableCell.typeName)
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 0
         
@@ -262,8 +262,8 @@ class SearchVC: MultiSourceTableViewController {
                 cell.accessoryType = .disclosureIndicator
                 return cell
             } else if let song = container as? Song {
-                let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
-                cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
+                let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
+                cell.display(playable: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
                 return cell
             } else {
                 let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
@@ -290,9 +290,9 @@ class SearchVC: MultiSourceTableViewController {
             cell.accessoryType = .disclosureIndicator
             return cell
         case .Song:
-            let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
+            let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
             let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
+            cell.display(playable: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
             return cell
         case .none:
             return UITableViewCell()
@@ -324,7 +324,7 @@ class SearchVC: MultiSourceTableViewController {
             if container is Playlist {
                 return PlaylistTableCell.rowHeight
             } else if container is Song {
-                return SongTableCell.rowHeight
+                return PlayableTableCell.rowHeight
             } else {
                 return GenericTableCell.rowHeight
             }
@@ -335,7 +335,7 @@ class SearchVC: MultiSourceTableViewController {
         case .Album:
             return GenericTableCell.rowHeight
         case .Song:
-            return SongTableCell.rowHeight
+            return PlayableTableCell.rowHeight
         case .none:
             return 0.0
         }

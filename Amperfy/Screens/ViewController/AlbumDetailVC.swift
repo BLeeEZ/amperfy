@@ -56,8 +56,8 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
         singleFetchedResultsController?.fetch()
         
         configureSearchController(placeholder: "Search in \"Album\"", scopeButtonTitles: ["All", "Cached"])
-        tableView.register(nibName: AlbumSongTableCell.typeName)
-        tableView.rowHeight = AlbumSongTableCell.albumSongRowHeight
+        tableView.register(nibName: PlayableTableCell.typeName)
+        tableView.rowHeight = PlayableTableCell.rowHeight
         
         let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
             infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },
@@ -121,8 +121,8 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
     }
 
     func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, song: Song) -> UITableViewCell {
-        let cell: AlbumSongTableCell = dequeueCell(for: tableView, at: indexPath)
-        cell.display(song: song, playContextCb: convertCellViewToPlayContext, rootView: self)
+        let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
+        cell.display(playable: song, playContextCb: convertCellViewToPlayContext, rootView: self, isDislayAlbumTrackNumberStyle: true)
         return cell
     }
     

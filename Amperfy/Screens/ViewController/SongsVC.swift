@@ -38,8 +38,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         
         applyFilter()
         configureSearchController(placeholder: "Search in \"\(self.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
-        tableView.register(nibName: SongTableCell.typeName)
-        tableView.rowHeight = SongTableCell.rowHeight
+        tableView.register(nibName: PlayableTableCell.typeName)
+        tableView.rowHeight = PlayableTableCell.rowHeight
         
         let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
             infoCB: { "\(self.fetchedResultsController.fetchedObjects?.count ?? 0) Song\((self.fetchedResultsController.fetchedObjects?.count ?? 0) == 1 ? "" : "s")" },
@@ -124,9 +124,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
+        let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
         let song = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
+        cell.display(playable: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
         return cell
     }
     

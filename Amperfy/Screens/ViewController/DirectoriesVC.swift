@@ -43,7 +43,7 @@ class DirectoriesVC: MultiSourceTableViewController {
         configureSearchController(placeholder: "Directories and Songs", scopeButtonTitles: ["All", "Cached"])
         navigationItem.title = directory.name
         tableView.register(nibName: DirectoryTableCell.typeName)
-        tableView.register(nibName: SongTableCell.typeName)
+        tableView.register(nibName: PlayableTableCell.typeName)
         
         let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
             infoCB: { "\(self.directory.songs.count) Song\(self.directory.songs.count == 1 ? "" : "s")" },
@@ -177,9 +177,9 @@ class DirectoriesVC: MultiSourceTableViewController {
             cell.display(directory: cellDirectory)
             return cell
         case 1:
-            let cell: SongTableCell = dequeueCell(for: tableView, at: indexPath)
+            let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
             let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(song: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
+            cell.display(playable: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
             return cell
         default:
             return UITableViewCell()
@@ -191,7 +191,7 @@ class DirectoriesVC: MultiSourceTableViewController {
         case 0:
             return DirectoryTableCell.rowHeight
         case 1:
-            return SongTableCell.rowHeight
+            return PlayableTableCell.rowHeight
         default:
             return 0.0
         }
