@@ -100,7 +100,7 @@ extension Genre: PlayableContainable  {
             }
             let completeDuration = songs.reduce(0, {$0 + $1.duration})
             if completeDuration > 0 {
-                infoContent.append("\(completeDuration.asDurationString)")
+                infoContent.append("\(completeDuration.asDurationShortString)")
             }
             if details.isShowDetailedInfo {
                 infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")

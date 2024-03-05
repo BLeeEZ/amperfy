@@ -30,6 +30,9 @@ class GenericTableCell: BasicTableCell {
     @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var favoriteIconImage: UIImageView!
     
+    @IBOutlet weak var subtitleLabelWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var infoLabelWidthConstraint: NSLayoutConstraint!
+    
     static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
     static let rowHeightWithoutImage: CGFloat = 28.0 + margin.bottom + margin.top
     
@@ -47,6 +50,20 @@ class GenericTableCell: BasicTableCell {
         infoLabel.isHidden = infoText.isEmpty
         infoLabel.text = infoText
         favoriteIconImage.isHidden = !container.isFavorite
+        
+        if container is Album {
+            subtitleLabelWidthConstraint.constant = 250
+            infoLabelWidthConstraint.constant = 140
+        } else if container is Artist {
+            subtitleLabelWidthConstraint.constant = 200
+            infoLabelWidthConstraint.constant = 200
+        } else if container is Genre {
+            subtitleLabelWidthConstraint.constant = 0
+            infoLabelWidthConstraint.constant = 260
+        } else if container is Podcast {
+            subtitleLabelWidthConstraint.constant = 0
+            infoLabelWidthConstraint.constant = 140
+        }
     }
 
 }

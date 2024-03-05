@@ -93,6 +93,13 @@ extension Int {
         }
     }
     
+    public var asDurationShortString: String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute]
+        formatter.unitsStyle = .abbreviated
+        return formatter.string(from: TimeInterval(self))!
+    }
+    
     public var asDurationString: String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.hour, .minute, .second]

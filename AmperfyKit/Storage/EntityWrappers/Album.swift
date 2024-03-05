@@ -179,7 +179,7 @@ extension Album: PlayableContainable  {
             infoContent.append("\(songCount) Songs")
         }
         if details.type == .short, details.isShowAlbumDuration, duration > 0 {
-            infoContent.append("\(duration.asDurationString)")
+            infoContent.append("\(duration.asDurationShortString)")
         }
         if details.type == .long {
             if isCompletelyCached {
@@ -192,7 +192,7 @@ extension Album: PlayableContainable  {
                 infoContent.append("Genre: \(genre.name)")
             }
             if duration > 0 {
-                infoContent.append("\(duration.asDurationString)")
+                infoContent.append("\(duration.asDurationShortString)")
             }
             if details.isShowDetailedInfo {
                 infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")

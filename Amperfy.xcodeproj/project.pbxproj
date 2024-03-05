@@ -1088,6 +1088,17 @@
 			path = ManagedObjects;
 			sourceTree = "<group>";
 		};
+		503E04472B98F42F0091D31E /* Collection */ = {
+			isa = PBXGroup;
+			children = (
+				5005938828E2D4EF008C8DF6 /* CommonCollectionSectionHeader.xib */,
+				5005938A28E2D4FB008C8DF6 /* CommonCollectionSectionHeader.swift */,
+				50DF1E5928DDECEA00F3EA00 /* AlbumCollectionCell.xib */,
+				50DF1E5428DDE3FA00F3EA00 /* AlbumCollectionCell.swift */,
+			);
+			path = Collection;
+			sourceTree = "<group>";
+		};
 		5041B7FE220D4DF600603F02 /* Common */ = {
 			isa = PBXGroup;
 			children = (
@@ -1555,6 +1566,7 @@
 		50C16C0E21E533E800F086F0 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				503E04472B98F42F0091D31E /* Collection */,
 				50AFA1482632E83100F198DD /* GenericDetailTableHeader.xib */,
 				50AFA1472632E83100F198DD /* GenericDetailTableHeader.swift */,
 				500B7D4421EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib */,
@@ -1565,10 +1577,6 @@
 				50DEEE05265E27070073FF20 /* DirectoryTableCell.swift */,
 				50C16C2521E7CBA500F086F0 /* GenericTableCell.xib */,
 				50C16C1D21E7A35C00F086F0 /* GenericTableCell.swift */,
-				50DF1E5928DDECEA00F3EA00 /* AlbumCollectionCell.xib */,
-				50DF1E5428DDE3FA00F3EA00 /* AlbumCollectionCell.swift */,
-				5005938828E2D4EF008C8DF6 /* CommonCollectionSectionHeader.xib */,
-				5005938A28E2D4FB008C8DF6 /* CommonCollectionSectionHeader.swift */,
 				5055AA5526835A9000096B8D /* PodcastEpisodeTableCell.xib */,
 				5055AA5626835A9000096B8D /* PodcastEpisodeTableCell.swift */,
 				50C16C0B21E52BBB00F086F0 /* PlayableTableCell.xib */,

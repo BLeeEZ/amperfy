@@ -505,7 +505,7 @@ extension Playlist: PlayableContainable  {
             infoContent.append("Smart Playlist")
         }
         if details.type == .short, duration > 0 {
-            infoContent.append("\(duration.asDurationString)")
+            infoContent.append("\(duration.asDurationShortString)")
         }
         if details.type == .long {
             if isCompletelyCached {
@@ -513,7 +513,7 @@ extension Playlist: PlayableContainable  {
             }
             let completeDuration = playables.reduce(0, {$0 + $1.duration})
             if completeDuration > 0 {
-                infoContent.append("\(completeDuration.asDurationString)")
+                infoContent.append("\(completeDuration.asDurationShortString)")
             }
             if details.isShowDetailedInfo {
                 infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
