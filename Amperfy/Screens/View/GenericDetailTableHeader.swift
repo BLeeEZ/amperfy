@@ -66,16 +66,16 @@ class GenericDetailTableHeader: UIView {
 
     func prepare(configuration: DetailHeaderConfiguration) {
         self.config = configuration
+        self.config?.playShuffleInfoConfig?.isEmbeddedInOtherView = true
         titleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         nameTextField.setContentCompressionResistancePriority(.required, for: .vertical)
         subtitleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         infoLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         self.layoutMargins = UIView.defaultMarginTopElement
-        if let playShuffleInfoConfig = configuration.playShuffleInfoConfig {
+        if let playShuffleInfoConfig = self.config?.playShuffleInfoConfig {
             playShuffleInfoView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib()
             playShuffleInfoPlaceholderStack.addArrangedSubview(playShuffleInfoView!)
             playShuffleInfoView?.prepare(configuration: playShuffleInfoConfig)
-            playShuffleInfoView?.layoutMargins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
         }
         if let descriptionText = configuration.descriptionText {
             descriptionLabel.text = descriptionText

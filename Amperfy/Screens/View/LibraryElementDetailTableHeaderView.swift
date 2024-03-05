@@ -34,6 +34,7 @@ struct PlayShuffleInfoConfiguration {
     var isShuffleHidden = false
     var isShuffleOnContextNeccessary: Bool = true
     var shuffleContextCb: GetPlayContextCallback? = nil
+    var isEmbeddedInOtherView: Bool = false
 }
 
 class LibraryElementDetailTableHeaderView: UIView {
@@ -67,8 +68,18 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     func refresh() {
-        infoContainerView.isHidden = (config?.isInfoAlwaysHidden ?? true) || (traitCollection.horizontalSizeClass == .compact)
-        infoLabel.text = config?.infoCB?() ?? ""
+        guard let config = config else { return }
+        if config.isEmbeddedInOtherView {
+            self.layoutMargins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+        } else {
+            if traitCollection.horizontalSizeClass == .compact {
+                self.layoutMargins = UIEdgeInsets(top: 0.0, left: UIView.defaultMarginCellX, bottom: 0.0, right: UIView.defaultMarginCellX)
+            } else {
+                self.layoutMargins = UIEdgeInsets(top: 0.0, left: UIView.defaultMarginX, bottom: 0.0, right: UIView.defaultMarginX)
+            }
+        }
+        infoContainerView.isHidden = config.isInfoAlwaysHidden || (traitCollection.horizontalSizeClass == .compact)
+        infoLabel.text = config.infoCB?() ?? ""
     }
     
     @IBAction func playAllButtonPressed(_ sender: Any) {
