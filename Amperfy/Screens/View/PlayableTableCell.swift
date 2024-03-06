@@ -150,21 +150,26 @@ class PlayableTableCell: BasicTableCell {
     func refreshCacheAndDuration() {
         guard let playable = playable else { return }
         let isDurationVisible = appDelegate.storage.settings.isShowSongDuration || (traitCollection.horizontalSizeClass == .regular)
-        if playable.isCached {
-            cacheIconImage.isHidden = false
-            labelTrailingCacheConstraint.priority = .defaultHigh
-            labelTrailingDurationConstraint.priority = .defaultLow
-            labelTrailingCellConstraint.priority = .defaultLow
-        } else if isDurationVisible {
-            cacheIconImage.isHidden = true
-            labelTrailingCacheConstraint.priority = .defaultLow
-            labelTrailingDurationConstraint.priority = .defaultHigh
-            labelTrailingCellConstraint.priority = .defaultLow
+        if traitCollection.horizontalSizeClass == .regular {
+            cacheIconImage.isHidden = !playable.isCached
+            // only one distant constaint is active for regular
         } else {
-            cacheIconImage.isHidden = true
-            labelTrailingCacheConstraint.priority = .defaultLow
-            labelTrailingDurationConstraint.priority = .defaultLow
-            labelTrailingCellConstraint.priority = .defaultHigh
+            if playable.isCached {
+                cacheIconImage.isHidden = false
+                labelTrailingCacheConstraint.priority = .defaultHigh
+                labelTrailingDurationConstraint.priority = .defaultLow
+                labelTrailingCellConstraint.priority = .defaultLow
+            } else if isDurationVisible {
+                cacheIconImage.isHidden = true
+                labelTrailingCacheConstraint.priority = .defaultLow
+                labelTrailingDurationConstraint.priority = .defaultHigh
+                labelTrailingCellConstraint.priority = .defaultLow
+            } else {
+                cacheIconImage.isHidden = true
+                labelTrailingCacheConstraint.priority = .defaultLow
+                labelTrailingDurationConstraint.priority = .defaultLow
+                labelTrailingCellConstraint.priority = .defaultHigh
+            }
         }
         
         favoriteIconImage.isHidden = !playable.isFavorite
