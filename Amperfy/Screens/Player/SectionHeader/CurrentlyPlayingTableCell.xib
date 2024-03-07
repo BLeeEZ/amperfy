@@ -35,11 +35,16 @@
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Songs Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BqX-0l-UXJ" userLabel="Title Label" customClass="MarqueeLabel" customModule="MarqueeLabel">
                         <rect key="frame" x="96" y="27" width="187" height="20"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="20" id="mnK-vb-nqe"/>
+                            <constraint firstAttribute="height" constant="20" id="mnK-vb-nqe">
+                                <variation key="widthClass=regular" constant="22"/>
+                            </constraint>
                         </constraints>
                         <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
+                        <variation key="widthClass=regular">
+                            <fontDescription key="fontDescription" type="boldSystem" pointSize="19"/>
+                        </variation>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xdv-qI-JIo" userLabel="Artist Name Button">
                         <rect key="frame" x="96" y="47" width="187" height="20"/>
@@ -50,10 +55,15 @@
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O9L-T9-lNw" userLabel="Artist Name Label" customClass="MarqueeLabel" customModule="MarqueeLabel">
                         <rect key="frame" x="96" y="47" width="187" height="20"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="20" id="hae-qK-0t1"/>
+                            <constraint firstAttribute="height" constant="20" id="hae-qK-0t1">
+                                <variation key="widthClass=regular" constant="22"/>
+                            </constraint>
                         </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
                         <nil key="highlightedColor"/>
+                        <variation key="widthClass=regular">
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        </variation>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FXO-Ca-aCo" userLabel="Favorite">
                         <rect key="frame" x="291" y="32" width="30" height="30"/>
@@ -132,7 +142,7 @@
             <size key="intrinsicContentSize" width="91.5" height="20.5"/>
         </designable>
         <designable name="O9L-T9-lNw">
-            <size key="intrinsicContentSize" width="76.5" height="17"/>
+            <size key="intrinsicContentSize" width="86" height="19.5"/>
         </designable>
     </designables>
     <resources>

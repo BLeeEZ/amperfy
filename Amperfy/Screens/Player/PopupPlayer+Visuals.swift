@@ -226,4 +226,14 @@ extension PopupPlayerVC {
         refresh()
     }
     
+    func adjustLaoutMargins() {
+        if self.traitCollection.userInterfaceIdiom == .phone {
+            self.view.layoutMargins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+        } else if self.traitCollection.horizontalSizeClass == .compact {
+            self.view.layoutMargins = UIEdgeInsets(top: 10.0, left: 0.0, bottom: 0.0, right: 0.0)
+        } else {
+            self.view.layoutMargins = UIEdgeInsets(top: 10.0, left: 30.0, bottom: 10.0, right: 30.0)
+        }
+    }
+    
 }

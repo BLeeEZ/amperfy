@@ -97,6 +97,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        adjustLaoutMargins()
         refreshCellMasks()
     }
     
@@ -104,6 +105,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         super.viewWillAppear(animated)
         appDelegate.userStatistics.visited(.popupPlayer)
         self.becomeFirstResponder()
+        adjustLaoutMargins()
         changeDisplayStyle(to: appDelegate.storage.settings.playerDisplayStyle, animated: false)
         reloadData()
         scrollToCurrentlyPlayingRow()
