@@ -47,7 +47,7 @@
                                     </mask>
                                 </variation>
                                 <variation key="widthClass=regular">
-                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <mask key="constraints">
                                         <include reference="6qd-Cl-jB4"/>
                                     </mask>

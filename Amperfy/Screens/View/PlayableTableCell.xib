@@ -61,7 +61,7 @@
                                         <color key="textColor" systemColor="secondaryLabelColor"/>
                                         <nil key="highlightedColor"/>
                                         <variation key="widthClass=regular">
-                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         </variation>
                                     </label>
                                 </subviews>
@@ -155,9 +155,9 @@
                 </variation>
                 <variation key="widthClass=regular">
                     <mask key="constraints">
+                        <include reference="XSd-DE-MgM"/>
                         <exclude reference="nIp-de-9oL"/>
                         <exclude reference="7Pv-5E-gkm"/>
-                        <include reference="XSd-DE-MgM"/>
                         <exclude reference="xUH-ZW-LLy"/>
                     </mask>
                 </variation>

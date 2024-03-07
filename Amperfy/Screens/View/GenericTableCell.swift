@@ -30,7 +30,6 @@ class GenericTableCell: BasicTableCell {
     @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var favoriteIconImage: UIImageView!
     
-    @IBOutlet weak var subtitleLabelWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var infoLabelWidthConstraint: NSLayoutConstraint!
     
     static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
@@ -42,6 +41,7 @@ class GenericTableCell: BasicTableCell {
     func display(container: PlayableContainable, rootView: UITableViewController) {
         self.container = container
         self.rootView = rootView
+        self.selectionStyle = .none
         titleLabel.text = container.name
         subtitleLabel.isHidden = container.subtitle == nil
         subtitleLabel.text = container.subtitle
@@ -52,16 +52,12 @@ class GenericTableCell: BasicTableCell {
         favoriteIconImage.isHidden = !container.isFavorite
         
         if container is Album {
-            subtitleLabelWidthConstraint.constant = 250
             infoLabelWidthConstraint.constant = 140
         } else if container is Artist {
-            subtitleLabelWidthConstraint.constant = 200
-            infoLabelWidthConstraint.constant = 200
+            infoLabelWidthConstraint.constant = 230
         } else if container is Genre {
-            subtitleLabelWidthConstraint.constant = 0
             infoLabelWidthConstraint.constant = 260
         } else if container is Podcast {
-            subtitleLabelWidthConstraint.constant = 0
             infoLabelWidthConstraint.constant = 140
         }
     }

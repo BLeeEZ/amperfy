@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
@@ -19,55 +19,82 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="sEM-ZY-PBA" userLabel="VStack View">
-                        <rect key="frame" x="16" y="10" width="701" height="48"/>
+                        <rect key="frame" x="16" y="9" width="701" height="50"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kaN-9u-M2i" userLabel="EntityImage" customClass="EntityImageView" customModule="AmperfyKit">
-                                <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
+                                <rect key="frame" x="0.0" y="1" width="48" height="48"/>
                                 <color key="backgroundColor" systemColor="systemRedColor"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="48" id="5oe-DH-jSb"/>
                                     <constraint firstAttribute="width" secondItem="kaN-9u-M2i" secondAttribute="height" multiplier="1:1" id="wD7-nl-i5l"/>
                                 </constraints>
                             </view>
-                            <stackView opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceLeftToRight" axis="vertical" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="55a-sm-8cR" userLabel="HStack View">
-                                <rect key="frame" x="56" y="15" width="645" height="18"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="55a-sm-8cR" userLabel="HStack View">
+                                <rect key="frame" x="56" y="0.0" width="645" height="50"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHk-4e-H8f" userLabel="Title Label">
-                                        <rect key="frame" x="0.0" y="0.0" width="229" height="18"/>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="HDj-Db-Qbv">
+                                        <rect key="frame" x="0.0" y="0.0" width="645" height="35"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHk-4e-H8f" userLabel="Title Label">
+                                                <rect key="frame" x="0.0" y="0.0" width="645" height="20.5"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="16" id="vsJ-7z-xj1">
+                                                        <variation key="widthClass=regular" constant="18"/>
+                                                    </constraint>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                                <variation key="default">
+                                                    <mask key="constraints">
+                                                        <exclude reference="vsJ-7z-xj1"/>
+                                                    </mask>
+                                                </variation>
+                                                <variation key="widthClass=regular">
+                                                    <mask key="constraints">
+                                                        <include reference="vsJ-7z-xj1"/>
+                                                    </mask>
+                                                </variation>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hM0-yx-hsO" userLabel="Subtitle Label">
+                                                <rect key="frame" x="0.0" y="20.5" width="645" height="14.5"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="15" id="dnN-rs-XET">
+                                                        <variation key="widthClass=regular" constant="18"/>
+                                                    </constraint>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                <nil key="highlightedColor"/>
+                                                <variation key="default">
+                                                    <mask key="constraints">
+                                                        <exclude reference="dnN-rs-XET"/>
+                                                    </mask>
+                                                </variation>
+                                                <variation key="widthClass=regular">
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <mask key="constraints">
+                                                        <include reference="dnN-rs-XET"/>
+                                                    </mask>
+                                                </variation>
+                                            </label>
+                                        </subviews>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="16" id="vsJ-7z-xj1">
-                                                <variation key="widthClass=regular" constant="18"/>
-                                            </constraint>
+                                            <constraint firstAttribute="height" constant="35" id="y2Z-f4-QBV"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hM0-yx-hsO" userLabel="Subtitle Label">
-                                        <rect key="frame" x="237" y="0.0" width="200" height="18"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="200" id="N2K-d9-pBH"/>
-                                            <constraint firstAttribute="height" constant="15" id="dnN-rs-XET">
-                                                <variation key="widthClass=regular" constant="18"/>
-                                            </constraint>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                        <color key="textColor" systemColor="secondaryLabelColor"/>
-                                        <nil key="highlightedColor"/>
                                         <variation key="default">
                                             <mask key="constraints">
-                                                <exclude reference="N2K-d9-pBH"/>
+                                                <exclude reference="y2Z-f4-QBV"/>
                                             </mask>
                                         </variation>
-                                        <variation key="widthClass=regular">
-                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                        <variation key="widthClass=regular" alignment="center" axis="horizontal" distribution="fillEqually">
                                             <mask key="constraints">
-                                                <include reference="N2K-d9-pBH"/>
+                                                <include reference="y2Z-f4-QBV"/>
                                             </mask>
                                         </variation>
-                                    </label>
+                                    </stackView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ah3-fC-zQQ" userLabel="Info Label">
-                                        <rect key="frame" x="445" y="0.0" width="200" height="18"/>
+                                        <rect key="frame" x="0.0" y="35" width="645" height="15"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="15" id="1Hs-Po-1o2">
                                                 <variation key="widthClass=regular" constant="18"/>
@@ -129,7 +156,6 @@
                 <outlet property="infoLabel" destination="Ah3-fC-zQQ" id="YLL-zm-iRb"/>
                 <outlet property="infoLabelWidthConstraint" destination="ser-uw-D7d" id="lZc-8W-s88"/>
                 <outlet property="subtitleLabel" destination="hM0-yx-hsO" id="37o-uX-paA"/>
-                <outlet property="subtitleLabelWidthConstraint" destination="N2K-d9-pBH" id="EIy-uh-sqj"/>
                 <outlet property="titleLabel" destination="WHk-4e-H8f" id="ohx-DI-VsD"/>
             </connections>
             <point key="canvasLocation" x="-226.171875" y="-367.3828125"/>
