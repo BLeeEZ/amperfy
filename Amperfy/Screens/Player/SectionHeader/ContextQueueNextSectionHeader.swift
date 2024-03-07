@@ -46,6 +46,7 @@ class ContextQueueNextSectionHeader: UIView {
     
     func prepare(toWorkOnRootView: PopupPlayerVC? ) {
         self.rootView = toWorkOnRootView
+        contextNameLabel.applyAmperfyStyle()
         refresh()
     }
     
