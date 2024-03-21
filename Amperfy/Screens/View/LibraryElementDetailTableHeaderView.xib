@@ -44,7 +44,9 @@
                                             <color key="tintColor" systemColor="tintColor"/>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
                                             <state key="normal" title="Play" image="play.fill" catalog="system"/>
-                                            <buttonConfiguration key="configuration" style="gray" image="play.fill" catalog="system" title="Play" imagePadding="12" buttonSize="large"/>
+                                            <buttonConfiguration key="configuration" style="gray" image="play.fill" catalog="system" title="Play" imagePadding="12" buttonSize="large">
+                                                <directionalEdgeInsets key="contentInsets" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
+                                            </buttonConfiguration>
                                             <connections>
                                                 <action selector="playAllButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="phc-Oa-Z7W"/>
                                             </connections>
@@ -54,7 +56,9 @@
                                             <color key="tintColor" systemColor="tintColor"/>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="12" maxY="0.0"/>
                                             <state key="normal" title="Shuffle" image="shuffle" catalog="system"/>
-                                            <buttonConfiguration key="configuration" style="gray" image="shuffle" catalog="system" title="Shuffle" imagePadding="12" buttonSize="large"/>
+                                            <buttonConfiguration key="configuration" style="gray" image="shuffle" catalog="system" title="Shuffle" imagePadding="12" buttonSize="large">
+                                                <directionalEdgeInsets key="contentInsets" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
+                                            </buttonConfiguration>
                                             <connections>
                                                 <action selector="addAllShuffledButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="jJy-6e-BVq"/>
                                             </connections>
