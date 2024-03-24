@@ -673,7 +673,7 @@
                                 <color key="progressTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="trackTintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </progressView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100.0%" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KKh-tQ-byV">
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100.0%" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KKh-tQ-byV">
                                 <rect key="frame" x="329" y="226" width="60" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="hbQ-OO-Ail"/>
@@ -688,6 +688,10 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="3en-Wv-ZMc">
+                                <rect key="frame" x="369" y="226" width="20" height="20"/>
+                                <color key="color" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="fzc-Vu-2Fw"/>
                         <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -697,14 +701,17 @@
                             <constraint firstItem="8Hu-Ks-SWY" firstAttribute="top" secondItem="fzc-Vu-2Fw" secondAttribute="top" constant="105" id="AFT-rh-m1X"/>
                             <constraint firstItem="npf-bB-pkf" firstAttribute="leading" secondItem="fzc-Vu-2Fw" secondAttribute="leading" constant="25" id="Fhv-0h-2ew"/>
                             <constraint firstItem="KKh-tQ-byV" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="qe5-xR-nU8" secondAttribute="trailing" constant="8" id="NIu-Bu-c0c"/>
+                            <constraint firstItem="3en-Wv-ZMc" firstAttribute="trailing" secondItem="npf-bB-pkf" secondAttribute="trailing" id="UKn-Xo-PcW"/>
                             <constraint firstItem="KKh-tQ-byV" firstAttribute="trailing" secondItem="npf-bB-pkf" secondAttribute="trailing" id="Yo9-zw-fD3"/>
                             <constraint firstItem="fzc-Vu-2Fw" firstAttribute="trailing" secondItem="npf-bB-pkf" secondAttribute="trailing" constant="25" id="Z9Z-7x-Dmt"/>
                             <constraint firstItem="qe5-xR-nU8" firstAttribute="leading" secondItem="npf-bB-pkf" secondAttribute="leading" id="dAw-V3-zzn"/>
                             <constraint firstItem="npf-bB-pkf" firstAttribute="top" secondItem="8Hu-Ks-SWY" secondAttribute="bottom" constant="88" id="etY-SN-P1i"/>
+                            <constraint firstItem="3en-Wv-ZMc" firstAttribute="top" secondItem="npf-bB-pkf" secondAttribute="bottom" constant="8" id="h5V-IR-KPi"/>
                             <constraint firstItem="KKh-tQ-byV" firstAttribute="centerY" secondItem="qe5-xR-nU8" secondAttribute="centerY" id="zZb-RW-x56"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activitySpinner" destination="3en-Wv-ZMc" id="jKV-Yl-cfg"/>
                         <outlet property="progressBar" destination="npf-bB-pkf" id="C83-ms-bZn"/>
                         <outlet property="progressInfo" destination="qe5-xR-nU8" id="9mn-5u-yc5"/>
                         <outlet property="progressLabel" destination="KKh-tQ-byV" id="Wib-rh-Gpj"/>
@@ -971,13 +978,13 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="secondarySystemBackgroundColor">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemBlueColor">
-            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

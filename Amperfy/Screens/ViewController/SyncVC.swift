@@ -35,6 +35,7 @@ class SyncVC: UIViewController {
     @IBOutlet weak var progressBar: UIProgressView!
     @IBOutlet weak var progressLabel: UILabel!
     @IBOutlet weak var progressInfo: UILabel!
+    @IBOutlet weak var activitySpinner: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,6 +60,11 @@ class SyncVC: UIViewController {
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Initial Sync", error: error, displayPopup: false)
         }.finally {
+            self.progressInfo.text = "Done"
+            self.activitySpinner.stopAnimating()
+            self.activitySpinner.isHidden = true
+            self.progressLabel.isHidden = true
+            
             self.appDelegate.storage.librarySyncVersion = .newestVersion
             self.appDelegate.storage.isLibrarySynced = true
             self.appDelegate.intentManager.registerXCallbackURLs()
@@ -77,7 +83,7 @@ class SyncVC: UIViewController {
             if let infoText = infoText {
                 self.progressInfo.text = infoText
             }
-            self.progressBar.setProgress(percentParsed, animated: true)
+            self.progressBar.setProgress(percentParsed, animated: percentParsed != 0.0)
             self.progressLabel.text = String(format: "%.1f", percentParsed * 100) + "%"
         }
     }
@@ -96,7 +102,7 @@ extension SyncVC: SyncCallbacks {
         
         var parsePercent: Float = 0.0
         if self.libObjectsToParseCount > 0 {
-            parsePercent = Float(self.parsedObjectCount) / Float(self.libObjectsToParseCount)
+            parsePercent = min(Float(self.parsedObjectCount) / Float(self.libObjectsToParseCount), 1.0)
         }
         let percentDiff = Int(parsePercent*1000)-Int(self.parsedObjectPercent*1000)
         if percentDiff > 0 {
@@ -112,6 +118,15 @@ extension SyncVC: SyncCallbacks {
         self.parsedObjectPercent = 0.0
         self.state = parsedObjectType
         self.libObjectsToParseCount = totalCount > 0 ? totalCount : 1
+        
+        if totalCount > 0 {
+            activitySpinner.stopAnimating()
+            activitySpinner.isHidden = true
+        } else {
+            activitySpinner.startAnimating()
+            activitySpinner.isHidden = false
+        }
+        progressLabel.isHidden = totalCount <= 0
         
         switch parsedObjectType {
         case .artist:

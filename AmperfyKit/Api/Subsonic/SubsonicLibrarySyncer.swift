@@ -31,6 +31,8 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     private let eventLogger: EventLogger
     private let log = OSLog(subsystem: "Amperfy", category: "SubsonicLibSyncer")
     
+    private static let maxItemCountToPollAtOnce: Int = 500
+    
     var isSyncAllowed: Bool {
         return Reachability.isConnectedToNetwork()
     }
@@ -60,11 +62,12 @@ class SubsonicLibrarySyncer: LibrarySyncer {
             }
         }.then { auth -> Promise<Void> in
             let artists = self.storage.main.library.getArtists().filter{ !$0.id.isEmpty }
-            statusNotifyier?.notifySyncStarted(ofType: .album, totalCount: artists.count)
-            
-            let artistPromises: [() -> Promise<Void>] = artists.compactMap { artist in return {
+            let albumCount = artists.reduce(0, { $0 + $1.albumCount })
+            let pollCountArtist = max(1, Int(ceil(Double(albumCount) / Double(Self.maxItemCountToPollAtOnce))))
+            statusNotifyier?.notifySyncStarted(ofType: .album, totalCount: pollCountArtist)
+            let artistPromises: [() -> Promise<Void>] = Array(0...pollCountArtist).compactMap { index in return {
                 return firstly {
-                    self.subsonicServerApi.requestArtist(id: artist.id)
+                    self.subsonicServerApi.requestAlbums(offset: index*Self.maxItemCountToPollAtOnce, count: Self.maxItemCountToPollAtOnce)
                 }.then { response in
                     self.storage.async.perform { asyncCompanion in
                         let parserDelegate = SsAlbumParserDelegate(library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)

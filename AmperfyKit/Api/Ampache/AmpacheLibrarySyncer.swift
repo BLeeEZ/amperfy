@@ -57,7 +57,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             self.ampacheXmlServerApi.requesetLibraryMetaData()
         }.then { auth -> Promise<Void> in
             statusNotifyier?.notifySyncStarted(ofType: .artist, totalCount: auth.artistCount)
-            let pollCountArtist = auth.artistCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce
+            let pollCountArtist = max(1, Int(ceil(Double(auth.artistCount) / Double(AmpacheXmlServerApi.maxItemCountToPollAtOnce))))
             let artistPromises: [() -> Promise<Void>] = Array(0...pollCountArtist).compactMap { index in return {
                 return firstly {
                     self.ampacheXmlServerApi.requestArtists(startIndex: index*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
@@ -73,7 +73,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
             self.ampacheXmlServerApi.requesetLibraryMetaData()
         }.then { auth -> Promise<AuthentificationHandshake> in
             statusNotifyier?.notifySyncStarted(ofType: .album, totalCount: auth.albumCount)
-            let pollCountAlbum = auth.albumCount / AmpacheXmlServerApi.maxItemCountToPollAtOnce
+            let pollCountAlbum = max(1, Int(ceil(Double(auth.albumCount) / Double(AmpacheXmlServerApi.maxItemCountToPollAtOnce))))
             let albumPromises: [() -> Promise<Void>] = Array(0...pollCountAlbum).compactMap { index in return {
                 firstly {
                     self.ampacheXmlServerApi.requestAlbums(startIndex: index*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
