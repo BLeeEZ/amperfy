@@ -89,11 +89,13 @@ class SubsonicServerApi: URLCleanser {
     private let log = OSLog(subsystem: "Amperfy", category: "Subsonic")
     private let performanceMonitor: ThreadPerformanceMonitor
     private let eventLogger: EventLogger
+    private let persistentStorage: PersistentStorage
     private var credentials: LoginCredentials?
     
-    init(performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
+    init(performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger, persistentStorage: PersistentStorage) {
         self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
+        self.persistentStorage = persistentStorage
     }
     
     static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
@@ -260,9 +262,41 @@ class SubsonicServerApi: URLCleanser {
             self.determineApiVersionToUse()
         }.then { version -> Promise<URL> in
             if let podcastEpisode = playable.asPodcastEpisode, let streamId = podcastEpisode.streamId {
-                return Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: streamId)))
+                return Promise<URL> { seal in
+                    var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: streamId)
+                    switch self.persistentStorage.settings.streamingFormatPreference {
+                    case .mp3:
+                        urlComp.addQueryItem(name: "format", value: "mp3")
+                    case .raw:
+                        urlComp.addQueryItem(name: "format", value: "raw")
+                    }
+                    switch self.persistentStorage.settings.streamingMaxBitratePreference {
+                    case .noLimit:
+                        break
+                    default:
+                        urlComp.addQueryItem(name: "maxBitRate", value: self.persistentStorage.settings.streamingMaxBitratePreference.rawValue)
+                    }
+                    let url = try self.createUrl(from: urlComp)
+                    seal.fulfill(url)
+                }
             } else {
-                return Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: playable.id)))
+                return Promise<URL> { seal in
+                    var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: playable.id)
+                    switch self.persistentStorage.settings.streamingFormatPreference {
+                    case .mp3:
+                        urlComp.addQueryItem(name: "format", value: "mp3")
+                    case .raw:
+                        urlComp.addQueryItem(name: "format", value: "raw")
+                    }
+                    switch self.persistentStorage.settings.streamingMaxBitratePreference {
+                    case .noLimit:
+                        break
+                    default:
+                        urlComp.addQueryItem(name: "maxBitRate", value: self.persistentStorage.settings.streamingMaxBitratePreference.rawValue)
+                    }
+                    let url = try self.createUrl(from: urlComp)
+                    seal.fulfill(url)
+                }
             }
         }
     }

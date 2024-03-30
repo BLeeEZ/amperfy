@@ -29,6 +29,8 @@ final class Settings: ObservableObject {
     @Published var isShowAlbumDuration = false
     @Published var isShowArtistDuration = false
     @Published var screenLockPreventionPreference: ScreenLockPreventionPreference = .defaultValue
+    @Published var streamingMaxBitratePreference: StreamingMaxBitratePreference = .defaultValue
+    @Published var streamingFormatPreference: StreamingFormatPreference = .defaultValue
     @Published var isAutoCacheLatestSongs = false
     @Published var isAutoCacheLatestPodcastEpisodes = false
     @Published var isPlayerAutoCachePlayedItems = false

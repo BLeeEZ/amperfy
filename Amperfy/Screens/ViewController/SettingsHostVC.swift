@@ -77,6 +77,16 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.screenLockPreventionPreference = newValue
         }))
         
+        settings.streamingMaxBitratePreference = self.appDelegate.storage.settings.streamingMaxBitratePreference
+        changesAgent.append(settings.$streamingMaxBitratePreference.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.streamingMaxBitratePreference = newValue
+        }))
+        
+        settings.streamingFormatPreference = self.appDelegate.storage.settings.streamingFormatPreference
+        changesAgent.append(settings.$streamingFormatPreference.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.streamingFormatPreference = newValue
+        }))
+        
         settings.isAutoCacheLatestSongs = self.appDelegate.storage.settings.isAutoDownloadLatestSongsActive
         changesAgent.append(settings.$isAutoCacheLatestSongs.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.isAutoDownloadLatestSongsActive = newValue

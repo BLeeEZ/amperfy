@@ -83,6 +83,44 @@ public enum ScreenLockPreventionPreference: Int, CaseIterable {
     }
 }
 
+public enum StreamingMaxBitratePreference: Int, CaseIterable {
+    case noLimit = 0
+    case limit32 = 32
+    case limit64 = 64
+    case limit96 = 96
+    case limit128 = 128
+    case limit192 = 192
+    case limit256 = 256
+    case limit320 = 320
+    
+    public static let defaultValue: StreamingMaxBitratePreference = .noLimit
+    
+    public var description: String {
+        switch self {
+        case .noLimit:
+            return "No Limit (default)"
+        default:
+            return "\(self.rawValue) kbps"
+        }
+    }
+}
+
+public enum StreamingFormatPreference: Int, CaseIterable {
+    case mp3 = 0
+    case raw = 1
+    
+    public static let defaultValue: StreamingFormatPreference = .mp3
+    
+    public var description: String {
+        switch self {
+        case .mp3:
+            return "mp3 (default)"
+        case .raw:
+            return "Raw/Original"
+        }
+    }
+}
+
 public class CoreDataCompanion {
     public let context: NSManagedObjectContext
     public let library: LibraryStorage
@@ -135,6 +173,8 @@ public class PersistentStorage {
         case ArtworkDisplayPreference = "artworkDisplayPreference"
         case SleepTimerInterval = "sleepTimerInterval" // not used anymore !!! 
         case ScreenLockPreventionPreference = "screenLockPreventionPreference"
+        case StreamingMaxBitratePreference = "streamingMaxBitratePreference"
+        case StreamingFormatPreference = "streamingFormatPreference"
         case CacheLimit = "cacheLimitInBytes" // limit in byte
         case ShowDetailedInfo = "showDetailedInfo"
         case ShowSongDuration = "showSongDuration"
@@ -190,6 +230,22 @@ public class PersistentStorage {
                 return ScreenLockPreventionPreference(rawValue: screenLockPreventionPreferenceRaw) ?? ScreenLockPreventionPreference.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ScreenLockPreventionPreference.rawValue) }
+        }
+        
+        public var streamingMaxBitratePreference: StreamingMaxBitratePreference {
+            get {
+                let streamingMaxBitratePreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.StreamingMaxBitratePreference.rawValue) as? Int ?? StreamingMaxBitratePreference.defaultValue.rawValue
+                return StreamingMaxBitratePreference(rawValue: streamingMaxBitratePreferenceRaw) ?? StreamingMaxBitratePreference.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.StreamingMaxBitratePreference.rawValue) }
+        }
+        
+        public var streamingFormatPreference: StreamingFormatPreference {
+            get {
+                let streamingFormatPreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.StreamingFormatPreference.rawValue) as? Int ?? StreamingFormatPreference.defaultValue.rawValue
+                return StreamingFormatPreference(rawValue: streamingFormatPreferenceRaw) ?? StreamingFormatPreference.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.StreamingFormatPreference.rawValue) }
         }
         
         public var isShowDetailedInfo: Bool {

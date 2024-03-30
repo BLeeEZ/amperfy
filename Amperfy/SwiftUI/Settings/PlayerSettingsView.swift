@@ -20,10 +20,43 @@
 //
 
 import SwiftUI
+import AmperfyKit
 
 struct PlayerSettingsView: View {
     
     @EnvironmentObject private var settings: Settings
+    
+    func streamingMaxBitrateNoLimit() {
+        settings.streamingMaxBitratePreference = .noLimit
+    }
+    func streamingMaxBitrate32() {
+        settings.streamingMaxBitratePreference = .limit32
+    }
+    func streamingMaxBitrate64() {
+        settings.streamingMaxBitratePreference = .limit64
+    }
+    func streamingMaxBitrate96() {
+        settings.streamingMaxBitratePreference = .limit96
+    }
+    func streamingMaxBitrate128() {
+        settings.streamingMaxBitratePreference = .limit128
+    }
+    func streamingMaxBitrate192() {
+        settings.streamingMaxBitratePreference = .limit192
+    }
+    func streamingMaxBitrate256() {
+        settings.streamingMaxBitratePreference = .limit256
+    }
+    func streamingMaxBitrate320() {
+        settings.streamingMaxBitratePreference = .limit320
+    }
+    
+    func streamingFormatMp3() {
+        settings.streamingFormatPreference = .mp3
+    }
+    func streamingFormatRaw() {
+        settings.streamingFormatPreference = .raw
+    }
     
     var body: some View {
         ZStack{
@@ -48,6 +81,40 @@ struct PlayerSettingsView: View {
                 }
                 , footer: {
                     Text("Some server count streamed items already as played. When active streamed Songs are getting always scrobbled.")
+                })
+                
+                Section(content: {
+                    HStack {
+                        Text("Max Bitrate for Streaming")
+                        Spacer()
+                        Menu(settings.streamingMaxBitratePreference.description) {
+                            Button(StreamingMaxBitratePreference.noLimit.description, action: streamingMaxBitrateNoLimit)
+                            Button(StreamingMaxBitratePreference.limit32.description, action: streamingMaxBitrate32)
+                            Button(StreamingMaxBitratePreference.limit64.description, action: streamingMaxBitrate64)
+                            Button(StreamingMaxBitratePreference.limit96.description, action: streamingMaxBitrate96)
+                            Button(StreamingMaxBitratePreference.limit128.description, action: streamingMaxBitrate128)
+                            Button(StreamingMaxBitratePreference.limit192.description, action: streamingMaxBitrate192)
+                            Button(StreamingMaxBitratePreference.limit256.description, action: streamingMaxBitrate256)
+                            Button(StreamingMaxBitratePreference.limit320.description, action: streamingMaxBitrate320)
+                        }
+                    }
+                }
+                , footer: {
+                    Text("Lower bitrate saves bandwidth. This takes only affect when streaming.")
+                })
+                
+                Section(content: {
+                    HStack {
+                        Text("Streaming Format (Transcoding)")
+                        Spacer()
+                        Menu(settings.streamingFormatPreference.description) {
+                            Button(StreamingFormatPreference.mp3.description, action: streamingFormatMp3)
+                            Button(StreamingFormatPreference.raw.description, action: streamingFormatRaw)
+                        }
+                    }
+                }
+                , footer: {
+                    Text("Transicoding is recommended due to incompatibility with some formats. This takes only affect when streaming.")
                 })
             }
         }

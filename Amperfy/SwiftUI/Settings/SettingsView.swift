@@ -97,7 +97,7 @@ struct SettingsView: View {
                         Text("Library")
                     }
                     NavigationLink(destination: PlayerSettingsView()) {
-                        Text("Player & Scrobble")
+                        Text("Player, Stream & Scrobble")
                     }
                     NavigationLink(destination: SwipeSettingsView()) {
                         Text("Swipe")

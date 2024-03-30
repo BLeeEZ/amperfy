@@ -148,6 +148,7 @@ public class BackendProxy {
     private let log = OSLog(subsystem: "Amperfy", category: "BackendProxy")
     private let performanceMonitor: ThreadPerformanceMonitor
     private let eventLogger: EventLogger
+    private let persistentStorage: PersistentStorage
     private var activeApiType = BackenApiType.ampache
     public var selectedApi: BackenApiType {
         get {
@@ -173,22 +174,23 @@ public class BackendProxy {
     }
  
     private lazy var ampacheApi: BackendApi = {
-        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger), performanceMonitor: performanceMonitor, eventLogger: eventLogger)
+        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger, persistentStorage: persistentStorage), performanceMonitor: performanceMonitor, eventLogger: eventLogger)
     }()
     private lazy var subsonicApi: BackendApi = {
-        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger), performanceMonitor: performanceMonitor, eventLogger: eventLogger)
+        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger, persistentStorage: persistentStorage), performanceMonitor: performanceMonitor, eventLogger: eventLogger)
         api.authType = .autoDetect
         return api
     }()
     private lazy var subsonicLegacyApi: BackendApi = {
-        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger), performanceMonitor: performanceMonitor, eventLogger: eventLogger)
+        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger, persistentStorage: persistentStorage), performanceMonitor: performanceMonitor, eventLogger: eventLogger)
         api.authType = .legacy
         return api
     }()
     
-    init(performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
+    init(performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger, persistentStorage: PersistentStorage) {
         self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
+        self.persistentStorage = persistentStorage
     }
 
     public func login(apiType: BackenApiType, credentials: LoginCredentials) -> Promise<BackenApiType> {

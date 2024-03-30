@@ -80,6 +80,7 @@ class AmpacheXmlServerApi: URLCleanser {
     let eventLogger: EventLogger
     private var credentials: LoginCredentials?
     private var authHandshake: AuthentificationHandshake?
+    private let persistentStorage: PersistentStorage
     
     func requestServerPodcastSupport() -> Promise<Bool> {
         return firstly {
@@ -93,9 +94,10 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    init(performanceMonitor: ThreadPerformanceMonitor,eventLogger: EventLogger) {
+    init(performanceMonitor: ThreadPerformanceMonitor,eventLogger: EventLogger, persistentStorage: PersistentStorage) {
         self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
+        self.persistentStorage = persistentStorage
     }
     
     static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
@@ -691,7 +693,31 @@ class AmpacheXmlServerApi: URLCleanser {
     }
     
     func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
-        return generateUrl(forDownloadingPlayable: playable)
+        return firstly {
+            reauthenticate()
+        }.then { auth in
+            return Promise<URL> { seal in
+                var urlComp = try self.createAuthApiUrlComponent(auth: auth)
+                urlComp.addQueryItem(name: "action", value: "stream")
+                urlComp.addQueryItem(name: "type", value: playable.isSong ? "song" : "podcast_episode")
+                urlComp.addQueryItem(name: "id", value: playable.id)
+                switch self.persistentStorage.settings.streamingFormatPreference {
+                case .mp3:
+                    urlComp.addQueryItem(name: "format", value: "mp3")
+                case .raw:
+                    urlComp.addQueryItem(name: "format", value: "raw")
+                }
+                switch self.persistentStorage.settings.streamingMaxBitratePreference {
+                case .noLimit:
+                    break
+                default:
+                    urlComp.addQueryItem(name: "bitrate", value: self.persistentStorage.settings.streamingMaxBitratePreference.rawValue)
+                }
+                urlComp.addQueryItem(name: "length", value: 1)
+                let url = try self.createUrl(from: urlComp)
+                seal.fulfill(url)
+            }
+        }
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
