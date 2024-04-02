@@ -134,6 +134,7 @@ public struct TranscodingInfo {
 public protocol BackendApi: URLCleanser {
     var clientApiVersion: String { get }
     var serverApiVersion: String { get }
+    var isStreamingTranscodingActive: Bool { get }
     func provideCredentials(credentials: LoginCredentials)
     func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void>
     func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL>

@@ -81,6 +81,9 @@ class SubsonicServerApi: URLCleanser {
     
     var serverApiVersion: SubsonicVersion?
     var clientApiVersion: SubsonicVersion?
+    var isStreamingTranscodingActive: Bool {
+        return persistentStorage.settings.streamingFormatPreference != .raw
+    }
     var authType: SubsonicApiAuthType = .autoDetect
     private var authTypeBasedClientApiVersion: SubsonicVersion {
         return self.authType == .legacy ? Self.defaultClientApiVersionPreToken : Self.defaultClientApiVersionWithToken

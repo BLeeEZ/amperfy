@@ -51,6 +51,10 @@ extension SubsonicApi: BackendApi {
     public var serverApiVersion: String {
         return subsonicServerApi.serverApiVersion?.description ?? "-"
     }
+    
+    public var isStreamingTranscodingActive: Bool {
+        return subsonicServerApi.isStreamingTranscodingActive
+    }
 
     func provideCredentials(credentials: LoginCredentials) {
         subsonicServerApi.provideCredentials(credentials: credentials)

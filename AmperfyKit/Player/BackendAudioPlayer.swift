@@ -132,15 +132,19 @@ class BackendAudioPlayer {
     
     func requestToPlay(playable: AbstractPlayable, playbackRate: PlaybackRate) {
         userDefinedPlaybackRate = playbackRate
-        if !playable.isPlayableOniOS, let contentType = playable.contentType {
-            clearPlayer()
-            eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playable.displayString)\" is not playable via Amperfy.", displayPopup: true)
-            self.responder?.notifyItemPreparationFinished()
-        } else if playable.isCached {
+        if playable.isCached {
+            guard playable.isPlayableOniOS else {
+                reactToIncompatibleContentType(contentType: playable.fileContentType ?? "", playableDisplayTitle: playable.displayString)
+                return
+            }
             insertCachedPlayable(playable: playable)
             self.continuePlay()
             self.responder?.notifyItemPreparationFinished()
         } else if !isOfflineMode{
+            guard playable.isPlayableOniOS || backendApi.isStreamingTranscodingActive else {
+                reactToIncompatibleContentType(contentType: playable.fileContentType ?? "", playableDisplayTitle: playable.displayString)
+                return
+            }
             firstly {
                 insertStreamPlayable(playable: playable)
             }.done {
@@ -159,6 +163,12 @@ class BackendAudioPlayer {
             clearPlayer()
             self.responder?.notifyItemPreparationFinished()
         }
+    }
+    
+    private func reactToIncompatibleContentType(contentType: String, playableDisplayTitle: String) {
+        clearPlayer()
+        eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playableDisplayTitle)\" is not playable via Amperfy. Activating transcoding in Settings could resolve this issue.", displayPopup: true)
+        self.responder?.notifyItemPreparationFinished()
     }
     
     private func clearPlayer() {

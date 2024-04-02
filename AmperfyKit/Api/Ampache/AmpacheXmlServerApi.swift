@@ -74,6 +74,9 @@ class AmpacheXmlServerApi: URLCleanser {
     
     var serverApiVersion: String?
     let clientApiVersion = "500000"
+    var isStreamingTranscodingActive: Bool {
+        return persistentStorage.settings.streamingFormatPreference != .raw
+    }
     
     private let log = OSLog(subsystem: "Amperfy", category: "Ampache")
     private let performanceMonitor: ThreadPerformanceMonitor

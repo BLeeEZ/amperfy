@@ -301,6 +301,10 @@ extension BackendProxy: BackendApi {
         return activeApi.serverApiVersion
     }
     
+    public var isStreamingTranscodingActive: Bool {
+        return activeApi.isStreamingTranscodingActive
+    }
+    
     public func provideCredentials(credentials: LoginCredentials) {
         activeApi.provideCredentials(credentials: credentials)
     }
