@@ -246,8 +246,13 @@ class PlayerControlView: UIView {
             if !timeSlider.isTracking {
                 let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
                 elapsedTimeLabel.text = elapsedClockTime.asShortString()
-                let remainingTime = ClockTime(timeInSeconds: Int(player.elapsedTime - ceil(player.duration)))
-                remainingTimeLabel.text = remainingTime.asShortString()
+                let duration = player.duration
+                if duration.isNormal && !duration.isZero {
+                    let remainingTime = ClockTime(timeInSeconds: Int(player.elapsedTime - ceil(player.duration)))
+                    remainingTimeLabel.text = remainingTime.asShortString()
+                } else {
+                    remainingTimeLabel.text = "--:--"
+                }
                 timeSlider.value = Float(player.elapsedTime)
             }
             let progress = Float(player.elapsedTime / player.duration)
