@@ -127,11 +127,13 @@ class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
 class MOCK_BackendApi: BackendApi {
     var clientApiVersion: String = ""
     var serverApiVersion: String = ""
+    var isStreamingTranscodingActive: Bool = true
     func provideCredentials(credentials: LoginCredentials) {}
     func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> { return Promise(error: BackendError.notSupported) }
     func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> { return Helper.urlPromise }
     func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> { return Helper.urlPromise }
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> { return Helper.urlPromise }
+    func determTranscodingInfo(url: URL) -> AmperfyKit.TranscodingInfo { return AmperfyKit.TranscodingInfo() }
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError? { return nil }
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer { return MOCK_LibrarySyncer() }
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }
