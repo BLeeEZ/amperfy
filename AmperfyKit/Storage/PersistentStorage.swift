@@ -121,6 +121,51 @@ public enum StreamingFormatPreference: Int, CaseIterable {
     }
 }
 
+public enum CacheTranscodingFormatPreference: Int, CaseIterable {
+    case raw = 0
+    case mp3 = 1
+    
+    public static let defaultValue: CacheTranscodingFormatPreference = .mp3
+    
+    public var asFileFormatString: String? {
+        switch self {
+        case .raw:
+            return nil
+        case .mp3:
+            return "mp3"
+        }
+    }
+    
+    public var asMIMETypeString: String? {
+        switch self {
+        case .raw:
+            return nil
+        case .mp3:
+            return "audio/mpeg"
+        }
+    }
+    
+    public static func createFromString(_ value: String) -> CacheTranscodingFormatPreference? {
+        switch value {
+        case "raw":
+            return .raw
+        case "mp3":
+            return .mp3
+        default:
+            return nil
+        }
+    }
+    
+    public var description: String {
+        switch self {
+        case .mp3:
+            return "mp3 (default)"
+        case .raw:
+            return "Raw/Original"
+        }
+    }
+}
+
 public class CoreDataCompanion {
     public let context: NSManagedObjectContext
     public let library: LibraryStorage
@@ -175,6 +220,7 @@ public class PersistentStorage {
         case ScreenLockPreventionPreference = "screenLockPreventionPreference"
         case StreamingMaxBitratePreference = "streamingMaxBitratePreference"
         case StreamingFormatPreference = "streamingFormatPreference"
+        case CacheTranscodingFormatPreference = "cacheTranscodingFormatPreference"
         case CacheLimit = "cacheLimitInBytes" // limit in byte
         case ShowDetailedInfo = "showDetailedInfo"
         case ShowSongDuration = "showSongDuration"
@@ -239,13 +285,21 @@ public class PersistentStorage {
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.StreamingMaxBitratePreference.rawValue) }
         }
-        
+         
         public var streamingFormatPreference: StreamingFormatPreference {
             get {
                 let streamingFormatPreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.StreamingFormatPreference.rawValue) as? Int ?? StreamingFormatPreference.defaultValue.rawValue
                 return StreamingFormatPreference(rawValue: streamingFormatPreferenceRaw) ?? StreamingFormatPreference.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.StreamingFormatPreference.rawValue) }
+        }       
+        
+        public var cacheTranscodingFormatPreference: CacheTranscodingFormatPreference {
+            get {
+                let cacheTranscodingFormatPreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.CacheTranscodingFormatPreference.rawValue) as? Int ?? CacheTranscodingFormatPreference.defaultValue.rawValue
+                return CacheTranscodingFormatPreference(rawValue: cacheTranscodingFormatPreferenceRaw) ?? CacheTranscodingFormatPreference.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.CacheTranscodingFormatPreference.rawValue) }
         }
         
         public var isShowDetailedInfo: Bool {

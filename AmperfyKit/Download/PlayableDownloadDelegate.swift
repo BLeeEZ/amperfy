@@ -62,11 +62,12 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
         return Guarantee<Void> { seal in
             guard let data = download.resumeData,
-                  let playable = download.element as? AbstractPlayable else {
+                  let playable = download.element as? AbstractPlayable,
+                  let url = download.url else {
                 return seal(Void())
             }
             let library = LibraryStorage(context: storage.main.context)
-            savePlayableDataAsync(playable: playable, data: data, storage: storage)
+            savePlayableDataAsync(playable: playable, url: url, data: data, storage: storage)
             artworkExtractor.extractEmbeddedArtwork(library: library, playable: playable, fileData: data)
             library.saveContext()
             seal(Void())
@@ -74,7 +75,7 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     }
     
     /// save downloaded playable async to avoid memory overflow issues due to kept references
-    func savePlayableDataAsync(playable: AbstractPlayable, data: Data, storage: PersistentStorage) {
+    func savePlayableDataAsync(playable: AbstractPlayable, url: URL, data: Data, storage: PersistentStorage) {
         firstly {
             storage.async.perform { companion in
                 guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else {
@@ -84,6 +85,8 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
                 let playableFile = companion.library.createPlayableFile()
                 playableFile.info = playableAsync
                 playableFile.data = data
+                let transcodingInfo = self.backendApi.determTranscodingInfo(url: url)
+                playableAsync.contentTypeTranscoded = transcodingInfo.format?.asMIMETypeString
             }
         }.catch { error in
             // no error possible

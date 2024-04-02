@@ -58,6 +58,13 @@ struct PlayerSettingsView: View {
         settings.streamingFormatPreference = .raw
     }
     
+    func cacheFormatMp3() {
+        settings.cacheTranscodingFormatPreference = .mp3
+    }
+    func cacheFormatRaw() {
+        settings.cacheTranscodingFormatPreference = .raw
+    }
+    
     var body: some View {
         ZStack{
             List {
@@ -114,11 +121,25 @@ struct PlayerSettingsView: View {
                     }
                 }
                 , footer: {
-                    Text("Transicoding is recommended due to incompatibility with some formats. This takes only affect when streaming.")
+                    Text("Transcoding is recommended due to incompatibility with some formats. This takes only affect when streaming.")
+                })
+                
+                Section(content: {
+                    HStack {
+                        Text("Cache Format (Transcoding)")
+                        Spacer()
+                        Menu(settings.cacheTranscodingFormatPreference.description) {
+                            Button(CacheTranscodingFormatPreference.mp3.description, action: cacheFormatMp3)
+                            Button(CacheTranscodingFormatPreference.raw.description, action: cacheFormatRaw)
+                        }
+                    }
+                }
+                , footer: {
+                    Text("Transicoding is recommended due to incompatibility with some formats. Changes will not effect already downloaded songs, if this is wanted: Clear cache and redownload. \(((appDelegate.storage.loginCredentials?.backendApi ?? .ampache) == .ampache) ? "" : "\nIf cache format 'raw' is selected Amperfy will use the Subsonic API action 'download' for caching. Every other option requires Amperfy to use the Subsonic API action 'stream' for caching. Only 'stream' allows server side transcoding. Please check for correct server configuration regarding the active API action.")")
                 })
             }
         }
-        .navigationTitle("Player & Scrobble")
+        .navigationTitle("Player, Stream & Scrobble")
         .onAppear {
             appDelegate.userStatistics.visited(.settingsPlayer)
         }

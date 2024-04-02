@@ -688,8 +688,24 @@ class AmpacheXmlServerApi: URLCleanser {
     }
     
     func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> {
-        guard let urlString = playable.url else { return Promise(error: BackendError.invalidUrl) }
-        return self.updateUrlToken(urlString: urlString)
+        return firstly {
+            reauthenticate()
+        }.then { auth in
+            return Promise<URL> { seal in
+                var urlComp = try self.createAuthApiUrlComponent(auth: auth)
+                urlComp.addQueryItem(name: "action", value: "download")
+                urlComp.addQueryItem(name: "type", value: playable.isSong ? "song" : "podcast_episode")
+                urlComp.addQueryItem(name: "id", value: playable.id)
+                switch self.persistentStorage.settings.cacheTranscodingFormatPreference {
+                case .mp3:
+                    urlComp.addQueryItem(name: "format", value: "mp3")
+                default:
+                    urlComp.addQueryItem(name: "format", value: "raw")
+                }
+                let url = try self.createUrl(from: urlComp)
+                seal.fulfill(url)
+            }
+        }
     }
     
     func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
@@ -731,6 +747,26 @@ class AmpacheXmlServerApi: URLCleanser {
         parser.parse()
         guard let ampacheError = errorParser.error else { return nil }
         return ResponseError.createFromAmpacheError(cleansedURL: response.url?.asCleansedURL(cleanser: self), error: ampacheError, data: response.data)
+    }
+    
+    func determTranscodingInfo(url: URL) -> TranscodingInfo {
+        var info = TranscodingInfo()
+        let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        if let queryItems = urlComp?.queryItems {
+            for queryItem in queryItems {
+                if queryItem.name == "format",
+                   let formatRaw = queryItem.value,
+                   let format = CacheTranscodingFormatPreference.createFromString(formatRaw) {
+                    info.format = format
+                } else if queryItem.name == "bitrate",
+                          let bitrateRawString = queryItem.value,
+                          let bitrateRawInt = Int(bitrateRawString),
+                          let bitrate = StreamingMaxBitratePreference(rawValue: bitrateRawInt) {
+                    info.bitrate = bitrate
+                }
+            }
+        }
+        return info
     }
     
     func updateUrlToken(urlString: String) -> Promise<URL> {

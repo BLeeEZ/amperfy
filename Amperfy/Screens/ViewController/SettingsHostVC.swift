@@ -81,10 +81,15 @@ class SettingsHostVC: UIViewController {
         changesAgent.append(settings.$streamingMaxBitratePreference.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.streamingMaxBitratePreference = newValue
         }))
-        
+         
         settings.streamingFormatPreference = self.appDelegate.storage.settings.streamingFormatPreference
         changesAgent.append(settings.$streamingFormatPreference.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.streamingFormatPreference = newValue
+        }))       
+        
+        settings.cacheTranscodingFormatPreference = self.appDelegate.storage.settings.cacheTranscodingFormatPreference
+        changesAgent.append(settings.$cacheTranscodingFormatPreference.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.cacheTranscodingFormatPreference = newValue
         }))
         
         settings.isAutoCacheLatestSongs = self.appDelegate.storage.settings.isAutoDownloadLatestSongsActive

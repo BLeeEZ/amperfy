@@ -401,6 +401,7 @@ public class LibraryStorage: PlayableFileCachable {
         if let playableFile = getFile(forPlayable: playable) {
             deletePlayableFile(playableFile: playableFile)
             playable.playableManagedObject.file = nil
+            playable.contentTypeTranscoded = nil
         }
     }
     

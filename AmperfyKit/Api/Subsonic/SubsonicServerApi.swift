@@ -249,10 +249,21 @@ class SubsonicServerApi: URLCleanser {
         return firstly {
             self.determineApiVersionToUse()
         }.then { version -> Promise<URL> in
-            if let podcastEpisode = playable.asPodcastEpisode, let streamId = podcastEpisode.streamId {
-                return Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "download", id: streamId)))
-            } else {
-                return Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "download", id: playable.id)))
+            return Promise<URL> { seal in
+                let apiID = playable.asPodcastEpisode?.streamId ?? playable.id
+                // If transcoding is selected for caching the subsonic API method 'stream' must be used
+                // For raw format subsonic API method 'download' can be used
+                switch self.persistentStorage.settings.cacheTranscodingFormatPreference {
+                case .mp3:
+                    var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiID)
+                    urlComp.addQueryItem(name: "format", value: "mp3")
+                    let url = try self.createUrl(from: urlComp)
+                    seal.fulfill(url)
+                case .raw:
+                    let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "download", id: apiID)
+                    let url = try self.createUrl(from: urlComp)
+                    seal.fulfill(url)
+                }
             }
         }
     }
@@ -261,42 +272,23 @@ class SubsonicServerApi: URLCleanser {
         return firstly {
             self.determineApiVersionToUse()
         }.then { version -> Promise<URL> in
-            if let podcastEpisode = playable.asPodcastEpisode, let streamId = podcastEpisode.streamId {
-                return Promise<URL> { seal in
-                    var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: streamId)
-                    switch self.persistentStorage.settings.streamingFormatPreference {
-                    case .mp3:
-                        urlComp.addQueryItem(name: "format", value: "mp3")
-                    case .raw:
-                        urlComp.addQueryItem(name: "format", value: "raw")
-                    }
-                    switch self.persistentStorage.settings.streamingMaxBitratePreference {
-                    case .noLimit:
-                        break
-                    default:
-                        urlComp.addQueryItem(name: "maxBitRate", value: self.persistentStorage.settings.streamingMaxBitratePreference.rawValue)
-                    }
-                    let url = try self.createUrl(from: urlComp)
-                    seal.fulfill(url)
+            return Promise<URL> { seal in
+                let apiID = playable.asPodcastEpisode?.streamId ?? playable.id
+                var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiID)
+                switch self.persistentStorage.settings.streamingFormatPreference {
+                case .mp3:
+                    urlComp.addQueryItem(name: "format", value: "mp3")
+                case .raw:
+                    urlComp.addQueryItem(name: "format", value: "raw")
                 }
-            } else {
-                return Promise<URL> { seal in
-                    var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: playable.id)
-                    switch self.persistentStorage.settings.streamingFormatPreference {
-                    case .mp3:
-                        urlComp.addQueryItem(name: "format", value: "mp3")
-                    case .raw:
-                        urlComp.addQueryItem(name: "format", value: "raw")
-                    }
-                    switch self.persistentStorage.settings.streamingMaxBitratePreference {
-                    case .noLimit:
-                        break
-                    default:
-                        urlComp.addQueryItem(name: "maxBitRate", value: self.persistentStorage.settings.streamingMaxBitratePreference.rawValue)
-                    }
-                    let url = try self.createUrl(from: urlComp)
-                    seal.fulfill(url)
+                switch self.persistentStorage.settings.streamingMaxBitratePreference {
+                case .noLimit:
+                    break
+                default:
+                    urlComp.addQueryItem(name: "maxBitRate", value: self.persistentStorage.settings.streamingMaxBitratePreference.rawValue)
                 }
+                let url = try self.createUrl(from: urlComp)
+                seal.fulfill(url)
             }
         }
     }
@@ -312,6 +304,26 @@ class SubsonicServerApi: URLCleanser {
         }.then { version in
             Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "getCoverArt", id: coverArtId)))
         }
+    }
+    
+    func determTranscodingInfo(url: URL) -> TranscodingInfo {
+        var info = TranscodingInfo()
+        let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        if let queryItems = urlComp?.queryItems {
+            for queryItem in queryItems {
+                if queryItem.name == "format",
+                   let formatRaw = queryItem.value,
+                   let format = CacheTranscodingFormatPreference.createFromString(formatRaw) {
+                    info.format = format
+                } else if queryItem.name == "maxBitRate",
+                          let bitrateRawString = queryItem.value,
+                          let bitrateRawInt = Int(bitrateRawString),
+                          let bitrate = StreamingMaxBitratePreference(rawValue: bitrateRawInt) {
+                    info.bitrate = bitrate
+                }
+            }
+        }
+        return info
     }
     
     private func requestServerApiVersionPromise(providedCredentials: LoginCredentials? = nil) -> Promise<SubsonicVersion> {

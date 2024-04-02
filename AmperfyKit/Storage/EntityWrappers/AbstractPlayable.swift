@@ -157,19 +157,32 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
             if playableManagedObject.contentType != newValue { playableManagedObject.contentType = newValue }
         }
     }
+    public var contentTypeTranscoded: String? {
+        get { return playableManagedObject.contentTypeTranscoded }
+        set {
+            if playableManagedObject.contentTypeTranscoded != newValue { playableManagedObject.contentTypeTranscoded = newValue }
+        }
+    }
+    public var fileContentType: String? {
+        let type = isCached ? (contentTypeTranscoded != nil ? contentTypeTranscoded : contentType)
+                            : contentType
+        return type
+    }
     public var iOsCompatibleContentType: String? {
-        guard isPlayableOniOS, let originalContenType = contentType else { return nil }
-        if originalContenType == "audio/x-flac" {
+        guard isPlayableOniOS, let type = fileContentType else { return nil }
+        if type == "audio/x-flac" {
             return "audio/flac"
         }
-        if originalContenType == "audio/m4a" {
+        if type == "audio/m4a" {
             return "audio/mp4"
         }
-        return originalContenType
+        return type
     }
     public var isPlayableOniOS: Bool {
-        guard let originalContenType = contentType else { return true }
-        if originalContenType == "audio/x-ms-wma" {
+        guard let originalContenType = fileContentType else { return true }
+        if originalContenType == "audio/x-ms-wma" ||
+           originalContenType == "audio/ogg" ||
+           originalContenType == "application/ogg" {
             return false
         }
         return true
@@ -219,6 +232,18 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
             }
             if bitrate > 0 {
                 infoContent.append("Bitrate \(bitrate)")
+            }
+            if details.isShowDetailedInfo {
+                if isCached {
+                    if let contentType = contentType, let fileContentType = fileContentType, contentType != fileContentType {
+                        infoContent.append("Transcoded MIME Type: \(fileContentType)")
+                        infoContent.append("Original MIME Type: \(contentType)")
+                    } else if let contentType = contentType {
+                        infoContent.append("Cache MIME Type: \(contentType)")
+                    } else if let fileContentType = fileContentType {
+                        infoContent.append("Cache MIME Type: \(fileContentType)")
+                    }
+                }
             }
         }
         return infoContent

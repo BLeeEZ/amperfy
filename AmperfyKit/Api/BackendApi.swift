@@ -122,6 +122,15 @@ public protocol URLCleanser {
     func cleanse(url: URL) -> CleansedURL
 }
 
+public struct TranscodingInfo {
+    var format: CacheTranscodingFormatPreference? = nil
+    var bitrate: StreamingMaxBitratePreference? = nil
+    
+    var description: String {
+        return "Format: \(format?.description ?? "-"), Bitrate: \(bitrate?.description ?? "-")"
+    }
+}
+
 public protocol BackendApi: URLCleanser {
     var clientApiVersion: String { get }
     var serverApiVersion: String { get }
@@ -130,6 +139,7 @@ public protocol BackendApi: URLCleanser {
     func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL>
     func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL>
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL>
+    func determTranscodingInfo(url: URL) -> TranscodingInfo
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate

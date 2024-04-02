@@ -65,6 +65,10 @@ class AmpacheApi: BackendApi {
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
         return ampacheXmlServerApi.checkForErrorResponse(response: response)
     }
+    
+    func determTranscodingInfo(url: URL) -> TranscodingInfo {
+        return ampacheXmlServerApi.determTranscodingInfo(url: url)
+    }
 
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
         return AmpacheLibrarySyncer(ampacheXmlServerApi: ampacheXmlServerApi, performanceMonitor: self.performanceMonitor, storage: storage, eventLogger: eventLogger)

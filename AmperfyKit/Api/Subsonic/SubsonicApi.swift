@@ -68,6 +68,10 @@ extension SubsonicApi: BackendApi {
         return subsonicServerApi.generateUrl(forStreamingPlayable: playable)
     }
     
+    func determTranscodingInfo(url: URL) -> TranscodingInfo {
+        return subsonicServerApi.determTranscodingInfo(url: url)
+    }
+    
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
         return subsonicServerApi.generateUrl(forArtwork: artwork)
     }

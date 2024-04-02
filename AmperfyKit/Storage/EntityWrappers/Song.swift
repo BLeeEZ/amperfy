@@ -120,6 +120,16 @@ public class Song: AbstractPlayable, Identifyable {
                 if bitrate > 0 {
                     infoContent.append("Bitrate: \(bitrate)")
                 }
+                if isCached {
+                    if let contentType = contentType, let fileContentType = fileContentType, contentType != fileContentType {
+                        infoContent.append("Transcoded MIME Type: \(fileContentType)")
+                        infoContent.append("Original MIME Type: \(contentType)")
+                    } else if let contentType = contentType {
+                        infoContent.append("Cache MIME Type: \(contentType)")
+                    } else if let fileContentType = fileContentType {
+                        infoContent.append("Cache MIME Type: \(fileContentType)")
+                    }
+                }
                 infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
             }
         }
