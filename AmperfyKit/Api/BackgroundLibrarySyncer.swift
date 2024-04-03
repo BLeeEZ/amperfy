@@ -26,6 +26,7 @@ import PromiseKit
 public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     
     private let storage: PersistentStorage
+    private let networkMonitor: NetworkMonitor
     private let librarySyncer: LibrarySyncer
     private let playableDownloadManager: DownloadManageable
     private let eventLogger: EventLogger
@@ -36,8 +37,9 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     private var isRunning = false
     private var isCurrentlyActive = false
     
-    init(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable, eventLogger: EventLogger) {
+    init(storage: PersistentStorage, networkMonitor: NetworkMonitor, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable, eventLogger: EventLogger) {
         self.storage = storage
+        self.networkMonitor = networkMonitor
         self.librarySyncer = librarySyncer
         self.playableDownloadManager = playableDownloadManager
         self.eventLogger = eventLogger
@@ -67,7 +69,7 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
             self.activeDispatchGroup.enter()
             os_log("start", log: self.log, type: .info)
             
-            if self.isRunning, self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
+            if self.isRunning, self.storage.settings.isOnlineMode, self.networkMonitor.isConnectedToNetwork {
                 firstlyOnMain {
                     AutoDownloadLibrarySyncer(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
                         .syncNewestLibraryElements(offset: 0, count: AmperKit.newestElementsFetchCount)
@@ -79,7 +81,7 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
                 self.syncSemaphore.wait()
             }
 
-            while self.isRunning, self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
+            while self.isRunning, self.storage.settings.isOnlineMode, self.networkMonitor.isConnectedToNetwork {
                 firstlyOnMain { () -> Promise<Void> in
                     let albumToSync = self.storage.main.library.getAlbumWithoutSyncedSongs()
                     guard let albumToSync = albumToSync else {

@@ -46,6 +46,9 @@ public class AmperKit {
     public lazy var log = {
         return OSLog(subsystem: "Amperfy", category: "AppDelegate")
     }()
+    public lazy var networkMonitor = {
+        return NetworkMonitor()
+    }()
     public lazy var coreDataManager = {
         return CoreDataPersistentManager()
     }()
@@ -62,7 +65,7 @@ public class AmperKit {
         return EventLogger(storage: storage)
     }()
     public lazy var backendApi: BackendProxy = {
-        return BackendProxy(performanceMonitor: self, eventLogger: eventLogger, persistentStorage: storage)
+        return BackendProxy(networkMonitor: networkMonitor, performanceMonitor: self, eventLogger: eventLogger, persistentStorage: storage)
     }()
     public lazy var notificationHandler: EventNotificationHandler = {
         return EventNotificationHandler()
@@ -97,7 +100,7 @@ public class AmperKit {
     }()
     public lazy var playableDownloadManager: DownloadManageable = {
         let artworkExtractor = EmbeddedArtworkExtractor()
-        let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi, artworkExtractor: artworkExtractor)
+        let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi, artworkExtractor: artworkExtractor, networkMonitor: networkMonitor)
         let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
         let dlManager = DownloadManager(name: "PlayableDownloader", storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger, urlCleanser: backendApi)
         
@@ -138,10 +141,10 @@ public class AmperKit {
         return dlManager
     }()
     public lazy var backgroundLibrarySyncer = {
-        return BackgroundLibrarySyncer(storage: storage, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager, eventLogger: eventLogger)
+        return BackgroundLibrarySyncer(storage: storage, networkMonitor: networkMonitor, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager, eventLogger: eventLogger)
     }()
     public lazy var scrobbleSyncer = {
-        return ScrobbleSyncer(storage: storage, librarySyncer: librarySyncer, eventLogger: eventLogger)
+        return ScrobbleSyncer(storage: storage, networkMonitor: networkMonitor, librarySyncer: librarySyncer, eventLogger: eventLogger)
     }()
     public lazy var libraryUpdater = {
         return LibraryUpdater(storage: storage, backendApi: backendApi)

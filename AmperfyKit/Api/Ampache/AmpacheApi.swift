@@ -25,11 +25,13 @@ import PromiseKit
 class AmpacheApi: BackendApi {
 
     private let ampacheXmlServerApi: AmpacheXmlServerApi
+    private let networkMonitor: NetworkMonitor
     private let performanceMonitor: ThreadPerformanceMonitor
     private let eventLogger: EventLogger
 
-    init(ampacheXmlServerApi: AmpacheXmlServerApi, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
+    init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitor, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
+        self.networkMonitor = networkMonitor
         self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
     }
@@ -75,11 +77,11 @@ class AmpacheApi: BackendApi {
     }
 
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
-        return AmpacheLibrarySyncer(ampacheXmlServerApi: ampacheXmlServerApi, performanceMonitor: self.performanceMonitor, storage: storage, eventLogger: eventLogger)
-    }    
+        return AmpacheLibrarySyncer(ampacheXmlServerApi: ampacheXmlServerApi, networkMonitor: networkMonitor, performanceMonitor: self.performanceMonitor, storage: storage, eventLogger: eventLogger)
+    }
 
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
-        return AmpacheArtworkDownloadDelegate(ampacheXmlServerApi: ampacheXmlServerApi)
+        return AmpacheArtworkDownloadDelegate(ampacheXmlServerApi: ampacheXmlServerApi, networkMonitor: networkMonitor)
     }
     
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {

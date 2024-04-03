@@ -27,10 +27,12 @@ import PromiseKit
 class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     
     private let ampacheXmlServerApi: AmpacheXmlServerApi
+    private let networkMonitor: NetworkMonitor
     private var defaultImageData: Data?
 
-    init(ampacheXmlServerApi: AmpacheXmlServerApi) {
+    init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitor) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
+        self.networkMonitor = networkMonitor
     }
     
     var requestPredicate: NSPredicate {
@@ -46,7 +48,7 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
             guard let artwork = download.element as? Artwork else {
                 throw DownloadError.fetchFailed
             }
-            guard Reachability.isConnectedToNetwork() else { throw DownloadError.noConnectivity }
+            guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
             seal.fulfill(artwork)
         }.then { artwork in
             self.ampacheXmlServerApi.generateUrl(forArtwork: artwork)

@@ -27,6 +27,7 @@ import PromiseKit
 class SubsonicLibrarySyncer: LibrarySyncer {
 
     private let subsonicServerApi: SubsonicServerApi
+    private let networkMonitor: NetworkMonitor
     private let performanceMonitor: ThreadPerformanceMonitor
     private let storage: PersistentStorage
     private let eventLogger: EventLogger
@@ -35,13 +36,14 @@ class SubsonicLibrarySyncer: LibrarySyncer {
     private static let maxItemCountToPollAtOnce: Int = 500
     
     var isSyncAllowed: Bool {
-        return Reachability.isConnectedToNetwork()
+        return networkMonitor.isConnectedToNetwork
     }
     
-    init(subsonicServerApi: SubsonicServerApi, performanceMonitor: ThreadPerformanceMonitor, storage: PersistentStorage, eventLogger: EventLogger) {
+    init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitor, performanceMonitor: ThreadPerformanceMonitor, storage: PersistentStorage, eventLogger: EventLogger) {
         self.subsonicServerApi = subsonicServerApi
         self.performanceMonitor = performanceMonitor
         self.storage = storage
+        self.networkMonitor = networkMonitor
         self.eventLogger = eventLogger
     }
     

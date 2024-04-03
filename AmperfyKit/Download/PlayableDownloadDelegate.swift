@@ -27,10 +27,12 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
 
     private let backendApi: BackendApi
     private let artworkExtractor: EmbeddedArtworkExtractor
+    private let networkMonitor: NetworkMonitor
 
-    init(backendApi: BackendApi, artworkExtractor: EmbeddedArtworkExtractor) {
+    init(backendApi: BackendApi, artworkExtractor: EmbeddedArtworkExtractor, networkMonitor: NetworkMonitor) {
         self.backendApi = backendApi
         self.artworkExtractor = artworkExtractor
+        self.networkMonitor = networkMonitor
     }
     
     var requestPredicate: NSPredicate {
@@ -45,7 +47,7 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
         return Promise<AbstractPlayable> { seal in
             guard let playable = download.element as? AbstractPlayable else { throw DownloadError.fetchFailed }
             guard !playable.isCached else { throw DownloadError.alreadyDownloaded }
-            guard Reachability.isConnectedToNetwork() else { throw DownloadError.noConnectivity }
+            guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
             seal.fulfill(playable)
         }.then { playable in
             self.backendApi.generateUrl(forDownloadingPlayable: playable)

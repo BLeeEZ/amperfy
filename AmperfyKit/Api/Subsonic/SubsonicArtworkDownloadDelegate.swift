@@ -28,9 +28,11 @@ import PromiseKit
 class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         
     private let subsonicServerApi: SubsonicServerApi
+    private let networkMonitor: NetworkMonitor
 
-    init(subsonicServerApi: SubsonicServerApi) {
+    init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitor) {
         self.subsonicServerApi = subsonicServerApi
+        self.networkMonitor = networkMonitor
     }
     
     var requestPredicate: NSPredicate {
@@ -44,7 +46,7 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     func prepareDownload(download: Download) -> Promise<URL> {
         return Promise<Artwork> { seal in
             guard let artwork = download.element as? Artwork else { throw DownloadError.fetchFailed }
-            guard Reachability.isConnectedToNetwork() else { throw DownloadError.noConnectivity }
+            guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
             seal.fulfill(artwork)
         }.then { artwork in
             self.subsonicServerApi.generateUrl(forArtwork: artwork)

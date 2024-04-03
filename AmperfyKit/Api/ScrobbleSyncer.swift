@@ -27,6 +27,7 @@ public class ScrobbleSyncer {
     
     private let log = OSLog(subsystem: "Amperfy", category: "ScrobbleSyncer")
     private let storage: PersistentStorage
+    private let networkMonitor: NetworkMonitor
     private let librarySyncer: LibrarySyncer
     private let eventLogger: EventLogger
     private let activeDispatchGroup = DispatchGroup()
@@ -34,8 +35,9 @@ public class ScrobbleSyncer {
     private var isRunning = false
     private var isActive = false
     
-    init(storage: PersistentStorage, librarySyncer: LibrarySyncer, eventLogger: EventLogger) {
+    init(storage: PersistentStorage, networkMonitor: NetworkMonitor, librarySyncer: LibrarySyncer, eventLogger: EventLogger) {
         self.storage = storage
+        self.networkMonitor = networkMonitor
         self.librarySyncer = librarySyncer
         self.eventLogger = eventLogger
     }
@@ -55,7 +57,7 @@ public class ScrobbleSyncer {
     }
     
     func scrobble(playedSong: Song) {
-        if self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
+        if self.storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork{
             cacheScrobbleRequest(playedSong: playedSong, isUploaded: true)
             scrobbleToServerAsync(playedSong: playedSong)
             start() // send cached request to server
@@ -70,7 +72,7 @@ public class ScrobbleSyncer {
             self.activeDispatchGroup.enter()
             os_log("start", log: self.log, type: .info)
             
-            while self.isRunning, self.storage.settings.isOnlineMode, Reachability.isConnectedToNetwork() {
+            while self.isRunning, self.storage.settings.isOnlineMode, self.networkMonitor.isConnectedToNetwork {
                 self.uploadSemaphore.wait()
                 firstlyOnMain {
                     self.getNextScrobbleEntry()

@@ -192,6 +192,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             os_log("application launch", log: self.log, type: .info)
         }
 
+        AmperKit.shared.networkMonitor.start()
         configureDefaultNavigationBarStyle()
         configureBatteryMonitoring()
         configureBackgroundFetch()
