@@ -61,6 +61,12 @@ class PlayerControlView: UIView {
         refreshPlayer()
     }
     
+    @IBAction func swipeHandler(_ gestureRecognizer : UISwipeGestureRecognizer) {
+        if gestureRecognizer.state == .ended {
+            rootView?.closePopupPlayer()
+        }
+    }
+    
     @IBAction func playButtonPushed(_ sender: Any) {
         player.togglePlayPause()
         refreshPlayButton()

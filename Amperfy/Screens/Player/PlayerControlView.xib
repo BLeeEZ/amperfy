@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -19,6 +19,7 @@
                 <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" continuous="NO" translatesAutoresizingMaskIntoConstraints="NO" id="42q-l9-IXM" userLabel="Progress" customClass="PlaytimeSlider" customModule="Amperfy" customModuleProvider="target">
                     <rect key="frame" x="14" y="36" width="347" height="31"/>
                     <color key="tintColor" systemColor="labelColor"/>
+                    <gestureRecognizers/>
                     <constraints>
                         <constraint firstAttribute="height" constant="30" id="KQ1-7I-Fbo"/>
                     </constraints>
@@ -214,6 +215,7 @@
                 </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <gestureRecognizers/>
             <constraints>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="3yB-kd-VKC"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="4ed-LA-PXc"/>
@@ -248,9 +250,15 @@
                 <outlet property="skipForwardButton" destination="QO0-Ep-X2s" id="idR-HQ-cSv"/>
                 <outlet property="sleepTimerButton" destination="dNu-q7-Vtb" id="zWZ-5a-1Pb"/>
                 <outlet property="timeSlider" destination="42q-l9-IXM" id="Uit-8D-ekQ"/>
+                <outletCollection property="gestureRecognizers" destination="UMb-bk-6ia" appends="YES" id="Btr-RL-2lg"/>
             </connections>
             <point key="canvasLocation" x="138.40000000000001" y="99.400299850074973"/>
         </view>
+        <swipeGestureRecognizer direction="down" id="UMb-bk-6ia">
+            <connections>
+                <action selector="swipeHandler:" destination="iN0-l3-epB" id="o6g-Sz-f3c"/>
+            </connections>
+        </swipeGestureRecognizer>
     </objects>
     <resources>
         <image name="airplayaudio" catalog="system" width="128" height="123"/>
