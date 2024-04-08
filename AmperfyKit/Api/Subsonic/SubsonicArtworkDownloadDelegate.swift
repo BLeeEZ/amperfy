@@ -28,9 +28,9 @@ import PromiseKit
 class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         
     private let subsonicServerApi: SubsonicServerApi
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorFacade
 
-    init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitor) {
+    init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitorFacade) {
         self.subsonicServerApi = subsonicServerApi
         self.networkMonitor = networkMonitor
     }

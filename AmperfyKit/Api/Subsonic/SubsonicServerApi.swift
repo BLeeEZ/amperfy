@@ -271,7 +271,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> {
         return firstly {
             self.determineApiVersionToUse()
         }.then { version -> Promise<URL> in
@@ -284,11 +284,11 @@ class SubsonicServerApi: URLCleanser {
                 case .raw:
                     urlComp.addQueryItem(name: "format", value: "raw")
                 }
-                switch self.persistentStorage.settings.streamingMaxBitratePreference {
+                switch maxBitrate {
                 case .noLimit:
                     break
                 default:
-                    urlComp.addQueryItem(name: "maxBitRate", value: self.persistentStorage.settings.streamingMaxBitratePreference.rawValue)
+                    urlComp.addQueryItem(name: "maxBitRate", value: maxBitrate.rawValue)
                 }
                 let url = try self.createUrl(from: urlComp)
                 seal.fulfill(url)

@@ -26,7 +26,7 @@ import PromiseKit
 public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     
     private let storage: PersistentStorage
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorFacade
     private let librarySyncer: LibrarySyncer
     private let playableDownloadManager: DownloadManageable
     private let eventLogger: EventLogger
@@ -37,7 +37,7 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     private var isRunning = false
     private var isCurrentlyActive = false
     
-    init(storage: PersistentStorage, networkMonitor: NetworkMonitor, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable, eventLogger: EventLogger) {
+    init(storage: PersistentStorage, networkMonitor: NetworkMonitorFacade, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable, eventLogger: EventLogger) {
         self.storage = storage
         self.networkMonitor = networkMonitor
         self.librarySyncer = librarySyncer

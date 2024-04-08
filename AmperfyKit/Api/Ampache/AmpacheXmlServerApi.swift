@@ -711,7 +711,7 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> {
         return firstly {
             reauthenticate()
         }.then { auth in
@@ -726,11 +726,11 @@ class AmpacheXmlServerApi: URLCleanser {
                 case .raw:
                     urlComp.addQueryItem(name: "format", value: "raw")
                 }
-                switch self.persistentStorage.settings.streamingMaxBitratePreference {
+                switch maxBitrate {
                 case .noLimit:
                     break
                 default:
-                    urlComp.addQueryItem(name: "bitrate", value: self.persistentStorage.settings.streamingMaxBitratePreference.rawValue)
+                    urlComp.addQueryItem(name: "bitrate", value: maxBitrate.rawValue)
                 }
                 urlComp.addQueryItem(name: "length", value: 1)
                 let url = try self.createUrl(from: urlComp)

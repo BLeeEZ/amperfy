@@ -46,7 +46,7 @@ public class AmperKit {
     public lazy var log = {
         return OSLog(subsystem: "Amperfy", category: "AppDelegate")
     }()
-    public lazy var networkMonitor = {
+    public lazy var networkMonitor: NetworkMonitorFacade = {
         return NetworkMonitor()
     }()
     public lazy var coreDataManager = {
@@ -72,7 +72,12 @@ public class AmperKit {
     }()
     private var audioSessionHandler: AudioSessionHandler?
     public lazy var player: PlayerFacade = {
-       let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
+        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
+        networkMonitor.connectionTypeChangedCB = { isWiFiConnected in
+            backendAudioPlayer.streamingMaxBitrates = StreamingMaxBitrates(
+                wifi: self.storage.settings.streamingMaxBitrateWifiPreference,
+                cellular: self.storage.settings.streamingMaxBitrateCellularPreference)
+        }
         let playerData = storage.main.library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
         let curPlayer = AudioPlayer(coreData: playerData, queueHandler: queueHandler, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)

@@ -27,7 +27,7 @@ import PromiseKit
 class SubsonicLibrarySyncer: LibrarySyncer {
 
     private let subsonicServerApi: SubsonicServerApi
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorFacade
     private let performanceMonitor: ThreadPerformanceMonitor
     private let storage: PersistentStorage
     private let eventLogger: EventLogger
@@ -39,11 +39,11 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         return networkMonitor.isConnectedToNetwork
     }
     
-    init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitor, performanceMonitor: ThreadPerformanceMonitor, storage: PersistentStorage, eventLogger: EventLogger) {
+    init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, storage: PersistentStorage, eventLogger: EventLogger) {
         self.subsonicServerApi = subsonicServerApi
+        self.networkMonitor = networkMonitor
         self.performanceMonitor = performanceMonitor
         self.storage = storage
-        self.networkMonitor = networkMonitor
         self.eventLogger = eventLogger
     }
     

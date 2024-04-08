@@ -26,30 +26,79 @@ struct PlayerSettingsView: View {
     
     @EnvironmentObject private var settings: Settings
     
-    func streamingMaxBitrateNoLimit() {
-        settings.streamingMaxBitratePreference = .noLimit
+    func updateBitrate() {
+        appDelegate.player.streamingMaxBitrates = StreamingMaxBitrates(
+            wifi: appDelegate.storage.settings.streamingMaxBitrateWifiPreference,
+            cellular: appDelegate.storage.settings.streamingMaxBitrateCellularPreference)
     }
-    func streamingMaxBitrate32() {
-        settings.streamingMaxBitratePreference = .limit32
+    
+    func streamingMaxBitrateWifiNoLimit() {
+        settings.streamingMaxBitrateWifiPreference = .noLimit
+        updateBitrate()
     }
-    func streamingMaxBitrate64() {
-        settings.streamingMaxBitratePreference = .limit64
+    func streamingMaxBitrateWifi32() {
+        settings.streamingMaxBitrateWifiPreference = .limit32
+        updateBitrate()
     }
-    func streamingMaxBitrate96() {
-        settings.streamingMaxBitratePreference = .limit96
+    func streamingMaxBitrateWifi64() {
+        settings.streamingMaxBitrateWifiPreference = .limit64
+        updateBitrate()
     }
-    func streamingMaxBitrate128() {
-        settings.streamingMaxBitratePreference = .limit128
+    func streamingMaxBitrateWifi96() {
+        settings.streamingMaxBitrateWifiPreference = .limit96
+        updateBitrate()
     }
-    func streamingMaxBitrate192() {
-        settings.streamingMaxBitratePreference = .limit192
+    func streamingMaxBitrateWifi128() {
+        settings.streamingMaxBitrateWifiPreference = .limit128
+        updateBitrate()
     }
-    func streamingMaxBitrate256() {
-        settings.streamingMaxBitratePreference = .limit256
+    func streamingMaxBitrateWifi192() {
+        settings.streamingMaxBitrateWifiPreference = .limit192
+        updateBitrate()
     }
-    func streamingMaxBitrate320() {
-        settings.streamingMaxBitratePreference = .limit320
+    func streamingMaxBitrateWifi256() {
+        settings.streamingMaxBitrateWifiPreference = .limit256
+        updateBitrate()
     }
+    func streamingMaxBitrateWifi320() {
+        settings.streamingMaxBitrateWifiPreference = .limit320
+        updateBitrate()
+    }
+    
+    
+    func streamingMaxBitrateCellularNoLimit() {
+        settings.streamingMaxBitrateCellularPreference = .noLimit
+        updateBitrate()
+    }
+    func streamingMaxBitrateCellular32() {
+        settings.streamingMaxBitrateCellularPreference = .limit32
+        updateBitrate()
+    }
+    func streamingMaxBitrateCellular64() {
+        settings.streamingMaxBitrateCellularPreference = .limit64
+        updateBitrate()
+    }
+    func streamingMaxBitrateCellular96() {
+        settings.streamingMaxBitrateCellularPreference = .limit96
+        updateBitrate()
+    }
+    func streamingMaxBitrateCellular128() {
+        settings.streamingMaxBitrateCellularPreference = .limit128
+        updateBitrate()
+    }
+    func streamingMaxBitrateCellular192() {
+        settings.streamingMaxBitrateCellularPreference = .limit192
+        updateBitrate()
+    }
+    func streamingMaxBitrateCellular256() {
+        settings.streamingMaxBitrateCellularPreference = .limit256
+        updateBitrate()
+    }
+    func streamingMaxBitrateCellular320() {
+        settings.streamingMaxBitrateCellularPreference = .limit320
+        updateBitrate()
+    }
+    
     
     func streamingFormatMp3() {
         settings.streamingFormatPreference = .mp3
@@ -92,22 +141,42 @@ struct PlayerSettingsView: View {
                 
                 Section(content: {
                     HStack {
-                        Text("Max Bitrate for Streaming")
+                        Text("Max Bitrate for Streaming (WiFi)")
                         Spacer()
-                        Menu(settings.streamingMaxBitratePreference.description) {
-                            Button(StreamingMaxBitratePreference.noLimit.description, action: streamingMaxBitrateNoLimit)
-                            Button(StreamingMaxBitratePreference.limit32.description, action: streamingMaxBitrate32)
-                            Button(StreamingMaxBitratePreference.limit64.description, action: streamingMaxBitrate64)
-                            Button(StreamingMaxBitratePreference.limit96.description, action: streamingMaxBitrate96)
-                            Button(StreamingMaxBitratePreference.limit128.description, action: streamingMaxBitrate128)
-                            Button(StreamingMaxBitratePreference.limit192.description, action: streamingMaxBitrate192)
-                            Button(StreamingMaxBitratePreference.limit256.description, action: streamingMaxBitrate256)
-                            Button(StreamingMaxBitratePreference.limit320.description, action: streamingMaxBitrate320)
+                        Menu(settings.streamingMaxBitrateWifiPreference.description) {
+                            Button(StreamingMaxBitratePreference.noLimit.description, action: streamingMaxBitrateWifiNoLimit)
+                            Button(StreamingMaxBitratePreference.limit32.description, action: streamingMaxBitrateWifi32)
+                            Button(StreamingMaxBitratePreference.limit64.description, action: streamingMaxBitrateWifi64)
+                            Button(StreamingMaxBitratePreference.limit96.description, action: streamingMaxBitrateWifi96)
+                            Button(StreamingMaxBitratePreference.limit128.description, action: streamingMaxBitrateWifi128)
+                            Button(StreamingMaxBitratePreference.limit192.description, action: streamingMaxBitrateWifi192)
+                            Button(StreamingMaxBitratePreference.limit256.description, action: streamingMaxBitrateWifi256)
+                            Button(StreamingMaxBitratePreference.limit320.description, action: streamingMaxBitrateWifi320)
                         }
                     }
                 }
                 , footer: {
-                    Text("Lower bitrate saves bandwidth. This takes only affect when streaming.")
+                    Text("Lower bitrate saves bandwidth. This takes only affect when streaming and connected via WiFi.")
+                })
+                
+                Section(content: {
+                    HStack {
+                        Text("Max Bitrate for Streaming (Cellular)")
+                        Spacer()
+                        Menu(settings.streamingMaxBitrateCellularPreference.description) {
+                            Button(StreamingMaxBitratePreference.noLimit.description, action: streamingMaxBitrateCellularNoLimit)
+                            Button(StreamingMaxBitratePreference.limit32.description, action: streamingMaxBitrateCellular32)
+                            Button(StreamingMaxBitratePreference.limit64.description, action: streamingMaxBitrateCellular64)
+                            Button(StreamingMaxBitratePreference.limit96.description, action: streamingMaxBitrateCellular96)
+                            Button(StreamingMaxBitratePreference.limit128.description, action: streamingMaxBitrateCellular128)
+                            Button(StreamingMaxBitratePreference.limit192.description, action: streamingMaxBitrateCellular192)
+                            Button(StreamingMaxBitratePreference.limit256.description, action: streamingMaxBitrateCellular256)
+                            Button(StreamingMaxBitratePreference.limit320.description, action: streamingMaxBitrateCellular320)
+                        }
+                    }
+                }
+                , footer: {
+                    Text("Lower bitrate saves bandwidth. This takes only affect when streaming and connected via Cellular.")
                 })
                 
                 Section(content: {

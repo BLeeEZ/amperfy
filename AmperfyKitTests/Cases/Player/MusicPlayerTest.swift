@@ -131,7 +131,7 @@ class MOCK_BackendApi: BackendApi {
     func provideCredentials(credentials: LoginCredentials) {}
     func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> { return Promise(error: BackendError.notSupported) }
     func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> { return Helper.urlPromise }
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> { return Helper.urlPromise }
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> { return Helper.urlPromise }
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> { return Helper.urlPromise }
     func determTranscodingInfo(url: URL) -> AmperfyKit.TranscodingInfo { return AmperfyKit.TranscodingInfo() }
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError? { return nil }
@@ -139,6 +139,14 @@ class MOCK_BackendApi: BackendApi {
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { return nil }
     func cleanse(url: URL) -> CleansedURL { return CleansedURL(urlString: "") }
+}
+
+class MOCK_NetworkMonitor: NetworkMonitorFacade {
+    var connectionTypeChangedCB: ConnectionTypeChangedCallack?
+    var isConnectedToNetwork: Bool { return true }
+    var isCellular: Bool { return false }
+    var isWifiOrEthernet: Bool { return true }
+    func start() {}
 }
 
 class MOCK_MusicPlayable: MusicPlayable {
@@ -191,6 +199,7 @@ class MusicPlayerTest: XCTestCase {
     var userStatistics: UserStatistics!
     var songDownloader: MOCK_SongDownloader!
     var backendApi: MOCK_BackendApi!
+    var networkMonitor: MOCK_NetworkMonitor!
     var backendPlayer: BackendAudioPlayer!
     var mockMusicPlayable: MOCK_MusicPlayable!
     var playerData: PlayerData!
@@ -215,7 +224,8 @@ class MusicPlayerTest: XCTestCase {
         eventLogger = EventLogger(storage: storage)
         userStatistics = library.getUserStatistics(appVersion: "")
         backendApi = MOCK_BackendApi()
-        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)
+        networkMonitor = MOCK_NetworkMonitor()
+        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)
         mockMusicPlayable = MOCK_MusicPlayable()
         playerData = library.getPlayerData()
         testQueueHandler = PlayQueueHandler(playerData: playerData)

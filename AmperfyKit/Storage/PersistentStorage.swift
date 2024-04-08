@@ -103,6 +103,10 @@ public enum StreamingMaxBitratePreference: Int, CaseIterable {
             return "\(self.rawValue) kbps"
         }
     }
+    
+    public var asBitsPerSecondAV: Double {
+        return Double(self.rawValue * 1000)
+    }
 }
 
 public enum StreamingFormatPreference: Int, CaseIterable {
@@ -218,7 +222,8 @@ public class PersistentStorage {
         case ArtworkDisplayPreference = "artworkDisplayPreference"
         case SleepTimerInterval = "sleepTimerInterval" // not used anymore !!! 
         case ScreenLockPreventionPreference = "screenLockPreventionPreference"
-        case StreamingMaxBitratePreference = "streamingMaxBitratePreference"
+        case StreamingMaxBitrateWifiPreference = "streamingMaxBitrateWifiPreference"
+        case StreamingMaxBitrateCellularPreference = "streamingMaxBitrateCellularPreference"
         case StreamingFormatPreference = "streamingFormatPreference"
         case CacheTranscodingFormatPreference = "cacheTranscodingFormatPreference"
         case CacheLimit = "cacheLimitInBytes" // limit in byte
@@ -278,12 +283,20 @@ public class PersistentStorage {
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ScreenLockPreventionPreference.rawValue) }
         }
         
-        public var streamingMaxBitratePreference: StreamingMaxBitratePreference {
+        public var streamingMaxBitrateWifiPreference: StreamingMaxBitratePreference {
             get {
-                let streamingMaxBitratePreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.StreamingMaxBitratePreference.rawValue) as? Int ?? StreamingMaxBitratePreference.defaultValue.rawValue
-                return StreamingMaxBitratePreference(rawValue: streamingMaxBitratePreferenceRaw) ?? StreamingMaxBitratePreference.defaultValue
+                let streamingMaxBitrateWifiPreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.StreamingMaxBitrateWifiPreference.rawValue) as? Int ?? StreamingMaxBitratePreference.defaultValue.rawValue
+                return StreamingMaxBitratePreference(rawValue: streamingMaxBitrateWifiPreferenceRaw) ?? StreamingMaxBitratePreference.defaultValue
             }
-            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.StreamingMaxBitratePreference.rawValue) }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.StreamingMaxBitrateWifiPreference.rawValue) }
+        }
+        
+        public var streamingMaxBitrateCellularPreference: StreamingMaxBitratePreference {
+            get {
+                let streamingMaxBitrateCelluarPreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.StreamingMaxBitrateCellularPreference.rawValue) as? Int ?? StreamingMaxBitratePreference.defaultValue.rawValue
+                return StreamingMaxBitratePreference(rawValue: streamingMaxBitrateCelluarPreferenceRaw) ?? StreamingMaxBitratePreference.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.StreamingMaxBitrateCellularPreference.rawValue) }
         }
          
         public var streamingFormatPreference: StreamingFormatPreference {

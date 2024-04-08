@@ -146,7 +146,7 @@ public class ResourceNotAvailableResponseError: ResponseError {
 public class BackendProxy {
     
     private let log = OSLog(subsystem: "Amperfy", category: "BackendProxy")
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorFacade
     private let performanceMonitor: ThreadPerformanceMonitor
     private let eventLogger: EventLogger
     private let persistentStorage: PersistentStorage
@@ -188,7 +188,7 @@ public class BackendProxy {
         return api
     }()
     
-    init(networkMonitor: NetworkMonitor, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger, persistentStorage: PersistentStorage) {
+    init(networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger, persistentStorage: PersistentStorage) {
         self.networkMonitor = networkMonitor
         self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
@@ -319,8 +319,8 @@ extension BackendProxy: BackendApi {
         return activeApi.generateUrl(forDownloadingPlayable: playable)
     }
     
-    public func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
-        return activeApi.generateUrl(forStreamingPlayable: playable)
+    public func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> {
+        return activeApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
     }
     
     public func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {

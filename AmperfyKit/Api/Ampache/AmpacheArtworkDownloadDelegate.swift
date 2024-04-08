@@ -27,10 +27,10 @@ import PromiseKit
 class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     
     private let ampacheXmlServerApi: AmpacheXmlServerApi
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorFacade
     private var defaultImageData: Data?
 
-    init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitor) {
+    init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitorFacade) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
         self.networkMonitor = networkMonitor
     }

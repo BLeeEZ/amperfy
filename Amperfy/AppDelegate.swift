@@ -54,6 +54,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public lazy var storage = {
         return AmperKit.shared.storage
     }()
+    public lazy var networkMonitor = {
+        return AmperKit.shared.networkMonitor
+    }()
     public lazy var librarySyncer = {
         return AmperKit.shared.librarySyncer
     }()

@@ -25,11 +25,11 @@ import PromiseKit
 class AmpacheApi: BackendApi {
 
     private let ampacheXmlServerApi: AmpacheXmlServerApi
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorFacade
     private let performanceMonitor: ThreadPerformanceMonitor
     private let eventLogger: EventLogger
 
-    init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitor, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
+    init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
         self.networkMonitor = networkMonitor
         self.performanceMonitor = performanceMonitor
@@ -60,8 +60,8 @@ class AmpacheApi: BackendApi {
         return ampacheXmlServerApi.generateUrl(forDownloadingPlayable: playable)
     }
 
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
-        return ampacheXmlServerApi.generateUrl(forStreamingPlayable: playable)
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> {
+        return ampacheXmlServerApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
     }
     
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {

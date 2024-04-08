@@ -27,7 +27,7 @@ public class ScrobbleSyncer {
     
     private let log = OSLog(subsystem: "Amperfy", category: "ScrobbleSyncer")
     private let storage: PersistentStorage
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorFacade
     private let librarySyncer: LibrarySyncer
     private let eventLogger: EventLogger
     private let activeDispatchGroup = DispatchGroup()
@@ -35,7 +35,7 @@ public class ScrobbleSyncer {
     private var isRunning = false
     private var isActive = false
     
-    init(storage: PersistentStorage, networkMonitor: NetworkMonitor, librarySyncer: LibrarySyncer, eventLogger: EventLogger) {
+    init(storage: PersistentStorage, networkMonitor: NetworkMonitorFacade, librarySyncer: LibrarySyncer, eventLogger: EventLogger) {
         self.storage = storage
         self.networkMonitor = networkMonitor
         self.librarySyncer = librarySyncer

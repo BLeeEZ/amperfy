@@ -27,9 +27,9 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
 
     private let backendApi: BackendApi
     private let artworkExtractor: EmbeddedArtworkExtractor
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorFacade
 
-    init(backendApi: BackendApi, artworkExtractor: EmbeddedArtworkExtractor, networkMonitor: NetworkMonitor) {
+    init(backendApi: BackendApi, artworkExtractor: EmbeddedArtworkExtractor, networkMonitor: NetworkMonitorFacade) {
         self.backendApi = backendApi
         self.artworkExtractor = artworkExtractor
         self.networkMonitor = networkMonitor

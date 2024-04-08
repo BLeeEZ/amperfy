@@ -138,7 +138,7 @@ public protocol BackendApi: URLCleanser {
     func provideCredentials(credentials: LoginCredentials)
     func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void>
     func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL>
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL>
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL>
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL>
     func determTranscodingInfo(url: URL) -> TranscodingInfo
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError?

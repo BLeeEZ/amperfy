@@ -41,22 +41,32 @@ enum PlayType {
 }
 
 class BackendAudioPlayer {
-
+    
     private let playableDownloader: DownloadManageable
     private let cacheProxy: PlayableFileCachable
     private let backendApi: BackendApi
     private let userStatistics: UserStatistics
     private let player: AVPlayer
     private let eventLogger: EventLogger
+    private let networkMonitor: NetworkMonitorFacade
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     
     private var userDefinedPlaybackRate: PlaybackRate = .one
     
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
+    public var streamingMaxBitrates: StreamingMaxBitrates = .init() {
+        didSet {
+            let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: self.networkMonitor)
+            os_log(.default, "Update Streaming Max Bitrate: %s %s", streamingMaxBitrate.description, (self.playType == .stream) ? "(active)" : "")
+            if self.playType == .stream {
+                player.currentItem?.preferredPeakBitRate = streamingMaxBitrate.asBitsPerSecondAV
+            }
+        }
+    }
     public private(set) var isPlaying: Bool = false
     public private(set) var playType: PlayType?
-
+    
     var responder: BackendAudioPlayerNotifiable?
     var isPlayableLoaded: Bool {
         return player.currentItem?.status == AVPlayerItem.Status.readyToPlay
@@ -85,9 +95,10 @@ class BackendAudioPlayer {
         return player.currentItem != nil
     }
     
-    init(mediaPlayer: AVPlayer, eventLogger: EventLogger, backendApi: BackendApi, playableDownloader: DownloadManageable, cacheProxy: PlayableFileCachable, userStatistics: UserStatistics) {
+    init(mediaPlayer: AVPlayer, eventLogger: EventLogger, backendApi: BackendApi, networkMonitor: NetworkMonitorFacade, playableDownloader: DownloadManageable, cacheProxy: PlayableFileCachable, userStatistics: UserStatistics) {
         self.player = mediaPlayer
         self.backendApi = backendApi
+        self.networkMonitor = networkMonitor
         self.eventLogger = eventLogger
         self.playableDownloader = playableDownloader
         self.cacheProxy = cacheProxy
@@ -189,17 +200,18 @@ class BackendAudioPlayer {
     }
     
     private func insertStreamPlayable(playable: AbstractPlayable) -> Promise<Void> {
+        let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: self.networkMonitor)
         return firstly {
-            backendApi.generateUrl(forStreamingPlayable: playable)
+            return backendApi.generateUrl(forStreamingPlayable: playable, maxBitrate: streamingMaxBitrate)
         }.get { streamUrl in
-            os_log(.default, "Stream item: %s", playable.displayString)
+            os_log(.default, "Stream item (%s): %s", streamingMaxBitrate.description, playable.displayString)
             self.playType = .stream
             if playable.isSong { self.userStatistics.playedSong(isPlayedFromCache: false) }
-            self.insert(playable: playable, withUrl: streamUrl)
+            self.insert(playable: playable, withUrl: streamUrl, streamingMaxBitrate: streamingMaxBitrate)
         }.asVoid()
     }
 
-    private func insert(playable: AbstractPlayable, withUrl url: URL) {
+    private func insert(playable: AbstractPlayable, withUrl url: URL, streamingMaxBitrate: StreamingMaxBitratePreference = .noLimit) {
         player.pause()
         player.replaceCurrentItem(with: nil)
         var item: AVPlayerItem?
@@ -209,6 +221,7 @@ class BackendAudioPlayer {
         } else {
             item = AVPlayerItem(url: url)
         }
+        item?.preferredPeakBitRate = streamingMaxBitrate.asBitsPerSecondAV
         player.replaceCurrentItem(with: item)
         NotificationCenter.default.addObserver(self, selector: #selector(itemFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
     }

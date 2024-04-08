@@ -77,9 +77,14 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.screenLockPreventionPreference = newValue
         }))
         
-        settings.streamingMaxBitratePreference = self.appDelegate.storage.settings.streamingMaxBitratePreference
-        changesAgent.append(settings.$streamingMaxBitratePreference.sink(receiveValue: { newValue in
-            self.appDelegate.storage.settings.streamingMaxBitratePreference = newValue
+        settings.streamingMaxBitrateWifiPreference = self.appDelegate.storage.settings.streamingMaxBitrateWifiPreference
+        changesAgent.append(settings.$streamingMaxBitrateWifiPreference.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.streamingMaxBitrateWifiPreference = newValue
+        }))
+        
+        settings.streamingMaxBitrateCellularPreference = self.appDelegate.storage.settings.streamingMaxBitrateCellularPreference
+        changesAgent.append(settings.$streamingMaxBitrateCellularPreference.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.streamingMaxBitrateCellularPreference = newValue
         }))
          
         settings.streamingFormatPreference = self.appDelegate.storage.settings.streamingFormatPreference

@@ -26,11 +26,11 @@ import PromiseKit
 class SubsonicApi  {
         
     private let subsonicServerApi: SubsonicServerApi
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorFacade
     private let performanceMonitor: ThreadPerformanceMonitor
     private let eventLogger: EventLogger
 
-    init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitor, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
+    init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
         self.subsonicServerApi = subsonicServerApi
         self.networkMonitor = networkMonitor
         self.performanceMonitor = performanceMonitor
@@ -70,8 +70,8 @@ extension SubsonicApi: BackendApi {
         return subsonicServerApi.generateUrl(forDownloadingPlayable: playable)
     }
 
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable) -> Promise<URL> {
-        return subsonicServerApi.generateUrl(forStreamingPlayable: playable)
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> {
+        return subsonicServerApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
     }
     
     func determTranscodingInfo(url: URL) -> TranscodingInfo {

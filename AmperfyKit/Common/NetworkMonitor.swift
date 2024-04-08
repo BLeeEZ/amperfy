@@ -23,13 +23,25 @@ import OSLog
 import SystemConfiguration
 import Alamofire
 
-public class NetworkMonitor {
+public typealias ConnectionTypeChangedCallack = (_ isWiFiConnected: Bool) -> Void
+
+public protocol NetworkMonitorFacade {
+    var connectionTypeChangedCB: ConnectionTypeChangedCallack?  { get set }
+    var isConnectedToNetwork: Bool { get }
+    var isCellular: Bool { get }
+    var isWifiOrEthernet: Bool { get }
+    func start()
+}
+
+public class NetworkMonitor : NetworkMonitorFacade {
     
     private var reachabilityManager = Alamofire.NetworkReachabilityManager()
     private let queue = DispatchQueue(label: "NetworkMonitor")
     private let log = OSLog(subsystem: "Amperfy", category: "NetworkMonitor")
     private let accessSemaphore = DispatchSemaphore(value: 1)
     private var isCellularConnected = false
+    
+    public var connectionTypeChangedCB: ConnectionTypeChangedCallack?
     
     public var isConnectedToNetwork: Bool {
         var zeroAddress = sockaddr_in(sin_len: 0, sin_family: 0, sin_port: 0, sin_addr: in_addr(s_addr: 0), sin_zero: (0, 0, 0, 0, 0, 0, 0, 0))
@@ -82,10 +94,8 @@ public class NetworkMonitor {
             self.accessSemaphore.signal()
             
             os_log("Start listening for network type changes", log: self.log, type: .info)
-            reachabilityManager.startListening()  { status in
+            reachabilityManager.startListening()  { [self] status in
                 self.accessSemaphore.wait()
-                defer { self.accessSemaphore.signal() }
-                
                 switch status {
                 case .notReachable:
                     os_log("Disconnected: The network is not reachable", log: self.log, type: .info)
@@ -98,13 +108,13 @@ public class NetworkMonitor {
                     self.isCellularConnected = true
                     os_log("Connected: The network is reachable over the WWAN connection", log: self.log, type: .info)
                 }
+                self.accessSemaphore.signal()
+                self.connectionTypeChangedCB?(!self.isCellularConnected)
             }
         } else {
             self.accessSemaphore.signal()
         }
 
     }
-    
-
     
 }

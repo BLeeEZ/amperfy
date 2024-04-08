@@ -22,6 +22,29 @@
 import Foundation
 import MediaPlayer
 
+public struct StreamingMaxBitrates {
+    public var wifi: StreamingMaxBitratePreference = .noLimit
+    public var cellular: StreamingMaxBitratePreference = .noLimit
+    
+    public init(wifi: StreamingMaxBitratePreference, cellular: StreamingMaxBitratePreference) {
+        self.wifi = wifi
+        self.cellular = cellular
+    }
+    
+    public init() {
+        self.wifi = .noLimit
+        self.cellular = .noLimit
+    }
+    
+    public func getActive(networkMonitor: NetworkMonitorFacade) -> StreamingMaxBitratePreference {
+        if networkMonitor.isWifiOrEthernet {
+            return wifi
+        } else {
+            return cellular
+        }
+    }
+}
+
 public struct PlayContext {
     let index: Int
     let name: String
@@ -104,6 +127,7 @@ public protocol PlayerFacade {
     var podcastItemCount: Int { get }
     var playerMode: PlayerMode { get }
     func setPlayerMode(_ newValue: PlayerMode)
+    var streamingMaxBitrates: StreamingMaxBitrates { get set }
 
     func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler)
     func seek(toSecond: Double)
@@ -254,6 +278,15 @@ class PlayerFacadeImpl: PlayerFacade {
         musicPlayer.stopButRemainIndex()
         playerStatus.playerMode = newValue
         musicPlayer.notifyPlaylistUpdated()
+    }
+    
+    var streamingMaxBitrates: StreamingMaxBitrates {
+        get {
+            return backendAudioPlayer.streamingMaxBitrates
+        }
+        set {
+            backendAudioPlayer.streamingMaxBitrates = newValue
+        }
     }
     
     func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler) {

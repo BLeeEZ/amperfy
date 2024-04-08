@@ -28,7 +28,7 @@ import PromiseKit
 class AmpacheLibrarySyncer: LibrarySyncer {
     
     private let ampacheXmlServerApi: AmpacheXmlServerApi
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorFacade
     private let performanceMonitor: ThreadPerformanceMonitor
     private let storage: PersistentStorage
     private let eventLogger: EventLogger
@@ -38,7 +38,7 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         return networkMonitor.isConnectedToNetwork
     }
     
-    init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitor, performanceMonitor: ThreadPerformanceMonitor, storage: PersistentStorage, eventLogger: EventLogger) {
+    init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, storage: PersistentStorage, eventLogger: EventLogger) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
         self.networkMonitor = networkMonitor
         self.performanceMonitor = performanceMonitor
