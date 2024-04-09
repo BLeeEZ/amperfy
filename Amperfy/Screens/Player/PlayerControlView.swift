@@ -244,6 +244,14 @@ class PlayerControlView: UIView {
             skipForwardButton.isHidden = true
         }
     }
+    
+    private var remainingTime: Int? {
+        let duration = player.duration
+        if player.currentlyPlaying != nil, duration.isNormal, !duration.isZero {
+            return Int(player.elapsedTime - ceil(player.duration))
+        }
+        return nil
+    }
 
     func refreshTimeInfo() {
         if player.currentlyPlaying != nil {
@@ -252,10 +260,8 @@ class PlayerControlView: UIView {
             if !timeSlider.isTracking {
                 let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
                 elapsedTimeLabel.text = elapsedClockTime.asShortString()
-                let duration = player.duration
-                if duration.isNormal && !duration.isZero {
-                    let remainingTime = ClockTime(timeInSeconds: Int(player.elapsedTime - ceil(player.duration)))
-                    remainingTimeLabel.text = remainingTime.asShortString()
+                if let remainingTime = remainingTime {
+                    remainingTimeLabel.text = ClockTime(timeInSeconds: remainingTime).asShortString()
                 } else {
                     remainingTimeLabel.text = "--:--"
                 }
@@ -372,7 +378,7 @@ class PlayerControlView: UIView {
         sleepTimerButton.showsMenuAsPrimaryAction = true
     }
     
-    func refreshPlayerOptions() {
+    func createPlayerOptionsMenu() -> UIMenu {
         var menuActions = [UIAction]()
         if player.currentlyPlaying != nil || player.prevQueue.count > 0 || player.userQueue.count > 0 || player.nextQueue.count > 0 {
             let clearPlayer = UIAction(title: "Clear Player", image: .clear, handler: { _ in
@@ -405,7 +411,7 @@ class PlayerControlView: UIView {
             }
         case .podcast: break
         }
-
+        
         switch self.appDelegate.storage.settings.playerDisplayStyle {
         case .compact:
             let scrollToCurrentlyPlaying = UIAction(title: "Scroll to currently playing", image: .squareArrow, handler: { _ in
@@ -414,9 +420,42 @@ class PlayerControlView: UIView {
             menuActions.append(scrollToCurrentlyPlaying)
         case .large: break
         }
-
-        optionsButton.menu = UIMenu(title: "Player Options", children: menuActions)
+        return UIMenu(options: .displayInline, children: menuActions)
+    }
+    
+    func refreshPlayerOptions() {
+        var menuTitle = ""
+        var remainingTotalPlaytime = 0
+        var totalPlaytime = 0
+        remainingTotalPlaytime += player.userQueue.reduce(0, { $0 + $1.duration})
+        remainingTotalPlaytime += player.nextQueue.reduce(0, { $0 + $1.duration})
+        
+        totalPlaytime += remainingTotalPlaytime
+        totalPlaytime += player.prevQueue.reduce(0, { $0 + $1.duration})
+        totalPlaytime += player.currentlyPlaying?.duration ?? 0
+        if let remainingTime = self.remainingTime {
+            remainingTotalPlaytime -= remainingTime
+        } else if let currentlyPlaying = player.currentlyPlaying {
+            remainingTotalPlaytime += currentlyPlaying.duration
+        }
+        
+        if remainingTotalPlaytime > 0 {
+            menuTitle += "\nRemaining Play Time: \(remainingTotalPlaytime.asDurationString)"
+        }
+        if totalPlaytime > 0 {
+            menuTitle += "\nTotal Play Time: \(totalPlaytime.asDurationString)"
+        }
+        
+        if menuTitle.isEmpty {
+            menuTitle = "Player Options"
+        } else {
+            menuTitle = "Player Info:" + menuTitle
+        }
+        
         optionsButton.showsMenuAsPrimaryAction = true
+        optionsButton.menu = UIMenu.lazyMenu(title: menuTitle) {
+            return self.createPlayerOptionsMenu()
+        }
     }
     
     func activateSleepTimer(timeInterval: TimeInterval) {
@@ -467,6 +506,7 @@ extension PlayerControlView: MusicPlayable {
 
     func didElapsedTimeChange() {
         refreshTimeInfo()
+        refreshPlayerOptions()
     }
     
     func didPlaylistChange() {

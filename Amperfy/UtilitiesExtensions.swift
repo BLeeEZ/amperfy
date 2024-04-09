@@ -284,8 +284,8 @@ extension UICollectionViewCell {
 
 extension UIMenu {
     /// rebuilds menu on every access
-    static func lazyMenu(builder: @escaping () -> UIMenu) -> UIMenu {
-        return UIMenu(children: [
+    static func lazyMenu(title: String = "", builder: @escaping () -> UIMenu) -> UIMenu {
+        return UIMenu(title: title, children: [
                 UIDeferredMenuElement.uncached { completion in
                     let menu = builder()
                     completion([menu])
