@@ -116,7 +116,9 @@ class LibraryElementDetailTableHeaderView: UIView {
     func prepare(configuration: PlayShuffleInfoConfiguration) {
         self.config = configuration
         playAllButton.setTitle(config?.customPlayName ?? "Play", for: .normal)
+        playAllButton.layer.cornerRadius = 10.0
         playShuffledButton.setTitle(configuration.isShuffleOnContextNeccessary ? "Shuffle" : "Random", for: .normal)
+        playShuffledButton.layer.cornerRadius = 10.0
         playShuffledButton.isHidden = configuration.isShuffleHidden
         activate()
     }
