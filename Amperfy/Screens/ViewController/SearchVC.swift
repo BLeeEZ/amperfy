@@ -32,44 +32,80 @@ public enum SearchSection: Int, CaseIterable {
     case Song
 }
 
-class SearchVC: MultiSourceTableViewController {
+class SearchDiffableDataSource: BasicUITableViewDiffableDataSource {
     
-    private static let fetchLimit = 10
+    public var searchVC: SearchVC!
     
-    private var searchHistoryFetchedResultsController: SearchHistoryFetchedResultsController!
-    private var artistFetchedResultsController: ArtistFetchedResultsController!
-    private var albumFetchedResultsController: AlbumFetchedResultsController!
-    private var playlistFetchedResultsController: PlaylistFetchedResultsController!
-    private var songFetchedResultsController: SongsFetchedResultsController!
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch SearchSection(rawValue: section) {
+        case .History:
+            if searchVC.searchHistory.isEmpty {
+                return  "No Recent Searches"
+            } else {
+                return  "Recently Searched"
+            }
+        case .Playlist:
+            return "Playlists"
+        case .Artist:
+            return "Artists"
+        case .Album:
+            return "Albums"
+        case .Song:
+            return "Songs"
+        case .none:
+            return ""
+        }
+    }
+    
+}
+
+class SearchVC: BasicTableViewController {
+    
+    private static let categoryItemLimit = 10
+    
+    private var diffableDataSource: SearchDiffableDataSource?
+    fileprivate var searchHistory: [SearchHistoryItem] = []
+    fileprivate var artists: [Artist] = []
+    fileprivate var albums: [Album] = []
+    fileprivate var playlists: [Playlist] = []
+    fileprivate var songs: [Song] = []
     
     private var optionsButton: UIBarButtonItem!
     private var isSearchActive = false
     
+    func createDiffableDataSource() -> SearchDiffableDataSource {
+        let source = SearchDiffableDataSource(tableView: tableView) { (tableView, indexPath, objectID) -> UITableViewCell? in
+            return self.tableView(self.tableView, cellForRowAt: indexPath)
+        }
+        source.searchVC = self
+        return source
+    }
+    
+    func updateDataSource(animated: Bool) {
+        guard let dataSource = tableView?.dataSource as? UITableViewDiffableDataSource<Int, NSManagedObjectID> else {
+            assertionFailure("The data source has not implemented snapshot support while it should")
+            return
+        }
+        var snapshot = dataSource.snapshot() as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>
+        snapshot.deleteAllItems()
+        snapshot.appendSections(SearchSection.allCases.compactMap{ $0.rawValue })
+        snapshot.appendItems(searchHistory.compactMap{$0.managedObject.objectID}, toSection: SearchSection.History.rawValue)
+        snapshot.appendItems(artists.compactMap{$0.managedObject.objectID}, toSection: SearchSection.Artist.rawValue)
+        snapshot.appendItems(albums.compactMap{$0.managedObject.objectID}, toSection: SearchSection.Album.rawValue)
+        snapshot.appendItems(playlists.compactMap{$0.managedObject.objectID}, toSection: SearchSection.Playlist.rawValue)
+        snapshot.appendItems(songs.compactMap{$0.managedObject.objectID}, toSection: SearchSection.Song.rawValue)
+        dataSource.apply(snapshot, animatingDifferences: animated)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        /// Store the data source in an instance property to make sure it's retained.
+        self.diffableDataSource = createDiffableDataSource()
+        /// Assign the data source to your collection view.
+        tableView.dataSource = diffableDataSource
         
-        searchHistoryFetchedResultsController = SearchHistoryFetchedResultsController(
-            coreDataCompanion: appDelegate.storage.main)
-        playlistFetchedResultsController = PlaylistFetchedResultsController(
-            coreDataCompanion: appDelegate.storage.main,
-            sortType: .name,
-            isGroupedInAlphabeticSections: false,
-            fetchLimit: Self.fetchLimit)
-        artistFetchedResultsController = ArtistFetchedResultsController(
-            coreDataCompanion: appDelegate.storage.main,
-            sortType: .name,
-            isGroupedInAlphabeticSections: false,
-            fetchLimit: Self.fetchLimit)
-        albumFetchedResultsController = AlbumFetchedResultsController(
-            coreDataCompanion: appDelegate.storage.main,
-            sortType: .name,
-            isGroupedInAlphabeticSections: false,
-            fetchLimit: Self.fetchLimit)
-        songFetchedResultsController = SongsFetchedResultsController(
-            coreDataCompanion: appDelegate.storage.main,
-            sortType: .name,
-            isGroupedInAlphabeticSections: false,
-            fetchLimit: Self.fetchLimit)
+        searchHistory = appDelegate.storage.main.library.getSearchHistory()
+        updateDataSource(animated: false)
         
         configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: PlaylistTableCell.typeName)
@@ -84,8 +120,8 @@ class SearchVC: MultiSourceTableViewController {
             UIAction(title: "Clear Search History", image: .clear, handler: { _ in
                 self.appDelegate.storage.main.library.deleteSearchHistory()
                 self.appDelegate.storage.main.library.saveContext()
-                self.searchHistoryFetchedResultsController.fetch()
-                self.tableView.reloadSections(IndexSet(integer: SearchSection.History.rawValue), with: .fade)
+                self.searchHistory = []
+                self.updateDataSource(animated: true)
             })
         ])
         navigationItem.rightBarButtonItem = optionsButton
@@ -93,15 +129,15 @@ class SearchVC: MultiSourceTableViewController {
         containableAtIndexPathCallback = { (indexPath) in
             switch SearchSection(rawValue: indexPath.section) {
             case .History:
-                return self.searchHistoryFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0)).searchedPlayableContainable
+                return self.searchHistory[indexPath.row].searchedPlayableContainable
             case .Playlist:
-                return self.playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return self.playlists[indexPath.row]
             case .Artist:
-                return self.artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return self.artists[indexPath.row]
             case .Album:
-                return self.albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return self.albums[indexPath.row]
             case .Song:
-                return self.songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                return self.songs[indexPath.row]
             case .none:
                 return nil
             }
@@ -109,20 +145,20 @@ class SearchVC: MultiSourceTableViewController {
         playContextAtIndexPathCallback = { (indexPath) in
             switch SearchSection(rawValue: indexPath.section) {
             case .History:
-                let history = self.searchHistoryFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                let history = self.searchHistory[indexPath.row]
                 guard let container = history.searchedPlayableContainable else { return nil }
                 return PlayContext(containable: container)
             case .Playlist:
-                let entity = self.playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                let entity = self.playlists[indexPath.row]
                 return PlayContext(containable: entity)
             case .Artist:
-                let entity = self.artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                let entity = self.artists[indexPath.row]
                 return PlayContext(containable: entity)
             case .Album:
-                let entity = self.albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                let entity = self.albums[indexPath.row]
                 return PlayContext(containable: entity)
             case .Song:
-                let entity = self.songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+                let entity = self.songs[indexPath.row]
                 return PlayContext(containable: entity)
             case .none:
                 return nil
@@ -150,7 +186,7 @@ class SearchVC: MultiSourceTableViewController {
     func determSwipeActionContext(at indexPath: IndexPath, completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void) {
         switch SearchSection(rawValue: indexPath.section) {
         case .History:
-            let history = searchHistoryFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let history = self.searchHistory[indexPath.row]
             guard let container = history.searchedPlayableContainable else { completionHandler(nil); return }
             firstly {
                 container.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
@@ -160,7 +196,7 @@ class SearchVC: MultiSourceTableViewController {
                 completionHandler(SwipeActionContext(containable: container))
             }
         case .Playlist:
-            let playlist = playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let playlist = self.playlists[indexPath.row]
             firstly {
                 playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
             }.catch { error in
@@ -169,7 +205,7 @@ class SearchVC: MultiSourceTableViewController {
                 completionHandler(SwipeActionContext(containable: playlist))
             }
         case .Artist:
-            let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let artist = self.artists[indexPath.row]
             firstly {
                 artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
             }.catch { error in
@@ -178,7 +214,7 @@ class SearchVC: MultiSourceTableViewController {
                 completionHandler(SwipeActionContext(containable: artist))
             }
         case .Album:
-            let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let album = self.albums[indexPath.row]
             firstly {
                 album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
             }.catch { error in
@@ -187,7 +223,7 @@ class SearchVC: MultiSourceTableViewController {
                 completionHandler(SwipeActionContext(containable: album))
             }
         case .Song:
-            let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let song = self.songs[indexPath.row]
             completionHandler(SwipeActionContext(containable: song))
         case .none:
             completionHandler(nil)
@@ -197,10 +233,10 @@ class SearchVC: MultiSourceTableViewController {
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
         guard let indexPath = tableView.indexPath(for: cell) else { return nil }
         if SearchSection(rawValue: indexPath.section) == .Song {
-            let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let song = self.songs[indexPath.row]
             return PlayContext(containable: song)
         } else if SearchSection(rawValue: indexPath.section) == .History {
-            let history = searchHistoryFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let history = self.searchHistory[indexPath.row]
             guard let song = history.searchedPlayableContainable as? Song else { return nil }
             return PlayContext(containable: song)
         }
@@ -208,53 +244,10 @@ class SearchVC: MultiSourceTableViewController {
     }
 
     // MARK: - Table view data source
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return SearchSection.allCases.count
-    }
-    
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch SearchSection(rawValue: section) {
-        case .History:
-            if searchHistoryFetchedResultsController.fetchedObjects?.isEmpty ?? true {
-                return  "No Recent Searches"
-            } else {
-                return  "Recently Searched"
-            }
-        case .Playlist:
-            return "Playlists"
-        case .Artist:
-            return "Artists"
-        case .Album:
-            return "Albums"
-        case .Song:
-            return "Songs"
-        case .none:
-            return ""
-        }
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch SearchSection(rawValue: section) {
-        case .History:
-            return searchHistoryFetchedResultsController.sections?[0].numberOfObjects ?? 0
-        case .Playlist:
-            return playlistFetchedResultsController.sections?[0].numberOfObjects ?? 0
-        case .Artist:
-            return artistFetchedResultsController.sections?[0].numberOfObjects ?? 0
-        case .Album:
-            return albumFetchedResultsController.sections?[0].numberOfObjects ?? 0
-        case .Song:
-            return songFetchedResultsController.sections?[0].numberOfObjects ?? 0
-        case .none:
-            return 0
-        }
-    }
-
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch SearchSection(rawValue: indexPath.section) {
         case .History:
-            let history = searchHistoryFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let history = self.searchHistory[indexPath.row]
             guard let container = history.searchedPlayableContainable else { return UITableViewCell() }
             if let playlist = container as? Playlist {
                 let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
@@ -273,25 +266,25 @@ class SearchVC: MultiSourceTableViewController {
             }
         case .Playlist:
             let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
-            let playlist = playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let playlist = self.playlists[indexPath.row]
             cell.display(playlist: playlist, rootView: self)
             cell.accessoryType = .disclosureIndicator
             return cell
         case .Artist:
             let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
-            let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let artist = self.artists[indexPath.row]
             cell.display(container: artist, rootView: self)
             cell.accessoryType = .disclosureIndicator
             return cell
         case .Album:
             let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
-            let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let album = self.albums[indexPath.row]
             cell.display(container: album, rootView: self)
             cell.accessoryType = .disclosureIndicator
             return cell
         case .Song:
             let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
-            let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let song = self.songs[indexPath.row]
             cell.display(playable: song, playContextCb: self.convertCellViewToPlayContext, rootView: self)
             return cell
         case .none:
@@ -304,13 +297,13 @@ class SearchVC: MultiSourceTableViewController {
         case .History:
             return !isSearchActive ? CommonScreenOperations.tableSectionHeightLarge : 0
         case .Playlist:
-            return playlistFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
+            return (isSearchActive && !self.playlists.isEmpty) ? CommonScreenOperations.tableSectionHeightLarge : 0
         case .Artist:
-            return artistFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
+            return (isSearchActive && !self.artists.isEmpty) ? CommonScreenOperations.tableSectionHeightLarge : 0
         case .Album:
-            return albumFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
+            return (isSearchActive && !self.albums.isEmpty) ? CommonScreenOperations.tableSectionHeightLarge : 0
         case .Song:
-            return songFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
+            return (isSearchActive && !self.songs.isEmpty) ? CommonScreenOperations.tableSectionHeightLarge : 0
         case .none:
             return 0.0
         }
@@ -319,7 +312,7 @@ class SearchVC: MultiSourceTableViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch SearchSection(rawValue: indexPath.section) {
         case .History:
-            let history = searchHistoryFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let history = self.searchHistory[indexPath.row]
             guard let container = history.searchedPlayableContainable else { return 0.0 }
             if container is Playlist {
                 return PlaylistTableCell.rowHeight
@@ -344,26 +337,26 @@ class SearchVC: MultiSourceTableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch SearchSection(rawValue: indexPath.section) {
         case .History:
-            let history = searchHistoryFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let history = self.searchHistory[indexPath.row]
             guard let container = history.searchedPlayableContainable else { break }
             let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: container)
             if !(container is Song) {
                 EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
             }
         case .Playlist:
-            let playlist = playlistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let playlist = self.playlists[indexPath.row]
             let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: playlist)
             performSegue(withIdentifier: Segues.toPlaylistDetail.rawValue, sender: playlist)
         case .Artist:
-            let artist = artistFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let artist = self.artists[indexPath.row]
             let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: artist)
             performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
         case .Album:
-            let album = albumFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let album = self.albums[indexPath.row]
             let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: album)
             performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
         case .Song:
-            let song = songFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
+            let song = self.songs[indexPath.row]
             let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: song)
         case .none: break
         }
@@ -391,7 +384,6 @@ class SearchVC: MultiSourceTableViewController {
     override func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            isSearchActive = true
             firstly {
                 self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
             }.catch { error in
@@ -410,51 +402,103 @@ class SearchVC: MultiSourceTableViewController {
                 self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
             }
 
-            searchHistoryFetchedResultsController.clearResults()
-            playlistFetchedResultsController.search(searchText: searchText, playlistSearchCategory: .all)
-            artistFetchedResultsController.search(searchText: searchText, onlyCached: false, displayFilter: .all)
-            albumFetchedResultsController.search(searchText: searchText, onlyCached: false, displayFilter: .all)
-            songFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false, displayFilter: .all)
-            tableView.separatorStyle = .singleLine
+            appDelegate.storage.async.perform { asyncCompanion in
+                let artists = asyncCompanion.library.searchArtists(searchText: searchText, onlyCached: false, displayFilter: .all)
+                let albums = asyncCompanion.library.searchAlbums(searchText: searchText, onlyCached: false, displayFilter: .all)
+                let playlists = asyncCompanion.library.searchPlaylists(searchText: searchText, playlistSearchCategory: .all)
+                let songs = asyncCompanion.library.searchSongs(searchText: searchText, onlyCached: false, displayFilter: .all)
+                
+                let artistsIDs = FuzzySearcher.findBestMatch(in: artists, search: searchText)
+                    .prefix(upToAsArray: Self.categoryItemLimit)
+                    .compactMap{ $0 as? Artist }
+                    .compactMap{ $0.managedObject.objectID }
+                let albumsIDs = FuzzySearcher.findBestMatch(in: albums, search: searchText)
+                    .prefix(upToAsArray: Self.categoryItemLimit)
+                    .compactMap{ $0 as? Album }
+                    .compactMap{ $0.managedObject.objectID }
+                let playlistsIDs = FuzzySearcher.findBestMatch(in: playlists, search: searchText)
+                    .prefix(upToAsArray: Self.categoryItemLimit)
+                    .compactMap{ $0 as? Playlist }
+                    .compactMap{ $0.managedObject.objectID }
+                let songsIDs = FuzzySearcher.findBestMatch(in: songs, search: searchText)
+                    .prefix(upToAsArray: Self.categoryItemLimit)
+                    .compactMap{ $0 as? Song }
+                    .compactMap{ $0.managedObject.objectID }
+                
+                DispatchQueue.main.async {
+                    guard searchText == self.searchController.searchBar.text else { return }
+                    self.isSearchActive = true
+                    self.searchHistory = []
+                    self.artists = artistsIDs
+                        .compactMap{ self.appDelegate.storage.main.context.object(with: $0) as? ArtistMO }
+                        .compactMap{ Artist(managedObject: $0) }
+                    self.albums = albumsIDs
+                        .compactMap{ self.appDelegate.storage.main.context.object(with: $0) as? AlbumMO }
+                        .compactMap{ Album(managedObject: $0) }
+                    self.playlists = playlistsIDs
+                        .compactMap{ self.appDelegate.storage.main.context.object(with: $0) as? PlaylistMO }
+                        .compactMap{ Playlist(library: self.appDelegate.storage.main.library, managedObject: $0) }
+                    self.songs = songsIDs
+                        .compactMap{ self.appDelegate.storage.main.context.object(with: $0) as? SongMO }
+                        .compactMap{ Song(managedObject: $0) }
+                    self.tableView.separatorStyle = .singleLine
+                    self.updateDataSource(animated: false)
+                }
+            }.catch { error in }
         } else if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 1 {
-            isSearchActive = true
-            searchHistoryFetchedResultsController.clearResults()
-            playlistFetchedResultsController.search(searchText: searchText, playlistSearchCategory: .cached)
-            artistFetchedResultsController.search(searchText: searchText, onlyCached: true, displayFilter: .all)
-            albumFetchedResultsController.search(searchText: searchText, onlyCached: true, displayFilter: .all)
-            songFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true, displayFilter: .all)
-            tableView.separatorStyle = .singleLine
+            appDelegate.storage.async.perform { asyncCompanion in
+                let artists = asyncCompanion.library.searchArtists(searchText: searchText, onlyCached: true, displayFilter: .all)
+                let albums = asyncCompanion.library.searchAlbums(searchText: searchText, onlyCached: true, displayFilter: .all)
+                let playlists = asyncCompanion.library.searchPlaylists(searchText: searchText, playlistSearchCategory: .cached)
+                let songs = asyncCompanion.library.searchSongs(searchText: searchText, onlyCached: true, displayFilter: .all)
+                
+                let artistsIDs = FuzzySearcher.findBestMatch(in: artists, search: searchText)
+                    .prefix(upToAsArray: Self.categoryItemLimit)
+                    .compactMap{ $0 as? Artist }
+                    .compactMap{ $0.managedObject.objectID }
+                let albumsIDs = FuzzySearcher.findBestMatch(in: albums, search: searchText)
+                    .prefix(upToAsArray: Self.categoryItemLimit)
+                    .compactMap{ $0 as? Album }
+                    .compactMap{ $0.managedObject.objectID }
+                let playlistsIDs = FuzzySearcher.findBestMatch(in: playlists, search: searchText)
+                    .prefix(upToAsArray: Self.categoryItemLimit)
+                    .compactMap{ $0 as? Playlist }
+                    .compactMap{ $0.managedObject.objectID }
+                let songsIDs = FuzzySearcher.findBestMatch(in: songs, search: searchText)
+                    .prefix(upToAsArray: Self.categoryItemLimit)
+                    .compactMap{ $0 as? Song }
+                    .compactMap{ $0.managedObject.objectID }
+                
+                DispatchQueue.main.async {
+                    guard searchText == self.searchController.searchBar.text else { return }
+                    self.isSearchActive = true
+                    self.searchHistory = []
+                    self.artists = artistsIDs
+                        .compactMap{ self.appDelegate.storage.main.context.object(with: $0) as? ArtistMO }
+                        .compactMap{ Artist(managedObject: $0) }
+                    self.albums = albumsIDs
+                        .compactMap{ self.appDelegate.storage.main.context.object(with: $0) as? AlbumMO }
+                        .compactMap{ Album(managedObject: $0) }
+                    self.playlists = playlistsIDs
+                        .compactMap{ self.appDelegate.storage.main.context.object(with: $0) as? PlaylistMO }
+                        .compactMap{ Playlist(library: self.appDelegate.storage.main.library, managedObject: $0) }
+                    self.songs = songsIDs
+                        .compactMap{ self.appDelegate.storage.main.context.object(with: $0) as? SongMO }
+                        .compactMap{ Song(managedObject: $0) }
+                    self.tableView.separatorStyle = .singleLine
+                    self.updateDataSource(animated: false)
+                }
+            }.catch { error in }
         } else {
             isSearchActive = false
-            searchHistoryFetchedResultsController.showAllResults()
-            playlistFetchedResultsController.clearResults()
-            artistFetchedResultsController.hideResults()
-            albumFetchedResultsController.hideResults()
-            songFetchedResultsController.hideResults()
+            self.searchHistory = appDelegate.storage.main.library.getSearchHistory()
+            self.artists = []
+            self.albums = []
+            self.playlists = []
+            self.songs = []
             tableView.separatorStyle = .singleLine
+            self.updateDataSource(animated: false)
         }
-        tableView.reloadData()
-    }
-    
-    override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        var section: Int = 0
-        switch controller {
-        case playlistFetchedResultsController.fetchResultsController:
-            section = SearchSection.Playlist.rawValue
-        case artistFetchedResultsController.fetchResultsController:
-            section = SearchSection.Artist.rawValue
-        case albumFetchedResultsController.fetchResultsController:
-            section = SearchSection.Album.rawValue
-        case songFetchedResultsController.fetchResultsController:
-            section = SearchSection.Song.rawValue
-        default:
-            return
-        }
-        
-        resultUpdateHandler?.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
-    }
-    
-    override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
     }
     
 }

@@ -838,6 +838,91 @@ public class LibraryStorage: PlayableFileCachable {
         return songs ?? [Song]()
     }
     
+    public func getSearchHistory() -> [SearchHistoryItem] {
+        let fetchRequest = SearchHistoryItemMO.searchDateFetchRequest
+        fetchRequest.predicate = SearchHistoryItemMO.excludeEmptyItemsFetchPredicate
+        let foundHistory = try? context.fetch(fetchRequest)
+        let history = foundHistory?.compactMap{ SearchHistoryItem(managedObject: $0) }
+        return history ?? [SearchHistoryItem]()
+    }
+    
+    public func getSearchArtistsPredicate(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) -> NSPredicate {
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSCompoundPredicate(orPredicateWithSubpredicates: [
+                AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
+                self.getFetchPredicate(onlyCachedArtists: true)
+            ]),
+            ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+            self.getFetchPredicate(onlyCachedArtists: onlyCached),
+            self.getFetchPredicate(artistsDisplayFilter: displayFilter)
+        ])
+        return predicate
+    }
+    
+    public func searchArtists(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) -> [Artist] {
+        let fetchRequest = ArtistMO.identifierSortedFetchRequest
+        fetchRequest.predicate = getSearchArtistsPredicate(searchText: searchText, onlyCached: onlyCached, displayFilter: displayFilter)
+        let found = try? context.fetch(fetchRequest)
+        let wrapped = found?.compactMap{ Artist(managedObject: $0) }
+        return wrapped ?? [Artist]()
+    }
+    
+    public func getSearchAlbumsPredicate(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) -> NSPredicate {
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSCompoundPredicate(orPredicateWithSubpredicates: [
+                AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
+                self.getFetchPredicate(onlyCachedAlbums: true)
+            ]),
+            AlbumMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+            self.getFetchPredicate(onlyCachedAlbums: onlyCached),
+            self.getFetchPredicate(albumsDisplayFilter: displayFilter)
+        ])
+        return predicate
+    }
+    
+    public func searchAlbums(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) -> [Album] {
+        let fetchRequest = AlbumMO.identifierSortedFetchRequest
+        fetchRequest.predicate = getSearchAlbumsPredicate(searchText: searchText, onlyCached: onlyCached, displayFilter: displayFilter)
+        let found = try? context.fetch(fetchRequest)
+        let wrapped = found?.compactMap{ Album(managedObject: $0) }
+        return wrapped ?? [Album]()
+    }
+    
+    public func getSearchPlaylistsPredicate(searchText: String, playlistSearchCategory: PlaylistSearchCategory) -> NSPredicate {
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            PlaylistMO.excludeSystemPlaylistsFetchPredicate,
+            PlaylistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+            self.getFetchPredicate(forPlaylistSearchCategory: playlistSearchCategory)
+        ])
+        return predicate
+    }
+    
+    public func searchPlaylists(searchText: String, playlistSearchCategory: PlaylistSearchCategory) -> [Playlist] {
+        let fetchRequest = PlaylistMO.identifierSortedFetchRequest
+        fetchRequest.predicate = getSearchPlaylistsPredicate(searchText: searchText, playlistSearchCategory: playlistSearchCategory)
+        let found = try? context.fetch(fetchRequest)
+        let wrapped = found?.compactMap{ Playlist(library: self, managedObject: $0) }
+        return wrapped ?? [Playlist]()
+    }
+    
+    public func getSearchSongsPredicate(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) -> NSPredicate {
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+            SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+            self.getFetchPredicate(onlyCachedSongs: onlyCached),
+            self.getFetchPredicate(songsDisplayFilter: displayFilter)
+        ])
+        return predicate
+    }
+    
+    public func searchSongs(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) -> [Song] {
+        let fetchRequest = SongMO.identifierSortedFetchRequest
+        fetchRequest.predicate = getSearchSongsPredicate(searchText: searchText, onlyCached: onlyCached, displayFilter: displayFilter)
+        let found = try? context.fetch(fetchRequest)
+        let wrapped = found?.compactMap{ Song(managedObject: $0) }
+        return wrapped ?? [Song]()
+    }
+    
     public func getRandomSongs(count: Int = 100, onlyCached: Bool) -> [Song] {
         let fetchRequest = SongMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [

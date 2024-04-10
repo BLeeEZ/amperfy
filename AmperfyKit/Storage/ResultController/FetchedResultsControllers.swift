@@ -366,15 +366,7 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
     
     public func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
         if searchText.count > 0 || onlyCached || displayFilter != .all {
-            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                NSCompoundPredicate(orPredicateWithSubpredicates: [
-                    AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                    coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: true)
-                ]),
-                ArtistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: onlyCached),
-                coreDataCompanion.library.getFetchPredicate(artistsDisplayFilter: displayFilter)
-            ])
+            let predicate = coreDataCompanion.library.getSearchArtistsPredicate(searchText: searchText, onlyCached: onlyCached, displayFilter: displayFilter)
             search(predicate: predicate)
         } else {
             showAllResults()
@@ -488,15 +480,7 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
     
     public func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
         if searchText.count > 0 || onlyCached || displayFilter != .all {
-            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                NSCompoundPredicate(orPredicateWithSubpredicates: [
-                    AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-                    coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true)
-                ]),
-                AlbumMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: onlyCached),
-                coreDataCompanion.library.getFetchPredicate(albumsDisplayFilter: displayFilter)
-            ])
+            let predicate = coreDataCompanion.library.getSearchAlbumsPredicate(searchText: searchText, onlyCached: onlyCached, displayFilter: displayFilter)
             search(predicate: predicate)
         } else {
             showAllResults()
@@ -528,12 +512,7 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
     
     public func search(searchText: String, onlyCachedSongs: Bool, displayFilter: DisplayCategoryFilter) {
         if searchText.count > 0 || onlyCachedSongs || displayFilter != .all {
-            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-                SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs),
-                coreDataCompanion.library.getFetchPredicate(songsDisplayFilter: displayFilter)
-            ])
+            let predicate = coreDataCompanion.library.getSearchSongsPredicate(searchText: searchText, onlyCached: onlyCachedSongs, displayFilter: displayFilter)
             search(predicate: predicate)
         } else {
             showAllResults()
@@ -621,11 +600,7 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
     
     public func search(searchText: String, playlistSearchCategory: PlaylistSearchCategory) {
         if searchText.count > 0 || playlistSearchCategory != .defaultValue {
-            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                PlaylistMO.excludeSystemPlaylistsFetchPredicate,
-                PlaylistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                coreDataCompanion.library.getFetchPredicate(forPlaylistSearchCategory: playlistSearchCategory)
-            ])
+            let predicate = coreDataCompanion.library.getSearchPlaylistsPredicate(searchText: searchText, playlistSearchCategory: playlistSearchCategory)
             search(predicate: predicate)
         } else {
             showAllResults()

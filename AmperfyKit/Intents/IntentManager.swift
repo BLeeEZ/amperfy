@@ -600,54 +600,31 @@ public class IntentManager {
         case .unknown:
             fallthrough
         case .song:
-            playableContainer = self.findBestMatch(in: library.getSongs(), search: searchTerm).first
+            playableContainer = FuzzySearcher.findBestMatch(in: library.getSongs(), search: searchTerm).first
         case .artist:
-            playableContainer = self.findBestMatch(in: library.getArtists(), search: searchTerm).first
+            playableContainer = FuzzySearcher.findBestMatch(in: library.getArtists(), search: searchTerm).first
         case .podcastEpisode:
-            playableContainer = self.findBestMatch(in: library.getPodcastEpisodes(), search: searchTerm).first
+            playableContainer = FuzzySearcher.findBestMatch(in: library.getPodcastEpisodes(), search: searchTerm).first
         case .playlist:
-            playableContainer = self.findBestMatch(in: library.getPlaylists(), search: searchTerm).first
+            playableContainer = FuzzySearcher.findBestMatch(in: library.getPlaylists(), search: searchTerm).first
         case .album:
-            playableContainer = self.findBestMatch(in: library.getAlbums(), search: searchTerm).first
+            playableContainer = FuzzySearcher.findBestMatch(in: library.getAlbums(), search: searchTerm).first
         case .genre:
-            playableContainer = self.findBestMatch(in: library.getGenres(), search: searchTerm).first
+            playableContainer = FuzzySearcher.findBestMatch(in: library.getGenres(), search: searchTerm).first
         case .podcast:
-            playableContainer = self.findBestMatch(in: library.getPodcasts(), search: searchTerm).first
+            playableContainer = FuzzySearcher.findBestMatch(in: library.getPodcasts(), search: searchTerm).first
         }
         return playableContainer
     }
     
     private func getSong(songName: String, artistName: String) -> PlayableContainable? {
-        let foundPlayables = self.findBestMatch(in: library.getSongs(), search: songName)
+        let foundPlayables = FuzzySearcher.findBestMatch(in: library.getSongs(), search: songName)
         let foundSongs = foundPlayables.compactMap { $0 as? Song }
         let artists = foundSongs.compactMap { $0.artist }
-        let matchingArtistsRaw = self.findBestMatch(in: artists, search: artistName)
+        let matchingArtistsRaw = FuzzySearcher.findBestMatch(in: artists, search: artistName)
         let matchingArtists = matchingArtistsRaw.compactMap { $0 as? Artist }
         let foundSong = foundSongs.lazy.filter { song in matchingArtists.contains(where: { artist in song.artist == artist}) }.first
         return foundSong
-    }
-    
-    struct MatchResult {
-        let item: PlayableContainable
-        let score: Double
-    }
-    
-    static let fuzzyMatchThreshold = 0.2 // A score be below this value (0 (exact match) and 1 (not a match)) will result in a match
-    
-    private func findBestMatch(in items: [PlayableContainable], search: String) -> [PlayableContainable] {
-        let fuse = Fuse()
-        // Improve performance by creating the pattern once
-        let pattern = fuse.createPattern(from: search)
-
-        var matches = [MatchResult]()
-        items.forEach {
-            let result = fuse.search(pattern, in: $0.name)
-            if let result = result, result.score <= Self.fuzzyMatchThreshold {
-                matches.append(MatchResult(item: $0, score: result.score))
-            }
-        }
-        let sortedMatches = matches.sorted(by: {$0.score < $1.score})
-        return sortedMatches.compactMap { $0.item }
     }
     
     private func getPlayableContainer(id: String, libraryElementType: PlayableContainerType) -> PlayableContainable? {
