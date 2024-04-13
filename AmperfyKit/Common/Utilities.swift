@@ -231,6 +231,10 @@ extension Array {
         }
         return Array(copy.suffix(n))
     }
+    
+    public func prefix(upToAsArray: Int) -> [Element] {
+        return Array(prefix(upToAsArray))
+    }
 }
 
 extension UIColor {

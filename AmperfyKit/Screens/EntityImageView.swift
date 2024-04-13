@@ -102,6 +102,7 @@ open class EntityImageView: UIView {
                         $0.isHidden = false
                     }
                     for (index, entity) in quadEntities.enumerated() {
+                        guard index < quadImages.count else { break }
                         quadImages[index].display(entity: entity)
                     }
                     quadImages[0].layer.maskedCorners = [.layerMinXMinYCorner]

@@ -536,7 +536,7 @@ extension Playlist: PlayableContainable  {
         } else if artworkItems.count == 1 {
             return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: artworkItems[0].playable)
         } else {
-            let quadImages = artworkItems.compactMap { return $0.playable }
+            let quadImages = artworkItems.compactMap{ return $0.playable }.prefix(upToAsArray: 4)
             return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: artworkItems[0].playable, quadImageEntity: quadImages)
         }
     }
