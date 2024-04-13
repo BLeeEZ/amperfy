@@ -59,6 +59,7 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         fetchedResultsController.fetch()
     }
     
