@@ -22,18 +22,40 @@
 import Foundation
 import CarPlay
 import AmperfyKit
+import PromiseKit
 
 extension CarPlaySceneDelegate {
     func configureNowPlayingTemplate() {
-        CPNowPlayingTemplate.shared.updateNowPlayingButtons([
+        var buttons: [CPNowPlayingButton] = []
+        buttons.append(
             CPNowPlayingRepeatButton(handler: { [weak self] button in
                 guard let `self` = self else { return }
                 self.appDelegate.player.setRepeatMode(self.appDelegate.player.repeatMode.nextMode)
-            }),
+            })
+        )
+        buttons.append(
             CPNowPlayingShuffleButton(handler: { [weak self] button in
                 guard let `self` = self else { return }
                 self.appDelegate.player.toggleShuffle()
-            }),
+            })
+        )
+        if appDelegate.player.playerMode == .music {
+            let isFavorite =  appDelegate.player.currentlyPlaying?.isFavorite ?? false
+            buttons.append(
+                CPNowPlayingImageButton(image: isFavorite ? .heartFill : .heartEmpty, handler: { [weak self] button in
+                    guard let `self` = self else { return }
+                    guard let playableInfo = appDelegate.player.currentlyPlaying else { return }
+                    firstly {
+                        playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+                    }.catch { error in
+                        self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+                    }.finally {
+                        self.configureNowPlayingTemplate()
+                    }
+                })
+            )
+        }
+        buttons.append(
             CPNowPlayingPlaybackRateButton(handler: { [weak self] button in
                 guard let `self` = self else { return }
                 let availablePlaybackRates: [CPListItem] = PlaybackRate.allCases.compactMap { playbackRate in
@@ -52,7 +74,8 @@ extension CarPlaySceneDelegate {
                 self.interfaceController?.pushTemplate(playbackRateTemplate, animated: true, completion: nil)
                 
             })
-        ])
+        )
+        CPNowPlayingTemplate.shared.updateNowPlayingButtons(buttons)
         CPNowPlayingTemplate.shared.upNextTitle = Self.queueButtonText
         CPNowPlayingTemplate.shared.isUpNextButtonEnabled = true
     }
@@ -124,6 +147,7 @@ extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
 
 extension CarPlaySceneDelegate: MusicPlayable {
     func didStartPlaying() {
+        configureNowPlayingTemplate()
         playerQueueSection.updateSections(createPlayerQueueSections())
     }
     func didPause() { }
