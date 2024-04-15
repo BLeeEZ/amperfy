@@ -82,6 +82,9 @@ class SubsonicServerApi: URLCleanser {
     var serverApiVersion: SubsonicVersion?
     var clientApiVersion: SubsonicVersion?
     var authType: SubsonicApiAuthType = .autoDetect
+    private var authTypeBasedClientApiVersion: SubsonicVersion {
+        return self.authType == .legacy ? Self.defaultClientApiVersionPreToken : Self.defaultClientApiVersionWithToken
+    }
     
     private let log = OSLog(subsystem: "Amperfy", category: "Subsonic")
     private let performanceMonitor: ThreadPerformanceMonitor
@@ -111,14 +114,6 @@ class SubsonicServerApi: URLCleanser {
         return authenticationToken
     }
     
-    private func determineApiVersionToUse(providedCredentials: LoginCredentials? = nil) -> Promise<SubsonicVersion> {
-        return firstly {
-            self.getCachedServerApiVersionOrRequestIt(providedCredentials: providedCredentials)
-        }.then { version in
-            self.determineClientApiVersion(serverVersion: version)
-        }
-    }
-    
     private func getCachedServerApiVersionOrRequestIt(providedCredentials: LoginCredentials? = nil) -> Promise<SubsonicVersion> {
         if let serverVersion = serverApiVersion {
             return Promise<SubsonicVersion>.value(serverVersion)
@@ -127,24 +122,26 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    private func determineClientApiVersion(serverVersion: SubsonicVersion) -> Promise<SubsonicVersion> {
-        return Promise<SubsonicVersion> { seal in
-            if let clientApi = self.clientApiVersion {
-                return seal.fulfill(clientApi)
+    private func determineApiVersionToUse(providedCredentials: LoginCredentials? = nil) -> Promise<SubsonicVersion> {
+        return Promise<SubsonicVersion> { clientVersionSeal in
+            if let clientApiVersion = self.clientApiVersion {
+                return clientVersionSeal.fulfill(clientApiVersion)
             }
-            guard authType != .legacy else {
-                os_log("Client API legacy login", log: log, type: .info)
-                self.clientApiVersion = SubsonicServerApi.defaultClientApiVersionPreToken
-                return seal.fulfill(self.clientApiVersion!)
+            firstly {
+                self.getCachedServerApiVersionOrRequestIt(providedCredentials: providedCredentials)
+            }.done { serverVersion in
+                os_log("Server API version is '%s'", log: self.log, type: .info, serverVersion.description)
+                if self.authType == .legacy {
+                    self.clientApiVersion = Self.defaultClientApiVersionPreToken
+                    os_log("Client API legacy login", log: self.log, type: .info)
+                } else {
+                    self.clientApiVersion = Self.defaultClientApiVersionWithToken
+                    os_log("Client API version is '%s'", log: self.log, type: .info, self.clientApiVersion!.description)
+                }
+                return clientVersionSeal.fulfill(self.clientApiVersion!)
+            }.catch { error in
+                return clientVersionSeal.reject(error)
             }
-            os_log("Server API version is '%s'", log: log, type: .info, serverVersion.description)
-            if serverVersion < SubsonicVersion.authenticationTokenRequiredServerApi {
-                self.clientApiVersion = SubsonicServerApi.defaultClientApiVersionPreToken
-            } else {
-                self.clientApiVersion = SubsonicServerApi.defaultClientApiVersionWithToken
-            }
-            os_log("Client API version is '%s'", log: log, type: .info, self.clientApiVersion!.description)
-            return seal.fulfill(clientApiVersion!)
         }
     }
     
@@ -223,9 +220,7 @@ class SubsonicServerApi: URLCleanser {
     
     func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
         return firstly {
-            self.requestServerApiVersionPromise(providedCredentials: credentials)
-        }.then { version in
-            self.determineClientApiVersion(serverVersion: version)
+            self.determineApiVersionToUse(providedCredentials: credentials)
         }.then { version -> Promise<APIDataResponse> in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "ping", credentials: credentials)
             return self.request(url: try self.createUrl(from: urlComp))
@@ -288,7 +283,7 @@ class SubsonicServerApi: URLCleanser {
     private func requestServerApiVersionPromise(providedCredentials: LoginCredentials? = nil) -> Promise<SubsonicVersion> {
         return firstly {
             Promise<URL> { seal in
-                guard let urlComp = createBasicApiUrlComponent(forAction: "ping", providedCredentials: providedCredentials) else {
+                guard let urlComp = try? createAuthApiUrlComponent(version: authTypeBasedClientApiVersion, forAction: "ping", credentials: providedCredentials) else {
                     throw BackendError.invalidUrl
                 }
                 return seal.fulfill(try createUrl(from: urlComp))
