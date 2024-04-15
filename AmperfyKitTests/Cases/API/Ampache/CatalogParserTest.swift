@@ -31,7 +31,7 @@ class CatalogParserTest: AbstractAmpacheTest {
     }
     
     override func recreateParserDelegate() {
-        parserDelegate = CatalogParserDelegate(library: library)
+        parserDelegate = CatalogParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library)
     }
     
     override func checkCorrectParsing() {

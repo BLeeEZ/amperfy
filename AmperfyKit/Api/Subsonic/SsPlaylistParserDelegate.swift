@@ -31,11 +31,11 @@ class SsPlaylistParserDelegate: SsXmlParser {
     private var parsedPlaylists: Set<Playlist>
     private let library: LibraryStorage
     
-    init(library: LibraryStorage) {
+    init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage) {
         self.library = library
         oldPlaylists = Set(library.getPlaylists())
         parsedPlaylists = Set<Playlist>()
-        super.init()
+        super.init(performanceMonitor: performanceMonitor)
     }
 
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {

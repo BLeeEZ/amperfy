@@ -31,7 +31,7 @@ class PlaylistsParserTest: AbstractAmpacheTest {
     }
     
     override func recreateParserDelegate() {
-        parserDelegate = PlaylistParserDelegate(library: library, parseNotifier: nil)
+        parserDelegate = PlaylistParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, parseNotifier: nil)
     }
     
     func testLibraryContainsBeforeMorePlaylistsThenAfter() {

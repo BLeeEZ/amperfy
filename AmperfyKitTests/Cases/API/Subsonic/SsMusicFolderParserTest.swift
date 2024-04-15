@@ -27,7 +27,7 @@ class SsMusicFolderParserTest: AbstractSsParserTest {
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "musicFolders_example_1")
-        ssParserDelegate = SsMusicFolderParserDelegate(library: library)
+        ssParserDelegate = SsMusicFolderParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library)
     }
     
     override func checkCorrectParsing() {

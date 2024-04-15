@@ -37,7 +37,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     }
     
     override func recreateParserDelegate() {
-        ssParserDelegate = SsPlaylistSongsParserDelegate(playlist: playlist, library: library, subsonicUrlCreator: subsonicUrlCreator)
+        ssParserDelegate = SsPlaylistSongsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), playlist: playlist, library: library, subsonicUrlCreator: subsonicUrlCreator)
     }
 
     func createTestArtists() {

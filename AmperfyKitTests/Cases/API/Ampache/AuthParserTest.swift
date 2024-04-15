@@ -31,7 +31,7 @@ class AuthParserTest: XCTestCase {
     }
     
     func testParsing() {
-        let parserDelegate = AuthParserDelegate()
+        let parserDelegate = AuthParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
         let parser = XMLParser(data: xmlData)
         parser.delegate = parserDelegate
         parser.parse()

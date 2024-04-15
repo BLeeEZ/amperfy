@@ -24,7 +24,7 @@ import Foundation
 class SsXmlParser: GenericXmlParser {
     
     var error: SubsonicResponseError?
-
+    
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
         
@@ -41,8 +41,9 @@ class SsNotifiableXmlParser: SsXmlParser {
     
     var parseNotifier: ParsedObjectNotifiable?
     
-    init(parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(performanceMonitor: ThreadPerformanceMonitor, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.parseNotifier = parseNotifier
+        super.init(performanceMonitor: performanceMonitor)
     }
     
 }
@@ -51,9 +52,9 @@ class SsXmlLibParser: SsNotifiableXmlParser {
     
     var library: LibraryStorage
     
-    init(library: LibraryStorage, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.library = library
-        super.init(parseNotifier: parseNotifier)
+        super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
     }
     
 }
@@ -62,9 +63,9 @@ class SsXmlLibWithArtworkParser: SsXmlLibParser {
     
     var subsonicUrlCreator: SubsonicUrlCreator
     
-    init(library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.subsonicUrlCreator = subsonicUrlCreator
-        super.init(library: library, parseNotifier: parseNotifier)
+        super.init(performanceMonitor: performanceMonitor, library: library, parseNotifier: parseNotifier)
     }
 
     func parseArtwork(id: String) -> Artwork? {

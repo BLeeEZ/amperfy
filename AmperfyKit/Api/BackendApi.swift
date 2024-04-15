@@ -41,6 +41,10 @@ public protocol SyncCallbacks: ParsedObjectNotifiable {
     func notifySyncStarted(ofType parsedObjectType: ParsedObjectType, totalCount: Int)
 }
 
+public protocol ThreadPerformanceMonitor {
+    var shouldSlowDownExecution: Bool { get }
+}
+
 public class APIDataResponse {
     public var data: Data
     public var url: URL?

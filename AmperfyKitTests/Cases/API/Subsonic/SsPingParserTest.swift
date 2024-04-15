@@ -34,7 +34,7 @@ class SsPingParserTest: XCTestCase {
     }
     
     func testParsing() {
-        let parserDelegate = SsPingParserDelegate()
+        let parserDelegate = SsPingParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
         let parser = XMLParser(data: xmlData)
         parser.delegate = parserDelegate
         parser.parse()

@@ -31,7 +31,7 @@ class ArtistParserTest: AbstractAmpacheTest {
     }
     
     override func recreateParserDelegate() {
-        parserDelegate = ArtistParserDelegate(library: library, parseNotifier: nil)
+        parserDelegate = ArtistParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, parseNotifier: nil)
     }
     
     override func checkCorrectParsing() {

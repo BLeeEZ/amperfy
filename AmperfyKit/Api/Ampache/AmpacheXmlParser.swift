@@ -57,8 +57,9 @@ class AmpacheNotifiableXmlParser: AmpacheXmlParser {
     
     var parseNotifier: ParsedObjectNotifiable?
     
-    init(parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(performanceMonitor: ThreadPerformanceMonitor, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.parseNotifier = parseNotifier
+        super.init(performanceMonitor: performanceMonitor)
     }
     
 }
@@ -67,9 +68,9 @@ class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
     
     var library: LibraryStorage
     
-    init(library: LibraryStorage, parseNotifier: ParsedObjectNotifiable? = nil) {
+    init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage, parseNotifier: ParsedObjectNotifiable? = nil) {
         self.library = library
-        super.init(parseNotifier: parseNotifier)
+        super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
     }
     
     func parseArtwork(urlString: String) -> Artwork? {

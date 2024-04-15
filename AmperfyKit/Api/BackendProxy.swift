@@ -146,6 +146,7 @@ public class ResourceNotAvailableResponseError: ResponseError {
 public class BackendProxy {
     
     private let log = OSLog(subsystem: "Amperfy", category: "BackendProxy")
+    private let performanceMonitor: ThreadPerformanceMonitor
     private let eventLogger: EventLogger
     private var activeApiType = BackenApiType.ampache
     public var selectedApi: BackenApiType {
@@ -172,20 +173,21 @@ public class BackendProxy {
     }
  
     private lazy var ampacheApi: BackendApi = {
-        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(eventLogger: eventLogger), eventLogger: eventLogger)
+        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger), performanceMonitor: performanceMonitor, eventLogger: eventLogger)
     }()
     private lazy var subsonicApi: BackendApi = {
-        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(eventLogger: eventLogger), eventLogger: eventLogger)
+        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger), performanceMonitor: performanceMonitor, eventLogger: eventLogger)
         api.authType = .autoDetect
         return api
     }()
     private lazy var subsonicLegacyApi: BackendApi = {
-        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(eventLogger: eventLogger), eventLogger: eventLogger)
+        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger), performanceMonitor: performanceMonitor, eventLogger: eventLogger)
         api.authType = .legacy
         return api
     }()
     
-    init(eventLogger: EventLogger) {
+    init(performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
+        self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
     }
 

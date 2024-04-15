@@ -27,7 +27,7 @@ class SsGenreParserTest: AbstractSsParserTest {
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "genres_example_1")
-        ssParserDelegate = SsGenreParserDelegate(library: library, parseNotifier: nil)
+        ssParserDelegate = SsGenreParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, parseNotifier: nil)
     }
     
     override func checkCorrectParsing() {

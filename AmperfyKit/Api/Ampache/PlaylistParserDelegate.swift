@@ -32,13 +32,13 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
     private var parsedPlaylists: Set<Playlist>
     private var library: LibraryStorage
     
-    init(library: LibraryStorage, parseNotifier: ParsedObjectNotifiable?, playlistToValidate: Playlist? = nil) {
+    init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage, parseNotifier: ParsedObjectNotifiable?, playlistToValidate: Playlist? = nil) {
         self.library = library
         self.playlist = playlistToValidate
         self.playlistToValidate = playlistToValidate
         oldPlaylists = Set(library.getPlaylists())
         parsedPlaylists = Set<Playlist>()
-        super.init(parseNotifier: parseNotifier)
+        super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
     }
     
     private func resetPlaylistInCaseOfError() {

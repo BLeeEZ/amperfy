@@ -41,6 +41,8 @@ public class AmperKit {
         return inst!
     }
     
+    public var isInForeground = true
+    
     public lazy var log = {
         return OSLog(subsystem: "Amperfy", category: "AppDelegate")
     }()
@@ -60,7 +62,7 @@ public class AmperKit {
         return EventLogger(storage: storage)
     }()
     public lazy var backendApi: BackendProxy = {
-        return BackendProxy(eventLogger: eventLogger)
+        return BackendProxy(performanceMonitor: self, eventLogger: eventLogger)
     }()
     public lazy var notificationHandler: EventNotificationHandler = {
         return EventNotificationHandler()
@@ -163,4 +165,10 @@ public class AmperKit {
         player.reinit(playerStatus: playerData, queueHandler: queueHandler)
     }
     
+}
+
+extension AmperKit: ThreadPerformanceMonitor {
+    public var shouldSlowDownExecution: Bool {
+        return !isInForeground
+    }
 }

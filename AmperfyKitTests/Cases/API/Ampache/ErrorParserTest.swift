@@ -31,7 +31,7 @@ class ErrorParserTest: XCTestCase {
     }
     
     func testParsing() {
-        let parserDelegate = AmpacheXmlParser()
+        let parserDelegate = AmpacheXmlParser(performanceMonitor: MOCK_PerformanceMonitor())
         let parser = XMLParser(data: xmlData)
         parser.delegate = parserDelegate
         parser.parse()

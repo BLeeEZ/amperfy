@@ -28,7 +28,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
     var createdSongCount = 0
     
     override func recreateParserDelegate() {
-        parserDelegate = PlaylistSongsParserDelegate(playlist: playlist, library: library)
+        parserDelegate = PlaylistSongsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), playlist: playlist, library: library)
     }
     
     override func setUp() {

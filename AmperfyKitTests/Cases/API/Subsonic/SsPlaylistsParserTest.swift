@@ -27,11 +27,11 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "playlists_example_1")
-        ssParserDelegate = SsPlaylistParserDelegate(library: library)
+        ssParserDelegate = SsPlaylistParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library)
     }
     
     override func recreateParserDelegate() {
-        ssParserDelegate = SsPlaylistParserDelegate(library: library)
+        ssParserDelegate = SsPlaylistParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library)
     }
     
     func testLibraryContainsBeforeMorePlaylistsThenAfter() {

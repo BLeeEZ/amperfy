@@ -76,6 +76,7 @@ class AmpacheXmlServerApi: URLCleanser {
     let clientApiVersion = "500000"
     
     private let log = OSLog(subsystem: "Amperfy", category: "Ampache")
+    private let performanceMonitor: ThreadPerformanceMonitor
     let eventLogger: EventLogger
     private var credentials: LoginCredentials?
     private var authHandshake: AuthentificationHandshake?
@@ -92,7 +93,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    init(eventLogger: EventLogger) {
+    init(performanceMonitor: ThreadPerformanceMonitor,eventLogger: EventLogger) {
+        self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
     }
     
@@ -214,7 +216,7 @@ class AmpacheXmlServerApi: URLCleanser {
     private func parseAuthResult(response: APIDataResponse) -> Promise<AuthentificationHandshake> {
         return Promise<AuthentificationHandshake> { seal in
             let parser = XMLParser(data: response.data)
-            let curDelegate = AuthParserDelegate()
+            let curDelegate = AuthParserDelegate(performanceMonitor: self.performanceMonitor)
             parser.delegate = curDelegate
             let success = parser.parse()
             if let serverApiVersion = curDelegate.serverApiVersion {
@@ -697,7 +699,7 @@ class AmpacheXmlServerApi: URLCleanser {
     }
     
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
-        let errorParser = AmpacheXmlParser()
+        let errorParser = AmpacheXmlParser(performanceMonitor: self.performanceMonitor)
         let parser = XMLParser(data: response.data)
         parser.delegate = errorParser
         parser.parse()

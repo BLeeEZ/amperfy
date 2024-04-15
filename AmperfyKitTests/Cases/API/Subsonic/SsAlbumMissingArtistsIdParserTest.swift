@@ -28,7 +28,7 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
     override func setUp() {
         super.setUp()
         xmlData = getTestFileData(name: "album_missing_artistId")
-        ssParserDelegate = SsSongParserDelegate(library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        ssParserDelegate = SsSongParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
         createTestAlbum()
     }
 

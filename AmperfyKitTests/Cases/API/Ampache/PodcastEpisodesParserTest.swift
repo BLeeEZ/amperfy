@@ -34,7 +34,7 @@ class PodcastEpisodesParserTest: AbstractAmpacheTest {
     }
     
     override func recreateParserDelegate() {
-        parserDelegate = PodcastEpisodeParserDelegate(podcast: testPodcast!, library: library)
+        parserDelegate = PodcastEpisodeParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), podcast: testPodcast!, library: library)
     }
     
     override func checkCorrectParsing() {

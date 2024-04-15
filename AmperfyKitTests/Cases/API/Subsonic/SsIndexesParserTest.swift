@@ -30,7 +30,7 @@ class SsIndexesParserTest: AbstractSsParserTest {
         super.setUp()
         xmlData = getTestFileData(name: "indexes_example_1")
         musicFolder = library.createMusicFolder()
-        ssParserDelegate = SsDirectoryParserDelegate(musicFolder: musicFolder, library: library, subsonicUrlCreator: subsonicUrlCreator)
+        ssParserDelegate = SsDirectoryParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), musicFolder: musicFolder, library: library, subsonicUrlCreator: subsonicUrlCreator)
     }
     
     override func checkCorrectParsing() {

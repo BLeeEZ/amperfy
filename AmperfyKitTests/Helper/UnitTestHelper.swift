@@ -21,7 +21,12 @@
 
 import Foundation
 import XCTest
+import AmperfyKit
 import PromiseKit
+
+public class MOCK_PerformanceMonitor: ThreadPerformanceMonitor {
+    public var shouldSlowDownExecution = false
+}
 
 class Helper {
     static let testURL = URL(string: "https://github.com/BLeeEZ/amperfy")!

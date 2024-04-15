@@ -30,9 +30,9 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
     var episodeBuffer: PodcastEpisode?
     var parsedEpisodes = [PodcastEpisode]()
     
-    init(podcast: Podcast?, library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator) {
+    init(performanceMonitor: ThreadPerformanceMonitor, podcast: Podcast?, library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator) {
         self.podcast = podcast
-        super.init(library: library, subsonicUrlCreator: subsonicUrlCreator)
+        super.init(performanceMonitor: performanceMonitor, library: library, subsonicUrlCreator: subsonicUrlCreator)
     }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {

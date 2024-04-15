@@ -84,10 +84,12 @@ class SubsonicServerApi: URLCleanser {
     var authType: SubsonicApiAuthType = .autoDetect
     
     private let log = OSLog(subsystem: "Amperfy", category: "Subsonic")
+    private let performanceMonitor: ThreadPerformanceMonitor
     private let eventLogger: EventLogger
     private var credentials: LoginCredentials?
     
-    init(eventLogger: EventLogger) {
+    init(performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
+        self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
     }
     
@@ -228,7 +230,7 @@ class SubsonicServerApi: URLCleanser {
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "ping", credentials: credentials)
             return self.request(url: try self.createUrl(from: urlComp))
         }.then { response -> Promise<Void> in
-            let parserDelegate = SsPingParserDelegate()
+            let parserDelegate = SsPingParserDelegate(performanceMonitor: self.performanceMonitor)
             let parser = XMLParser(data: response.data)
             parser.delegate = parserDelegate
             let success = parser.parse()
@@ -295,7 +297,7 @@ class SubsonicServerApi: URLCleanser {
             self.request(url: url)
         }.then { response in
             return Promise<SubsonicVersion> { seal in
-                let delegate = SsPingParserDelegate()
+                let delegate = SsPingParserDelegate(performanceMonitor: self.performanceMonitor)
                 let parser = XMLParser(data: response.data)
                 parser.delegate = delegate
                 parser.parse()
@@ -494,7 +496,7 @@ class SubsonicServerApi: URLCleanser {
     }
     
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
-        let errorParser = SsXmlParser()
+        let errorParser = SsXmlParser(performanceMonitor: self.performanceMonitor)
         let parser = XMLParser(data: response.data)
         parser.delegate = errorParser
         parser.parse()
