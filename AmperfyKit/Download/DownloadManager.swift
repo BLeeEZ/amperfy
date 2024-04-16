@@ -128,11 +128,12 @@ class DownloadManager: NSObject, DownloadManageable {
     
     private func startAvailableDownload() {
         // A free download task is available
-        if self.activeTasks.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success {
-            // There is download to be started
+        if storage.settings.isOnlineMode &&
+           Reachability.isConnectedToNetwork() &&
+           self.activeTasks.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success {
             if let nextDownload = self.requestManager.getNextRequestToDownload() {
-                // trigger an additional download
-                self.triggerBackgroundDownload()
+                // There is a download to be started
+                self.triggerBackgroundDownload() // trigger an additional download
                 self.manageDownload(download: nextDownload).finally { }
             } else {
                 self.activeTasks.signal()
