@@ -40,14 +40,14 @@ struct PlayerSettingsView: View {
                 
                 Section(content: {
                     HStack {
-                        Text("Scrobble streamed Songs or Podcast Episodes")
+                        Text("Scrobble streamed Songs")
                         Spacer()
                         Toggle(isOn: $settings.isScrobbleStreamedItems) {}
                             .frame(width: 130)
                     }
                 }
                 , footer: {
-                    Text("Some server count streamed items already as played. When active streamed Songs/Podcast Episodes are getting always scrobbled.")
+                    Text("Some server count streamed items already as played. When active streamed Songs are getting always scrobbled.")
                 })
             }
         }
