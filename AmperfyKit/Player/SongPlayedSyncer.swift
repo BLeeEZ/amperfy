@@ -29,6 +29,7 @@ class SongPlayedSyncer  {
     private let backendAudioPlayer: BackendAudioPlayer
     private let storage: PersistentStorage
     private let scrobbleSyncer: ScrobbleSyncer
+    private var scrobbleTimer: Timer?
 
     init(musicPlayer: AudioPlayer, backendAudioPlayer: BackendAudioPlayer, storage: PersistentStorage, scrobbleSyncer: ScrobbleSyncer) {
         self.musicPlayer = musicPlayer
@@ -44,25 +45,23 @@ class SongPlayedSyncer  {
             waitDuration = Self.maximumWaitDurationInSec
         }
         
-        DispatchQueue.global().async {
-            sleep(UInt32(waitDuration))
-            DispatchQueue.main.async {
-                guard self.backendAudioPlayer.isPlaying,
-                      curPlaying == self.musicPlayer.currentlyPlaying,
-                      self.backendAudioPlayer.playType == .cache || self.storage.settings.isScrobbleStreamedItems
-                else { return }
-                self.scrobbleSyncer.scrobble(playedSong: curPlayingSong)
-            }
+        scrobbleTimer?.invalidate()
+        scrobbleTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(waitDuration), repeats: false) { (t) in
+            guard curPlaying == self.musicPlayer.currentlyPlaying,
+                  self.backendAudioPlayer.playType == .cache || self.storage.settings.isScrobbleStreamedItems
+            else { return }
+            self.scrobbleSyncer.scrobble(playedSong: curPlayingSong)
         }
     }
 
 }
 
 extension SongPlayedSyncer: MusicPlayable {
-    func didStartPlaying() {
+    func didStartPlayingFromBeginning() {
         syncSongPlayed()
     }
     
+    func didStartPlaying() { }
     func didPause() { }
     func didStopPlaying() { }
     func didElapsedTimeChange() { }

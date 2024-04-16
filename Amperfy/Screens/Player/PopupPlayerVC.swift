@@ -233,6 +233,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 }
 
 extension PopupPlayerVC: MusicPlayable {
+    
+    func didStartPlayingFromBeginning() { }
+    
     func didStartPlaying() {
         self.reloadData()
         refresh()

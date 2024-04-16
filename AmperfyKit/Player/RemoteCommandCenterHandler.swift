@@ -189,6 +189,7 @@ class RemoteCommandCenterHandler {
 }
 
 extension RemoteCommandCenterHandler: MusicPlayable {
+    func didStartPlayingFromBeginning() { }
     func didStartPlaying() {
         changeRemoteCommandCenterControlsBasedOnCurrentPlayableType()
     }

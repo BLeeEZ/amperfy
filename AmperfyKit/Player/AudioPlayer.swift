@@ -73,6 +73,7 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         os_log(.debug, "Replay")
         backendAudioPlayer.seek(toSecond: 0)
         play()
+        notifyItemStartedPlayingFromBeginning()
     }
 
     private func insertIntoPlayer(playable: AbstractPlayable) {
@@ -83,6 +84,7 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     
     //BackendAudioPlayerNotifiable
     func notifyItemPreparationFinished() {
+        notifyItemStartedPlayingFromBeginning()
         notifyItemStartedPlaying()
     }
     
@@ -230,12 +232,18 @@ class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     func removeAllNotifier() {
         notifierList.removeAll()
     }
+    
+    func notifyItemStartedPlayingFromBeginning() {
+        for notifier in notifierList {
+            notifier.didStartPlayingFromBeginning()
+        }
+        seekToLastStoppedPlayTime()
+    }
 
     func notifyItemStartedPlaying() {
         for notifier in notifierList {
             notifier.didStartPlaying()
         }
-        seekToLastStoppedPlayTime()
     }
     
     //BackendAudioPlayerNotifiable

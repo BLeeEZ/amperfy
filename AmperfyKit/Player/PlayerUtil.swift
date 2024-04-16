@@ -24,6 +24,7 @@ import MediaPlayer
 import Intents
 
 public protocol MusicPlayable {
+    func didStartPlayingFromBeginning()
     func didStartPlaying()
     func didPause()
     func didStopPlaying()

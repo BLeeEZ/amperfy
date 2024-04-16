@@ -64,6 +64,8 @@ class NowPlayingInfoCenterHandler {
 }
 
 extension NowPlayingInfoCenterHandler: MusicPlayable {
+    func didStartPlayingFromBeginning() { }
+    
     func didStartPlaying() {
         if let curPlayable = musicPlayer.currentlyPlaying {
             updateNowPlayingInfo(playable: curPlayable)

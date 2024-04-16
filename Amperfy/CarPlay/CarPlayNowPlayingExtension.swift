@@ -146,6 +146,7 @@ extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
 }
 
 extension CarPlaySceneDelegate: MusicPlayable {
+    func didStartPlayingFromBeginning() { }
     func didStartPlaying() {
         configureNowPlayingTemplate()
         playerQueueSection.updateSections(createPlayerQueueSections())

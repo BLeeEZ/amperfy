@@ -92,6 +92,7 @@ class BarPlayerHandler {
 }
 
 extension BarPlayerHandler: MusicPlayable {
+    func didStartPlayingFromBeginning() { }
     func didStartPlaying() {
         handlePopupBar()
     }

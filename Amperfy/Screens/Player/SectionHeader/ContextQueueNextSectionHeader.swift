@@ -106,6 +106,9 @@ class ContextQueueNextSectionHeader: UIView {
 
 extension ContextQueueNextSectionHeader: MusicPlayable {
 
+    func didStartPlayingFromBeginning() {
+    }
+    
     func didStartPlaying() {
     }
     

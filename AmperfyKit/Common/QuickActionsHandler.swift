@@ -134,6 +134,7 @@ public class QuickActionsHandler {
 }
 
 extension QuickActionsHandler: MusicPlayable {
+    public func didStartPlayingFromBeginning() { }
     public func didStartPlaying() {
         self.configureQuickActions()
     }

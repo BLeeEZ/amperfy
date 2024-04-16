@@ -62,12 +62,12 @@ class PlayerDownloadPreparationHandler {
 }
 
 extension PlayerDownloadPreparationHandler: MusicPlayable {
-    func didStartPlaying() {
+    func didStartPlayingFromBeginning() {
         if playerStatus.isAutoCachePlayedItems {
             preDownloadNextItems()
         }
     }
-    
+    func didStartPlaying() { }
     func didPause() { }
     func didStopPlaying() { }
     func didElapsedTimeChange() { }

@@ -490,7 +490,9 @@ class PlayerControlView: UIView {
 }
 
 extension PlayerControlView: MusicPlayable {
-
+    
+    func didStartPlayingFromBeginning() { }
+    
     func didStartPlaying() {
         refreshPlayer()
     }

@@ -32,6 +32,8 @@ class PlayerNotificationAdapter {
 }
 
 extension PlayerNotificationAdapter: MusicPlayable {
+    func didStartPlayingFromBeginning() { }
+    
     func didStartPlaying() {
         notificationHandler.post(name: .playerPlay, object: self, userInfo: nil)
     }
