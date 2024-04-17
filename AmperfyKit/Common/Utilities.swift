@@ -37,12 +37,6 @@ extension CustomEquatable where Self: Equatable {
     }
 }
 
-extension Array {
-    public func prefix(upToAsArray end: Int) -> Array<Element> {
-        return Array(self.prefix(end))
-    }
-}
-
 extension Bool {
     public mutating func toggle() {
         self = !self

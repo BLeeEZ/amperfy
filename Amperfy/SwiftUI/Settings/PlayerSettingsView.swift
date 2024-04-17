@@ -136,7 +136,7 @@ struct PlayerSettingsView: View {
                     }
                 }
                 , footer: {
-                    Text("Some server count streamed items already as played. When active streamed Songs are getting always scrobbled.")
+                    Text("Some server count streamed Songs already as played. When enabled, all streamed Songs are consistently scrobbled.")
                 })
                 
                 Section(content: {

@@ -26,6 +26,7 @@ import PromiseKit
 
 class DownloadManager: NSObject, DownloadManageable {
     
+    let networkMonitor: NetworkMonitorFacade
     let storage: PersistentStorage
     let requestManager: DownloadRequestManager
     let downloadDelegate: DownloadManagerDelegate
@@ -44,8 +45,9 @@ class DownloadManager: NSObject, DownloadManageable {
     private var sleepTimer: Timer?
     private let timeInterval = TimeInterval(5) // time to check for available downloads to start
     
-    init(name: String, storage: PersistentStorage, requestManager: DownloadRequestManager, downloadDelegate: DownloadManagerDelegate, notificationHandler: EventNotificationHandler, eventLogger: EventLogger, urlCleanser: URLCleanser) {
+    init(name: String, networkMonitor: NetworkMonitorFacade, storage: PersistentStorage, requestManager: DownloadRequestManager, downloadDelegate: DownloadManagerDelegate, notificationHandler: EventNotificationHandler, eventLogger: EventLogger, urlCleanser: URLCleanser) {
         log = OSLog(subsystem: "Amperfy", category: name)
+        self.networkMonitor = networkMonitor
         self.storage = storage
         self.requestManager = requestManager
         self.downloadDelegate = downloadDelegate
@@ -129,7 +131,7 @@ class DownloadManager: NSObject, DownloadManageable {
     private func startAvailableDownload() {
         // A free download task is available
         if storage.settings.isOnlineMode &&
-           Reachability.isConnectedToNetwork() &&
+            networkMonitor.isConnectedToNetwork &&
            self.activeTasks.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success {
             if let nextDownload = self.requestManager.getNextRequestToDownload() {
                 // There is a download to be started

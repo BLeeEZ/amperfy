@@ -107,7 +107,7 @@ public class AmperKit {
         let artworkExtractor = EmbeddedArtworkExtractor()
         let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi, artworkExtractor: artworkExtractor, networkMonitor: networkMonitor)
         let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
-        let dlManager = DownloadManager(name: "PlayableDownloader", storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger, urlCleanser: backendApi)
+        let dlManager = DownloadManager(name: "PlayableDownloader", networkMonitor: networkMonitor, storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger, urlCleanser: backendApi)
         
         let configuration = URLSessionConfiguration.background(withIdentifier: "\(Bundle.main.bundleIdentifier!).PlayableDownloader.background")
         var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
@@ -119,7 +119,7 @@ public class AmperKit {
         let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
         let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
         requestManager.clearAllDownloadsIfAllHaveFinished()
-        let dlManager = DownloadManager(name: "ArtworkDownloader", storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger, urlCleanser: backendApi)
+        let dlManager = DownloadManager(name: "ArtworkDownloader", networkMonitor: networkMonitor, storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger, urlCleanser: backendApi)
         dlManager.isFailWithPopupError = false
         
         dlManager.preDownloadIsValidCheck = { (object: Downloadable) -> Bool in
