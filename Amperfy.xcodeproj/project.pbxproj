@@ -379,7 +379,6 @@
 		50C9D6DC284FAB88007F18D0 /* RemoteCommandCenterHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501171312756778300B7C08D /* RemoteCommandCenterHandler.swift */; };
 		50C9D6DD284FAB88007F18D0 /* BackendAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */; };
 		50C9D6DE284FAB88007F18D0 /* PlayQueueHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011712B2744FDD700B7C08D /* PlayQueueHandler.swift */; };
-		50C9D6E0284FAB96007F18D0 /* UIColorAssetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509D55EA2810086E00E0E0B5 /* UIColorAssetsExtension.swift */; };
 		50C9D6E3284FAB96007F18D0 /* UIImageAssetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B053AC27BFADB200D9C1ED /* UIImageAssetsExtension.swift */; };
 		50C9D6E6284FABCB007F18D0 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6E5284FABCB007F18D0 /* AudioPlayer.swift */; };
 		50C9D6E9284FACAF007F18D0 /* ArtworkCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6E8284FACAF007F18D0 /* ArtworkCollection.swift */; };
@@ -723,7 +722,6 @@
 		509B430C2B72631A005E8130 /* Amperfy v34.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v34.xcdatamodel"; sourceTree = "<group>"; };
 		509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayIndicator.swift; sourceTree = "<group>"; };
 		509D55E8280FDAE100E0E0B5 /* PlayerNotificationAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNotificationAdapter.swift; sourceTree = "<group>"; };
-		509D55EA2810086E00E0E0B5 /* UIColorAssetsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorAssetsExtension.swift; sourceTree = "<group>"; };
 		50A01FBD27BCD4BD000368EF /* Amperfy v20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v20.xcdatamodel"; sourceTree = "<group>"; };
 		50A12F402739203E00E7B2AA /* Amperfy v15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v15.xcdatamodel"; sourceTree = "<group>"; };
 		50A12F412739239800E7B2AA /* EmbeddedArtworkMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmbeddedArtworkMO+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -1509,7 +1507,6 @@
 			children = (
 				508385EE21C5965E00C4BB32 /* Assets.xcassets */,
 				50B053AC27BFADB200D9C1ED /* UIImageAssetsExtension.swift */,
-				509D55EA2810086E00E0E0B5 /* UIColorAssetsExtension.swift */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -1917,7 +1914,7 @@
 					New,
 				);
 				LastSwiftUpdateCheck = 1330;
-				LastUpgradeCheck = 1510;
+				LastUpgradeCheck = 1530;
 				ORGANIZATIONNAME = "Maximilian Bauer";
 				TargetAttributes = {
 					508385E321C5965B00C4BB32 = {
@@ -2304,7 +2301,6 @@
 				50C9D64A284FAA02007F18D0 /* SsPodcastParserDelegate.swift in Sources */,
 				50C9D6DC284FAB88007F18D0 /* RemoteCommandCenterHandler.swift in Sources */,
 				50C9D6D8284FAB88007F18D0 /* PlayerUtil.swift in Sources */,
-				50C9D6E0284FAB96007F18D0 /* UIColorAssetsExtension.swift in Sources */,
 				50C9D6C5284FAB0C007F18D0 /* Utilities.swift in Sources */,
 				50C9D6B6284FAA87007F18D0 /* PodcastEpisode.swift in Sources */,
 				50C9D65D284FAA0B007F18D0 /* PlaylistParserDelegate.swift in Sources */,
@@ -2470,6 +2466,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -2533,6 +2530,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
