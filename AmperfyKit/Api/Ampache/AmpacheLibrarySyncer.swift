@@ -662,6 +662,17 @@ class AmpacheLibrarySyncer: LibrarySyncer {
         }
     }
     
+    /// Ampache has no equivalend to Subsonic's NowPlaying
+    func syncNowPlaying(song: Song, songPosition: NowPlayingSongPosition) -> Promise<Void> {
+        switch songPosition {
+        case .start:
+            // Do nothing
+            return Promise.value
+        case .end:
+            return scrobble(song: song, date: nil)
+        }
+    }
+    
     func scrobble(song: Song, date: Date?) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         if let date = date {

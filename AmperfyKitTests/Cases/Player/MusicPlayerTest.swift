@@ -106,6 +106,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func sync(directory: Directory) -> Promise<Void> { return Promise.value }
     func requestRandomSongs(playlist: Playlist, count: Int) -> Promise<Void> { return Promise.value }
     func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) -> Promise<Void> { return Promise.value }
+    func syncNowPlaying(song: Song, songPosition: NowPlayingSongPosition) -> Promise<Void> { return Promise.value }
     func scrobble(song: Song, date: Date?) -> Promise<Void> { return Promise.value }
     func setRating(song: Song, rating: Int) -> Promise<Void> { return Promise.value }
     func setRating(album: Album, rating: Int) -> Promise<Void> { return Promise.value }
@@ -155,6 +156,7 @@ class MOCK_MusicPlayable: MusicPlayable {
     var expectationDidStartPlaying: XCTestExpectation?
     var expectationErrorOccured: XCTestExpectation?
     
+    func didStartPlayingFromBeginning() {}
     func didStartPlaying() {
         expectationDidStartPlaying?.fulfill()
     }

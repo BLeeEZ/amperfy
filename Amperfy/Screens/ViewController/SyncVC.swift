@@ -47,7 +47,7 @@ class SyncVC: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         self.appDelegate.eventLogger.supressAlerts = true
-        self.appDelegate.scrobbleSyncer.stopAndWait()
+        self.appDelegate.scrobbleSyncer?.stopAndWait()
         self.appDelegate.backgroundLibrarySyncer.stopAndWait()
         self.appDelegate.artworkDownloadManager.stop()
         self.appDelegate.playableDownloadManager.stop()

@@ -71,6 +71,7 @@ public class AmperKit {
         return EventNotificationHandler()
     }()
     private var audioSessionHandler: AudioSessionHandler?
+    public private(set) var scrobbleSyncer: ScrobbleSyncer?
     public lazy var player: PlayerFacade = {
         let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
         networkMonitor.connectionTypeChangedCB = { isWiFiConnected in
@@ -84,8 +85,8 @@ public class AmperKit {
         
         let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(playerStatus: playerData, queueHandler: queueHandler, playableDownloadManager: playableDownloadManager)
         curPlayer.addNotifier(notifier:  playerDownloadPreparationHandler)
-        let songPlayedSyncer = SongPlayedSyncer(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, storage: storage, scrobbleSyncer: scrobbleSyncer)
-        curPlayer.addNotifier(notifier: songPlayedSyncer)
+        scrobbleSyncer = ScrobbleSyncer(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, networkMonitor: networkMonitor, storage: storage, librarySyncer: librarySyncer, eventLogger: eventLogger)
+        curPlayer.addNotifier(notifier: scrobbleSyncer!)
 
         let facadeImpl = PlayerFacadeImpl(playerStatus: playerData, queueHandler: queueHandler, musicPlayer: curPlayer, library: storage.main.library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
         facadeImpl.isOfflineMode = storage.settings.isOfflineMode
@@ -147,9 +148,6 @@ public class AmperKit {
     }()
     public lazy var backgroundLibrarySyncer = {
         return BackgroundLibrarySyncer(storage: storage, networkMonitor: networkMonitor, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager, eventLogger: eventLogger)
-    }()
-    public lazy var scrobbleSyncer = {
-        return ScrobbleSyncer(storage: storage, networkMonitor: networkMonitor, librarySyncer: librarySyncer, eventLogger: eventLogger)
     }()
     public lazy var libraryUpdater = {
         return LibraryUpdater(storage: storage, backendApi: backendApi)

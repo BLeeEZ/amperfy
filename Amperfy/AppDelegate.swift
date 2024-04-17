@@ -218,7 +218,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         artworkDownloadManager.start()
         playableDownloadManager.start()
         backgroundLibrarySyncer.start()
-        scrobbleSyncer.start()
+        scrobbleSyncer?.start()
         userStatistics.sessionStarted()
         return true
     }

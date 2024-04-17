@@ -608,13 +608,14 @@ class SubsonicServerApi: URLCleanser {
             return try self.createUrl(from: urlComp)
         }
     }
-
-    func requestRecordSongPlay(id: String, date: Date?) -> Promise<APIDataResponse> {
+    
+    func requestScrobble(id: String, submission: Bool, date: Date? = nil) -> Promise<APIDataResponse> {
         return request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "scrobble", id: id)
             if let date = date {
                 urlComp.addQueryItem(name: "date", value: Int(date.timeIntervalSince1970))
             }
+            urlComp.addQueryItem(name: "submission", value: submission.description)
             return try self.createUrl(from: urlComp)
         }
     }

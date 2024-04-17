@@ -375,7 +375,6 @@
 		50C9D6D7284FAB88007F18D0 /* PlayerNotificationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509D55E8280FDAE100E0E0B5 /* PlayerNotificationAdapter.swift */; };
 		50C9D6D8284FAB88007F18D0 /* PlayerUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501171292743F25300B7C08D /* PlayerUtil.swift */; };
 		50C9D6D9284FAB88007F18D0 /* EmbeddedArtworkExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048F962759186A0087EDFB /* EmbeddedArtworkExtractor.swift */; };
-		50C9D6DA284FAB88007F18D0 /* SongPlayedSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048F98275954A30087EDFB /* SongPlayedSyncer.swift */; };
 		50C9D6DB284FAB88007F18D0 /* AudioSessionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501171332756A73000B7C08D /* AudioSessionHandler.swift */; };
 		50C9D6DC284FAB88007F18D0 /* RemoteCommandCenterHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501171312756778300B7C08D /* RemoteCommandCenterHandler.swift */; };
 		50C9D6DD284FAB88007F18D0 /* BackendAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */; };
@@ -513,7 +512,6 @@
 		5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySyncPopupVC.swift; sourceTree = "<group>"; };
 		50048F9427590FAD0087EDFB /* PlayerDownloadPreparationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerDownloadPreparationHandler.swift; sourceTree = "<group>"; };
 		50048F962759186A0087EDFB /* EmbeddedArtworkExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedArtworkExtractor.swift; sourceTree = "<group>"; };
-		50048F98275954A30087EDFB /* SongPlayedSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongPlayedSyncer.swift; sourceTree = "<group>"; };
 		50048F9A275A4B560087EDFB /* podcast_episodes_example_2.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = podcast_episodes_example_2.xml; sourceTree = "<group>"; };
 		50048F9C275A4BA10087EDFB /* PodcastEpisodesExample2ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastEpisodesExample2ParserTest.swift; sourceTree = "<group>"; };
 		50048F9E275A9AA10087EDFB /* Amperfy v17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v17.xcdatamodel"; sourceTree = "<group>"; };
@@ -1255,7 +1253,6 @@
 				5086F87A22397B8400546F5A /* BackendApi.swift */,
 				500B2B302249607B00D14EF4 /* BackendProxy.swift */,
 				50CDF201264BB1C000F83EF6 /* EventLogger.swift */,
-				5086F8822239A2B700546F5A /* ScrobbleSyncer.swift */,
 				5077F954222C58A10099CA91 /* GenericXmlParser.swift */,
 				50BA92EE21CBF45D00E5901D /* LoginCredentials.swift */,
 				509A7D8128059A0D009791D1 /* BackgroundLibrarySyncer.swift */,
@@ -1779,8 +1776,8 @@
 				501171332756A73000B7C08D /* AudioSessionHandler.swift */,
 				50048F9427590FAD0087EDFB /* PlayerDownloadPreparationHandler.swift */,
 				50048F962759186A0087EDFB /* EmbeddedArtworkExtractor.swift */,
-				50048F98275954A30087EDFB /* SongPlayedSyncer.swift */,
 				509D55E8280FDAE100E0E0B5 /* PlayerNotificationAdapter.swift */,
+				5086F8822239A2B700546F5A /* ScrobbleSyncer.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -2359,7 +2356,6 @@
 				50C9D669284FAA0B007F18D0 /* AmpacheXmlParser.swift in Sources */,
 				50C9D6A3284FAA77007F18D0 /* MigrationPolicyV4toV5.swift in Sources */,
 				50C9D6DD284FAB88007F18D0 /* BackendAudioPlayer.swift in Sources */,
-				50C9D6DA284FAB88007F18D0 /* SongPlayedSyncer.swift in Sources */,
 				50C9D693284FAA6C007F18D0 /* DirectoryMO+CoreDataProperties.swift in Sources */,
 				50C9D6ED284FADB8007F18D0 /* PlayerDisplayStyleType.swift in Sources */,
 				50C9D6B4284FAA87007F18D0 /* AbstractPlayable.swift in Sources */,

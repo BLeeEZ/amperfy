@@ -25,19 +25,29 @@ import PromiseKit
 
 public class ScrobbleSyncer {
     
+    private static let maximumWaitDurationInSec = 20
+
     private let log = OSLog(subsystem: "Amperfy", category: "ScrobbleSyncer")
-    private let storage: PersistentStorage
+    private let musicPlayer: AudioPlayer
+    private let backendAudioPlayer: BackendAudioPlayer
     private let networkMonitor: NetworkMonitorFacade
+    private let storage: PersistentStorage
     private let librarySyncer: LibrarySyncer
     private let eventLogger: EventLogger
     private let activeDispatchGroup = DispatchGroup()
     private let uploadSemaphore = DispatchSemaphore(value: 1)
     private var isRunning = false
     private var isActive = false
+    private var scrobbleTimer: Timer?
     
-    init(storage: PersistentStorage, networkMonitor: NetworkMonitorFacade, librarySyncer: LibrarySyncer, eventLogger: EventLogger) {
-        self.storage = storage
+    private var songToBeScrobbled: Song?
+    private var songHasBeenListendEnough = false
+    
+    init(musicPlayer: AudioPlayer, backendAudioPlayer: BackendAudioPlayer, networkMonitor: NetworkMonitorFacade, storage: PersistentStorage, librarySyncer: LibrarySyncer, eventLogger: EventLogger) {
+        self.musicPlayer = musicPlayer
+        self.backendAudioPlayer = backendAudioPlayer
         self.networkMonitor = networkMonitor
+        self.storage = storage
         self.librarySyncer = librarySyncer
         self.eventLogger = eventLogger
     }
@@ -56,14 +66,29 @@ public class ScrobbleSyncer {
         activeDispatchGroup.wait()
     }
     
-    func scrobble(playedSong: Song) {
-        if self.storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork{
-            cacheScrobbleRequest(playedSong: playedSong, isUploaded: true)
-            scrobbleToServerAsync(playedSong: playedSong)
-            start() // send cached request to server
-        } else {
-            os_log("Scrobble cache: %s", log: self.log, type: .info, playedSong.displayString)
-            cacheScrobbleRequest(playedSong: playedSong, isUploaded: false)
+    func scrobble(playedSong: Song, songPosition: NowPlayingSongPosition) {
+        func nowPlayingToServerAsync(playedSong: Song, songPosition: NowPlayingSongPosition) {
+             firstly {
+                self.librarySyncer.syncNowPlaying(song: playedSong, songPosition: songPosition)
+            }.catch { error in
+                self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
+            }
+        }
+        
+        switch songPosition {
+        case .start:
+            if self.storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork {
+                nowPlayingToServerAsync(playedSong: playedSong, songPosition: .start)
+            }
+        case .end:
+            if self.storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork {
+                cacheScrobbleRequest(playedSong: playedSong, isUploaded: true)
+                nowPlayingToServerAsync(playedSong: playedSong, songPosition: .end)
+                start() // send cached request to server
+            } else {
+                os_log("Scrobble cache: %s", log: self.log, type: .info, playedSong.displayString)
+                cacheScrobbleRequest(playedSong: playedSong, isUploaded: false)
+            }
         }
     }
     
@@ -114,14 +139,6 @@ public class ScrobbleSyncer {
         }
     }
     
-    private func scrobbleToServerAsync(playedSong: Song) {
-        firstly {
-            self.librarySyncer.scrobble(song: playedSong, date: nil)
-        }.catch { error in
-            self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
-        }
-    }
-    
     private func cacheScrobbleRequest(playedSong: Song, isUploaded: Bool) {
         let scrobbleEntry = storage.main.library.createScrobbleEntry()
         scrobbleEntry.date = Date()
@@ -130,4 +147,54 @@ public class ScrobbleSyncer {
         storage.main.saveContext()
     }
     
+    private func syncSongPlayed() {
+        syncSongStopped()
+        
+        guard let curPlaying = musicPlayer.currentlyPlaying,
+              let curPlayingSong = curPlaying.asSong
+        else { return }
+        
+        self.songToBeScrobbled = curPlayingSong
+        scrobble(playedSong: curPlayingSong, songPosition: .start)
+        
+        var waitDuration = curPlayingSong.duration / 2
+        if waitDuration > Self.maximumWaitDurationInSec {
+            waitDuration = Self.maximumWaitDurationInSec
+        }
+        
+        scrobbleTimer?.invalidate()
+        scrobbleTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(waitDuration), repeats: false) { (t) in
+            guard curPlaying == self.musicPlayer.currentlyPlaying,
+                  self.backendAudioPlayer.playType == .cache || self.storage.settings.isScrobbleStreamedItems
+            else { return }
+            self.songHasBeenListendEnough = true
+        }
+    }
+    
+    private func syncSongStopped() {
+        if let oldSong = self.songToBeScrobbled,
+           self.songHasBeenListendEnough {
+            self.scrobble(playedSong: oldSong, songPosition: .end)
+        }
+        self.songHasBeenListendEnough = false
+        self.songToBeScrobbled = nil
+    }
+    
+}
+
+extension ScrobbleSyncer: MusicPlayable {
+    public func didStartPlayingFromBeginning() {
+        syncSongPlayed()
+    }
+    public func didStartPlaying() { }
+    public func didPause() { }
+    public func didStopPlaying() {
+        syncSongStopped()
+    }
+    public func didElapsedTimeChange() { }
+    public func didPlaylistChange() { }
+    public func didArtworkChange() { }
+    public func didShuffleChange() { }
+    public func didRepeatChange() { }
+    public func didPlaybackRateChange() { }
 }

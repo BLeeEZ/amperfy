@@ -142,6 +142,10 @@ extension LibrarySyncerProxy: LibrarySyncer {
         return activeSyncer.requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
     }
     
+    func syncNowPlaying(song: Song, songPosition: NowPlayingSongPosition) -> Promise<Void> {
+        return activeSyncer.syncNowPlaying(song: song, songPosition: songPosition)
+    }
+    
     func scrobble(song: Song, date: Date?) -> Promise<Void> {
         return activeSyncer.scrobble(song: song, date: date)
     }

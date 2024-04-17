@@ -529,15 +529,32 @@ class SubsonicLibrarySyncer: LibrarySyncer {
         }
     }
     
-    func scrobble(song: Song, date: Date?) -> Promise<Void> {
+    func syncNowPlaying(song: Song, songPosition: NowPlayingSongPosition) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
-        if let date = date {
+        switch songPosition {
+        case .start:
+            return scrobble(song: song, submission: false)
+        case .end:
+            return scrobble(song: song, submission: true)
+        }
+    }
+    
+    func scrobble(song: Song, date: Date?) -> Promise<Void> {
+        return scrobble(song: song, submission: true, date: date)
+    }
+    
+    private func scrobble(song: Song, submission: Bool, date: Date? = nil) -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        if !submission {
+            os_log("Now Playing Beginn: %s", log: log, type: .info, song.displayString)
+        } else if let date = date {
             os_log("Scrobbled at %s: %s", log: log, type: .info, date.description, song.displayString)
         } else {
-            os_log("Scrobble now: %s", log: log, type: .info, song.displayString)
+            os_log("Now Playing End (Scrobble): %s", log: log, type: .info, song.displayString)
         }
+        
         return firstly {
-            self.subsonicServerApi.requestRecordSongPlay(id: song.id, date: date)
+            self.subsonicServerApi.requestScrobble(id: song.id, submission: submission, date: date)
         }.then { response in
             self.parseForError(response: response)
         }
