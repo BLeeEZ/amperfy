@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -18,6 +18,14 @@
                 <rect key="frame" x="0.0" y="0.0" width="375" height="94"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gmN-OC-LuP" userLabel="Artwork Button">
+                        <rect key="frame" x="16" y="11" width="72" height="72"/>
+                        <state key="normal" title="Button"/>
+                        <buttonConfiguration key="configuration" style="plain"/>
+                        <connections>
+                            <action selector="artworkPressed:" destination="gve-H7-PxP" eventType="touchUpInside" id="Vbj-zr-e7V"/>
+                        </connections>
+                    </button>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vJs-cv-sQf" customClass="LibraryEntityImage" customModule="AmperfyKit">
                         <rect key="frame" x="16" y="11" width="72" height="72"/>
                         <constraints>
@@ -97,10 +105,12 @@
                     </button>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="gmN-OC-LuP" firstAttribute="top" secondItem="vJs-cv-sQf" secondAttribute="top" id="0c7-yb-aFd"/>
                     <constraint firstItem="O9L-T9-lNw" firstAttribute="leading" secondItem="BqX-0l-UXJ" secondAttribute="leading" id="21q-6Z-K0S"/>
                     <constraint firstItem="3q7-oA-9sM" firstAttribute="trailing" secondItem="BqX-0l-UXJ" secondAttribute="trailing" id="2sP-P5-NF2"/>
                     <constraint firstItem="awQ-BG-bfX" firstAttribute="centerY" secondItem="FXO-Ca-aCo" secondAttribute="centerY" id="66I-sg-aek"/>
                     <constraint firstAttribute="trailingMargin" secondItem="awQ-BG-bfX" secondAttribute="trailing" id="7Lt-qX-X9F"/>
+                    <constraint firstItem="gmN-OC-LuP" firstAttribute="bottom" secondItem="vJs-cv-sQf" secondAttribute="bottom" id="8Tb-0K-Q41"/>
                     <constraint firstItem="O9L-T9-lNw" firstAttribute="leading" secondItem="xdv-qI-JIo" secondAttribute="leading" id="8eA-9D-Ncn"/>
                     <constraint firstItem="3q7-oA-9sM" firstAttribute="leading" secondItem="BqX-0l-UXJ" secondAttribute="leading" id="AjR-gn-cfi"/>
                     <constraint firstItem="awQ-BG-bfX" firstAttribute="leading" secondItem="FXO-Ca-aCo" secondAttribute="trailing" constant="8" id="C59-7r-Oj5"/>
@@ -114,6 +124,8 @@
                     <constraint firstItem="3q7-oA-9sM" firstAttribute="top" secondItem="BqX-0l-UXJ" secondAttribute="top" id="S2w-gC-8WJ"/>
                     <constraint firstItem="vJs-cv-sQf" firstAttribute="top" secondItem="4aT-Z7-2jl" secondAttribute="topMargin" id="SQe-t4-xT4"/>
                     <constraint firstItem="FXO-Ca-aCo" firstAttribute="leading" secondItem="3q7-oA-9sM" secondAttribute="trailing" constant="8" id="Spa-jH-UWM"/>
+                    <constraint firstItem="gmN-OC-LuP" firstAttribute="leading" secondItem="vJs-cv-sQf" secondAttribute="leading" id="VkP-10-TYv"/>
+                    <constraint firstItem="gmN-OC-LuP" firstAttribute="trailing" secondItem="vJs-cv-sQf" secondAttribute="trailing" id="Z4o-4a-InT"/>
                     <constraint firstItem="O9L-T9-lNw" firstAttribute="trailing" secondItem="xdv-qI-JIo" secondAttribute="trailing" id="ZQV-U6-aX5"/>
                     <constraint firstItem="O9L-T9-lNw" firstAttribute="top" secondItem="xdv-qI-JIo" secondAttribute="top" id="eqR-Bd-s0c"/>
                     <constraint firstItem="BqX-0l-UXJ" firstAttribute="leading" secondItem="vJs-cv-sQf" secondAttribute="trailing" constant="8" id="pDH-HQ-WN6"/>
@@ -152,7 +164,7 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

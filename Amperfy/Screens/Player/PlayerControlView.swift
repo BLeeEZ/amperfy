@@ -129,12 +129,8 @@ class PlayerControlView: UIView {
         airplayVolume.removeFromSuperview()
     }
     
-    @IBAction private func displayPlaylistPressed() {
-        appDelegate.userStatistics.usedAction(.changePlayerDisplayStyle)
-        var displayStyle = appDelegate.storage.settings.playerDisplayStyle
-        displayStyle.switchToNextStyle()
-        appDelegate.storage.settings.playerDisplayStyle = displayStyle
-        rootView?.changeDisplayStyle(to: displayStyle)
+    @IBAction func displayPlaylistPressed() {
+        rootView?.switchDisplayStyleOptionPersistent()
         refreshDisplayPlaylistButton()
         refreshPlayerOptions()
     }

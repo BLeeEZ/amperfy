@@ -26,7 +26,15 @@ extension PopupPlayerVC {
     
     static let displaStyleAnimationDuration = TimeInterval(0.2)
     
-    func changeDisplayStyle(to displayStyle: PlayerDisplayStyle, animated: Bool = true) {
+    func switchDisplayStyleOptionPersistent() {
+        appDelegate.userStatistics.usedAction(.changePlayerDisplayStyle)
+        var displayStyle = appDelegate.storage.settings.playerDisplayStyle
+        displayStyle.switchToNextStyle()
+        appDelegate.storage.settings.playerDisplayStyle = displayStyle
+        changeDisplayStyleVisually(to: displayStyle, animated: true)
+    }
+    
+    func changeDisplayStyleVisually(to displayStyle: PlayerDisplayStyle, animated: Bool = true) {
         var viewToDisapper: UIView?
         var artworkToDisapper: UIView?
         var containerToDisapper: UIView?

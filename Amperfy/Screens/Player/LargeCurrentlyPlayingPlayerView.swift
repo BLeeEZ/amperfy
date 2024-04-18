@@ -71,6 +71,9 @@ class LargeCurrentlyPlayingPlayerView: UIView {
         rootView?.refreshArtwork(artworkImage: artworkImage)
     }
 
+    @IBAction func artworkPressed(_ sender: Any) {
+        rootView?.controlView?.displayPlaylistPressed()
+    }
     @IBAction func titlePressed(_ sender: Any) {
         rootView?.displayAlbumDetail()
         rootView?.displayPodcastDetail()

@@ -106,7 +106,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         appDelegate.userStatistics.visited(.popupPlayer)
         self.becomeFirstResponder()
         adjustLaoutMargins()
-        changeDisplayStyle(to: appDelegate.storage.settings.playerDisplayStyle, animated: false)
+        changeDisplayStyleVisually(to: appDelegate.storage.settings.playerDisplayStyle, animated: false)
         reloadData()
         scrollToCurrentlyPlayingRow()
         self.controlView?.refreshView()
