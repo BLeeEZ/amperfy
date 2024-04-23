@@ -147,15 +147,14 @@ public class ScrobbleSyncer {
         storage.main.saveContext()
     }
     
-    private func syncSongPlayed() {
-        syncSongStopped()
+    private func startSongPlayed() {
+        syncSongStopped(clearCurPlaying: true)
         
         guard let curPlaying = musicPlayer.currentlyPlaying,
               let curPlayingSong = curPlaying.asSong
         else { return }
         
         self.songToBeScrobbled = curPlayingSong
-        scrobble(playedSong: curPlayingSong, songPosition: .start)
         
         var waitDuration = curPlayingSong.duration / 2
         if waitDuration > Self.maximumWaitDurationInSec {
@@ -171,25 +170,38 @@ public class ScrobbleSyncer {
         }
     }
     
-    private func syncSongStopped() {
+    private func syncSongStopped(clearCurPlaying: Bool) {
+        func clearingCurPlaying() {
+            self.songHasBeenListendEnough = false
+            self.songToBeScrobbled = nil
+        }
+        
         if let oldSong = self.songToBeScrobbled,
            self.songHasBeenListendEnough {
             self.scrobble(playedSong: oldSong, songPosition: .end)
+            clearingCurPlaying()
+        } else if clearCurPlaying {
+            clearingCurPlaying()
         }
-        self.songHasBeenListendEnough = false
-        self.songToBeScrobbled = nil
     }
     
 }
 
 extension ScrobbleSyncer: MusicPlayable {
     public func didStartPlayingFromBeginning() {
-        syncSongPlayed()
+        startSongPlayed()
     }
-    public func didStartPlaying() { }
-    public func didPause() { }
+    public func didStartPlaying() {
+        guard let curPlaying = musicPlayer.currentlyPlaying,
+              let curPlayingSong = curPlaying.asSong
+        else { return }
+        scrobble(playedSong: curPlayingSong, songPosition: .start)
+    }
+    public func didPause() {
+        syncSongStopped(clearCurPlaying: false)
+    }
     public func didStopPlaying() {
-        syncSongStopped()
+        syncSongStopped(clearCurPlaying: true)
     }
     public func didElapsedTimeChange() { }
     public func didPlaylistChange() { }
