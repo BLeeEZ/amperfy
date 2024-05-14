@@ -44,6 +44,9 @@ public class CacheFileManager {
         if createDirectoryIfNeeded(at: subDir) {
             try? markItemAsExcludedFromBackup(at: subDir)
         }
+        if fileManager.fileExists(atPath: to.path) {
+            try? self.removeItem(at: to)
+        }
         try fileManager.moveItem(at: at, to: to)
         try markItemAsExcludedFromBackup(at: to)
     }
@@ -141,7 +144,11 @@ public class CacheFileManager {
     
     public func createRelPath(for artwork: Artwork) -> URL? {
         guard !artwork.managedObject.id.isEmpty else { return nil }
-        return Self.artworksDir.appendingPathComponent(artwork.managedObject.id)
+        if !artwork.type.isEmpty {
+            return Self.artworksDir.appendingPathComponent(artwork.type).appendingPathComponent(artwork.managedObject.id)
+        } else {
+            return Self.artworksDir.appendingPathComponent(artwork.managedObject.id)
+        }
     }
     
     public func createRelPath(for embeddedArtwork: EmbeddedArtwork) -> URL? {
