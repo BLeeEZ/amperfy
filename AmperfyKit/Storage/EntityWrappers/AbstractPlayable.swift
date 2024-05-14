@@ -33,7 +33,7 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     This will result in memory overflow for an array of songs.
     */
     public let playableManagedObject: AbstractPlayableMO
-
+    
     public init(managedObject: AbstractPlayableMO) {
         self.playableManagedObject = managedObject
         super.init(managedObject: managedObject)
@@ -201,11 +201,20 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     }
 
     public var isCached: Bool {
-        if playableManagedObject.file != nil {
-            return true
-        }
-        return false
+        return relFilePath != nil
     }
+    public var relFilePath: URL? {
+        get {
+            if let relFilePathString = playableManagedObject.relFilePath {
+                return URL(string: relFilePathString)
+            }
+            return nil
+        }
+        set {
+            playableManagedObject.relFilePath = newValue?.path
+        }
+    }
+
     
     public var isSong: Bool {
         return playableManagedObject is SongMO

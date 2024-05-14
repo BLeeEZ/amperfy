@@ -50,6 +50,7 @@ class BackendAudioPlayer {
     private let eventLogger: EventLogger
     private let networkMonitor: NetworkMonitorFacade
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+    private let fileManager = CacheFileManager.shared
     
     private var userDefinedPlaybackRate: PlaybackRate = .one
     
@@ -143,7 +144,8 @@ class BackendAudioPlayer {
     
     func requestToPlay(playable: AbstractPlayable, playbackRate: PlaybackRate) {
         userDefinedPlaybackRate = playbackRate
-        if playable.isCached {
+        if let relFilePath = playable.relFilePath,
+           fileManager.fileExits(relFilePath: relFilePath) {
             guard playable.isPlayableOniOS else {
                 reactToIncompatibleContentType(contentType: playable.fileContentType ?? "", playableDisplayTitle: playable.displayString)
                 return
@@ -189,14 +191,13 @@ class BackendAudioPlayer {
     }
     
     private func insertCachedPlayable(playable: AbstractPlayable) {
-        guard let playableData = cacheProxy.getFile(forPlayable: playable)?.data else {
+        guard let fileURL = cacheProxy.getFileURL(forPlayable: playable) else {
             return
         }
         os_log(.default, "Play item: %s", playable.displayString)
         playType = .cache
         if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
-        let itemUrl = playableData.createLocalUrl(fileName: "curPlayItem.mp3")
-        insert(playable: playable, withUrl: itemUrl)
+        insert(playable: playable, withUrl: fileURL)
     }
     
     private func insertStreamPlayable(playable: AbstractPlayable) -> Promise<Void> {

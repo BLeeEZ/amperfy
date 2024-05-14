@@ -31,6 +31,8 @@
 		501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501A7D4E26820B3F0055A51B /* PodcastDetailVC.swift */; };
 		501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501DBE9E2632D2CF00B31128 /* GenreDetailVC.swift */; };
 		5021B1282BC723F400893C33 /* FuzzySearcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5021B1272BC723F400893C33 /* FuzzySearcher.swift */; };
+		5023D9B02BD9A55E00310144 /* CacheFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5023D9AF2BD9A55E00310144 /* CacheFileManager.swift */; };
+		5023D9B22BDAA48200310144 /* UpdateVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5023D9B12BDAA48200310144 /* UpdateVC.swift */; };
 		502E56BC27561AD900638BD2 /* UserQueueSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502E56BB27561AD900638BD2 /* UserQueueSectionHeader.swift */; };
 		502E56BD27561C2700638BD2 /* UserQueueSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* UserQueueSectionHeader.xib */; };
 		504627EA2B73B44C00F481F8 /* PopupPlayerVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 504627E92B73B44C00F481F8 /* PopupPlayerVC.xib */; };
@@ -585,6 +587,9 @@
 		502040332203865400ED48A3 /* PlaylistSongsParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistSongsParserDelegate.swift; sourceTree = "<group>"; };
 		5021B1272BC723F400893C33 /* FuzzySearcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuzzySearcher.swift; sourceTree = "<group>"; };
 		50223EF2264543EA007445BC /* LibrarySyncVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySyncVersion.swift; sourceTree = "<group>"; };
+		5023D9AE2BD8408B00310144 /* Amperfy v37.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v37.xcdatamodel"; sourceTree = "<group>"; };
+		5023D9AF2BD9A55E00310144 /* CacheFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheFileManager.swift; sourceTree = "<group>"; };
+		5023D9B12BDAA48200310144 /* UpdateVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateVC.swift; sourceTree = "<group>"; };
 		50253F78284614A100BCCFB2 /* DuplicateEntitiesResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateEntitiesResolver.swift; sourceTree = "<group>"; };
 		50253F7A284A566700BCCFB2 /* Intents.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; path = Intents.intentdefinition; sourceTree = "<group>"; };
 		50253F81284A5EEA00BCCFB2 /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
@@ -1460,6 +1465,7 @@
 				50253F78284614A100BCCFB2 /* DuplicateEntitiesResolver.swift */,
 				50C9D6EA284FAD51007F18D0 /* PodcastsShowType.swift */,
 				50C9D6EC284FADB8007F18D0 /* PlayerDisplayStyleType.swift */,
+				5023D9AF2BD9A55E00310144 /* CacheFileManager.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -1543,6 +1549,7 @@
 				50C16C1F21E7A37000F086F0 /* Segues.swift */,
 				508385E921C5965B00C4BB32 /* LoginVC.swift */,
 				50BA930321D10F0000E5901D /* SyncVC.swift */,
+				5023D9B12BDAA48200310144 /* UpdateVC.swift */,
 				5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */,
 				50E1D3992B8BEA540001A572 /* SplitVC.swift */,
 				508FDE4F21F64ED6005A0724 /* TabBarVC.swift */,
@@ -2127,6 +2134,7 @@
 				500B7D4921EDD6250083ED6F /* ViewBuilder.swift in Sources */,
 				508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */,
 				50C9D7152850759B007F18D0 /* AnimatedGradientLayer.swift in Sources */,
+				5023D9B22BDAA48200310144 /* UpdateVC.swift in Sources */,
 				50CFB59228D483AD00A47D44 /* AddSwipeActionView.swift in Sources */,
 				508FDE3621F1E130005A0724 /* NewPlaylistTableHeader.swift in Sources */,
 				50722747286794FC00910574 /* AppDelegateKeyboardCommands.swift in Sources */,
@@ -2290,6 +2298,7 @@
 				50C9D664284FAA0B007F18D0 /* CatalogParserDelegate.swift in Sources */,
 				50C9D690284FAA6C007F18D0 /* ArtworkMO+CoreDataProperties.swift in Sources */,
 				50C9D657284FAA02007F18D0 /* SsSongParserDelegate.swift in Sources */,
+				5023D9B02BD9A55E00310144 /* CacheFileManager.swift in Sources */,
 				50C9D6C1284FAACE007F18D0 /* PlayableDownloadDelegate.swift in Sources */,
 				50C9D671284FAA4D007F18D0 /* Identifyable.swift in Sources */,
 				50C9D6B2284FAA87007F18D0 /* ScrobbleEntry.swift in Sources */,
@@ -3075,6 +3084,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				5023D9AE2BD8408B00310144 /* Amperfy v37.xcdatamodel */,
 				50FF31192BBB27AC00C2C3B9 /* Amperfy v36.xcdatamodel */,
 				505CA1F62B8730D100AA81CD /* Amperfy v35.xcdatamodel */,
 				509B430C2B72631A005E8130 /* Amperfy v34.xcdatamodel */,
@@ -3112,7 +3122,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 50FF31192BBB27AC00C2C3B9 /* Amperfy v36.xcdatamodel */;
+			currentVersion = 5023D9AE2BD8408B00310144 /* Amperfy v37.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

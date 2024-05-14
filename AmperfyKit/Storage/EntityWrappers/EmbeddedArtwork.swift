@@ -25,18 +25,31 @@ import UIKit
 public class EmbeddedArtwork: NSObject {
     
     public let managedObject: EmbeddedArtworkMO
+    private let fileManager = CacheFileManager.shared
     
     public init(managedObject: EmbeddedArtworkMO) {
         self.managedObject = managedObject
     }
-
+    
     public var image: UIImage? {
-        guard let imageData = managedObject.imageData else { return nil }
-        return UIImage(data: imageData)
+        if let relFilePath = relFilePath,
+           let absolutePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath){
+            return UIImage(contentsOfFile: absolutePath.path)
+        } else {
+            return nil
+        }
     }
     
-    public func setImage(fromData: Data?) {
-        managedObject.imageData = fromData
+    public var relFilePath: URL? {
+        get {
+            if let relFilePathString = managedObject.relFilePath {
+                return URL(string: relFilePathString)
+            }
+            return nil
+        }
+        set {
+            managedObject.relFilePath = newValue?.path
+        }
     }
     
     public var owner: AbstractPlayable? {

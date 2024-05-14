@@ -38,6 +38,7 @@ public struct ArtworkRemoteInfo {
 public class Artwork: NSObject {
     
     public let managedObject: ArtworkMO
+    private let fileManager = CacheFileManager.shared
     
     public init(managedObject: ArtworkMO) {
         self.managedObject = managedObject
@@ -67,22 +68,31 @@ public class Artwork: NSObject {
             }
         }
     }
+    
+    public var relFilePath: URL? {
+        get {
+            if let relFilePathString = managedObject.relFilePath {
+                return URL(string: relFilePathString)
+            }
+            return nil
+        }
+        set {
+            managedObject.relFilePath = newValue?.path
+        }
+    }
 
     public var image: UIImage? {
         var img: UIImage?
         switch status {
         case .CustomImage:
-            if let data = managedObject.imageData {
-                img = UIImage(data: data as Data)
+            if let relFilePath = relFilePath,
+               let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath){
+                img = UIImage(contentsOfFile: absFilePath.path)
             }
         default:
             break
         }
         return img
-    }
-    
-    public func setImage(fromData: Data?) {
-        managedObject.imageData = fromData
     }
     
     public var owners: [AbstractLibraryEntity] {

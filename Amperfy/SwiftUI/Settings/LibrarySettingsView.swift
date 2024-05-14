@@ -20,12 +20,14 @@
 //
 
 import SwiftUI
+import AmperfyKit
 
 struct LibrarySettingsView: View {
     
     @EnvironmentObject private var settings: Settings
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    let fileManager = CacheFileManager.shared
     
     @State var playlistCount = 0
     @State var artistCount = 0
@@ -67,10 +69,13 @@ struct LibrarySettingsView: View {
             }
             self.cachedSongCount = asyncCompanion.library.cachedSongCount
             self.cachedPodcastEpisodesCount = asyncCompanion.library.cachedPodcastEpisodeCount
-            self.completeCacheSize = asyncCompanion.library.cachedPlayableSizeInByte.asByteString
-            let cacheSize = Int64(settings.cacheSizeLimit)
-            self.cacheSizeLimit = cacheSize > 0 ? cacheSize.asByteString : "No Limit"
-            self.cacheSelection = cacheSize > 0 ? [cacheSize.asByteString.components(separatedBy: " ")[0], " " + cacheSize.asByteString.components(separatedBy: " ")[1]] : ["0"," MB"]
+            
+            let playableByteSize = fileManager.playableCacheSize
+            self.completeCacheSize = (playableByteSize > 1_000_000) ? playableByteSize.asByteString : Int64(0).asByteString
+            
+            let curCacheSizeLimit = Int64(settings.cacheSizeLimit)
+            self.cacheSizeLimit = curCacheSizeLimit > 0 ? curCacheSizeLimit.asByteString : "No Limit"
+            self.cacheSelection = curCacheSizeLimit > 0 ? [curCacheSizeLimit.asByteString.components(separatedBy: " ")[0], " " + curCacheSizeLimit.asByteString.components(separatedBy: " ")[1]] : ["0"," MB"]
         }.catch { error in }
     }
     
@@ -210,16 +215,17 @@ struct LibrarySettingsView: View {
                     Button(action: {
                         isShowDeleteCacheAlert = true
                     }) {
-                        Text("Delete Cache")
+                        Text("Delete downloaded Songs and Podcast Episodes")
                             .foregroundColor(.red)
                     }
                     .alert(isPresented: $isShowDeleteCacheAlert) {
-                        Alert(title: Text("Delete Cache"), message: Text("Are you sure to delete all downloaded files from cache?"),
+                        Alert(title: Text("Delete Cache"), message: Text("Are you sure to delete all downloaded Songs and Podcast Episodes?"),
                         primaryButton: .destructive(Text("Delete")) {
                             self.appDelegate.player.stop()
                             self.appDelegate.playableDownloadManager.stop()
-                            self.appDelegate.storage.main.library.deleteCompleteSongCache()
+                            self.appDelegate.storage.main.library.deletePlayableCachePaths()
                             self.appDelegate.storage.main.library.saveContext()
+                            self.fileManager.deletePlayableCache()
                             self.appDelegate.playableDownloadManager.start()
                         },secondaryButton: .cancel())
                     }

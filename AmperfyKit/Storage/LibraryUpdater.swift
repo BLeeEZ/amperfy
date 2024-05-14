@@ -20,20 +20,34 @@
 //
 
 import Foundation
+import PromiseKit
 import os.log
+
+public protocol LibraryUpdaterCallbacks {
+    func startOperation(name: String, totalCount: Int)
+    func tickOpersation()
+}
 
 public class LibraryUpdater {
     
     private let log = OSLog(subsystem: "Amperfy", category: "BackgroundSyncer")
     private let storage : PersistentStorage
     private let backendApi: BackendApi
+    private let fileManager = CacheFileManager.shared
 
     init(storage: PersistentStorage, backendApi: BackendApi) {
         self.storage = storage
         self.backendApi = backendApi
     }
     
-    public func performBlockingLibraryUpdatesIfNeeded() {
+    public var isVisualUpadateNeeded: Bool {
+        return storage.librarySyncVersion != .newestVersion
+    }
+    
+    /// This function will block the execution before the scene handler
+    /// Perform here only small/fast opersation
+    /// Use UpdateVC for longer operations to display progress to user
+    public func performSmallBlockingLibraryUpdatesIfNeeded() {
         if storage.librarySyncVersion < .v9 {
             os_log("Perform blocking library update (START): Artwork ids", log: log, type: .info)
             updateArtworkIdStructure()
@@ -62,7 +76,28 @@ public class LibraryUpdater {
             updatePlaylistArtworkItems()
             os_log("Perform blocking library update (DONE): Playlist artworkItems", log: log, type: .info)
         }
-        storage.librarySyncVersion = .newestVersion
+    }
+    
+    private var isRunning = true
+    
+    public func cancleLibraryUpdate() {
+        os_log("LibraryUpdate: cancle", log: self.log, type: .info)
+        isRunning = false
+    }
+    
+    /// Opersation can be cancled. Opersation must be able to be restarted
+    public func performLibraryUpdateWithStatus(notifier: LibraryUpdaterCallbacks) -> Promise<Void> {
+        isRunning = true
+        return storage.async.perform { asyncCompanion in
+            if self.storage.librarySyncVersion < .v17 {
+                os_log("Perform blocking library update (START): Extract Binary Data", log: self.log, type: .info)
+                try self.extractBinaryDataToFileManager(notifier: notifier, asyncCompanion: asyncCompanion)
+                os_log("Perform blocking library update (DONE): Extract  Binary Data", log: self.log, type: .info)
+                if self.isRunning {
+                    self.storage.librarySyncVersion = .v17
+                }
+            }
+        }
     }
     
     private func updateArtworkIdStructure() {
@@ -152,6 +187,87 @@ public class LibraryUpdater {
             $0.updateArtworkItems(isInitialUpdate: true)
         }
         storage.main.saveContext()
+    }
+    
+    private func extractBinaryDataToFileManager(notifier: LibraryUpdaterCallbacks, asyncCompanion: CoreDataCompanion) throws {
+        os_log("Artwork Update", log: log, type: .info)
+        let artworks = asyncCompanion.library.getArtworksContainingBinaryData()
+        notifier.startOperation(name: "Artwork Update", totalCount: artworks.count)
+        for artwork in artworks {
+            if let imageData = artwork.managedObject.imageData,
+               let relFilePath = fileManager.createRelPath(for: artwork),
+               let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
+                do {
+                    try self.fileManager.writeDataExcludedFromBackup(data: imageData, to: absFilePath)
+                    artwork.relFilePath = relFilePath
+                } catch {
+                    artwork.relFilePath = nil
+                }
+            }
+            artwork.managedObject.imageData = nil
+            asyncCompanion.library.saveContext()
+            notifier.tickOpersation()
+            if !isRunning {
+                throw PMKError.cancelled
+            }
+        }
+        os_log("Embedded Artwork Update", log: log, type: .info)
+        let embeddedArtworks = asyncCompanion.library.getEmbeddedArtworksContainingBinaryData()
+        notifier.startOperation(name: "Embedded Artwork Update", totalCount: embeddedArtworks.count)
+        for embeddedArtwork in embeddedArtworks {
+            if let imageData = embeddedArtwork.managedObject.imageData,
+               let relFilePath = fileManager.createRelPath(for: embeddedArtwork),
+               let absfilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
+                do {
+                    try self.fileManager.writeDataExcludedFromBackup(data: imageData, to: absfilePath)
+                    embeddedArtwork.relFilePath = relFilePath
+                } catch {
+                    embeddedArtwork.relFilePath = nil
+                }
+            }
+            embeddedArtwork.managedObject.imageData = nil
+            asyncCompanion.library.saveContext()
+            notifier.tickOpersation()
+            if !isRunning {
+                throw PMKError.cancelled
+            }
+        }
+        os_log("Songs/Podcast Episode Update", log: log, type: .info)
+        let playableFiles = asyncCompanion.library.getPlayableFiles()
+        notifier.startOperation(name: "Songs/Episodes Update", totalCount: playableFiles.count)
+        for playableFile in playableFiles {
+            if let fileData = playableFile.data {
+                if let song = playableFile.info?.asSong,
+                   let relFilePath = fileManager.createRelPath(for: song),
+                   let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
+                    do {
+                        try fileManager.writeDataExcludedFromBackup(data: fileData, to: absFilePath)
+                        song.playableManagedObject.file = nil
+                        song.relFilePath = relFilePath
+                    } catch {
+                        os_log("File for <%s> could not be written to <%s>", log: log, type: .error, song.displayString, relFilePath.path)
+                        song.relFilePath = nil
+                    }
+                } else if let episode = playableFile.info?.asPodcastEpisode,
+                          let relFilePath = fileManager.createRelPath(for: episode),
+                          let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
+                    do {
+                        try fileManager.writeDataExcludedFromBackup(data: fileData, to: absFilePath)
+                        episode.playableManagedObject.file = nil
+                        episode.relFilePath = relFilePath
+                    } catch {
+                       os_log("File for <%s> could not be written to <%s>", log: log, type: .error, episode.displayString, relFilePath.path)
+                        episode.relFilePath = nil
+                    }
+                }
+            }
+            asyncCompanion.library.deletePlayableFile(playableFile: playableFile)
+            asyncCompanion.library.saveContext()
+            notifier.tickOpersation()
+            if !isRunning {
+                throw PMKError.cancelled
+            }
+        }
     }
     
 }

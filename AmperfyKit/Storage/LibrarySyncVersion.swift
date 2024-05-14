@@ -33,7 +33,8 @@ public enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible {
     case v14 = 8 // duration/remoteDuration added to Artist,Album,Playlist (CoreDataMigrationVersion v31)
     case v15 = 9 // remoteSongCount added to Playlist (CoreDataMigrationVersion v32)
     case v16 = 10 // artworkItems added to Playlist (CoreDataMigrationVersion v33)
-    
+    case v17 = 11 // extract artwork binary data from core data to FileManager (CoreDataMigrationVersion v37)
+
     public var description : String {
         switch self {
         case .v6: return "v6"
@@ -47,13 +48,14 @@ public enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible {
         case .v14: return "v14"
         case .v15: return "v15"
         case .v16: return "v16"
+        case .v17: return "v17"
         }
     }
     public var isNewestVersion: Bool {
         return self == Self.newestVersion
     }
     
-    public static let newestVersion: LibrarySyncVersion = .v16
+    public static let newestVersion: LibrarySyncVersion = .v17
     public static let defaultValue: LibrarySyncVersion = .v6
     
     public static func < (lhs: LibrarySyncVersion, rhs: LibrarySyncVersion) -> Bool {

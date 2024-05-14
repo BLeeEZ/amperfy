@@ -29,6 +29,7 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     private let ampacheXmlServerApi: AmpacheXmlServerApi
     private let networkMonitor: NetworkMonitorFacade
     private var defaultImageData: Data?
+    private let fileManager = CacheFileManager.shared
 
     init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitorFacade) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
@@ -65,6 +66,7 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
         return Guarantee<Void> { seal in
             guard let data = download.resumeData,
+                  download.fileURL != nil,
                   let artwork = download.element as? Artwork else {
                 return seal(Void())
             }
@@ -73,19 +75,32 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
             }.done { defaultImageData in
                 if data == defaultImageData {
                     artwork.status = .IsDefaultImage
-                    artwork.setImage(fromData: nil)
+                    artwork.relFilePath = nil
                 } else {
                     artwork.status = .CustomImage
-                    artwork.setImage(fromData: data)
+                    artwork.relFilePath = self.handleCustomImage(download: download, artwork: artwork)
                 }
                 storage.main.saveContext()
             }.catch { error in
                 artwork.status = .CustomImage
-                artwork.setImage(fromData: data)
+                artwork.relFilePath = self.handleCustomImage(download: download, artwork: artwork)
                 storage.main.saveContext()
             }.finally {
                 seal(Void())
             }
+        }
+    }
+    
+    func handleCustomImage(download: Download, artwork: Artwork) -> URL? {
+        guard let downloadPath = download.fileURL,
+              let relFilePath = self.fileManager.createRelPath(for: artwork),
+              let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
+        else { return nil }
+        do {
+            try self.fileManager.moveExcludedFromBackupItem(at: downloadPath, to: absFilePath)
+            return relFilePath
+        } catch {
+            return nil
         }
     }
     

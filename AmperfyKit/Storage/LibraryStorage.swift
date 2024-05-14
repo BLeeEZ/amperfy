@@ -24,7 +24,7 @@ import CoreData
 import os.log
 
 protocol PlayableFileCachable {
-    func getFile(forPlayable playable: AbstractPlayable) -> PlayableFile?
+    func getFileURL(forPlayable playable: AbstractPlayable) -> URL?
 }
 
 public enum PlaylistSearchCategory: Int {
@@ -47,6 +47,7 @@ public class LibraryStorage: PlayableFileCachable {
     static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName, ScrobbleEntry.typeName, SearchHistoryItem.typeName]
     private let log = OSLog(subsystem: "Amperfy", category: "LibraryStorage")
     private var context: NSManagedObjectContext
+    private let fileManager = CacheFileManager.shared
     
     public init(context: NSManagedObjectContext) {
         self.context = context
@@ -183,7 +184,7 @@ public class LibraryStorage: PlayableFileCachable {
         libraryInfo.songCount = songCount
         libraryInfo.cachedSongCount = cachedSongCount
         libraryInfo.playlistCount = playlistCount
-        libraryInfo.cachedSongSize = cachedPlayableSizeInByte.asByteString
+        libraryInfo.cachedSongSize = fileManager.playableCacheSize.asByteString
         libraryInfo.genreCount = genreCount
         libraryInfo.artworkCount = artworkCount
         libraryInfo.musicFolderCount = musicFolderCount
@@ -244,7 +245,7 @@ public class LibraryStorage: PlayableFileCachable {
     public var artworkNotCheckedCount: Int {
         let request: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K == nil", #keyPath(ArtworkMO.imageData)),
+            NSPredicate(format: "%K == nil", #keyPath(ArtworkMO.relFilePath)),
             NSPredicate(format: "%K == %@", #keyPath(ArtworkMO.status), NSNumber(integerLiteral: Int(ImageStatus.NotChecked.rawValue))),
         ])
         return (try? context.count(for: request)) ?? 0
@@ -253,7 +254,7 @@ public class LibraryStorage: PlayableFileCachable {
     public var cachedArtworkCount: Int {
         let request: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K != nil", #keyPath(ArtworkMO.imageData))
+            NSPredicate(format: "%K != nil", #keyPath(ArtworkMO.relFilePath))
         ])
         return (try? context.count(for: request)) ?? 0
     }
@@ -268,9 +269,7 @@ public class LibraryStorage: PlayableFileCachable {
     
     public var cachedSongCount: Int {
         let request: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
-        ])
+        request.predicate = getFetchPredicate(onlyCachedSongs: true)
         return (try? context.count(for: request)) ?? 0
     }
     
@@ -290,20 +289,8 @@ public class LibraryStorage: PlayableFileCachable {
     
     public var cachedPodcastEpisodeCount: Int {
         let request: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
-        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K != nil", #keyPath(PodcastEpisodeMO.file))
-        ])
+        request.predicate = getFetchPredicate(onlyCachedPodcastEpisodes: true)
         return (try? context.count(for: request)) ?? 0
-    }
-    
-    public var cachedPlayableSizeInByte: Int64 {
-        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: PlayableFile.typeName)
-        fetchRequest.propertiesToFetch = [#keyPath(PlayableFileMO.data)]
-        fetchRequest.resultType = .dictionaryResultType
-        let foundPlayableFiles = (try? context.fetch(fetchRequest)) ?? [NSDictionary]()
-        let files = foundPlayableFiles.compactMap{ $0[#keyPath(PlayableFileMO.data)] as? NSData }
-        let cachedPlayableSizeInByte: Int64 = files.reduce(0, { $0 + $1.sizeInByte})
-        return cachedPlayableSizeInByte
     }
     
     func createGenre() -> Genre {
@@ -346,11 +333,6 @@ public class LibraryStorage: PlayableFileCachable {
     func createSong() -> Song {
         let songMO = SongMO(context: context)
         return Song(managedObject: songMO)
-    }
-    
-    func createPlayableFile() -> PlayableFile {
-        let playableFileMO = PlayableFileMO(context: context)
-        return PlayableFile(managedObject: playableFileMO)
     }
     
     func createScrobbleEntry() -> ScrobbleEntry {
@@ -398,11 +380,17 @@ public class LibraryStorage: PlayableFileCachable {
     }
 
     public func deleteCache(ofPlayable playable: AbstractPlayable) {
-        if let playableFile = getFile(forPlayable: playable) {
-            deletePlayableFile(playableFile: playableFile)
-            playable.playableManagedObject.file = nil
-            playable.contentTypeTranscoded = nil
+        if let relFilePath = playable.relFilePath,
+           fileManager.fileExits(relFilePath: relFilePath),
+           let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
+            do {
+                try fileManager.removeItem(at: absFilePath)
+            } catch {
+                os_log("File for <%s> could not be removed at <%s>", log: log, type: .info, playable.displayString, absFilePath.path)
+            }
         }
+        playable.contentTypeTranscoded = nil
+        playable.relFilePath = nil
     }
     
     public func deleteCache(of playables: [AbstractPlayable]) {
@@ -417,8 +405,12 @@ public class LibraryStorage: PlayableFileCachable {
         }
     }
 
-    public func deleteCompleteSongCache() {
+    public func deletePlayableCachePaths() {
         clearStorage(ofType: PlayableFile.typeName)
+        let songs = getCachedSongs()
+        songs.forEach{ $0.relFilePath = nil }
+        let episodes = getCachedPodcastEpisodes()
+        episodes.forEach{ $0.relFilePath = nil }
     }
     
     func createEmbeddedArtwork() -> EmbeddedArtwork {
@@ -597,7 +589,7 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(onlyCachedArtists: Bool) -> NSPredicate {
         if onlyCachedArtists {
-            return NSPredicate(format: "SUBQUERY(songs, $song, $song.file != nil) .@count > 0")
+            return NSPredicate(format: "SUBQUERY(songs, $song, $song.relFilePath != nil) .@count > 0")
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -605,7 +597,7 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(onlyCachedAlbums: Bool) -> NSPredicate {
         if onlyCachedAlbums {
-            return NSPredicate(format: "SUBQUERY(songs, $song, $song.file != nil) .@count > 0")
+            return NSPredicate(format: "SUBQUERY(songs, $song, $song.relFilePath != nil) .@count > 0")
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -613,7 +605,7 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(onlyCachedPlaylistItems: Bool) -> NSPredicate {
         if onlyCachedPlaylistItems {
-            return NSPredicate(format: "%K != nil", #keyPath(PlaylistItemMO.playable.file))
+            return NSPredicate(format: "%K != nil", #keyPath(PlaylistItemMO.playable.relFilePath))
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -621,7 +613,9 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(onlyCachedSongs: Bool) -> NSPredicate {
         if onlyCachedSongs {
-            return NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
+            return NSCompoundPredicate(orPredicateWithSubpredicates: [
+                NSPredicate(format: "%K != nil", #keyPath(SongMO.relFilePath))
+            ])
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -629,7 +623,7 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(onlyCachedPodcasts: Bool) -> NSPredicate {
         if onlyCachedPodcasts {
-            return NSPredicate(format: "SUBQUERY(episodes, $episode, $episode.file != nil) .@count > 0")
+            return NSPredicate(format: "SUBQUERY(episodes, $episode, $episode.relFilePath != nil) .@count > 0")
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -637,7 +631,9 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(onlyCachedPodcastEpisodes: Bool) -> NSPredicate {
         if onlyCachedPodcastEpisodes {
-            return NSPredicate(format: "%K != nil", #keyPath(PodcastEpisodeMO.file))
+            return NSCompoundPredicate(orPredicateWithSubpredicates: [
+                NSPredicate(format: "%K != nil", #keyPath(PodcastEpisodeMO.relFilePath))
+            ])
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -645,7 +641,7 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(onlyCachedGenreArtists: Bool) -> NSPredicate {
         if onlyCachedGenreArtists {
-            return NSPredicate(format: "SUBQUERY(artists, $artist, ANY $artist.songs.file != nil) .@count > 0")
+            return NSPredicate(format: "SUBQUERY(artists, $artist, ANY $artist.songs.relFilePath != nil) .@count > 0")
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -653,7 +649,7 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(onlyCachedGenreAlbums: Bool) -> NSPredicate {
         if onlyCachedGenreAlbums {
-            return NSPredicate(format: "SUBQUERY(albums, $album, ANY $album.songs.file != nil) .@count > 0")
+            return NSPredicate(format: "SUBQUERY(albums, $album, ANY $album.songs.relFilePath != nil) .@count > 0")
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -661,7 +657,7 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(onlyCachedGenreSongs: Bool) -> NSPredicate {
         if onlyCachedGenreSongs {
-            return NSPredicate(format: "SUBQUERY(songs, $song, $song.file != nil) .@count > 0")
+            return NSPredicate(format: "SUBQUERY(songs, $song, $song.relFilePath != nil) .@count > 0")
         } else {
             return NSPredicate.alwaysTrue
         }
@@ -703,7 +699,7 @@ public class LibraryStorage: PlayableFileCachable {
         case .all:
             return NSPredicate.alwaysTrue
         case .cached:
-            return NSPredicate(format: "SUBQUERY(items, $item, $item.playable.file != nil) .@count > 0")
+            return NSPredicate(format: "SUBQUERY(items, $item, $item.playable.relFilePath != nil) .@count > 0")
         case .userOnly:
             return NSPredicate(format: "NOT (%K BEGINSWITH %@)", #keyPath(PlaylistMO.id), Playlist.smartPlaylistIdPrefix)
         case .smartOnly:
@@ -831,6 +827,14 @@ public class LibraryStorage: PlayableFileCachable {
         return podcastEpisodes ?? [PodcastEpisode]()
     }
     
+    public func getCachedPodcastEpisodes() -> [PodcastEpisode] {
+        let fetchRequest = PodcastEpisodeMO.identifierSortedFetchRequest
+        fetchRequest.predicate = getFetchPredicate(onlyCachedPodcastEpisodes: true)
+        let foundPodcastEpisodes = try? context.fetch(fetchRequest)
+        let podcastEpisodes = foundPodcastEpisodes?.compactMap{ PodcastEpisode(managedObject: $0) }
+        return podcastEpisodes ?? [PodcastEpisode]()
+    }
+    
     public func getSongs() -> [Song] {
         let fetchRequest = SongMO.identifierSortedFetchRequest
         let foundSongs = try? context.fetch(fetchRequest)
@@ -938,7 +942,7 @@ public class LibraryStorage: PlayableFileCachable {
         let fetchRequest = SongMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-            NSPredicate(format: "%K == nil", #keyPath(SongMO.file)),
+            NSPredicate(format: "%K == nil", #keyPath(SongMO.relFilePath)),
             NSPredicate(format: "%K == nil", #keyPath(SongMO.download))
         ])
         let foundSongs = try? context.fetch(fetchRequest)
@@ -946,11 +950,30 @@ public class LibraryStorage: PlayableFileCachable {
         return songs ?? [Song]()
     }
     
+    /// get all "old" song which contain the binary data in core data
+    func getPlayableFiles() -> [PlayableFile] {
+        let fetchRequest = PlayableFileMO.fetchRequest()
+        let founds = try? context.fetch(fetchRequest)
+        let files = founds?.compactMap{ PlayableFile(managedObject: $0) }
+        return files ?? [PlayableFile]()
+    }
+    
     public func getFavoriteSongs() -> [Song] {
         let fetchRequest: NSFetchRequest<SongMO> = SongMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
             NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isFavorite))
+        ])
+        let foundSongs = try? context.fetch(fetchRequest)
+        let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
+        return songs ?? [Song]()
+    }
+    
+    public func getCachedSongs() -> [Song] {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+            getFetchPredicate(onlyCachedSongs: true)
         ])
         let foundSongs = try? context.fetch(fetchRequest)
         let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
@@ -1157,13 +1180,14 @@ public class LibraryStorage: PlayableFileCachable {
         return songs?.compactMap{ Song(managedObject: $0) } ?? [Song]()
     }
     
-    func getFile(forPlayable playable: AbstractPlayable) -> PlayableFile? {
-        guard playable.isCached else { return nil }
-        let fetchRequest: NSFetchRequest<PlayableFileMO> = PlayableFileMO.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PlayableFileMO.info.id), NSString(string: playable.id))
-        fetchRequest.fetchLimit = 1
-        let playableFiles = try? context.fetch(fetchRequest)
-        return playableFiles?.lazy.compactMap{ PlayableFile(managedObject: $0) }.first
+    func getFileURL(forPlayable playable: AbstractPlayable) -> URL? {
+        var absFileURL: URL?
+        if let relFilePath = playable.relFilePath {
+            absFileURL = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
+        } else {
+            os_log("File URL was not able to retrieve for: %s", log: log, type: .error, playable.displayString)
+        }
+        return absFileURL
     }
 
     func getPlaylist(id: String) -> Playlist? {
@@ -1186,10 +1210,32 @@ public class LibraryStorage: PlayableFileCachable {
         return Playlist(library: self, managedObject: foundManagedPlaylist)
     }
     
+    /// get all "old" embedded artworks which contain the image in core data
+    func getEmbeddedArtworksContainingBinaryData() -> [EmbeddedArtwork] {
+        let fetchRequest: NSFetchRequest<EmbeddedArtworkMO> = EmbeddedArtworkMO.fetchRequest()
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K != nil", #keyPath(EmbeddedArtworkMO.imageData)),
+        ])
+        let founds = try? context.fetch(fetchRequest)
+        let artworks = founds?.compactMap{ EmbeddedArtwork(managedObject: $0) }
+        return artworks ?? [EmbeddedArtwork]()
+    }
+    
     func getArtworks() -> [Artwork] {
         let fetchRequest: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
-        let foundMusicFolders = try? context.fetch(fetchRequest)
-        let artworks = foundMusicFolders?.compactMap{ Artwork(managedObject: $0) }
+        let founds = try? context.fetch(fetchRequest)
+        let artworks = founds?.compactMap{ Artwork(managedObject: $0) }
+        return artworks ?? [Artwork]()
+    }
+    
+    /// get all "old" artworks which contain the image in core data
+    func getArtworksContainingBinaryData() -> [Artwork] {
+        let fetchRequest: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K != nil", #keyPath(ArtworkMO.imageData)),
+        ])
+        let founds = try? context.fetch(fetchRequest)
+        let artworks = founds?.compactMap{ Artwork(managedObject: $0) }
         return artworks ?? [Artwork]()
     }
     
@@ -1207,7 +1253,7 @@ public class LibraryStorage: PlayableFileCachable {
     public func getArtworksForCompleteLibraryDownload() -> [Artwork] {
         let fetchRequest = ArtworkMO.fetchRequest()
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K == nil", #keyPath(ArtworkMO.imageData)),
+            NSPredicate(format: "%K == nil", #keyPath(ArtworkMO.relFilePath)),
             NSCompoundPredicate(orPredicateWithSubpredicates: [
                 NSPredicate(format: "%K == nil", #keyPath(ArtworkMO.download)),
                 NSPredicate(format: "%K != nil", #keyPath(ArtworkMO.download.errorDate)),

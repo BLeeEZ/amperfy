@@ -24,7 +24,8 @@ import ID3TagEditor
 
 class EmbeddedArtworkExtractor  {
 
-    let id3TagEditor = ID3TagEditor()
+    private let id3TagEditor = ID3TagEditor()
+    private let fileManager = CacheFileManager.shared
     
     func extractEmbeddedArtwork(library: LibraryStorage, playable: AbstractPlayable, fileData: Data) {
         guard let id3Tag = try? id3TagEditor.read(mp3: fileData) else { return }
@@ -42,8 +43,19 @@ class EmbeddedArtworkExtractor  {
 
     private func saveEmbeddedImageInLibrary(library: LibraryStorage, playable: AbstractPlayable, embeddedImage: UIImage) {
         let embeddedArtwork = library.createEmbeddedArtwork()
-        embeddedArtwork.setImage(fromData: embeddedImage.pngData())
         embeddedArtwork.owner = playable
+        
+        guard let relFilePath = self.fileManager.createRelPath(for: embeddedArtwork),
+              let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath),
+              let pngData = embeddedImage.pngData()
+        else { return }
+        
+        do {
+            try fileManager.writeDataExcludedFromBackup(data: pngData, to: absFilePath)
+            embeddedArtwork.relFilePath = relFilePath
+        } catch {
+            embeddedArtwork.relFilePath = nil
+        }
         library.saveContext()
     }
     

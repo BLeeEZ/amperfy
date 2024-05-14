@@ -29,7 +29,8 @@ extension EmbeddedArtworkMO {
         return NSFetchRequest<EmbeddedArtworkMO>(entityName: "EmbeddedArtwork")
     }
 
-    @NSManaged public var imageData: Data?
+    @NSManaged public var imageData: Data? /// deprecated! use relFilePath instead
+    @NSManaged public var relFilePath: String?
     @NSManaged public var owner: AbstractPlayableMO?
 
 }

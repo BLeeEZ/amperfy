@@ -22,6 +22,7 @@
 import Foundation
 import CoreData
 
+/// deprecated! use FileManger instead
 @objc(PlayableFileMO)
 public class PlayableFileMO: NSManagedObject {
 

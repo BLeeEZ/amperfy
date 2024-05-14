@@ -36,6 +36,7 @@ class DownloadManager: NSObject, DownloadManageable {
     let log: OSLog
     var isFailWithPopupError: Bool = true
     var preDownloadIsValidCheck: ((_ object: Downloadable) -> Bool)?
+    let fileManager = CacheFileManager.shared
     
     private let downloadSlotCount: Int
     private let eventLogger: EventLogger
@@ -115,7 +116,7 @@ class DownloadManager: NSObject, DownloadManageable {
     
     func storageExceedsCacheLimit() -> Bool {
         guard storage.settings.cacheLimit != 0 else { return false }
-        return storage.main.library.cachedPlayableSizeInByte > storage.settings.cacheLimit
+        return fileManager.playableCacheSize > storage.settings.cacheLimit
     }
     
     func cancelPlayableDownloads(){
@@ -181,11 +182,12 @@ class DownloadManager: NSObject, DownloadManageable {
         storage.main.library.saveContext()
     }
     
-    func finishDownload(download: Download, data: Data) {
+    func finishDownload(download: Download, fileURL: URL, data: Data) {
         self.activeTasks.signal()
         self.triggerBackgroundDownload()
         
         download.resumeData = data
+        download.fileURL = fileURL
         if let responseError = downloadDelegate.validateDownloadedData(download: download) {
             os_log("Fetching %s API-ERROR StatusCode: %d, Message: %s", log: log, type: .error, download.title, responseError.statusCode, responseError.message)
             eventLogger.report(topic: "Download", error: responseError, displayPopup: isFailWithPopupError)
@@ -196,6 +198,7 @@ class DownloadManager: NSObject, DownloadManageable {
         firstly {
             downloadDelegate.completedDownload(download: download, storage: self.storage)
         }.done {
+            download.fileURL = nil
             download.resumeData = nil
             download.isDownloading = false
             self.storage.main.saveContext()

@@ -28,6 +28,7 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     private let backendApi: BackendApi
     private let artworkExtractor: EmbeddedArtworkExtractor
     private let networkMonitor: NetworkMonitorFacade
+    private let fileManager = CacheFileManager.shared
 
     init(backendApi: BackendApi, artworkExtractor: EmbeddedArtworkExtractor, networkMonitor: NetworkMonitorFacade) {
         self.backendApi = backendApi
@@ -64,12 +65,13 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
         return Guarantee<Void> { seal in
             guard let data = download.resumeData,
+                  let fileURL = download.fileURL,
                   let playable = download.element as? AbstractPlayable,
                   let url = download.url else {
                 return seal(Void())
             }
             let library = LibraryStorage(context: storage.main.context)
-            savePlayableDataAsync(playable: playable, url: url, data: data, storage: storage)
+            savePlayableDataAsync(playable: playable, downloadUrl: url, fileURL: fileURL, storage: storage)
             artworkExtractor.extractEmbeddedArtwork(library: library, playable: playable, fileData: data)
             library.saveContext()
             seal(Void())
@@ -77,18 +79,22 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     }
     
     /// save downloaded playable async to avoid memory overflow issues due to kept references
-    func savePlayableDataAsync(playable: AbstractPlayable, url: URL, data: Data, storage: PersistentStorage) {
+    func savePlayableDataAsync(playable: AbstractPlayable, downloadUrl: URL, fileURL: URL, storage: PersistentStorage) {
         firstly {
             storage.async.perform { companion in
-                guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else {
-                    return
-                }
+                guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else { return }
                 let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
-                let playableFile = companion.library.createPlayableFile()
-                playableFile.info = playableAsync
-                playableFile.data = data
-                let transcodingInfo = self.backendApi.determTranscodingInfo(url: url)
+                guard let relFilePath = self.fileManager.createRelPath(for: playableAsync),
+                      let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
+                else { return }
+                let transcodingInfo = self.backendApi.determTranscodingInfo(url: downloadUrl)
                 playableAsync.contentTypeTranscoded = transcodingInfo.format?.asMIMETypeString
+                do {
+                    try self.fileManager.moveExcludedFromBackupItem(at: fileURL, to: absFilePath)
+                    playableAsync.relFilePath = relFilePath
+                } catch {
+                    playableAsync.relFilePath = nil
+                }
             }
         }.catch { error in
             // no error possible

@@ -29,6 +29,7 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         
     private let subsonicServerApi: SubsonicServerApi
     private let networkMonitor: NetworkMonitorFacade
+    private let fileManager = CacheFileManager.shared
 
     init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitorFacade) {
         self.subsonicServerApi = subsonicServerApi
@@ -62,14 +63,27 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     
     func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
         return Guarantee<Void> { seal in
-            guard let data = download.resumeData,
+            guard download.fileURL != nil,
                   let artwork = download.element as? Artwork else {
                 return seal(Void())
             }
             artwork.status = .CustomImage
-            artwork.setImage(fromData: data)
+            artwork.relFilePath = self.handleCustomImage(download: download, artwork: artwork)
             storage.main.saveContext()
             seal(Void())
+        }
+    }
+    
+    func handleCustomImage(download: Download, artwork: Artwork) -> URL? {
+        guard let downloadPath = download.fileURL,
+              let relFilePath = self.fileManager.createRelPath(for: artwork),
+              let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
+        else { return nil }
+        do {
+            try self.fileManager.moveExcludedFromBackupItem(at: downloadPath, to: absFilePath)
+            return relFilePath
+        } catch {
+            return nil
         }
     }
     

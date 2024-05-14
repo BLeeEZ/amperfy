@@ -212,7 +212,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard AmperKit.shared.storage.isLibrarySynced else {
             return true
         }
-        libraryUpdater.performBlockingLibraryUpdatesIfNeeded()
+        os_log("Amperfy Cache Location: %s", log: self.log, type: .info, CacheFileManager.shared.getAmperfyPath() ?? "-")
+        libraryUpdater.performSmallBlockingLibraryUpdatesIfNeeded()
         intentManager.registerXCallbackURLs()
         duplicateEntitiesResolver.start()
         artworkDownloadManager.start()

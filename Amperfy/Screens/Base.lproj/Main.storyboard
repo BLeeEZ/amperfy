@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -54,6 +54,7 @@
         <scene sceneID="Vro-PU-fi2">
             <objects>
                 <splitViewController storyboardIdentifier="SplitVC" allowDoubleColumnStyle="YES" primaryBackgroundStyle="sidebar" id="gSJ-HJ-kXz" customClass="SplitVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="QCo-S0-2E8"/>
                     <connections>
                         <segue destination="Odu-0e-SfH" kind="relationship" relationship="compactViewController" id="hjS-Sj-wjB"/>
                         <segue destination="0kE-xi-dh6" kind="relationship" relationship="masterViewController" id="4ai-j3-sse"/>
@@ -959,11 +960,83 @@
             </objects>
             <point key="canvasLocation" x="1192.753623188406" y="-1331.25"/>
         </scene>
+        <!--UpdateVC-->
+        <scene sceneID="kZi-gb-Ied">
+            <objects>
+                <viewController storyboardIdentifier="UpdateVC" id="aa1-XZ-0Qq" customClass="UpdateVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="S8S-p0-qnj">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Updating" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jrv-NL-BF0">
+                                <rect key="frame" x="172" y="153" width="70" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="j91-Tv-cP7"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Iq-Ky-1CL">
+                                <rect key="frame" x="25" y="262" width="364" height="4"/>
+                                <color key="progressTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="trackTintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </progressView>
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100.0%" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CPF-gs-YSl">
+                                <rect key="frame" x="329" y="274" width="60" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="PR0-jM-5uS"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SfK-rI-5Rb">
+                                <rect key="frame" x="25" y="274" width="29" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="CnR-bF-BSK">
+                                <rect key="frame" x="369" y="274" width="20" height="20"/>
+                                <color key="color" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </activityIndicatorView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="nnI-kd-OaY"/>
+                        <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="CPF-gs-YSl" firstAttribute="centerY" secondItem="SfK-rI-5Rb" secondAttribute="centerY" id="1g4-AK-fdm"/>
+                            <constraint firstItem="CPF-gs-YSl" firstAttribute="top" secondItem="3Iq-Ky-1CL" secondAttribute="bottom" constant="8" id="CjB-il-vYu"/>
+                            <constraint firstItem="CPF-gs-YSl" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="SfK-rI-5Rb" secondAttribute="trailing" constant="8" id="Lwp-0W-kfn"/>
+                            <constraint firstItem="Jrv-NL-BF0" firstAttribute="centerX" secondItem="S8S-p0-qnj" secondAttribute="centerX" id="T51-eg-B5s"/>
+                            <constraint firstItem="CnR-bF-BSK" firstAttribute="top" secondItem="3Iq-Ky-1CL" secondAttribute="bottom" constant="8" id="eiB-QU-RsT"/>
+                            <constraint firstItem="SfK-rI-5Rb" firstAttribute="leading" secondItem="3Iq-Ky-1CL" secondAttribute="leading" id="eq7-M9-qNZ"/>
+                            <constraint firstItem="3Iq-Ky-1CL" firstAttribute="top" secondItem="Jrv-NL-BF0" secondAttribute="bottom" constant="88" id="fCz-JC-ARu"/>
+                            <constraint firstItem="nnI-kd-OaY" firstAttribute="trailing" secondItem="3Iq-Ky-1CL" secondAttribute="trailing" constant="25" id="fW2-4c-jxD"/>
+                            <constraint firstItem="CnR-bF-BSK" firstAttribute="trailing" secondItem="3Iq-Ky-1CL" secondAttribute="trailing" id="fXY-7f-uxU"/>
+                            <constraint firstItem="CPF-gs-YSl" firstAttribute="trailing" secondItem="3Iq-Ky-1CL" secondAttribute="trailing" id="kJP-dX-Ycj"/>
+                            <constraint firstItem="Jrv-NL-BF0" firstAttribute="top" secondItem="nnI-kd-OaY" secondAttribute="top" constant="105" id="kyK-wg-WtM"/>
+                            <constraint firstItem="3Iq-Ky-1CL" firstAttribute="leading" secondItem="nnI-kd-OaY" secondAttribute="leading" constant="25" id="sWw-ym-nTV"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="activitySpinner" destination="CnR-bF-BSK" id="tKF-Az-bq1"/>
+                        <outlet property="progressBar" destination="3Iq-Ky-1CL" id="W2l-96-FSi"/>
+                        <outlet property="progressInfo" destination="SfK-rI-5Rb" id="wDT-oP-TFc"/>
+                        <outlet property="progressLabel" destination="CPF-gs-YSl" id="XeY-0n-87Q"/>
+                        <segue destination="gSJ-HJ-kXz" kind="presentation" identifier="toLibrary" modalPresentationStyle="fullScreen" id="rbW-cq-AGx"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5UM-fe-Qqf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-959" y="-903"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="kw4-13-m0t"/>
         <segue reference="PtL-O3-n85"/>
         <segue reference="whh-XI-a5P"/>
+        <segue reference="rbW-cq-AGx"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.triangle.2.circlepath" catalog="system" width="128" height="104"/>

@@ -48,7 +48,7 @@ public class ScrobbleEntry: NSObject {
     }
     
     override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? PlayableFile else { return false }
+        guard let object = object as? ScrobbleEntry else { return false }
         return managedObject == object.managedObject
     }
     

@@ -33,6 +33,7 @@ extension AbstractPlayableMO {
     @NSManaged public var contentType: String?
     @NSManaged public var contentTypeTranscoded: String?
     @NSManaged public var disk: String?
+    @NSManaged public var relFilePath: String?
     @NSManaged public var combinedDuration: Int16
     @NSManaged public var playDuration: Int16
     @NSManaged public var playProgress: Int16
@@ -44,7 +45,7 @@ extension AbstractPlayableMO {
     @NSManaged public var year: Int16
     @NSManaged public var download: DownloadMO?
     @NSManaged public var embeddedArtwork: EmbeddedArtworkMO?
-    @NSManaged public var file: PlayableFileMO?
+    @NSManaged public var file: PlayableFileMO? /// deprecated! use relFilePath instead
     @NSManaged public var playlistItems: NSOrderedSet?
     @NSManaged public var scrobbleEntries: NSOrderedSet?
 
