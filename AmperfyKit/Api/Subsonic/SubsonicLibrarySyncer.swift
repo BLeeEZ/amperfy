@@ -24,27 +24,15 @@ import CoreData
 import os.log
 import PromiseKit
 
-class SubsonicLibrarySyncer: LibrarySyncer {
+class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     private let subsonicServerApi: SubsonicServerApi
-    private let networkMonitor: NetworkMonitorFacade
-    private let performanceMonitor: ThreadPerformanceMonitor
-    private let storage: PersistentStorage
-    private let eventLogger: EventLogger
-    private let log = OSLog(subsystem: "Amperfy", category: "SubsonicLibSyncer")
-    
+   
     private static let maxItemCountToPollAtOnce: Int = 500
-    
-    var isSyncAllowed: Bool {
-        return networkMonitor.isConnectedToNetwork
-    }
     
     init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, storage: PersistentStorage, eventLogger: EventLogger) {
         self.subsonicServerApi = subsonicServerApi
-        self.networkMonitor = networkMonitor
-        self.performanceMonitor = performanceMonitor
-        self.storage = storage
-        self.eventLogger = eventLogger
+        super.init(networkMonitor: networkMonitor, performanceMonitor: performanceMonitor, storage: storage, eventLogger: eventLogger)
     }
     
     func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void> {
@@ -130,6 +118,8 @@ class SubsonicLibrarySyncer: LibrarySyncer {
                     try self.parse(response: response, delegate: parserDelegate)
                 }
             }
+        }.then {
+            super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
         }
     }
     

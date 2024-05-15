@@ -25,25 +25,13 @@ import os.log
 import UIKit
 import PromiseKit
 
-class AmpacheLibrarySyncer: LibrarySyncer {
+class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     
     private let ampacheXmlServerApi: AmpacheXmlServerApi
-    private let networkMonitor: NetworkMonitorFacade
-    private let performanceMonitor: ThreadPerformanceMonitor
-    private let storage: PersistentStorage
-    private let eventLogger: EventLogger
-    private let log = OSLog(subsystem: "Amperfy", category: "AmpacheLibSyncer")
-    
-    var isSyncAllowed: Bool {
-        return networkMonitor.isConnectedToNetwork
-    }
     
     init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, storage: PersistentStorage, eventLogger: EventLogger) {
         self.ampacheXmlServerApi = ampacheXmlServerApi
-        self.networkMonitor = networkMonitor
-        self.performanceMonitor = performanceMonitor
-        self.storage = storage
-        self.eventLogger = eventLogger
+        super.init(networkMonitor: networkMonitor, performanceMonitor: performanceMonitor, storage: storage, eventLogger: eventLogger)
     }
     
     func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void> {
@@ -112,6 +100,8 @@ class AmpacheLibrarySyncer: LibrarySyncer {
                     try self.parse(response: response, delegate: parserDelegate)
                 }
             }
+        }.then {
+            super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
         }
     }
     

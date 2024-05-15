@@ -133,6 +133,138 @@ public class CacheFileManager {
         return getOrCreateSubDirectory(subDirectoryName: Self.embeddedArtworksDir.path)
     }
     
+    public struct PlayableCacheInfo {
+        let url: URL
+        let id: String
+        let relFilePath: URL?
+    }
+    
+    public func getCachedSongs() -> [PlayableCacheInfo] {
+        var URLs = [URL]()
+        var cacheInfo = [PlayableCacheInfo]()
+        if let songsDir = getOrCreateAbsoluteSongsDirectory() {
+            URLs = contentsOfDirectory(url: songsDir)
+        }
+        for url in URLs {
+            let isDirectoryResourceValue: URLResourceValues
+            do {
+                isDirectoryResourceValue = try url.resourceValues(forKeys: [.isDirectoryKey])
+            } catch {
+                continue
+            }
+            guard isDirectoryResourceValue.isDirectory == nil || isDirectoryResourceValue.isDirectory == false else {
+                continue
+            }
+            
+            let id = url.lastPathComponent
+            cacheInfo.append(PlayableCacheInfo(url: url, id: id, relFilePath: Self.songsDir.appendingPathComponent(id)))
+        }
+        return cacheInfo
+    }
+    
+    public func getCachedEpisodes() -> [PlayableCacheInfo] {
+        var URLs = [URL]()
+        var cacheInfo = [PlayableCacheInfo]()
+        if let episodesDir = getOrCreateAbsolutePodcastEpisodesDirectory() {
+            URLs = contentsOfDirectory(url: episodesDir)
+        }
+        for url in URLs {
+            let isDirectoryResourceValue: URLResourceValues
+            do {
+                isDirectoryResourceValue = try url.resourceValues(forKeys: [.isDirectoryKey])
+            } catch {
+                continue
+            }
+            guard isDirectoryResourceValue.isDirectory == nil || isDirectoryResourceValue.isDirectory == false else {
+                continue
+            }
+            
+            let id = url.lastPathComponent
+            cacheInfo.append(PlayableCacheInfo(url: url, id: id, relFilePath: Self.episodesDir.appendingPathComponent(id)))
+        }
+        return cacheInfo
+    }
+
+    public struct EmbeddedArtworkCacheInfo {
+        let url: URL
+        let id: String
+        let isSong: Bool
+        let relFilePath: URL?
+    }
+    
+    public func getCachedEmbeddedArtworks() -> [EmbeddedArtworkCacheInfo] {
+        var cacheInfo = [EmbeddedArtworkCacheInfo]()
+        if let embeddedArtworksDir = getOrCreateAbsoluteEmbeddedArtworksDirectory() {
+            cacheInfo.append(contentsOf: getCachedEmbeddedArtworks(in: embeddedArtworksDir.appendingPathComponent(Self.songsDir.path), isSong: true))
+            cacheInfo.append(contentsOf: getCachedEmbeddedArtworks(in: embeddedArtworksDir.appendingPathComponent(Self.episodesDir.path), isSong: false))
+        }
+        return cacheInfo
+    }
+    
+    private func getCachedEmbeddedArtworks(in dir: URL, isSong: Bool) -> [EmbeddedArtworkCacheInfo] {
+        let URLs = contentsOfDirectory(url: dir)
+        var cacheInfo = [EmbeddedArtworkCacheInfo]()
+        for url in URLs {
+            let isDirectoryResourceValue: URLResourceValues
+            do {
+                isDirectoryResourceValue = try url.resourceValues(forKeys: [.isDirectoryKey])
+            } catch {
+                continue
+            }
+            
+            guard isDirectoryResourceValue.isDirectory == nil || isDirectoryResourceValue.isDirectory == false else {
+                continue
+            }
+
+            let id = url.lastPathComponent
+            let relFilePath = isSong ?
+                Self.embeddedArtworksDir.appendingPathComponent(Self.songsDir.path).appendingPathComponent(id) :
+                Self.embeddedArtworksDir.appendingPathComponent(Self.episodesDir.path).appendingPathComponent(id)
+            cacheInfo.append(EmbeddedArtworkCacheInfo(url: url, id: id, isSong: isSong, relFilePath: relFilePath))
+        }
+        return cacheInfo
+    }
+    
+    public struct ArtworkCacheInfo {
+        let url: URL
+        let id: String
+        let type: String
+        let relFilePath: URL?
+    }
+    
+    public func getCachedArtworks() -> [ArtworkCacheInfo] {
+        var cacheInfo = [ArtworkCacheInfo]()
+        if let artworksDir = getOrCreateAbsoluteArtworksDirectory() {
+            cacheInfo.append(contentsOf: getCachedArtworks(in: artworksDir, type: ""))
+        }
+        return cacheInfo
+    }
+    
+    private func getCachedArtworks(in dir: URL, type: String) -> [ArtworkCacheInfo] {
+        let URLs = contentsOfDirectory(url: dir)
+        var cacheInfo = [ArtworkCacheInfo]()
+        for url in URLs {
+            let isDirectoryResourceValue: URLResourceValues
+            do {
+                isDirectoryResourceValue = try url.resourceValues(forKeys: [.isDirectoryKey])
+            } catch {
+                continue
+            }
+           
+            if isDirectoryResourceValue.isDirectory == true {
+                let newType = url.lastPathComponent
+                cacheInfo.append(contentsOf: getCachedArtworks(in: url, type: newType))
+            } else {
+                let id = url.lastPathComponent
+                let relFilePath = !type.isEmpty ?
+                    Self.artworksDir.appendingPathComponent(type).appendingPathComponent(id) :
+                    Self.artworksDir.appendingPathComponent(id)
+                cacheInfo.append(ArtworkCacheInfo(url: url, id: id, type: type, relFilePath: relFilePath))
+            }
+        }
+        return cacheInfo
+    }
+    
     public func createRelPath(for playable: AbstractPlayable) -> URL? {
         guard !playable.playableManagedObject.id.isEmpty else { return nil }
         if playable.isSong {
@@ -187,6 +319,11 @@ public class CacheFileManager {
         // Apply those values to the URL.
         var url = at
         try url.setResourceValues(values)
+    }
+    
+    public func contentsOfDirectory(url: URL) -> [URL] {
+        let contents = try? fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: [.isDirectoryKey])
+        return contents ?? [URL]()
     }
     
     public func directorySize(url: URL) -> Int64 {

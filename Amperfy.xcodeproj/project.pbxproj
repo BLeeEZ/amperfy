@@ -35,6 +35,7 @@
 		5023D9B22BDAA48200310144 /* UpdateVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5023D9B12BDAA48200310144 /* UpdateVC.swift */; };
 		502E56BC27561AD900638BD2 /* UserQueueSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502E56BB27561AD900638BD2 /* UserQueueSectionHeader.swift */; };
 		502E56BD27561C2700638BD2 /* UserQueueSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* UserQueueSectionHeader.xib */; };
+		504262A52BF48ADF00B5EF38 /* CommonLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504262A42BF48ADF00B5EF38 /* CommonLibrarySyncer.swift */; };
 		504627EA2B73B44C00F481F8 /* PopupPlayerVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 504627E92B73B44C00F481F8 /* PopupPlayerVC.xib */; };
 		504B441728D6EB370033982C /* ArtworkDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441628D6EB370033982C /* ArtworkDisplaySettings.swift */; };
 		504B441928D6F0920033982C /* LicenseSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441828D6F0920033982C /* LicenseSettingsView.swift */; };
@@ -607,6 +608,7 @@
 		5040B2C2269C451A00911451 /* Amperfy v12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v12.xcdatamodel"; sourceTree = "<group>"; };
 		5040B2C3269CD19600911451 /* LocalNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationManager.swift; sourceTree = "<group>"; };
 		5040B2C5269D947F00911451 /* BackgroundFetchTriggeredSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundFetchTriggeredSyncer.swift; sourceTree = "<group>"; };
+		504262A42BF48ADF00B5EF38 /* CommonLibrarySyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonLibrarySyncer.swift; sourceTree = "<group>"; };
 		504627E92B73B44C00F481F8 /* PopupPlayerVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PopupPlayerVC.xib; sourceTree = "<group>"; };
 		5046DAF02689A66E00B3C37E /* Amperfy v11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v11.xcdatamodel"; sourceTree = "<group>"; };
 		5046DAF12689B97600B3C37E /* AbstractPlayableMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AbstractPlayableMO+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -1264,6 +1266,7 @@
 				50BA92F321CC29D600E5901D /* Ampache */,
 				509A7D832806A232009791D1 /* AutoDownloadLibrarySyncer.swift */,
 				50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */,
+				504262A42BF48ADF00B5EF38 /* CommonLibrarySyncer.swift */,
 			);
 			path = Api;
 			sourceTree = "<group>";
@@ -2291,6 +2294,7 @@
 				505CA1FE2B8739AE00AA81CD /* SearchHistoryItem.swift in Sources */,
 				50C9D69B284FAA6C007F18D0 /* PlayerMO+CoreDataClass.swift in Sources */,
 				50C9D69E284FAA6C007F18D0 /* AbstractLibraryEntityMO+CoreDataProperties.swift in Sources */,
+				504262A52BF48ADF00B5EF38 /* CommonLibrarySyncer.swift in Sources */,
 				505CA1FC2B87387600AA81CD /* SearchHistoryItemMO+CoreDataProperties.swift in Sources */,
 				50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */,
 				50C9D642284FA9C7007F18D0 /* GenericXmlParser.swift in Sources */,

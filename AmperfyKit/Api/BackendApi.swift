@@ -31,6 +31,7 @@ public enum ParsedObjectType {
     case playlist
     case genre
     case podcast
+    case cache
 }
 
 public protocol ParsedObjectNotifiable {

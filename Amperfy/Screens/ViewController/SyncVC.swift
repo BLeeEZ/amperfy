@@ -141,6 +141,8 @@ extension SyncVC: SyncCallbacks {
             self.updateSyncInfo(infoText: "Syncing genres ...", percentParsed: 0.0)
         case .podcast:
             self.updateSyncInfo(infoText: "Syncing podcasts ...", percentParsed: 0.0)
+        case .cache:
+            self.updateSyncInfo(infoText: "Applying cache ...", percentParsed: 0.0)
         }
         syncSemaphore.signal()
     }
