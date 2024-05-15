@@ -41,6 +41,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             // Save it off for later when we become active.
             appDelegate.quickActionsManager.savedShortCutItemForLaterUse(savedShortCutItem: shortcutItem)
         }
+        // If Amperfy is terminated and a Siri Shortcut is triggered, ConnectionOptions will contain the activity
+        for activity in connectionOptions.userActivities {
+            os_log("willConnectTo activity: %s", log: self.log, type: .info, activity.activityType)
+            _ = appDelegate.intentManager.handleIncomingIntent(userActivity: activity)
+        }
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
@@ -161,7 +166,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func scene(_ scene: UIScene, didUpdate userActivity: NSUserActivity) {
-        os_log("didUpdate userActivity", log: self.log, type: .info)
+        os_log("didUpdate userActivity: %s", log: self.log, type: .info, userActivity.activityType)
     }
     
 }
