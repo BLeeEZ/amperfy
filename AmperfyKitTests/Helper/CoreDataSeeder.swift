@@ -77,6 +77,10 @@ class CoreDataSeeder {
             album.artist = artist
         }
         
+        let relFilePath = URL(string: "testSong")!
+        let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
+        try! CacheFileManager.shared.writeDataExcludedFromBackup(data: Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)!, to: absFilePath)
+        
         for songSeed in songs {
             let song = library.createSong()
             song.id = songSeed.id
@@ -88,9 +92,7 @@ class CoreDataSeeder {
             let album = library.getAlbum(id: songSeed.albumId)
             song.album = album
             if songSeed.isCached {
-                let songFile = library.createPlayableFile()
-                songFile.info = song
-                songFile.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
+                song.relFilePath = relFilePath
             }
         }
         

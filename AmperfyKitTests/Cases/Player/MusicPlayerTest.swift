@@ -253,9 +253,10 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func markAsCached(playable: AbstractPlayable) {
-        let playableFile = library.createPlayableFile()
-        playableFile.info = playable
-        playableFile.data = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
+        let relFilePath = URL(string: "testSong")!
+        let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
+        try! CacheFileManager.shared.writeDataExcludedFromBackup(data: Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)!, to: absFilePath)
+        playable.relFilePath = relFilePath
     }
     
     func prepareNoWaitingQueuePlaying() {

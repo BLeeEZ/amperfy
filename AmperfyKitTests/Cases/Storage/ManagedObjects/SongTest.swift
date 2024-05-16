@@ -103,30 +103,21 @@ class SongTest: XCTestCase {
         XCTAssertEqual(songFetched.url, testUrl)
     }
     
-    func testCachedSong() {
-        let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)
-        let playableFile = library.createPlayableFile()
-        playableFile.info = testSong
-        playableFile.data = testData
-        XCTAssertTrue(testSong.isCached)
-        library.saveContext()
-        guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
-        XCTAssertTrue(songFetched.isCached)
-        guard let songFileFetched = library.getFile(forPlayable: testSong) else { XCTFail(); return }
-        XCTAssertEqual(songFileFetched.data, testData)
-    }
-    
     func testArtworkAndImage() {
         let testData = UIImage.songArtwork.pngData()!
         let testImg = UIImage.songArtwork
+        let relFilePath = URL(string: "testArtwork")!
+        let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
+        try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
         testSong.artwork = library.createArtwork()
-        testSong.artwork?.setImage(fromData: testData)
+        testSong.artwork?.relFilePath = relFilePath
         XCTAssertNil(testSong.artwork?.image)
         XCTAssertEqual(testSong.image(setting: .serverArtworkOnly), testImg)
         library.saveContext()
         guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
         XCTAssertNil(songFetched.artwork?.image)
         XCTAssertEqual(songFetched.image(setting: .serverArtworkOnly), testImg)
+        try! CacheFileManager.shared.removeItem(at: absFilePath)
     }
     
     func testRating() {

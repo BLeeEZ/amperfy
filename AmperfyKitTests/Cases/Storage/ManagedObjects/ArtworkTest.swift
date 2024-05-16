@@ -75,19 +75,25 @@ class ArtworkTest: XCTestCase {
         testArtwork.status = ImageStatus.CustomImage
         let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)!
         let testImg = UIImage(data: testData)
-        testArtwork.setImage(fromData: testData)
-        XCTAssertEqual(testArtwork.managedObject.imageData, testData)
+        let relFilePath = URL(string: "testArtwork")!
+        let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
+        try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
+        testArtwork.relFilePath = relFilePath
         XCTAssertEqual(testArtwork.status, ImageStatus.CustomImage)
         XCTAssertEqual(testArtwork.image, testImg)
+        try! CacheFileManager.shared.removeItem(at: absFilePath)
     }
     
     func testImageWithWrongStatus() {
         testArtwork.status = ImageStatus.NotChecked
         let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)!
-        testArtwork.setImage(fromData: testData)
-        XCTAssertEqual(testArtwork.managedObject.imageData, testData)
+        let relFilePath = URL(string: "testArtwork")!
+        let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
+        try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
+        testArtwork.relFilePath = relFilePath
         XCTAssertEqual(testArtwork.status, ImageStatus.NotChecked)
         XCTAssertNil(testArtwork.image)
+        try! CacheFileManager.shared.removeItem(at: absFilePath)
     }
     
     func testOwners() {

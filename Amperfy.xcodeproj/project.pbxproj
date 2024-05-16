@@ -128,7 +128,6 @@
 		50BE5D482850F4C900156FC6 /* PlaylistTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B798B123B7F51000551E62 /* PlaylistTest.swift */; };
 		50BE5D492850F4C900156FC6 /* ArtistTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E8B23BB666100EAAC3E /* ArtistTest.swift */; };
 		50BE5D4A2850F4C900156FC6 /* SongTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504C719023BAD112001F82C7 /* SongTest.swift */; };
-		50BE5D4B2850F4C900156FC6 /* PlayableFileTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E9523BE22AA00EAAC3E /* PlayableFileTest.swift */; };
 		50BE5D4C2850F4C900156FC6 /* PlaylistItemTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504C718E23BAC8F2001F82C7 /* PlaylistItemTest.swift */; };
 		50BE5D4D2850F4C900156FC6 /* ArtworkTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E8F23BCDE1600EAAC3E /* ArtworkTest.swift */; };
 		50BE5D4E2850F4C900156FC6 /* PlayerDataTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E9123BD29BB00EAAC3E /* PlayerDataTest.swift */; };
@@ -871,7 +870,6 @@
 		50F81E8F23BCDE1600EAAC3E /* ArtworkTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkTest.swift; sourceTree = "<group>"; };
 		50F81E9123BD29BB00EAAC3E /* PlayerDataTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerDataTest.swift; sourceTree = "<group>"; };
 		50F81E9323BE1AFD00EAAC3E /* PlayableFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayableFile.swift; sourceTree = "<group>"; };
-		50F81E9523BE22AA00EAAC3E /* PlayableFileTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayableFileTest.swift; sourceTree = "<group>"; };
 		50F81EC823BF6B1D00EAAC3E /* ArtistMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArtistMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50F81EC923BF6B1D00EAAC3E /* ArtistMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArtistMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50F81ECA23BF6B1D00EAAC3E /* PlaylistMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistMO+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -1296,7 +1294,6 @@
 				50F81E8B23BB666100EAAC3E /* ArtistTest.swift */,
 				50F81E8723BB29CD00EAAC3E /* AlbumTest.swift */,
 				504C719023BAD112001F82C7 /* SongTest.swift */,
-				50F81E9523BE22AA00EAAC3E /* PlayableFileTest.swift */,
 				50B798B123B7F51000551E62 /* PlaylistTest.swift */,
 				504C718E23BAC8F2001F82C7 /* PlaylistItemTest.swift */,
 				50F81E8F23BCDE1600EAAC3E /* ArtworkTest.swift */,
@@ -2283,7 +2280,6 @@
 				50BE5D6E2850F4FB00156FC6 /* SsPlaylistsParserTest.swift in Sources */,
 				50BE5D862850F50F00156FC6 /* PlaylistSongsParserTest.swift in Sources */,
 				50BE5D532850F4E700156FC6 /* MusicPlayerTest.swift in Sources */,
-				50BE5D4B2850F4C900156FC6 /* PlayableFileTest.swift in Sources */,
 				50BE5D732850F4FB00156FC6 /* SsPodcastParserTest.swift in Sources */,
 				50BE5D722850F4FB00156FC6 /* SsSongExample1ParserTest.swift in Sources */,
 				50BE5D912850F50F00156FC6 /* GenreParserTest.swift in Sources */,

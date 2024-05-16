@@ -86,14 +86,18 @@ class ArtistTest: XCTestCase {
     func testArtworkAndImage() {
         let testData = UIImage.artistArtwork.pngData()!
         let testImg = UIImage.artistArtwork
+        let relFilePath = URL(string: "testArtwork")!
+        let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
+        try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
         testArtist.artwork = library.createArtwork()
-        testArtist.artwork?.setImage(fromData: testData)
+        testArtist.artwork?.relFilePath = relFilePath
         XCTAssertNil(testArtist.artwork?.image)
         XCTAssertEqual(testArtist.image(setting: .serverArtworkOnly), testImg)
         library.saveContext()
         guard let artistFetched = library.getArtist(id: testId) else { XCTFail(); return }
         XCTAssertNil(artistFetched.artwork?.image)
         XCTAssertEqual(artistFetched.image(setting: .serverArtworkOnly), testImg)
+        try! CacheFileManager.shared.removeItem(at: absFilePath)
     }
 
 }
