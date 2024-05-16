@@ -20,10 +20,26 @@
 //
 
 import Foundation
+import AmperfyKit
 import Intents
 import CallbackURLKit
 import Fuse
 import OSLog
+
+extension RepeatMode {
+    public static func fromIntent(type: RepeatType) -> RepeatMode {
+        switch type {
+        case .unknown:
+            return .off
+        case .single:
+            return .single
+        case .all:
+            return .all
+        case .off:
+            return .off
+        }
+    }
+}
 
 extension PlayableContainerType {
     public static func from(string: String) -> PlayableContainerType? {
@@ -76,6 +92,7 @@ public class IntentManager {
     private let storage: PersistentStorage
     private let library: LibraryStorage
     private let player: PlayerFacade
+    private var lastResult: AmperfyMediaIntentItemResult?
     
     init(storage: PersistentStorage, library: LibraryStorage, player: PlayerFacade) {
         self.storage = storage
@@ -439,21 +456,29 @@ public class IntentManager {
         }
     }
     
-    public func handleIncomingPlayMediaIntent(playMediaIntent: INPlayMediaIntent) -> Bool {
+    public struct AmperfyMediaIntentItemResult {
+        var playableContainer: PlayableContainable?
+        var playableElements: [AbstractPlayable]?
+        var item: INMediaItem
+    }
+    
+    public func handleIncomingPlayMediaIntent(playMediaIntent: INPlayMediaIntent) -> AmperfyMediaIntentItemResult? {
         // intent interpretion is only working if media search is provided
         guard let mediaSearch = playMediaIntent.mediaSearch else {
             os_log("No media search provided", log: self.log, type: .error)
-            return false
+            return nil
         }
 #if false // use for debug only
         os_log("playMediaIntent: %s", log: self.log, type: .debug, playMediaIntent.debugDescription)
         os_log("mediaSearch: %s", log: self.log, type: .debug, mediaSearch.debugDescription)
 #endif
-        
-        var playableContainer: PlayableContainable?
-        var playableElements: [AbstractPlayable]?
+        var result: AmperfyMediaIntentItemResult?
         let playableContainerType = PlayableContainerType.fromINMediaItemType(type: mediaSearch.mediaType)
-        if playableContainerType != .unknown || mediaSearch.mediaType == .music {
+        if playableContainerType != .unknown ||
+           mediaSearch.mediaType == .music ||
+           mediaSearch.mediaType == .radioStation ||
+           mediaSearch.mediaType == .station ||
+           mediaSearch.mediaType == .algorithmicRadioStation {
             // media type is provided by user
             // "play music" => mediaType: 18
             // "play podcasts" => mediaType: 6
@@ -464,24 +489,43 @@ public class IntentManager {
             // "play <Rock>" => mediaType: 4; mediaName: -; artistNames: -; genreNames: Rock
             // "play playlist <blub>" => mediaType: 5; mediaName: blub; artistNames: -
             // "play podcast <blub>" => mediaType: 6; mediaName: blub; artistNames: -
-            if let mediaName = mediaSearch.mediaName {
-                os_log("Search explicitly in %ss: <%s>", log: self.log, type: .info, playableContainerType.description, mediaName)
-                playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: playableContainerType)
-            } else if mediaSearch.mediaType == .music {
+            if mediaSearch.mediaType == .music ||
+                      mediaSearch.mediaType == .radioStation ||
+                      mediaSearch.mediaType == .station ||
+                      mediaSearch.mediaType == .algorithmicRadioStation {
                 os_log("Play Music", log: self.log, type: .info)
-                playableElements = library.getRandomSongs(onlyCached: storage.settings.isOfflineMode)
+                let playableElements = library.getRandomSongs(onlyCached: storage.settings.isOfflineMode)
+                result = AmperfyMediaIntentItemResult(
+                    playableElements: playableElements,
+                    item: INMediaItem(identifier: nil, title: "Random Songs", type: INMediaItemType.music, artwork: nil))
             } else if mediaSearch.mediaType == .podcastShow ||
                       mediaSearch.mediaType == .podcastEpisode ||
                       mediaSearch.mediaType == .podcastStation ||
                       mediaSearch.mediaType == .podcastPlaylist {
                 os_log("Play Podcasts", log: self.log, type: .info)
-                playableElements = library.getNewestPodcastEpisode(count: 1)
+                let playableElements = library.getNewestPodcastEpisode(count: 1)
+                if playableElements.count > 0 {
+                    result = AmperfyMediaIntentItemResult(
+                        playableElements: playableElements,
+                        item: INMediaItem(identifier: nil, title: playableElements[0].title, type: INMediaItemType.podcastEpisode, artwork: nil, artist: playableElements[0].creatorName))
+                }
+            } else if let mediaName = mediaSearch.mediaName {
+                os_log("Search explicitly in %ss: <%s>", log: self.log, type: .info, playableContainerType.description, mediaName)
+                if let playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: playableContainerType) {
+                    result = AmperfyMediaIntentItemResult(
+                        playableContainer: playableContainer,
+                        item: INMediaItem(identifier: nil, title: playableContainer.name, type: mediaSearch.mediaType, artwork: nil, artist: playableContainer.subsubtitle))
+                }
             } else if let genres = mediaSearch.genreNames {
                 os_log("Search explicitly in genres: <%s>", log: self.log, type: .info, genres.joined(separator: ", "))
                 for genre in genres {
-                    guard playableContainer == nil else { break }
+                    guard result == nil else { break }
                     os_log("Search explicitly in genre: <%s>", log: self.log, type: .info, genre)
-                    playableContainer = self.getPlayableContainer(searchTerm: genre, searchCategory: .genre)
+                    if let playableContainer = self.getPlayableContainer(searchTerm: genre, searchCategory: .genre) {
+                        result = AmperfyMediaIntentItemResult(
+                            playableContainer: playableContainer,
+                            item: INMediaItem(identifier: nil, title: genre, type: INMediaItemType.genre, artwork: nil))
+                    }
                 }
             }
         } else {
@@ -491,56 +535,78 @@ public class IntentManager {
                 // "play <title> by <artist>" => mediaType: 0; mediaName: title; artistNames: artist
                 if let artistName = mediaSearch.artistName {
                     os_log("Search implicitly in songs: <%s> - <%s>", log: self.log, type: .info, artistName, mediaName)
-                    playableContainer = self.getSong(songName: mediaName, artistName: artistName)
+                    if let playableContainer = self.getSong(songName: mediaName, artistName: artistName) {
+                        result = AmperfyMediaIntentItemResult(
+                            playableContainer: playableContainer,
+                            item: INMediaItem(identifier: nil, title: playableContainer.name, type: INMediaItemType.song, artwork: nil, artist: playableContainer.subtitle))
+                    }
                 }
-                if playableContainer == nil {
+                if result == nil {
                     os_log("Search implicitly in playlists: <%s>", log: self.log, type: .info, mediaName)
-                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .playlist)
+                    if let playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .playlist) {
+                        result = AmperfyMediaIntentItemResult(
+                            playableContainer: playableContainer,
+                            item: INMediaItem(identifier: nil, title: playableContainer.name, type: INMediaItemType.playlist, artwork: nil))
+                    }
                 }
-                if playableContainer == nil {
+                if result == nil {
                     os_log("Search implicitly in artists: <%s>", log: self.log, type: .info, mediaName)
-                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .artist)
+                    if let playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .artist) {
+                        result = AmperfyMediaIntentItemResult(
+                            playableContainer: playableContainer,
+                            item: INMediaItem(identifier: nil, title: playableContainer.name, type: INMediaItemType.artist, artwork: nil))
+                    }
                 }
-                if playableContainer == nil {
+                if result == nil {
                     os_log("Search implicitly in podcasts: <%s>", log: self.log, type: .info, mediaName)
-                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .podcast)
+                    if let playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .podcast) {
+                        result = AmperfyMediaIntentItemResult(
+                            playableContainer: playableContainer,
+                            item: INMediaItem(identifier: nil, title: playableContainer.name, type: INMediaItemType.podcastShow, artwork: nil))
+                    }
                 }
-                if playableContainer == nil {
+                if result == nil {
                     os_log("Search implicitly in albums: <%s>", log: self.log, type: .info, mediaName)
-                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .album)
+                    if let playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .album) {
+                        result = AmperfyMediaIntentItemResult(
+                            playableContainer: playableContainer,
+                            item: INMediaItem(identifier: nil, title: playableContainer.name, type: INMediaItemType.album, artwork: nil))
+                    }
                 }
-                if playableContainer == nil {
+                if result == nil {
                     os_log("Search implicitly in songs: <%s>", log: self.log, type: .info, mediaName)
-                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .song)
+                    if let playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .song) {
+                        result = AmperfyMediaIntentItemResult(
+                            playableContainer: playableContainer,
+                            item: INMediaItem(identifier: nil, title: playableContainer.name, type: INMediaItemType.song, artwork: nil, artist: playableContainer.subtitle))
+                    }
                 }
-                if playableContainer == nil {
+                if result == nil {
                     os_log("Search implicitly in podcastEpisodes: <%s>", log: self.log, type: .info, mediaName)
-                    playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .podcastEpisode)
+                    if let playableContainer = self.getPlayableContainer(searchTerm: mediaName, searchCategory: .podcastEpisode) {
+                        result = AmperfyMediaIntentItemResult(
+                            playableContainer: playableContainer,
+                            item: INMediaItem(identifier: nil, title: playableContainer.name, type: INMediaItemType.podcastEpisode, artwork: nil, artist: playableContainer.subtitle))
+                    }
                 }
             } else if let genres = mediaSearch.genreNames {
                 os_log("Search implicitly in genres: <%s>", log: self.log, type: .info, genres.joined(separator: ", "))
                 for genre in genres {
-                    guard playableContainer == nil else { break }
+                    guard result == nil else { break }
                     os_log("Search implicitly in genre: <%s>", log: self.log, type: .info, genre)
-                    playableContainer = self.getPlayableContainer(searchTerm: genre, searchCategory: .genre)
+                    if let playableContainer = self.getPlayableContainer(searchTerm: genre, searchCategory: .genre) {
+                        result = AmperfyMediaIntentItemResult(
+                            playableContainer: playableContainer,
+                            item: INMediaItem(identifier: nil, title: playableContainer.name, type: INMediaItemType.genre, artwork: nil))
+                    }
                 }
             }
         }
-        
-        let shuffleOption = playMediaIntent.playShuffled ?? false
-        let repeatOption = RepeatMode.fromINPlaybackRepeatMode(mode: playMediaIntent.playbackRepeatMode)
-        
-        if let playableContainer = playableContainer {
-            os_log("Play container <%s> (shuffle: %s, repeat: %s)", log: self.log, type: .info, playableContainer.name, shuffleOption.description, repeatOption.description)
-            play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
-            return true
-        } else if let playableElements = playableElements{
-            os_log("Play Music (shuffle: %s, repeat: %s)", log: self.log, type: .info, shuffleOption.description, repeatOption.description)
-            play(context: PlayContext(name: "Siri Command", playables: playableElements), shuffleOption: shuffleOption, repeatOption: repeatOption)
-            return true
+        if result == nil {
+            os_log("No playable container found", log: self.log, type: .info)
         }
-        os_log("No playable container found", log: self.log, type: .error)
-        return false
+        lastResult = result
+        return result
     }
     
     public func handleIncomingIntent(userActivity: NSUserActivity) -> Bool {
@@ -551,7 +617,7 @@ public class IntentManager {
             else {
                 return false
         }
-        if userActivity.activityType == NSUserActivity.searchAndPlayActivityType,
+        if userActivity.activityType == NSUserActivity.searchAndPlayActivityType || userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self),
            let searchTerm = userActivity.userInfo?[NSUserActivity.ActivityKeys.searchTerm.rawValue] as? String,
            let searchCategoryRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.searchCategory.rawValue] as? Int,
            let searchCategory = PlayableContainerType(rawValue: searchCategoryRaw) {
@@ -570,7 +636,7 @@ public class IntentManager {
 
             let playableContainer = self.getPlayableContainer(searchTerm: searchTerm, searchCategory: searchCategory)
             play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
-        } else if userActivity.activityType == NSUserActivity.playIdActivityType,
+        } else if userActivity.activityType == NSUserActivity.playIdActivityType || userActivity.activityType == NSStringFromClass(PlayIDIntent.self),
            let id = userActivity.userInfo?[NSUserActivity.ActivityKeys.id.rawValue] as? String,
            let libraryElementTypeRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.libraryElementType.rawValue] as? Int,
            let libraryElementType = PlayableContainerType(rawValue: libraryElementTypeRaw) {
@@ -649,6 +715,22 @@ public class IntentManager {
             playableContainer = library.getPodcast(id: id)
         }
         return playableContainer
+    }
+    
+    public func playLastResult(shuffleOption: Bool, repeatOption: RepeatMode) -> Bool {
+        guard let lastResult = lastResult else { return false }
+        self.lastResult = nil
+        
+        if let playableContainer = lastResult.playableContainer {
+            os_log("Play container <%s> (shuffle: %s, repeat: %s)", log: self.log, type: .info, playableContainer.name, shuffleOption.description, repeatOption.description)
+            play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+        } else if let playableElements = lastResult.playableElements{
+            os_log("Play Music (shuffle: %s, repeat: %s)", log: self.log, type: .info, shuffleOption.description, repeatOption.description)
+            play(context: PlayContext(name: "Siri Command", playables: playableElements), shuffleOption: shuffleOption, repeatOption: repeatOption)
+        } else {
+            return false
+        }
+        return true
     }
 
     private func play(container: PlayableContainable?, shuffleOption: Bool, repeatOption: RepeatMode) {

@@ -102,19 +102,7 @@ public enum RepeatMode: Int16 {
             return .off
         }
     }
-    
-    public static func fromIntent(type: RepeatType) -> RepeatMode {
-        switch type {
-        case .unknown:
-            return .off
-        case .single:
-            return .single
-        case .all:
-            return .all
-        case .off:
-            return .off
-        }
-    }
+
 }
 
 public enum PlaybackRate: Int, CaseIterable {

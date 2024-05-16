@@ -1,6 +1,6 @@
 //
 //  AmperfyIntentHandler.swift
-//  AmperfyIntents
+//  AmperfyKit
 //
 //  Created by Maximilian Bauer on 06.06.22.
 //  Copyright (c) 2022 Maximilian Bauer. All rights reserved.
@@ -22,8 +22,16 @@
 import Foundation
 import Intents
 import AmperfyKit
+import OSLog
 
 public class SearchAndPlayIntentHandler: NSObject, SearchAndPlayIntentHandling {
+    
+    let intentManager: IntentManager
+    
+    public init(intentManager: IntentManager) {
+        self.intentManager = intentManager
+    }
+    
     @available(iOSApplicationExtension 13.0, *)
     public func resolveSearchTerm(for intent: SearchAndPlayIntent, with completion: @escaping (INStringResolutionResult) -> Void) {
         completion(INStringResolutionResult.success(with: intent.searchTerm ?? ""))
@@ -50,12 +58,23 @@ public class SearchAndPlayIntentHandler: NSObject, SearchAndPlayIntentHandling {
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.searchCategory.rawValue: intent.searchCategory.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: intent.shuffleOption.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.repeatOption.rawValue: intent.repeatOption.rawValue])
-        let response = SearchAndPlayIntentResponse(code: .continueInApp, userActivity: userActivity)
-        completion(response)
+        
+        if intentManager.handleIncomingIntent(userActivity: userActivity) {
+            completion(SearchAndPlayIntentResponse(code: .success, userActivity: nil))
+        } else {
+            completion(SearchAndPlayIntentResponse(code: .failure, userActivity: nil))
+        }
     }
 }
 
 public class PlayIDIntentHandler: NSObject, PlayIDIntentHandling {
+    
+    let intentManager: IntentManager
+    
+    public init(intentManager: IntentManager) {
+        self.intentManager = intentManager
+    }
+    
     @available(iOSApplicationExtension 13.0, *)
     public func resolveId(for intent: PlayIDIntent, with completion: @escaping (INStringResolutionResult) -> Void) {
         completion(INStringResolutionResult.success(with: intent.id ?? ""))
@@ -82,15 +101,31 @@ public class PlayIDIntentHandler: NSObject, PlayIDIntentHandling {
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.libraryElementType.rawValue: intent.libraryElementType.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: intent.shuffleOption.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.repeatOption.rawValue: intent.repeatOption.rawValue])
-        let response = PlayIDIntentResponse(code: .continueInApp, userActivity: userActivity)
-        completion(response)
+        
+        if intentManager.handleIncomingIntent(userActivity: userActivity) {
+            completion(PlayIDIntentResponse(code: .success, userActivity: nil))
+        } else {
+            completion(PlayIDIntentResponse(code: .failure, userActivity: nil))
+        }
     }
 }
 
 public class PlayMediaIntentHandler: NSObject, INPlayMediaIntentHandling {
+    
+    let intentManager: IntentManager
+    
+    public init(intentManager: IntentManager) {
+        self.intentManager = intentManager
+    }
+    
     @available(iOS 13.0, *)
     public func resolveMediaItems(for intent: INPlayMediaIntent, with completion: @escaping ([INPlayMediaMediaItemResolutionResult]) -> Void) {
-        completion(INPlayMediaMediaItemResolutionResult.successes(with: []))
+        let mediaItemsToPlay = intentManager.handleIncomingPlayMediaIntent(playMediaIntent: intent)
+        if let mediaItem = mediaItemsToPlay?.item {
+            completion(INPlayMediaMediaItemResolutionResult.successes(with: [mediaItem]))
+        } else {
+            completion(INPlayMediaMediaItemResolutionResult.successes(with: []))
+        }
     }
 
     @available(iOS 13.0, *)
@@ -119,7 +154,13 @@ public class PlayMediaIntentHandler: NSObject, INPlayMediaIntentHandling {
     }
 
     public func handle(intent: INPlayMediaIntent, completion: @escaping (INPlayMediaIntentResponse) -> Void) {
-        // send intent to Amperfy App to analyse the intent and act accordingly
-        completion(INPlayMediaIntentResponse(code: .handleInApp, userActivity: nil))
+        let shuffleOption = intent.playShuffled ?? false
+        let repeatOption = RepeatMode.fromINPlaybackRepeatMode(mode: intent.playbackRepeatMode)
+        
+        if intentManager.playLastResult(shuffleOption: shuffleOption, repeatOption: repeatOption) {
+            completion(INPlayMediaIntentResponse(code: .success, userActivity: nil))
+        } else {
+            completion(INPlayMediaIntentResponse(code: .failure, userActivity: nil))
+        }
     }
 }

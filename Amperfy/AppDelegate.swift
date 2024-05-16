@@ -97,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return AmperKit.shared.backgroundFetchTriggeredSyncer
     }()
     public lazy var intentManager = {
-        return AmperKit.shared.intentManager
+        return IntentManager(storage: storage, library: storage.main.library, player: player)
     }()
     public lazy var quickActionsManager = {
         return QuickActionsHandler(storage: self.storage, player: self.player, application: UIApplication.shared, displaySearchTabCB: self.displaySearchTab)
@@ -273,15 +273,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         os_log("didDiscardSceneSessions", log: self.log, type: .info)
     }
 
-    // This method is called when the application is background launched in response to the extension returning .handleInApp.
-    func application(_ application: UIApplication, handle intent: INIntent, completionHandler: @escaping (INIntentResponse) -> Void) {
-        os_log("application handle INPlayMediaIntent", log: self.log, type: .info)
-        guard let playMediaIntent = intent as? INPlayMediaIntent else {
-            completionHandler(INPlayMediaIntentResponse(code: .failure, userActivity: nil))
-            return
+    func application(_ application: UIApplication, handlerFor intent: INIntent) -> Any? {
+        os_log("application handlerFor intent", log: self.log, type: .info)
+        // This is the default implementation.  If you want different objects to handle different intents,
+        // you can override this and return the handler you want for that particular intent.
+        if intent is SearchAndPlayIntent {
+            return SearchAndPlayIntentHandler(intentManager: intentManager)
         }
-        let isSuccess = intentManager.handleIncomingPlayMediaIntent(playMediaIntent: playMediaIntent)
-        completionHandler(INPlayMediaIntentResponse(code: isSuccess ? .success : .failure, userActivity: nil))
+        if intent is PlayIDIntent {
+            return PlayIDIntentHandler(intentManager: intentManager)
+        }
+        if intent is INPlayMediaIntent {
+            return PlayMediaIntentHandler(intentManager: intentManager)
+        }
+        return nil
     }
     
 }

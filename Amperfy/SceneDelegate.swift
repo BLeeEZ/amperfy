@@ -141,7 +141,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return nil
     }
 
-    
     // This will be called after scene connection, but before activation, and will provide the
     // activity that was last supplied to the stateRestorationActivityForScene callback, or
     // set on the UISceneSession.stateRestorationActivity property.
@@ -150,7 +149,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, restoreInteractionStateWith stateRestorationActivity: NSUserActivity) {
         os_log("restoreInteractionStateWith", log: self.log, type: .info)
     }
-
     
     func scene(_ scene: UIScene, willContinueUserActivityWithType userActivityType: String) {
         os_log("willContinueUserActivityWithType", log: self.log, type: .info)

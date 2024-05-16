@@ -24,7 +24,7 @@ import AVFoundation
 import MediaPlayer
 import os.log
 
-class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
+public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     
     public static let replayInsteadPlayPreviousTimeInSec = 5.0
     static let progressTimeStartThreshold: Double = 15.0

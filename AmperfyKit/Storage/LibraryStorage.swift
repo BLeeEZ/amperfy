@@ -1060,7 +1060,7 @@ public class LibraryStorage: PlayableFileCachable {
         return playerData
     }
 
-    func getGenre(id: String) -> Genre? {
+    public func getGenre(id: String) -> Genre? {
         let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(GenreMO.id), NSString(string: id))
         fetchRequest.fetchLimit = 1
@@ -1083,7 +1083,7 @@ public class LibraryStorage: PlayableFileCachable {
         return genres?.lazy.compactMap{ Genre(managedObject: $0) }.first
     }
     
-    func getArtist(id: String) -> Artist? {
+    public func getArtist(id: String) -> Artist? {
         let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(ArtistMO.id), NSString(string: id))
         fetchRequest.fetchLimit = 1
@@ -1109,7 +1109,7 @@ public class LibraryStorage: PlayableFileCachable {
         return artists?.lazy.compactMap{ Artist(managedObject: $0) }.first
     }
     
-    func getAlbum(id: String) -> Album? {
+    public func getAlbum(id: String) -> Album? {
         let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(AlbumMO.id), NSString(string: id))
         fetchRequest.fetchLimit = 1
@@ -1135,7 +1135,7 @@ public class LibraryStorage: PlayableFileCachable {
         return albums?.lazy.compactMap{ Album(managedObject: $0) }.first
     }
 
-    func getPodcast(id: String) -> Podcast? {
+    public func getPodcast(id: String) -> Podcast? {
         let fetchRequest: NSFetchRequest<PodcastMO> = PodcastMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PodcastMO.id), NSString(string: id))
         fetchRequest.fetchLimit = 1
@@ -1190,7 +1190,7 @@ public class LibraryStorage: PlayableFileCachable {
         return absFileURL
     }
 
-    func getPlaylist(id: String) -> Playlist? {
+    public func getPlaylist(id: String) -> Playlist? {
         let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PlaylistMO.id), NSString(string: id))
         fetchRequest.fetchLimit = 1
