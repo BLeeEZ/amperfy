@@ -144,7 +144,7 @@ class BackendAudioPlayer {
         player.seek(to: CMTime(seconds: toSecond, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
     }
     
-    func requestToPlay(playable: AbstractPlayable, playbackRate: PlaybackRate) {
+    func requestToPlay(playable: AbstractPlayable, playbackRate: PlaybackRate, autoStartPlayback: Bool) {
         userDefinedPlaybackRate = playbackRate
         if let relFilePath = playable.relFilePath,
            fileManager.fileExits(relFilePath: relFilePath) {
@@ -153,7 +153,11 @@ class BackendAudioPlayer {
                 return
             }
             insertCachedPlayable(playable: playable)
-            self.continuePlay()
+            if autoStartPlayback {
+                self.continuePlay()
+            } else {
+                isPlaying = false
+            }
             self.responder?.notifyItemPreparationFinished()
         } else if !isOfflineMode{
             guard playable.isPlayableOniOS || backendApi.isStreamingTranscodingActive else {
@@ -167,7 +171,11 @@ class BackendAudioPlayer {
                 if self.isAutoCachePlayedItems {
                     self.playableDownloader.download(object: playable)
                 }
-                self.continuePlay()
+                if autoStartPlayback {
+                    self.continuePlay()
+                } else {
+                    self.isPlaying = false
+                }
                 self.responder?.notifyItemPreparationFinished()
             }.catch { error in
                 self.responder?.notifyErrorOccured(error: error)

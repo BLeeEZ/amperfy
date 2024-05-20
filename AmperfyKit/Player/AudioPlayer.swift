@@ -44,14 +44,16 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     private var playerStatus: PlayerStatusPersistent
     private var queueHandler: PlayQueueHandler
     private let backendAudioPlayer: BackendAudioPlayer
+    private let settings: PersistentStorage.Settings
     private let userStatistics: UserStatistics
     private var notifierList = [MusicPlayable]()
 
-    init(coreData: PlayerStatusPersistent, queueHandler: PlayQueueHandler, backendAudioPlayer: BackendAudioPlayer, userStatistics: UserStatistics) {
+    init(coreData: PlayerStatusPersistent, queueHandler: PlayQueueHandler, backendAudioPlayer: BackendAudioPlayer, settings: PersistentStorage.Settings, userStatistics: UserStatistics) {
         self.playerStatus = coreData
         self.queueHandler = queueHandler
         self.backendAudioPlayer = backendAudioPlayer
         self.backendAudioPlayer.isAutoCachePlayedItems = coreData.isAutoCachePlayedItems
+        self.settings = settings
         self.userStatistics = userStatistics
         super.init()
         self.backendAudioPlayer.responder = self
@@ -79,7 +81,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     private func insertIntoPlayer(playable: AbstractPlayable) {
         userStatistics.playedItem(repeatMode: playerStatus.repeatMode, isShuffle: playerStatus.isShuffle)
         playable.countPlayed()
-        backendAudioPlayer.requestToPlay(playable: playable, playbackRate: playerStatus.playbackRate)
+        backendAudioPlayer.requestToPlay(playable: playable, playbackRate: playerStatus.playbackRate, autoStartPlayback: !self.settings.isPlaybackStartOnlyOnPlay)
     }
     
     //BackendAudioPlayerNotifiable

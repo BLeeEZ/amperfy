@@ -206,6 +206,18 @@ struct PlayerSettingsView: View {
                 , footer: {
                     Text("Transcoding is recommended due to incompatibility with some formats. Changes will not effect already downloaded songs, if this is wanted: Clear cache and redownload. \(((appDelegate.storage.loginCredentials?.backendApi ?? .ampache) == .ampache) ? "" : "\nIf cache format 'raw' is selected Amperfy will use the Subsonic API action 'download' for caching. Every other option requires Amperfy to use the Subsonic API action 'stream' for caching. Only 'stream' allows server side transcoding. Please check for correct server configuration regarding the active API action.")")
                 })
+                
+                Section(content: {
+                    HStack {
+                        Text("Start audio playback only on explicit press on Play")
+                        Spacer()
+                        Toggle(isOn: $settings.isPlaybackStartOnlyOnPlay) {}
+                            .frame(width: 130)
+                    }
+                }
+                , footer: {
+                    Text("When enabled, audio playback starts only when the Play button is actively pressed. Otherwise, audio playback starts automatically.")
+                })
             }
         }
         .navigationTitle("Player, Stream & Scrobble")

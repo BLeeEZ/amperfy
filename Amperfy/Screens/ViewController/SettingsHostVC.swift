@@ -122,6 +122,11 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.isScrobbleStreamedItems = newValue
         }))
         
+        settings.isPlaybackStartOnlyOnPlay = self.appDelegate.storage.settings.isPlaybackStartOnlyOnPlay
+        changesAgent.append(settings.$isPlaybackStartOnlyOnPlay.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.isPlaybackStartOnlyOnPlay = newValue
+        }))
+        
         settings.swipeActionSettings = self.appDelegate.storage.settings.swipeActionSettings
         changesAgent.append(settings.$swipeActionSettings.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.swipeActionSettings = newValue

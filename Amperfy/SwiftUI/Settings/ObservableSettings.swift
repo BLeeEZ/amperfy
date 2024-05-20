@@ -38,6 +38,7 @@ final class Settings: ObservableObject {
     @Published var isAutoCacheLatestPodcastEpisodes = false
     @Published var isPlayerAutoCachePlayedItems = false
     @Published var isScrobbleStreamedItems = false
+    @Published var isPlaybackStartOnlyOnPlay = false
     @Published var isShowMusicPlayerSkipButtons = false
     @Published var swipeActionSettings = SwipeActionSettings(leading: [], trailing: [])
     @Published var cacheSizeLimit : Int = 0 // limit in byte
