@@ -25,14 +25,10 @@ import os.log
 
 class AudioSessionHandler {
     
-    private let musicPlayer: AudioPlayer
-
-    init(musicPlayer: AudioPlayer) {
-        self.musicPlayer = musicPlayer
-    }
+    var musicPlayer: AudioPlayer?
     
-    func configureObserverForAudioSessionInterruption(audioSession: AVAudioSession) {
-        NotificationCenter.default.addObserver(self, selector: #selector(handleAudioSessionInterruption), name: AVAudioSession.interruptionNotification, object: audioSession)
+    func configureObserverForAudioSessionInterruption() {
+        NotificationCenter.default.addObserver(self, selector: #selector(handleAudioSessionInterruption), name: AVAudioSession.interruptionNotification, object: AVAudioSession.sharedInstance())
     }
     
     @objc private func handleAudioSessionInterruption(notification: NSNotification) {
@@ -47,7 +43,7 @@ class AudioSessionHandler {
             // Audio has stopped, already inactive
             // Change state of UI, etc., to reflect non-playing state
             os_log(.info, "Audio interruption began")
-            musicPlayer.pause()
+            musicPlayer?.pause()
         case AVAudioSession.InterruptionType.ended:
             // Make session active
             // Update user interface
@@ -58,17 +54,17 @@ class AudioSessionHandler {
                 if interruptionOption == AVAudioSession.InterruptionOptions.shouldResume {
                     // Here you should continue playback
                     os_log(.info, "Audio interruption ended -> Resume playing")
-                    musicPlayer.play()
+                    musicPlayer?.play()
                 }
             }
         default: break
         }
     }
 
-    func configureBackgroundPlayback(audioSession: AVAudioSession) {
+    func configureBackgroundPlayback() {
         do {
-            try audioSession.setCategory(AVAudioSession.Category.playback)
-            try audioSession.setActive(true)
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
+            try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             os_log(.error, "Error Player: %s", error.localizedDescription)
         }

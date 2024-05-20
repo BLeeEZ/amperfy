@@ -70,10 +70,10 @@ public class AmperKit {
     public lazy var notificationHandler: EventNotificationHandler = {
         return EventNotificationHandler()
     }()
-    private var audioSessionHandler: AudioSessionHandler?
     public private(set) var scrobbleSyncer: ScrobbleSyncer?
     public lazy var player: PlayerFacade = {
-        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
+        let audioSessionHandler = AudioSessionHandler()
+        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), audioSessionHandler: audioSessionHandler, eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
         networkMonitor.connectionTypeChangedCB = { isWiFiConnected in
             backendAudioPlayer.streamingMaxBitrates = StreamingMaxBitrates(
                 wifi: self.storage.settings.streamingMaxBitrateWifiPreference,
@@ -82,6 +82,8 @@ public class AmperKit {
         let playerData = storage.main.library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
         let curPlayer = AudioPlayer(coreData: playerData, queueHandler: queueHandler, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
+        audioSessionHandler.musicPlayer = curPlayer
+        audioSessionHandler.configureObserverForAudioSessionInterruption()
         
         let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(playerStatus: playerData, queueHandler: queueHandler, playableDownloadManager: playableDownloadManager)
         curPlayer.addNotifier(notifier:  playerDownloadPreparationHandler)
@@ -91,9 +93,6 @@ public class AmperKit {
         let facadeImpl = PlayerFacadeImpl(playerStatus: playerData, queueHandler: queueHandler, musicPlayer: curPlayer, library: storage.main.library, playableDownloadManager: playableDownloadManager, backendAudioPlayer: backendAudioPlayer, userStatistics: userStatistics)
         facadeImpl.isOfflineMode = storage.settings.isOfflineMode
         
-        audioSessionHandler = AudioSessionHandler(musicPlayer: curPlayer)
-        audioSessionHandler?.configureObserverForAudioSessionInterruption(audioSession: AVAudioSession.sharedInstance())
-        audioSessionHandler?.configureBackgroundPlayback(audioSession: AVAudioSession.sharedInstance())
         let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(musicPlayer: curPlayer, backendAudioPlayer: backendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(), storage: storage)
         curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
         let remoteCommandCenterHandler = RemoteCommandCenterHandler(musicPlayer: facadeImpl, backendAudioPlayer: backendAudioPlayer, librarySyncer: librarySyncer, eventLogger: eventLogger, remoteCommandCenter: MPRemoteCommandCenter.shared())

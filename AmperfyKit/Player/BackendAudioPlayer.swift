@@ -51,7 +51,8 @@ class BackendAudioPlayer {
     private let networkMonitor: NetworkMonitorFacade
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     private let fileManager = CacheFileManager.shared
-    
+    private var audioSessionHandler: AudioSessionHandler
+
     private var userDefinedPlaybackRate: PlaybackRate = .one
     
     public var isOfflineMode: Bool = false
@@ -96,8 +97,9 @@ class BackendAudioPlayer {
         return player.currentItem != nil
     }
     
-    init(mediaPlayer: AVPlayer, eventLogger: EventLogger, backendApi: BackendApi, networkMonitor: NetworkMonitorFacade, playableDownloader: DownloadManageable, cacheProxy: PlayableFileCachable, userStatistics: UserStatistics) {
+    init(mediaPlayer: AVPlayer, audioSessionHandler: AudioSessionHandler, eventLogger: EventLogger, backendApi: BackendApi, networkMonitor: NetworkMonitorFacade, playableDownloader: DownloadManageable, cacheProxy: PlayableFileCachable, userStatistics: UserStatistics) {
         self.player = mediaPlayer
+        self.audioSessionHandler = audioSessionHandler
         self.backendApi = backendApi
         self.networkMonitor = networkMonitor
         self.eventLogger = eventLogger
@@ -214,6 +216,7 @@ class BackendAudioPlayer {
 
     private func insert(playable: AbstractPlayable, withUrl url: URL, streamingMaxBitrate: StreamingMaxBitratePreference = .noLimit) {
         player.pause()
+        audioSessionHandler.configureBackgroundPlayback()
         player.replaceCurrentItem(with: nil)
         var item: AVPlayerItem?
         if let mimeType = playable.iOsCompatibleContentType {
