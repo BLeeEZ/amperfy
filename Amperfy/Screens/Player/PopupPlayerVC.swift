@@ -207,6 +207,11 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             userQueueSectionView.display(name: PlayerQueueType.user.description, buttonPressAction: self.clearUserQueue)
         }
     }
+    
+    func refreshContextQueueSectionHeader() {
+        guard let contextNextQueueSectionHeader = contextNextQueueSectionHeader else { return }
+        contextNextQueueSectionHeader.refresh()
+    }
 
     // MARK: - UIScrollViewDelegate
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

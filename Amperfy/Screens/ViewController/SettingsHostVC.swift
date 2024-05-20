@@ -67,6 +67,11 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.isShowArtistDuration = newValue
         }))
         
+        settings.isPlayerShuffleButtonEnabled = self.appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+        changesAgent.append(settings.$isPlayerShuffleButtonEnabled.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.isPlayerShuffleButtonEnabled = newValue
+        }))
+        
         settings.isShowMusicPlayerSkipButtons = self.appDelegate.storage.settings.isShowMusicPlayerSkipButtons
         changesAgent.append(settings.$isShowMusicPlayerSkipButtons.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.isShowMusicPlayerSkipButtons = newValue

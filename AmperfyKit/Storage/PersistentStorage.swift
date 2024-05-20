@@ -231,6 +231,7 @@ public class PersistentStorage {
         case ShowSongDuration = "showSongDuration"
         case ShowAlbumDuration = "showAlbumDuration"
         case ShowArtistDuration = "showArtistDuration"
+        case PlayerShuffleButtonEnabled = "enablePlayerShuffleButton"
         case ShowMusicPlayerSkipButtons = "showMusicPlayerSkipButtons"
         
         case SongActionOnTab = "songActionOnTab"
@@ -333,6 +334,11 @@ public class PersistentStorage {
         public var isShowArtistDuration: Bool {
             get { return UserDefaults.standard.object(forKey: UserDefaultsKey.ShowArtistDuration.rawValue) as? Bool ?? false }
             set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.ShowArtistDuration.rawValue) }
+        }
+        
+        public var isPlayerShuffleButtonEnabled: Bool {
+            get { return UserDefaults.standard.object(forKey: UserDefaultsKey.PlayerShuffleButtonEnabled.rawValue) as? Bool ?? true }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.PlayerShuffleButtonEnabled.rawValue) }
         }
         
         public var isShowMusicPlayerSkipButtons: Bool {

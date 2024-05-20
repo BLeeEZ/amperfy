@@ -28,6 +28,7 @@ final class Settings: ObservableObject {
     @Published var isShowSongDuration = false
     @Published var isShowAlbumDuration = false
     @Published var isShowArtistDuration = false
+    @Published var isPlayerShuffleButtonEnabled = true
     @Published var screenLockPreventionPreference: ScreenLockPreventionPreference = .defaultValue
     @Published var streamingMaxBitrateWifiPreference: StreamingMaxBitratePreference = .defaultValue
     @Published var streamingMaxBitrateCellularPreference: StreamingMaxBitratePreference = .defaultValue

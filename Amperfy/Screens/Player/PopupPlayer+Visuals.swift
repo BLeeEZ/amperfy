@@ -25,6 +25,7 @@ import AmperfyKit
 extension PopupPlayerVC {
     
     func refresh() {
+        refreshContextQueueSectionHeader()
         refreshUserQueueSectionHeader()
         refreshCellMasks()
         refreshVisibleCellsSubtitleColor()

@@ -85,6 +85,7 @@ class ContextQueueNextSectionHeader: UIView {
     
     func refreshShuffleButton() {
         guard let rootView = rootView else { return }
+        shuffleButton.isEnabled = appDelegate.storage.settings.isPlayerShuffleButtonEnabled
         shuffleButton.isSelected = player.isShuffle
         var config = rootView.getPlayerButtonConfiguration(isSelected: shuffleButton.isSelected)
         config.image = .shuffle

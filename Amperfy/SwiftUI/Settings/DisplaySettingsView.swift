@@ -92,6 +92,21 @@ struct DisplaySettingsView: View {
                 , footer: {
                     Text("Display artist duration in table rows.")
                 })
+                
+                Section(content: {
+                    HStack {
+                        Text("Disable Player Shuffle Button")
+                        Spacer()
+                        Toggle(isOn: Binding<Bool>(
+                            get: { !settings.isPlayerShuffleButtonEnabled },
+                            set: { settings.isPlayerShuffleButtonEnabled = !$0 }
+                        )) {}
+                            .frame(width: 130)
+                    }
+                }
+                , footer: {
+                    Text("Player Shuffle Button is displayed but it can't be interacted with.")
+                })
             }
         }
         .navigationTitle("Display")
