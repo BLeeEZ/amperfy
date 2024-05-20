@@ -227,11 +227,11 @@ class MusicPlayerTest: XCTestCase {
         userStatistics = library.getUserStatistics(appVersion: "")
         backendApi = MOCK_BackendApi()
         networkMonitor = MOCK_NetworkMonitor()
-        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)
+        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, audioSessionHandler: AudioSessionHandler(), eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)
         mockMusicPlayable = MOCK_MusicPlayable()
         playerData = library.getPlayerData()
         testQueueHandler = PlayQueueHandler(playerData: playerData)
-        testMusicPlayer = AudioPlayer(coreData: playerData, queueHandler: testQueueHandler, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
+        testMusicPlayer = AudioPlayer(coreData: playerData, queueHandler: testQueueHandler, backendAudioPlayer: backendPlayer, settings: storage.settings, userStatistics: userStatistics)
         testPlayer = PlayerFacadeImpl(playerStatus: playerData, queueHandler: testQueueHandler, musicPlayer: testMusicPlayer, library: library, playableDownloadManager: songDownloader, backendAudioPlayer: backendPlayer, userStatistics: userStatistics)
         testPlayer.addNotifier(notifier: mockMusicPlayable)
         
