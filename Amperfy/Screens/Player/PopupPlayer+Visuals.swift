@@ -28,7 +28,6 @@ extension PopupPlayerVC {
         refreshContextQueueSectionHeader()
         refreshUserQueueSectionHeader()
         refreshCellMasks()
-        refreshVisibleCellsSubtitleColor()
         refreshCurrentlyPlayingInfoView()
     }
     
@@ -51,20 +50,6 @@ extension PopupPlayerVC {
                 currentlyPlayingCell.refreshArtwork()
                 break
             }
-        }
-    }
-    
-    func subtitleColor(style: UIUserInterfaceStyle) -> UIColor {
-        if let artwork = player.currentlyPlaying?.image(setting: appDelegate.storage.settings.artworkDisplayPreference), artwork != player.currentlyPlaying?.defaultImage {
-            let customColor: UIColor!
-            if traitCollection.userInterfaceStyle == .dark {
-                customColor = artwork.averageColor().getWithLightness(of: 0.8)
-            } else {
-                customColor = artwork.averageColor().getWithLightness(of: 0.2)
-            }
-            return customColor
-        } else {
-            return .labelColor
         }
     }
     
@@ -138,7 +123,6 @@ extension PopupPlayerVC {
         albumContainerView: UIView? = nil
     ) {
         refreshArtwork(artworkImage: artworkImage)
-        refreshLabelColor(label: artistLabel)
         if let playableInfo = player.currentlyPlaying {
             titleLabel.text = playableInfo.title
             albumLabel?.text = playableInfo.asSong?.album?.name ?? ""
@@ -189,10 +173,6 @@ extension PopupPlayerVC {
         }
     }
     
-    func refreshLabelColor(label: UILabel) {
-        label.textColor = subtitleColor(style: traitCollection.userInterfaceStyle)
-    }
-    
     func getPlayerRoundButtonConfiguration() -> UIButton.Configuration {
         var config = UIButton.Configuration.gray()
         config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
@@ -212,13 +192,6 @@ extension PopupPlayerVC {
         config.baseBackgroundColor = !isSelected ? .clear : .label
         config.cornerStyle = .medium
         return config
-    }
-    
-    func refreshVisibleCellsSubtitleColor() {
-        let subtitleColor = self.subtitleColor(style: traitCollection.userInterfaceStyle)
-        tableView.visibleCells.forEach {
-            ($0 as? PlayableTableCell)?.updateSubtitleColor(color: subtitleColor)
-        }
     }
     
     // handle dark/light mode change

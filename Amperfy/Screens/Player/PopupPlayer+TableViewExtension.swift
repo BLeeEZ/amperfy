@@ -164,8 +164,7 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
                 playable: playable,
                 playContextCb: {(_) in PlayContext()},
                 rootView: self,
-                playerIndexCb: convertCellViewToPlayerIndex,
-                subtitleColor: self.subtitleColor(style: traitCollection.userInterfaceStyle))
+                playerIndexCb: convertCellViewToPlayerIndex)
             cell.maskCell(fromTop: 0.0)
             return cell
         case .currentlyPlaying:

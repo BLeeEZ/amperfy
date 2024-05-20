@@ -54,7 +54,6 @@ class PlayableTableCell: BasicTableCell {
     private var playable: AbstractPlayable?
     private var download: Download?
     private var rootView: UIViewController?
-    private var subtitleColor: UIColor?
     private var playIndicator: PlayIndicator!
     private var isDislayAlbumTrackNumberStyle: Bool = false
 
@@ -63,7 +62,7 @@ class PlayableTableCell: BasicTableCell {
         playContextCb = nil
     }
     
-    func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, isDislayAlbumTrackNumberStyle: Bool = false, download: Download? = nil, subtitleColor: UIColor? = nil) {
+    func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, isDislayAlbumTrackNumberStyle: Bool = false, download: Download? = nil) {
         if playIndicator == nil {
             playIndicator = PlayIndicator(rootViewTypeName: rootView.typeName)
         }
@@ -73,7 +72,6 @@ class PlayableTableCell: BasicTableCell {
         self.rootView = rootView
         self.isDislayAlbumTrackNumberStyle = isDislayAlbumTrackNumberStyle
         self.download = download
-        self.subtitleColor = subtitleColor
         self.selectionStyle = .none
         refresh()
     }
@@ -185,22 +183,11 @@ class PlayableTableCell: BasicTableCell {
         }
     }
     
-    func updateSubtitleColor(color: UIColor?) {
-        self.subtitleColor = color
-        refreshSubtitleColor()
-    }
-    
     private func refreshSubtitleColor() {
         if playerIndexCb != nil {
-            if let subtitleColor = self.subtitleColor {
-                cacheIconImage.tintColor = subtitleColor
-                artistLabel.textColor = subtitleColor
-                durationLabel.textColor = subtitleColor
-            } else {
-                cacheIconImage.tintColor = UIColor.labelColor
-                artistLabel.textColor = UIColor.labelColor
-                durationLabel.textColor = UIColor.labelColor
-            }
+            cacheIconImage.tintColor = UIColor.labelColor
+            artistLabel.textColor = UIColor.labelColor
+            durationLabel.textColor = UIColor.labelColor
         } else {
             cacheIconImage.tintColor = UIColor.secondaryLabelColor
             artistLabel.textColor = UIColor.secondaryLabelColor
