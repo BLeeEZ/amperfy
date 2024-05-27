@@ -72,6 +72,7 @@ struct SupportSettingsView: View {
             }
         }
         .navigationTitle("Support")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             appDelegate.userStatistics.visited(.settingsSupport)
         }

@@ -82,6 +82,7 @@ struct ArtworkSettingsView: View {
             }
         }
         .navigationTitle("Artwork")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             updateValues()
         }

@@ -105,6 +105,7 @@ struct ServerSettingsView: View {
             }
         }
         .navigationTitle("Server")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPwUpdateDialogVisible) {
             UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
         }

@@ -250,6 +250,7 @@ struct LibrarySettingsView: View {
             }
         }
         .navigationTitle("Library")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             updateValues()
             appDelegate.userStatistics.visited(.settingsLibrary)
