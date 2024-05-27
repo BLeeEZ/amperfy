@@ -121,6 +121,7 @@ struct SwipeSettingsView: View {
             }
         }
         .navigationTitle("Swipe")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             reload()
         }

@@ -46,13 +46,7 @@ class SplitVC: UISplitViewController {
     }
     
     func embeddInNavigation(vc: UIViewController) -> UINavigationController {
-        let nav = UINavigationController(rootViewController: vc)
-        if vc is SettingsHostVC {
-            nav.navigationBar.prefersLargeTitles = false
-        } else {
-            nav.navigationBar.prefersLargeTitles = true
-        }
-        return nav
+        return UINavigationController(rootViewController: vc)
     }
     
     var defaultSecondaryVC: UINavigationController {

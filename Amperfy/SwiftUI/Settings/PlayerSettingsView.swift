@@ -221,6 +221,7 @@ struct PlayerSettingsView: View {
             }
         }
         .navigationTitle("Player, Stream & Scrobble")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             appDelegate.userStatistics.visited(.settingsPlayer)
         }

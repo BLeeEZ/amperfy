@@ -305,6 +305,7 @@ THE SOFTWARE.
             .padding([.leading, .trailing], 16)
         }
         .navigationTitle("Licenses")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

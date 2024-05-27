@@ -110,6 +110,7 @@ struct DisplaySettingsView: View {
             }
         }
         .navigationTitle("Display")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
