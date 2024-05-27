@@ -3,7 +3,7 @@
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -760,18 +760,17 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bcG-FU-Xh9">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="847"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <connections>
                                     <segue destination="Wdk-bS-aW2" kind="embed" destinationCreationSelector="segueToSwiftUI:" id="rgx-91-t0t"/>
                                 </connections>
                             </containerView>
                         </subviews>
-                        <viewLayoutGuide key="safeArea" id="kTI-Wq-9sy"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="bcG-FU-Xh9" firstAttribute="leading" secondItem="kTI-Wq-9sy" secondAttribute="leading" id="Feh-dt-yoo"/>
-                            <constraint firstItem="kTI-Wq-9sy" firstAttribute="bottom" secondItem="bcG-FU-Xh9" secondAttribute="bottom" id="I7Z-vX-NPk"/>
-                            <constraint firstItem="kTI-Wq-9sy" firstAttribute="trailing" secondItem="bcG-FU-Xh9" secondAttribute="trailing" id="gwe-Pw-LmG"/>
+                            <constraint firstItem="bcG-FU-Xh9" firstAttribute="leading" secondItem="hwu-20-I2H" secondAttribute="leading" id="Feh-dt-yoo"/>
+                            <constraint firstAttribute="bottom" secondItem="bcG-FU-Xh9" secondAttribute="bottom" id="I7Z-vX-NPk"/>
+                            <constraint firstAttribute="trailing" secondItem="bcG-FU-Xh9" secondAttribute="trailing" id="gwe-Pw-LmG"/>
                             <constraint firstItem="bcG-FU-Xh9" firstAttribute="top" secondItem="hwu-20-I2H" secondAttribute="top" id="hpc-ft-5Pw"/>
                         </constraints>
                     </view>
