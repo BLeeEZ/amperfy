@@ -43,7 +43,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }.then { response in
             self.storage.async.perform { asyncCompanion in
                 let parserDelegate = GenreParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
-                try self.parse(response: response, delegate: parserDelegate)
+                try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
             }
         }.then {
             self.ampacheXmlServerApi.requesetLibraryMetaData()
@@ -56,7 +56,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 }.then { response in
                     self.storage.async.perform { asyncCompanion in
                         let parserDelegate = ArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
-                        try self.parse(response: response, delegate: parserDelegate)
+                        try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
                     }
                 }
             }}
@@ -72,7 +72,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 }.then { response in
                     self.storage.async.perform { asyncCompanion in
                         let parserDelegate = AlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
-                        try self.parse(response: response, delegate: parserDelegate)
+                        try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
                     }
                 }
             }}
@@ -83,7 +83,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }.then { response in
             self.storage.async.perform { asyncCompanion in
                 let parserDelegate = PlaylistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
-                try self.parse(response: response, delegate: parserDelegate)
+                try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
             }
         }.then {
             self.ampacheXmlServerApi.requesetLibraryMetaData()
@@ -97,7 +97,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
             }.then { response in
                 self.storage.async.perform { asyncCompanion in
                     let parserDelegate = PodcastParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
-                    try self.parse(response: response, delegate: parserDelegate)
+                    try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
                 }
             }
         }.then {
@@ -784,15 +784,15 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }
     }
     
-    private func parse(response: APIDataResponse, delegate: AmpacheXmlParser, throwForNotFoundErrors: Bool = false) throws {
+    private func parse(response: APIDataResponse, delegate: AmpacheXmlParser, throwForNotFoundErrors: Bool = false, isThrowingErrorsAllowed: Bool = true) throws {
         let parser = XMLParser(data: response.data)
         parser.delegate = delegate
         parser.parse()
-        if let error = parser.parserError {
+        if let error = parser.parserError, isThrowingErrorsAllowed {
             os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
             throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: ampacheXmlServerApi), data: response.data)
         }
-        if let error = delegate.error, let ampacheError = error.ampacheError, ampacheError.shouldErrorBeDisplayedToUser || throwForNotFoundErrors {
+        if let error = delegate.error, let ampacheError = error.ampacheError, isThrowingErrorsAllowed, ampacheError.shouldErrorBeDisplayedToUser || throwForNotFoundErrors {
             throw ResponseError.createFromAmpacheError(cleansedURL: response.url?.asCleansedURL(cleanser: ampacheXmlServerApi), error: error, data: response.data)
         }
     }

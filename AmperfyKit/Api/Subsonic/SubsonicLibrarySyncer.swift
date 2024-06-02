@@ -42,7 +42,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }.then { response in
             self.storage.async.perform { asyncCompanion in
                 let parserDelegate = SsGenreParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
-                try self.parse(response: response, delegate: parserDelegate)
+                try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
             }
         }.then { () -> Promise<APIDataResponse> in
             statusNotifyier?.notifySyncStarted(ofType: .artist, totalCount: 0)
@@ -50,7 +50,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }.then { response in
             self.storage.async.perform { asyncCompanion in
                 let parserDelegate = SsArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
-                try self.parse(response: response, delegate: parserDelegate)
+                try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
             }
         }.then { auth -> Promise<Void> in
             let artists = self.storage.main.library.getArtists().filter{ !$0.id.isEmpty }
@@ -63,7 +63,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 }.then { response in
                     self.storage.async.perform { asyncCompanion in
                         let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
-                        try self.parse(response: response, delegate: parserDelegate)
+                        try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
                     }
                 }.get {
                     statusNotifyier?.notifyParsedObject(ofType: .album)
@@ -103,7 +103,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }.then { response in
             self.storage.async.perform { asyncCompanion in
                 let parserDelegate = SsPlaylistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
-                try self.parse(response: response, delegate: parserDelegate)
+                try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
             }
         }.then {
             self.subsonicServerApi.requestServerPodcastSupport()
@@ -115,7 +115,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
             }.then { response in
                 self.storage.async.perform { asyncCompanion in
                     let parserDelegate = SsPodcastParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
-                    try self.parse(response: response, delegate: parserDelegate)
+                    try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
                 }
             }
         }.then {
@@ -695,15 +695,15 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }
     }
     
-    private func parse(response: APIDataResponse, delegate: SsXmlParser) throws {
+    private func parse(response: APIDataResponse, delegate: SsXmlParser, isThrowingErrorsAllowed: Bool = true) throws {
         let parser = XMLParser(data: response.data)
         parser.delegate = delegate
         parser.parse()
-        if let error = parser.parserError {
+        if let error = parser.parserError, isThrowingErrorsAllowed {
             os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
             throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: subsonicServerApi), data: response.data)
         }
-        if let error = delegate.error, let _ = error.subsonicError {
+        if let error = delegate.error, let _ = error.subsonicError, isThrowingErrorsAllowed {
             throw ResponseError.createFromSubsonicError(cleansedURL: response.url?.asCleansedURL(cleanser: subsonicServerApi), error: error, data: response.data)
         }
     }
