@@ -316,7 +316,7 @@ class SubsonicServerApi: URLCleanser {
             for queryItem in queryItems {
                 if queryItem.name == "format",
                    let formatRaw = queryItem.value,
-                   let format = CacheTranscodingFormatPreference.createFromString(formatRaw) {
+                   let format = CacheTranscodingFormatPreference.createFromFileFormatString(formatRaw) {
                     info.format = format
                 } else if queryItem.name == "maxBitRate",
                           let bitrateRawString = queryItem.value,

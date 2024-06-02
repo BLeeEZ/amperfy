@@ -136,6 +136,8 @@ public class CacheFileManager {
     public struct PlayableCacheInfo {
         let url: URL
         let id: String
+        let fileType: String
+        let transcodingType: CacheTranscodingFormatPreference
         let relFilePath: URL?
     }
     
@@ -156,8 +158,15 @@ public class CacheFileManager {
                 continue
             }
             
-            let id = url.lastPathComponent
-            cacheInfo.append(PlayableCacheInfo(url: url, id: id, relFilePath: Self.songsDir.appendingPathComponent(id)))
+            let fileName = url.lastPathComponent
+            var id = fileName
+            let pathExtension = url.pathExtension
+            var transcodingType = CacheTranscodingFormatPreference.raw
+            if !pathExtension.isEmpty {
+                id = (fileName as NSString).deletingPathExtension
+                transcodingType = CacheTranscodingFormatPreference.createFromFileFormatString(pathExtension) ?? .raw
+            }
+            cacheInfo.append(PlayableCacheInfo(url: url, id: id, fileType: pathExtension, transcodingType: transcodingType, relFilePath: Self.songsDir.appendingPathComponent(fileName)))
         }
         return cacheInfo
     }
@@ -179,8 +188,15 @@ public class CacheFileManager {
                 continue
             }
             
-            let id = url.lastPathComponent
-            cacheInfo.append(PlayableCacheInfo(url: url, id: id, relFilePath: Self.episodesDir.appendingPathComponent(id)))
+            let fileName = url.lastPathComponent
+            var id = fileName
+            let pathExtension = url.pathExtension
+            var transcodingType = CacheTranscodingFormatPreference.raw
+            if !pathExtension.isEmpty {
+                id = (fileName as NSString).deletingPathExtension
+                transcodingType = CacheTranscodingFormatPreference.createFromFileFormatString(pathExtension) ?? .raw
+            }
+            cacheInfo.append(PlayableCacheInfo(url: url, id: id, fileType: pathExtension, transcodingType: transcodingType, relFilePath: Self.episodesDir.appendingPathComponent(fileName)))
         }
         return cacheInfo
     }
@@ -267,10 +283,11 @@ public class CacheFileManager {
     
     public func createRelPath(for playable: AbstractPlayable) -> URL? {
         guard !playable.playableManagedObject.id.isEmpty else { return nil }
+        let transcodingType = CacheTranscodingFormatPreference.createFromMIMETypeString(playable.contentTypeTranscoded)
         if playable.isSong {
-            return Self.songsDir.appendingPathComponent(playable.playableManagedObject.id)
+            return Self.songsDir.appendingPathComponent(playable.playableManagedObject.id).appendingPathExtension(transcodingType.asFileFormatString)
         } else {
-            return Self.episodesDir.appendingPathComponent(playable.playableManagedObject.id)
+            return Self.episodesDir.appendingPathComponent(playable.playableManagedObject.id).appendingPathExtension(transcodingType.asFileFormatString)
         }
     }
     

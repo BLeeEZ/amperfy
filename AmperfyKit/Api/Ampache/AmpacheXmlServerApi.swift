@@ -759,7 +759,7 @@ class AmpacheXmlServerApi: URLCleanser {
             for queryItem in queryItems {
                 if queryItem.name == "format",
                    let formatRaw = queryItem.value,
-                   let format = CacheTranscodingFormatPreference.createFromString(formatRaw) {
+                   let format = CacheTranscodingFormatPreference.createFromFileFormatString(formatRaw) {
                     info.format = format
                 } else if queryItem.name == "bitrate",
                           let bitrateRawString = queryItem.value,
