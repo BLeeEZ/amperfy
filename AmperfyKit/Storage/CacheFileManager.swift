@@ -112,6 +112,7 @@ public class CacheFileManager {
         return bytes
     }
     
+    private static let artworkFileExtension = "png"
     private static let songsDir = URL(string: "songs")!
     private static let episodesDir = URL(string: "episodes")!
     private static let artworksDir = URL(string: "artworks")!
@@ -232,10 +233,16 @@ public class CacheFileManager {
                 continue
             }
 
-            let id = url.lastPathComponent
+            
+            let fileName = url.lastPathComponent
+            var id = fileName
+            let pathExtension = url.pathExtension
+            if !pathExtension.isEmpty {
+                id = (fileName as NSString).deletingPathExtension
+            }
             let relFilePath = isSong ?
-                Self.embeddedArtworksDir.appendingPathComponent(Self.songsDir.path).appendingPathComponent(id) :
-                Self.embeddedArtworksDir.appendingPathComponent(Self.episodesDir.path).appendingPathComponent(id)
+                Self.embeddedArtworksDir.appendingPathComponent(Self.songsDir.path).appendingPathComponent(fileName) :
+                Self.embeddedArtworksDir.appendingPathComponent(Self.episodesDir.path).appendingPathComponent(fileName)
             cacheInfo.append(EmbeddedArtworkCacheInfo(url: url, id: id, isSong: isSong, relFilePath: relFilePath))
         }
         return cacheInfo
@@ -271,10 +278,15 @@ public class CacheFileManager {
                 let newType = url.lastPathComponent
                 cacheInfo.append(contentsOf: getCachedArtworks(in: url, type: newType))
             } else {
-                let id = url.lastPathComponent
+                let fileName = url.lastPathComponent
+                var id = fileName
+                let pathExtension = url.pathExtension
+                if !pathExtension.isEmpty {
+                    id = (fileName as NSString).deletingPathExtension
+                }
                 let relFilePath = !type.isEmpty ?
-                    Self.artworksDir.appendingPathComponent(type).appendingPathComponent(id) :
-                    Self.artworksDir.appendingPathComponent(id)
+                    Self.artworksDir.appendingPathComponent(type).appendingPathComponent(fileName) :
+                    Self.artworksDir.appendingPathComponent(fileName)
                 cacheInfo.append(ArtworkCacheInfo(url: url, id: id, type: type, relFilePath: relFilePath))
             }
         }
@@ -294,9 +306,9 @@ public class CacheFileManager {
     public func createRelPath(for artwork: Artwork) -> URL? {
         guard !artwork.managedObject.id.isEmpty else { return nil }
         if !artwork.type.isEmpty {
-            return Self.artworksDir.appendingPathComponent(artwork.type).appendingPathComponent(artwork.managedObject.id)
+            return Self.artworksDir.appendingPathComponent(artwork.type).appendingPathComponent(artwork.managedObject.id).appendingPathExtension(Self.artworkFileExtension)
         } else {
-            return Self.artworksDir.appendingPathComponent(artwork.managedObject.id)
+            return Self.artworksDir.appendingPathComponent(artwork.managedObject.id).appendingPathExtension(Self.artworkFileExtension)
         }
     }
     
@@ -304,7 +316,9 @@ public class CacheFileManager {
         guard let owner = embeddedArtwork.owner,
               let ownerRelFilePath = createRelPath(for: owner)
         else { return nil }
-        return Self.embeddedArtworksDir.appendingPathComponent(ownerRelFilePath.path)
+        
+        let embeddedArtworkOwnerRelFilePath = ownerRelFilePath.deletingPathExtension().appendingPathExtension(Self.artworkFileExtension)
+        return Self.embeddedArtworksDir.appendingPathComponent(embeddedArtworkOwnerRelFilePath.path)
     }
     
     public func getAmperfyPath() -> String? {
