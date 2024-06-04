@@ -141,8 +141,8 @@ extension UIImage {
         let buildView = EntityImageView(frame: frame)
         let grayScale = 0.92
         let artworkBackgroundColor = UIColor(red: grayScale, green: grayScale, blue: grayScale, alpha: 1)
-        let imageTintColor: UIColor = getThemeColor(preference: AmperKit.shared.storage.settings.appThemePreference)
-        let backgroundColor = switchColors ? .defaultBlue : artworkBackgroundColor
+        let imageTintColor = !switchColors ? getThemeColor(preference: AmperKit.shared.storage.settings.appThemePreference) : artworkBackgroundColor
+        let backgroundColor = switchColors ? getThemeColor(preference: AmperKit.shared.storage.settings.appThemePreference) : artworkBackgroundColor
         buildView.configureStyling(image: image, imageSizeType: iconSizeType, imageTintColor: imageTintColor, backgroundColor: backgroundColor)
         buildView.layoutIfNeeded()
         return buildView.screenshot ?? UIImage()
