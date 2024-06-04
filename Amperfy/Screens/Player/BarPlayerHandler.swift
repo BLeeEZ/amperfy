@@ -43,7 +43,8 @@ class BarPlayerHandler {
     }
     
     private func configureBar(vc: UIViewController) {
-        vc.popupBar.tintColor = UIColor.defaultBlue
+        let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        vc.popupBar.tintColor = appDelegate.getThemeColor(preference: AmperKit.shared.storage.settings.appThemePreference)
         vc.popupBar.imageView.layer.cornerRadius = 5
         vc.popupBar.progressViewStyle = .bottom
         if #available(iOS 17, *) {
