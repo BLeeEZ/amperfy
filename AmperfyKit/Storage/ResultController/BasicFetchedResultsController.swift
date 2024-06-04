@@ -55,37 +55,8 @@ public enum SectionIndexType: Int {
     public static let noYearSymbol = "#"
 }
 
-public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchRequestResult>: NSFetchedResultsController<NSFetchRequestResult> {
- 
-    public var sectionIndexType: SectionIndexType
-    
-    public init(fetchRequest: NSFetchRequest<ResultType>, coreDataCompanion: CoreDataCompanion, sectionNameKeyPath: String?, cacheName name: String?, sectionIndexType: SectionIndexType = .defaultValue) {
-        self.sectionIndexType = sectionIndexType
-        super.init(fetchRequest: fetchRequest as! NSFetchRequest<NSFetchRequestResult>, managedObjectContext: coreDataCompanion.context, sectionNameKeyPath: sectionNameKeyPath, cacheName: name)
-    }
-    
-    override public func sectionIndexTitle(forSectionName sectionName: String) -> String? {
-        switch sectionIndexType {
-        case .alphabet:
-            return sectionName
-        case .rating:
-            return sortByRating(forSectionName: sectionName)
-        case .newestOrRecent:
-            return nil
-        case .durationSong:
-            return sortByDurationSong(forSectionName: sectionName)
-        case .durationAlbum:
-            return sortByDurationAlbum(forSectionName: sectionName)
-        case .durationArtist:
-            return sortByDurationArtist(forSectionName: sectionName)
-        case .none:
-            return nil
-        case .year:
-            return sortByYear(forSectionName: sectionName)
-        }
-    }
-    
-    private func sortByRating(forSectionName sectionName: String) -> String? {
+public class IndexHeaderNameGenerator {
+    public static func sortByRating(forSectionName sectionName: String) -> String {
         guard sectionName.count > 0 else { return SectionIndexType.noRatingIndexSymbol }
         let initial = String(sectionName.prefix(1))
         switch initial {
@@ -97,9 +68,8 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
         default: return SectionIndexType.noRatingIndexSymbol
         }
     }
-    
-    
-    private func sortByDurationSong(forSectionName sectionName: String) -> String? {
+
+    public static func sortByDurationSong(forSectionName sectionName: String) -> String {
         if let durationInSec = Int(sectionName) {
             if durationInSec == 0 {
                 return SectionIndexType.noDurationSymbol
@@ -121,7 +91,7 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
         }
     }
     
-    private func sortByDurationAlbum(forSectionName sectionName: String) -> String? {
+    public static func sortByDurationAlbum(forSectionName sectionName: String) -> String {
         if let durationInSec = Int(sectionName) {
             if durationInSec == 0 {
                 return SectionIndexType.noDurationSymbol
@@ -149,7 +119,7 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
         }
     }
     
-    private func sortByDurationArtist(forSectionName sectionName: String) -> String? {
+    public static func sortByDurationArtist(forSectionName sectionName: String) -> String {
         if let durationInSec = Int(sectionName) {
             if durationInSec == 0 {
                 return SectionIndexType.noDurationSymbol
@@ -171,11 +141,42 @@ public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchReque
         }
     }
     
-    private func sortByYear(forSectionName sectionName: String) -> String? {
+    public static func sortByYear(forSectionName sectionName: String) -> String {
         if let year = Int(sectionName), year > 0 {
             return "\(year)"
         } else {
             return SectionIndexType.noYearSymbol
+        }
+    }
+}
+
+public class CustomSectionIndexFetchedResultsController<ResultType: NSFetchRequestResult>: NSFetchedResultsController<NSFetchRequestResult> {
+ 
+    public var sectionIndexType: SectionIndexType
+    
+    public init(fetchRequest: NSFetchRequest<ResultType>, coreDataCompanion: CoreDataCompanion, sectionNameKeyPath: String?, cacheName name: String?, sectionIndexType: SectionIndexType = .defaultValue) {
+        self.sectionIndexType = sectionIndexType
+        super.init(fetchRequest: fetchRequest as! NSFetchRequest<NSFetchRequestResult>, managedObjectContext: coreDataCompanion.context, sectionNameKeyPath: sectionNameKeyPath, cacheName: name)
+    }
+    
+    override public func sectionIndexTitle(forSectionName sectionName: String) -> String? {
+        switch sectionIndexType {
+        case .alphabet:
+            return sectionName
+        case .rating:
+            return IndexHeaderNameGenerator.sortByRating(forSectionName: sectionName)
+        case .newestOrRecent:
+            return nil
+        case .durationSong:
+            return IndexHeaderNameGenerator.sortByDurationSong(forSectionName: sectionName)
+        case .durationAlbum:
+            return IndexHeaderNameGenerator.sortByDurationAlbum(forSectionName: sectionName)
+        case .durationArtist:
+            return IndexHeaderNameGenerator.sortByDurationArtist(forSectionName: sectionName)
+        case .none:
+            return nil
+        case .year:
+            return IndexHeaderNameGenerator.sortByYear(forSectionName: sectionName)
         }
     }
     
