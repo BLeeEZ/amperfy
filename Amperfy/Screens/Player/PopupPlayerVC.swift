@@ -59,7 +59,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         self.tableView.dragDelegate = self
         self.tableView.dropDelegate = self
         self.tableView.dragInteractionEnabled = true
-        UIView.appearance().tintColor = .label
         
         player = appDelegate.player
         player.addNotifier(notifier: self)
