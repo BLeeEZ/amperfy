@@ -54,7 +54,7 @@ class BarPlayerHandler {
         
         let appearance = LNPopupBarAppearance()
         appearance.subtitleTextAttributes = AttributeContainer()
-                        .foregroundColor(UIColor.defaultBlue)
+            .foregroundColor(.label)
         vc.popupBar.standardAppearance = appearance
         vc.popupBar.standardAppearance.marqueeScrollEnabled = true
         vc.popupContentView.popupCloseButtonStyle = .chevron
