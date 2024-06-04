@@ -20,14 +20,58 @@
 //
 
 import SwiftUI
+import AmperfyKit
 
 struct DisplaySettingsView: View {
     
     @EnvironmentObject private var settings: Settings
     
+    @State var isShowRestartAppThemeChange = false
+
+    
+    func setAppThemePreference(preference: AppThemePreference) {
+        settings.appThemePreference = preference
+        isShowRestartAppThemeChange = true
+    }
+    
     var body: some View {
         ZStack{
             List {
+                Section(content: {
+                    HStack {
+                        Text("App color")
+                        Spacer()
+                        Menu(settings.appThemePreference.description) {
+                            Button(AppThemePreference.blue.description) {
+                                setAppThemePreference(preference: AppThemePreference.blue)
+                            }
+                            Button(AppThemePreference.green.description) {
+                                setAppThemePreference(preference: AppThemePreference.green)
+                            }
+                            Button(AppThemePreference.red.description) {
+                                setAppThemePreference(preference: AppThemePreference.red)
+                            }
+                            Button(AppThemePreference.yellow.description) {
+                                setAppThemePreference(preference: AppThemePreference.yellow)
+                            }
+                            Button(AppThemePreference.pink.description) {
+                                setAppThemePreference(preference: AppThemePreference.pink)
+                            }
+                            Button(AppThemePreference.purple.description) {
+                                setAppThemePreference(preference: AppThemePreference.purple)
+                            }
+                        }.alert(isPresented: $isShowRestartAppThemeChange) {
+                            Alert(title: Text("Apply Theme"), message: Text("In order to change the theme you should restart the app now"),
+                            primaryButton: .destructive(Text("Restart")) {
+                                self.appDelegate.restartByUser()
+                            },secondaryButton: .cancel())
+                        }
+                    }
+ 
+                }
+                , footer: {
+                    Text("Sets the app accent color")
+                })
                 Section(content: {
                     HStack {
                         Text("Music player skip buttons")

@@ -42,4 +42,5 @@ final class Settings: ObservableObject {
     @Published var isShowMusicPlayerSkipButtons = false
     @Published var swipeActionSettings = SwipeActionSettings(leading: [], trailing: [])
     @Published var cacheSizeLimit : Int = 0 // limit in byte
+    @Published var appThemePreference : AppThemePreference = .defaultValue
 }

@@ -136,6 +136,12 @@ class SettingsHostVC: UIViewController {
         changesAgent.append(settings.$cacheSizeLimit.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.cacheLimit = newValue
         }))
+        
+        settings.appThemePreference = self.appDelegate.storage.settings.appThemePreference
+        changesAgent.append(settings.$appThemePreference.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.appThemePreference = newValue
+        }))
+        
     }
     
     @IBSegueAction func segueToSwiftUI(_ coder: NSCoder) -> UIViewController? {

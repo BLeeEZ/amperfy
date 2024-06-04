@@ -186,6 +186,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             exit(0)
         }
     }
+    
+    func setAppTheme(preference: AppThemePreference) {
+        os_log("Setting theme to: %s", log: self.log, type: .info, preference.description)
+        switch(preference) {
+        case .blue:
+            UIView.appearance().tintColor = .systemBlue
+        case .green:
+            UIView.appearance().tintColor = .systemGreen
+        case .red:
+            UIView.appearance().tintColor = .systemRed
+        case .yellow:
+            UIView.appearance().tintColor = .systemYellow
+        case .pink:
+            UIView.appearance().tintColor = .systemPink
+        case .purple:
+            UIView.appearance().tintColor = .systemPurple
+        }
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if let options = launchOptions {
@@ -202,6 +220,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         configureNotificationHandling()
         initEventLogger()
         self.window = UIWindow(frame: UIScreen.main.bounds)
+        
+        setAppTheme(preference: AmperKit.shared.storage.settings.appThemePreference)
         
         guard let credentials = storage.loginCredentials else {
             return true

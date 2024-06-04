@@ -125,6 +125,34 @@ public enum StreamingFormatPreference: Int, CaseIterable {
     }
 }
 
+public enum AppThemePreference: Int, CaseIterable {
+    case blue = 0
+    case green = 1
+    case red = 2
+    case yellow = 3
+    case pink = 4
+    case purple = 5
+    
+    public static let defaultValue: AppThemePreference = .blue
+    
+    public var description: String {
+        switch self {
+        case .blue:
+            return "Blue"
+        case .green:
+            return "Green"
+        case .red:
+            return "Red"
+        case .yellow:
+            return "Yellow"
+        case .pink:
+            return "Pink"
+        case .purple:
+            return "Purple"
+        }
+    }
+}
+
 public enum CacheTranscodingFormatPreference: Int, CaseIterable {
     case raw = 0
     case mp3 = 1
@@ -261,6 +289,8 @@ public class PersistentStorage {
         case LibrarySyncVersion = "librarySyncVersion"
         
         case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
+        
+        case AppThemePreference = "appThemePreference"
     }
     
     private var coreDataManager: CoreDataManagable
@@ -292,6 +322,15 @@ public class PersistentStorage {
                 return ScreenLockPreventionPreference(rawValue: screenLockPreventionPreferenceRaw) ?? ScreenLockPreventionPreference.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ScreenLockPreventionPreference.rawValue) }
+        }
+        
+        public var appThemePreference: AppThemePreference {
+            get {
+                let appThemePreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.AppThemePreference.rawValue) as? Int ??
+                    AppThemePreference.defaultValue.rawValue
+                return AppThemePreference(rawValue: appThemePreferenceRaw) ?? AppThemePreference.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.AppThemePreference.rawValue) }
         }
         
         public var streamingMaxBitrateWifiPreference: StreamingMaxBitratePreference {
