@@ -57,12 +57,22 @@ class RemoteCommandCenterHandler {
         
         remoteCommandCenter.previousTrackCommand.isEnabled = true
         remoteCommandCenter.previousTrackCommand.addTarget(handler: { (event) in
-            self.musicPlayer.playPreviousOrReplay()
+            switch self.musicPlayer.playerMode {
+            case .music:
+                self.musicPlayer.playPreviousOrReplay()
+            case .podcast:
+                self.musicPlayer.skipBackward(interval: self.musicPlayer.skipBackwardPodcastInterval)
+            }
             return .success})
 
         remoteCommandCenter.nextTrackCommand.isEnabled = true
         remoteCommandCenter.nextTrackCommand.addTarget(handler: { (event) in
-            self.musicPlayer.playNext()
+            switch self.musicPlayer.playerMode {
+            case .music:
+                self.musicPlayer.playNext()
+            case .podcast:
+                self.musicPlayer.skipForward(interval: self.musicPlayer.skipForwardPodcastInterval)
+            }
             return .success})
         
         remoteCommandCenter.changeRepeatModeCommand.isEnabled = true
