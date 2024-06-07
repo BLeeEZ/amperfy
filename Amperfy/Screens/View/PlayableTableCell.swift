@@ -213,8 +213,7 @@ class PlayableTableCell: BasicTableCell {
             playable.isCached || appDelegate.storage.settings.isOnlineMode {
              animateActivation()
              hideSearchBarKeyboardInRootView()
-             let generator = UINotificationFeedbackGenerator()
-             generator.notificationOccurred(.success)
+             Haptics.success.vibrate()
              appDelegate.player.play(context: context)
          }
     }

@@ -76,6 +76,15 @@ struct SettingsView: View {
                 
                 Section(content: {
                     HStack {
+                        Text("Haptic Feedback")
+                        Spacer()
+                        Toggle(isOn: $settings.isHapticsEnabled) {}
+                    }
+ 
+                })
+                
+                Section(content: {
+                    HStack {
                         Text("Prevent Screen Lock")
                         Spacer()
                         Menu(settings.screenLockPreventionPreference.description) {

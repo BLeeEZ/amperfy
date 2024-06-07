@@ -83,14 +83,12 @@ class LibraryElementDetailTableHeaderView: UIView {
     }
     
     @IBAction func playAllButtonPressed(_ sender: Any) {
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
+        Haptics.success.vibrate()
         play(isShuffled: false)
     }
     
     @IBAction func addAllShuffledButtonPressed(_ sender: Any) {
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
+        Haptics.success.vibrate()
         shuffle()
     }
     
