@@ -45,7 +45,7 @@ public class LibraryUpdater {
     }
     
     /// This function will block the execution before the scene handler
-    /// Perform here only small/fast opersation
+    /// Perform here only small/fast operations
     /// Use UpdateVC for longer operations to display progress to user
     public func performSmallBlockingLibraryUpdatesIfNeeded() {
         if storage.librarySyncVersion < .v9 {
@@ -85,17 +85,14 @@ public class LibraryUpdater {
         isRunning = false
     }
     
-    /// Opersation can be cancled. Opersation must be able to be restarted
     public func performLibraryUpdateWithStatus(notifier: LibraryUpdaterCallbacks) -> Promise<Void> {
         isRunning = true
         return storage.async.perform { asyncCompanion in
             if self.storage.librarySyncVersion < .v17 {
+                self.storage.librarySyncVersion = .v17 // if App crashes don't do this step again -> This step is only for convenience
                 os_log("Perform blocking library update (START): Extract Binary Data", log: self.log, type: .info)
                 try self.extractBinaryDataToFileManager(notifier: notifier, asyncCompanion: asyncCompanion)
                 os_log("Perform blocking library update (DONE): Extract  Binary Data", log: self.log, type: .info)
-                if self.isRunning {
-                    self.storage.librarySyncVersion = .v17
-                }
             }
         }
     }
@@ -246,6 +243,8 @@ public class LibraryUpdater {
                 throw PMKError.cancelled
             }
         }
+        asyncCompanion.library.deleteBinaryPlayableFileSavedInCoreData()
+        asyncCompanion.library.saveContext()
     }
     
     private func moveArtworkToFileManager(artworkRemoteInfo: ArtworkRemoteInfo, asyncCompanion: CoreDataCompanion) {

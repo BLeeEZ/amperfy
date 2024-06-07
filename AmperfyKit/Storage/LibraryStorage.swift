@@ -404,9 +404,14 @@ public class LibraryStorage: PlayableFileCachable {
             deleteCache(ofPlayable: playable)
         }
     }
+    
+    /// binary data is saved in file manager. Old binary data is ensured to be deleted this way.
+    public func deleteBinaryPlayableFileSavedInCoreData() {
+        clearStorage(ofType: PlayableFile.typeName)
+    }
 
     public func deletePlayableCachePaths() {
-        clearStorage(ofType: PlayableFile.typeName)
+        deleteBinaryPlayableFileSavedInCoreData()
         let songs = getCachedSongs()
         songs.forEach{ $0.relFilePath = nil }
         let episodes = getCachedPodcastEpisodes()
