@@ -213,7 +213,7 @@ class PlayableTableCell: BasicTableCell {
             playable.isCached || appDelegate.storage.settings.isOnlineMode {
              animateActivation()
              hideSearchBarKeyboardInRootView()
-             Haptics.success.vibrate()
+             Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
              appDelegate.player.play(context: context)
          }
     }
