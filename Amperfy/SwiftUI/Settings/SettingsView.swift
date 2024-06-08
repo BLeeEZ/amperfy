@@ -88,7 +88,7 @@ struct SettingsView: View {
                 
                 Section() {
                     NavigationLink(destination: DisplaySettingsView()) {
-                        Text("Display")
+                        Text("Display & Interaction")
                     }
                     NavigationLink(destination: ServerSettingsView()) {
                         Text("Server")

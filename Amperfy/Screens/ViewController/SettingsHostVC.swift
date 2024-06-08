@@ -136,6 +136,11 @@ class SettingsHostVC: UIViewController {
         changesAgent.append(settings.$cacheSizeLimit.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.cacheLimit = newValue
         }))
+        
+        settings.isHapticsEnabled = self.appDelegate.storage.settings.isHapticsEnabled
+        changesAgent.append(settings.$isHapticsEnabled.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.isHapticsEnabled = newValue
+        }))
     }
     
     @IBSegueAction func segueToSwiftUI(_ coder: NSCoder) -> UIViewController? {

@@ -192,8 +192,7 @@ class BasicTableViewController: KeyCommandTableViewController {
 
     func createSwipeAction(for actionType: SwipeActionType, buttonColor: UIColor, indexPath: IndexPath, preCbContainable: PlayableContainable, actionCallback: @escaping SwipeActionCallback) -> UIContextualAction {
         let action = UIContextualAction(style: .normal, title: actionType.displayName) { (action, view, completionHandler) in
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
+            Haptics.success.vibrate(isHapticsEnabled: self.appDelegate.storage.settings.isHapticsEnabled)
             actionCallback(indexPath) { actionContext in
                 guard let actionContext = actionContext else { return }
                 switch actionType {

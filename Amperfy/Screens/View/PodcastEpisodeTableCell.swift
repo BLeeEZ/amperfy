@@ -121,8 +121,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
     }
     
     @IBAction func showDescriptionButtonPressed(_ sender: Any) {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
+        Haptics.light.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
         guard let episode = self.episode, let rootView = rootView else { return }
         let showDescriptionVC = PodcastDescriptionVC()
         showDescriptionVC.display(podcastEpisode: episode, on: rootView)

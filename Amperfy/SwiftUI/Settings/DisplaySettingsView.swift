@@ -30,6 +30,17 @@ struct DisplaySettingsView: View {
             List {
                 Section(content: {
                     HStack {
+                        Text("Haptic Feedback")
+                        Spacer()
+                        Toggle(isOn: $settings.isHapticsEnabled) {}
+                    }
+                }
+                , footer: {
+                    Text("Certain interactions provide haptic feedback. Long pressing to display the details menu will always trigger haptic feedback.")
+                })
+                
+                Section(content: {
+                    HStack {
                         Text("Music player skip buttons")
                         Spacer()
                         Toggle(isOn: $settings.isShowMusicPlayerSkipButtons) {}

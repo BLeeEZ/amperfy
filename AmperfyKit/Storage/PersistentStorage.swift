@@ -259,6 +259,7 @@ public class PersistentStorage {
         case IsScrobbleStreamedItems = "isScrobbleStreamedItems"
         case IsPlaybackStartOnlyOnPlay = "isPlaybackStartOnlyOnPlay"
         case LibrarySyncVersion = "librarySyncVersion"
+        case IsHapticsEnabled = "isHapticsEnabled"
         
         case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
     }
@@ -470,6 +471,11 @@ public class PersistentStorage {
         
         public var isOnlineMode: Bool {
             return !isOfflineMode
+        }
+        
+        public var isHapticsEnabled: Bool {
+            get { return UserDefaults.standard.object(forKey: UserDefaultsKey.IsHapticsEnabled.rawValue) as? Bool ?? true }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsHapticsEnabled.rawValue) }
         }
     }
     
