@@ -78,16 +78,8 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
                     downloadTask: URLSessionDownloadTask,
                     didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
                     totalBytesExpectedToWrite: Int64) {
-        guard let requestUrl = downloadTask.originalRequest?.url?.absoluteString else { return }
-        
-        self.storage.async.perform { asyncCompanion in
-            guard let download = asyncCompanion.library.getDownload(url: requestUrl) else { return }
-            let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
-            guard progress > download.progress, (download.progress == 0.0) || (progress > download.progress + 0.1) else { return }
-            download.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
-            download.totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
-            asyncCompanion.saveContext()
-        }.catch { error in }
+        // ignore progress: don't save progress in CoreData -> huge CPU load
+        return
     }
     
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {

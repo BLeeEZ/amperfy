@@ -32,7 +32,7 @@ class PlayableTableCell: BasicTableCell {
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var entityImage: EntityImageView!
     @IBOutlet weak var trackNumberLabel: UILabel!
-    @IBOutlet weak var downloadProgress: UIProgressView!
+    @IBOutlet weak var downloadProgress: UIProgressView! // depricated: replaced with a spinner in the accessoryView
     @IBOutlet weak private var cacheIconImage: UIImageView!
     @IBOutlet weak private var favoriteIconImage: UIImageView!
     
@@ -77,6 +77,7 @@ class PlayableTableCell: BasicTableCell {
     }
 
     func refresh() {
+        downloadProgress.isHidden = true
         guard let playable = playable else { return }
         titleLabel.text = playable.title
         artistLabel.text = playable.creatorName
@@ -125,19 +126,17 @@ class PlayableTableCell: BasicTableCell {
             let img = UIImageView(image: .check)
             img.tintColor = .labelColor
             accessoryView = img
+        } else if download?.isDownloading ?? false {
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.startAnimating()
+            spinner.tintColor = .labelColor
+            accessoryView = spinner
         } else {
             accessoryView = nil
         }
         
         refreshSubtitleColor()
         refreshCacheAndDuration()
-        
-        if let download = download, download.isDownloading {
-            downloadProgress.isHidden = false
-            downloadProgress.progress = download.progress
-        } else {
-            downloadProgress.isHidden = true
-        }
     }
     
     private func configureTrackNumberLabel() {
