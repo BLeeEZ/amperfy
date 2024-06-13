@@ -54,7 +54,7 @@ class PlayableTableCell: BasicTableCell {
     private var playable: AbstractPlayable?
     private var download: Download?
     private var rootView: UIViewController?
-    private var playIndicator: PlayIndicator!
+    private var playIndicator: PlayIndicator?
     private var isDislayAlbumTrackNumberStyle: Bool = false
 
     override func awakeFromNib() {
@@ -84,28 +84,28 @@ class PlayableTableCell: BasicTableCell {
         
         if self.isDislayAlbumTrackNumberStyle {
             configureTrackNumberLabel()
-            playIndicator.willDisplayIndicatorCB = { [weak self] () in
+            playIndicator?.willDisplayIndicatorCB = { [weak self] () in
                 guard let self = self else { return }
                 self.trackNumberLabel.text = ""
             }
-            playIndicator.willHideIndicatorCB = { [weak self] () in
+            playIndicator?.willHideIndicatorCB = { [weak self] () in
                 guard let self = self else { return }
                 self.configureTrackNumberLabel()
             }
             
-            playIndicator.display(playable: playable, rootView: self.trackNumberLabel)
+            playIndicator?.display(playable: playable, rootView: self.trackNumberLabel)
             trackNumberLabel.isHidden = false
             entityImage.isHidden = true
             trackNumberTrailingTitleConstaint.priority = .defaultHigh
             artworkTrailingTitleConstaint.priority = .defaultLow
         } else {
-            playIndicator.willDisplayIndicatorCB = nil
-            playIndicator.willHideIndicatorCB = nil
+            playIndicator?.willDisplayIndicatorCB = nil
+            playIndicator?.willHideIndicatorCB = nil
             if self.playerIndexCb == nil {
-                playIndicator.display(playable: playable, rootView: self.entityImage, isOnImage: true)
+                playIndicator?.display(playable: playable, rootView: self.entityImage, isOnImage: true)
             } else {
                 // don't show play indicator on PopupPlayer
-                playIndicator.reset()
+                playIndicator?.reset()
             }
             trackNumberLabel.isHidden = true
             entityImage.isHidden = false
@@ -197,7 +197,7 @@ class PlayableTableCell: BasicTableCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        playIndicator.reset()
+        playIndicator?.reset()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -225,7 +225,7 @@ class PlayableTableCell: BasicTableCell {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        playIndicator.applyStyle()
+        playIndicator?.applyStyle()
     }
 
 }

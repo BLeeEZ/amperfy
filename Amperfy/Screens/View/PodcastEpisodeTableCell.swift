@@ -38,9 +38,9 @@ class PodcastEpisodeTableCell: BasicTableCell {
     
     static let rowHeight: CGFloat = 143.0 + margin.bottom + margin.top
     
-    private var episode: PodcastEpisode!
+    private var episode: PodcastEpisode?
     private var rootView: UIViewController?
-    private var playIndicator: PlayIndicator!
+    private var playIndicator: PlayIndicator?
     
     func display(episode: PodcastEpisode, rootView: UIViewController) {
         if playIndicator == nil {
@@ -56,12 +56,12 @@ class PodcastEpisodeTableCell: BasicTableCell {
     func refresh() {
         guard let episode = self.episode else { return }
         configurePlayEpisodeButton()
-        playIndicator.display(playable: episode, rootView: playEpisodeButton)
-        playIndicator.willDisplayIndicatorCB = { [weak self] () in
+        playIndicator?.display(playable: episode, rootView: playEpisodeButton)
+        playIndicator?.willDisplayIndicatorCB = { [weak self] () in
             guard let self = self else { return }
             self.configurePlayEpisodeButton()
         }
-        playIndicator.willHideIndicatorCB = { [weak self] () in
+        playIndicator?.willHideIndicatorCB = { [weak self] () in
             guard let self = self else { return }
             self.configurePlayEpisodeButton()
         }
@@ -97,7 +97,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        playIndicator.reset()
+        playIndicator?.reset()
     }
 
     private func configurePlayEpisodeButton() {
