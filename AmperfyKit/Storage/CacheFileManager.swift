@@ -295,7 +295,11 @@ public class CacheFileManager {
     
     public func createRelPath(for playable: AbstractPlayable) -> URL? {
         guard !playable.playableManagedObject.id.isEmpty else { return nil }
-        let transcodingType = CacheTranscodingFormatPreference.createFromMIMETypeString(playable.contentTypeTranscoded)
+        var transcodingType = CacheTranscodingFormatPreference.createFromMIMETypeString(playable.contentTypeTranscoded)
+        // check if the original format is mp3
+        if transcodingType == .raw {
+            transcodingType = CacheTranscodingFormatPreference.createFromMIMETypeString(playable.contentType)
+        }
         if playable.isSong {
             return Self.songsDir.appendingPathComponent(playable.playableManagedObject.id).appendingPathExtension(transcodingType.asFileFormatString)
         } else {
