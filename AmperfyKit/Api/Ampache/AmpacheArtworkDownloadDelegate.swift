@@ -26,6 +26,9 @@ import PromiseKit
 
 class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     
+    /// max file size of an error response from an API
+    private static let maxFileSizeOfErrorResponse = 2_000
+
     private let ampacheXmlServerApi: AmpacheXmlServerApi
     private let networkMonitor: NetworkMonitorFacade
     private var defaultImageData: Data?
@@ -57,23 +60,26 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     }
     
     func validateDownloadedData(download: Download) -> ResponseError? {
-        guard let data = download.resumeData else {
-            return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: ampacheXmlServerApi), data: download.resumeData)
+        guard let fileURL = download.fileURL else {
+            return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: ampacheXmlServerApi), data: nil)
         }
+        guard let data = fileManager.getFileDataIfNotToBig(url: fileURL, maxFileSize: Self.maxFileSizeOfErrorResponse) else { return nil }
         return ampacheXmlServerApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url, meta: nil))
     }
 
     func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
         return Guarantee<Void> { seal in
-            guard let data = download.resumeData,
-                  download.fileURL != nil,
+            guard let fileURL = download.fileURL,
                   let artwork = download.element as? Artwork else {
                 return seal(Void())
             }
             firstly {
                 self.requestDefaultImageData()
             }.done { defaultImageData in
-                if data == defaultImageData {
+                if let artworkFileSize = self.fileManager.getFileSize(url: fileURL),
+                   artworkFileSize == defaultImageData.sizeInByte,
+                   let artworkData = self.fileManager.getFileDataIfNotToBig(url: fileURL),
+                   artworkData == defaultImageData {
                     artwork.status = .IsDefaultImage
                     artwork.relFilePath = nil
                 } else {

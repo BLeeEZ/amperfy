@@ -24,7 +24,9 @@ import CoreData
 import PromiseKit
 
 class PlayableDownloadDelegate: DownloadManagerDelegate {
-
+    /// max file size of an error response from an API
+    private static let maxFileSizeOfErrorResponse = 2_000
+   
     private let backendApi: BackendApi
     private let artworkExtractor: EmbeddedArtworkExtractor
     private let networkMonitor: NetworkMonitorFacade
@@ -56,49 +58,49 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     }
     
     func validateDownloadedData(download: Download) -> ResponseError? {
-        guard let data = download.resumeData else {
-            return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: backendApi), data: download.resumeData)
+        guard let fileURL = download.fileURL else {
+            return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: backendApi), data: nil)
         }
+        guard let data = fileManager.getFileDataIfNotToBig(url: fileURL, maxFileSize: Self.maxFileSizeOfErrorResponse) else { return nil }
         return backendApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url, meta: nil))
     }
 
     func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
         return Guarantee<Void> { seal in
-            guard let data = download.resumeData,
-                  let fileURL = download.fileURL,
+            guard let fileURL = download.fileURL,
                   let playable = download.element as? AbstractPlayable,
                   let url = download.url else {
                 return seal(Void())
             }
-            let library = LibraryStorage(context: storage.main.context)
-            savePlayableDataAsync(playable: playable, downloadUrl: url, fileURL: fileURL, storage: storage)
-            artworkExtractor.extractEmbeddedArtwork(library: library, playable: playable, fileData: data)
-            library.saveContext()
-            seal(Void())
+            firstly {
+                self.savePlayableDataAsync(playable: playable, downloadUrl: url, fileURL: fileURL, storage: storage)
+            }.then {
+                self.artworkExtractor.extractEmbeddedArtwork(storage: storage, playable: playable)
+            }.catch { error in
+                // no error possible
+            }.finally {
+                seal(Void())
+            }
         }
     }
     
     /// save downloaded playable async to avoid memory overflow issues due to kept references
-    func savePlayableDataAsync(playable: AbstractPlayable, downloadUrl: URL, fileURL: URL, storage: PersistentStorage) {
-        firstly {
-            storage.async.perform { companion in
-                guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else { return }
-                let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
-                let transcodingInfo = self.backendApi.determTranscodingInfo(url: downloadUrl)
-                playableAsync.contentTypeTranscoded = transcodingInfo.format?.asMIMETypeString
-                // transcoding info needs to available to generate a correct file extension
-                guard let relFilePath = self.fileManager.createRelPath(for: playableAsync),
-                      let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
-                else { return }
-                do {
-                    try self.fileManager.moveExcludedFromBackupItem(at: fileURL, to: absFilePath)
-                    playableAsync.relFilePath = relFilePath
-                } catch {
-                    playableAsync.relFilePath = nil
-                }
+    func savePlayableDataAsync(playable: AbstractPlayable, downloadUrl: URL, fileURL: URL, storage: PersistentStorage) -> Promise<Void> {
+        return storage.async.perform { companion in
+            guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else { return }
+            let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
+            let transcodingInfo = self.backendApi.determTranscodingInfo(url: downloadUrl)
+            playableAsync.contentTypeTranscoded = transcodingInfo.format?.asMIMETypeString
+            // transcoding info needs to available to generate a correct file extension
+            guard let relFilePath = self.fileManager.createRelPath(for: playableAsync),
+                  let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
+            else { return }
+            do {
+                try self.fileManager.moveExcludedFromBackupItem(at: fileURL, to: absFilePath)
+                playableAsync.relFilePath = relFilePath
+            } catch {
+                playableAsync.relFilePath = nil
             }
-        }.catch { error in
-            // no error possible
         }
     }
     

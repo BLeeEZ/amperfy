@@ -378,17 +378,30 @@ public class CacheFileManager {
             if isDirectoryResourceValue.isDirectory == true {
                 size += directorySize(url: url)
             } else {
-                let fileSizeResourceValue: URLResourceValues
-                do {
-                    fileSizeResourceValue = try url.resourceValues(forKeys: [.fileSizeKey])
-                } catch {
-                    continue
+                if let fileSize = getFileSize(url: url) {
+                    size += fileSize
                 }
-            
-                size += Int64(fileSizeResourceValue.fileSize ?? 0)
             }
         }
         return size
+    }
+    
+    public func getFileSize(url: URL) -> Int64? {
+        guard let fileSizeResourceValue = try? url.resourceValues(forKeys: [.fileSizeKey]),
+              let intSize = fileSizeResourceValue.fileSize
+        else { return nil }
+        return Int64(intSize)
+    }
+    
+    /// maximum file size that is allowed to load directly into memory to avoid memory overflow
+    public static let maxFileSizeToHandleDataInMemory = 50_000_000
+    
+    public func getFileDataIfNotToBig(url: URL?, maxFileSize: Int = maxFileSizeToHandleDataInMemory) -> Data? {
+        guard let fileURL = url,
+              let fileSize = getFileSize(url: fileURL),
+              fileSize < maxFileSize
+        else { return nil }
+        return try? Data(contentsOf: fileURL)
     }
     
 }
