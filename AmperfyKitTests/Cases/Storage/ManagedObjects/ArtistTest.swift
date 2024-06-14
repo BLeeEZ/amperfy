@@ -48,7 +48,7 @@ class ArtistTest: XCTestCase {
         XCTAssertFalse(artist.playables.hasCachedItems)
         XCTAssertEqual(artist.albums.count, 0)
         XCTAssertNil(artist.artwork)
-        XCTAssertEqual(artist.image(setting: .serverArtworkOnly), UIImage.artistArtwork)
+        XCTAssertEqual(artist.image(themeColor: .blue, setting: .serverArtworkOnly), UIImage.getGeneratedArtwork(themeColor: .blue, artworkType: .artist))
     }
     
     func testName() {
@@ -84,19 +84,19 @@ class ArtistTest: XCTestCase {
     }
     
     func testArtworkAndImage() {
-        let testData = UIImage.artistArtwork.pngData()!
-        let testImg = UIImage.artistArtwork
+        let testData = UIImage.getGeneratedArtwork(themeColor: .blue, artworkType: .artist).pngData()!
+        let testImg = UIImage.getGeneratedArtwork(themeColor: .blue, artworkType: .artist)
         let relFilePath = URL(string: "testArtwork")!
         let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
         try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
         testArtist.artwork = library.createArtwork()
         testArtist.artwork?.relFilePath = relFilePath
         XCTAssertNil(testArtist.artwork?.image)
-        XCTAssertEqual(testArtist.image(setting: .serverArtworkOnly), testImg)
+        XCTAssertEqual(testArtist.image(themeColor: .blue, setting: .serverArtworkOnly), testImg)
         library.saveContext()
         guard let artistFetched = library.getArtist(id: testId) else { XCTFail(); return }
         XCTAssertNil(artistFetched.artwork?.image)
-        XCTAssertEqual(artistFetched.image(setting: .serverArtworkOnly), testImg)
+        XCTAssertEqual(artistFetched.image(themeColor: .blue, setting: .serverArtworkOnly), testImg)
         try! CacheFileManager.shared.removeItem(at: absFilePath)
     }
 

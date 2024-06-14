@@ -45,10 +45,6 @@ class ArtworkTest: XCTestCase {
         XCTAssertEqual(artwork.owners.count, 0)
     }
     
-    func testDefaultImage() {
-        XCTAssertEqual(UIImage.songArtwork, UIImage.songArtwork)
-    }
-    
     func testStatus() {
         testArtwork.status = ImageStatus.FetchError
         XCTAssertEqual(testArtwork.status, ImageStatus.FetchError)
