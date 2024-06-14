@@ -157,8 +157,9 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
         switch PlayerSectionCategory(rawValue: indexPath.section) {
         case .contextPrev, .userQueue, .contextNext:
             let cell: PlayableTableCell = self.tableView.dequeueCell(for: tableView, at: indexPath)
-            guard let playerIndex = PlayerIndex.create(from: indexPath) else { return cell }
-            let playable = player.getPlayable(at: playerIndex)
+            guard let playerIndex = PlayerIndex.create(from: indexPath),
+                  let playable = player.getPlayable(at: playerIndex)
+            else { return cell }
             cell.backgroundColor = UIColor.clear
             cell.display(
                 playable: playable,
@@ -265,8 +266,9 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let playerIndex = PlayerIndex.create(from: indexPath) else { return nil }
-        let containable = self.player.getPlayable(at: playerIndex)
+        guard let playerIndex = PlayerIndex.create(from: indexPath),
+              let containable = self.player.getPlayable(at: playerIndex)
+        else { return nil }
         let identifier = NSString(string: TableViewPreviewInfo(playableContainerIdentifier: containable.containerIdentifier, indexPath: indexPath).asJSONString())
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
             let vc = EntityPreviewVC()

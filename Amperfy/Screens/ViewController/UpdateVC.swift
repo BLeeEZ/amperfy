@@ -48,20 +48,18 @@ class UpdateVC: UIViewController {
         
         firstly {
             self.appDelegate.libraryUpdater.performLibraryUpdateWithStatus(notifier: self)
-        }.then() {
-            return Guarantee<Void> { seal in
-                self.progressInfo.text = "Done"
-                self.activitySpinner.stopAnimating()
-                self.activitySpinner.isHidden = true
-                self.progressLabel.isHidden = true
-                
-                self.appDelegate.isKeepScreenAlive = false
-                self.appDelegate.eventLogger.supressAlerts = false
-                self.performSegue(withIdentifier: "toLibrary", sender: self)
-                seal(Void())
-            }
         }.catch { error in
-            // do nothing
+            // cancle and do nothing
+        }.finally {
+            self.progressInfo.text = "Done"
+            self.activitySpinner.stopAnimating()
+            self.activitySpinner.isHidden = true
+            self.progressLabel.isHidden = true
+            
+            self.appDelegate.isKeepScreenAlive = false
+            self.appDelegate.eventLogger.supressAlerts = false
+            self.appDelegate.startManagerForNormalOperation()
+            self.performSegue(withIdentifier: "toLibrary", sender: self)
         }
     }
     

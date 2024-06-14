@@ -404,9 +404,14 @@ public class LibraryStorage: PlayableFileCachable {
             deleteCache(ofPlayable: playable)
         }
     }
+    
+    /// binary data is saved in file manager. Old binary data is ensured to be deleted this way.
+    public func deleteBinaryPlayableFileSavedInCoreData() {
+        clearStorage(ofType: PlayableFile.typeName)
+    }
 
     public func deletePlayableCachePaths() {
-        clearStorage(ofType: PlayableFile.typeName)
+        deleteBinaryPlayableFileSavedInCoreData()
         let songs = getCachedSongs()
         songs.forEach{ $0.relFilePath = nil }
         let episodes = getCachedPodcastEpisodes()
@@ -835,6 +840,15 @@ public class LibraryStorage: PlayableFileCachable {
         return podcastEpisodes ?? [PodcastEpisode]()
     }
     
+    /// depricated: file data is now in file manager
+    public func getCachedPodcastEpisodesThatHaveFileDataInCoreData() -> [PodcastEpisode] {
+        let fetchRequest = PodcastEpisodeMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSPredicate(format: "%K != nil", #keyPath(PodcastEpisodeMO.file))
+        let foundPodcastEpisodes = try? context.fetch(fetchRequest)
+        let podcastEpisodes = foundPodcastEpisodes?.compactMap{ PodcastEpisode(managedObject: $0) }
+        return podcastEpisodes ?? [PodcastEpisode]()
+    }
+    
     public func getSongs() -> [Song] {
         let fetchRequest = SongMO.identifierSortedFetchRequest
         let foundSongs = try? context.fetch(fetchRequest)
@@ -975,6 +989,15 @@ public class LibraryStorage: PlayableFileCachable {
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
             getFetchPredicate(onlyCachedSongs: true)
         ])
+        let foundSongs = try? context.fetch(fetchRequest)
+        let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
+        return songs ?? [Song]()
+    }
+    
+    /// depricated: file data is now in file manager
+    public func getCachedSongsThatHaveFileDataInCoreData() -> [Song] {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
         let foundSongs = try? context.fetch(fetchRequest)
         let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
         return songs ?? [Song]()
@@ -1189,6 +1212,58 @@ public class LibraryStorage: PlayableFileCachable {
         }
         return absFileURL
     }
+    
+    /// depricated: file data is now in file manager
+    public func getFile(forPlayable playable: AbstractPlayable) -> PlayableFile? {
+        let fetchRequest: NSFetchRequest<PlayableFileMO> = PlayableFileMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PlayableFileMO.info.id), NSString(string: playable.id))
+        fetchRequest.fetchLimit = 1
+        let playableFiles = try? context.fetch(fetchRequest)
+        return playableFiles?.lazy.compactMap{ PlayableFile(managedObject: $0) }.first
+    }
+    
+    /// depricated: file data is now in file manager
+    public func getArtworkData(forArtworkRemoteInfo: ArtworkRemoteInfo) -> Data? {
+        var data: Data?
+        autoreleasepool {
+            let duplicateArtwork = getArtwork(remoteInfo: forArtworkRemoteInfo)
+            data = duplicateArtwork?.managedObject.imageData
+        }
+        return data
+    }
+    
+    /// depricated: file data is now in file manager
+    public func getEmbeddedArtworkData(forOwner playable: AbstractPlayable) -> Data? {
+        var data: Data?
+        autoreleasepool {
+            let fetchRequest: NSFetchRequest<EmbeddedArtworkMO> = EmbeddedArtworkMO.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(EmbeddedArtworkMO.owner.id), NSString(string: playable.id))
+            fetchRequest.fetchLimit = 1
+            let embeddedArtworks = try? self.context.fetch(fetchRequest)
+            data = embeddedArtworks?.lazy.compactMap{ $0.imageData }.first
+        }
+        return data
+    }
+    
+    public func getEmbeddedArtwork(forOwner playable: AbstractPlayable) -> EmbeddedArtwork? {
+        let fetchRequest: NSFetchRequest<EmbeddedArtworkMO> = EmbeddedArtworkMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(EmbeddedArtworkMO.owner.id), NSString(string: playable.id))
+        fetchRequest.fetchLimit = 1
+        let embeddedArtworks = try? self.context.fetch(fetchRequest)
+        return embeddedArtworks?.lazy.compactMap{ EmbeddedArtwork(managedObject: $0) }.first
+    }
+    
+    /// depricated: file data is now in file manager
+    public func getFileSizeOfPlayableFileInByte(playableFile: PlayableFile) -> Int64 {
+        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: PlayableFile.typeName)
+        guard let ownerId = playableFile.info?.id else { return 0 }
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(PlayableFileMO.info.id), NSString(string: ownerId))
+        fetchRequest.propertiesToFetch = [#keyPath(PlayableFileMO.data)]
+        fetchRequest.resultType = .dictionaryResultType
+        let foundPlayableFiles = (try? context.fetch(fetchRequest)) ?? [NSDictionary]()
+        let file = foundPlayableFiles.lazy.compactMap{ $0[#keyPath(PlayableFileMO.data)] as? NSData }.first
+        return file?.sizeInByte ?? 0
+     }
 
     public func getPlaylist(id: String) -> Playlist? {
         let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
@@ -1210,7 +1285,7 @@ public class LibraryStorage: PlayableFileCachable {
         return Playlist(library: self, managedObject: foundManagedPlaylist)
     }
     
-    /// get all "old" embedded artworks which contain the image in core data
+    /// depricated: get all "old" embedded artworks which contain the image in core data
     func getEmbeddedArtworksContainingBinaryData() -> [EmbeddedArtwork] {
         let fetchRequest: NSFetchRequest<EmbeddedArtworkMO> = EmbeddedArtworkMO.fetchRequest()
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -1228,7 +1303,7 @@ public class LibraryStorage: PlayableFileCachable {
         return artworks ?? [Artwork]()
     }
     
-    /// get all "old" artworks which contain the image in core data
+    /// depricated: get all "old" artworks which contain the image in core data
     func getArtworksContainingBinaryData() -> [Artwork] {
         let fetchRequest: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [

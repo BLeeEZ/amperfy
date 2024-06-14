@@ -216,14 +216,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         os_log("Amperfy Cache Location: %s", log: self.log, type: .info, CacheFileManager.shared.getAmperfyPath() ?? "-")
         libraryUpdater.performSmallBlockingLibraryUpdatesIfNeeded()
+        // start manager only if no visual indicated updates are needed
+        if !libraryUpdater.isVisualUpadateNeeded {
+            startManagerForNormalOperation()
+        }
+        userStatistics.sessionStarted()
+        return true
+    }
+    
+    func startManagerAfterSync() {
+        os_log("Start background manager after sync", log: self.log, type: .info)
+        intentManager.registerXCallbackURLs()
+        playableDownloadManager.start()
+        artworkDownloadManager.start()
+        backgroundLibrarySyncer.start()
+    }
+    
+    func startManagerForNormalOperation() {
+        os_log("Start background manager for normal operation", log: self.log, type: .info)
         intentManager.registerXCallbackURLs()
         duplicateEntitiesResolver.start()
         artworkDownloadManager.start()
         playableDownloadManager.start()
         backgroundLibrarySyncer.start()
         scrobbleSyncer?.start()
-        userStatistics.sessionStarted()
-        return true
     }
     
     func setAppTheme(color: UIColor) {

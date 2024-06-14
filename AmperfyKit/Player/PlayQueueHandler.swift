@@ -276,14 +276,14 @@ public class PlayQueueHandler  {
         }
     }
     
-    func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable {
+    func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable? {
         switch(playerIndex.queueType) {
         case .prev:
-            return prevQueue[playerIndex.index]
+            return prevQueue.element(at: playerIndex.index)
         case .user:
-            return userQueue[playerIndex.index]
+            return userQueue.element(at: playerIndex.index)
         case .next:
-            return nextQueue[playerIndex.index]
+            return nextQueue.element(at: playerIndex.index)
         }
     }
     

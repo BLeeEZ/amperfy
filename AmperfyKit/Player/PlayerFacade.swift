@@ -106,7 +106,7 @@ public protocol PlayerFacade {
     var nextQueue: [AbstractPlayable] { get }
     
     var isPlaying: Bool { get }
-    func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable
+    func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable?
     var currentlyPlaying: AbstractPlayable?  { get }
     var currentMusicItem: AbstractPlayable? { get }
     var currentPodcastItem: AbstractPlayable? { get }
@@ -196,7 +196,7 @@ class PlayerFacadeImpl: PlayerFacade {
     var isPlaying: Bool {
         return backendAudioPlayer.isPlaying
     }
-    func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable {
+    func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable? {
         return queueHandler.getPlayable(at: playerIndex)
     }
     var currentlyPlaying: AbstractPlayable? {

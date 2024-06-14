@@ -173,7 +173,7 @@ class DownloadManager: NSObject, DownloadManageable {
             if error != .apiErrorResponse {
                 os_log("Fetching %s FAILED: %s", log: self.log, type: .info, download.title, error.description)
                 let shortMessage = "Error \"\(error.description)\" occured while downloading object \"\(download.title)\"."
-                let responseError = ResponseError(message: shortMessage, cleansedURL: download.url?.asCleansedURL(cleanser: urlCleanser), data: download.resumeData)
+                let responseError = ResponseError(message: shortMessage, cleansedURL: download.url?.asCleansedURL(cleanser: urlCleanser), data: nil)
                 eventLogger.report(topic: "Download Error", error: responseError, displayPopup: isFailWithPopupError)
             }
             downloadDelegate.failedDownload(download: download, storage: self.storage)
@@ -182,11 +182,10 @@ class DownloadManager: NSObject, DownloadManageable {
         storage.main.library.saveContext()
     }
     
-    func finishDownload(download: Download, fileURL: URL, data: Data) {
+    func finishDownload(download: Download, fileURL: URL) {
         self.activeTasks.signal()
         self.triggerBackgroundDownload()
         
-        download.resumeData = data
         download.fileURL = fileURL
         if let responseError = downloadDelegate.validateDownloadedData(download: download) {
             os_log("Fetching %s API-ERROR StatusCode: %d, Message: %s", log: log, type: .error, download.title, responseError.statusCode, responseError.message)
@@ -194,12 +193,11 @@ class DownloadManager: NSObject, DownloadManageable {
             finishDownload(download: download, error: .apiErrorResponse)
             return
         }
-        os_log("Fetching %s SUCCESS (%{iec-bytes}d)", log: self.log, type: .info, download.title, data.count)
+        os_log("Fetching %s SUCCESS (%{iec-bytes}d)", log: self.log, type: .info, download.title, fileManager.getFileSize(url: fileURL) ?? 0)
         firstly {
             downloadDelegate.completedDownload(download: download, storage: self.storage)
         }.done {
             download.fileURL = nil
-            download.resumeData = nil
             download.isDownloading = false
             self.storage.main.saveContext()
             if let downloadElement = download.element {

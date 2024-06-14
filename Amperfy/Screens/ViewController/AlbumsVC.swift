@@ -25,6 +25,86 @@ import AmperfyKit
 import PromiseKit
 
 class AlbumsDiffableDataSource: BasicUITableViewDiffableDataSource {
+    
+    var sortType: AlbumElementSortType = .name
+    
+    func getAlbum(at indexPath: IndexPath) -> Album? {
+        guard let objectID = itemIdentifier(for: indexPath) else { return nil }
+        guard let object = try? self.appDelegate.storage.main.context.existingObject(with: objectID),
+              let albumMO = object as? AlbumMO
+        else {
+            return nil
+        }
+        return Album(managedObject: albumMO)
+    }
+    
+    func getFirstAlbum(in section: Int) -> Album? {
+        return getAlbum(at: IndexPath(row: 0, section: section))
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch sortType {
+        case .name:
+            guard let album = getFirstAlbum(in: section) else { return nil }
+            return album.name
+        case .rating:
+            guard let album = getFirstAlbum(in: section) else { return nil }
+            if album.rating > 0 {
+                return "\(album.rating) Star\(album.rating != 1 ? "s" : "")"
+            } else {
+                return "Not rated"
+            }
+        case .newest, .recent:
+            return nil
+        case .artist:
+            guard let album = getFirstAlbum(in: section) else { return nil }
+            return album.subtitle
+        case .duration:
+            guard let album = getFirstAlbum(in: section) else { return nil }
+            return album.duration.description
+        case .year:
+            let year = getFirstAlbum(in: section)?.year.description
+            guard let year = year else { return nil }
+            return IndexHeaderNameGenerator.sortByYear(forSectionName: year)
+        }
+    }
+    
+    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+        let sectionCount = numberOfSections(in: tableView)
+        var indexTitles = [String]()
+        for i in 0...sectionCount {
+            if let sectionName = self.tableView(tableView, titleForHeaderInSection: i) {
+                var indexTitle = ""
+                switch sortType {
+                case .name:
+                    indexTitle = sectionName.prefix(1).uppercased()
+                    if let _ = Int(indexTitle) {
+                        indexTitle = "#"
+                    }
+                case .artist:
+                    indexTitle = sectionName.prefix(1).uppercased()
+                    if let _ = Int(indexTitle) {
+                        indexTitle = "#"
+                    }
+                case .rating:
+                    indexTitle = IndexHeaderNameGenerator.sortByRating(forSectionName: sectionName)
+                case .duration:
+                    indexTitle = IndexHeaderNameGenerator.sortByDurationAlbum(forSectionName: sectionName)
+                case .year:
+                    indexTitle = IndexHeaderNameGenerator.sortByYear(forSectionName: sectionName)
+                default:
+                    break
+                }
+                indexTitles.append(indexTitle)
+            }
+        }
+        return indexTitles
+    }
+    
+    override func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
+        return index
+    }
+    
 }
 
 class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
@@ -123,6 +203,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
         
         fetchedResultsController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
+        (diffableDataSource as? AlbumsDiffableDataSource)?.sortType = sortType
         singleFetchedResultsController = fetchedResultsController
         singleFetchedResultsController?.delegate = self
         singleFetchedResultsController?.fetch()
@@ -207,8 +288,9 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     
     func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, album: Album) -> UITableViewCell {
         let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
-        let album = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(container: album, rootView: self)
+        if let album = (diffableDataSource as? AlbumsDiffableDataSource)?.getAlbum(at: indexPath) {
+            cell.display(container: album, rootView: self)
+        }
         return cell
     }
     
@@ -228,30 +310,9 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
             return CommonScreenOperations.tableSectionHeightLarge
         }
     }
-        
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch sortType {
-        case .name:
-            return super.tableView(tableView, titleForHeaderInSection: section)
-        case .rating:
-            if let sectionNameInitial = super.tableView(tableView, titleForHeaderInSection: section), sectionNameInitial != SectionIndexType.noRatingIndexSymbol {
-                return "\(sectionNameInitial) Star\(sectionNameInitial != "1" ? "s" : "")"
-            } else {
-                return "Not rated"
-            }
-        case .newest, .recent:
-            return super.tableView(tableView, titleForHeaderInSection: section)
-        case .artist:
-            return super.tableView(tableView, titleForHeaderInSection: section)
-        case .duration:
-            return nil
-        case .year:
-            return super.tableView(tableView, titleForHeaderInSection: section)
-        }
-    }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let album = fetchedResultsController.getWrappedEntity(at: indexPath)
+        guard let album = (diffableDataSource as? AlbumsDiffableDataSource)?.getAlbum(at: indexPath) else { return }
         performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
     }
     

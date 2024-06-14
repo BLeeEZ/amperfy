@@ -27,6 +27,9 @@ import PromiseKit
 
 class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         
+    /// max file size of an error response from an API
+    private static let maxFileSizeOfErrorResponse = 2_000
+    
     private let subsonicServerApi: SubsonicServerApi
     private let networkMonitor: NetworkMonitorFacade
     private let fileManager = CacheFileManager.shared
@@ -55,9 +58,10 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     }
     
     func validateDownloadedData(download: Download) -> ResponseError? {
-        guard let data = download.resumeData else {
-            return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: subsonicServerApi), data: download.resumeData)
+        guard let fileURL = download.fileURL else {
+            return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: subsonicServerApi), data: nil)
         }
+        guard let data = fileManager.getFileDataIfNotToBig(url: fileURL, maxFileSize: Self.maxFileSizeOfErrorResponse) else { return nil }
         return subsonicServerApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url, meta: nil))
     }
     

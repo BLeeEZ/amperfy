@@ -45,7 +45,7 @@ public class LibraryUpdater {
     }
     
     /// This function will block the execution before the scene handler
-    /// Perform here only small/fast opersation
+    /// Perform here only small/fast operations
     /// Use UpdateVC for longer operations to display progress to user
     public func performSmallBlockingLibraryUpdatesIfNeeded() {
         if storage.librarySyncVersion < .v9 {
@@ -85,17 +85,14 @@ public class LibraryUpdater {
         isRunning = false
     }
     
-    /// Opersation can be cancled. Opersation must be able to be restarted
     public func performLibraryUpdateWithStatus(notifier: LibraryUpdaterCallbacks) -> Promise<Void> {
         isRunning = true
         return storage.async.perform { asyncCompanion in
             if self.storage.librarySyncVersion < .v17 {
+                self.storage.librarySyncVersion = .v17 // if App crashes don't do this step again -> This step is only for convenience
                 os_log("Perform blocking library update (START): Extract Binary Data", log: self.log, type: .info)
                 try self.extractBinaryDataToFileManager(notifier: notifier, asyncCompanion: asyncCompanion)
                 os_log("Perform blocking library update (DONE): Extract  Binary Data", log: self.log, type: .info)
-                if self.isRunning {
-                    self.storage.librarySyncVersion = .v17
-                }
             }
         }
     }
@@ -190,11 +187,70 @@ public class LibraryUpdater {
     }
     
     private func extractBinaryDataToFileManager(notifier: LibraryUpdaterCallbacks, asyncCompanion: CoreDataCompanion) throws {
+        // To avoid crashed due to RAM overflow we need to use
+        // autoreleasepool: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmAutoreleasePools.html
+        // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreData/Performance.html
+        
         os_log("Artwork Update", log: log, type: .info)
-        let artworks = asyncCompanion.library.getArtworksContainingBinaryData()
-        notifier.startOperation(name: "Artwork Update", totalCount: artworks.count)
-        for artwork in artworks {
-            if let imageData = artwork.managedObject.imageData,
+        var artworkRemoteInfos = [ArtworkRemoteInfo]()
+        autoreleasepool {
+            let artworks = asyncCompanion.library.getArtworksContainingBinaryData()
+            artworkRemoteInfos = artworks.compactMap{ $0.remoteInfo }
+        }
+        notifier.startOperation(name: "Artwork Update", totalCount: artworkRemoteInfos.count)
+        for artworkRemoteInfo in artworkRemoteInfos {
+            moveArtworkToFileManager(artworkRemoteInfo: artworkRemoteInfo, asyncCompanion: asyncCompanion)
+            asyncCompanion.library.saveContext()
+            notifier.tickOpersation()
+            if !isRunning {
+                throw PMKError.cancelled
+            }
+        }
+        
+        os_log("Embedded Artwork Update", log: log, type: .info)
+        var embeddedArtworkOwners = [AbstractPlayable]()
+        autoreleasepool {
+            let embeddedArtworks = asyncCompanion.library.getEmbeddedArtworksContainingBinaryData()
+            embeddedArtworkOwners = embeddedArtworks.compactMap{ $0.owner }
+        }
+        notifier.startOperation(name: "Embedded Artwork Update", totalCount: embeddedArtworkOwners.count)
+        for embeddedArtworkOwner in embeddedArtworkOwners {
+            moveEmbeddedArtworkToFileManager(embeddedArtworkOwner: embeddedArtworkOwner, asyncCompanion: asyncCompanion)
+            asyncCompanion.library.saveContext()
+            notifier.tickOpersation()
+            if !isRunning {
+                throw PMKError.cancelled
+            }
+        }
+    
+        os_log("Songs/Podcast Episode Update", log: log, type: .info)
+        let cachedSongs = asyncCompanion.library.getCachedSongsThatHaveFileDataInCoreData()
+        let cachedEpisodes = asyncCompanion.library.getCachedPodcastEpisodesThatHaveFileDataInCoreData()
+        notifier.startOperation(name: "Songs/Episodes Update", totalCount: cachedSongs.count + cachedEpisodes.count)
+        for cachedSong in cachedSongs {
+            movePlayableToFileManager(playable: cachedSong, asyncCompanion: asyncCompanion)
+            asyncCompanion.library.saveContext()
+            notifier.tickOpersation()
+            if !isRunning {
+                throw PMKError.cancelled
+            }
+        }
+        for cachedEpisode in cachedEpisodes {
+            movePlayableToFileManager(playable: cachedEpisode, asyncCompanion: asyncCompanion)
+            asyncCompanion.library.saveContext()
+            notifier.tickOpersation()
+            if !isRunning {
+                throw PMKError.cancelled
+            }
+        }
+        asyncCompanion.library.deleteBinaryPlayableFileSavedInCoreData()
+        asyncCompanion.library.saveContext()
+    }
+    
+    private func moveArtworkToFileManager(artworkRemoteInfo: ArtworkRemoteInfo, asyncCompanion: CoreDataCompanion) {
+        autoreleasepool {
+            if let imageData = asyncCompanion.library.getArtworkData(forArtworkRemoteInfo: artworkRemoteInfo),
+               let artwork = asyncCompanion.library.getArtwork(remoteInfo: artworkRemoteInfo),
                let relFilePath = fileManager.createRelPath(for: artwork),
                let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
                 do {
@@ -203,69 +259,60 @@ public class LibraryUpdater {
                 } catch {
                     artwork.relFilePath = nil
                 }
-            }
-            artwork.managedObject.imageData = nil
-            asyncCompanion.library.saveContext()
-            notifier.tickOpersation()
-            if !isRunning {
-                throw PMKError.cancelled
+                artwork.managedObject.imageData = nil
             }
         }
-        os_log("Embedded Artwork Update", log: log, type: .info)
-        let embeddedArtworks = asyncCompanion.library.getEmbeddedArtworksContainingBinaryData()
-        notifier.startOperation(name: "Embedded Artwork Update", totalCount: embeddedArtworks.count)
-        for embeddedArtwork in embeddedArtworks {
-            if let imageData = embeddedArtwork.managedObject.imageData,
+    }
+    
+    private func moveEmbeddedArtworkToFileManager(embeddedArtworkOwner: AbstractPlayable, asyncCompanion: CoreDataCompanion) {
+        autoreleasepool {
+            if let imageData = asyncCompanion.library.getEmbeddedArtworkData(forOwner: embeddedArtworkOwner),
+               let embeddedArtwork = asyncCompanion.library.getEmbeddedArtwork(forOwner: embeddedArtworkOwner),
                let relFilePath = fileManager.createRelPath(for: embeddedArtwork),
-               let absfilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
+               let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
                 do {
-                    try self.fileManager.writeDataExcludedFromBackup(data: imageData, to: absfilePath)
+                    try self.fileManager.writeDataExcludedFromBackup(data: imageData, to: absFilePath)
                     embeddedArtwork.relFilePath = relFilePath
                 } catch {
                     embeddedArtwork.relFilePath = nil
                 }
-            }
-            embeddedArtwork.managedObject.imageData = nil
-            asyncCompanion.library.saveContext()
-            notifier.tickOpersation()
-            if !isRunning {
-                throw PMKError.cancelled
+                embeddedArtwork.managedObject.imageData = nil
             }
         }
-        os_log("Songs/Podcast Episode Update", log: log, type: .info)
-        let playableFiles = asyncCompanion.library.getPlayableFiles()
-        notifier.startOperation(name: "Songs/Episodes Update", totalCount: playableFiles.count)
-        for playableFile in playableFiles {
-            if let fileData = playableFile.data {
-                if let song = playableFile.info?.asSong,
-                   let relFilePath = fileManager.createRelPath(for: song),
-                   let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
-                    do {
-                        try fileManager.writeDataExcludedFromBackup(data: fileData, to: absFilePath)
-                        song.playableManagedObject.file = nil
-                        song.relFilePath = relFilePath
-                    } catch {
-                        os_log("File for <%s> could not be written to <%s>", log: log, type: .error, song.displayString, relFilePath.path)
-                        song.relFilePath = nil
-                    }
-                } else if let episode = playableFile.info?.asPodcastEpisode,
-                          let relFilePath = fileManager.createRelPath(for: episode),
-                          let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
-                    do {
-                        try fileManager.writeDataExcludedFromBackup(data: fileData, to: absFilePath)
-                        episode.playableManagedObject.file = nil
-                        episode.relFilePath = relFilePath
-                    } catch {
-                       os_log("File for <%s> could not be written to <%s>", log: log, type: .error, episode.displayString, relFilePath.path)
-                        episode.relFilePath = nil
-                    }
+    }
+    
+    private func movePlayableToFileManager(playable: AbstractPlayable, asyncCompanion: CoreDataCompanion) {
+        if let playableData = getPlayableDataAndDeleteCoreDataFile(playable: playable, asyncCompanion: asyncCompanion) {
+            movePlayableToFileManager(playable: playable, fileData: playableData)
+        }
+    }
+    
+    private func getPlayableDataAndDeleteCoreDataFile(playable: AbstractPlayable, asyncCompanion: CoreDataCompanion) -> Data? {
+        var data: Data?
+        autoreleasepool {
+            if let playableFile = asyncCompanion.library.getFile(forPlayable: playable) {
+                let playableFileSizeInByte = asyncCompanion.library.getFileSizeOfPlayableFileInByte(playableFile: playableFile)
+                // file size must be smaller than 1 GB
+                // file data will be loaded into memory -> too big will lead to crash
+                if playableFileSizeInByte < 1_000_000_000 {
+                    data = playableFile.data
                 }
+                playableFile.info?.playableManagedObject.file = nil
+                asyncCompanion.library.deletePlayableFile(playableFile: playableFile)
             }
-            asyncCompanion.library.deletePlayableFile(playableFile: playableFile)
-            asyncCompanion.library.saveContext()
-            notifier.tickOpersation()
-            if !isRunning {
-                throw PMKError.cancelled
+        }
+        return data
+    }
+    
+    private func movePlayableToFileManager(playable: AbstractPlayable, fileData: Data) {
+        if let relFilePath = fileManager.createRelPath(for: playable),
+           let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
+            do {
+                try fileManager.writeDataExcludedFromBackup(data: fileData, to: absFilePath)
+                playable.relFilePath = relFilePath
+            } catch {
+                os_log("File for <%s> could not be written to <%s>", log: log, type: .error, playable.displayString, relFilePath.path)
+                playable.relFilePath = nil
             }
         }
     }

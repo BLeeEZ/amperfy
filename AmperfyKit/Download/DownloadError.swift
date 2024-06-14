@@ -30,6 +30,7 @@ public enum DownloadError: Error {
     case emptyFile
     case apiErrorResponse
     case canceled
+    case fileManagerError
     
     public var description : String {
         switch self {
@@ -40,6 +41,7 @@ public enum DownloadError: Error {
         case .emptyFile: return "File is empty"
         case .apiErrorResponse: return "API Error"
         case .canceled: return "Cancled"
+        case .fileManagerError: return "File Manager Error"
         }
     }
     
@@ -52,6 +54,7 @@ public enum DownloadError: Error {
         case .emptyFile: return 5
         case .apiErrorResponse: return 6
         case .canceled: return 7
+        case .fileManagerError: return 8
         }
     }
     
@@ -64,6 +67,7 @@ public enum DownloadError: Error {
         case 5: return .emptyFile
         case 6: return .apiErrorResponse
         case 7: return .canceled
+        case 8: return .fileManagerError
         default:
             return nil
         }

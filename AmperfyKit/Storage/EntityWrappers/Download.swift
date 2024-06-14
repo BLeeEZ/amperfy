@@ -34,7 +34,6 @@ public class Download: NSObject {
         }
     }
     
-    public var resumeData: Data? // Will not be saved in CoreData
     public var fileURL: URL? // Will not be saved in CoreData
 
     public var title: String {

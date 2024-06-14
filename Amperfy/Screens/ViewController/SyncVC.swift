@@ -67,11 +67,7 @@ class SyncVC: UIViewController {
             
             self.appDelegate.storage.librarySyncVersion = .newestVersion
             self.appDelegate.storage.isLibrarySynced = true
-            self.appDelegate.intentManager.registerXCallbackURLs()
-            self.appDelegate.playableDownloadManager.start()
-            self.appDelegate.artworkDownloadManager.start()
-            self.appDelegate.backgroundLibrarySyncer.start()
-            
+            self.appDelegate.startManagerAfterSync()
             self.appDelegate.isKeepScreenAlive = false
             self.appDelegate.eventLogger.supressAlerts = false
             self.performSegue(withIdentifier: "toLibrary", sender: self)

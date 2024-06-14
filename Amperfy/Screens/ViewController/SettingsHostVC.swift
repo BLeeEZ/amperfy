@@ -137,6 +137,11 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.cacheLimit = newValue
         }))
         
+        settings.isHapticsEnabled = self.appDelegate.storage.settings.isHapticsEnabled
+        changesAgent.append(settings.$isHapticsEnabled.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.isHapticsEnabled = newValue
+        }))
+        
         settings.themePreference = self.appDelegate.storage.settings.themePreference
         changesAgent.append(settings.$themePreference.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.themePreference = newValue

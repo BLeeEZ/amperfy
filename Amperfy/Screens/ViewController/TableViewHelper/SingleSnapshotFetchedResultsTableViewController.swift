@@ -104,8 +104,8 @@ class SingleSnapshotFetchedResultsTableViewController<ResultType>:
             guard let existingObject = try? controller.managedObjectContext.existingObject(with: itemIdentifier), existingObject.isUpdated else { return nil }
             return itemIdentifier
         }
-        snapshot.reloadItems(reloadIdentifiers)
-
+        snapshot.reconfigureItems(reloadIdentifiers)
+        
         dataSource.apply(snapshot as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>, animatingDifferences: false)
         self.snapshotDidChange?()
     }
