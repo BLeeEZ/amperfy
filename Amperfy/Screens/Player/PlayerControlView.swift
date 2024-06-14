@@ -63,6 +63,8 @@ class PlayerControlView: UIView {
         playButton.imageView?.tintColor = .label
         previousButton.tintColor = .label
         nextButton.tintColor = .label
+        skipBackwardButton.tintColor = .label
+        skipForwardButton.tintColor = .label
         playbackRateButton.setTitleColor(.label, for: .normal)
         playbackRateButton.setTitleColor(.label, for: .highlighted)
         airplayButton.tintColor = .label

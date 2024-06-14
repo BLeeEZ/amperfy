@@ -101,8 +101,8 @@ public class Artist: AbstractLibraryEntity {
             if managedObject.genre != newValue?.managedObject { managedObject.genre = newValue?.managedObject }
         }
     }
-    override public var defaultImage: UIImage {
-        return UIImage.artistArtwork
+    override public func getDefaultImage(themeColor: UIColor) -> UIImage  {
+        return UIImage.getGeneratedArtwork(themeColor: themeColor, artworkType: .artist)
     }
 
 }
@@ -167,8 +167,8 @@ extension Artist: PlayableContainable  {
     public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
         librarySyncer.sync(artist: self)
     }
-    public var artworkCollection: ArtworkCollection {
-        return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
+    public func getArtworkCollection(themeColor: UIColor) -> ArtworkCollection {
+        return ArtworkCollection(defaultImage: getDefaultImage(themeColor: themeColor), singleImageEntity: self)
     }
     public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .artist, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
 }

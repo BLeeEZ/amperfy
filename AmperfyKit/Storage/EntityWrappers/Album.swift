@@ -32,16 +32,16 @@ public class Album: AbstractLibraryEntity {
         self.managedObject = managedObject
         super.init(managedObject: managedObject)
     }
-    override public func image(setting: ArtworkDisplayPreference) -> UIImage {
+    override public func image(themeColor: UIColor, setting: ArtworkDisplayPreference) -> UIImage {
         switch setting {
         case .id3TagOnly:
-            return embeddedArtworkImage ?? defaultImage
+            return embeddedArtworkImage ?? getDefaultImage(themeColor: themeColor)
         case .serverArtworkOnly:
-            return super.image(setting: setting)
+            return super.image(themeColor: themeColor, setting: setting)
         case .preferServerArtwork:
-            return artwork?.image ?? embeddedArtworkImage ?? defaultImage
+            return artwork?.image ?? embeddedArtworkImage ?? getDefaultImage(themeColor: themeColor)
         case .preferId3Tag:
-            return embeddedArtworkImage ?? artwork?.image ?? defaultImage
+            return embeddedArtworkImage ?? artwork?.image ?? getDefaultImage(themeColor: themeColor)
         }
     }
     private var embeddedArtworkImage: UIImage? {
@@ -151,8 +151,8 @@ public class Album: AbstractLibraryEntity {
     public var isOrphaned: Bool {
         return identifier == "Unknown (Orphaned)"
     }
-    override public var defaultImage: UIImage {
-        return UIImage.albumArtwork
+    override public func getDefaultImage(themeColor: UIColor) -> UIImage  {
+        return UIImage.getGeneratedArtwork(themeColor: themeColor, artworkType: .album)
     }
     
     public func markAsRemoteDeleted() {
@@ -213,8 +213,8 @@ extension Album: PlayableContainable  {
     public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
         return librarySyncer.sync(album: self)
     }
-    public var artworkCollection: ArtworkCollection {
-        return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
+    public func getArtworkCollection(themeColor: UIColor) -> ArtworkCollection {
+        return ArtworkCollection(defaultImage: getDefaultImage(themeColor: themeColor), singleImageEntity: self)
     }
     public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .album, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
 }

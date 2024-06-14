@@ -137,9 +137,9 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.cacheLimit = newValue
         }))
         
-        settings.appThemePreference = self.appDelegate.storage.settings.appThemePreference
-        changesAgent.append(settings.$appThemePreference.sink(receiveValue: { newValue in
-            self.appDelegate.storage.settings.appThemePreference = newValue
+        settings.themePreference = self.appDelegate.storage.settings.themePreference
+        changesAgent.append(settings.$themePreference.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.themePreference = newValue
         }))
         
     }

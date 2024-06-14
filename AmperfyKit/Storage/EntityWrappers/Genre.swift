@@ -66,8 +66,8 @@ public class Genre: AbstractLibraryEntity {
             Song(managedObject: $0)
         }
     }
-    override public var defaultImage: UIImage {
-        return UIImage.genreArtwork
+    override public func getDefaultImage(themeColor: UIColor) -> UIImage  {
+        return UIImage.getGeneratedArtwork(themeColor: themeColor, artworkType: .genre)
     }
 
 }
@@ -118,8 +118,8 @@ extension Genre: PlayableContainable  {
     public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
         return Promise<Void>(error: BackendError.notSupported)
     }
-    public var artworkCollection: ArtworkCollection {
-        return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: self)
+    public func getArtworkCollection(themeColor: UIColor) -> ArtworkCollection {
+        return ArtworkCollection(defaultImage: getDefaultImage(themeColor: themeColor), singleImageEntity: self)
     }
     public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .genre, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
 }

@@ -45,8 +45,8 @@ class PlayIndicatorHandler {
             indicator = VYPlayIndicator()
             indicatorDict[viewControllerTypeName] = indicator
             indicator!.indicatorStyle = .modern
-            indicator!.color = appDelegate.getThemeColor(preference: AmperKit.shared.storage.settings.appThemePreference)
         }
+        indicator?.color = appDelegate.storage.settings.themePreference.asColor
         return indicator!
     }
     

@@ -64,8 +64,8 @@ open class EntityImageView: UIView {
         self.view = view
     }
     
-    public func display(container: PlayableContainable) {
-        display(collection: container.artworkCollection)
+    public func display(themeColor: UIColor, container: PlayableContainable) {
+        display(themeColor: themeColor, collection: container.getArtworkCollection(themeColor: themeColor))
     }
 
     public func configureStyling(image: UIImage, imageSizeType: ArtworkIconSizeType, imageTintColor: UIColor, backgroundColor: UIColor) {
@@ -76,7 +76,7 @@ open class EntityImageView: UIView {
         singleImage.display(image: modImage)
     }
     
-    public func display(collection: ArtworkCollection) {
+    public func display(themeColor: UIColor, collection: ArtworkCollection) {
         backgroundColor = .clear
         layer.cornerRadius = RoundedImage.cornerRadius
         layer.masksToBounds = true
@@ -98,7 +98,7 @@ open class EntityImageView: UIView {
                 } else {
                     singleImage.isHidden = true
                     quadImages.forEach{
-                        $0.display(image: UIImage.songArtwork)
+                        $0.display(image: UIImage.getGeneratedArtwork(themeColor: themeColor, artworkType: .song))
                         $0.isHidden = false
                     }
                     for (index, entity) in quadEntities.enumerated() {

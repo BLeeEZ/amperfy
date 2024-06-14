@@ -45,11 +45,12 @@ class GenericTableCell: BasicTableCell {
         titleLabel.text = container.name
         subtitleLabel.isHidden = container.subtitle == nil
         subtitleLabel.text = container.subtitle
-        entityImage.display(container: container)
+        entityImage.display(themeColor: appDelegate.storage.settings.themePreference.asColor, container: container)
         let infoText = container.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .short, settings: appDelegate.storage.settings))
         infoLabel.isHidden = infoText.isEmpty
         infoLabel.text = infoText
         favoriteIconImage.isHidden = !container.isFavorite
+        favoriteIconImage.tintColor = .red
         
         if container is Album {
             infoLabelWidthConstraint.constant = 140

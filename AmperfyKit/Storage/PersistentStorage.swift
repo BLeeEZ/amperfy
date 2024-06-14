@@ -20,6 +20,7 @@
 //
 
 import Foundation
+import UIKit
 import CoreData
 import PromiseKit
 
@@ -125,7 +126,7 @@ public enum StreamingFormatPreference: Int, CaseIterable {
     }
 }
 
-public enum AppThemePreference: Int, CaseIterable {
+public enum ThemePreference: Int, CaseIterable {
     case blue = 0
     case green = 1
     case red = 2
@@ -133,7 +134,7 @@ public enum AppThemePreference: Int, CaseIterable {
     case pink = 4
     case purple = 5
     
-    public static let defaultValue: AppThemePreference = .blue
+    public static let defaultValue: ThemePreference = .blue
     
     public var description: String {
         switch self {
@@ -149,6 +150,23 @@ public enum AppThemePreference: Int, CaseIterable {
             return "Pink"
         case .purple:
             return "Purple"
+        }
+    }
+    
+    public var asColor: UIColor {
+        switch(self) {
+        case .blue:
+            return .systemBlue
+        case .green:
+            return .systemGreen
+        case .red:
+            return .systemRed
+        case .yellow:
+            return .systemYellow
+        case .pink:
+            return .systemPink
+        case .purple:
+            return .systemPurple
         }
     }
 }
@@ -287,10 +305,8 @@ public class PersistentStorage {
         case IsScrobbleStreamedItems = "isScrobbleStreamedItems"
         case IsPlaybackStartOnlyOnPlay = "isPlaybackStartOnlyOnPlay"
         case LibrarySyncVersion = "librarySyncVersion"
-        
         case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
-        
-        case AppThemePreference = "appThemePreference"
+        case ThemePreference = "themePreference"
     }
     
     private var coreDataManager: CoreDataManagable
@@ -324,13 +340,13 @@ public class PersistentStorage {
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ScreenLockPreventionPreference.rawValue) }
         }
         
-        public var appThemePreference: AppThemePreference {
+        public var themePreference: ThemePreference {
             get {
-                let appThemePreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.AppThemePreference.rawValue) as? Int ??
-                    AppThemePreference.defaultValue.rawValue
-                return AppThemePreference(rawValue: appThemePreferenceRaw) ?? AppThemePreference.defaultValue
+                let themePreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ThemePreference.rawValue) as? Int ??
+                    ThemePreference.defaultValue.rawValue
+                return ThemePreference(rawValue: themePreferenceRaw) ?? ThemePreference.defaultValue
             }
-            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.AppThemePreference.rawValue) }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ThemePreference.rawValue) }
         }
         
         public var streamingMaxBitrateWifiPreference: StreamingMaxBitratePreference {

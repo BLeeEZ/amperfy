@@ -26,12 +26,15 @@ struct DisplaySettingsView: View {
     
     @EnvironmentObject private var settings: Settings
     
-    @State var isShowRestartAppThemeChange = false
-
-    
-    func setAppThemePreference(preference: AppThemePreference) {
-        settings.appThemePreference = preference
-        isShowRestartAppThemeChange = true
+    func setThemePreference(preference: ThemePreference) {
+        settings.themePreference = preference
+        appDelegate.setAppTheme(color: preference.asColor)
+        // the following applies the tint color to already loaded views
+        guard let window = appDelegate.window else { return }
+        for view in window.subviews {
+            view.removeFromSuperview()
+            window.addSubview(view)
+        }
     }
     
     var body: some View {
@@ -39,39 +42,32 @@ struct DisplaySettingsView: View {
             List {
                 Section(content: {
                     HStack {
-                        Text("App color")
+                        Text("Theme Color")
                         Spacer()
-                        Menu(settings.appThemePreference.description) {
-                            Button(AppThemePreference.blue.description) {
-                                setAppThemePreference(preference: AppThemePreference.blue)
+                        Menu(settings.themePreference.description) {
+                            Button(ThemePreference.blue.description) {
+                                setThemePreference(preference: .blue)
                             }
-                            Button(AppThemePreference.green.description) {
-                                setAppThemePreference(preference: AppThemePreference.green)
+                            Button(ThemePreference.green.description) {
+                                setThemePreference(preference: .green)
                             }
-                            Button(AppThemePreference.red.description) {
-                                setAppThemePreference(preference: AppThemePreference.red)
+                            Button(ThemePreference.red.description) {
+                                setThemePreference(preference: .red)
                             }
-                            Button(AppThemePreference.yellow.description) {
-                                setAppThemePreference(preference: AppThemePreference.yellow)
+                            Button(ThemePreference.yellow.description) {
+                                setThemePreference(preference: .yellow)
                             }
-                            Button(AppThemePreference.pink.description) {
-                                setAppThemePreference(preference: AppThemePreference.pink)
+                            Button(ThemePreference.pink.description) {
+                                setThemePreference(preference: .pink)
                             }
-                            Button(AppThemePreference.purple.description) {
-                                setAppThemePreference(preference: AppThemePreference.purple)
+                            Button(ThemePreference.purple.description) {
+                                setThemePreference(preference: .purple)
                             }
-                        }.alert(isPresented: $isShowRestartAppThemeChange) {
-                            Alert(title: Text("Apply Theme"), message: Text("In order to change the theme you should restart the app now"),
-                            primaryButton: .destructive(Text("Restart")) {
-                                self.appDelegate.restartByUser()
-                            },secondaryButton: .cancel())
                         }
                     }
  
-                }
-                , footer: {
-                    Text("Sets the app accent color")
                 })
+                
                 Section(content: {
                     HStack {
                         Text("Music player skip buttons")

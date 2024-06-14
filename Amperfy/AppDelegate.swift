@@ -186,28 +186,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             exit(0)
         }
     }
-    func getThemeColor(preference: AppThemePreference) -> UIColor {
-        os_log("Setting theme to: %s", log: self.log, type: .info, preference.description)
-        switch(preference) {
-        case .blue:
-            return .systemBlue
-        case .green:
-            return .systemGreen
-        case .red:
-            return .systemRed
-        case .yellow:
-            return .systemYellow
-        case .pink:
-            return .systemPink
-        case .purple:
-            return .systemPurple
-        }
-    }
-    
-    func setAppTheme(color: UIColor) {
-        UIView.appearance().tintColor = color
-
-    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if let options = launchOptions {
@@ -225,7 +203,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         initEventLogger()
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
-        setAppTheme(color: getThemeColor(preference: AmperKit.shared.storage.settings.appThemePreference))
+        setAppTheme(color: storage.settings.themePreference.asColor)
         
         guard let credentials = storage.loginCredentials else {
             return true
@@ -246,6 +224,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         scrobbleSyncer?.start()
         userStatistics.sessionStarted()
         return true
+    }
+    
+    func setAppTheme(color: UIColor) {
+        UIView.appearance().tintColor = color
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

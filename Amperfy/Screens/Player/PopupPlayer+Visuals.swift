@@ -146,13 +146,13 @@ extension PopupPlayerVC {
     func refreshBackgroundAndPopupItemArtwork() {
         var artwork: UIImage?
         if let playableInfo = player.currentlyPlaying {
-            artwork = playableInfo.image(setting: appDelegate.storage.settings.artworkDisplayPreference)
+            artwork = playableInfo.image(themeColor: appDelegate.storage.settings.themePreference.asColor, setting: appDelegate.storage.settings.artworkDisplayPreference)
         } else {
             switch player.playerMode {
             case .music:
-                artwork = .songArtwork
+                artwork = .getGeneratedArtwork(themeColor: appDelegate.storage.settings.themePreference.asColor, artworkType: .song)
             case .podcast:
-                artwork = .podcastArtwork
+                artwork = .getGeneratedArtwork(themeColor: appDelegate.storage.settings.themePreference.asColor, artworkType: .podcastEpisode)
             }
         }
         guard let artwork = artwork else { return }
@@ -166,9 +166,9 @@ extension PopupPlayerVC {
         } else {
             switch player.playerMode {
             case .music:
-                artworkImage.display(image: .songArtwork)
+                artworkImage.display(image: .getGeneratedArtwork(themeColor: appDelegate.storage.settings.themePreference.asColor, artworkType: .song))
             case .podcast:
-                artworkImage.display(image: .podcastArtwork)
+                artworkImage.display(image: .getGeneratedArtwork(themeColor: appDelegate.storage.settings.themePreference.asColor, artworkType: .podcastEpisode))
             }
         }
     }
