@@ -485,8 +485,8 @@ public class Playlist: Identifyable {
         }
     }
     
-    public var defaultImage: UIImage {
-        return UIImage.playlistArtwork
+    public func getDefaultImage(themeColor: UIColor) -> UIImage  {
+        return UIImage.getGeneratedArtwork(themeColor: themeColor, artworkType: .playlist)
     }
 
 }
@@ -528,16 +528,16 @@ extension Playlist: PlayableContainable  {
     public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
         return Promise<Void>(error: BackendError.notSupported)
     }
-    public var artworkCollection: ArtworkCollection {
+    public func getArtworkCollection(themeColor: UIColor) -> ArtworkCollection {
         let artworkItems = artworkItems
         
         if artworkItems.isEmpty {
-            return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: nil)
+            return ArtworkCollection(defaultImage: getDefaultImage(themeColor: themeColor), singleImageEntity: nil)
         } else if artworkItems.count == 1 {
-            return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: artworkItems[0].playable)
+            return ArtworkCollection(defaultImage: getDefaultImage(themeColor: themeColor), singleImageEntity: artworkItems[0].playable)
         } else {
             let quadImages = artworkItems.compactMap{ return $0.playable }.prefix(upToAsArray: 4)
-            return ArtworkCollection(defaultImage: defaultImage, singleImageEntity: artworkItems[0].playable, quadImageEntity: quadImages)
+            return ArtworkCollection(defaultImage: getDefaultImage(themeColor: themeColor), singleImageEntity: artworkItems[0].playable, quadImageEntity: quadImages)
         }
     }
     public func playedViaContext() {

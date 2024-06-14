@@ -20,14 +20,54 @@
 //
 
 import SwiftUI
+import AmperfyKit
 
 struct DisplaySettingsView: View {
     
     @EnvironmentObject private var settings: Settings
     
+    func setThemePreference(preference: ThemePreference) {
+        settings.themePreference = preference
+        appDelegate.setAppTheme(color: preference.asColor)
+        // the following applies the tint color to already loaded views
+        guard let window = appDelegate.window else { return }
+        for view in window.subviews {
+            view.removeFromSuperview()
+            window.addSubview(view)
+        }
+    }
+    
     var body: some View {
         ZStack{
             List {
+                Section(content: {
+                    HStack {
+                        Text("Theme Color")
+                        Spacer()
+                        Menu(settings.themePreference.description) {
+                            Button(ThemePreference.blue.description) {
+                                setThemePreference(preference: .blue)
+                            }
+                            Button(ThemePreference.green.description) {
+                                setThemePreference(preference: .green)
+                            }
+                            Button(ThemePreference.red.description) {
+                                setThemePreference(preference: .red)
+                            }
+                            Button(ThemePreference.yellow.description) {
+                                setThemePreference(preference: .yellow)
+                            }
+                            Button(ThemePreference.pink.description) {
+                                setThemePreference(preference: .pink)
+                            }
+                            Button(ThemePreference.purple.description) {
+                                setThemePreference(preference: .purple)
+                            }
+                        }
+                    }
+ 
+                })
+                
                 Section(content: {
                     HStack {
                         Text("Haptic Feedback")

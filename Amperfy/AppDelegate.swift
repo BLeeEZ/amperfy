@@ -203,6 +203,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         initEventLogger()
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
+        setAppTheme(color: storage.settings.themePreference.asColor)
+        
         guard let credentials = storage.loginCredentials else {
             return true
         }
@@ -238,6 +240,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         playableDownloadManager.start()
         backgroundLibrarySyncer.start()
         scrobbleSyncer?.start()
+    }
+    
+    func setAppTheme(color: UIColor) {
+        UIView.appearance().tintColor = color
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

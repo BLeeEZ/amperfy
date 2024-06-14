@@ -97,29 +97,29 @@ public enum SwipeActionType: Int, CaseIterable {
     public var image: UIImage {
         switch self {
         case .insertUserQueue:
-            return UIImage.userQueueInsert
+            return UIImage.userQueueInsert.withTintColor(.white)
         case .appendUserQueue:
-            return UIImage.userQueueAppend
+            return UIImage.userQueueAppend.withTintColor(.white)
         case .insertContextQueue:
-            return UIImage.contextQueueInsert
+            return UIImage.contextQueueInsert.withTintColor(.white)
         case .appendContextQueue:
-            return UIImage.contextQueueAppend
+            return UIImage.contextQueueAppend.withTintColor(.white)
         case .download:
-            return UIImage.download
+            return UIImage.download.withTintColor(.white)
         case .removeFromCache:
-            return UIImage.trash
+            return UIImage.trash.withTintColor(.white)
         case .addToPlaylist:
-            return UIImage.playlist
+            return UIImage.playlist.withTintColor(.white)
         case .play:
-            return UIImage.play
+            return UIImage.play.withTintColor(.white)
         case .playShuffled:
-            return UIImage.shuffle
+            return UIImage.shuffle.withTintColor(.white)
         case .insertPodcastQueue:
-            return UIImage.podcastQueueInsert
+            return UIImage.podcastQueueInsert.withTintColor(.white)
         case .appendPodcastQueue:
-            return UIImage.podcastQueueAppend
+            return UIImage.podcastQueueAppend.withTintColor(.white)
         case .favorite:
-            return UIImage.heartFill
+            return UIImage.heartFill.withTintColor(.white)
         }
     }
 }

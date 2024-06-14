@@ -81,7 +81,7 @@ class PlayableTableCell: BasicTableCell {
         guard let playable = playable else { return }
         titleLabel.text = playable.title
         artistLabel.text = playable.creatorName
-        entityImage.display(container: playable)
+        entityImage.display(themeColor: appDelegate.storage.settings.themePreference.asColor, container: playable)
         
         if self.isDislayAlbumTrackNumberStyle {
             configureTrackNumberLabel()
@@ -170,6 +170,7 @@ class PlayableTableCell: BasicTableCell {
         }
         
         favoriteIconImage.isHidden = !playable.isFavorite
+        favoriteIconImage.tintColor = .red
         
         durationLabel.isHidden = !isDurationVisible
         if isDurationVisible {

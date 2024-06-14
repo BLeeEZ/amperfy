@@ -24,10 +24,22 @@ import UIKit
 
 public enum ArtworkIconSizeType: CGFloat {
     // rawValue will be used as insets
-    case small = 250.0
-    case big = 100.0
+    case small = 50.0
+    case big = 20.0
     
-    public static let defaultSize: CGFloat = 1000.0
+    public static let defaultSize: CGFloat = 200.0
+}
+
+public enum ArtworkType {
+    case song
+    case album
+    case genre
+    case artist
+    case podcast
+    case podcastEpisode
+    case playlist
+    case folder
+  
 }
 
 extension UIImage {
@@ -120,14 +132,38 @@ extension UIImage {
     public static let podcastQueueInsert = contextQueueInsert
     public static let podcastQueueAppend = contextQueueAppend
     
-    public static let songArtwork = UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small)
-    public static let albumArtwork = UIImage.createArtwork(with: UIImage.album, iconSizeType: .big)
-    public static let genreArtwork = UIImage.createArtwork(with: UIImage.genre, iconSizeType: .big)
-    public static let artistArtwork = UIImage.createArtwork(with: UIImage.artist, iconSizeType: .big)
-    public static let podcastArtwork = UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .big)
-    public static let podcastEpisodeArtwork = UIImage.createArtwork(with: UIImage.podcastEpisode, iconSizeType: .small)
-    public static let playlistArtwork = UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, switchColors: true)
-    public static let folderArtwork = UIImage.createArtwork(with: UIImage.folder, iconSizeType: .big)
+    private static var artworkDict: [UIColor: [ArtworkType: UIImage?]] = [:]
+    public static func getGeneratedArtwork(themeColor: UIColor, artworkType: ArtworkType) -> UIImage {
+        let img = artworkDict[themeColor]?[artworkType]
+        if let img2 = img, let img3 = img2 {
+            return img3
+        } else {
+            if artworkDict[themeColor] == nil {
+                artworkDict[themeColor] = [:]
+            }
+            var generatedArtwork: UIImage?
+            switch artworkType {
+            case .song:
+                generatedArtwork = UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, themeColor: themeColor)
+            case .album:
+                generatedArtwork = UIImage.createArtwork(with: UIImage.album, iconSizeType: .big, themeColor: themeColor)
+            case .genre:
+                generatedArtwork = UIImage.createArtwork(with: UIImage.genre, iconSizeType: .big, themeColor: themeColor)
+            case .artist:
+                generatedArtwork = UIImage.createArtwork(with: UIImage.artist, iconSizeType: .big, themeColor: themeColor)
+            case .podcast:
+                generatedArtwork = UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .big, themeColor: themeColor)
+            case .podcastEpisode:
+                generatedArtwork = UIImage.createArtwork(with: UIImage.podcastEpisode, iconSizeType: .small, themeColor: themeColor)
+            case .playlist:
+                generatedArtwork = UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, themeColor: themeColor, switchColors: true)
+            case .folder:
+                generatedArtwork = UIImage.createArtwork(with: UIImage.folder, iconSizeType: .big, themeColor: themeColor)
+            }
+            artworkDict[themeColor]?[artworkType] = generatedArtwork
+            return generatedArtwork ?? UIImage()
+        }
+    }
     
     private static func create(_ named: String) -> UIImage {
         return UIImage(named: named) ?? UIImage()
@@ -136,13 +172,13 @@ extension UIImage {
         return UIImage(systemName: systemName) ?? UIImage()
     }
     
-    public static func createArtwork(with image: UIImage, iconSizeType: ArtworkIconSizeType, switchColors: Bool = false) -> UIImage {
+    public static func createArtwork(with image: UIImage, iconSizeType: ArtworkIconSizeType, themeColor: UIColor, switchColors: Bool = false) -> UIImage {
         let frame = CGRect(x: 0, y: 0, width: ArtworkIconSizeType.defaultSize, height: ArtworkIconSizeType.defaultSize)
         let buildView = EntityImageView(frame: frame)
         let grayScale = 0.92
         let artworkBackgroundColor = UIColor(red: grayScale, green: grayScale, blue: grayScale, alpha: 1)
-        let imageTintColor = !switchColors ? .defaultBlue : artworkBackgroundColor
-        let backgroundColor = switchColors ? .defaultBlue : artworkBackgroundColor
+        let imageTintColor = !switchColors ? themeColor : artworkBackgroundColor
+        let backgroundColor = switchColors ? themeColor : artworkBackgroundColor
         buildView.configureStyling(image: image, imageSizeType: iconSizeType, imageTintColor: imageTintColor, backgroundColor: backgroundColor)
         buildView.layoutIfNeeded()
         return buildView.screenshot ?? UIImage()

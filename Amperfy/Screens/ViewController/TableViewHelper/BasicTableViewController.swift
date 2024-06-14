@@ -241,7 +241,7 @@ class BasicTableViewController: KeyCommandTableViewController {
         if actionType == .favorite {
             action.image = preCbContainable.isFavorite ? UIImage.heartFill : UIImage.heartEmpty
         } else {
-            action.image = actionType.image
+            action.image = actionType.image.withRenderingMode(.alwaysOriginal)
         }
         return action
     }

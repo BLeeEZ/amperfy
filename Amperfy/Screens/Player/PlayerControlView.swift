@@ -44,6 +44,8 @@ class PlayerControlView: UIView {
     @IBOutlet weak var remainingTimeLabel: UILabel!
     
     @IBOutlet weak var playerModeButton: UIButton!
+    @IBOutlet weak var airplayButton: UIButton!
+    @IBOutlet weak var playerModeChangeButton: UIButton!
     @IBOutlet weak var displayPlaylistButton: UIButton!
     @IBOutlet weak var playbackRateButton: UIButton!
     @IBOutlet weak var sleepTimerButton: UIButton!
@@ -58,6 +60,16 @@ class PlayerControlView: UIView {
     
     func prepare(toWorkOnRootView: PopupPlayerVC? ) {
         self.rootView = toWorkOnRootView
+        playButton.imageView?.tintColor = .label
+        previousButton.tintColor = .label
+        nextButton.tintColor = .label
+        skipBackwardButton.tintColor = .label
+        skipForwardButton.tintColor = .label
+        playbackRateButton.setTitleColor(.label, for: .normal)
+        playbackRateButton.setTitleColor(.label, for: .highlighted)
+        airplayButton.tintColor = .label
+        playerModeChangeButton.tintColor = .label
+        optionsButton.imageView?.tintColor = .label
         refreshPlayer()
     }
     

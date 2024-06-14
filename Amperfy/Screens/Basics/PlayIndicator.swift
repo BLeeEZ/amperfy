@@ -40,12 +40,13 @@ class PlayIndicatorHandler {
     
     func getIndicator(for viewControllerTypeName: String) -> VYPlayIndicator {
         var indicator = indicatorDict[viewControllerTypeName]
+        let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         if indicator == nil {
             indicator = VYPlayIndicator()
             indicatorDict[viewControllerTypeName] = indicator
             indicator!.indicatorStyle = .modern
-            indicator!.color = .defaultBlue
         }
+        indicator?.color = appDelegate.storage.settings.themePreference.asColor
         return indicator!
     }
     

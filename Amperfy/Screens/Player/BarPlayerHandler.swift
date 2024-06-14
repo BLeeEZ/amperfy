@@ -43,7 +43,8 @@ class BarPlayerHandler {
     }
     
     private func configureBar(vc: UIViewController) {
-        vc.popupBar.tintColor = UIColor.defaultBlue
+        let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+        vc.popupBar.tintColor = appDelegate.storage.settings.themePreference.asColor
         vc.popupBar.imageView.layer.cornerRadius = 5
         vc.popupBar.progressViewStyle = .bottom
         if #available(iOS 17, *) {
@@ -54,7 +55,7 @@ class BarPlayerHandler {
         
         let appearance = LNPopupBarAppearance()
         appearance.subtitleTextAttributes = AttributeContainer()
-                        .foregroundColor(UIColor.defaultBlue)
+            .foregroundColor(.label)
         vc.popupBar.standardAppearance = appearance
         vc.popupBar.standardAppearance.marqueeScrollEnabled = true
         vc.popupContentView.popupCloseButtonStyle = .chevron

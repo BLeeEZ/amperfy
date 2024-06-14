@@ -59,7 +59,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         self.tableView.dragDelegate = self
         self.tableView.dropDelegate = self
         self.tableView.dragInteractionEnabled = true
-            
+        
         player = appDelegate.player
         player.addNotifier(notifier: self)
         

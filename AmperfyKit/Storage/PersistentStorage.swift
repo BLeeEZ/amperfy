@@ -20,6 +20,7 @@
 //
 
 import Foundation
+import UIKit
 import CoreData
 import PromiseKit
 
@@ -121,6 +122,51 @@ public enum StreamingFormatPreference: Int, CaseIterable {
             return "mp3 (default)"
         case .raw:
             return "Raw/Original"
+        }
+    }
+}
+
+public enum ThemePreference: Int, CaseIterable {
+    case blue = 0
+    case green = 1
+    case red = 2
+    case yellow = 3
+    case pink = 4
+    case purple = 5
+    
+    public static let defaultValue: ThemePreference = .blue
+    
+    public var description: String {
+        switch self {
+        case .blue:
+            return "Blue"
+        case .green:
+            return "Green"
+        case .red:
+            return "Red"
+        case .yellow:
+            return "Yellow"
+        case .pink:
+            return "Pink"
+        case .purple:
+            return "Purple"
+        }
+    }
+    
+    public var asColor: UIColor {
+        switch(self) {
+        case .blue:
+            return .systemBlue
+        case .green:
+            return .systemGreen
+        case .red:
+            return .systemRed
+        case .yellow:
+            return .systemYellow
+        case .pink:
+            return .systemPink
+        case .purple:
+            return .systemPurple
         }
     }
 }
@@ -262,6 +308,7 @@ public class PersistentStorage {
         case IsHapticsEnabled = "isHapticsEnabled"
         
         case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
+        case ThemePreference = "themePreference"
     }
     
     private var coreDataManager: CoreDataManagable
@@ -293,6 +340,15 @@ public class PersistentStorage {
                 return ScreenLockPreventionPreference(rawValue: screenLockPreventionPreferenceRaw) ?? ScreenLockPreventionPreference.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ScreenLockPreventionPreference.rawValue) }
+        }
+        
+        public var themePreference: ThemePreference {
+            get {
+                let themePreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ThemePreference.rawValue) as? Int ??
+                    ThemePreference.defaultValue.rawValue
+                return ThemePreference(rawValue: themePreferenceRaw) ?? ThemePreference.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ThemePreference.rawValue) }
         }
         
         public var streamingMaxBitrateWifiPreference: StreamingMaxBitratePreference {

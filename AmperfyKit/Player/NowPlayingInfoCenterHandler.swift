@@ -38,7 +38,7 @@ class NowPlayingInfoCenterHandler {
 
     func updateNowPlayingInfo(playable: AbstractPlayable) {
         let albumTitle = playable.asSong?.album?.name ?? ""
-        let artwork = playable.image(setting: storage.settings.artworkDisplayPreference)
+        let artwork = playable.image(themeColor: storage.settings.themePreference.asColor, setting: storage.settings.artworkDisplayPreference)
         nowPlayingInfoCenter.nowPlayingInfo = [
             MPNowPlayingInfoPropertyMediaType: NSNumber(value: MPNowPlayingInfoMediaType.audio.rawValue),
             MPNowPlayingInfoPropertyServiceIdentifier: AmperKit.name,

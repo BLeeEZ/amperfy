@@ -37,7 +37,7 @@ class PlaylistTableCell: BasicTableCell {
         self.playlist = playlist
         self.rootView = rootView
         nameLabel.text = playlist.name
-        entityImage.display(container: playlist)
+        entityImage.display(themeColor: appDelegate.storage.settings.themePreference.asColor, container: playlist)
         infoLabel.text = playlist.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .short, settings: appDelegate.storage.settings))
     }
     
