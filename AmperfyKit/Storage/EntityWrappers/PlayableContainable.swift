@@ -72,7 +72,7 @@ public protocol PlayableContainable {
     var duration: Int { get }
     var isRateable: Bool { get }
     var isDownloadAvailable: Bool { get }
-    func getArtworkCollection(themeColor: UIColor) -> ArtworkCollection
+    func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection
     func cachePlayables(downloadManager: DownloadManageable)
     func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void>
     var isFavoritable: Bool { get }

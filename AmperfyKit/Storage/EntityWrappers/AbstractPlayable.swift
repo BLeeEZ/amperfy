@@ -39,16 +39,16 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         super.init(managedObject: managedObject)
     }
 
-    override public func image(themeColor: UIColor, setting: ArtworkDisplayPreference) -> UIImage {
+    override public func image(theme: ThemePreference, setting: ArtworkDisplayPreference) -> UIImage {
         switch setting {
         case .id3TagOnly:
-            return embeddedArtwork?.image ?? getDefaultImage(themeColor: themeColor)
+            return embeddedArtwork?.image ?? getDefaultImage(theme: theme)
         case .serverArtworkOnly:
-            return super.image(themeColor: themeColor, setting: setting)
+            return super.image(theme: theme, setting: setting)
         case .preferServerArtwork:
-            return artwork?.image ?? embeddedArtwork?.image ?? getDefaultImage(themeColor: themeColor)
+            return artwork?.image ?? embeddedArtwork?.image ?? getDefaultImage(theme: theme)
         case .preferId3Tag:
-            return embeddedArtwork?.image ?? artwork?.image ?? getDefaultImage(themeColor: themeColor)
+            return embeddedArtwork?.image ?? artwork?.image ?? getDefaultImage(theme: theme)
         }
     }
     public var embeddedArtwork: EmbeddedArtwork? {
@@ -257,10 +257,10 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         }
         return infoContent
     }
-    override public func getDefaultImage(themeColor: UIColor) -> UIImage  {
+    override public func getDefaultImage(theme: ThemePreference) -> UIImage  {
         return isPodcastEpisode ?
-            UIImage.getGeneratedArtwork(themeColor: themeColor, artworkType: .podcastEpisode) :
-            UIImage.getGeneratedArtwork(themeColor: themeColor, artworkType: .song)
+            UIImage.getGeneratedArtwork(theme: theme, artworkType: .podcastEpisode) :
+            UIImage.getGeneratedArtwork(theme: theme, artworkType: .song)
     }
     
     override public func playedViaContext() {
@@ -297,8 +297,8 @@ extension AbstractPlayable: PlayableContainable  {
         return syncer.setFavorite(song: song, isFavorite: isFavorite)
     }
     public var isDownloadAvailable: Bool { return asPodcastEpisode?.isAvailableToUser ?? true }
-    public func getArtworkCollection(themeColor: UIColor) -> ArtworkCollection {
-        return ArtworkCollection(defaultImage: getDefaultImage(themeColor: themeColor), singleImageEntity: self)
+    public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
+        return ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)
     }
     public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: isSong ? .song : .podcastEpisode, objectID: playableManagedObject.objectID.uriRepresentation().absoluteString) }
 }

@@ -132,7 +132,7 @@ extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
     
     private func createQueueItem(for playable: AbstractPlayable, playerIndex: PlayerIndex) -> CPListItem {
         let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
-        let image = playable.image(themeColor: appDelegate.storage.settings.themePreference.asColor, setting: artworkDisplayPreference)
+        let image = playable.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference)
         let listItem = CPListItem(text: playable.title, detailText: playable.subtitle, image: image.carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: accessoryType)
         listItem.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }

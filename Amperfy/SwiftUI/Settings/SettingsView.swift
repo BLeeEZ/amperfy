@@ -118,6 +118,14 @@ struct SettingsView: View {
                         Text("X-Callback-URL Documentation")
                     }
                 }
+                
+                #if false
+                Section() {
+                    NavigationLink(destination: DeveloperView()) {
+                        Text("Developer")
+                    }
+                }
+                #endif
             }
             .navigationTitle("Settings")
         }

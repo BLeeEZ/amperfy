@@ -119,6 +119,7 @@
 		50AC4E5428D909730091FF33 /* EventLogCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5228D909730091FF33 /* EventLogCellView.swift */; };
 		50AC4E5628D99A410091FF33 /* ButtonStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5528D99A410091FF33 /* ButtonStyles.swift */; };
 		50AC4E5828D9D12D0091FF33 /* ObservableSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5728D9D12D0091FF33 /* ObservableSettings.swift */; };
+		50AE79AC2C1CCBEC0085CBB3 /* DeveloperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79AB2C1CCBEC0085CBB3 /* DeveloperView.swift */; };
 		50AFA1492632E83100F198DD /* GenericDetailTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AFA1472632E83100F198DD /* GenericDetailTableHeader.swift */; };
 		50AFA14E2632E95900F198DD /* GenericDetailTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50AFA1482632E83100F198DD /* GenericDetailTableHeader.xib */; };
 		50BA92F821CC318D00E5901D /* PlayableTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92F721CC318D00E5901D /* PlayableTableCell.swift */; };
@@ -738,6 +739,7 @@
 		50AC4E5728D9D12D0091FF33 /* ObservableSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableSettings.swift; sourceTree = "<group>"; };
 		50ACAF1127B144040039913C /* SwipeActionSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActionSettings.swift; sourceTree = "<group>"; };
 		50ACAF1327B277B50039913C /* Amperfy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Amperfy.entitlements; sourceTree = "<group>"; };
+		50AE79AB2C1CCBEC0085CBB3 /* DeveloperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperView.swift; sourceTree = "<group>"; };
 		50AFA1472632E83100F198DD /* GenericDetailTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericDetailTableHeader.swift; sourceTree = "<group>"; };
 		50AFA1482632E83100F198DD /* GenericDetailTableHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericDetailTableHeader.xib; sourceTree = "<group>"; };
 		50B053AC27BFADB200D9C1ED /* UIImageAssetsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageAssetsExtension.swift; sourceTree = "<group>"; };
@@ -1127,6 +1129,7 @@
 				50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */,
 				504B441828D6F0920033982C /* LicenseSettingsView.swift */,
 				504B441C28D7A6330033982C /* XCallbackURLsSetttingsView.swift */,
+				50AE79AB2C1CCBEC0085CBB3 /* DeveloperView.swift */,
 				50CFB59828D5006100A47D44 /* Artwork */,
 				50CFB59528D4848300A47D44 /* Swipe */,
 				50791E8328D36EBD006CE6E5 /* Server */,
@@ -1976,6 +1979,7 @@
 				50CFB59728D4FC0100A47D44 /* ArtworkSettingsView.swift in Sources */,
 				5005939128E42F66008C8DF6 /* BasicCollectionCell.swift in Sources */,
 				5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */,
+				50AE79AC2C1CCBEC0085CBB3 /* DeveloperView.swift in Sources */,
 				504262B32BF5FC3800B5EF38 /* AmperfyIntentHandler.swift in Sources */,
 				507148AD2B767FE200557904 /* ContextQueuePrevSectionHeader.swift in Sources */,
 				500B7D4721EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift in Sources */,

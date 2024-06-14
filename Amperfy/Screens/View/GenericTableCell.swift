@@ -45,7 +45,7 @@ class GenericTableCell: BasicTableCell {
         titleLabel.text = container.name
         subtitleLabel.isHidden = container.subtitle == nil
         subtitleLabel.text = container.subtitle
-        entityImage.display(themeColor: appDelegate.storage.settings.themePreference.asColor, container: container)
+        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: container)
         let infoText = container.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .short, settings: appDelegate.storage.settings))
         infoLabel.isHidden = infoText.isEmpty
         infoLabel.text = infoText

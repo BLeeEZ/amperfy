@@ -30,7 +30,7 @@ public enum ArtworkIconSizeType: CGFloat {
     public static let defaultSize: CGFloat = 200.0
 }
 
-public enum ArtworkType {
+public enum ArtworkType: CaseIterable {
     case song
     case album
     case genre
@@ -40,6 +40,26 @@ public enum ArtworkType {
     case playlist
     case folder
   
+    public var description: String {
+        switch self {
+        case .song:
+            return "Song"
+        case .album:
+            return "Album"
+        case .genre:
+            return "Genre"
+        case .artist:
+            return "Artist"
+        case .podcast:
+            return "Podcast"
+        case .podcastEpisode:
+            return "PodcastEpisode"
+        case .playlist:
+            return "Playlist"
+        case .folder:
+            return "Folder"
+        }
+    }
 }
 
 extension UIImage {
@@ -132,37 +152,149 @@ extension UIImage {
     public static let podcastQueueInsert = contextQueueInsert
     public static let podcastQueueAppend = contextQueueAppend
     
-    private static var artworkDict: [UIColor: [ArtworkType: UIImage?]] = [:]
-    public static func getGeneratedArtwork(themeColor: UIColor, artworkType: ArtworkType) -> UIImage {
-        let img = artworkDict[themeColor]?[artworkType]
-        if let img2 = img, let img3 = img2 {
-            return img3
-        } else {
-            if artworkDict[themeColor] == nil {
-                artworkDict[themeColor] = [:]
-            }
-            var generatedArtwork: UIImage?
+    public static func getGeneratedArtwork(theme: ThemePreference, artworkType: ArtworkType) -> UIImage {
+        var img = UIImage()
+        switch(theme) {
+        case .blue:
             switch artworkType {
             case .song:
-                generatedArtwork = UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, themeColor: themeColor)
+                img = .blueSong
             case .album:
-                generatedArtwork = UIImage.createArtwork(with: UIImage.album, iconSizeType: .big, themeColor: themeColor)
+                img = .blueAlbum
             case .genre:
-                generatedArtwork = UIImage.createArtwork(with: UIImage.genre, iconSizeType: .big, themeColor: themeColor)
+                img = .blueGenre
             case .artist:
-                generatedArtwork = UIImage.createArtwork(with: UIImage.artist, iconSizeType: .big, themeColor: themeColor)
+                img = .blueArtist
             case .podcast:
-                generatedArtwork = UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .big, themeColor: themeColor)
+                img = .bluePodcast
             case .podcastEpisode:
-                generatedArtwork = UIImage.createArtwork(with: UIImage.podcastEpisode, iconSizeType: .small, themeColor: themeColor)
+                img = .bluePodcastEpisode
             case .playlist:
-                generatedArtwork = UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, themeColor: themeColor, switchColors: true)
+                img = .bluePlaylist
             case .folder:
-                generatedArtwork = UIImage.createArtwork(with: UIImage.folder, iconSizeType: .big, themeColor: themeColor)
+                img = .blueFolder
             }
-            artworkDict[themeColor]?[artworkType] = generatedArtwork
-            return generatedArtwork ?? UIImage()
+        case .green:
+            switch artworkType {
+            case .song:
+                img = .greenSong
+            case .album:
+                img = .greenAlbum
+            case .genre:
+                img = .greenGenre
+            case .artist:
+                img = .greenArtist
+            case .podcast:
+                img = .greenPodcast
+            case .podcastEpisode:
+                img = .greenPodcastEpisode
+            case .playlist:
+                img = .greenPlaylist
+            case .folder:
+                img = .greenFolder
+            }
+        case .red:
+            switch artworkType {
+            case .song:
+                img = .redSong
+            case .album:
+                img = .redAlbum
+            case .genre:
+                img = .redGenre
+            case .artist:
+                img = .redArtist
+            case .podcast:
+                img = .redPodcast
+            case .podcastEpisode:
+                img = .redPodcastEpisode
+            case .playlist:
+                img = .redPlaylist
+            case .folder:
+                img = .redFolder
+            }
+        case .yellow:
+            switch artworkType {
+            case .song:
+                img = .yellowSong
+            case .album:
+                img = .yellowAlbum
+            case .genre:
+                img = .yellowGenre
+            case .artist:
+                img = .yellowArtist
+            case .podcast:
+                img = .yellowPodcast
+            case .podcastEpisode:
+                img = .yellowPodcastEpisode
+            case .playlist:
+                img = .yellowPlaylist
+            case .folder:
+                img = .yellowFolder
+            }
+        case .orange:
+            switch artworkType {
+            case .song:
+                img = .orangeSong
+            case .album:
+                img = .orangeAlbum
+            case .genre:
+                img = .orangeGenre
+            case .artist:
+                img = .orangeArtist
+            case .podcast:
+                img = .orangePodcast
+            case .podcastEpisode:
+                img = .orangePodcastEpisode
+            case .playlist:
+                img = .orangePlaylist
+            case .folder:
+                img = .orangeFolder
+            }
+        case .purple:
+            switch artworkType {
+            case .song:
+                img = .purpleSong
+            case .album:
+                img = .purpleAlbum
+            case .genre:
+                img = .purpleGenre
+            case .artist:
+                img = .purpleArtist
+            case .podcast:
+                img = .purplePodcast
+            case .podcastEpisode:
+                img = .purplePodcastEpisode
+            case .playlist:
+                img = .purplePlaylist
+            case .folder:
+                img = .purpleFolder
+            }
         }
+
+        return img
+    }
+    
+    public static func generateArtwork(theme: ThemePreference, artworkType: ArtworkType) -> UIImage {
+        var generatedArtwork: UIImage?
+        switch artworkType {
+        case .song:
+            generatedArtwork = UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, theme: theme)
+        case .album:
+            generatedArtwork = UIImage.createArtwork(with: UIImage.album, iconSizeType: .big, theme: theme)
+        case .genre:
+            generatedArtwork = UIImage.createArtwork(with: UIImage.genre, iconSizeType: .big, theme: theme)
+        case .artist:
+            generatedArtwork = UIImage.createArtwork(with: UIImage.artist, iconSizeType: .big, theme: theme)
+        case .podcast:
+            generatedArtwork = UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .big, theme: theme)
+        case .podcastEpisode:
+            generatedArtwork = UIImage.createArtwork(with: UIImage.podcastEpisode, iconSizeType: .small, theme: theme)
+        case .playlist:
+            generatedArtwork = UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, theme: theme, switchColors: true)
+        case .folder:
+            generatedArtwork = UIImage.createArtwork(with: UIImage.folder, iconSizeType: .big, theme: theme)
+        }
+        return generatedArtwork ?? UIImage()
     }
     
     private static func create(_ named: String) -> UIImage {
@@ -172,13 +304,13 @@ extension UIImage {
         return UIImage(systemName: systemName) ?? UIImage()
     }
     
-    public static func createArtwork(with image: UIImage, iconSizeType: ArtworkIconSizeType, themeColor: UIColor, switchColors: Bool = false) -> UIImage {
+    public static func createArtwork(with image: UIImage, iconSizeType: ArtworkIconSizeType, theme: ThemePreference, switchColors: Bool = false) -> UIImage {
         let frame = CGRect(x: 0, y: 0, width: ArtworkIconSizeType.defaultSize, height: ArtworkIconSizeType.defaultSize)
         let buildView = EntityImageView(frame: frame)
         let grayScale = 0.92
         let artworkBackgroundColor = UIColor(red: grayScale, green: grayScale, blue: grayScale, alpha: 1)
-        let imageTintColor = !switchColors ? themeColor : artworkBackgroundColor
-        let backgroundColor = switchColors ? themeColor : artworkBackgroundColor
+        let imageTintColor = !switchColors ? theme.asColor : artworkBackgroundColor
+        let backgroundColor = switchColors ? theme.asColor : artworkBackgroundColor
         buildView.configureStyling(image: image, imageSizeType: iconSizeType, imageTintColor: imageTintColor, backgroundColor: backgroundColor)
         buildView.layoutIfNeeded()
         return buildView.screenshot ?? UIImage()

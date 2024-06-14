@@ -39,7 +39,7 @@ class AlbumCollectionCell: BasicCollectionCell {
         titleLabel.text = container.name
         subtitleLabel.isHidden = container.subtitle == nil
         subtitleLabel.text = container.subtitle
-        entityImage.display(themeColor: appDelegate.storage.settings.themePreference.asColor, container: container)
+        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: container)
     }
     
 }

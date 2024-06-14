@@ -166,7 +166,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     
     func createLibraryItem(text: String, icon: UIImage, sectionToDisplay: CPListTemplate) -> CPListItem {
-        let item =  CPListItem(text: text, detailText: nil, image: UIImage.createArtwork(with: icon, iconSizeType: .small, themeColor: appDelegate.storage.settings.themePreference.asColor, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let item =  CPListItem(text: text, detailText: nil, image: UIImage.createArtwork(with: icon, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         item.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             self.interfaceController?.pushTemplate(sectionToDisplay, animated: true) { _,_ in
@@ -179,7 +179,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     func createContinePlayingItems() -> [CPListItem] {
         var continuePlayingItems = [CPListItem]()
         if appDelegate.player.musicItemCount > 0 {
-            let item = CPListItem(text: "Music", detailText: "", image: UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, themeColor: appDelegate.storage.settings.themePreference.asColor, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .none)
+            let item = CPListItem(text: "Music", detailText: "", image: UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .none)
             item.handler = { [weak self] item, completion in
                 guard let `self` = self else { completion(); return }
                 appDelegate.player.setPlayerMode(.music)
@@ -189,7 +189,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             continuePlayingItems.append(item)
         }
         if appDelegate.player.podcastItemCount > 0 {
-            let item = CPListItem(text: "Podcasts", detailText: "", image: UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .small, themeColor: appDelegate.storage.settings.themePreference.asColor, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .none)
+            let item = CPListItem(text: "Podcasts", detailText: "", image: UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .none)
             item.handler = { [weak self] item, completion in
                 guard let `self` = self else { completion(); return }
                 appDelegate.player.setPlayerMode(.podcast)
@@ -202,7 +202,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
     
     func createPlayRandomSongsItem() -> CPListItem {
-        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, themeColor: appDelegate.storage.settings.themePreference.asColor, switchColors: true).carPlayImage(carTraitCollection: traits)
+        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits)
         let item =  CPListItem(text: "Play Random Songs", detailText: nil, image: img, accessoryImage: nil, accessoryType: .disclosureIndicator)
         item.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
@@ -215,7 +215,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
     
     func createPlayRandomAlbumsItem() -> CPListItem {
-        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, themeColor: appDelegate.storage.settings.themePreference.asColor, switchColors: true).carPlayImage(carTraitCollection: traits)
+        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits)
         let item =  CPListItem(text: "Play Random Albums", detailText: nil, image: img, accessoryImage: nil, accessoryType: .disclosureIndicator)
         item.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
@@ -319,7 +319,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     
     private func createDetailTemplate(for artist: Artist) -> CPListItem {
-        let section = CPListItem(text: artist.name, detailText: artist.subtitle, image: artist.image(themeColor: appDelegate.storage.settings.themePreference.asColor, setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let section = CPListItem(text: artist.name, detailText: artist.subtitle, image: artist.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var albumItems = [CPListItem]()
@@ -340,7 +340,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
     
     private func createDetailAllSongsTemplate(for artist: Artist) -> CPListItem {
-        let section = CPListItem(text: "All Songs", detailText: nil, image: UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, themeColor: appDelegate.storage.settings.themePreference.asColor, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let section = CPListItem(text: "All Songs", detailText: nil, image: UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var songItems = [CPListItem]()
@@ -360,7 +360,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
     
     private func createDetailTemplate(for album: Album) -> CPListItem {
-        let section = CPListItem(text: album.name, detailText: album.subtitle, image: album.image(themeColor: appDelegate.storage.settings.themePreference.asColor, setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        let section = CPListItem(text: album.name, detailText: album.subtitle, image: album.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var songItems = [CPListItem]()
@@ -415,7 +415,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             let podcastMO = fetchedPodcasts[podcastIndex]
             let podcast = Podcast(managedObject: podcastMO)
 
-            let section = CPListItem(text: podcast.title, detailText: podcast.subtitle, image: podcast.image(themeColor: appDelegate.storage.settings.themePreference.asColor, setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
+            let section = CPListItem(text: podcast.title, detailText: podcast.subtitle, image: podcast.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
             section.handler = { [weak self] item, completion in
                 guard let `self` = self else { completion(); return }
                 let podcastDetailTemplate = CPListTemplate(title: podcast.name, sections: [
@@ -432,7 +432,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     }
 
     private func createPlayShuffledListItem(playContext: PlayContext, text: String = "Shuffle") -> CPListItem {
-        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, themeColor: appDelegate.storage.settings.themePreference.asColor, switchColors: true).carPlayImage(carTraitCollection: traits)
+        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits)
         let listItem = CPListItem(text: text, detailText: nil, image: img)
         listItem.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
@@ -459,7 +459,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     private func createDetailTemplate(for playable: AbstractPlayable, playContext: PlayContext, isTrackDisplayed: Bool = false) -> CPListItem {
         let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
-        let image = isTrackDisplayed ? UIImage.numberToImage(number: playable.track) : playable.image(themeColor: appDelegate.storage.settings.themePreference.asColor, setting: artworkDisplayPreference)
+        let image = isTrackDisplayed ? UIImage.numberToImage(number: playable.track) : playable.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference)
         let listItem = CPListItem(text: playable.title, detailText: playable.subtitle, image: image.carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: accessoryType)
         listItem.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }

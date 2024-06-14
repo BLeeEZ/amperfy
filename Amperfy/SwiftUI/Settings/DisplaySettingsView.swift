@@ -57,15 +57,14 @@ struct DisplaySettingsView: View {
                             Button(ThemePreference.yellow.description) {
                                 setThemePreference(preference: .yellow)
                             }
-                            Button(ThemePreference.pink.description) {
-                                setThemePreference(preference: .pink)
+                            Button(ThemePreference.orange.description) {
+                                setThemePreference(preference: .orange)
                             }
                             Button(ThemePreference.purple.description) {
                                 setThemePreference(preference: .purple)
                             }
                         }
                     }
- 
                 })
                 
                 Section(content: {

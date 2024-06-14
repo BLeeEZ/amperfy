@@ -81,7 +81,7 @@ class PlayableTableCell: BasicTableCell {
         guard let playable = playable else { return }
         titleLabel.text = playable.title
         artistLabel.text = playable.creatorName
-        entityImage.display(themeColor: appDelegate.storage.settings.themePreference.asColor, container: playable)
+        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playable)
         
         if self.isDislayAlbumTrackNumberStyle {
             configureTrackNumberLabel()

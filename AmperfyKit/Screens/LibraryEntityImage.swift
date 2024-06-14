@@ -36,7 +36,7 @@ public class LibraryEntityImage: RoundedImage {
     
     public func display(entity: AbstractLibraryEntity) {
         self.entity = entity
-        self.backupImage = entity.getDefaultImage(themeColor: appDelegate.storage.settings.themePreference.asColor)
+        self.backupImage = entity.getDefaultImage(theme: appDelegate.storage.settings.themePreference)
         refresh()
     }
 
@@ -54,7 +54,7 @@ public class LibraryEntityImage: RoundedImage {
     }
     
     public func refresh() {
-        self.image = entity?.image(themeColor: appDelegate.storage.settings.themePreference.asColor, setting: appDelegate.storage.settings.artworkDisplayPreference) ?? backupImage ?? UIImage.getGeneratedArtwork(themeColor: appDelegate.storage.settings.themePreference.asColor, artworkType: .song)
+        self.image = entity?.image(theme: appDelegate.storage.settings.themePreference, setting: appDelegate.storage.settings.artworkDisplayPreference) ?? backupImage ?? UIImage.getGeneratedArtwork(theme: appDelegate.storage.settings.themePreference, artworkType: .song)
     }
     
     @objc private func downloadFinishedSuccessful(notification: Notification) {

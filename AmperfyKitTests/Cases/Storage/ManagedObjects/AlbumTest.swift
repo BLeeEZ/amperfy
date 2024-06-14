@@ -48,7 +48,7 @@ class AlbumTest: XCTestCase {
         XCTAssertEqual(album.artist, nil)
         XCTAssertEqual(album.songs.count, 0)
         XCTAssertNil(album.artwork)
-        XCTAssertEqual(album.image(themeColor: .blue, setting: .serverArtworkOnly), UIImage.getGeneratedArtwork(themeColor: .blue, artworkType: .album))
+        XCTAssertEqual(album.image(theme: .blue, setting: .serverArtworkOnly), UIImage.getGeneratedArtwork(theme: .blue, artworkType: .album))
         XCTAssertFalse(album.playables.hasCachedItems)
         XCTAssertFalse(album.isOrphaned)
     }
@@ -84,19 +84,19 @@ class AlbumTest: XCTestCase {
     
     
     func testArtworkAndImage() {
-        let testData = UIImage.getGeneratedArtwork(themeColor: .blue, artworkType: .album).pngData()!
-        let testImg = UIImage.getGeneratedArtwork(themeColor: .blue, artworkType: .album)
+        let testData = UIImage.getGeneratedArtwork(theme: .blue, artworkType: .album).pngData()!
+        let testImg = UIImage.getGeneratedArtwork(theme: .blue, artworkType: .album)
         let relFilePath = URL(string: "testArtwork")!
         let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
         try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
         testAlbum.artwork = library.createArtwork()
         testAlbum.artwork?.relFilePath = relFilePath
         XCTAssertNil(testAlbum.artwork?.image)
-        XCTAssertEqual(testAlbum.image(themeColor: .blue, setting: .serverArtworkOnly), testImg)
+        XCTAssertEqual(testAlbum.image(theme: .blue, setting: .serverArtworkOnly), testImg)
         library.saveContext()
         guard let albumFetched = library.getAlbum(id: testId) else { XCTFail(); return }
         XCTAssertNil(albumFetched.artwork?.image)
-        XCTAssertEqual(albumFetched.image(themeColor: .blue, setting: .serverArtworkOnly), testImg)
+        XCTAssertEqual(albumFetched.image(theme: .blue, setting: .serverArtworkOnly), testImg)
         try! CacheFileManager.shared.removeItem(at: absFilePath)
     }
     

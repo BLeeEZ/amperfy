@@ -92,8 +92,8 @@ extension Directory: PlayableContainable  {
     public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
         return librarySyncer.sync(directory: self)
     }
-    public func getArtworkCollection(themeColor: UIColor) -> ArtworkCollection {
-        return ArtworkCollection(defaultImage: .getGeneratedArtwork(themeColor: themeColor, artworkType: .folder), singleImageEntity: self)
+    public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
+        return ArtworkCollection(defaultImage: .getGeneratedArtwork(theme: theme, artworkType: .folder), singleImageEntity: self)
     }
     public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .directory, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
     public var duration: Int {
