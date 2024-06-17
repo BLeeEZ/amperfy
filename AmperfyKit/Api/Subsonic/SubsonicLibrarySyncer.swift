@@ -211,6 +211,49 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 let parserDelegate = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                 try self.parse(response: response, delegate: parserDelegate)
             }
+        }.then {
+            self.syncLyrics(song: song)
+        }
+    }
+    
+    private func syncLyrics(song: Song) -> Promise<Void> {
+        return Promise<Void> { seal in
+            firstly {
+                self.subsonicServerApi.isOpenSubsonicExtensionSupported(extension: .songLyrics)
+            }.then { isSupported -> Promise<Void> in
+                guard isSupported else { return Promise.value }
+                return firstly {
+                    self.subsonicServerApi.requestLyricsBySongId(id: song.id)
+                }.then { response in
+                    self.storage.async.perform { asyncCompanion in
+                        guard let songAsyncMO = asyncCompanion.context.object(with: song.objectID) as? SongMO else { return }
+                        let songAsync = Song(managedObject: songAsyncMO)
+                        
+                        guard let lyricsRelFilePath = self.fileManager.createRelPath(forLyricsOf: songAsync),
+                              let lyricsAbsFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: lyricsRelFilePath)
+                        else { return }
+                        
+                        let parserDelegate = SsLyricsParserDelegate(performanceMonitor: self.performanceMonitor)
+                        try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
+                        // save xml response only if it contains valid lyrics
+                        if (parserDelegate.lyricsList?.lyrics.count ?? 0) > 0 {
+                            do {
+                                try self.fileManager.writeDataExcludedFromBackup(data: response.data, to: lyricsAbsFilePath)
+                                songAsync.lyricsRelFilePath = lyricsRelFilePath
+                                os_log("Lyrics found for <%s> and saved to: %s", log: self.log, type: .info, songAsync.displayString, lyricsRelFilePath.path)
+                            } catch {
+                                songAsync.lyricsRelFilePath = nil
+                            }
+                        } else {
+                            os_log("No lyrics available for <%s>", log: self.log, type: .info, songAsync.displayString)
+                        }
+                    }
+                }
+            }.done {
+                seal.fulfill(Void())
+            }.catch { error in
+                seal.fulfill(Void())
+            }
         }
     }
     
@@ -649,6 +692,28 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }
     }
     
+    func parseLyrics(relFilePath: URL) -> Promise<LyricsList> {
+        return Promise<LyricsList> { seal in
+            DispatchQueue.global().async {
+                do {
+                    let parserDelegate = SsLyricsParserDelegate(performanceMonitor: self.performanceMonitor)
+                    guard let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) else {
+                        seal.reject(XMLParserResponseError(cleansedURL: nil, data: nil))
+                        return
+                    }
+                    try self.parse(absFilePath: absFilePath, delegate: parserDelegate, isThrowingErrorsAllowed: false)
+                    guard let lyricsList = parserDelegate.lyricsList else {
+                        seal.reject(XMLParserResponseError(cleansedURL: nil, data: nil))
+                        return
+                    }
+                    seal.fulfill(lyricsList)
+                } catch {
+                    seal.reject(XMLParserResponseError(cleansedURL: nil, data: nil))
+                }
+            }
+        }
+    }
+    
     private func createPlaylistRemote(playlist: Playlist) -> Promise<Void> {
         os_log("Create playlist on server", log: log, type: .info)
         return firstly {
@@ -705,6 +770,21 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }
         if let error = delegate.error, let _ = error.subsonicError, isThrowingErrorsAllowed {
             throw ResponseError.createFromSubsonicError(cleansedURL: response.url?.asCleansedURL(cleanser: subsonicServerApi), error: error, data: response.data)
+        }
+    }
+    
+    private func parse(absFilePath: URL, delegate: SsXmlParser, isThrowingErrorsAllowed: Bool = true) throws {
+        guard let parser = XMLParser(contentsOf: absFilePath) else {
+            throw XMLParserResponseError(cleansedURL: nil, data: nil)
+        }
+        parser.delegate = delegate
+        parser.parse()
+        if let error = parser.parserError, isThrowingErrorsAllowed {
+            os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
+            throw XMLParserResponseError(cleansedURL: nil, data: nil)
+        }
+        if let error = delegate.error, let _ = error.subsonicError, isThrowingErrorsAllowed {
+            throw XMLParserResponseError(cleansedURL: nil, data: nil)
         }
     }
     

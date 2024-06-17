@@ -61,7 +61,8 @@ class EntityPreviewActionBuilder {
     }
     private var isDeleteOnServer = false
     private var isShowPodcastDetails = false
-    
+    private var isShowSongDetails = false
+
     init(container: PlayableContainable, on rootView: UIViewController, playContextCb: GetPlayContextCallback? = nil, playerIndexCb: GetPlayerIndexCallback? = nil) {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         self.entityContainer = container
@@ -100,6 +101,11 @@ class EntityPreviewActionBuilder {
         }
         if isShowArtist {
             gotoActions.append(createShowArtistAction())
+        }
+        if isShowSongDetails,
+           let song = (entityContainer as? AbstractPlayable)?.asSong,
+           let lyricsShowAction = createShowLyricsAction(song: song) {
+            gotoActions.append(lyricsShowAction)
         }
         if isShowPodcastDetails, let podcastEpisode = (entityContainer as? AbstractPlayable)?.asPodcastEpisode {
             gotoActions.append(createShowEpisodeDetailsAction(podcastEpisode: podcastEpisode))
@@ -224,6 +230,7 @@ class EntityPreviewActionBuilder {
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
         isDeleteOnServer = false
         isShowPodcastDetails = false
+        isShowSongDetails = true
     }
     
     private func configureFor(podcastEpisode: PodcastEpisode) {
@@ -241,6 +248,7 @@ class EntityPreviewActionBuilder {
         isAddToPlaylist = false
         isDeleteOnServer = podcastEpisode.podcastStatus != .deleted && appDelegate.storage.settings.isOnlineMode
         isShowPodcastDetails = true
+        isShowSongDetails = false
     }
     
     private func configureFor(playlist: Playlist) {
@@ -253,6 +261,7 @@ class EntityPreviewActionBuilder {
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
         isDeleteOnServer = false
         isShowPodcastDetails = false
+        isShowSongDetails = false
     }
     
     private func configureFor(genre: Genre) {
@@ -265,6 +274,7 @@ class EntityPreviewActionBuilder {
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
         isDeleteOnServer = false
         isShowPodcastDetails = false
+        isShowSongDetails = false
     }
     
     private func configureFor(podcast: Podcast) {
@@ -277,6 +287,7 @@ class EntityPreviewActionBuilder {
         isAddToPlaylist = false
         isDeleteOnServer = false
         isShowPodcastDetails = true
+        isShowSongDetails = false
     }
     
     private func configureFor(artist: Artist) {
@@ -289,6 +300,7 @@ class EntityPreviewActionBuilder {
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
         isDeleteOnServer = false
         isShowPodcastDetails = false
+        isShowSongDetails = false
     }
     
     private func configureFor(album: Album) {
@@ -301,6 +313,7 @@ class EntityPreviewActionBuilder {
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
         isDeleteOnServer = false
         isShowPodcastDetails = false
+        isShowSongDetails = false
     }
     
     private func configureFor(directory: Directory) {
@@ -313,6 +326,7 @@ class EntityPreviewActionBuilder {
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode && !entityContainer.playables.isEmpty
         isDeleteOnServer = false
         isShowPodcastDetails = false
+        isShowSongDetails = false
     }
     
     private func createPlayAction() -> UIAction {
@@ -545,20 +559,37 @@ class EntityPreviewActionBuilder {
             self.showPodcastDetails()
         }
     }
-    
+
     private func showPodcastDetails() {
-        var descriptionVC: PodcastDescriptionVC?
+        var descriptionVC: PlainDetailsVC?
         if let playable = entityContainer as? AbstractPlayable, let podcastEpisode = playable.asPodcastEpisode {
-            descriptionVC = PodcastDescriptionVC()
+            descriptionVC = PlainDetailsVC()
             descriptionVC?.display(podcastEpisode: podcastEpisode, on: rootView)
         } else if let podcast = entityContainer as? Podcast {
-            descriptionVC = PodcastDescriptionVC()
+            descriptionVC = PlainDetailsVC()
             descriptionVC?.display(podcast: podcast, on: rootView)
         }
         
         if let descriptionVC = descriptionVC {
             rootView.present(descriptionVC, animated: true)
         }
+    }
+    
+    private func createShowLyricsAction(song: Song) -> UIAction? {
+        guard let playable = entityContainer as? AbstractPlayable,
+              let song = playable.asSong,
+              let lyricsRelFilePath = song.lyricsRelFilePath 
+        else { return nil }
+        
+        return UIAction(title: "Show Lyrics", image: .lyrics) { action in
+            self.showLyrics(lyricsRelFilePath: lyricsRelFilePath)
+        }
+    }
+    
+    private func showLyrics(lyricsRelFilePath: URL) {
+        let lyricsVC = PlainDetailsVC()
+        lyricsVC.display(lyricsRelFilePath: lyricsRelFilePath, on: rootView)
+        rootView.present(lyricsVC, animated: true)
     }
     
     private func createCopyIdToClipboardAction() -> UIMenu {

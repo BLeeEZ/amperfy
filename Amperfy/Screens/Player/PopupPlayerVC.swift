@@ -155,9 +155,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         case .podcast:
             guard let podcastEpisode = player.currentlyPlaying?.asPodcastEpisode
             else { return }
-            let descriptionVC = PodcastDescriptionVC()
-            descriptionVC.display(podcastEpisode: podcastEpisode, on: self)
-            present(descriptionVC, animated: true)
+            let plainDetailsVC = PlainDetailsVC()
+            plainDetailsVC.display(podcastEpisode: podcastEpisode, on: self)
+            present(plainDetailsVC, animated: true)
         }
     }
     
@@ -239,7 +239,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
 extension PopupPlayerVC: MusicPlayable {
     
-    func didStartPlayingFromBeginning() { }
+    func didStartPlayingFromBeginning() {
+        fetchSongInfoAndUpdateViews()
+    }
     
     func didStartPlaying() {
         self.reloadData()

@@ -174,4 +174,8 @@ extension LibrarySyncerProxy: LibrarySyncer {
         return activeSyncer.setFavorite(artist: artist, isFavorite: isFavorite)
     }
     
+    func parseLyrics(relFilePath: URL) -> Promise<LyricsList> {
+        return activeSyncer.parseLyrics(relFilePath: relFilePath)
+    }
+    
 }

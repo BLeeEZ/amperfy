@@ -1,0 +1,12 @@
+<subsonic-response
+    xmlns="http://subsonic.org/restapi" status="ok" version="1.16.1" type="navidrome" serverVersion="0.52.5 (c5560888)" openSubsonic="true">
+    <openSubsonicExtensions name="transcodeOffset">
+        <versions>1</versions>
+    </openSubsonicExtensions>
+    <openSubsonicExtensions name="formPost">
+        <versions>1</versions>
+    </openSubsonicExtensions>
+    <openSubsonicExtensions name="songLyrics">
+        <versions>1</versions>
+    </openSubsonicExtensions>
+</subsonic-response>

@@ -1,5 +1,5 @@
 //
-//  PodcastDescriptionVC.swift
+//  PlainDetailsVC.swift
 //  Amperfy
 //
 //  Created by Maximilian Bauer on 01.02.24.
@@ -21,17 +21,20 @@
 
 import Foundation
 import UIKit
+import PromiseKit
 import AmperfyKit
 import MarqueeLabel
 
-class PodcastDescriptionVC: UIViewController {
+class PlainDetailsVC: UIViewController {
     
-    @IBOutlet weak var descriptionTextView: UITextView!
+    @IBOutlet weak var headerLabel: UILabel!
+    @IBOutlet weak var detailsTextView: UITextView!
     
     private var rootView: UIViewController?
     private var podcast: Podcast?
     private var podcastEpisode: PodcastEpisode?
-    
+    private var lyricsRelFilePath: URL?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.setBackgroundBlur(style: .prominent)
@@ -54,19 +57,45 @@ class PodcastDescriptionVC: UIViewController {
         self.rootView = rootView
         self.podcast = podcast
         self.podcastEpisode = nil
+        self.lyricsRelFilePath = nil
     }
     func display(podcastEpisode: PodcastEpisode, on rootView: UIViewController) {
         self.rootView = rootView
         self.podcast = nil
         self.podcastEpisode = podcastEpisode
+        self.lyricsRelFilePath = nil
+    }
+    func display(lyricsRelFilePath: URL, on rootView: UIViewController) {
+        self.rootView = rootView
+        self.podcast = nil
+        self.podcastEpisode = nil
+        self.lyricsRelFilePath = lyricsRelFilePath
     }
 
     func refresh() {
         if let podcast = podcast {
-            descriptionTextView.text = podcast.depiction
+            detailsTextView.text = podcast.depiction
+            headerLabel.text = "Description"
         } else if let podcastEpisode = podcastEpisode {
-            descriptionTextView.text = podcastEpisode.depiction
+            detailsTextView.text = podcastEpisode.depiction
+            headerLabel.text = "Description"
+        } else if let lyricsRelFilePath = lyricsRelFilePath {
+            detailsTextView.text = ""
+            headerLabel.text = "Lyrics"
+            firstly {
+                appDelegate.librarySyncer.parseLyrics(relFilePath: lyricsRelFilePath)
+            }.done { lyricsList in
+                self.displayLyrics(lyricsList: lyricsList)
+            }.catch { error in
+                self.detailsTextView.text = "Lyrics are not available anymore."
+            }
         }
+    }
+    
+    private func displayLyrics(lyricsList: LyricsList) {
+        guard let structuredLyrics = lyricsList.lyrics.object(at: 0) else { return }
+        let lyricsLines = structuredLyrics.line.reduce("", { $0 == "" ? $1.value : $0 + "\n" + $1.value })
+        self.detailsTextView.text = lyricsLines
     }
     
     @IBAction func pressedClose(_ sender: Any) {

@@ -113,11 +113,13 @@ public class CacheFileManager {
     }
     
     private static let artworkFileExtension = "png"
+    private static let lyricsFileExtension = "xml"
     private static let songsDir = URL(string: "songs")!
     private static let episodesDir = URL(string: "episodes")!
     private static let artworksDir = URL(string: "artworks")!
     private static let embeddedArtworksDir = URL(string: "embedded-artworks")!
-    
+    private static let lyricsDir = URL(string: "lyrics")!
+
     public func getOrCreateAbsoluteSongsDirectory() -> URL?  {
         return getOrCreateSubDirectory(subDirectoryName: Self.songsDir.path)
     }
@@ -132,6 +134,10 @@ public class CacheFileManager {
     
     public func getOrCreateAbsoluteEmbeddedArtworksDirectory() -> URL?  {
         return getOrCreateSubDirectory(subDirectoryName: Self.embeddedArtworksDir.path)
+    }
+    
+    public func getOrCreateAbsoluteLyricsDirectory() -> URL?  {
+        return getOrCreateSubDirectory(subDirectoryName: Self.lyricsDir.path)
     }
     
     public struct PlayableCacheInfo {
@@ -291,6 +297,59 @@ public class CacheFileManager {
             }
         }
         return cacheInfo
+    }
+
+    public struct LyricsCacheInfo {
+        let url: URL
+        let id: String
+        let isSong: Bool
+        let relFilePath: URL?
+    }
+    
+    public func getCachedLyrics() -> [LyricsCacheInfo] {
+        var cacheInfo = [LyricsCacheInfo]()
+        if let lyricsDir = getOrCreateAbsoluteLyricsDirectory() {
+            cacheInfo.append(contentsOf: getCachedLyrics(in: lyricsDir.appendingPathComponent(Self.songsDir.path), isSong: true))
+            cacheInfo.append(contentsOf: getCachedLyrics(in: lyricsDir.appendingPathComponent(Self.episodesDir.path), isSong: false))
+        }
+        return cacheInfo
+    }
+    
+    private func getCachedLyrics(in dir: URL, isSong: Bool) -> [LyricsCacheInfo] {
+        let URLs = contentsOfDirectory(url: dir)
+        var cacheInfo = [LyricsCacheInfo]()
+        for url in URLs {
+            let isDirectoryResourceValue: URLResourceValues
+            do {
+                isDirectoryResourceValue = try url.resourceValues(forKeys: [.isDirectoryKey])
+            } catch {
+                continue
+            }
+            
+            guard isDirectoryResourceValue.isDirectory == nil || isDirectoryResourceValue.isDirectory == false else {
+                continue
+            }
+
+            let fileName = url.lastPathComponent
+            var id = fileName
+            let pathExtension = url.pathExtension
+            if !pathExtension.isEmpty {
+                id = (fileName as NSString).deletingPathExtension
+            }
+            let relFilePath = isSong ?
+                Self.lyricsDir.appendingPathComponent(Self.songsDir.path).appendingPathComponent(fileName) :
+                Self.lyricsDir.appendingPathComponent(Self.episodesDir.path).appendingPathComponent(fileName)
+            cacheInfo.append(LyricsCacheInfo(url: url, id: id, isSong: isSong, relFilePath: relFilePath))
+        }
+        return cacheInfo
+    }
+
+    public func createRelPath(forLyricsOf song: Song) -> URL? {
+        guard let ownerRelFilePath = createRelPath(for: song)
+        else { return nil }
+
+        let lyricsRelFilePath = ownerRelFilePath.deletingPathExtension().appendingPathExtension(Self.lyricsFileExtension)
+        return Self.lyricsDir.appendingPathComponent(lyricsRelFilePath.path)
     }
     
     public func createRelPath(for playable: AbstractPlayable) -> URL? {

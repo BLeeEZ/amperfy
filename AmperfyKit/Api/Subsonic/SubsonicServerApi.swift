@@ -53,6 +53,14 @@ extension ResponseError {
     }
 }
 
+enum OpenSubsonicExtension: String {
+    case songLyrics = "songLyrics"
+}
+
+struct OpenSubsonicExtensionsSupport {
+    var extensionResponse: OpenSubsonicExtensionsResponse?
+    var isSupported = false
+}
 
 class SubsonicServerApi: URLCleanser {
     
@@ -94,7 +102,8 @@ class SubsonicServerApi: URLCleanser {
     private let eventLogger: EventLogger
     private let persistentStorage: PersistentStorage
     private var credentials: LoginCredentials?
-    
+    private var openSubsonicExtensionsSupport: OpenSubsonicExtensionsSupport?
+
     init(performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger, persistentStorage: PersistentStorage) {
         self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
@@ -377,6 +386,79 @@ class SubsonicServerApi: URLCleanser {
                     }
                 }
             }
+        }
+    }
+    
+    private func requestOpenSubsonicExtensions() -> Promise<APIDataResponse> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getOpenSubsonicExtensions")
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
+    func isOpenSubsonicExtensionSupported(extension oSsExtention: OpenSubsonicExtension) -> Guarantee<Bool> {
+        // the member variable will be set after the server has been requested
+        // here we already asked the server for its support and use the cached response
+        if let oSsExtSupport = self.openSubsonicExtensionsSupport {
+            if oSsExtSupport.isSupported == false {
+                os_log("No OpenSubsonicExtensions supported (%s)!", log: self.log, type: .info, oSsExtention.rawValue)
+                return Guarantee.value(false)
+            } else if let response = oSsExtSupport.extensionResponse {
+                let isExtensionSupported = response.supportedExtensions.contains(oSsExtention.rawValue)
+                os_log("OpenSubsonicExtension %s supported: %s", log: self.log, type: .info, oSsExtention.rawValue, isExtensionSupported ? "yes" : "no")
+                return Guarantee.value(isExtensionSupported)
+            } else {
+                os_log("No OpenSubsonicExtensions supported (%s)!", log: self.log, type: .info, oSsExtention.rawValue)
+                return Guarantee.value(false)
+            }
+        } else {
+            // we haven't yet requested the server for OpenSubsonicExtensions support
+            return Guarantee<Bool> { seal in
+                firstly {
+                    self.requestOpenSubsonicExtensions()
+                }.done { response in
+                    DispatchQueue.global().async {
+                        let parserDelegate = SsOpenSubsonicExtensionsParserDelegate(performanceMonitor: self.performanceMonitor)
+                        
+                        let parser = XMLParser(data: response.data)
+                        parser.delegate = parserDelegate
+                        let success = parser.parse()
+                        guard success else {
+                            os_log("No OpenSubsonicExtensions supported (%s)!", log: self.log, type: .info, oSsExtention.rawValue)
+                            seal(false)
+                            return
+                        }
+                        
+                        self.openSubsonicExtensionsSupport = OpenSubsonicExtensionsSupport()
+                        self.openSubsonicExtensionsSupport?.isSupported = !parserDelegate.openSubsonicExtensionsResponse.supportedExtensions.isEmpty
+                        self.openSubsonicExtensionsSupport?.extensionResponse = parserDelegate.openSubsonicExtensionsResponse
+                        
+                        if let availableExtensions = self.openSubsonicExtensionsSupport?.extensionResponse?.supportedExtensions {
+                            let availableExtensionsStr = availableExtensions.reduce("", { $0 == "" ? $1 : $0 + ", " + $1 })
+                            os_log("OpenSubsonicExtensions supported: %s", log: self.log, type: .info, availableExtensionsStr)
+                            let isSpecificExtensionSupported = availableExtensions.contains(oSsExtention.rawValue)
+                            os_log("OpenSubsonicExtensions %s supported: %s", log: self.log, type: .info, oSsExtention.rawValue, isSpecificExtensionSupported ? "yes" : "no")
+                            seal(isSpecificExtensionSupported)
+                        } else {
+                            os_log("No OpenSubsonicExtension supported (%s)!", log: self.log, type: .info, oSsExtention.rawValue)
+                            seal(false)
+                        }
+                    }
+                }.catch { error in
+                    os_log("No OpenSubsonicExtension supported (%s)!", log: self.log, type: .info, oSsExtention.rawValue)
+                    self.openSubsonicExtensionsSupport = OpenSubsonicExtensionsSupport()
+                    self.openSubsonicExtensionsSupport?.isSupported = false
+                    seal(false)
+                }
+            }
+        }
+    }
+    
+    /// this requires that the server supports OpenSubsonicExtension "songLyrics"
+    func requestLyricsBySongId(id: String) -> Promise<APIDataResponse> {
+        return request { version in
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getLyricsBySongId", id: id)
+            return try self.createUrl(from: urlComp)
         }
     }
 

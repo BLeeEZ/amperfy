@@ -63,6 +63,27 @@ public class APIDataResponse {
     }
 }
 
+
+public struct LyricsList {
+    public var lyrics = [StructuredLyrics]()
+}
+
+public struct StructuredLyrics {
+    /// required
+    public var lang = "" // The lyrics language (ideally ISO 639). If the language is unknown (e.g. lrc file), the server must return und (ISO standard) or xxx (common value for taggers)
+    public var synced = false // True if the lyrics are synced, false otherwise
+    public var line = [LyricsLine]() // The actual lyrics. Ordered by start time (synced) or appearance order (unsynced)
+    /// optional
+    public var displayArtist: String? // The artist name to display. This could be the localized name, or any other value
+    public var displayTitle: String? // The title to display. This could be the song title (localized), or any other value
+    public var offset = 0 // The offset to apply to all lyrics, in milliseconds. Positive means lyrics appear sooner, negative means later. If not included, the offset must be assumed to be 0
+}
+
+public struct LyricsLine {
+    public var start: Int? // The start time of the lyrics, relative to the start time of the track, in milliseconds. If this is not part of synced lyrics, start must be omitted
+    public var value = "" // The actual text of this line
+}
+
 public protocol LibrarySyncer {
     func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void>
     func sync(genre: Genre) -> Promise<Void>
@@ -98,6 +119,7 @@ public protocol LibrarySyncer {
     func setFavorite(song: Song, isFavorite: Bool) -> Promise<Void>
     func setFavorite(album: Album, isFavorite: Bool) -> Promise<Void>
     func setFavorite(artist: Artist, isFavorite: Bool) -> Promise<Void>
+    func parseLyrics(relFilePath: URL) -> Promise<LyricsList>
 }
 
 protocol AbstractBackgroundLibrarySyncer {

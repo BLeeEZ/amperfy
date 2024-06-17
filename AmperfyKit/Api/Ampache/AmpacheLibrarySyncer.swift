@@ -776,6 +776,12 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }
     }
     
+    func parseLyrics(relFilePath: URL) -> Promise<LyricsList> {
+        return Promise<LyricsList> { seal in
+            seal.reject(XMLParserResponseError(cleansedURL: nil, data: nil))
+        }
+    }
+    
     private func parseForError(response: APIDataResponse) -> Promise<Void> {
         Promise<Void> { seal in
             let parserDelegate = AmpacheXmlParser(performanceMonitor: self.performanceMonitor)

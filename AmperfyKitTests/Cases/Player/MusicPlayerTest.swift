@@ -114,6 +114,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func setFavorite(song: Song, isFavorite: Bool) -> Promise<Void> { return Promise.value }
     func setFavorite(album: Album, isFavorite: Bool) -> Promise<Void> { return Promise.value }
     func setFavorite(artist: Artist, isFavorite: Bool) -> Promise<Void> { return Promise.value }
+    func parseLyrics(relFilePath: URL) -> Promise<LyricsList> { return Promise<LyricsList>.value(LyricsList()) }
 }
 
 class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {

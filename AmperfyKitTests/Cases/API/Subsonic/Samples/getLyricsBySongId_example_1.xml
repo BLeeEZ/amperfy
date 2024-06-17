@@ -1,0 +1,13 @@
+<subsonic-response status="ok" version="1.16.1" type="AwesomeServerName" serverVersion="0.1.3 (tag)" openSubsonic="true">
+  <lyricsList>
+    <structuredLyrics displayArtist="Muse" displayTitle="Hysteria" lang="en" offset="-100" synced="true">
+      <line start="0">It's bugging me</line>
+      <line start="2000">Grating me</line>
+      <line start="3001">And twisting me around...</line>
+    </structuredLyrics>
+    <structuredLyrics displayArtist="Mu2se" displayTitle="Hy2steria" lang="de" offset="100" synced="false">
+      <line>It's bugging2 me</line>
+      <line>Grating2 me</line>
+      <line>And twisting2 me around...</line>
+    </structuredLyrics>
+</subsonic-response>

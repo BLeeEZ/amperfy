@@ -31,6 +31,16 @@ public class Song: AbstractPlayable, Identifyable {
         self.managedObject = managedObject
         super.init(managedObject: managedObject)
     }
+    
+    public var lyricsRelFilePath: URL? {
+        get {
+            guard let lyricsRelFilePathString = managedObject.lyricsRelFilePath else { return nil }
+            return URL(string: lyricsRelFilePathString)
+        }
+        set {
+            managedObject.lyricsRelFilePath = newValue?.path
+        }
+    }
 
     public var album: Album? {
         get {

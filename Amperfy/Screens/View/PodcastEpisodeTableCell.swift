@@ -123,7 +123,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
     @IBAction func showDescriptionButtonPressed(_ sender: Any) {
         Haptics.light.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
         guard let episode = self.episode, let rootView = rootView else { return }
-        let showDescriptionVC = PodcastDescriptionVC()
+        let showDescriptionVC = PlainDetailsVC()
         showDescriptionVC.display(podcastEpisode: episode, on: rootView)
         rootView.present(showDescriptionVC, animated: true)
     }

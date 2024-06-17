@@ -30,7 +30,7 @@ class CommonLibrarySyncer {
     let storage: PersistentStorage
     let eventLogger: EventLogger
     let log = OSLog(subsystem: "Amperfy", category: "LibrarySyncer")
-    private let fileManager = CacheFileManager.shared
+    let fileManager = CacheFileManager.shared
     
     var isSyncAllowed: Bool {
         return networkMonitor.isConnectedToNetwork
@@ -46,10 +46,11 @@ class CommonLibrarySyncer {
     func createCachedItemRepresentationsInCoreData(statusNotifyier: SyncCallbacks?) -> Promise<Void> {
         let cachedArtworks = fileManager.getCachedArtworks()
         let cachedEmbeddedArtworks = fileManager.getCachedEmbeddedArtworks()
+        let cachedLyrics = fileManager.getCachedLyrics()
         let cachedSongs = fileManager.getCachedSongs()
         let cachedEpisodes = fileManager.getCachedEpisodes()
 
-        let totalCount = cachedArtworks.count + cachedEmbeddedArtworks.count + cachedSongs.count + cachedEpisodes.count
+        let totalCount = cachedArtworks.count + cachedEmbeddedArtworks.count + cachedLyrics.count + cachedSongs.count + cachedEpisodes.count
         guard totalCount > 0 else {
             // nothing to do
             return Promise.value
@@ -89,6 +90,20 @@ class CommonLibrarySyncer {
                     let embeddedArtwork = asyncCompanion.library.createEmbeddedArtwork()
                     embeddedArtwork.relFilePath = cachedEmbeddedArtwork.relFilePath
                     embeddedArtwork.owner = episode
+                }
+                statusNotifyier?.notifyParsedObject(ofType: .cache)
+            }
+            // match lyrics after songs/episods so that owner are already created
+            for cachedLyric in cachedLyrics {
+                if cachedLyric.isSong {
+                    var song = asyncCompanion.library.getSong(id: cachedLyric.id)
+                    if song == nil  {
+                        song = asyncCompanion.library.createSong()
+                        song?.id = cachedLyric.id
+                    }
+                    song?.lyricsRelFilePath = cachedLyric.relFilePath
+                } else if !cachedLyric.isSong, let _ = asyncCompanion.library.getPodcastEpisode(id: cachedLyric.id) {
+                    // not supported
                 }
                 statusNotifyier?.notifyParsedObject(ofType: .cache)
             }
