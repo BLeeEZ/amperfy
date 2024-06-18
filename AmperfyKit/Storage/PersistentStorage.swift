@@ -289,6 +289,7 @@ public class PersistentStorage {
         case PlayerShuffleButtonEnabled = "enablePlayerShuffleButton"
         case ShowMusicPlayerSkipButtons = "showMusicPlayerSkipButtons"
         case AlwaysHidePlayerLyricsButton = "alwaysHidePlayerLyricsButton"
+        case IsLyricsSmoothScrolling = "isLyricsSmoothScrolling"
 
         case SongActionOnTab = "songActionOnTab"
         case LibraryDisplaySettings = "libraryDisplaySettings"
@@ -420,6 +421,11 @@ public class PersistentStorage {
             set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.AlwaysHidePlayerLyricsButton.rawValue) }
         }
         
+        public var isLyricsSmoothScrolling: Bool {
+            get { return UserDefaults.standard.object(forKey: UserDefaultsKey.IsLyricsSmoothScrolling.rawValue) as? Bool ?? true }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsLyricsSmoothScrolling.rawValue) }
+        }
+
         public var cacheLimit: Int {
             get {
                 return UserDefaults.standard.object(forKey: UserDefaultsKey.CacheLimit.rawValue) as? Int ?? 0

@@ -71,7 +71,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     }
     
     func refreshLyricsTime(time: CMTime) {
-        self.lyricsView?.scroll(toTime: time, animated: true)
+        self.lyricsView?.scroll(toTime: time)
     }
     
     func initializeLyrics() {
@@ -140,7 +140,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     }
     
     private func showLyrics(structuredLyrics: StructuredLyrics) {
-        self.lyricsView?.display(lyrics: structuredLyrics)
+        self.lyricsView?.display(lyrics: structuredLyrics, scrollAnimation: appDelegate.storage.settings.isLyricsSmoothScrolling)
         self.lyricsView?.isHidden = false
         self.artworkImage.alpha = 0.1
     }

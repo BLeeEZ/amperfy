@@ -41,6 +41,7 @@ final class Settings: ObservableObject {
     @Published var isPlaybackStartOnlyOnPlay = false
     @Published var isShowMusicPlayerSkipButtons = false
     @Published var isAlwaysHidePlayerLyricsButton = false
+    @Published var isLyricsSmoothScrolling = true
     @Published var swipeActionSettings = SwipeActionSettings(leading: [], trailing: [])
     @Published var cacheSizeLimit : Int = 0 // limit in byte
     @Published var isHapticsEnabled = true

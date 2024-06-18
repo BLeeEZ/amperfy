@@ -81,7 +81,7 @@ struct DisplaySettingsView: View {
                         Toggle(isOn: $settings.isHapticsEnabled) {}
                     }
                 }
-                        , footer: {
+                , footer: {
                     Text("Certain interactions provide haptic feedback. Long pressing to display the details menu will always trigger haptic feedback.")
                 })
                 
@@ -94,7 +94,7 @@ struct DisplaySettingsView: View {
                     }
                     
                 }
-                        , footer: {
+                , footer: {
                     Text("Display skip forward button and skip backward button in music player in addition to previous/next buttons.")
                 })
                 
@@ -111,8 +111,21 @@ struct DisplaySettingsView: View {
                         }
                         
                     }
-                            , footer: {
+                    , footer: {
                         Text("Display lyrics button in music player.")
+                    })
+                    
+                    Section(content: {
+                        HStack {
+                            Text("Lyrics Smooth Scrolling")
+                            Spacer()
+                            Toggle(isOn: $settings.isLyricsSmoothScrolling) {}
+                                .frame(width: 130)
+                        }
+                        
+                    }
+                    , footer: {
+                        Text("Lyrics are smoothly scrolled to next line. Deactivating will result in jumping from line to line.")
                     })
                 }
                 

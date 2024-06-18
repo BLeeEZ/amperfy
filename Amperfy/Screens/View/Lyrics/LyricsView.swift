@@ -31,6 +31,7 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
     private var lastIndex: Int?
     private var lineSpacing: CGFloat = 16
     private var hasLastLyricsLineAlreadyDisplayedOnce = false
+    private var scrollAnimation = true
     
     override init(frame: CGRect, style: UITableView.Style) {
         super.init(frame: frame, style: style)
@@ -75,8 +76,9 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
         return mask
     }
     
-    public func display(lyrics: StructuredLyrics) {
+    public func display(lyrics: StructuredLyrics, scrollAnimation: Bool) {
         self.lyrics = lyrics
+        self.scrollAnimation = scrollAnimation
         reloadViewModels()
     }
     
@@ -135,7 +137,7 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
         contentInset = UIEdgeInsets(top: frame.height / 2, left: 0, bottom: frame.height / 2, right: 0)
     }
     
-    func scroll(toTime time: CMTime, animated: Bool) {
+    func scroll(toTime time: CMTime) {
         guard let lyrics = self.lyrics,
               !lyricModels.isEmpty,
               lyrics.synced // if the lyrics are not synced -> only display
@@ -143,7 +145,7 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
         
         guard let indexOfNextLine = lyrics.line.firstIndex(where: { $0.startTime >= time }) else {
             if !hasLastLyricsLineAlreadyDisplayedOnce {
-                scrollToRow(at: IndexPath(row: lyricModels.count-1, section: 0), at: .middle, animated: animated)
+                scrollToRow(at: IndexPath(row: lyricModels.count-1, section: 0), at: .middle, animated: scrollAnimation)
                 hasLastLyricsLineAlreadyDisplayedOnce = true
             }
             if let lastIndex = self.lastIndex {
@@ -160,6 +162,6 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
         }
         lastIndex = indexOfCurrentLine
         lyricModels.object(at: indexOfCurrentLine)?.isActiveLine = true
-        scrollToRow(at: IndexPath(row: indexOfCurrentLine, section: 0), at: .middle, animated: animated)
+        scrollToRow(at: IndexPath(row: indexOfCurrentLine, section: 0), at: .middle, animated: scrollAnimation)
     }
 }

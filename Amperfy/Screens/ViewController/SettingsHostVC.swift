@@ -82,6 +82,11 @@ class SettingsHostVC: UIViewController {
             self.appDelegate.storage.settings.isAlwaysHidePlayerLyricsButton = newValue
         }))
         
+        settings.isLyricsSmoothScrolling = self.appDelegate.storage.settings.isLyricsSmoothScrolling
+        changesAgent.append(settings.$isLyricsSmoothScrolling.sink(receiveValue: { newValue in
+            self.appDelegate.storage.settings.isLyricsSmoothScrolling = newValue
+        }))
+
         settings.screenLockPreventionPreference = self.appDelegate.storage.settings.screenLockPreventionPreference
         changesAgent.append(settings.$screenLockPreventionPreference.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.screenLockPreventionPreference = newValue
