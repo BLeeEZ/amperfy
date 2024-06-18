@@ -299,6 +299,7 @@ public class PersistentStorage {
         case ArtistsSortSetting = "artistsSortSetting"
         case AlbumsSortSetting = "albumsSortSetting"
         case SongsSortSetting = "songsSortSetting"
+        case ArtistsFilterSetting = "artistsFilterSetting"
         case PodcastsShowSetting = "podcastsShowSetting"
         case PlayerDisplayStyle = "playerDisplayStyle"
         case IsPlayerLyricsDisplayed = "isPlayerLyricsDisplayed"
@@ -449,7 +450,6 @@ public class PersistentStorage {
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtistsSortSetting.rawValue) }
         }
         
-        
         public var albumsSortSetting: AlbumElementSortType {
             get {
                 let albumsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.AlbumsSortSetting.rawValue) as? Int ?? AlbumElementSortType.defaultValue.rawValue
@@ -464,6 +464,14 @@ public class PersistentStorage {
                 return SongElementSortType(rawValue: songsSortSettingRaw) ?? SongElementSortType.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.SongsSortSetting.rawValue) }
+        }
+        
+        public var artistsFilterSetting: ArtistCategoryFilter {
+            get {
+                let artistsFilterSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ArtistsFilterSetting.rawValue) as? Int ?? ArtistElementSortType.defaultValue.rawValue
+                return ArtistCategoryFilter(rawValue: artistsFilterSettingRaw) ?? ArtistCategoryFilter.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtistsFilterSetting.rawValue) }
         }
         
         public var swipeActionSettings: SwipeActionSettings {

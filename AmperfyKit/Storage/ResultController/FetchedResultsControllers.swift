@@ -123,6 +123,14 @@ public enum DisplayCategoryFilter {
     case favorites
 }
 
+public enum ArtistCategoryFilter: Int {
+    case all = 0
+    case favorites = 1
+    case albumArtists = 2
+    
+    public static let defaultValue: ArtistCategoryFilter = .albumArtists
+}
+
 public class SearchHistoryFetchedResultsController: BasicFetchedResultsController<SearchHistoryItemMO> {
 
     public init(coreDataCompanion: CoreDataCompanion) {
@@ -364,7 +372,7 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
-    public func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
+    public func search(searchText: String, onlyCached: Bool, displayFilter: ArtistCategoryFilter) {
         if searchText.count > 0 || onlyCached || displayFilter != .all {
             let predicate = coreDataCompanion.library.getSearchArtistsPredicate(searchText: searchText, onlyCached: onlyCached, displayFilter: displayFilter)
             search(predicate: predicate)

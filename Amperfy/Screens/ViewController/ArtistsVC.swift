@@ -28,7 +28,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
 
     private var fetchedResultsController: ArtistFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
-    public var displayFilter: DisplayCategoryFilter = .all
+    public var displayFilter: ArtistCategoryFilter = .all
     private var sortType: ArtistElementSortType = .name
     private var filterTitle = "Artists"
     
@@ -38,6 +38,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         
         applyFilter()
         change(sortType: appDelegate.storage.settings.artistsSortSetting)
+        change(filterType: appDelegate.storage.settings.artistsFilterSetting)
         configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
@@ -67,12 +68,10 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         switch displayFilter {
         case .all:
             self.filterTitle = "Artists"
-        case .newest:
-            self.filterTitle = "Newest Artists"
-        case .recent:
-            self.filterTitle = "Recent Artists"
         case .favorites:
             self.filterTitle = "Favorite Artists"
+        case .albumArtists:
+            self.filterTitle = "Album Artists"
         }
         self.navigationItem.title = self.filterTitle
     }
@@ -89,6 +88,15 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         updateRightBarButtonItems()
     }
     
+    func change(filterType: ArtistCategoryFilter) {
+        // favorite views can't change the display filter
+        guard self.displayFilter != .favorites else { return }
+        self.displayFilter = filterType
+        appDelegate.storage.settings.artistsFilterSetting = filterType
+        self.updateSearchResults(for: self.searchController)
+        updateRightBarButtonItems()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateRightBarButtonItems()
@@ -98,6 +106,9 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     func updateRightBarButtonItems() {
         var actions = [UIMenu]()
         actions.append(createSortButtonMenu())
+        if self.displayFilter != .favorites {
+            actions.append(createFilterButtonMenu())
+        }
         if appDelegate.storage.settings.isOnlineMode {
             actions.append(createActionButtonMenu())
         }
@@ -109,7 +120,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     func updateFromRemote() {
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
         switch displayFilter {
-        case .all, .newest, .recent:
+        case .all, .albumArtists:
             break
         case .favorites:
             firstly {
@@ -204,14 +215,24 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         return UIMenu(title: "Sort", image: .sort, options: [], children: [sortByName, sortByRating, sortByDuration])
     }
     
+    private func createFilterButtonMenu() -> UIMenu {
+        let filterAll = UIAction(title: "All", image: displayFilter == .all ? .check : nil, handler: { _ in
+            self.change(filterType: .all)
+        })
+        let filterAlbumArtists = UIAction(title: "Album Artists", image: displayFilter == .albumArtists ? .check : nil, handler: { _ in
+            self.change(filterType: .albumArtists)
+        })
+        return UIMenu(title: "Filter", image: .filter, options: [], children: [filterAll, filterAlbumArtists])
+    }
+    
     private func createActionButtonMenu() -> UIMenu {
         let action = UIAction(title: "Download \(filterTitle)", image: UIImage.startDownload, handler: { _ in
             var artists = [Artist]()
             switch self.displayFilter {
             case .all:
                 artists = self.appDelegate.storage.main.library.getArtists()
-            case .newest, .recent:
-                break
+            case .albumArtists:
+                artists = self.appDelegate.storage.main.library.getAlbumArtists()
             case .favorites:
                 artists = self.appDelegate.storage.main.library.getFavoriteArtists()
             }

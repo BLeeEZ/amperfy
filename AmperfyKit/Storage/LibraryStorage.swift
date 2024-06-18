@@ -690,10 +690,12 @@ public class LibraryStorage: PlayableFileCachable {
         }
     }
 
-    func getFetchPredicate(artistsDisplayFilter: DisplayCategoryFilter) -> NSPredicate {
+    func getFetchPredicate(artistsDisplayFilter: ArtistCategoryFilter) -> NSPredicate {
         switch artistsDisplayFilter {
-        case .all, .newest, .recent:
+        case .all:
             return NSPredicate.alwaysTrue
+        case .albumArtists:
+            return NSPredicate(format: "%K.@count > 0", #keyPath(ArtistMO.albums))
         case .favorites:
             return NSPredicate(format: "%K == TRUE", #keyPath(ArtistMO.isFavorite))
         }
@@ -730,6 +732,16 @@ public class LibraryStorage: PlayableFileCachable {
         let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.identifierSortedFetchRequest
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "%K == TRUE", #keyPath(ArtistMO.isFavorite))
+        ])
+        let foundArtists = try? context.fetch(fetchRequest)
+        let artists = foundArtists?.compactMap{ Artist(managedObject: $0) }
+        return artists ?? [Artist]()
+    }
+    
+    public func getAlbumArtists() -> [Artist] {
+        let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            getFetchPredicate(artistsDisplayFilter: .albumArtists)
         ])
         let foundArtists = try? context.fetch(fetchRequest)
         let artists = foundArtists?.compactMap{ Artist(managedObject: $0) }
@@ -864,7 +876,7 @@ public class LibraryStorage: PlayableFileCachable {
         return history ?? [SearchHistoryItem]()
     }
     
-    public func getSearchArtistsPredicate(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) -> NSPredicate {
+    public func getSearchArtistsPredicate(searchText: String, onlyCached: Bool, displayFilter: ArtistCategoryFilter) -> NSPredicate {
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSCompoundPredicate(orPredicateWithSubpredicates: [
                 AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
@@ -877,7 +889,7 @@ public class LibraryStorage: PlayableFileCachable {
         return predicate
     }
     
-    public func searchArtists(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) -> [Artist] {
+    public func searchArtists(searchText: String, onlyCached: Bool, displayFilter: ArtistCategoryFilter) -> [Artist] {
         let fetchRequest = ArtistMO.identifierSortedFetchRequest
         fetchRequest.predicate = getSearchArtistsPredicate(searchText: searchText, onlyCached: onlyCached, displayFilter: displayFilter)
         let found = try? context.fetch(fetchRequest)
