@@ -214,6 +214,11 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         }
     }
     
+    //BackendAudioPlayerNotifiable
+    func didLyricsTimeChange(time: CMTime) {
+        notifyLyricsTimeChanged(time: time)
+    }
+    
     private func savePlayInformation(of playable: AbstractPlayable) {
         let playDuration = backendAudioPlayer.duration
         let playProgress = backendAudioPlayer.elapsedTime
@@ -276,6 +281,12 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     func notifyElapsedTimeChanged() {
         for notifier in notifierList {
             notifier.didElapsedTimeChange()
+        }
+    }
+    
+    func notifyLyricsTimeChanged(time: CMTime) {
+        for notifier in notifierList {
+            notifier.didLyricsTimeChange(time: time)
         }
     }
     

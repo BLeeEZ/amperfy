@@ -213,6 +213,7 @@
                 <outlet property="favoriteButton" destination="5ux-aQ-e6U" id="DB3-56-C7w"/>
                 <outlet property="optionsButton" destination="cYG-VG-BvQ" id="074-0X-dKf"/>
                 <outlet property="titleLabel" destination="B6V-RA-yV3" id="yUd-j1-8AA"/>
+                <outlet property="upperContainerView" destination="ia9-ph-a9C" id="EdU-TJ-xZh"/>
             </connections>
             <point key="canvasLocation" x="138.40000000000001" y="99.400299850074973"/>
         </view>
@@ -235,7 +236,7 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

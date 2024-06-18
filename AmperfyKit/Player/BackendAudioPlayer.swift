@@ -27,6 +27,7 @@ import PromiseKit
 
 protocol BackendAudioPlayerNotifiable {
     func didElapsedTimeChange()
+    func didLyricsTimeChange(time: CMTime) // high refresh count
     func stop()
     func playPrevious()
     func playNext()
@@ -50,6 +51,7 @@ class BackendAudioPlayer {
     private let eventLogger: EventLogger
     private let networkMonitor: NetworkMonitorFacade
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+    private let updateLyricsTimeInterval = CMTime(seconds: 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     private let fileManager = CacheFileManager.shared
     private var audioSessionHandler: AudioSessionHandler
 
@@ -111,6 +113,11 @@ class BackendAudioPlayer {
         player.addPeriodicTimeObserver(forInterval: updateElapsedTimeInterval, queue: DispatchQueue.main) { [weak self] time in
             if let self = self {
                 self.responder?.didElapsedTimeChange()
+            }
+        }
+        player.addPeriodicTimeObserver(forInterval: updateLyricsTimeInterval, queue: DispatchQueue.main) { [weak self] time in
+            if let self = self {
+                self.responder?.didLyricsTimeChange(time: time)
             }
         }
     }

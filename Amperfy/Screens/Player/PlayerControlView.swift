@@ -47,6 +47,7 @@ class PlayerControlView: UIView {
     @IBOutlet weak var airplayButton: UIButton!
     @IBOutlet weak var playerModeChangeButton: UIButton!
     @IBOutlet weak var displayPlaylistButton: UIButton!
+    @IBOutlet weak var displayLyricsButton: UIButton!
     @IBOutlet weak var playbackRateButton: UIButton!
     @IBOutlet weak var sleepTimerButton: UIButton!
     @IBOutlet weak var optionsButton: UIButton!
@@ -145,6 +146,12 @@ class PlayerControlView: UIView {
         rootView?.switchDisplayStyleOptionPersistent()
         refreshDisplayPlaylistButton()
         refreshPlayerOptions()
+    }
+    
+    @IBAction func displayLyricsPressed(_ sender: Any) {
+        appDelegate.storage.settings.isPlayerLyricsDisplayed.toggle()
+        rootView?.largeCurrentlyPlayingView?.initializeLyrics()
+        refreshDisplayLyricsButton()
     }
     
     @IBAction func playerModeChangePressed(_ sender: Any) {
@@ -296,6 +303,7 @@ class PlayerControlView: UIView {
         refreshPlaybackRateButton()
         refreshSleepTimerButton()
         refreshDisplayPlaylistButton()
+        refreshDisplayLyricsButton()
         refreshPlayerModeChangeButton()
         refreshPlayerOptions()
     }
@@ -484,6 +492,17 @@ class PlayerControlView: UIView {
         config.image = .playlistDisplayStyle
         displayPlaylistButton.isSelected = isSelected
         displayPlaylistButton.configuration = config
+    }
+    
+    func refreshDisplayLyricsButton() {
+        guard let rootView = rootView else { return }
+        displayLyricsButton.isHidden = !(rootView.largeCurrentlyPlayingView?.isLyricsButtonAllowedToDisplay ?? false)
+             
+        let isSelected = appDelegate.storage.settings.isPlayerLyricsDisplayed
+        var config = rootView.getPlayerButtonConfiguration(isSelected: isSelected)
+        config.image = .lyrics
+        displayLyricsButton.isSelected = isSelected
+        displayLyricsButton.configuration = config
     }
     
     func refreshPlayerModeChangeButton() {

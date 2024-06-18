@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -139,7 +139,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
-                            <rect key="frame" x="90.5" y="0.0" width="28" height="28"/>
+                            <rect key="frame" x="68" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="dHI-Uf-EN9"/>
                                 <constraint firstAttribute="height" constant="28" id="dOb-nc-wBt"/>
@@ -158,8 +158,28 @@
                                 <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
                             </connections>
                         </button>
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MwT-Zv-e8l" userLabel="Lyrics Button">
+                            <rect key="frame" x="136" y="0.0" width="28" height="28"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="28" id="Jaw-IB-PJv"/>
+                                <constraint firstAttribute="width" secondItem="MwT-Zv-e8l" secondAttribute="height" multiplier="1:1" id="ORF-qP-V4k"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="rectangle.portrait.inset.filled" catalog="system" symbolScale="medium"/>
+                            </state>
+                            <buttonConfiguration key="configuration" style="gray" cornerStyle="medium" buttonSize="small">
+                                <imageReference key="image" image="book.pages" catalog="system" symbolScale="small"/>
+                                <backgroundConfiguration key="background"/>
+                            </buttonConfiguration>
+                            <connections>
+                                <action selector="displayLyricsPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="T5I-A9-fTA"/>
+                            </connections>
+                        </button>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change">
-                            <rect key="frame" x="181.5" y="0.0" width="28" height="28"/>
+                            <rect key="frame" x="204" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="Iye-f4-Rd2"/>
                                 <constraint firstAttribute="width" constant="28" id="O0l-F2-ebZ"/>
@@ -191,6 +211,7 @@
                     </subviews>
                     <constraints>
                         <constraint firstAttribute="width" constant="300" id="dMH-9W-9do"/>
+                        <constraint firstItem="MwT-Zv-e8l" firstAttribute="width" secondItem="MwT-Zv-e8l" secondAttribute="height" multiplier="1:1" id="r7H-ic-qIC"/>
                     </constraints>
                 </stackView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dNu-q7-Vtb" userLabel="Sleep Timer Button">
@@ -238,6 +259,7 @@
             </constraints>
             <connections>
                 <outlet property="airplayButton" destination="l5j-2I-Ltc" id="ENH-UT-6ix"/>
+                <outlet property="displayLyricsButton" destination="MwT-Zv-e8l" id="5fb-7U-tR6"/>
                 <outlet property="displayPlaylistButton" destination="ZVN-JG-VAA" id="2Rh-6V-CMd"/>
                 <outlet property="elapsedTimeLabel" destination="okd-ac-nGY" id="MFD-Qa-B7r"/>
                 <outlet property="nextButton" destination="E3q-DK-jgm" id="MGI-Lm-8TL"/>
@@ -265,6 +287,7 @@
     <resources>
         <image name="airplayaudio" catalog="system" width="128" height="123"/>
         <image name="backward.fill" catalog="system" width="128" height="77"/>
+        <image name="book.pages" catalog="system" width="107" height="128"/>
         <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="forward.fill" catalog="system" width="128" height="77"/>
         <image name="gobackward.10" catalog="system" width="119" height="128"/>

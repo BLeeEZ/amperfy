@@ -29,11 +29,16 @@ public protocol MusicPlayable {
     func didPause()
     func didStopPlaying()
     func didElapsedTimeChange()
+    func didLyricsTimeChange(time: CMTime) // high refresh count
     func didPlaylistChange()
     func didArtworkChange()
     func didShuffleChange()
     func didRepeatChange()
     func didPlaybackRateChange()
+}
+
+public extension MusicPlayable {
+    func didLyricsTimeChange(time: CMTime) {} // make it an optional method
 }
 
 extension MusicPlayable {

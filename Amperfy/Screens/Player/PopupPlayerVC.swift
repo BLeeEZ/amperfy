@@ -20,6 +20,7 @@
 //
 
 import UIKit
+import CoreMedia
 import AmperfyKit
 import PromiseKit
 
@@ -241,6 +242,7 @@ extension PopupPlayerVC: MusicPlayable {
     
     func didStartPlayingFromBeginning() {
         fetchSongInfoAndUpdateViews()
+        largeCurrentlyPlayingView?.initializeLyrics()
     }
     
     func didStartPlaying() {
@@ -260,6 +262,11 @@ extension PopupPlayerVC: MusicPlayable {
     
     func didPause() {}
     func didElapsedTimeChange() {}
+    
+    func didLyricsTimeChange(time: CMTime) {
+        largeCurrentlyPlayingView?.refreshLyricsTime(time: time)
+    }
+    
     func didArtworkChange() {
         self.refreshCurrentlyPlayingArtworks()
     }

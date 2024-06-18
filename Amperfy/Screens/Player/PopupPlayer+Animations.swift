@@ -154,6 +154,15 @@ extension PopupPlayerVC {
         fakeImageView.image = image
         fakeImageView.contentMode = .scaleAspectFill
         fakeImageView.clipsToBounds = true
+        fakeImageView.alpha = sourceView.alpha
+        
+        // animate alpha for active lyrics view
+        UIView.animate(withDuration: Self.displaStyleAnimationDuration, delay: 0, animations: {
+            fakeImageView.alpha = targetView.alpha
+        }, completion: { _ in
+            fakeImageView.alpha = targetView.alpha
+        })
+        
         animatePlayStyleObject(object: fakeImageView, sourceView: sourceView, targetView: targetView, sourceFrame: sourceFrame, targetFrame: targetFrame)
     }
     

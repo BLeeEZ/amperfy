@@ -31,7 +31,9 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     static private let margin = UIEdgeInsets(top: 0, left: UIView.defaultMarginX, bottom: 20, right: UIView.defaultMarginX)
     
     private var rootView: PopupPlayerVC?
+    private var lyricsView: LyricsView?
     
+    @IBOutlet weak var upperContainerView: UIView!
     @IBOutlet weak var artworkImage: LibraryEntityImage!
     @IBOutlet weak var detailsContainer: UIView!
     @IBOutlet weak var titleLabel: MarqueeLabel!
@@ -47,12 +49,100 @@ class LargeCurrentlyPlayingPlayerView: UIView {
         self.layoutMargins = Self.margin
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        lyricsView?.frame = CGRect(
+                x: 0,
+                y: 0,
+                width: upperContainerView.bounds.width,
+                height: upperContainerView.bounds.height)
+    }
+    
     func prepare(toWorkOnRootView: PopupPlayerVC? ) {
         self.rootView = toWorkOnRootView
         titleLabel.applyAmperfyStyle()
         albumLabel.applyAmperfyStyle()
         artistLabel.applyAmperfyStyle()
+        lyricsView = LyricsView()
+        lyricsView!.frame = upperContainerView.bounds
+        upperContainerView.addSubview(lyricsView!)
         refresh()
+        initializeLyrics()
+    }
+    
+    func refreshLyricsTime(time: CMTime) {
+        self.lyricsView?.scroll(toTime: time, animated: true)
+    }
+    
+    func initializeLyrics() {
+        guard isLyricsViewAllowedToDisplay else {
+            hideLyrics()
+            return
+        }
+        
+        guard let playable = rootView?.player.currentlyPlaying,
+              let song = playable.asSong,
+              let lyricsRelFilePath = song.lyricsRelFilePath
+        else {
+            showLyricsAreNotAvailable()
+            return
+        }
+        
+        firstly {
+            appDelegate.librarySyncer.parseLyrics(relFilePath: lyricsRelFilePath)
+        }.done { lyricsList in
+            guard self.isLyricsViewAllowedToDisplay else {
+                self.hideLyrics()
+                return
+            }
+            
+            if song == self.appDelegate.player.currentlyPlaying?.asSong,
+               let structuredLyrics = lyricsList.getFirstSyncedLyricsOrUnsyncedAsDefault() {
+                self.showLyrics(structuredLyrics: structuredLyrics)
+            } else {
+                self.showLyricsAreNotAvailable()
+            }
+        }.catch { error in
+            guard self.isLyricsViewAllowedToDisplay else {
+                self.hideLyrics()
+                return
+            }
+            self.showLyricsAreNotAvailable()
+        }
+    }
+    
+    var isLyricsViewAllowedToDisplay: Bool {
+        return appDelegate.storage.settings.isPlayerLyricsDisplayed &&
+            appDelegate.player.playerMode == .music &&
+            appDelegate.backendApi.selectedApi != .ampache
+    }
+    
+    var isLyricsButtonAllowedToDisplay: Bool {
+        return  !appDelegate.storage.settings.isAlwaysHidePlayerLyricsButton &&
+            appDelegate.player.playerMode == .music &&
+            appDelegate.backendApi.selectedApi != .ampache
+    }
+    
+    private func hideLyrics() {
+        self.lyricsView?.clear()
+        self.lyricsView?.isHidden = true
+        self.artworkImage.alpha = 1
+    }
+    
+    private func showLyricsAreNotAvailable() {
+        var notAvailableLyrics = StructuredLyrics()
+        notAvailableLyrics.synced = false
+        var line = LyricsLine()
+        line.value = "No Lyrics"
+        notAvailableLyrics.line.append(line)
+        showLyrics(structuredLyrics: notAvailableLyrics)
+        self.lyricsView?.highlightAllLyrics()
+    }
+    
+    private func showLyrics(structuredLyrics: StructuredLyrics) {
+        self.lyricsView?.display(lyrics: structuredLyrics)
+        self.lyricsView?.isHidden = false
+        self.artworkImage.alpha = 0.1
     }
     
     func refresh() {
@@ -65,6 +155,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
             albumContainerView: albumContainerView)
         rootView?.refreshFavoriteButton(button: favoriteButton)
         rootView?.refreshOptionButton(button: optionsButton, rootView: rootView)
+        initializeLyrics()
     }
     
     func refreshArtwork() {

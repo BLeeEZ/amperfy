@@ -288,7 +288,8 @@ public class PersistentStorage {
         case ShowArtistDuration = "showArtistDuration"
         case PlayerShuffleButtonEnabled = "enablePlayerShuffleButton"
         case ShowMusicPlayerSkipButtons = "showMusicPlayerSkipButtons"
-        
+        case AlwaysHidePlayerLyricsButton = "alwaysHidePlayerLyricsButton"
+
         case SongActionOnTab = "songActionOnTab"
         case LibraryDisplaySettings = "libraryDisplaySettings"
         case SwipeLeadingActionSettings = "swipeLeadingActionSettings"
@@ -299,6 +300,7 @@ public class PersistentStorage {
         case SongsSortSetting = "songsSortSetting"
         case PodcastsShowSetting = "podcastsShowSetting"
         case PlayerDisplayStyle = "playerDisplayStyle"
+        case IsPlayerLyricsDisplayed = "isPlayerLyricsDisplayed"
         case IsOfflineMode = "isOfflineMode"
         case IsAutoDownloadLatestSongsActive = "isAutoDownloadLatestSongsActive"
         case IsAutoDownloadLatestPodcastEpisodesActive = "isAutoDownloadLatestPodcastEpisodesActive"
@@ -413,6 +415,11 @@ public class PersistentStorage {
             set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.ShowMusicPlayerSkipButtons.rawValue) }
         }
         
+        public var isAlwaysHidePlayerLyricsButton: Bool {
+            get { return UserDefaults.standard.object(forKey: UserDefaultsKey.AlwaysHidePlayerLyricsButton.rawValue) as? Bool ?? false }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.AlwaysHidePlayerLyricsButton.rawValue) }
+        }
+        
         public var cacheLimit: Int {
             get {
                 return UserDefaults.standard.object(forKey: UserDefaultsKey.CacheLimit.rawValue) as? Int ?? 0
@@ -498,6 +505,11 @@ public class PersistentStorage {
                 return PlayerDisplayStyle(rawValue: playerDisplayStyleRaw) ?? PlayerDisplayStyle.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.PlayerDisplayStyle.rawValue) }
+        }
+        
+        public var isPlayerLyricsDisplayed: Bool {
+            get { return UserDefaults.standard.object(forKey: UserDefaultsKey.IsPlayerLyricsDisplayed.rawValue) as? Bool ?? false }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsPlayerLyricsDisplayed.rawValue) }
         }
         
         public var isOfflineMode: Bool {

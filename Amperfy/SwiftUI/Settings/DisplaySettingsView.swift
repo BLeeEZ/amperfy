@@ -37,6 +37,13 @@ struct DisplaySettingsView: View {
         }
     }
     
+    func tooglePlayerLyricsButtonPreference() {
+        settings.isAlwaysHidePlayerLyricsButton.toggle()
+        if settings.isAlwaysHidePlayerLyricsButton {
+            appDelegate.storage.settings.isPlayerLyricsDisplayed = false
+        }
+    }
+    
     var body: some View {
         ZStack{
             List {
@@ -74,22 +81,40 @@ struct DisplaySettingsView: View {
                         Toggle(isOn: $settings.isHapticsEnabled) {}
                     }
                 }
-                , footer: {
+                        , footer: {
                     Text("Certain interactions provide haptic feedback. Long pressing to display the details menu will always trigger haptic feedback.")
                 })
                 
                 Section(content: {
                     HStack {
-                        Text("Music player skip buttons")
+                        Text("Music Player Skip Buttons")
                         Spacer()
                         Toggle(isOn: $settings.isShowMusicPlayerSkipButtons) {}
                             .frame(width: 130)
                     }
- 
+                    
                 }
-                , footer: {
-                    Text("Displays skip forward button and skip backward button in music player in addition to previous/next buttons.")
+                        , footer: {
+                    Text("Display skip forward button and skip backward button in music player in addition to previous/next buttons.")
                 })
+                
+                if appDelegate.backendApi.selectedApi != .ampache {
+                    Section(content: {
+                        HStack {
+                            Text("Music Player Lyrics Button")
+                            Spacer()
+                            Toggle(isOn: Binding<Bool>(
+                                get: { !settings.isAlwaysHidePlayerLyricsButton },
+                                set: { _ in tooglePlayerLyricsButtonPreference() }
+                            )) {}
+                                .frame(width: 130)
+                        }
+                        
+                    }
+                            , footer: {
+                        Text("Display lyrics button in music player.")
+                    })
+                }
                 
                 Section(content: {
                     HStack {

@@ -21,6 +21,7 @@
 
 import Foundation
 import CoreData
+import CoreMedia
 import PromiseKit
 import PMKAlamofire
 
@@ -66,6 +67,13 @@ public class APIDataResponse {
 
 public struct LyricsList {
     public var lyrics = [StructuredLyrics]()
+    
+    public func getFirstSyncedLyricsOrUnsyncedAsDefault() -> StructuredLyrics? {
+        guard let index = lyrics.firstIndex(where: { $0.synced }) else {
+            return lyrics.object(at: 0)
+        }
+        return lyrics[index]
+    }
 }
 
 public struct StructuredLyrics {
@@ -77,11 +85,18 @@ public struct StructuredLyrics {
     public var displayArtist: String? // The artist name to display. This could be the localized name, or any other value
     public var displayTitle: String? // The title to display. This could be the song title (localized), or any other value
     public var offset = 0 // The offset to apply to all lyrics, in milliseconds. Positive means lyrics appear sooner, negative means later. If not included, the offset must be assumed to be 0
+    public init() {}
 }
 
 public struct LyricsLine {
     public var start: Int? // The start time of the lyrics, relative to the start time of the track, in milliseconds. If this is not part of synced lyrics, start must be omitted
     public var value = "" // The actual text of this line
+    
+    public init() {}
+    public var startTime: CMTime {
+        guard let start = start else { return CMTime(value: Int64(0), timescale: 1) }
+        return CMTime(value: Int64(start), timescale: 1_000)
+    }
 }
 
 public protocol LibrarySyncer {
