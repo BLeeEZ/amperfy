@@ -20,6 +20,7 @@
 //
 
 import Foundation
+import PromiseKit
 import AmperfyKit
 import Intents
 import CallbackURLKit
@@ -90,12 +91,16 @@ public class IntentManager {
     
     public private(set) var documentation: [XCallbackActionDocu]
     private let storage: PersistentStorage
+    private let librarySyncer: LibrarySyncer
+    private let playableDownloadManager: DownloadManageable
     private let library: LibraryStorage
     private let player: PlayerFacade
     private var lastResult: AmperfyMediaIntentItemResult?
     
-    init(storage: PersistentStorage, library: LibraryStorage, player: PlayerFacade) {
+    init(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable, library: LibraryStorage, player: PlayerFacade) {
         self.storage = storage
+        self.librarySyncer = librarySyncer
+        self.playableDownloadManager = playableDownloadManager
         self.library = library
         self.player = player
         self.documentation = [XCallbackActionDocu]()
@@ -180,8 +185,15 @@ public class IntentManager {
                 repeatOption = repeatInput
             }
             let playableContainer = self.getPlayableContainer(searchTerm: searchTerm, searchCategory: searchCategory)
-            self.play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
-            success(nil)
+            firstly {
+                self.play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            }.done { playSuccess in
+                if playSuccess {
+                    success(nil)
+                } else {
+                    failure(NSError.error(code: .missingErrorCode, failureReason: "Requested element could not be played."))
+                }
+            }
         }
         
         documentation.append(XCallbackActionDocu(
@@ -248,8 +260,15 @@ public class IntentManager {
                 repeatOption = repeatInput
             }
             let playableContainer = self.getPlayableContainer(id: id, libraryElementType: libraryElementType)
-            self.play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
-            success(nil)
+            firstly {
+                self.play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            }.done { playSuccess in
+                if playSuccess {
+                    success(nil)
+                } else {
+                    failure(NSError.error(code: .missingErrorCode, failureReason: "Requested element could not be played."))
+                }
+            }
         }
         
         documentation.append(XCallbackActionDocu(
@@ -609,13 +628,13 @@ public class IntentManager {
         return result
     }
     
-    public func handleIncomingIntent(userActivity: NSUserActivity) -> Bool {
+    public func handleIncomingIntent(userActivity: NSUserActivity) -> Guarantee<Bool> {
         guard userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self) ||
               userActivity.activityType == NSUserActivity.searchAndPlayActivityType ||
               userActivity.activityType == NSStringFromClass(PlayIDIntent.self) ||
               userActivity.activityType == NSUserActivity.playIdActivityType
             else {
-                return false
+                return Guarantee<Bool>.value(false)
         }
         if userActivity.activityType == NSUserActivity.searchAndPlayActivityType || userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self),
            let searchTerm = userActivity.userInfo?[NSUserActivity.ActivityKeys.searchTerm.rawValue] as? String,
@@ -635,7 +654,7 @@ public class IntentManager {
             }
 
             let playableContainer = self.getPlayableContainer(searchTerm: searchTerm, searchCategory: searchCategory)
-            play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            return play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else if userActivity.activityType == NSUserActivity.playIdActivityType || userActivity.activityType == NSStringFromClass(PlayIDIntent.self),
            let id = userActivity.userInfo?[NSUserActivity.ActivityKeys.id.rawValue] as? String,
            let libraryElementTypeRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.libraryElementType.rawValue] as? Int,
@@ -654,9 +673,10 @@ public class IntentManager {
             }
 
             let playableContainer = self.getPlayableContainer(id: id, libraryElementType: libraryElementType)
-            play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            return play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+        } else {
+            return Guarantee<Bool>.value(false)
         }
-        return true
     }
     
     private func getPlayableContainer(searchTerm: String, searchCategory: PlayableContainerType) -> PlayableContainable? {
@@ -717,34 +737,46 @@ public class IntentManager {
         return playableContainer
     }
     
-    public func playLastResult(shuffleOption: Bool, repeatOption: RepeatMode) -> Bool {
-        guard let lastResult = lastResult else { return false }
+    public func playLastResult(shuffleOption: Bool, repeatOption: RepeatMode) -> Guarantee<Bool> {
+        guard let lastResult = lastResult else { return Guarantee<Bool>.value(false) }
         self.lastResult = nil
         
         if let playableContainer = lastResult.playableContainer {
             os_log("Play container <%s> (shuffle: %s, repeat: %s)", log: self.log, type: .info, playableContainer.name, shuffleOption.description, repeatOption.description)
-            play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            return play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else if let playableElements = lastResult.playableElements{
             os_log("Play Music (shuffle: %s, repeat: %s)", log: self.log, type: .info, shuffleOption.description, repeatOption.description)
-            play(context: PlayContext(name: "Siri Command", playables: playableElements), shuffleOption: shuffleOption, repeatOption: repeatOption)
+            return play(context: PlayContext(name: "Siri Command", playables: playableElements), shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else {
-            return false
+            return Guarantee<Bool>.value(false)
         }
-        return true
     }
 
-    private func play(container: PlayableContainable?, shuffleOption: Bool, repeatOption: RepeatMode) {
-        guard let container = container else { return }
-        play(context: PlayContext(containable: container), shuffleOption: shuffleOption, repeatOption: repeatOption)
+    private func play(container: PlayableContainable?, shuffleOption: Bool, repeatOption: RepeatMode) -> Guarantee<Bool> {
+        guard let container = container else { return Guarantee<Bool>.value(false) }
+        return Guarantee<Bool> { seal in
+            firstly {
+                container.fetch(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
+            }.catch { error in
+                // ignore error
+            }.finally {
+                firstly {
+                    self.play(context: PlayContext(containable: container), shuffleOption: shuffleOption, repeatOption: repeatOption)
+                }.done { success in
+                    seal(success)
+                }
+            }
+        }
     }
     
-    private func play(context: PlayContext, shuffleOption: Bool, repeatOption: RepeatMode) {
+    private func play(context: PlayContext, shuffleOption: Bool, repeatOption: RepeatMode) -> Guarantee<Bool>  {
         if shuffleOption {
             player.playShuffled(context: context)
         } else {
             player.play(context: context)
         }
         player.setRepeatMode(repeatOption)
+        return Guarantee<Bool>.value(true)
     }
     
 }

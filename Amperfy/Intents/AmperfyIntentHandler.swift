@@ -21,6 +21,7 @@
 
 import Foundation
 import Intents
+import PromiseKit
 import AmperfyKit
 import OSLog
 
@@ -59,10 +60,10 @@ public class SearchAndPlayIntentHandler: NSObject, SearchAndPlayIntentHandling {
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: intent.shuffleOption.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.repeatOption.rawValue: intent.repeatOption.rawValue])
         
-        if intentManager.handleIncomingIntent(userActivity: userActivity) {
-            completion(SearchAndPlayIntentResponse(code: .success, userActivity: nil))
-        } else {
-            completion(SearchAndPlayIntentResponse(code: .failure, userActivity: nil))
+        firstly {
+            self.intentManager.handleIncomingIntent(userActivity: userActivity)
+        }.done { success in
+            completion(SearchAndPlayIntentResponse(code: success ? .success : .failure, userActivity: nil))
         }
     }
 }
@@ -102,10 +103,10 @@ public class PlayIDIntentHandler: NSObject, PlayIDIntentHandling {
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: intent.shuffleOption.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.repeatOption.rawValue: intent.repeatOption.rawValue])
         
-        if intentManager.handleIncomingIntent(userActivity: userActivity) {
-            completion(PlayIDIntentResponse(code: .success, userActivity: nil))
-        } else {
-            completion(PlayIDIntentResponse(code: .failure, userActivity: nil))
+        firstly {
+            self.intentManager.handleIncomingIntent(userActivity: userActivity)
+        }.done { success in
+            completion(PlayIDIntentResponse(code: success ? .success : .failure, userActivity: nil))
         }
     }
 }
@@ -157,10 +158,10 @@ public class PlayMediaIntentHandler: NSObject, INPlayMediaIntentHandling {
         let shuffleOption = intent.playShuffled ?? false
         let repeatOption = RepeatMode.fromINPlaybackRepeatMode(mode: intent.playbackRepeatMode)
         
-        if intentManager.playLastResult(shuffleOption: shuffleOption, repeatOption: repeatOption) {
-            completion(INPlayMediaIntentResponse(code: .success, userActivity: nil))
-        } else {
-            completion(INPlayMediaIntentResponse(code: .failure, userActivity: nil))
+        firstly {
+            self.intentManager.playLastResult(shuffleOption: shuffleOption, repeatOption: repeatOption)
+        }.done { success in
+            completion(INPlayMediaIntentResponse(code: success ? .success : .failure, userActivity: nil))
         }
     }
 }
