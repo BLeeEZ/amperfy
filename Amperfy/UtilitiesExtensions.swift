@@ -159,6 +159,15 @@ extension UIView {
     }
 }
 
+extension UINavigationController {
+    func replaceCurrentlyActiveVC(with vc: UIViewController, animated: Bool) {
+        var vcs = self.viewControllers
+        vcs = vcs.dropLast()
+        vcs.append(vc)
+        self.setViewControllers(vcs, animated:animated)
+    }
+}
+
 extension UITableView {
     func register(nibName: String) {
         self.register(UINib(nibName: nibName, bundle: nil), forCellReuseIdentifier: nibName)

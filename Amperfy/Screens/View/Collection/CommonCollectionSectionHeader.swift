@@ -30,23 +30,23 @@ class CommonCollectionSectionHeader: UICollectionReusableView {
     
     private var detailHeader: LibraryElementDetailTableHeaderView?
     
-    func display(title: String) {
+    func display(title: String?) {
         titleLabel.text = title
+        titleLabel.isHidden = (title == nil)
     }
     
-    func displayPlayHeader(infoCB: GetInfoCallback?, playContextCb: GetPlayContextCallback?, with player: PlayerFacade, shuffleContextCb: GetPlayContextCallback? = nil) {
-        
-        let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
-            infoCB: infoCB,
-            playContextCb: playContextCb,
-            player: player,
-            isInfoAlwaysHidden: true,
-            shuffleContextCb: shuffleContextCb)
+    func displayPlayHeader(configuration: PlayShuffleInfoConfiguration) {
         detailHeader = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
-        detailHeader?.prepare(configuration: playShuffleInfoConfig)
+        detailHeader?.prepare(configuration: configuration)
+        detailHeader?.traitCollectionDidChange(nil)
         if let detailHeader = detailHeader {
             self.addSubview(detailHeader)
         }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        detailHeader?.traitCollectionDidChange(previousTraitCollection)
     }
     
     override func prepareForReuse() {

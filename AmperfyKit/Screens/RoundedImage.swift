@@ -21,9 +21,23 @@
 
 import UIKit
 
+public enum CornerRadius {
+    case small
+    case big
+    
+    public var asCGFloat: CGFloat {
+        switch self {
+        case .small:
+            return 5.0
+        case .big:
+            return 15.0
+        }
+    }
+}
+
 public class RoundedImage: UIImageView {
     
-    public static let cornerRadius: CGFloat = 5.0
+    public static let cornerRadius: CGFloat = CornerRadius.small.asCGFloat
 
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)

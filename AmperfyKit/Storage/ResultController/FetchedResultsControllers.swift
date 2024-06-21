@@ -131,6 +131,13 @@ public enum ArtistCategoryFilter: Int {
     public static let defaultValue: ArtistCategoryFilter = .albumArtists
 }
 
+public enum AlbumsDisplayStyle: Int {
+    case table = 0
+    case grid = 1
+    
+    public static let defaultValue: AlbumsDisplayStyle = .grid
+}
+
 public class SearchHistoryFetchedResultsController: BasicFetchedResultsController<SearchHistoryItemMO> {
 
     public init(coreDataCompanion: CoreDataCompanion) {

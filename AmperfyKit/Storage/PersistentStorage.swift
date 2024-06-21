@@ -300,6 +300,7 @@ public class PersistentStorage {
         case AlbumsSortSetting = "albumsSortSetting"
         case SongsSortSetting = "songsSortSetting"
         case ArtistsFilterSetting = "artistsFilterSetting"
+        case AlbumsDisplayStyleSetting = "albumsDisplayStyleSetting"
         case PodcastsShowSetting = "podcastsShowSetting"
         case PlayerDisplayStyle = "playerDisplayStyle"
         case IsPlayerLyricsDisplayed = "isPlayerLyricsDisplayed"
@@ -472,6 +473,14 @@ public class PersistentStorage {
                 return ArtistCategoryFilter(rawValue: artistsFilterSettingRaw) ?? ArtistCategoryFilter.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ArtistsFilterSetting.rawValue) }
+        }
+        
+        public var albumsStyleSetting: AlbumsDisplayStyle {
+            get {
+                let albumsDisplayStyleRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.AlbumsDisplayStyleSetting.rawValue) as? Int ?? AlbumsDisplayStyle.defaultValue.rawValue
+                return AlbumsDisplayStyle(rawValue: albumsDisplayStyleRaw) ?? AlbumsDisplayStyle.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.AlbumsDisplayStyleSetting.rawValue) }
         }
         
         public var swipeActionSettings: SwipeActionSettings {

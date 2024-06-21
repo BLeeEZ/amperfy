@@ -21,11 +21,14 @@
 
 import UIKit
 import CoreData
+import AmperfyKit
 
 class BasicCollectionViewController: UICollectionViewController {
     
     let searchController = UISearchController(searchResultsController: nil)
-    var blockOperations: [BlockOperation] = []
+    
+    var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
+    var playContextAtIndexPathCallback: PlayContextAtIndexPathCallback?
     var isIndexTitelsHidden = false
     
     override func viewDidLoad() {
@@ -58,51 +61,47 @@ class BasicCollectionViewController: UICollectionViewController {
         self.definesPresentationContext = true
     }
     
-}
-
-extension BasicCollectionViewController: NSFetchedResultsControllerDelegate {
-    
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        blockOperations.removeAll()
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        collectionView.performBatchUpdates({
-             self.blockOperations.forEach { $0.start() }
-         }, completion: { finished in
-             self.blockOperations.removeAll(keepingCapacity: false)
-         })
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
-                    didChange anObject: Any,
-                    at indexPath: IndexPath?,
-                    for type: NSFetchedResultsChangeType,
-                    newIndexPath: IndexPath?) {
-
-        let op: BlockOperation
-        switch type {
-        case .insert:
-            guard let newIndexPath = newIndexPath else { return }
-            op = BlockOperation { self.collectionView.insertItems(at: [newIndexPath]) }
-        case .delete:
-            guard let indexPath = indexPath else { return }
-            op = BlockOperation { self.collectionView.deleteItems(at: [indexPath]) }
-        case .move:
-            guard let indexPath = indexPath,  let newIndexPath = newIndexPath else { return }
-            op = BlockOperation { self.collectionView.moveItem(at: indexPath, to: newIndexPath) }
-        case .update:
-            guard let indexPath = indexPath else { return }
-            op = BlockOperation { self.collectionView.reloadItems(at: [indexPath]) }
-        @unknown default:
-            fatalError()
+    override func collectionView(_ collectionView: UICollectionView,
+                                 contextMenuConfigurationForItemAt indexPath: IndexPath,
+                                 point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let containableCB = containableAtIndexPathCallback,
+              let containable = containableCB(indexPath)
+        else { return nil }
+        
+        let identifier = NSString(string: TableViewPreviewInfo(playableContainerIdentifier: containable.containerIdentifier, indexPath: indexPath).asJSONString())
+        return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
+            let vc = EntityPreviewVC()
+            vc.display(container: containable, on: self)
+            containable.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            .catch { error in
+                self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
+            }.finally {
+                vc.refresh()
+            }
+            return vc
+        }) { suggestedActions in
+            var playIndexCB : (() -> PlayContext?)?
+            if let playContextAtIndexPathCP = self.playContextAtIndexPathCallback {
+                playIndexCB = { playContextAtIndexPathCP(indexPath) }
+            }
+            return EntityPreviewActionBuilder(container: containable, on: self, playContextCb: playIndexCB).createMenu()
         }
-
-        blockOperations.append(op)
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView,
+                                 willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
+                                 animator: UIContextMenuInteractionCommitAnimating) {
+        animator.addCompletion {
+            if let identifier = configuration.identifier as? String,
+               let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
+               let containerIdentifier = tvPreviewInfo.playableContainerIdentifier,
+               let container = self.appDelegate.storage.main.library.getContainer(identifier: containerIdentifier) {
+                EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
+            }
+        }
     }
     
 }
-
 
 extension BasicCollectionViewController: UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
     
@@ -115,6 +114,50 @@ extension BasicCollectionViewController: UISearchResultsUpdating, UISearchBarDel
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         updateSearchResults(for: searchController)
+    }
+    
+}
+
+class SingleSnapshotFetchedResultsCollectionViewController<ResultType>:
+    BasicCollectionViewController,
+    NSFetchedResultsControllerDelegate where ResultType : NSFetchRequestResult {
+    
+    var diffableDataSource: BasicUICollectionViewDiffableDataSource?
+    var snapshotDidChange: (() -> Void)?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        /// Store the data source in an instance property to make sure it's retained.
+        self.diffableDataSource = createDiffableDataSource()
+        /// Assign the data source to your collection view.
+        collectionView.dataSource = diffableDataSource
+    }
+    
+    /// need to be overriden in child class
+    func createDiffableDataSource() -> BasicUICollectionViewDiffableDataSource {
+        fatalError("Should have been overriden in child class")
+    }
+    
+    /// This will override the NSFetchedResultsController handling of the super class -> Only use snapshots
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference) {
+        guard let dataSource = collectionView?.dataSource as? UICollectionViewDiffableDataSource<Int, NSManagedObjectID> else {
+            assertionFailure("The data source has not implemented snapshot support while it should")
+            return
+        }
+        var snapshot = snapshot as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>
+        let currentSnapshot = dataSource.snapshot() as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>
+
+        let reloadIdentifiers: [NSManagedObjectID] = snapshot.itemIdentifiers.compactMap { itemIdentifier in
+            guard let currentIndex = currentSnapshot.indexOfItem(itemIdentifier), let index = snapshot.indexOfItem(itemIdentifier), index == currentIndex else {
+                return nil
+            }
+            guard let existingObject = try? controller.managedObjectContext.existingObject(with: itemIdentifier), existingObject.isUpdated else { return nil }
+            return itemIdentifier
+        }
+        snapshot.reconfigureItems(reloadIdentifiers)
+        
+        dataSource.apply(snapshot as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>, animatingDifferences: false)
+        self.snapshotDidChange?()
     }
     
 }

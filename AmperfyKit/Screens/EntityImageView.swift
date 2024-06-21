@@ -64,8 +64,8 @@ open class EntityImageView: UIView {
         self.view = view
     }
     
-    public func display(theme: ThemePreference, container: PlayableContainable) {
-        display(theme: theme, collection: container.getArtworkCollection(theme: theme))
+    public func display(theme: ThemePreference, container: PlayableContainable, cornerRadius: CornerRadius = .small) {
+        display(theme: theme, collection: container.getArtworkCollection(theme: theme), cornerRadius: cornerRadius)
     }
 
     public func configureStyling(image: UIImage, imageSizeType: ArtworkIconSizeType, imageTintColor: UIColor, backgroundColor: UIColor) {
@@ -76,9 +76,9 @@ open class EntityImageView: UIView {
         singleImage.display(image: modImage)
     }
     
-    public func display(theme: ThemePreference, collection: ArtworkCollection) {
+    public func display(theme: ThemePreference, collection: ArtworkCollection, cornerRadius: CornerRadius = .small) {
         backgroundColor = .clear
-        layer.cornerRadius = RoundedImage.cornerRadius
+        layer.cornerRadius = cornerRadius.asCGFloat
         layer.masksToBounds = true
         self.view.backgroundColor = .clear
         self.view.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)

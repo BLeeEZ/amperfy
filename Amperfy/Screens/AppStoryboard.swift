@@ -21,6 +21,7 @@
 
 import Foundation
 import UIKit
+import AmperfyKit
 
 enum AppStoryboard : String {
     
@@ -32,6 +33,19 @@ enum AppStoryboard : String {
     
     func viewController<T: UIViewController>(viewControllerClass: T.Type) -> T {
         return self.instance.instantiateViewController(withIdentifier: viewControllerClass.storyboardID) as! T
+    }
+    
+    func createAlbumsVC(style: AlbumsDisplayStyle, category: DisplayCategoryFilter) -> UIViewController {
+        switch style {
+        case .table:
+            let vc = AlbumsVC.instantiateFromAppStoryboard()
+            vc.displayFilter = category
+            return vc
+        case .grid:
+            let vc = AlbumsCollectionVC.instantiateFromAppStoryboard()
+            vc.displayFilter = category
+            return vc
+        }
     }
     
 }

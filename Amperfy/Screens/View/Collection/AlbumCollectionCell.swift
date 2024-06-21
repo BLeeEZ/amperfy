@@ -27,6 +27,7 @@ class AlbumCollectionCell: BasicCollectionCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var subtitleLabel: UILabel!
     @IBOutlet weak var entityImage: EntityImageView!
+    @IBOutlet weak var artworkImageWidthConstraint: NSLayoutConstraint!
     
     static let maxWidth: CGFloat = 250.0
     
@@ -37,9 +38,17 @@ class AlbumCollectionCell: BasicCollectionCell {
         self.container = container
         self.rootView = rootView
         titleLabel.text = container.name
-        subtitleLabel.isHidden = container.subtitle == nil
         subtitleLabel.text = container.subtitle
-        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: container)
+        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: container, cornerRadius: .big)
+        let newImageWidth = min(entityImage.superview?.bounds.width ?? 0.0, entityImage.superview?.bounds.height ?? 0.0)
+        artworkImageWidthConstraint.constant = newImageWidth
+        layoutIfNeeded()
+    }
+    
+    override func layoutSubviews() {
+        let newImageWidth = min(entityImage.superview?.bounds.width ?? 0.0, entityImage.superview?.bounds.height ?? 0.0)
+        artworkImageWidthConstraint.constant = newImageWidth
+        super.layoutSubviews()
     }
     
 }

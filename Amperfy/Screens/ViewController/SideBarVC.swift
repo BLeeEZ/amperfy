@@ -59,7 +59,7 @@ class SideBarVC: KeyCommandCollectionViewController {
         }
 
         if let libraryItem = selectedItem.library {
-            splitVC.pushReplaceNavLibrary(vc: libraryItem.controller)
+            splitVC.pushReplaceNavLibrary(vc: libraryItem.controller(settings: appDelegate.storage.settings))
         } else if let libraryItem = selectedItem.tab {
             if libraryItem == .settings {
                 let vc = libraryItem.controller

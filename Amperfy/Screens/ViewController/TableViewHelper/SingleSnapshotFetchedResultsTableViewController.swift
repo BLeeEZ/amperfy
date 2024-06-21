@@ -67,6 +67,36 @@ class BasicUITableViewDiffableDataSource: UITableViewDiffableDataSource<Int, NSM
 
 }
 
+class BasicUICollectionViewDiffableDataSource: UICollectionViewDiffableDataSource<Int, NSManagedObjectID> {
+    
+    override func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        guard let fromObject = itemIdentifier(for: sourceIndexPath),
+              sourceIndexPath != destinationIndexPath else { return }
+        
+        var snap = snapshot()
+        snap.deleteItems([fromObject])
+        
+        if let toObject = itemIdentifier(for: destinationIndexPath) {
+            let isAfter = destinationIndexPath.row > sourceIndexPath.row
+            
+            if isAfter {
+                snap.insertItems([fromObject], afterItem: toObject)
+            } else {
+                snap.insertItems([fromObject], beforeItem: toObject)
+            }
+        } else {
+            snap.appendItems([fromObject], toSection: sourceIndexPath.section)
+        }
+        
+        apply(snap, animatingDifferences: true)
+    }
+
+}
+
 class SingleSnapshotFetchedResultsTableViewController<ResultType>:
     BasicFetchedResultsTableViewController<ResultType>,
     NSFetchedResultsControllerDelegate

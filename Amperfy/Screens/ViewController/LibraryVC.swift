@@ -43,7 +43,7 @@ class LibraryVC: KeyCommandCollectionViewController {
               splitVC.isCollapsed,
               let libraryItem = selectedItem.library
         else { return }
-        splitVC.pushReplaceNavLibrary(vc: libraryItem.controller)
+        splitVC.pushReplaceNavLibrary(vc: libraryItem.controller(settings: appDelegate.storage.settings))
     }
 
 }

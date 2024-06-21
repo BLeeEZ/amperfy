@@ -96,7 +96,8 @@ extension UIImage {
     public static let playlistX = UIImage.create(systemName: "text.badge.xmark")
     public static let playlistPlus = UIImage.create(systemName: "text.badge.plus")
     public static let squareArrow = UIImage.create(systemName: "arrow.forward.square")
-    
+    public static let grid = UIImage.create(systemName: "square.grid.2x2")
+
     public static let ellipsis = UIImage.create(systemName: "ellipsis")
     public static let filter = UIImage.create(systemName: "line.3.horizontal.decrease")
     public static let settings = UIImage.create(systemName: "gear")

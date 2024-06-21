@@ -46,6 +46,8 @@
 		504B441D28D7A6330033982C /* XCallbackURLsSetttingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441C28D7A6330033982C /* XCallbackURLsSetttingsView.swift */; };
 		504B442028D8E7880033982C /* SupportSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441F28D8E7880033982C /* SupportSettingsView.swift */; };
 		504B442228D8EBB20033982C /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B442128D8EBB20033982C /* MailView.swift */; };
+		505362D12C23682500846C53 /* AlbumsCollectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505362D02C23682500846C53 /* AlbumsCollectionVC.swift */; };
+		505362D32C2425C200846C53 /* AlbumsCommonVCInteractions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505362D22C2425C200846C53 /* AlbumsCommonVCInteractions.swift */; };
 		5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5055AA5626835A9000096B8D /* PodcastEpisodeTableCell.swift */; };
 		5055AA5826835AB000096B8D /* PodcastEpisodeTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5055AA5526835A9000096B8D /* PodcastEpisodeTableCell.xib */; };
 		5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */; };
@@ -592,6 +594,8 @@
 		504B442128D8EBB20033982C /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		504C718E23BAC8F2001F82C7 /* PlaylistItemTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistItemTest.swift; sourceTree = "<group>"; };
 		504C719023BAD112001F82C7 /* SongTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTest.swift; sourceTree = "<group>"; };
+		505362D02C23682500846C53 /* AlbumsCollectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsCollectionVC.swift; sourceTree = "<group>"; };
+		505362D22C2425C200846C53 /* AlbumsCommonVCInteractions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsCommonVCInteractions.swift; sourceTree = "<group>"; };
 		5055AA5526835A9000096B8D /* PodcastEpisodeTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastEpisodeTableCell.xib; sourceTree = "<group>"; };
 		5055AA5626835A9000096B8D /* PodcastEpisodeTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastEpisodeTableCell.swift; sourceTree = "<group>"; };
 		5058708F21DEBBCA0043896F /* PopupPlayerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupPlayerVC.swift; sourceTree = "<group>"; };
@@ -1505,7 +1509,9 @@
 				50CCD0582B6C388B0073793B /* PlainDetailsVC.swift */,
 				50C16C0F21E5463E00F086F0 /* ArtistsVC.swift */,
 				50C16C1921E704EC00F086F0 /* ArtistDetailVC.swift */,
+				505362D22C2425C200846C53 /* AlbumsCommonVCInteractions.swift */,
 				50C16C1721E704CE00F086F0 /* AlbumsVC.swift */,
+				505362D02C23682500846C53 /* AlbumsCollectionVC.swift */,
 				50C16C1B21E7051700F086F0 /* AlbumDetailVC.swift */,
 				50BA92F921CC37F800E5901D /* SongsVC.swift */,
 				5007CE4021EF5F4300BC5CBA /* PlaylistsVC.swift */,
@@ -2082,6 +2088,7 @@
 				50A30E622B756CA400722894 /* CurrentlyPlayingTableCell.swift in Sources */,
 				50C9D70C2850759B007F18D0 /* PlayIndicator.swift in Sources */,
 				504262B22BF5FC3400B5EF38 /* IntentManager.swift in Sources */,
+				505362D32C2425C200846C53 /* AlbumsCommonVCInteractions.swift in Sources */,
 				504262B12BF5FBDE00B5EF38 /* Intents.intentdefinition in Sources */,
 				504262B42BF5FC3D00B5EF38 /* NSUserActivity+IntentData.swift in Sources */,
 				50C16C1021E5463E00F086F0 /* ArtistsVC.swift in Sources */,
@@ -2099,6 +2106,7 @@
 				5078AFB22B40CA5E0038FD17 /* DisplaySettingsView.swift in Sources */,
 				50DEEE07265E27070073FF20 /* DirectoryTableCell.swift in Sources */,
 				5019441B2B7A049A00082D2E /* PopupPlayer+Visuals.swift in Sources */,
+				505362D12C23682500846C53 /* AlbumsCollectionVC.swift in Sources */,
 				50C16C1821E704CE00F086F0 /* AlbumsVC.swift in Sources */,
 				508AA57D2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift in Sources */,
 				5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */,
