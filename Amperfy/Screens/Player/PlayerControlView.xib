@@ -163,6 +163,7 @@
                             <constraints>
                                 <constraint firstAttribute="height" constant="28" id="Jaw-IB-PJv"/>
                                 <constraint firstAttribute="width" secondItem="MwT-Zv-e8l" secondAttribute="height" multiplier="1:1" id="ORF-qP-V4k"/>
+                                <constraint firstAttribute="width" secondItem="MwT-Zv-e8l" secondAttribute="height" multiplier="1:1" id="r7H-ic-qIC"/>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                             <color key="tintColor" systemColor="labelColor"/>
@@ -171,7 +172,7 @@
                                 <imageReference key="image" image="rectangle.portrait.inset.filled" catalog="system" symbolScale="medium"/>
                             </state>
                             <buttonConfiguration key="configuration" style="gray" cornerStyle="medium" buttonSize="small">
-                                <imageReference key="image" image="book.pages" catalog="system" symbolScale="small"/>
+                                <imageReference key="image" image="lyrics" symbolScale="small"/>
                                 <backgroundConfiguration key="background"/>
                             </buttonConfiguration>
                             <connections>
@@ -211,7 +212,6 @@
                     </subviews>
                     <constraints>
                         <constraint firstAttribute="width" constant="300" id="dMH-9W-9do"/>
-                        <constraint firstItem="MwT-Zv-e8l" firstAttribute="width" secondItem="MwT-Zv-e8l" secondAttribute="height" multiplier="1:1" id="r7H-ic-qIC"/>
                     </constraints>
                 </stackView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dNu-q7-Vtb" userLabel="Sleep Timer Button">
@@ -287,12 +287,12 @@
     <resources>
         <image name="airplayaudio" catalog="system" width="128" height="123"/>
         <image name="backward.fill" catalog="system" width="128" height="77"/>
-        <image name="book.pages" catalog="system" width="107" height="128"/>
         <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="forward.fill" catalog="system" width="128" height="77"/>
         <image name="gobackward.10" catalog="system" width="119" height="128"/>
         <image name="goforward.10" catalog="system" width="119" height="128"/>
         <image name="list.bullet" catalog="system" width="128" height="87"/>
+        <image name="lyrics" width="10" height="13"/>
         <image name="moon.zzz.fill" catalog="system" width="117" height="128"/>
         <image name="play.fill" catalog="system" width="117" height="128"/>
         <image name="podcast" width="448" height="512"/>

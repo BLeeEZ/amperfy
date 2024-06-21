@@ -135,7 +135,6 @@ extension UIImage {
     public static let refresh = UIImage.create(systemName: "arrow.triangle.2.circlepath")
     public static let exclamation = UIImage.create(systemName: "exclamationmark")
     public static let bell = UIImage.create(systemName: "bell.fill")
-    public static let lyrics = UIImage.create(systemName: "book.pages")
 
 /// Asset symbol generation is enabled by default for both new and old projects but can be disabled by setting the build setting "Generate Asset Symbols" (ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS) to NO.
 #if false
@@ -149,6 +148,7 @@ extension UIImage {
     public static let userQueueAppend = UIImage.create("user_queue_append") // SF-Symbols 5 Regular: custom.text.line.last.and.arrowtriangle.forward.badge.person.crop
     public static let contextQueueInsert = UIImage.create("context_queue_insert") // SF-Symbols 5 Regular: custom.text.line.first.and.arrowtriangle.forward
     public static let contextQueueAppend = UIImage.create("context_queue_append") // SF-Symbols 5 Regular: custom.text.line.last.and.arrowtriangle.forward
+    public static let lyrics = UIImage.create(systemName: "book.pages") // SF-Symbols 5 Regular: book.pages (available in system catalog with iOS 17.0 and upwards)
 #endif
     public static let podcastEpisode: UIImage = podcast
     public static let podcastQueueInsert = contextQueueInsert
