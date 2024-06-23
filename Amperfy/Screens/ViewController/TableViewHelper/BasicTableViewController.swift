@@ -82,6 +82,7 @@ class BasicTableViewController: KeyCommandTableViewController {
     var playContextAtIndexPathCallback: PlayContextAtIndexPathCallback?
     var swipeCallback: SwipeActionCallback?
     var isEditLockedDueToActiveSwipe = false
+    var isSingleCellEditingModeActive = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -97,12 +98,20 @@ class BasicTableViewController: KeyCommandTableViewController {
         }
         updateSearchResults(for: searchController)
     }
+    
+    override func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {
+        isSingleCellEditingModeActive = true
+    }
+    
+    override func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
+        isSingleCellEditingModeActive = false
+    }
 
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let swipeCB = swipeCallback,
               let containableCB = containableAtIndexPathCallback,
               let containable = containableCB(indexPath)
-        else { return nil }
+        else { return UISwipeActionsConfiguration() }
         
         var createdActionsIndex = 0
         var actions = [UIContextualAction]()
@@ -116,11 +125,14 @@ class BasicTableViewController: KeyCommandTableViewController {
     }
 
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard !tableView.isEditing else { return nil }
+        // return nil here allows to display the "Delete" confirmation swipe action in edit mode (nil -> show default action -> delete is the default one)
+        guard !(tableView.isEditing && !isSingleCellEditingModeActive) else { return nil }
+        // this empty configuration enshures to only perform one "Delete" action at a time (no confirmation is displayed)
+        guard !(tableView.isEditing && isSingleCellEditingModeActive) else { return UISwipeActionsConfiguration() }
         guard let swipeCB = swipeCallback,
               let containableCB = containableAtIndexPathCallback,
               let containable = containableCB(indexPath)
-        else { return nil }
+        else { return UISwipeActionsConfiguration() }
         var createdActionsIndex = 0
         var actions = [UIContextualAction]()
         for actionType in appDelegate.storage.settings.swipeActionSettings.trailing {
