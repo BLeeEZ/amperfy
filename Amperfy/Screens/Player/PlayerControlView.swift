@@ -389,7 +389,15 @@ class PlayerControlView: UIView {
                 self.activateSleepTimer(timeInterval: TimeInterval(60 * 60))
                 self.refreshSleepTimerButton()
             })
-            sleepTimerButton.menu = UIMenu(title: "Sleep Timer", children: [endOfTrack, sleep5, sleep10, sleep15, sleep30, sleep45, sleep60])
+            let sleep120 = UIAction(title: "2 Hours", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(2 * 60 * 60))
+                self.refreshSleepTimerButton()
+            })
+            let sleep240 = UIAction(title: "4 Hours", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(4 * 60 * 60))
+                self.refreshSleepTimerButton()
+            })
+            sleepTimerButton.menu = UIMenu(title: "Sleep Timer", children: [endOfTrack, sleep5, sleep10, sleep15, sleep30, sleep45, sleep60, sleep120, sleep240])
         }
         sleepTimerButton.showsMenuAsPrimaryAction = true
     }
