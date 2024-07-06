@@ -163,15 +163,15 @@ public class IntentManager {
             var repeatOption = RepeatMode.off
             
             guard let searchTerm = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.searchTerm.rawValue} )?.value else {
-                failure(NSError.error(code: .missingParameter, failureReason: "searchTerm not provided."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter searchTerm not provided."))
                 return
             }
             guard let searchCategoryStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.searchCategory.rawValue} )?.value else {
-                failure(NSError.error(code: .missingParameter, failureReason: "searchCategory not provided."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter searchCategory not provided."))
                 return
             }
             guard let searchCategory = PlayableContainerType.from(string: searchCategoryStringRaw) else {
-                failure(NSError.error(code: .missingParameter, failureReason: "searchCategory is not valid."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter searchCategory is not valid."))
                 return
             }
             if let shuffleStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.shuffleOption.rawValue} )?.value,
@@ -238,15 +238,15 @@ public class IntentManager {
             var repeatOption = RepeatMode.off
             
             guard let id = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.id.rawValue} )?.value else {
-                failure(NSError.error(code: .missingParameter, failureReason: "ID not provided."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter id not provided."))
                 return
             }
             guard let libraryElementTypeRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.libraryElementType.rawValue} )?.value else {
-                failure(NSError.error(code: .missingParameter, failureReason: "Library element type not provided."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter libraryElementType not provided."))
                 return
             }
             guard let libraryElementType = PlayableContainerType.from(string: libraryElementTypeRaw) else {
-                failure(NSError.error(code: .missingParameter, failureReason: "Library element type is not valid."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter libraryElementType is not valid."))
                 return
             }
             if let shuffleStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.shuffleOption.rawValue} )?.value,
@@ -396,13 +396,13 @@ public class IntentManager {
         )
         CallbackURLKit.register(action: "setShuffle") { parameters, success, failure, cancel in
             guard let shuffleStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.shuffleOption.rawValue} )?.value else {
-                failure(NSError.error(code: .missingParameter, failureReason: "shuffleOption not provided."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter shuffleOption not provided."))
                 return
             }
             guard let shuffleRaw = Int(shuffleStringRaw),
                   shuffleRaw >= 0,
                   shuffleRaw <= 1 else {
-                failure(NSError.error(code: .missingParameter, failureReason: "shuffleOption is not valid."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter shuffleOption is not valid."))
                 return
             }
             if self.player.isShuffle, shuffleRaw == 0 {
@@ -431,12 +431,12 @@ public class IntentManager {
         )
         CallbackURLKit.register(action: "setRepeat") { parameters, success, failure, cancel in
             guard let repeatStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.repeatOption.rawValue} )?.value else {
-                failure(NSError.error(code: .missingParameter, failureReason: "repeatOption not provided."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter repeatOption not provided."))
                 return
             }
             guard let repeatRaw = Int16(repeatStringRaw),
                   let repeatInput = RepeatMode(rawValue: repeatRaw) else {
-                failure(NSError.error(code: .missingParameter, failureReason: "repeatOption is not valid."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter repeatOption is not valid."))
                 return
             }
             self.player.setRepeatMode(repeatInput)
@@ -461,17 +461,125 @@ public class IntentManager {
         )
         CallbackURLKit.register(action: "setOfflineMode") { parameters, success, failure, cancel in
             guard let offlineModeStringRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.offlineMode.rawValue} )?.value else {
-                failure(NSError.error(code: .missingParameter, failureReason: "offlineMode not provided."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter offlineMode not provided."))
                 return
             }
             guard let offlineMode = Int(offlineModeStringRaw),
                   offlineMode >= 0,
                   offlineMode <= 1 else {
-                failure(NSError.error(code: .missingParameter, failureReason: "offlineMode is not valid."))
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter offlineMode is not valid."))
                 return
             }
             self.storage.settings.isOfflineMode = offlineMode == 1
             success(nil)
+        }
+        
+        documentation.append(XCallbackActionDocu(
+            name: "RateCurrentlyPlayingSong",
+            description: "Rate the currently playing song.",
+            exampleURLs: [
+                "amperfy://x-callback-url/rateCurrentlyPlayingSong?rating=0",
+                "amperfy://x-callback-url/rateCurrentlyPlayingSong?rating=5"
+            ],
+            action: "rateCurrentlyPlayingSong",
+            parameters: [
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.rating.rawValue,
+                    type: "Int",
+                    isMandatory: true,
+                    description: "Rating must be between 0 and 5"
+                ),
+            ])
+        )
+        CallbackURLKit.register(action: "rateCurrentlyPlayingSong") { parameters, success, failure, cancel in
+            guard let ratingRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.rating.rawValue} )?.value else {
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter rating not provided."))
+                return
+            }
+            guard let rating = Int(ratingRaw),
+                  rating >= 0,
+                  rating <= 5 else {
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter rating is not valid. Must be between 0 and 5."))
+                return
+            }
+            guard self.storage.settings.isOnlineMode else {
+                failure(NSError.error(code: .missingParameter, failureReason: "Rating can only be changed in Online Mode."))
+                return
+            }
+            guard let currentlyPlaying = self.player.currentlyPlaying else {
+                failure(NSError.error(code: .missingParameter, failureReason: "There is no song currently playing."))
+                return
+            }
+            guard let song = currentlyPlaying.asSong else {
+                failure(NSError.error(code: .missingParameter, failureReason: "Only songs can be rated."))
+                return
+            }
+            
+            song.rating = rating
+            self.storage.main.saveContext()
+            firstly {
+                self.librarySyncer.setRating(song: song, rating: rating)
+            }.catch { error in
+                // ignore error here
+            }.finally {
+                success(nil)
+            }
+        }
+        
+        documentation.append(XCallbackActionDocu(
+            name: "FavoriteCurrentlyPlayingSong",
+            description: "Mark the currently playing song as favorite.",
+            exampleURLs: [
+                "amperfy://x-callback-url/favoriteCurrentlyPlayingSong?favorite=0",
+                "amperfy://x-callback-url/favoriteCurrentlyPlayingSong?favorite=1"
+            ],
+            action: "favoriteCurrentlyPlayingSong",
+            parameters: [
+                XCallbackActionParameterDocu(
+                    name: NSUserActivity.ActivityKeys.favorite.rawValue,
+                    type: "Int",
+                    isMandatory: true,
+                    description: "0 (no favorite) or 1 (favorite)"
+                ),
+            ])
+        )
+        CallbackURLKit.register(action: "favoriteCurrentlyPlayingSong") { parameters, success, failure, cancel in
+            guard let favoriteRaw = parameters.first(where: {$0.key == NSUserActivity.ActivityKeys.favorite.rawValue} )?.value else {
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter favorite not provided."))
+                return
+            }
+            guard let favorite = Int(favoriteRaw),
+                  favorite >= 0,
+                  favorite <= 1 else {
+                failure(NSError.error(code: .missingParameter, failureReason: "Parameter favorite is not valid."))
+                return
+            }
+            guard self.storage.settings.isOnlineMode else {
+                failure(NSError.error(code: .missingParameter, failureReason: "Favorite can only be changed in Online Mode."))
+                return
+            }
+
+            guard let currentlyPlaying = self.player.currentlyPlaying else {
+                failure(NSError.error(code: .missingParameter, failureReason: "There is no song currently playing."))
+                return
+            }
+            guard currentlyPlaying.isSong else {
+                failure(NSError.error(code: .missingParameter, failureReason: "Only songs can be rated."))
+                return
+            }
+            guard currentlyPlaying.isFavorite != (favorite == 1) else {
+                // do nothing
+                success(nil)
+                return
+            }
+            
+            firstly {
+                currentlyPlaying.remoteToggleFavorite(syncer: self.librarySyncer)
+            }.catch { error in
+                // ignore error here
+            }.finally {
+                success(nil)
+            }
         }
     }
     
