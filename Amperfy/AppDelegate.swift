@@ -203,17 +203,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         initEventLogger()
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
-        setAppTheme(color: storage.settings.themePreference.asColor)
-        
         guard let credentials = storage.loginCredentials else {
             return true
         }
+        
+        setAppTheme(color: storage.settings.themePreference.asColor)
+        
         backendApi.selectedApi = credentials.backendApi
         backendApi.provideCredentials(credentials: credentials)
         
         guard AmperKit.shared.storage.isLibrarySynced else {
             return true
         }
+        
         os_log("Amperfy Cache Location: %s", log: self.log, type: .info, CacheFileManager.shared.getAmperfyPath() ?? "-")
         libraryUpdater.performSmallBlockingLibraryUpdatesIfNeeded()
         // start manager only if no visual indicated updates are needed
