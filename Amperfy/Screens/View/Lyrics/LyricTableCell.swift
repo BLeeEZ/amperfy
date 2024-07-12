@@ -60,7 +60,7 @@ class LyricTableCellModel {
     }
     
     public func calcHeight(containerWidth: CGFloat) -> CGFloat {
-        let boundingSize = CGSize(width: containerWidth, height: 9_999)
+        let boundingSize = CGSize(width: LyricTableCell.adjustContainerWidthForMargins(containerWidth: containerWidth), height: 9_999)
         if (isActiveLine) {
             return highlightedAttributedString?.boundingRect(with: boundingSize, options: .usesLineFragmentOrigin, context: nil).height ?? 0
         } else {
@@ -75,6 +75,10 @@ class LyricTableCell: UITableViewCell {
     
     private var lyricLabel: UILabel!
     override var layoutMargins: UIEdgeInsets { get { return BasicTableCell.margin } set { } }
+    
+    static func adjustContainerWidthForMargins(containerWidth: CGFloat) -> CGFloat {
+        return containerWidth - (2*BasicTableCell.margin.right)
+    }
     
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

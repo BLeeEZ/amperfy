@@ -148,20 +148,35 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
                 scrollToRow(at: IndexPath(row: lyricModels.count-1, section: 0), at: .middle, animated: scrollAnimation)
                 hasLastLyricsLineAlreadyDisplayedOnce = true
             }
-            if let lastIndex = self.lastIndex {
-                lyricModels.object(at: lastIndex)?.isActiveLine = false
+            if let lastIndex = self.lastIndex,
+               let lastIndexModel = lyricModels.object(at: lastIndex) {
+                lastIndexModel.isActiveLine = false
+                reconfigureRows(at: [IndexPath(row: lastIndex, section: 0)])
             }
             self.lastIndex = nil
             return
         }
         
+        var prevIndex: Int?
         hasLastLyricsLineAlreadyDisplayedOnce = false
         let indexOfCurrentLine = max(indexOfNextLine - 1, 0)
-        if let lastIndex = lastIndex {
-            lyricModels.object(at: lastIndex)?.isActiveLine = false
+        if let lastIndex = lastIndex,
+           let lastIndexModel = lyricModels.object(at: lastIndex) {
+            lastIndexModel.isActiveLine = false
+            prevIndex = lastIndex
         }
         lastIndex = indexOfCurrentLine
-        lyricModels.object(at: indexOfCurrentLine)?.isActiveLine = true
+        let curIndexModel = lyricModels.object(at: indexOfCurrentLine)
+        curIndexModel?.isActiveLine = true
+        
+        if prevIndex != indexOfCurrentLine {
+            if curIndexModel != nil {
+                reconfigureRows(at: [IndexPath(row: indexOfCurrentLine, section: 0)])
+            }
+            if let prevIndex = prevIndex, lyricModels.object(at: prevIndex) != nil {
+                reconfigureRows(at: [IndexPath(row: prevIndex, section: 0)])
+            }
+        }
         scrollToRow(at: IndexPath(row: indexOfCurrentLine, section: 0), at: .middle, animated: scrollAnimation)
     }
 }
