@@ -67,11 +67,17 @@ public class ScrobbleSyncer {
     }
     
     func scrobble(playedSong: Song, songPosition: NowPlayingSongPosition) {
-        func nowPlayingToServerAsync(playedSong: Song, songPosition: NowPlayingSongPosition) {
-             firstly {
+        func nowPlayingToServerAsync(playedSong: Song, songPosition: NowPlayingSongPosition, finallyCB: ((_: Song, _: Bool) -> Void)? = nil) {
+            var success = false
+            firstly {
                 self.librarySyncer.syncNowPlaying(song: playedSong, songPosition: songPosition)
+            }.done {
+                success = true
             }.catch { error in
+                os_log("Now Playing Sync Failed: %s", log: self.log, type: .info, playedSong.displayString)
                 self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
+            }.finally {
+                finallyCB?(playedSong, success)
             }
         }
         
@@ -82,11 +88,12 @@ public class ScrobbleSyncer {
             }
         case .end:
             if self.storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork {
-                cacheScrobbleRequest(playedSong: playedSong, isUploaded: true)
-                nowPlayingToServerAsync(playedSong: playedSong, songPosition: .end)
-                start() // send cached request to server
+                nowPlayingToServerAsync(playedSong: playedSong, songPosition: .end) { song, success in
+                    self.cacheScrobbleRequest(playedSong: song, isUploaded: success)
+                    guard success else { return }
+                    self.start() // send cached request to server
+                }
             } else {
-                os_log("Scrobble cache: %s", log: self.log, type: .info, playedSong.displayString)
                 cacheScrobbleRequest(playedSong: playedSong, isUploaded: false)
             }
         }
@@ -106,15 +113,24 @@ public class ScrobbleSyncer {
                         self.isRunning = false
                         return Promise.value
                     }
-                    defer {
-                        entry.isUploaded = true;
-                        self.storage.main.saveContext()
-                    }
                     guard let song = entry.playable?.asSong, let date = entry.date else {
                         return Promise.value
                     }
-                    return self.librarySyncer.scrobble(song: song, date: date)
+                    return Promise<Void> { seal in
+                        return firstly {
+                            self.librarySyncer.scrobble(song: song, date: date)
+                        }.done {
+                            entry.isUploaded = true;
+                            self.storage.main.saveContext()
+                        }.catch { error in
+                            self.isRunning = false
+                            self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
+                        }.finally {
+                            seal.fulfill(Void())
+                        }
+                    }
                 }.catch { error in
+                    self.isRunning = false
                     self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
                 }.finally {
                     self.uploadSemaphore.signal()
@@ -140,6 +156,9 @@ public class ScrobbleSyncer {
     }
     
     private func cacheScrobbleRequest(playedSong: Song, isUploaded: Bool) {
+        if !isUploaded {
+            os_log("Scrobble cache: %s", log: self.log, type: .info, playedSong.displayString)
+        }
         let scrobbleEntry = storage.main.library.createScrobbleEntry()
         scrobbleEntry.date = Date()
         scrobbleEntry.playable = playedSong
