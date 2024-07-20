@@ -3,7 +3,7 @@
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -34,7 +34,7 @@
                             <constraint firstAttribute="width" secondItem="vJs-cv-sQf" secondAttribute="height" multiplier="1:1" id="yT6-8I-ZaO"/>
                         </constraints>
                     </imageView>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3q7-oA-9sM" userLabel="Title Button">
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="3q7-oA-9sM" userLabel="Title Button">
                         <rect key="frame" x="96" y="27" width="187" height="20"/>
                         <connections>
                             <action selector="titlePressed:" destination="gve-H7-PxP" eventType="touchUpInside" id="GOe-CV-KLG"/>
@@ -54,7 +54,7 @@
                             <fontDescription key="fontDescription" type="boldSystem" pointSize="19"/>
                         </variation>
                     </label>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xdv-qI-JIo" userLabel="Artist Name Button">
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="xdv-qI-JIo" userLabel="Artist Name Button">
                         <rect key="frame" x="96" y="47" width="187" height="20"/>
                         <connections>
                             <action selector="artistNamePressed:" destination="gve-H7-PxP" eventType="touchUpInside" id="ldJ-42-Y4e"/>
@@ -73,7 +73,7 @@
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         </variation>
                     </label>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FXO-Ca-aCo" userLabel="Favorite">
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="FXO-Ca-aCo" userLabel="Favorite">
                         <rect key="frame" x="291" y="32" width="30" height="30"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="FXO-Ca-aCo" secondAttribute="height" multiplier="1:1" id="idH-Fa-pXm"/>
@@ -89,7 +89,7 @@
                             <action selector="favoritePressed:" destination="gve-H7-PxP" eventType="touchUpInside" id="nof-ey-DEY"/>
                         </connections>
                     </button>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="awQ-BG-bfX" userLabel="Options">
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="awQ-BG-bfX" userLabel="Options">
                         <rect key="frame" x="329" y="32" width="30" height="30"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="awQ-BG-bfX" secondAttribute="height" multiplier="1:1" id="HZS-GE-WzW"/>

@@ -80,6 +80,17 @@ class PlayableTableCell: BasicTableCell {
         downloadProgress.isHidden = true
         guard let playable = playable else { return }
         titleLabel.text = playable.title
+        /*
+        // Only show the artist if is not the same as the album artist
+        let artistLabelBelowTitle = artistLabel.center.y < titleLabel.center.y
+
+        if !artistLabelBelowTitle || (playable.asSong?.album?.artist?.name != playable.creatorName) {
+            artistLabel.text = playable.creatorName
+            artistLabel.isHidden = false
+        } else {
+            artistLabel.text = ""
+            artistLabel.isHidden = true
+        }*/
         artistLabel.text = playable.creatorName
         entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playable)
         

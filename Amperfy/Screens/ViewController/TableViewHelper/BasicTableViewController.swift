@@ -149,11 +149,15 @@ class BasicTableViewController: KeyCommandTableViewController {
         searchController.searchBar.autocapitalizationType = .none
         searchController.searchBar.scopeButtonTitles = scopeButtonTitles
         searchController.searchBar.placeholder = placeholder
-        
+
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
         if #available(iOS 16.0, *) {
+            #if targetEnvironment(macCatalyst)
+            navigationItem.preferredSearchBarPlacement = .inline
+            #else
             navigationItem.preferredSearchBarPlacement = .stacked
+            #endif
         }
         
         searchController.delegate = self

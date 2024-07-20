@@ -23,7 +23,7 @@ import UIKit
 import AmperfyKit
 
 class SideBarVC: KeyCommandCollectionViewController {
-    
+
     private var offsetData: [LibraryNavigatorItem] = {
         return [LibraryNavigatorItem(title: "Search", tab: .search),
                 LibraryNavigatorItem(title: "Settings", tab: .settings),
@@ -31,18 +31,22 @@ class SideBarVC: KeyCommandCollectionViewController {
     }()
     
     lazy var layoutConfig = {
-        var config = UICollectionLayoutListConfiguration(appearance: .sidebar)
-        return config
+        return UICollectionLayoutListConfiguration(appearance: .sidebar)
     }()
-    lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(offsetData: offsetData, librarySettings: appDelegate.storage.settings.libraryDisplaySettings, layoutConfig: self.layoutConfig, pressedOnLibraryItemCB: self.pushedOn)
+    lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(
+        offsetData: offsetData,
+        librarySettings: appDelegate.storage.settings.libraryDisplaySettings,
+        layoutConfig: self.layoutConfig, pressedOnLibraryItemCB: self.pushedOn
+    )
 
     override func viewDidLoad() {
         super.viewDidLoad()
         libraryItemConfigurator.viewDidLoad(navigationItem: navigationItem, collectionView: collectionView)
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         self.becomeFirstResponder()
+        libraryItemConfigurator.viewDidAppear(navigationItem: navigationItem, collectionView: collectionView)
     }
     
     override func viewDidDisappear(_ animated: Bool) {

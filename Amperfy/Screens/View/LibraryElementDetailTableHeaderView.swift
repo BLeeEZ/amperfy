@@ -43,7 +43,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     @IBOutlet weak var playShuffledButton: UIButton!
     @IBOutlet weak var infoContainerView: UIView!
     @IBOutlet weak var infoLabel: UILabel!
-    
+
     static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
     static let margin = UIView.defaultMarginMiddleElement
     

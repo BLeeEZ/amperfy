@@ -26,10 +26,17 @@ import PromiseKit
 
 class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
 
+    override var sceneTitle: String? { "Library" }
+
     private var fetchedResultsController: GenreFetchedResultsController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        #if !targetEnvironment(macCatalyst)
+        self.refreshControl = UIRefreshControl()
+        #endif
+
         appDelegate.userStatistics.visited(.genres)
         
         fetchedResultsController = GenreFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: true)
@@ -38,6 +45,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         configureSearchController(placeholder: "Search in \"Genres\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeightWithoutImage
+        tableView.estimatedRowHeight = GenericTableCell.rowHeightWithoutImage
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
         containableAtIndexPathCallback = { (indexPath) in

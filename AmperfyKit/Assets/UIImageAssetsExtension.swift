@@ -271,6 +271,25 @@ extension UIImage {
             case .folder:
                 img = .purpleFolder
             }
+        case .pink:
+            switch artworkType {
+            case .song:
+                img = .pinkSong
+            case .album:
+                img = .pinkAlbum
+            case .genre:
+                img = .pinkGenre
+            case .artist:
+                img = .pinkArtist
+            case .podcast:
+                img = .pinkPodcast
+            case .podcastEpisode:
+                img = .pinkPodcastEpisode
+            case .playlist:
+                img = .pinkPlaylist
+            case .folder:
+                img = .pinkFolder
+            }
         }
 
         return img

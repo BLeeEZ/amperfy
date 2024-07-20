@@ -26,6 +26,8 @@ import PromiseKit
 
 class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     
+    override var sceneTitle: String? { "Library" }
+
     var musicFolder: MusicFolder!
     private var fetchedResultsController: MusicFolderDirectoriesFetchedResultsController!
     
@@ -40,6 +42,7 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
         configureSearchController(placeholder: "Search in \"Directories\"")
         tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.rowHeight = DirectoryTableCell.rowHeight
+        tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
     }
     
     override func viewWillAppear(_ animated: Bool) {

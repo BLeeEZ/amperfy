@@ -39,5 +39,30 @@ extension UICellAccessory.CustomViewConfiguration {
             placement: .leading(displayed: .whenEditing)
         )
     }
-    
+
+    public static func createEdit(target: Any?, action: Selector?) -> UICellAccessory.CustomViewConfiguration {
+        let label = UILabel()
+        label.text = "Edit"
+        label.textColor = .secondaryLabel
+        label.isUserInteractionEnabled = true
+        let gestureRecognizer = UITapGestureRecognizer(target: target, action: action)
+        label.addGestureRecognizer(gestureRecognizer)
+        return UICellAccessory.CustomViewConfiguration(
+            customView: label,
+            placement: .trailing(displayed: .whenNotEditing)
+        )
+    }
+
+    public static func createDone(target: Any?, action: Selector?) -> UICellAccessory.CustomViewConfiguration {
+        let label = UILabel()
+        label.text = "Done"
+        label.textColor = .secondaryLabel
+        label.isUserInteractionEnabled = true
+        let gestureRecognizer = UITapGestureRecognizer(target: target, action: action)
+        label.addGestureRecognizer(gestureRecognizer)
+        return UICellAccessory.CustomViewConfiguration(
+            customView: label,
+            placement: .trailing(displayed: .whenEditing)
+        )
+    }
 }

@@ -25,6 +25,8 @@ import PromiseKit
 
 class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO> {
 
+    override var sceneTitle: String? { "Library" }
+
     var podcast: Podcast!
     var episodeToScrollTo: PodcastEpisode?
     private var fetchedResultsController: PodcastEpisodesFetchedResultsController!
@@ -40,7 +42,8 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         configureSearchController(placeholder: "Search in \"Podcast\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: PodcastEpisodeTableCell.typeName)
         tableView.rowHeight = PodcastEpisodeTableCell.rowHeight
-         
+        tableView.estimatedRowHeight = PodcastEpisodeTableCell.rowHeight
+
         let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
             infoCB: { "\(self.podcast.episodes.count) Episode\(self.podcast.episodes.count == 1 ? "" : "s")" },
             playContextCb: {() in

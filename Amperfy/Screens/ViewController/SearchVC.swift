@@ -61,6 +61,8 @@ class SearchDiffableDataSource: BasicUITableViewDiffableDataSource {
 
 class SearchVC: BasicTableViewController {
     
+    override var sceneTitle: String { "Search" }
+
     private static let categoryItemLimit = 10
     
     private var diffableDataSource: SearchDiffableDataSource?

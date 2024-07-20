@@ -54,6 +54,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.appDelegate.window = self.window
         var initialViewController: UIViewController?
         
+        #if targetEnvironment(macCatalyst)
+        let splitVC = SplitVC.instantiateFromAppStoryboard()
+
+        if AmperKit.shared.storage.loginCredentials == nil {
+            initialViewController = LoginVC.instantiateFromAppStoryboard()
+        } else if !AmperKit.shared.storage.isLibrarySynced {
+            initialViewController = SyncVC.instantiateFromAppStoryboard()
+        } else if AmperKit.shared.libraryUpdater.isVisualUpadateNeeded {
+            initialViewController = UpdateVC.instantiateFromAppStoryboard()
+        }
+
+        if let titlebar = windowScene.titlebar {
+            windowScene.title = "Search"
+            titlebar.toolbarStyle = .unified
+            titlebar.titleVisibility = .visible
+            titlebar.toolbar = nil
+        }
+
+        self.window?.rootViewController = splitVC
+        self.window?.makeKeyAndVisible()
+
+        if let initialViewController {
+            splitVC.present(initialViewController, animated: true)
+        }
+        #else
         if AmperKit.shared.storage.loginCredentials == nil {
             initialViewController = LoginVC.instantiateFromAppStoryboard()
         } else if !AmperKit.shared.storage.isLibrarySynced {
@@ -63,9 +88,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } else {
             initialViewController = SplitVC.instantiateFromAppStoryboard()
         }
-        
+
         self.window?.rootViewController = initialViewController
         self.window?.makeKeyAndVisible()
+        #endif
     }
         
     /** Called when the user activates your application by selecting a shortcut on the Home Screen,

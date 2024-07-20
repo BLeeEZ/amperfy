@@ -146,9 +146,11 @@ class AlbumsCollectionDiffableDataSource: BasicUICollectionViewDiffableDataSourc
 
 class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<AlbumMO> {
 
+    override var sceneTitle: String? { "Library" }
+
     fileprivate var common = AlbumsCommonVCInteractions()
     private var refreshControl: UIRefreshControl?
-    
+
     public var displayFilter: DisplayCategoryFilter {
         set { common.displayFilter = newValue }
         get { return common.displayFilter }
@@ -204,10 +206,12 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
             self.collectionView.showsVerticalScrollIndicator = true
         }
 
+        #if !targetEnvironment(macCatalyst)
         refreshControl = UIRefreshControl()
+        #endif
         refreshControl?.addTarget(common, action: #selector(AlbumsCommonVCInteractions.handleRefresh), for: UIControl.Event.valueChanged)
         collectionView.refreshControl = refreshControl
-        
+
         containableAtIndexPathCallback = { (indexPath) in
             return self.albumsDataSource?.getAlbum(at: indexPath)
         }

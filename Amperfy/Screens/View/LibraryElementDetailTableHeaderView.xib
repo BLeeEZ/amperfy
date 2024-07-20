@@ -3,7 +3,7 @@
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -39,7 +39,7 @@
                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="VUg-eX-qWb">
                                     <rect key="frame" x="171.5" y="0.0" width="171.5" height="40"/>
                                     <subviews>
-                                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aFp-vU-e7e">
+                                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="aFp-vU-e7e">
                                             <rect key="frame" x="0.0" y="0.0" width="76" height="40"/>
                                             <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="22"/>
@@ -52,7 +52,7 @@
                                                 <action selector="playAllButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="phc-Oa-Z7W"/>
                                             </connections>
                                         </button>
-                                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bqP-jY-7uf" userLabel="Add All To Play Next Button">
+                                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="bqP-jY-7uf" userLabel="Add All To Play Next Button">
                                             <rect key="frame" x="96" y="0.0" width="75.5" height="40"/>
                                             <color key="backgroundColor" systemColor="secondarySystemFillColor"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="22"/>
@@ -91,20 +91,20 @@
                 <outlet property="playAllButton" destination="aFp-vU-e7e" id="pTl-kf-Ow2"/>
                 <outlet property="playShuffledButton" destination="bqP-jY-7uf" id="3fZ-TL-t1I"/>
             </connections>
-            <point key="canvasLocation" x="140" y="135"/>
+            <point key="canvasLocation" x="140" y="134.48275862068968"/>
         </view>
     </objects>
     <resources>
         <image name="play.fill" catalog="system" width="117" height="128"/>
         <image name="shuffle" catalog="system" width="128" height="95"/>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="secondarySystemFillColor">
-            <color red="0.47058823529411764" green="0.47058823529411764" blue="0.50196078431372548" alpha="0.16" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.47058823529999999" green="0.47058823529999999" blue="0.50196078430000002" alpha="0.16" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="tintColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

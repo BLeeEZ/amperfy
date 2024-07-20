@@ -83,7 +83,7 @@ struct ServerURLsSettingsView: View {
                 }
             }
         }
-        .navigationTitle("Sever URLs")
+        .navigationTitle("Server URLs")
         .sheet(isPresented: $isAddDialogVisible) {
             AlternativeURLAddDialogView(isVisible: $isAddDialogVisible, activeServerURL: $activeServerURL, serverURLs: $serverURLs)
         }

@@ -25,7 +25,7 @@ import AmperfyKit
 import PromiseKit
 
 class AlbumsDiffableDataSource: BasicUITableViewDiffableDataSource {
-    
+
     var sortType: AlbumElementSortType = .name
     
     func getAlbum(at indexPath: IndexPath) -> Album? {
@@ -109,6 +109,8 @@ class AlbumsDiffableDataSource: BasicUITableViewDiffableDataSource {
 
 class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
 
+    override var sceneTitle: String? { "Library" }
+
     private var common = AlbumsCommonVCInteractions()
     
     public var displayFilter: DisplayCategoryFilter {
@@ -135,6 +137,11 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        #if !targetEnvironment(macCatalyst)
+        self.refreshControl = UIRefreshControl()
+        #endif
+
         appDelegate.userStatistics.visited(.albums)
         
         common.rootVC = self
@@ -160,10 +167,11 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
         configureSearchController(placeholder: "Search in \"\(common.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
-        
+        tableView.estimatedRowHeight = GenericTableCell.rowHeight
+
         _ = LibraryElementDetailTableHeaderView.createTableHeader(rootView: self, configuration: common.createPlayShuffleInfoConfig())
         self.refreshControl?.addTarget(common, action: #selector(AlbumsCommonVCInteractions.handleRefresh), for: UIControl.Event.valueChanged)
-        
+
         containableAtIndexPathCallback = { (indexPath) in
             return self.albumsDataSource?.getAlbum(at: indexPath)
         }

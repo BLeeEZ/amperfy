@@ -26,6 +26,8 @@ import PromiseKit
 
 class GenreDetailVC: MultiSourceTableViewController {
 
+    override var sceneTitle: String? { "Library" }
+
     var genre: Genre!
     private var artistsFetchedResultsController: GenreArtistsFetchedResultsController!
     private var albumsFetchedResultsController: GenreAlbumsFetchedResultsController!

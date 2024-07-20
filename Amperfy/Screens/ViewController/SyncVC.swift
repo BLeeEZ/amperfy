@@ -70,7 +70,12 @@ class SyncVC: UIViewController {
             self.appDelegate.startManagerAfterSync()
             self.appDelegate.isKeepScreenAlive = false
             self.appDelegate.eventLogger.supressAlerts = false
+
+            #if targetEnvironment(macCatalyst)
+            AppDelegate.rootViewController()?.dismiss(animated: true)
+            #else
             self.performSegue(withIdentifier: "toLibrary", sender: self)
+            #endif
         }
     }
     

@@ -79,7 +79,6 @@ class BarPlayerHandler {
         else { return }
         let popupPlayer = PopupPlayerVC()
         popupPlayer.hostingSplitVC = splitVC
-        
         isPopupBarDisplayed = true
         vc.presentPopupBar(withContentViewController: popupPlayer, animated: true, completion: nil)
     }

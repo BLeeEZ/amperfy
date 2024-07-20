@@ -26,6 +26,8 @@ import PromiseKit
 
 class PodcastsVC: MultiSourceTableViewController {
 
+    override var sceneTitle: String? { "Library" }
+
     private var podcastsFetchedResultsController: PodcastFetchedResultsController!
     private var episodesFetchedResultsController: PodcastEpisodesReleaseDateFetchedResultsController!
     private var optionsButton: UIBarButtonItem!

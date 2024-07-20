@@ -26,6 +26,8 @@ import PromiseKit
 
 class ArtistDetailVC: MultiSourceTableViewController {
 
+    override var sceneTitle: String? { "Library" }
+
     var artist: Artist!
     var albumToScrollTo: Album?
     private var albumsFetchedResultsController: ArtistAlbumsItemsFetchedResultsController!
@@ -223,7 +225,18 @@ class ArtistDetailVC: MultiSourceTableViewController {
             return 0.0
         }
     }
-    
+
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch indexPath.section+2 {
+        case LibraryElement.Album.rawValue:
+            return GenericTableCell.rowHeight
+        case LibraryElement.Song.rawValue:
+            return PlayableTableCell.rowHeight
+        default:
+            return 0.0
+        }
+    }
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.section+2 {
         case LibraryElement.Album.rawValue:

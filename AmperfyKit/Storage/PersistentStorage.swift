@@ -133,7 +133,8 @@ public enum ThemePreference: Int, CaseIterable {
     case yellow = 3
     case orange = 4
     case purple = 5
-    
+    case pink = 6
+
     public static let defaultValue: ThemePreference = .blue
     
     public var description: String {
@@ -150,6 +151,8 @@ public enum ThemePreference: Int, CaseIterable {
             return "Orange"
         case .purple:
             return "Purple"
+        case .pink:
+            return "Pink"
         }
     }
     
@@ -167,6 +170,8 @@ public enum ThemePreference: Int, CaseIterable {
             return .systemOrange
         case .purple:
             return .systemPurple
+        case .pink:
+            return .systemPink
         }
     }
 }

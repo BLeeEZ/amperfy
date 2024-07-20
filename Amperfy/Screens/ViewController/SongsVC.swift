@@ -26,6 +26,8 @@ import PromiseKit
 
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
+    override var sceneTitle: String? { "Library" }
+
     private var fetchedResultsController: SongsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     public var displayFilter: DisplayCategoryFilter = .all
@@ -34,13 +36,19 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        #if !targetEnvironment(macCatalyst)
+        self.refreshControl = UIRefreshControl()
+        #endif
+
         appDelegate.userStatistics.visited(.songs)
         
         applyFilter()
         configureSearchController(placeholder: "Search in \"\(self.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
-        
+        tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+
         let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
             infoCB: { "\(self.fetchedResultsController.fetchedObjects?.count ?? 0) Song\((self.fetchedResultsController.fetchedObjects?.count ?? 0) == 1 ? "" : "s")" },
             playContextCb: self.handleHeaderPlay,
@@ -48,8 +56,10 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             isInfoAlwaysHidden: false,
             shuffleContextCb: self.handleHeaderShuffle)
         _ = LibraryElementDetailTableHeaderView.createTableHeader(rootView: self, configuration: playShuffleInfoConfig)
+        #if !targetEnvironment(macCatalyst)
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
-        
+        #endif
+
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath)
         }
@@ -256,7 +266,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
         guard self.appDelegate.storage.settings.isOnlineMode else {
+            #if !targetEnvironment(macCatalyst)
             self.refreshControl?.endRefreshing()
+            #endif
             return
         }
         firstly {
@@ -265,7 +277,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Songs Newest Elements Sync", error: error)
         }.finally {
+            #if !targetEnvironment(macCatalyst)
             self.refreshControl?.endRefreshing()
+            #endif
         }
     }
     

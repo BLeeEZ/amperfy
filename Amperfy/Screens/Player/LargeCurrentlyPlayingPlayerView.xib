@@ -3,7 +3,7 @@
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -51,7 +51,7 @@
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="syN-Kp-zH0" userLabel="Details View">
                             <rect key="frame" x="0.0" y="567" width="375" height="100"/>
                             <subviews>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5ux-aQ-e6U" userLabel="Favorite">
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="5ux-aQ-e6U" userLabel="Favorite">
                                     <rect key="frame" x="289" y="35" width="30" height="30"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="30" id="Tlp-KE-s4R"/>
@@ -67,7 +67,7 @@
                                         <action selector="favoritePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="cBE-1x-Pe9"/>
                                     </connections>
                                 </button>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cYG-VG-BvQ" userLabel="Options">
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="cYG-VG-BvQ" userLabel="Options">
                                     <rect key="frame" x="329" y="35" width="30" height="30"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="30" id="EgN-tN-TB7"/>
@@ -99,7 +99,7 @@
                                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="19"/>
                                                     </variation>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eao-om-lSP" userLabel="Title Button">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="eao-om-lSP" userLabel="Title Button">
                                                     <rect key="frame" x="0.0" y="0.0" width="265" height="20"/>
                                                     <connections>
                                                         <action selector="titlePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="KuY-rR-wwf"/>
@@ -132,7 +132,7 @@
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     </variation>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kjh-GT-d1I" userLabel="Album Button">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="kjh-GT-d1I" userLabel="Album Button">
                                                     <rect key="frame" x="0.0" y="0.0" width="265" height="25.5"/>
                                                     <connections>
                                                         <action selector="albumPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="681-ed-ivp"/>
@@ -161,7 +161,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7d2-4h-d9h" userLabel="Artist Button">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="7d2-4h-d9h" userLabel="Artist Button">
                                                     <rect key="frame" x="0.0" y="0.0" width="265" height="20"/>
                                                     <connections>
                                                         <action selector="artistNamePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Gvn-WL-4Bt"/>
@@ -236,7 +236,7 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

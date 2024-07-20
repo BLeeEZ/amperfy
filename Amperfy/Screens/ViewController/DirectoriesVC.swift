@@ -26,6 +26,8 @@ import PromiseKit
 
 class DirectoriesVC: MultiSourceTableViewController {
     
+    override var sceneTitle: String? { "Library" }
+
     var directory: Directory!
     private var subdirectoriesFetchedResultsController: DirectorySubdirectoriesFetchedResultsController!
     private var songsFetchedResultsController: DirectorySongsFetchedResultsController!

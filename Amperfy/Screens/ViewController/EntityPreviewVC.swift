@@ -73,7 +73,7 @@ class EntityPreviewActionBuilder {
 
     public func createMenu() -> UIMenu {
         var menuActions = [UIMenuElement]()
-        
+
         configureUI()
         
         var playActions = [UIMenuElement]()
@@ -143,6 +143,17 @@ class EntityPreviewActionBuilder {
         if appDelegate.storage.settings.isShowDetailedInfo {
             menuActions.append(createCopyIdToClipboardAction())
         }
+
+        #if targetEnvironment(macCatalyst)
+        // Flatten menus on macOS to prevent incorrect display
+        menuActions = menuActions.flatMap { element in
+            if let menu = element as? UIMenu, menu.title.isEmpty {
+                return menu.children
+            } else {
+                return [element]
+            }
+        }
+        #endif
 
         return UIMenu(options: .displayInline, children: menuActions)
     }
@@ -604,6 +615,8 @@ class EntityPreviewActionBuilder {
 
 class EntityPreviewVC: UIViewController {
     
+    override var sceneTitle: String? { "Library" }
+
     static let margin = UIEdgeInsets(top: UIView.defaultMarginX, left: UIView.defaultMarginX, bottom: UIView.defaultMarginX, right: UIView.defaultMarginX)
     
     @IBOutlet weak var titleLabel: MarqueeLabel!

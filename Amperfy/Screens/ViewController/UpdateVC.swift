@@ -59,7 +59,12 @@ class UpdateVC: UIViewController {
             self.appDelegate.isKeepScreenAlive = false
             self.appDelegate.eventLogger.supressAlerts = false
             self.appDelegate.startManagerForNormalOperation()
+
+            #if targetEnvironment(macCatalyst)
+            AppDelegate.rootViewController()?.dismiss(animated: true)
+            #else
             self.performSegue(withIdentifier: "toLibrary", sender: self)
+            #endif
         }
     }
     

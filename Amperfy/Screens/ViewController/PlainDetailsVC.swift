@@ -27,6 +27,8 @@ import MarqueeLabel
 
 class PlainDetailsVC: UIViewController {
     
+    override var sceneTitle: String? { "Library" }
+
     @IBOutlet weak var headerLabel: UILabel!
     @IBOutlet weak var detailsTextView: UITextView!
     
