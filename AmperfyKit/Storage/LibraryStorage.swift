@@ -791,10 +791,17 @@ public class LibraryStorage: PlayableFileCachable {
     
     public func getRandomAlbums(count: Int, onlyCached: Bool) -> [Album] {
         let fetchRequest = AlbumMO.identifierSortedFetchRequest
-        fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
-            AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-            getFetchPredicate(onlyCachedAlbums: onlyCached)
-        ])
+        if onlyCached {
+            fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+                getFetchPredicate(onlyCachedAlbums: true),
+            ])
+        } else {
+            fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+                AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
+                getFetchPredicate(onlyCachedAlbums: true),
+            ])
+        }
+
         let foundAlbums = try? context.fetch(fetchRequest)
         let albums = foundAlbums?[randomPick: count].compactMap{ Album(managedObject: $0) }
         return albums ?? [Album]()

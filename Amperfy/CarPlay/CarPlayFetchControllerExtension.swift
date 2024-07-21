@@ -48,25 +48,50 @@ extension CarPlaySceneDelegate {
         artistsFavoritesFetchController?.delegate = self
         artistsFavoritesFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .favorites)
     }
+    func createArtistsFavoritesCachedFetchController() {
+        artistsFavoritesCachedFetchController = ArtistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.artistsSortSetting, isGroupedInAlphabeticSections: false)
+        artistsFavoritesCachedFetchController?.delegate = self
+        artistsFavoritesCachedFetchController?.search(searchText: "", onlyCached: true, displayFilter: .favorites)
+    }
     func createAlbumsFavoritesFetchController() {
         albumsFavoritesFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.albumsSortSetting, isGroupedInAlphabeticSections: false)
         albumsFavoritesFetchController?.delegate = self
         albumsFavoritesFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .favorites)
+    }
+    func createAlbumsFavoritesCachedFetchController() {
+        albumsFavoritesCachedFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.albumsSortSetting, isGroupedInAlphabeticSections: false)
+        albumsFavoritesCachedFetchController?.delegate = self
+        albumsFavoritesCachedFetchController?.search(searchText: "", onlyCached: true, displayFilter: .favorites)
     }
     func createAlbumsNewestFetchController() {
         albumsNewestFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .newest, isGroupedInAlphabeticSections: false)
         albumsNewestFetchController?.delegate = self
         albumsNewestFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .newest)
     }
+    func createAlbumsNewestCachedFetchController() {
+        albumsNewestCachedFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .newest, isGroupedInAlphabeticSections: false)
+        albumsNewestCachedFetchController?.delegate = self
+        albumsNewestCachedFetchController?.search(searchText: "", onlyCached: true, displayFilter: .newest)
+    }
     func createAlbumsRecentFetchController() {
         albumsRecentFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .recent, isGroupedInAlphabeticSections: false)
         albumsRecentFetchController?.delegate = self
         albumsRecentFetchController?.search(searchText: "", onlyCached: isOfflineMode, displayFilter: .recent)
     }
+    func createAlbumsRecentCachedFetchController() {
+        albumsRecentCachedFetchController = AlbumFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: .recent, isGroupedInAlphabeticSections: false)
+        albumsRecentCachedFetchController?.delegate = self
+        albumsRecentCachedFetchController?.search(searchText: "", onlyCached: true, displayFilter: .recent)
+    }
     func createSongsFavoritesFetchController() {
         songsFavoritesFetchController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.songsSortSetting, isGroupedInAlphabeticSections: false)
         songsFavoritesFetchController?.delegate = self
         songsFavoritesFetchController?.search(searchText: "", onlyCachedSongs: isOfflineMode, displayFilter: .favorites)
+    }
+    func createSongsFavoritesCachedFetchController() {
+        songsFavoritesCachedFetchController = SongsFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.songsSortSetting, isGroupedInAlphabeticSections: false)
+        songsFavoritesCachedFetchController?.delegate = self
+        songsFavoritesCachedFetchController?.search(searchText: "", onlyCachedSongs: true, displayFilter: .favorites)
     }
     func createPlaylistDetailFetchController(playlist: Playlist) {
         playlistDetailFetchController = PlaylistItemsFetchedResultsController(forPlaylist: playlist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
