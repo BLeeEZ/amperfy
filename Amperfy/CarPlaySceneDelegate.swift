@@ -50,6 +50,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         os_log("CarPlay: didConnect", log: self.log, type: .info)
         appDelegate.notificationHandler.register(self, selector: #selector(refreshSort), name: .fetchControllerSortChanged, object: nil)
         appDelegate.notificationHandler.register(self, selector: #selector(refreshOfflineMode),name: .offlineModeChanged, object: nil)
+        appDelegate.notificationHandler.register(self, selector: #selector(self.downloadFinishedSuccessful(notification:)), name: .downloadFinishedSuccess, object: appDelegate.artworkDownloadManager)
+        appDelegate.notificationHandler.register(self, selector: #selector(self.downloadFinishedSuccessful(notification:)), name: .downloadFinishedSuccess, object: appDelegate.playableDownloadManager)
         appDelegate.player.addNotifier(notifier: self)
         CPNowPlayingTemplate.shared.add(self)
         
@@ -66,6 +68,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         self.interfaceController = nil
         appDelegate.notificationHandler.remove(self, name: .fetchControllerSortChanged, object: nil)
         appDelegate.notificationHandler.remove(self, name: .offlineModeChanged, object: nil)
+        appDelegate.notificationHandler.remove(self, name: .downloadFinishedSuccess, object: appDelegate.artworkDownloadManager)
+        appDelegate.notificationHandler.remove(self, name: .downloadFinishedSuccess, object: appDelegate.playableDownloadManager)
         CPNowPlayingTemplate.shared.remove(self)
         
         playlistFetchController = nil
@@ -384,6 +388,14 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     private func createDetailTemplate(for artist: Artist, onlyCached: Bool) -> CPListItem {
         let section = CPListItem(text: artist.name, detailText: artist.subtitle, image: artist.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        if let artwork = artist.artwork {
+            appDelegate.artworkDownloadManager.download(object: artwork)
+        }
+        section.userInfo = [
+            CarPlayListUserInfoKeys.artworkDownloadID.rawValue: artist.artwork?.uniqueID as Any,
+            CarPlayListUserInfoKeys.artworkOwnerObjectID.rawValue: artist.managedObject.objectID as Any,
+            CarPlayListUserInfoKeys.artworkOwnerType.rawValue: ArtworkType.artist as Any,
+        ]
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var albumItems = [CPListItem]()
@@ -425,6 +437,14 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     private func createDetailTemplate(for album: Album, onlyCached: Bool) -> CPListItem {
         let section = CPListItem(text: album.name, detailText: album.subtitle, image: album.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
+        if let artwork = album.artwork {
+            appDelegate.artworkDownloadManager.download(object: artwork)
+        }
+        section.userInfo = [
+            CarPlayListUserInfoKeys.artworkDownloadID.rawValue: album.artwork?.uniqueID as Any,
+            CarPlayListUserInfoKeys.artworkOwnerObjectID.rawValue: album.managedObject.objectID as Any,
+            CarPlayListUserInfoKeys.artworkOwnerType.rawValue: ArtworkType.album as Any,
+        ]
         section.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             var songItems = [CPListItem]()
@@ -478,8 +498,16 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         for podcastIndex in 0...(sectionCount-1) {
             let podcastMO = fetchedPodcasts[podcastIndex]
             let podcast = Podcast(managedObject: podcastMO)
-
+            
             let section = CPListItem(text: podcast.title, detailText: podcast.subtitle, image: podcast.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .disclosureIndicator)
+            if let artwork = podcast.artwork {
+                appDelegate.artworkDownloadManager.download(object: artwork)
+            }
+            section.userInfo = [
+                CarPlayListUserInfoKeys.artworkDownloadID.rawValue: podcast.artwork?.uniqueID as Any,
+                CarPlayListUserInfoKeys.artworkOwnerObjectID.rawValue: podcast.managedObject.objectID as Any,
+                CarPlayListUserInfoKeys.artworkOwnerType.rawValue: ArtworkType.podcast as Any,
+            ]
             section.handler = { [weak self] item, completion in
                 guard let `self` = self else { completion(); return }
                 let podcastDetailTemplate = CPListTemplate(title: podcast.name, sections: [
@@ -521,10 +549,28 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         return listItem
     }
     
+    enum CarPlayListUserInfoKeys: String {
+        case playableDownloadID = "playableDownloadID"
+        case artworkDownloadID = "artworkDownloadID"
+        case artworkOwnerType = "artworkOwnerType"
+        case artworkOwnerObjectID = "artworkOwnerObjectID"
+        case isTrackDisplayed = "isTrackDisplayed"
+    }
+    
     private func createDetailTemplate(for playable: AbstractPlayable, playContext: PlayContext, isTrackDisplayed: Bool = false) -> CPListItem {
         let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
-        let image = isTrackDisplayed ? UIImage.numberToImage(number: playable.track) : playable.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference)
+        let image = getImage(for: playable, isTrackDisplayed: isTrackDisplayed)
+        if let artwork = playable.artwork {
+            appDelegate.artworkDownloadManager.download(object: artwork)
+        }
         let listItem = CPListItem(text: playable.title, detailText: playable.subtitle, image: image.carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: accessoryType)
+        listItem.userInfo = [
+            CarPlayListUserInfoKeys.playableDownloadID.rawValue: playable.uniqueID,
+            CarPlayListUserInfoKeys.artworkDownloadID.rawValue: playable.artwork?.uniqueID as Any,
+            CarPlayListUserInfoKeys.artworkOwnerObjectID.rawValue: playable.objectID,
+            CarPlayListUserInfoKeys.artworkOwnerType.rawValue: playable.isSong ? ArtworkType.song : ArtworkType.podcastEpisode,
+            CarPlayListUserInfoKeys.isTrackDisplayed.rawValue: isTrackDisplayed,
+        ]
         listItem.handler = { [weak self] item, completion in
             guard let `self` = self else { completion(); return }
             self.appDelegate.player.play(context: playContext)
@@ -533,6 +579,91 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             }
         }
         return listItem
+    }
+    
+    private func getImage(for playable: AbstractPlayable, isTrackDisplayed: Bool) -> UIImage {
+        return isTrackDisplayed ? UIImage.numberToImage(number: playable.track) : playable.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference)
+    }
+    
+    @objc private func downloadFinishedSuccessful(notification: Notification) {
+        guard let downloadNotification = DownloadNotification.fromNotification(notification) else { return }
+        guard let templates = self.interfaceController?.templates else { return }
+        
+        for template in templates {
+            var sections: [CPListSection]?
+            
+            if let listTemplate = template as? CPListTemplate {
+                sections = listTemplate.sections
+            } else if let tabBarTemplate = template as? CPTabBarTemplate,
+                      let selectedTemplate = tabBarTemplate.selectedTemplate as? CPListTemplate {
+                sections = selectedTemplate.sections
+            }
+            
+            guard let sections = sections else { continue }
+            for section in sections {
+                for listTemplateItem in section.items {
+                    guard let item = listTemplateItem as? CPListItem,
+                          let userInfo = item.userInfo as? [String: Any]
+                    else { continue }
+                    
+                    var isThisRelatedToTheDownload = false
+                    var isTrackDisplayed = false
+                    var playable: AbstractPlayable?
+                    var entity: AbstractLibraryEntity?
+                    
+                    for info in userInfo {
+                        if (info.key == CarPlayListUserInfoKeys.playableDownloadID.rawValue ||
+                            info.key == CarPlayListUserInfoKeys.artworkDownloadID.rawValue),
+                           let uniqueID = info.value as? String,
+                           uniqueID == downloadNotification.id {
+                            isThisRelatedToTheDownload = true
+                        } else if info.key == CarPlayListUserInfoKeys.artworkOwnerType.rawValue,
+                                  let ownerType = info.value as? ArtworkType,
+                                  let objectIdInfo = userInfo.first(where: { $0.key == CarPlayListUserInfoKeys.artworkOwnerObjectID.rawValue }),
+                                  let managedObjectID = objectIdInfo.value as? NSManagedObjectID {
+                            switch ownerType {
+                            case .song:
+                                let mo = appDelegate.storage.main.context.object(with: managedObjectID) as? SongMO
+                                if let mo = mo {
+                                    playable = Song(managedObject: mo)
+                                }
+                            case .album:
+                                let mo = appDelegate.storage.main.context.object(with: managedObjectID) as? AlbumMO
+                                if let mo = mo {
+                                    entity = Album(managedObject: mo)
+                                }
+                            case .artist:
+                                let mo = appDelegate.storage.main.context.object(with: managedObjectID) as? ArtistMO
+                                if let mo = mo {
+                                    entity = Artist(managedObject: mo)
+                                }
+                            case .podcast:
+                                let mo = appDelegate.storage.main.context.object(with: managedObjectID) as? PodcastMO
+                                if let mo = mo {
+                                    entity = Podcast(managedObject: mo)
+                                }
+                            case .podcastEpisode:
+                                let mo = appDelegate.storage.main.context.object(with: managedObjectID) as? PodcastEpisodeMO
+                                if let mo = mo {
+                                    playable = PodcastEpisode(managedObject: mo)
+                                }
+                            default: break
+                            }
+                        } else if info.key == CarPlayListUserInfoKeys.isTrackDisplayed.rawValue {
+                            isTrackDisplayed = (info.value as? Bool) ?? false
+                        }
+                    }
+                    
+                    if isThisRelatedToTheDownload {
+                        if let playable = playable {
+                            item.setImage(getImage(for: playable, isTrackDisplayed: isTrackDisplayed))
+                        } else if let entity = entity {
+                            item.setImage(entity.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference).carPlayImage(carTraitCollection: traits))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @objc private func refreshSort() {
