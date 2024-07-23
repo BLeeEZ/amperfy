@@ -41,6 +41,7 @@ class SideBarVC: KeyCommandCollectionViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.clearsSelectionOnViewWillAppear = false
         libraryItemConfigurator.viewDidLoad(navigationItem: navigationItem, collectionView: collectionView)
     }
 

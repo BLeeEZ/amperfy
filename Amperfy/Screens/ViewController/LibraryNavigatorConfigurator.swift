@@ -119,7 +119,9 @@ class LibraryNavigatorConfigurator: NSObject {
 
     func viewDidAppear(navigationItem: UINavigationItem, collectionView: UICollectionView) {
         #if targetEnvironment(macCatalyst)
-        self.collectionView.selectItem(at: .zero, animated: false, scrollPosition: .top)
+        if self.collectionView.indexPathsForSelectedItems?.first == nil {
+            self.collectionView.selectItem(at: .zero, animated: false, scrollPosition: .top)
+        }
         #endif
     }
 
