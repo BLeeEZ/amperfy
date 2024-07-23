@@ -29,10 +29,6 @@
                         <variation key="userInterfaceIdiom=mac">
                             <nil key="backgroundColor"/>
                         </variation>
-                        <connections>
-                            <outlet property="dataSource" destination="Hcv-qR-IhX" id="Bw1-wZ-Iwm"/>
-                            <outlet property="delegate" destination="Hcv-qR-IhX" id="bN3-IE-Vp4"/>
-                        </connections>
                     </collectionView>
                     <navigationItem key="navigationItem" title="Amperfy" id="Hqn-0C-F2J"/>
                 </collectionViewController>
@@ -552,7 +548,7 @@
                                 <rect key="frame" x="262" y="365" width="310" height="360"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jwb-Ck-Kjx" userLabel="Optional Button" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                        <rect key="frame" x="51" y="257" width="208" height="42"/>
+                                        <rect key="frame" x="58" y="262" width="194" height="30"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="HAw-ey-9J9"/>
@@ -565,7 +561,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oJc-Ob-FSO" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                        <rect key="frame" x="51" y="297" width="208" height="42"/>
+                                        <rect key="frame" x="58" y="302" width="194" height="30"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="6UK-3l-Lo3"/>
@@ -596,7 +592,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LaP-GD-BAs">
-                                        <rect key="frame" x="105" y="-22.5" width="100" height="87.5"/>
+                                        <rect key="frame" x="105" y="-23.5" width="100" height="87"/>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="100" id="4zW-ma-IiG"/>
@@ -1067,13 +1063,13 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="secondarySystemBackgroundColor">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemBlueColor">
-            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

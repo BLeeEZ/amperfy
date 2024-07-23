@@ -22,9 +22,7 @@
 import UIKit
 
 class KeyCommandCollectionViewController: UICollectionViewController {
-    
     lazy var collectionViewKeyCommandsController = CollectionViewKeyCommandsController(collectionView: collectionView)
-    
 }
 
 class CollectionViewKeyCommandsController {

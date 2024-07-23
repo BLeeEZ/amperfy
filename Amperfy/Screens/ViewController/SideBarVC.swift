@@ -29,7 +29,7 @@ class SideBarVC: KeyCommandCollectionViewController {
                 LibraryNavigatorItem(title: "Settings", tab: .settings),
                 LibraryNavigatorItem(title: "Library", isInteractable: false)]
     }()
-    
+
     lazy var layoutConfig = {
         return UICollectionLayoutListConfiguration(appearance: .sidebar)
     }()
