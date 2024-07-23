@@ -273,7 +273,6 @@ extension AlbumsCollectionVC: UICollectionViewDelegateFlowLayout {
         let inset = self.collectionView(collectionView, layout: collectionViewLayout, insetForSectionAt: indexPath.section)
         let spaceBetweenCells = self.collectionView(collectionView, layout: collectionViewLayout, minimumInteritemSpacingForSectionAt: indexPath.section)
         let availableWidth = collectionView.bounds.size.width - inset.left - inset.right
-        let rowCount = (availableWidth) / AlbumCollectionCell.maxWidth
         let count = CGFloat(appDelegate.storage.settings.albumsGridSizeSetting)
         let artworkWidth = (availableWidth - (spaceBetweenCells * (count - 1))) / count
         return CGSize(width: artworkWidth, height: artworkWidth + 45)
