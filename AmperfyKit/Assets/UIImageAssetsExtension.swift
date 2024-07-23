@@ -135,6 +135,7 @@ extension UIImage {
     public static let refresh = UIImage.create(systemName: "arrow.triangle.2.circlepath")
     public static let exclamation = UIImage.create(systemName: "exclamationmark")
     public static let bell = UIImage.create(systemName: "bell.fill")
+    public static let resize = UIImage.create(systemName: "arrow.down.left.and.arrow.up.right")
 
 /// Asset symbol generation is enabled by default for both new and old projects but can be disabled by setting the build setting "Generate Asset Symbols" (ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS) to NO.
 #if false
