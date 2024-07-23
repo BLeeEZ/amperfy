@@ -24,6 +24,42 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
+class SliderMenuView: UIView {
+    
+    let slider: UISlider = {
+        let slider = UISlider()
+        slider.translatesAutoresizingMaskIntoConstraints = false
+        return slider
+    }()
+    
+    var stepValue: Float = 1.0
+    var sliderValueChangedCB: VoidFunctionCallback?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupView()
+    }
+    
+    private func setupView() {
+        addSubview(slider)
+        slider.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
+        slider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
+        slider.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        slider.addTarget(self, action: #selector(sliderValueChanged(_:)), for: .valueChanged)
+    }
+    
+    @objc private func sliderValueChanged(_ sender: UISlider) {
+        let newStep = roundf(slider.value / self.stepValue)
+        self.slider.value = newStep * self.stepValue;
+        sliderValueChangedCB?()
+    }
+}
+
 class AlbumsCommonVCInteractions {
     
     public var isIndexTitelsHiddenCB: VoidFunctionCallback?
@@ -192,6 +228,52 @@ class AlbumsCommonVCInteractions {
         return UIMenu(title: "Sort", image: .sort, options: [], children: [sortByName, sortByRating, sortByArtist, sortByDuration, sortByYear])
     }
     
+    func showSliderMenu() {
+        guard let rootVC = rootVC else { return }
+        let sliderMenuView = SliderMenuView(frame: CGRect(x: 0, y: 0, width: 250, height: 100))
+        sliderMenuView.center = rootVC.view.center
+        sliderMenuView.backgroundColor = .backgroundColor
+        sliderMenuView.layer.cornerRadius = 10
+
+        sliderMenuView.layer.shadowColor = UIColor.black.cgColor
+        sliderMenuView.layer.shadowOpacity = 1
+        sliderMenuView.layer.shadowOffset = .zero
+        sliderMenuView.layer.shadowRadius = 10
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            sliderMenuView.slider.minimumValue = 3
+            sliderMenuView.slider.maximumValue = 7
+        } else {
+            sliderMenuView.slider.minimumValue = 2
+            sliderMenuView.slider.maximumValue = 5
+        }
+        sliderMenuView.slider.value = min(max(
+            sliderMenuView.slider.minimumValue,
+            Float(self.appDelegate.storage.settings.albumsGridSizeSetting)),
+            sliderMenuView.slider.maximumValue)
+        sliderMenuView.sliderValueChangedCB = {
+            let newIntValue = Int( sliderMenuView.slider.value )
+            if newIntValue != self.appDelegate.storage.settings.albumsGridSizeSetting {
+                self.appDelegate.storage.settings.albumsGridSizeSetting = newIntValue
+                if let collectionVC = rootVC as? AlbumsCollectionVC {
+                    collectionVC.collectionView.reloadData()
+                }
+            }
+        }
+
+        rootVC.view.addSubview(sliderMenuView)
+         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissSliderMenu(_:)))
+        rootVC.view.addGestureRecognizer(tapGesture)
+     }
+
+     @objc func dismissSliderMenu(_ sender: UITapGestureRecognizer) {
+         while let sliderMenuView = rootVC?.view.subviews.first(where: { $0 is SliderMenuView }) {
+             sliderMenuView.removeFromSuperview()
+         }
+         rootVC?.view.gestureRecognizers?.removeAll()
+     }
+    
     private func createStyleButtonMenu() -> UIMenu {
         let tableStyle = UIAction(title: "Table", image: self.appDelegate.storage.settings.albumsStyleSetting == .table ? .check : nil, handler: { _ in
             self.appDelegate.storage.settings.albumsStyleSetting = .table
@@ -201,7 +283,12 @@ class AlbumsCommonVCInteractions {
             self.appDelegate.storage.settings.albumsStyleSetting = .grid
             self.rootVC?.navigationController?.replaceCurrentlyActiveVC(with: AppStoryboard.Main.createAlbumsVC(style: self.appDelegate.storage.settings.albumsStyleSetting, category: self.displayFilter), animated: false)
         })
-        return UIMenu(title: "Style", image: .grid, options: [], children: [tableStyle, gridStyle])
+        let changeGridSize = UIAction(title: "Change Grid Size", image: .resize, handler: { _ in
+            self.showSliderMenu()
+        })
+        changeGridSize.attributes = (self.appDelegate.storage.settings.albumsStyleSetting != .grid) ? .disabled : []
+        
+        return UIMenu(title: "Style", image: .grid, options: [], children: [tableStyle, gridStyle, changeGridSize])
     }
     
     private func createActionButtonMenu() -> UIMenu {

@@ -301,6 +301,7 @@ public class PersistentStorage {
         case SongsSortSetting = "songsSortSetting"
         case ArtistsFilterSetting = "artistsFilterSetting"
         case AlbumsDisplayStyleSetting = "albumsDisplayStyleSetting"
+        case AlbumsGridSizeSetting = "albumsGridSizeSetting"
         case PodcastsShowSetting = "podcastsShowSetting"
         case PlayerDisplayStyle = "playerDisplayStyle"
         case IsPlayerLyricsDisplayed = "isPlayerLyricsDisplayed"
@@ -481,6 +482,12 @@ public class PersistentStorage {
                 return AlbumsDisplayStyle(rawValue: albumsDisplayStyleRaw) ?? AlbumsDisplayStyle.defaultValue
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.AlbumsDisplayStyleSetting.rawValue) }
+        }
+        
+        public var albumsGridSizeSetting: Int {
+            get { return UserDefaults.standard.object(forKey: UserDefaultsKey.AlbumsGridSizeSetting.rawValue) as? Int ?? 
+                ((UIDevice.current.userInterfaceIdiom == .pad) ? 4 : 3) }
+            set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.AlbumsGridSizeSetting.rawValue) }
         }
         
         public var swipeActionSettings: SwipeActionSettings {
