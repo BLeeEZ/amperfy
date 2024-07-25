@@ -157,6 +157,13 @@ extension UIView {
         blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.insertSubview(blurEffectView, at: 0)
     }
+
+    public func updateBackgroundBlur(style: UIBlurEffect.Style, alpha: CGFloat = 1.0) {
+        if let blurEffectView = self.subviews.first as? UIVisualEffectView {
+            blurEffectView.removeFromSuperview()
+        }
+        setBackgroundBlur(style: style)
+    }
 }
 
 extension UINavigationController {

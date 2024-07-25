@@ -126,6 +126,32 @@ public enum StreamingFormatPreference: Int, CaseIterable {
     }
 }
 
+public enum MusicPlayerDesignPreference: Int, CaseIterable {
+    case prominent = 0
+    case regular = 1
+
+    public static let defaultValue: MusicPlayerDesignPreference = .prominent
+
+    public var description: String {
+        switch self {
+        case .prominent:
+            return "prominent"
+        case .regular:
+            return "regular"
+        }
+    }
+
+    public var effectStyle: UIBlurEffect.Style {
+        switch self {
+        case .prominent:
+            return .prominent
+        case .regular:
+            return .regular
+        }
+    }
+}
+
+
 public enum ThemePreference: Int, CaseIterable {
     case blue = 0
     case green = 1
@@ -293,6 +319,7 @@ public class PersistentStorage {
         case ShowArtistDuration = "showArtistDuration"
         case PlayerShuffleButtonEnabled = "enablePlayerShuffleButton"
         case ShowMusicPlayerSkipButtons = "showMusicPlayerSkipButtons"
+        case MusicPlayerDesignPreference = "musicPlayerDesignPreference"
         case AlwaysHidePlayerLyricsButton = "alwaysHidePlayerLyricsButton"
         case IsLyricsSmoothScrolling = "isLyricsSmoothScrolling"
 
@@ -352,7 +379,16 @@ public class PersistentStorage {
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ScreenLockPreventionPreference.rawValue) }
         }
-        
+
+        public var musicPlayerDesignPreferences: MusicPlayerDesignPreference {
+            get {
+                let musicPlayerDesignPreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.MusicPlayerDesignPreference.rawValue) as? Int ??
+                    MusicPlayerDesignPreference.defaultValue.rawValue
+                return MusicPlayerDesignPreference(rawValue: musicPlayerDesignPreferenceRaw) ?? MusicPlayerDesignPreference.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.MusicPlayerDesignPreference.rawValue) }
+        }
+
         public var themePreference: ThemePreference {
             get {
                 let themePreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ThemePreference.rawValue) as? Int ??

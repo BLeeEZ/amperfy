@@ -23,6 +23,9 @@ import UIKit
 import CoreMedia
 import AmperfyKit
 import PromiseKit
+#if targetEnvironment(macCatalyst)
+import LNPopupController_ObjC
+#endif
 
 class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
@@ -46,15 +49,17 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     var userQueueSectionHeader: UserQueueSectionHeader?
     var contextNextQueueSectionHeader: ContextQueueNextSectionHeader?
     var activeDisplayedSectionHeader = Set<PlayerSectionCategory>()
+    var currentMusicPlayerDesignPreference: MusicPlayerDesignPreference = .defaultValue
     lazy var clearEmptySectionFooter = {
         let view = UIView()
         view.backgroundColor = .clear
         view.isHidden = true
         return view
     }()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
+
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.dragDelegate = self
@@ -63,8 +68,10 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         
         player = appDelegate.player
         player.addNotifier(notifier: self)
-        
-        self.backgroundImage.setBackgroundBlur(style: .prominent)
+
+        self.currentMusicPlayerDesignPreference = appDelegate.storage.settings.musicPlayerDesignPreferences
+        self.backgroundImage.setBackgroundBlur(style: self.currentMusicPlayerDesignPreference.effectStyle)
+
         refreshCurrentlyPlayingPopupItem()
         
         controlPlaceholderHeightConstraint.constant = PlayerControlView.frameHeight + safetyMarginOnBottom
@@ -101,10 +108,34 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         adjustLaoutMargins()
         refreshCellMasks()
     }
-    
+
+    #if targetEnvironment(macCatalyst)
+    override func positionPopupCloseButton(_ popupCloseButton: LNPopupCloseButton) -> Bool {
+        guard let largeCurrentlyPlayingView = self.largeCurrentlyPlayingView else { return false }
+
+        popupCloseButton.removeFromSuperview()
+        largeCurrentlyPlayingView.addSubview(popupCloseButton)
+
+        NSLayoutConstraint.activate([
+            popupCloseButton.leftAnchor.constraint(equalTo: largeCurrentlyPlayingView.leftAnchor, constant: 20),
+            popupCloseButton.topAnchor.constraint(equalTo: largeCurrentlyPlayingView.topAnchor, constant: 0),
+        ])
+        return true
+    }
+    #endif
+
+    private func updateMusicPlayerDesignPreference() {
+        let newStyle = appDelegate.storage.settings.musicPlayerDesignPreferences
+        if self.currentMusicPlayerDesignPreference != newStyle {
+            self.backgroundImage.updateBackgroundBlur(style: newStyle.effectStyle)
+            self.currentMusicPlayerDesignPreference = newStyle
+        }
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         appDelegate.userStatistics.visited(.popupPlayer)
+        updateMusicPlayerDesignPreference()
         self.becomeFirstResponder()
         adjustLaoutMargins()
         changeDisplayStyleVisually(to: appDelegate.storage.settings.playerDisplayStyle, animated: false)

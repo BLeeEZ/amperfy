@@ -251,7 +251,7 @@ class LibraryNavigatorConfigurator: NSObject {
             (supplementaryView, string, indexPath) in
             supplementaryView.isHidden = true
         }
-        // data source
+        // 2 - data source
         dataSource = SideBarDiffableDataSource(collectionView: collectionView) {
             (collectionView, indexPath, item) -> UICollectionViewCell? in
                 return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
@@ -261,15 +261,16 @@ class LibraryNavigatorConfigurator: NSObject {
             return self.collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: index)
         }
 
-        // Somehow, this fixes a crash when trying to reorder the sidebar in catalyst. Leave it in.
-        #if targetEnvironment(macCatalyst)
-        dataSource.reorderingHandlers.didReorder = { _ in }
-        #endif
-
+        /// 4 - data source reordering
         dataSource.reorderingHandlers.canReorderItem = { [weak self] item in
             let isEdit = self?.collectionView.isEditing ?? false
             return isEdit && (item.tab == nil)
         }
+
+        // Somehow, this fixes a crash when trying to reorder the sidebar in catalyst. Leave it in.
+        #if targetEnvironment(macCatalyst)
+        dataSource.reorderingHandlers.didReorder = { _ in }
+        #endif
     }
     
     private func applyInitialSnapshots() {

@@ -39,6 +39,7 @@ final class Settings: ObservableObject {
     @Published var isPlayerAutoCachePlayedItems = false
     @Published var isScrobbleStreamedItems = false
     @Published var isPlaybackStartOnlyOnPlay = false
+    @Published var musicPlayerDesignPreference: MusicPlayerDesignPreference = .defaultValue
     @Published var isShowMusicPlayerSkipButtons = false
     @Published var isAlwaysHidePlayerLyricsButton = false
     @Published var isLyricsSmoothScrolling = true

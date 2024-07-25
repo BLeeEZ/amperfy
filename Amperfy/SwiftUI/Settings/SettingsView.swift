@@ -59,7 +59,7 @@ enum NavigationTarget {
         case .library: "Library"
         case .player: "Player, Stream & Scrobble"
         case .swipe: "Swipe"
-        case .artwork: "Display & Interaction"
+        case .artwork: "Artwork"
         case .support: "Support"
         case .license: "License"
         case .xcallback: "X-Callback-URL Documentation"

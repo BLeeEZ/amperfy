@@ -36,7 +36,11 @@ struct DisplaySettingsView: View {
             window.addSubview(view)
         }
     }
-    
+
+    func setMusicPlayerDesignPreference(preference: MusicPlayerDesignPreference) {
+        settings.musicPlayerDesignPreference = preference
+    }
+
     func tooglePlayerLyricsButtonPreference() {
         settings.isAlwaysHidePlayerLyricsButton.toggle()
         if settings.isAlwaysHidePlayerLyricsButton {
@@ -87,7 +91,26 @@ struct DisplaySettingsView: View {
                 , footer: {
                     Text("Certain interactions provide haptic feedback. Long pressing to display the details menu will always trigger haptic feedback.")
                 })
-                
+
+                Section(content: {
+                    HStack {
+                        Text("Music Player Background Design")
+                        Spacer()
+                        Menu(settings.musicPlayerDesignPreference.description) {
+                            Button(MusicPlayerDesignPreference.prominent.description) {
+                                setMusicPlayerDesignPreference(preference: .prominent)
+                            }
+                            Button(MusicPlayerDesignPreference.regular.description) {
+                                setMusicPlayerDesignPreference(preference: .regular)
+                            }
+                        }
+                    }
+
+                }
+                , footer: {
+                    Text("Change the design of the music player background.")
+                })
+
                 Section(content: {
                     HStack {
                         Text("Music Player Skip Buttons")

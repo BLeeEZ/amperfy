@@ -57,8 +57,11 @@ class BarPlayerHandler {
         appearance.subtitleTextAttributes = AttributeContainer()
             .foregroundColor(.label)
         vc.popupBar.standardAppearance = appearance
-        vc.popupBar.standardAppearance.marqueeScrollEnabled = true
+        #if targetEnvironment(macCatalyst)
+        vc.popupContentView.popupCloseButtonStyle = .round
+        #else
         vc.popupContentView.popupCloseButtonStyle = .chevron
+        #endif
         vc.popupInteractionStyle = .snap
         isPopupBarDisplayed = false
         handlePopupBar()
