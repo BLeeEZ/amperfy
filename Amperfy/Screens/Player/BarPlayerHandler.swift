@@ -24,7 +24,7 @@ import UIKit
 import LNPopupController
 
 class BarPlayerHandler {
-    
+
     let player: PlayerFacade
     var isPopupBarDisplayed = false
     let splitVC: SplitVC
@@ -58,11 +58,14 @@ class BarPlayerHandler {
             .foregroundColor(.label)
         vc.popupBar.standardAppearance = appearance
         #if targetEnvironment(macCatalyst)
+        // allow dimissing the popup with the scroll wheel or a button
         vc.popupContentView.popupCloseButtonStyle = .round
+        vc.popupContentView.popupInteractionGestureRecognizer.allowedScrollTypesMask = .continuous
+        vc.popupInteractionStyle = .drag
         #else
         vc.popupContentView.popupCloseButtonStyle = .chevron
-        #endif
         vc.popupInteractionStyle = .snap
+        #endif
         isPopupBarDisplayed = false
         handlePopupBar()
     }
