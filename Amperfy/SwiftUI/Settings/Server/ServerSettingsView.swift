@@ -28,6 +28,7 @@ struct ServerSettingsView: View {
     @State var isShowLogoutAlert = false
     
     private func logout() {
+        self.appDelegate.storage.settings.isOfflineMode = false
         // reset login credentials -> at new start the login view is presented to auth and resync library
         self.appDelegate.storage.loginCredentials = nil
         // force resync after login

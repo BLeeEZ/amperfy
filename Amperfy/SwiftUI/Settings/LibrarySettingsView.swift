@@ -80,6 +80,7 @@ struct LibrarySettingsView: View {
     }
     
     private func resyncLibrary() {
+        self.appDelegate.storage.settings.isOfflineMode = false
         // reset library sync flag -> rest library at new start and continue with sync
         self.appDelegate.storage.isLibrarySynced = false
         // reset quick actions
