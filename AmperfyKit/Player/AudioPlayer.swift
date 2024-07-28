@@ -111,6 +111,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
             backendAudioPlayer.continuePlay()
             notifyItemStartedPlaying()
         }
+        WidgetUtils.saveCurrentSong(song: currentlyPlaying?.asSong)
     }
 
     public func play(context: PlayContext) {
@@ -133,6 +134,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         } else {
             play(playerIndex: PlayerIndex(queueType: .next, index: context.index-1))
         }
+        WidgetUtils.saveCurrentSong(song: currentlyPlaying?.asSong)
     }
     
     func play(playerIndex: PlayerIndex) {
@@ -141,6 +143,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
             return
         }
         insertIntoPlayer(playable: playable)
+        WidgetUtils.saveCurrentSong(song: currentlyPlaying?.asSong)
     }
     
     func playPreviousOrReplay() {
@@ -149,6 +152,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         } else {
             playPrevious()
         }
+        WidgetUtils.saveCurrentSong(song: currentlyPlaying?.asSong)
     }
 
     //BackendAudioPlayerNotifiable
@@ -160,6 +164,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         } else {
             replayCurrentItem()
         }
+        WidgetUtils.saveCurrentSong(song: currentlyPlaying?.asSong)
     }
 
     //BackendAudioPlayerNotifiable
@@ -173,11 +178,13 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         } else {
             stop()
         }
+        WidgetUtils.saveCurrentSong(song: currentlyPlaying?.asSong)
     }
     
     func pause() {
         backendAudioPlayer.pause()
         notifyItemPaused()
+        WidgetUtils.saveCurrentSong(song: currentlyPlaying?.asSong)
     }
     
     //BackendAudioPlayerNotifiable
@@ -185,11 +192,13 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         backendAudioPlayer.stop()
         playerStatus.stop()
         notifyPlayerStopped()
+        WidgetUtils.saveCurrentSong(song: currentlyPlaying?.asSong)
     }
     
     func stopButRemainIndex() {
         backendAudioPlayer.stop()
         notifyPlayerStopped()
+        WidgetUtils.saveCurrentSong(song: currentlyPlaying?.asSong)
     }
     
     func togglePlayPause() {
@@ -245,12 +254,14 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
             notifier.didStartPlayingFromBeginning()
         }
         seekToLastStoppedPlayTime()
+        WidgetUtils.setPlaybackStatus(isPlaying: true)
     }
 
     func notifyItemStartedPlaying() {
         for notifier in notifierList {
             notifier.didStartPlaying()
         }
+        WidgetUtils.setPlaybackStatus(isPlaying: true)
     }
     
     //BackendAudioPlayerNotifiable
@@ -258,18 +269,21 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         for notifier in notifierList {
             notifier.errorOccured(error: error)
         }
+        WidgetUtils.setPlaybackStatus(isPlaying: false)
     }
     
     func notifyItemPaused() {
         for notifier in notifierList {
             notifier.didPause()
         }
+        WidgetUtils.setPlaybackStatus(isPlaying: false)
     }
     
     func notifyPlayerStopped() {
         for notifier in notifierList {
             notifier.didStopPlaying()
         }
+        WidgetUtils.setPlaybackStatus(isPlaying: false)
     }
     
     func notifyArtworkChanged() {

@@ -427,7 +427,18 @@
 		50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */; };
 		50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */; };
 		50FF311B2BBC4D8000C2C3B9 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FF311A2BBC4D8000C2C3B9 /* NetworkMonitor.swift */; };
+		640E44572C270864005808DF /* AmperfyKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */; };
+		640E44582C270864005808DF /* AmperfyKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		640E445E2C27144E005808DF /* WidgetUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640E445D2C27144E005808DF /* WidgetUtils.swift */; };
+		640E44602C27231E005808DF /* PlayWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640E445F2C27231E005808DF /* PlayWidgetData.swift */; };
+		640E44622C274A49005808DF /* PlayWidgetIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640E44612C274A49005808DF /* PlayWidgetIntent.swift */; };
+		640E44632C274A49005808DF /* PlayWidgetIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640E44612C274A49005808DF /* PlayWidgetIntent.swift */; };
 		641708592C13BF5100BA2619 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641708582C13BF5100BA2619 /* Haptics.swift */; };
+		642559572C26E1410003D01F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 642559562C26E1410003D01F /* WidgetKit.framework */; };
+		642559592C26E1410003D01F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 642559582C26E1410003D01F /* SwiftUI.framework */; };
+		6425595C2C26E1410003D01F /* PlayWidgetSmallBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6425595B2C26E1410003D01F /* PlayWidgetSmallBundle.swift */; };
+		6425595E2C26E1410003D01F /* PlayWidgetSmall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6425595D2C26E1410003D01F /* PlayWidgetSmall.swift */; };
+		642559642C26E1440003D01F /* PlayWidgetSmallExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 642559552C26E1410003D01F /* PlayWidgetSmallExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -452,6 +463,20 @@
 			remoteGlobalIDString = 50C9D604284FA847007F18D0;
 			remoteInfo = AmpertyKit;
 		};
+		640E44592C270864005808DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 508385DC21C5965B00C4BB32 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 50C9D604284FA847007F18D0;
+			remoteInfo = AmperfyKit;
+		};
+		642559622C26E1440003D01F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 508385DC21C5965B00C4BB32 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 642559542C26E1410003D01F;
+			remoteInfo = PlayWidgetSmallExtension;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -461,6 +486,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				642559642C26E1440003D01F /* PlayWidgetSmallExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -473,6 +499,17 @@
 			files = (
 				50C9D61B284FA847007F18D0 /* AmperfyKit.framework in Embed Frameworks */,
 				507DFE8E2B1E7192002BBB1D /* LNPopupController in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		640E445B2C270864005808DF /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				640E44582C270864005808DF /* AmperfyKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -922,7 +959,17 @@
 		50FE808D26A55CEA00CB434D /* DownloadMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DownloadMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50FF31192BBB27AC00C2C3B9 /* Amperfy v36.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v36.xcdatamodel"; sourceTree = "<group>"; };
 		50FF311A2BBC4D8000C2C3B9 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		640E445D2C27144E005808DF /* WidgetUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetUtils.swift; sourceTree = "<group>"; };
+		640E445F2C27231E005808DF /* PlayWidgetData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayWidgetData.swift; sourceTree = "<group>"; };
+		640E44612C274A49005808DF /* PlayWidgetIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayWidgetIntent.swift; sourceTree = "<group>"; };
 		641708582C13BF5100BA2619 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		642559552C26E1410003D01F /* PlayWidgetSmallExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PlayWidgetSmallExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		642559562C26E1410003D01F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		642559582C26E1410003D01F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		6425595B2C26E1410003D01F /* PlayWidgetSmallBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayWidgetSmallBundle.swift; sourceTree = "<group>"; };
+		6425595D2C26E1410003D01F /* PlayWidgetSmall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayWidgetSmall.swift; sourceTree = "<group>"; };
+		642559612C26E1440003D01F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		642559682C26E20A0003D01F /* PlayWidgetSmallExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PlayWidgetSmallExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -963,6 +1010,16 @@
 			files = (
 				50C9D60F284FA847007F18D0 /* AmperfyKit.framework in Frameworks */,
 				507DFE6E2B1E6DFE002BBB1D /* PromiseKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		642559522C26E1410003D01F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				640E44572C270864005808DF /* AmperfyKit.framework in Frameworks */,
+				642559592C26E1410003D01F /* SwiftUI.framework in Frameworks */,
+				642559572C26E1410003D01F /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1181,6 +1238,7 @@
 				508385E621C5965B00C4BB32 /* Amperfy */,
 				50C9D606284FA847007F18D0 /* AmperfyKit */,
 				50C9D614284FA847007F18D0 /* AmperfyKitTests */,
+				6425595A2C26E1410003D01F /* PlayWidgetSmall */,
 				508385E521C5965B00C4BB32 /* Products */,
 				5091857E23A753C800A8891E /* Frameworks */,
 			);
@@ -1192,6 +1250,7 @@
 				508385E421C5965B00C4BB32 /* Amperfy.app */,
 				50C9D605284FA847007F18D0 /* AmperfyKit.framework */,
 				50C9D60E284FA847007F18D0 /* AmperfyKitTests.xctest */,
+				642559552C26E1410003D01F /* PlayWidgetSmallExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1299,6 +1358,8 @@
 				50CF3CEE28A4F83100263F7C /* CryptoKit.framework */,
 				50253F81284A5EEA00BCCFB2 /* Intents.framework */,
 				50253F8C284A5EEB00BCCFB2 /* IntentsUI.framework */,
+				642559562C26E1410003D01F /* WidgetKit.framework */,
+				642559582C26E1410003D01F /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1404,6 +1465,7 @@
 				501858F7265F779B00F2E13A /* Directory.swift */,
 				501A7D3C2680A9AE0055A51B /* Podcast.swift */,
 				50A12F4527392B2400E7B2AA /* EmbeddedArtwork.swift */,
+				640E445F2C27231E005808DF /* PlayWidgetData.swift */,
 			);
 			path = EntityWrappers;
 			sourceTree = "<group>";
@@ -1421,6 +1483,7 @@
 		50BA92F221CC26BE00E5901D /* Storage */ = {
 			isa = PBXGroup;
 			children = (
+				640E445C2C2713C4005808DF /* WidgetStorage */,
 				50B798AA23B723CA00551E62 /* EntityWrappers */,
 				505CA1FF2B88CD1D00AA81CD /* ResultController */,
 				5020402E2202271000ED48A3 /* ManagedObjects */,
@@ -1765,6 +1828,26 @@
 			path = Player;
 			sourceTree = "<group>";
 		};
+		640E445C2C2713C4005808DF /* WidgetStorage */ = {
+			isa = PBXGroup;
+			children = (
+				640E445D2C27144E005808DF /* WidgetUtils.swift */,
+			);
+			path = WidgetStorage;
+			sourceTree = "<group>";
+		};
+		6425595A2C26E1410003D01F /* PlayWidgetSmall */ = {
+			isa = PBXGroup;
+			children = (
+				642559682C26E20A0003D01F /* PlayWidgetSmallExtension.entitlements */,
+				6425595B2C26E1410003D01F /* PlayWidgetSmallBundle.swift */,
+				6425595D2C26E1410003D01F /* PlayWidgetSmall.swift */,
+				642559612C26E1440003D01F /* Info.plist */,
+				640E44612C274A49005808DF /* PlayWidgetIntent.swift */,
+			);
+			path = PlayWidgetSmall;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1793,6 +1876,7 @@
 			);
 			dependencies = (
 				50C9D619284FA847007F18D0 /* PBXTargetDependency */,
+				642559632C26E1440003D01F /* PBXTargetDependency */,
 			);
 			name = Amperfy;
 			packageProductDependencies = (
@@ -1858,6 +1942,25 @@
 			productReference = 50C9D60E284FA847007F18D0 /* AmperfyKitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		642559542C26E1410003D01F /* PlayWidgetSmallExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 642559672C26E1440003D01F /* Build configuration list for PBXNativeTarget "PlayWidgetSmallExtension" */;
+			buildPhases = (
+				642559512C26E1410003D01F /* Sources */,
+				642559522C26E1410003D01F /* Frameworks */,
+				642559532C26E1410003D01F /* Resources */,
+				640E445B2C270864005808DF /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				640E445A2C270864005808DF /* PBXTargetDependency */,
+			);
+			name = PlayWidgetSmallExtension;
+			productName = PlayWidgetSmallExtension;
+			productReference = 642559552C26E1410003D01F /* PlayWidgetSmallExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1868,7 +1971,7 @@
 				KnownAssetTags = (
 					New,
 				);
-				LastSwiftUpdateCheck = 1330;
+				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1530;
 				ORGANIZATIONNAME = "Maximilian Bauer";
 				TargetAttributes = {
@@ -1887,6 +1990,9 @@
 					50C9D60D284FA847007F18D0 = {
 						CreatedOnToolsVersion = 13.3.1;
 						TestTargetID = 508385E321C5965B00C4BB32;
+					};
+					642559542C26E1410003D01F = {
+						CreatedOnToolsVersion = 15.4;
 					};
 				};
 			};
@@ -1918,6 +2024,7 @@
 				508385E321C5965B00C4BB32 /* Amperfy */,
 				50C9D604284FA847007F18D0 /* AmperfyKit */,
 				50C9D60D284FA847007F18D0 /* AmperfyKitTests */,
+				642559542C26E1410003D01F /* PlayWidgetSmallExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -2001,6 +2108,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		642559532C26E1410003D01F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -2064,6 +2178,7 @@
 				50AFA1492632E83100F198DD /* GenericDetailTableHeader.swift in Sources */,
 				504B442228D8EBB20033982C /* MailView.swift in Sources */,
 				50C16C2021E7A37000F086F0 /* Segues.swift in Sources */,
+				640E44622C274A49005808DF /* PlayWidgetIntent.swift in Sources */,
 				50DE29E92B8F347300ABA78E /* BarPlayerHandler.swift in Sources */,
 				5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */,
 				50CFB59A28D5009200A47D44 /* ArtworkDownloadSettingsView.swift in Sources */,
@@ -2180,6 +2295,7 @@
 				50C9D65E284FAA0B007F18D0 /* AmpacheArtworkDownloadDelegate.swift in Sources */,
 				50C9D6D3284FAB0C007F18D0 /* JSONConverter.swift in Sources */,
 				50C9D670284FAA4D007F18D0 /* LibraryStorage.swift in Sources */,
+				640E44602C27231E005808DF /* PlayWidgetData.swift in Sources */,
 				50C9D672284FAA4D007F18D0 /* BasicFetchedResultsController.swift in Sources */,
 				50C9D682284FAA6C007F18D0 /* PodcastEpisodeMO+CoreDataProperties.swift in Sources */,
 				50C9D694284FAA6C007F18D0 /* PlayableFileMO+CoreDataProperties.swift in Sources */,
@@ -2252,6 +2368,7 @@
 				50C9D6C5284FAB0C007F18D0 /* Utilities.swift in Sources */,
 				50C9D6B6284FAA87007F18D0 /* PodcastEpisode.swift in Sources */,
 				50C9D65D284FAA0B007F18D0 /* PlaylistParserDelegate.swift in Sources */,
+				640E445E2C27144E005808DF /* WidgetUtils.swift in Sources */,
 				50C9D6C0284FAACE007F18D0 /* DownloadManagerSessionExtension.swift in Sources */,
 				50C9D6C4284FAB0C007F18D0 /* LocalNotificationManager.swift in Sources */,
 				50C9D6B5284FAA87007F18D0 /* PlayableFile.swift in Sources */,
@@ -2367,6 +2484,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		642559512C26E1410003D01F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				640E44632C274A49005808DF /* PlayWidgetIntent.swift in Sources */,
+				6425595C2C26E1410003D01F /* PlayWidgetSmallBundle.swift in Sources */,
+				6425595E2C26E1410003D01F /* PlayWidgetSmall.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2384,6 +2511,16 @@
 			isa = PBXTargetDependency;
 			target = 50C9D604284FA847007F18D0 /* AmperfyKit */;
 			targetProxy = 50C9D618284FA847007F18D0 /* PBXContainerItemProxy */;
+		};
+		640E445A2C270864005808DF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 50C9D604284FA847007F18D0 /* AmperfyKit */;
+			targetProxy = 640E44592C270864005808DF /* PBXContainerItemProxy */;
+		};
+		642559632C26E1440003D01F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 642559542C26E1410003D01F /* PlayWidgetSmallExtension */;
+			targetProxy = 642559622C26E1440003D01F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2691,6 +2828,73 @@
 			};
 			name = Release;
 		};
+		642559652C26E1440003D01F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = PlayWidgetSmall/PlayWidgetSmallExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R4HZQ3XP64;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PlayWidgetSmall/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PlayWidgetSmall;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Maximilian Bauer. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-music-priv.PlayWidgetSmall";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		642559662C26E1440003D01F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = PlayWidgetSmall/PlayWidgetSmallExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R4HZQ3XP64;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PlayWidgetSmall/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PlayWidgetSmall;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Maximilian Bauer. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-music-priv.PlayWidgetSmall";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2726,6 +2930,15 @@
 			buildConfigurations = (
 				50C9D620284FA847007F18D0 /* Debug */,
 				50C9D621284FA847007F18D0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		642559672C26E1440003D01F /* Build configuration list for PBXNativeTarget "PlayWidgetSmallExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				642559652C26E1440003D01F /* Debug */,
+				642559662C26E1440003D01F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

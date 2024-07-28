@@ -130,16 +130,19 @@ class BackendAudioPlayer {
         isPlaying = true
         player.play()
         player.playImmediately(atRate: Float(userDefinedPlaybackRate.asDouble))
+        WidgetUtils.setPlaybackStatus(isPlaying: isPlaying)
     }
     
     func pause() {
         isPlaying = false
         player.pause()
+        WidgetUtils.setPlaybackStatus(isPlaying: isPlaying)
     }
     
     func stop() {
         isPlaying = false
         clearPlayer()
+        WidgetUtils.setPlaybackStatus(isPlaying: isPlaying)
     }
     
     func setPlaybackRate(_ newValue: PlaybackRate) {
