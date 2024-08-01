@@ -33,6 +33,10 @@ class SplitVC: UISplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setViewController(defaultSecondaryVC, for: .secondary)
+        
+        if appDelegate.storage.settings.isOfflineMode {
+            appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
