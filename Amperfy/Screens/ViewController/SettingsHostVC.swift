@@ -162,12 +162,6 @@ class SettingsHostVC: UIViewController {
         changesAgent.append(settings.$themePreference.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.themePreference = newValue
         }))
-
-        settings.musicPlayerDesignPreference = self.appDelegate.storage.settings.musicPlayerDesignPreferences
-        changesAgent.append(settings.$musicPlayerDesignPreference.sink(receiveValue: { newValue in
-            self.appDelegate.storage.settings.musicPlayerDesignPreferences = newValue
-        }))
-
     }
     
     @IBSegueAction func segueToSwiftUI(_ coder: NSCoder) -> UIViewController? {

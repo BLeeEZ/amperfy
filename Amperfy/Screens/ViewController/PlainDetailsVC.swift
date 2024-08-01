@@ -40,7 +40,7 @@ class PlainDetailsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.setBackgroundBlur(style: .prominent)
-        
+
         if let presentationController = presentationController as? UISheetPresentationController {
             presentationController.detents = [
                 .large()

@@ -49,7 +49,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     var userQueueSectionHeader: UserQueueSectionHeader?
     var contextNextQueueSectionHeader: ContextQueueNextSectionHeader?
     var activeDisplayedSectionHeader = Set<PlayerSectionCategory>()
-    var currentMusicPlayerDesignPreference: MusicPlayerDesignPreference = .defaultValue
     lazy var clearEmptySectionFooter = {
         let view = UIView()
         view.backgroundColor = .clear
@@ -69,8 +68,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         player = appDelegate.player
         player.addNotifier(notifier: self)
 
-        self.currentMusicPlayerDesignPreference = appDelegate.storage.settings.musicPlayerDesignPreferences
-        self.backgroundImage.setBackgroundBlur(style: self.currentMusicPlayerDesignPreference.effectStyle)
+        self.backgroundImage.setBackgroundBlur(style: .prominent)
 
         refreshCurrentlyPlayingPopupItem()
         
@@ -124,18 +122,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     }
     #endif
 
-    private func updateMusicPlayerDesignPreference() {
-        let newStyle = appDelegate.storage.settings.musicPlayerDesignPreferences
-        if self.currentMusicPlayerDesignPreference != newStyle {
-            self.backgroundImage.updateBackgroundBlur(style: newStyle.effectStyle)
-            self.currentMusicPlayerDesignPreference = newStyle
-        }
-    }
-
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         appDelegate.userStatistics.visited(.popupPlayer)
-        updateMusicPlayerDesignPreference()
         self.becomeFirstResponder()
         adjustLaoutMargins()
         changeDisplayStyleVisually(to: appDelegate.storage.settings.playerDisplayStyle, animated: false)
