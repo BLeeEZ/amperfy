@@ -149,7 +149,6 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     override var sceneTitle: String? { "Library" }
 
     fileprivate var common = AlbumsCommonVCInteractions()
-    private var refreshControl: UIRefreshControl?
 
     public var displayFilter: DisplayCategoryFilter {
         set { common.displayFilter = newValue }
@@ -226,7 +225,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
         common.updateRightBarButtonItems()
         common.updateFromRemote()
     }
-    
+
     func createCell(_ collectionView: UICollectionView, forItemAt indexPath: IndexPath, album: Album) -> UICollectionViewCell {
         let cell: AlbumCollectionCell = collectionView.dequeueReusableCell(withReuseIdentifier: AlbumCollectionCell.typeName, for: indexPath) as! AlbumCollectionCell
         if let album = (diffableDataSource as? AlbumsCollectionDiffableDataSource)?.getAlbum(at: indexPath) {

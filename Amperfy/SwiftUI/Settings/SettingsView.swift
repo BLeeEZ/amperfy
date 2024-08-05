@@ -166,7 +166,7 @@ struct SettingsView: View {
                     navigationLink(.license)
                     navigationLink(.xcallback)
 
-                    #if true
+                    #if false
                     navigationLink(.developer)
                     #endif
                 }

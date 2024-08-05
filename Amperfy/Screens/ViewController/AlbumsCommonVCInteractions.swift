@@ -116,7 +116,7 @@ class AlbumsCommonVCInteractions {
             self.isIndexTitelsHidden = false
             change(sortType: appDelegate.storage.settings.albumsSortSetting)
         }
-        rootVC?.title = self.filterTitle
+        rootVC?.setNavBarTitle(title: self.filterTitle)
     }
 
     func change(sortType: AlbumElementSortType) {

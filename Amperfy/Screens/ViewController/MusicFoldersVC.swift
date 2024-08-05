@@ -38,6 +38,7 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
         singleFetchedResultsController = fetchedResultsController
         
         configureSearchController(placeholder: "Search in \"Directories\"")
+        setNavBarTitle(title: "Directories")
         tableView.register(nibName: DirectoryTableCell.typeName)
         tableView.rowHeight = DirectoryTableCell.rowHeight
         tableView.estimatedRowHeight = DirectoryTableCell.rowHeight

@@ -33,6 +33,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var largePlayerPlaceholderView: UIView!
     @IBOutlet weak var controlPlaceholderView: UIView!
     @IBOutlet weak var backgroundImage: UIImageView!
+    @IBOutlet weak var closeButtonPlaceholderView: UIView!
     
     @IBOutlet weak var controlPlaceholderHeightConstraint: NSLayoutConstraint!
     private let safetyMarginOnBottom = 20.0
@@ -83,6 +84,11 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             createdLargeCurrentlyPlayingView.prepare(toWorkOnRootView: self)
             largePlayerPlaceholderView.addSubview(createdLargeCurrentlyPlayingView)
         }
+        #if targetEnvironment(macCatalyst)
+        closeButtonPlaceholderView.isHidden = false
+        #else
+        closeButtonPlaceholderView.isHidden = true
+        #endif
         
         self.setupTableView()
         self.fetchSongInfoAndUpdateViews()
@@ -109,14 +115,12 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
     #if targetEnvironment(macCatalyst)
     override func positionPopupCloseButton(_ popupCloseButton: LNPopupCloseButton) -> Bool {
-        guard let largeCurrentlyPlayingView = self.largeCurrentlyPlayingView else { return false }
-
+        guard let placeholder = closeButtonPlaceholderView else { return false }
         popupCloseButton.removeFromSuperview()
-        largeCurrentlyPlayingView.addSubview(popupCloseButton)
-
+        placeholder.addSubview(popupCloseButton)
         NSLayoutConstraint.activate([
-            popupCloseButton.leftAnchor.constraint(equalTo: largeCurrentlyPlayingView.leftAnchor, constant: 20),
-            popupCloseButton.topAnchor.constraint(equalTo: largeCurrentlyPlayingView.topAnchor, constant: 0),
+            popupCloseButton.rightAnchor.constraint(equalTo: placeholder.rightAnchor, constant: 0),
+            popupCloseButton.topAnchor.constraint(equalTo: placeholder.topAnchor, constant: 0),
         ])
         return true
     }

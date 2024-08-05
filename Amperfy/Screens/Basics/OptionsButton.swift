@@ -20,6 +20,7 @@
 //
 
 import UIKit
+import AmperfyKit
 
 class OptionsButton: UIButton {
 
@@ -61,10 +62,17 @@ class OptionsBarButton: UIBarButtonItem {
     
     lazy var inUIButton = {
         var config = UIButton.Configuration.gray()
+        #if !targetEnvironment(macCatalyst)
         config.buttonSize = .small
         config.cornerStyle = .capsule
+        #endif
+        
         let button = UIButton(configuration: config)
+        #if targetEnvironment(macCatalyst)
+        button.setTitle("\(CommonString.threeMiddleDots)  ", for: .normal)
+        #else
         button.setImage(.ellipsis, for: .normal)
+        #endif
         button.showsMenuAsPrimaryAction = true
         return button
     }()
@@ -89,10 +97,17 @@ class SortBarButton: UIBarButtonItem {
     
     lazy var inUIButton = {
         var config = UIButton.Configuration.gray()
+        #if !targetEnvironment(macCatalyst)
         config.buttonSize = .small
         config.cornerStyle = .capsule
+        #endif
+
         let button = UIButton(configuration: config)
+        #if targetEnvironment(macCatalyst)
+        button.setTitle("\(CommonString.threeMiddleDots)  ", for: .normal)
+        #else
         button.setImage(.filter, for: .normal)
+        #endif
         button.showsMenuAsPrimaryAction = true
         return button
     }()

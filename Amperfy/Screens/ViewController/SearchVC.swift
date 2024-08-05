@@ -171,6 +171,12 @@ class SearchVC: BasicTableViewController {
                 completionHandler(actionContext)
             }
         }
+        
+        #if targetEnvironment(macCatalyst)
+        if #available(macCatalyst 16.0, *) {
+            self.navigationController?.navigationBar.preferredBehavioralStyle = .mac
+        }
+        #endif
     }
     
     override func viewWillAppear(_ animated: Bool) {

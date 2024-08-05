@@ -37,6 +37,18 @@ class SplitVC: UISplitViewController {
         if appDelegate.storage.settings.isOfflineMode {
             appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
         }
+        #if targetEnvironment(macCatalyst)
+        // hides the 'Hide Sidebar' button
+        self.presentsWithGesture = false
+        #endif
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        #if targetEnvironment(macCatalyst)
+        // set min and max sidebar width
+        self.minimumPrimaryColumnWidth = 350
+        self.maximumPrimaryColumnWidth = 500
+        #endif
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -44,6 +56,13 @@ class SplitVC: UISplitViewController {
         
         super.viewDidAppear(animated)
         setCorrectPlayerBarView(collapseMode: isCompact)
+        
+        #if !targetEnvironment(macCatalyst)
+        displayInfoPopups()
+        #endif
+    }
+    
+    func displayInfoPopups() {
         if !appDelegate.storage.isLibrarySyncInfoReadByUser {
             displaySyncInfo()
         } else {

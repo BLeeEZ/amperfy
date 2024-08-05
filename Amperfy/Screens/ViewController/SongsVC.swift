@@ -84,7 +84,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             self.isIndexTitelsHidden = false
             change(sortType: appDelegate.storage.settings.songsSortSetting)
         }
-        self.navigationItem.title = self.filterTitle
+        setNavBarTitle(title: self.filterTitle)
     }
     
     func change(sortType: SongElementSortType) {

@@ -24,6 +24,13 @@ import AmperfyKit
 import PromiseKit
 
 class AlbumDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        // Return false if you do not want the item to be re-orderable.
+        return false
+    }
 }
 
 class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {

@@ -79,7 +79,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         case .albumArtists:
             self.filterTitle = "Album Artists"
         }
-        self.navigationItem.title = self.filterTitle
+        setNavBarTitle(title: self.filterTitle)
     }
     
     func change(sortType: ArtistElementSortType) {

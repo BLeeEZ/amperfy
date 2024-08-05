@@ -41,6 +41,7 @@ class PodcastsVC: MultiSourceTableViewController {
         episodesFetchedResultsController = PodcastEpisodesReleaseDateFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
 
         configureSearchController(placeholder: "Search in \"Podcasts\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
+        setNavBarTitle(title: "Podcasts")
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: PodcastEpisodeTableCell.typeName)
         

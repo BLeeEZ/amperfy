@@ -27,7 +27,19 @@ import CoreData
 class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
     
     var playlist: Playlist!
+    var isEditing = false
     
+    #if targetEnvironment(macCatalyst)
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return isEditing
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        // Return false if you do not want the item to be re-orderable.
+        return isEditing
+    }
+    #endif
+
     override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         exectueAfterAnimation {
             self.playlist?.movePlaylistItem(fromIndex: sourceIndexPath.row, to: destinationIndexPath.row)
@@ -194,12 +206,14 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
     private func startEditing() {
         tableView.isEditing = true
+        (diffableDataSource as? PlaylistDetailDiffableDataSource)?.isEditing = true
         detailOperationsView?.startEditing()
         refreshBarButtons()
     }
     
     private func endEditing() {
         tableView.isEditing = false
+        (diffableDataSource as? PlaylistDetailDiffableDataSource)?.isEditing = false
         detailOperationsView?.endEditing()
         refreshBarButtons()
     }

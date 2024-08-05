@@ -72,7 +72,10 @@ class SyncVC: UIViewController {
             self.appDelegate.eventLogger.supressAlerts = false
 
             #if targetEnvironment(macCatalyst)
-            AppDelegate.rootViewController()?.dismiss(animated: true)
+            AppDelegate.rootViewController()?.dismiss(animated: true) {
+                guard let splitVC = AppDelegate.rootViewController() as? SplitVC else { return }
+                splitVC.displayInfoPopups()
+            }
             #else
             self.performSegue(withIdentifier: "toLibrary", sender: self)
             #endif
