@@ -80,16 +80,6 @@ open class EntityImageView: UIView {
         backgroundColor = .clear
         layer.cornerRadius = cornerRadius.asCGFloat
         layer.masksToBounds = true
-
-//        #if targetEnvironment(macCatalyst)
-//        layer.masksToBounds = false
-//        layer.shadowOffset = CGSize(width: 1, height: 1)
-//        layer.shadowColor = UIColor.black.cgColor
-//        layer.shadowOpacity = 0.4
-//        #else
-//        layer.masksToBounds = true
-//        #endif
-        
         self.view.backgroundColor = .clear
         self.view.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         quadImages.forEach{ $0.isHidden = true }

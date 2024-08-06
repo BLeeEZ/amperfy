@@ -73,11 +73,6 @@ class PlayerControlView: UIView {
         #endif
     }
 
-    @objc func handleScrollGesture(_ recognizer: UIPanGestureRecognizer) {
-        let delta = recognizer.translation(in: self.timeSlider)
-        print(delta)
-    }
-
     func prepare(toWorkOnRootView: PopupPlayerVC? ) {
         self.rootView = toWorkOnRootView
         playButton.imageView?.tintColor = .label

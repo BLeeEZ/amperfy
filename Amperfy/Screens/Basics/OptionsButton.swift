@@ -49,6 +49,7 @@ class CloseBarButton: UIBarButtonItem {
         button.addTarget(target, action: selector, for: .primaryActionTriggered)
         button.setImage(.xmark, for: .normal)
         button.showsMenuAsPrimaryAction = true
+        button.preferredBehavioralStyle = .pad
         self.customView = button
     }
     

@@ -93,7 +93,6 @@ struct DisplaySettingsView: View {
                         Text("Music Player Skip Buttons")
                         Spacer()
                         Toggle(isOn: $settings.isShowMusicPlayerSkipButtons) {}
-                            //.frame(width: 130)
                     }
                     
                 }
@@ -110,7 +109,6 @@ struct DisplaySettingsView: View {
                                 get: { !settings.isAlwaysHidePlayerLyricsButton },
                                 set: { _ in tooglePlayerLyricsButtonPreference() }
                             )) {}
-                                //.frame(width: 130)
                         }
                         
                     }
@@ -123,7 +121,6 @@ struct DisplaySettingsView: View {
                             Text("Lyrics Smooth Scrolling")
                             Spacer()
                             Toggle(isOn: $settings.isLyricsSmoothScrolling) {}
-                                //.frame(width: 130)
                         }
                         
                     }
@@ -137,7 +134,6 @@ struct DisplaySettingsView: View {
                         Text("Detailed Information")
                         Spacer()
                         Toggle(isOn: $settings.isShowDetailedInfo) {}
-                            //.frame(width: 130)
                     }
  
                 }
@@ -150,7 +146,6 @@ struct DisplaySettingsView: View {
                         Text("Song Duration")
                         Spacer()
                         Toggle(isOn: $settings.isShowSongDuration) {}
-                            //.frame(width: 130)
                     }
  
                 }
@@ -163,7 +158,6 @@ struct DisplaySettingsView: View {
                         Text("Album Duration")
                         Spacer()
                         Toggle(isOn: $settings.isShowAlbumDuration) {}
-                            //.frame(width: 130)
                     }
  
                 }
@@ -176,7 +170,6 @@ struct DisplaySettingsView: View {
                         Text("Artist Duration")
                         Spacer()
                         Toggle(isOn: $settings.isShowArtistDuration) {}
-                            //.frame(width: 130)
                     }
  
                 }
@@ -192,7 +185,6 @@ struct DisplaySettingsView: View {
                             get: { !settings.isPlayerShuffleButtonEnabled },
                             set: { settings.isPlayerShuffleButtonEnabled = !$0 }
                         )) {}
-                            //.frame(width: 130)
                     }
                 }
                 , footer: {

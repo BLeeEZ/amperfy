@@ -50,7 +50,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         tableView.rowHeight = PlaylistTableCell.rowHeight
         tableView.estimatedRowHeight = PlaylistTableCell.rowHeight
 
-#if !targetEnvironment(macCatalyst)
+        #if !targetEnvironment(macCatalyst)
         self.refreshControl = UIRefreshControl()
         #endif
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)

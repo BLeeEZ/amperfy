@@ -132,7 +132,6 @@ struct PlayerSettingsView: View {
                         Text("Scrobble streamed Songs")
                         Spacer()
                         Toggle(isOn: $settings.isScrobbleStreamedItems) {}
-                            //.frame(width: 130)
                     }
                 }
                 , footer: {
@@ -212,7 +211,6 @@ struct PlayerSettingsView: View {
                         Text("Start audio playback only on explicit press on Play")
                         Spacer()
                         Toggle(isOn: $settings.isPlaybackStartOnlyOnPlay) {}
-                            //.frame(width: 130)
                     }
                 }
                 , footer: {

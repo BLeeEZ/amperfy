@@ -3,7 +3,7 @@
     <device id="mac" appearance="light" renderMode="macOS"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -36,7 +36,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="373" height="35"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHk-4e-H8f" userLabel="Title Label">
-                                                <rect key="frame" x="0.0" y="0.0" width="373" height="20"/>
+                                                <rect key="frame" x="0.0" y="9" width="186.5" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="16" id="vsJ-7z-xj1">
                                                         <variation key="widthClass=regular" constant="18"/>
@@ -55,9 +55,12 @@
                                                         <include reference="vsJ-7z-xj1"/>
                                                     </mask>
                                                 </variation>
+                                                <variation key="userInterfaceIdiom=mac-widthClass=regular">
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                </variation>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hM0-yx-hsO" userLabel="Subtitle Label">
-                                                <rect key="frame" x="0.0" y="17" width="373" height="18"/>
+                                                <rect key="frame" x="187" y="9" width="186.5" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="15" id="dnN-rs-XET">
                                                         <variation key="widthClass=regular" constant="18"/>
@@ -95,7 +98,7 @@
                                                 <include reference="y2Z-f4-QBV"/>
                                             </mask>
                                         </variation>
-                                        <variation key="userInterfaceIdiom=mac-widthClass=regular" alignment="fill" axis="vertical" distribution="fill"/>
+                                        <variation key="userInterfaceIdiom=mac-widthClass=regular" alignment="center" axis="horizontal" distribution="fillEqually"/>
                                     </stackView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ah3-fC-zQQ" userLabel="Info Label">
                                         <rect key="frame" x="381" y="9" width="200" height="18"/>
