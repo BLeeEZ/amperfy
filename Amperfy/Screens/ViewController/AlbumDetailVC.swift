@@ -24,9 +24,18 @@ import AmperfyKit
 import PromiseKit
 
 class AlbumDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        // Return false if you do not want the item to be re-orderable.
+        return false
+    }
 }
 
 class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
+
+    override var sceneTitle: String? { "Library" }
 
     var album: Album!
     var songToScrollTo: Song?
@@ -58,7 +67,9 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
         configureSearchController(placeholder: "Search in \"Album\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
-        
+        // Catalyst also need an estimate to calculate the correct height before scrolling
+        tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+
         let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
             infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },
             playContextCb: {() in PlayContext(containable: self.album, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
@@ -66,7 +77,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
             isInfoAlwaysHidden: true)
         let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: album, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
-        
+
         optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu.lazyMenu {
             EntityPreviewActionBuilder(container: self.album, on: self).createMenu()
@@ -130,5 +141,4 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
         fetchedResultsController.search(searchText: searchController.searchBar.text ?? "", onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1 )
         tableView.reloadData()
     }
-    
 }

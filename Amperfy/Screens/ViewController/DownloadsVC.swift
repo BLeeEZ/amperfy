@@ -25,6 +25,8 @@ import AmperfyKit
 
 class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
     
+    override var sceneTitle: String? { "Library" }
+
     private var fetchedResultsController: DownloadsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var downloadManager: DownloadManageable!
@@ -39,7 +41,8 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
         
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
-        
+        tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+
         optionsButton = OptionsBarButton()
         optionsButton.menu = createActionButtonMenu()
         navigationItem.rightBarButtonItem = optionsButton

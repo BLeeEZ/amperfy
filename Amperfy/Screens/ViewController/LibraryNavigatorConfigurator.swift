@@ -74,42 +74,7 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
     }
 }
 
-class SideBarDiffableDataSource: UICollectionViewDiffableDataSource<Int, LibraryNavigatorItem> {
-    
-    let offsetDataCount: Int
-    var isEdit = false
-    
-    init(offsetDataCount: Int, collectionView: UICollectionView, cellProvider: @escaping UICollectionViewDiffableDataSource<Int, LibraryNavigatorItem>.CellProvider) {
-        self.offsetDataCount = offsetDataCount
-        super.init(collectionView: collectionView, cellProvider: cellProvider)
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
-        return isEdit && (indexPath.row >= offsetDataCount)
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        guard let fromObject = itemIdentifier(for: sourceIndexPath),
-              sourceIndexPath != destinationIndexPath else { return }
-        
-        var snap = snapshot()
-        snap.deleteItems([fromObject])
-        
-        if let toObject = itemIdentifier(for: destinationIndexPath) {
-            let isAfter = destinationIndexPath.row > sourceIndexPath.row
-            
-            if isAfter {
-                snap.insertItems([fromObject], afterItem: toObject)
-            } else {
-                snap.insertItems([fromObject], beforeItem: toObject)
-            }
-        } else {
-            snap.appendItems([fromObject], toSection: sourceIndexPath.section)
-        }
-        
-        apply(snap, animatingDifferences: true)
-    }
-}
+typealias SideBarDiffableDataSource = UICollectionViewDiffableDataSource<Int, LibraryNavigatorItem>
 
 class LibraryNavigatorConfigurator: NSObject {
     
@@ -121,7 +86,11 @@ class LibraryNavigatorConfigurator: NSObject {
     private var dataSource: SideBarDiffableDataSource!
     private let layoutConfig: UICollectionLayoutListConfiguration
     private let pressedOnLibraryItemCB: ((_: LibraryNavigatorItem) -> Void)
-    
+
+    #if targetEnvironment(macCatalyst)
+    private var preEditItem: LibraryNavigatorItem?
+    #endif
+
     private var editButton: UIBarButtonItem!
     private var librarySettings = LibraryDisplaySettings.defaultSettings
     private var libraryInUse = [LibraryNavigatorItem]()
@@ -136,24 +105,40 @@ class LibraryNavigatorConfigurator: NSObject {
     
     func viewDidLoad(navigationItem: UINavigationItem, collectionView: UICollectionView) {
         self.collectionView = collectionView
+        #if !targetEnvironment(macCatalyst)
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editingPressed))
         navigationItem.rightBarButtonItems = [editButton]
+        #endif
         libraryInUse = librarySettings.inUse.map { LibraryNavigatorItem(title: $0.displayName, library: $0) }
         libraryNotUsed = librarySettings.notUsed.map { LibraryNavigatorItem(title: $0.displayName, library: $0) }
-        
         self.collectionView.delegate = self
         self.collectionView.collectionViewLayout = createLayout() // 1 Configure the layout
         configureDataSource() // 2 configure the data Source
         applyInitialSnapshots() // 3 Apply the snapshots.
     }
-    
+
+    func viewDidAppear(navigationItem: UINavigationItem, collectionView: UICollectionView) {
+        #if targetEnvironment(macCatalyst)
+        if self.collectionView.indexPathsForSelectedItems?.first == nil {
+            self.collectionView.selectItem(at: .zero, animated: false, scrollPosition: .top)
+        }
+        #endif
+    }
+
     @objc private func editingPressed() {
         let isInEditMode = !collectionView.isEditing
+        #if !targetEnvironment(macCatalyst)
         editButton.title = isInEditMode ? "Done" : "Edit"
         editButton.style = isInEditMode ? .done : .plain
-        dataSource.isEdit = isInEditMode
-        
+        #endif
+
+
         if isInEditMode {
+            #if targetEnvironment(macCatalyst)
+            let selectedIndexPath = self.collectionView.indexPathsForSelectedItems?.first ?? .zero
+            preEditItem = self.dataSource.itemIdentifier(for: selectedIndexPath)
+            #endif
+
             collectionView.isEditing.toggle()
             var snapshot = dataSource.snapshot(for: 0)
             snapshot.append(libraryNotUsed)
@@ -187,6 +172,12 @@ class LibraryNavigatorConfigurator: NSObject {
             snapshot.delete(libraryNotUsed)
             appDelegate.storage.settings.libraryDisplaySettings = LibraryDisplaySettings(inUse: libraryInUse.compactMap({ $0.library }))
             dataSource.apply(snapshot, to: 0, animatingDifferences: true)
+
+            // Restore selection after editing endet on macOS
+            #if targetEnvironment(macCatalyst)
+            let indexPath = self.preEditItem != nil ? self.dataSource.indexPath(for: preEditItem!) : .zero
+            self.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .top)
+            #endif
         }
     }
     
@@ -212,7 +203,15 @@ class LibraryNavigatorConfigurator: NSObject {
             if !item.isInteractable {
                 content.text = item.title
                 content.textProperties.font = .preferredFont(forTextStyle: .headline)
+                #if targetEnvironment(macCatalyst)
+                // show edit on the right-hand side of the header
+                cell.accessories = [
+                    .customView(configuration: .createEdit(target: self, action: #selector(self.editingPressed))),
+                    .customView(configuration: .createDone(target: self, action: #selector(self.editingPressed)))
+                ]
+                #else
                 cell.accessories = []
+                #endif
             } else if let libraryItem = item.library {
                 content.text = libraryItem.displayName
                 content.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
@@ -223,9 +222,11 @@ class LibraryNavigatorConfigurator: NSObject {
                 }
                 content.imageProperties.maximumSize = imageSize
                 content.imageProperties.reservedLayoutSize = imageSize
-                cell.accessories = [
-                    .disclosureIndicator(displayed: .whenNotEditing),
-                    .reorder()]
+                #if targetEnvironment(macCatalyst)
+                cell.accessories = [.reorder()]
+                #else
+                cell.accessories = [.disclosureIndicator(displayed: .whenNotEditing), .reorder()]
+                #endif
                 if item.isSelected {
                     cell.accessories.append(.customView(configuration: .createIsSelected()))
                 } else {
@@ -234,7 +235,11 @@ class LibraryNavigatorConfigurator: NSObject {
             } else if let tabItem = item.tab {
                 content.text = tabItem.title
                 content.image = tabItem.icon
+                #if targetEnvironment(macCatalyst)
+                cell.accessories = []
+                #else
                 cell.accessories = [.disclosureIndicator()]
+                #endif
             }
             cell.contentConfiguration = content
             cell.indentationLevel = 0
@@ -246,16 +251,26 @@ class LibraryNavigatorConfigurator: NSObject {
             (supplementaryView, string, indexPath) in
             supplementaryView.isHidden = true
         }
-        // data source
-        dataSource = SideBarDiffableDataSource(offsetDataCount: offsetData.count ,collectionView: collectionView) {
+        // 2 - data source
+        dataSource = SideBarDiffableDataSource(collectionView: collectionView) {
             (collectionView, indexPath, item) -> UICollectionViewCell? in
                 return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
         /// 3 - data source supplementaryViewProvider
         dataSource.supplementaryViewProvider = { view, kind, index in
-            return self.collectionView.dequeueConfiguredReusableSupplementary(
-                using: headerRegistration, for: index)
+            return self.collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: index)
         }
+
+        /// 4 - data source reordering
+        dataSource.reorderingHandlers.canReorderItem = { [weak self] item in
+            let isEdit = self?.collectionView.isEditing ?? false
+            return isEdit && (item.tab == nil)
+        }
+
+        // Somehow, this fixes a crash when trying to reorder the sidebar in catalyst. Leave it in.
+        #if targetEnvironment(macCatalyst)
+        dataSource.reorderingHandlers.didReorder = { _ in }
+        #endif
     }
     
     private func applyInitialSnapshots() {
@@ -279,6 +294,12 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
         if collectionView.isEditing {
             return (indexPath.row >= offsetData.count)
         } else if let item = dataSource.itemIdentifier(for: indexPath) {
+            #if targetEnvironment(macCatalyst)
+            // Do not allow reselecting an already selected cell
+            guard let alreadySelected = collectionView.indexPathsForSelectedItems?.contains(indexPath), !alreadySelected else {
+                return false
+            }
+            #endif
             return item.isInteractable
         } else {
             return false
@@ -296,7 +317,7 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
             return IndexPath(row: offsetData.count, section: 0)
         }
     }
-    
+
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
         // handel selection
@@ -311,13 +332,23 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
         }
         // Retrieve the item identifier using index path.
         // The item identifier we get will be the selected data item
+
         guard let selectedItem = dataSource.itemIdentifier(for: indexPath) else {
+            #if !targetEnvironment(macCatalyst)
             collectionView.deselectItem(at: indexPath, animated: true)
+            #endif
             return
         }
+
+        #if !targetEnvironment(macCatalyst)
         collectionView.deselectItem(at: indexPath, animated: false)
-        
+        #endif
+
         pressedOnLibraryItemCB(selectedItem)
     }
+}
 
+
+extension IndexPath {
+    static let zero = IndexPath(row: 0, section: 0)
 }

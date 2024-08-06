@@ -35,6 +35,7 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.register(nibName: CurrentlyPlayingTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
+        tableView.estimatedRowHeight = PlayableTableCell.rowHeight
         tableView.backgroundColor = UIColor.clear
         tableView.sectionHeaderTopPadding = 0.0
     }

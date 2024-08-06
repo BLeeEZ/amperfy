@@ -26,17 +26,23 @@ import SwiftUI
 import Combine
 
 class SettingsHostVC: UIViewController {
-    
+
     lazy var settings: Settings = {
-       return Settings()
+        return Settings()
     }()
-    
+
     var changesAgent: [AnyCancellable] = []
-    
+
+    override var sceneTitle: String { "Settings" }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-    }
         
+        #if targetEnvironment(macCatalyst)
+        self.title = "Main"
+        #endif
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         changesAgent = [AnyCancellable]()
@@ -156,7 +162,6 @@ class SettingsHostVC: UIViewController {
         changesAgent.append(settings.$themePreference.sink(receiveValue: { newValue in
             self.appDelegate.storage.settings.themePreference = newValue
         }))
-        
     }
     
     @IBSegueAction func segueToSwiftUI(_ coder: NSCoder) -> UIViewController? {
@@ -166,5 +171,4 @@ class SettingsHostVC: UIViewController {
                 .environment(\.managedObjectContext, appDelegate.storage.main.context)
         )
     }
-    
 }

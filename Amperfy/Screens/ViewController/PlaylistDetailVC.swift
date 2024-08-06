@@ -27,7 +27,19 @@ import CoreData
 class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
     
     var playlist: Playlist!
+    var isEditing = false
     
+    #if targetEnvironment(macCatalyst)
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return isEditing
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        // Return false if you do not want the item to be re-orderable.
+        return isEditing
+    }
+    #endif
+
     override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         exectueAfterAnimation {
             self.playlist?.movePlaylistItem(fromIndex: sourceIndexPath.row, to: destinationIndexPath.row)
@@ -60,11 +72,12 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
 
 class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<PlaylistItemMO> {
 
+    override var sceneTitle: String? { "Library" }
+
     private var fetchedResultsController: PlaylistItemsFetchedResultsController!
     var playlist: Playlist!
     
     private var editButton: UIBarButtonItem!
-    private var doneButton: UIBarButtonItem!
     private var optionsButton: UIBarButtonItem!
     var detailOperationsView: GenericDetailTableHeader?
     
@@ -84,6 +97,11 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        #if !targetEnvironment(macCatalyst)
+        self.refreshControl = UIRefreshControl()
+        #endif
+
         appDelegate.userStatistics.visited(.playlistDetail)
         fetchedResultsController = PlaylistItemsFetchedResultsController(forPlaylist: playlist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
@@ -92,9 +110,11 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
+        tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+
+        // Use a single button, two buttons don't work on catalyst
+        editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(toggleEditing))
         
-        editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(startEditing))
-        doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(endEditing))
         optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu.lazyMenu {
             EntityPreviewActionBuilder(container: self.playlist, on: self).createMenu()
@@ -146,13 +166,18 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         if !tableView.isEditing {
             if appDelegate.storage.settings.isOnlineMode {
                 edititingBarButton = editButton
+                edititingBarButton?.title = "Edit"
+                edititingBarButton?.style = .plain
                 if playlist?.isSmartPlaylist ?? false {
                     edititingBarButton?.isEnabled = false
                 }
             }
         } else {
-            edititingBarButton = doneButton
+            edititingBarButton = editButton
+            edititingBarButton?.title = "Done"
+            edititingBarButton?.style = .done
         }
+
         navigationItem.rightBarButtonItems = [optionsButton, edititingBarButton].compactMap{$0}
     }
     
@@ -168,14 +193,27 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         return convertIndexPathToPlayContext(songIndexPath: IndexPath(row: indexPath.row, section: 0))
     }
 
-    @objc private func startEditing() {
+    @objc private func toggleEditing(sender: UIBarButtonItem) {
+        // Hack for catalyst, since isEnabled is ignored
+        guard sender.isEnabled else { return }
+
+        if tableView.isEditing {
+            self.endEditing()
+        } else {
+            self.startEditing()
+        }
+    }
+
+    private func startEditing() {
         tableView.isEditing = true
+        (diffableDataSource as? PlaylistDetailDiffableDataSource)?.isEditing = true
         detailOperationsView?.startEditing()
         refreshBarButtons()
     }
     
-    @objc private func endEditing() {
+    private func endEditing() {
         tableView.isEditing = false
+        (diffableDataSource as? PlaylistDetailDiffableDataSource)?.isEditing = false
         detailOperationsView?.endEditing()
         refreshBarButtons()
     }

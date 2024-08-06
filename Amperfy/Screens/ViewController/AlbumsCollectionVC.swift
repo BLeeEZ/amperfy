@@ -146,9 +146,10 @@ class AlbumsCollectionDiffableDataSource: BasicUICollectionViewDiffableDataSourc
 
 class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<AlbumMO> {
 
+    override var sceneTitle: String? { "Library" }
+
     fileprivate var common = AlbumsCommonVCInteractions()
-    private var refreshControl: UIRefreshControl?
-    
+
     public var displayFilter: DisplayCategoryFilter {
         set { common.displayFilter = newValue }
         get { return common.displayFilter }
@@ -204,10 +205,12 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
             self.collectionView.showsVerticalScrollIndicator = true
         }
 
+        #if !targetEnvironment(macCatalyst)
         refreshControl = UIRefreshControl()
+        #endif
         refreshControl?.addTarget(common, action: #selector(AlbumsCommonVCInteractions.handleRefresh), for: UIControl.Event.valueChanged)
         collectionView.refreshControl = refreshControl
-        
+
         containableAtIndexPathCallback = { (indexPath) in
             return self.albumsDataSource?.getAlbum(at: indexPath)
         }
@@ -222,7 +225,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
         common.updateRightBarButtonItems()
         common.updateFromRemote()
     }
-    
+
     func createCell(_ collectionView: UICollectionView, forItemAt indexPath: IndexPath, album: Album) -> UICollectionViewCell {
         let cell: AlbumCollectionCell = collectionView.dequeueReusableCell(withReuseIdentifier: AlbumCollectionCell.typeName, for: indexPath) as! AlbumCollectionCell
         if let album = (diffableDataSource as? AlbumsCollectionDiffableDataSource)?.getAlbum(at: indexPath) {
@@ -269,7 +272,6 @@ extension AlbumsCollectionVC: UICollectionViewDelegateFlowLayout {
         let inset = self.collectionView(collectionView, layout: collectionViewLayout, insetForSectionAt: indexPath.section)
         let spaceBetweenCells = self.collectionView(collectionView, layout: collectionViewLayout, minimumInteritemSpacingForSectionAt: indexPath.section)
         let availableWidth = collectionView.bounds.size.width - inset.left - inset.right
-        let rowCount = (availableWidth) / AlbumCollectionCell.maxWidth
         let count = CGFloat(appDelegate.storage.settings.albumsGridSizeSetting)
         let artworkWidth = (availableWidth - (spaceBetweenCells * (count - 1))) / count
         return CGSize(width: artworkWidth, height: artworkWidth + 45)

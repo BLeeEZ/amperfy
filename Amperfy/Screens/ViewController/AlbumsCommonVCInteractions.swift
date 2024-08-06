@@ -24,6 +24,20 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
+class SliderMenuPopover: UIViewController, UIPopoverPresentationControllerDelegate {
+    var sliderMenuView: SliderMenuView {
+        self.view as! SliderMenuView
+    }
+
+    override func loadView() {
+        self.view = SliderMenuView()
+    }
+
+    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
+        return .none
+    }
+}
+
 class SliderMenuView: UIView {
     
     let slider: UISlider = {
@@ -102,7 +116,7 @@ class AlbumsCommonVCInteractions {
             self.isIndexTitelsHidden = false
             change(sortType: appDelegate.storage.settings.albumsSortSetting)
         }
-        rootVC?.title = self.filterTitle
+        rootVC?.setNavBarTitle(title: self.filterTitle)
     }
 
     func change(sortType: AlbumElementSortType) {
@@ -230,16 +244,11 @@ class AlbumsCommonVCInteractions {
     
     func showSliderMenu() {
         guard let rootVC = rootVC else { return }
-        let sliderMenuView = SliderMenuView(frame: CGRect(x: 0, y: 0, width: 250, height: 100))
-        sliderMenuView.center = rootVC.view.center
-        sliderMenuView.backgroundColor = .backgroundColor
-        sliderMenuView.layer.cornerRadius = 10
 
-        sliderMenuView.layer.shadowColor = UIColor.black.cgColor
-        sliderMenuView.layer.shadowOpacity = 1
-        sliderMenuView.layer.shadowOffset = .zero
-        sliderMenuView.layer.shadowRadius = 10
-        
+        let popoverContentController = SliderMenuPopover()
+        let sliderMenuView = popoverContentController.sliderMenuView
+        sliderMenuView.frame = CGRect(x: 0, y: 0, width: 250, height: 50)
+
         if UIDevice.current.userInterfaceIdiom == .pad {
             sliderMenuView.slider.minimumValue = 3
             sliderMenuView.slider.maximumValue = 7
@@ -261,17 +270,24 @@ class AlbumsCommonVCInteractions {
             }
         }
 
-        rootVC.view.addSubview(sliderMenuView)
-         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissSliderMenu(_:)))
-        rootVC.view.addGestureRecognizer(tapGesture)
-     }
 
-     @objc func dismissSliderMenu(_ sender: UITapGestureRecognizer) {
-         while let sliderMenuView = rootVC?.view.subviews.first(where: { $0 is SliderMenuView }) {
-             sliderMenuView.removeFromSuperview()
-         }
-         rootVC?.view.gestureRecognizers?.removeAll()
+        popoverContentController.modalPresentationStyle = .popover
+        popoverContentController.preferredContentSize = sliderMenuView.frame.size
+
+        if let popoverPresentationController = popoverContentController.popoverPresentationController {
+            popoverPresentationController.permittedArrowDirections = .up
+            popoverPresentationController.delegate = popoverContentController
+            // Try to position the popover more nicely and fallback to the default if it does not work
+            if let optionsView = optionsButton.customView {
+                popoverPresentationController.sourceView = optionsView
+                var frame = optionsView.bounds
+                frame.origin.x = optionsView.frame.midX - 3
+                popoverPresentationController.sourceRect = frame
+            } else {
+                popoverPresentationController.barButtonItem = optionsButton
+            }
+            rootVC.present(popoverContentController, animated: true, completion: nil)
+        }
      }
     
     private func createStyleButtonMenu() -> UIMenu {

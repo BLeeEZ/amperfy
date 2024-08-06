@@ -26,6 +26,8 @@ import PromiseKit
 
 class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
 
+    override var sceneTitle: String? { "Library" }
+
     private var fetchedResultsController: ArtistFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     public var displayFilter: ArtistCategoryFilter = .all
@@ -42,9 +44,13 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
+        tableView.estimatedRowHeight = GenericTableCell.rowHeight
 
+        #if !targetEnvironment(macCatalyst)
+        self.refreshControl = UIRefreshControl()
+        #endif
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
-        
+
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath)
         }
@@ -73,7 +79,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         case .albumArtists:
             self.filterTitle = "Album Artists"
         }
-        self.navigationItem.title = self.filterTitle
+        setNavBarTitle(title: self.filterTitle)
     }
     
     func change(sortType: ArtistElementSortType) {

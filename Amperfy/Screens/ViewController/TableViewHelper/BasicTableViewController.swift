@@ -25,6 +25,14 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
+extension UIViewController {
+    
+    func setNavBarTitle(title: String) {
+        self.title = title
+    }
+    
+}
+
 public struct TableViewPreviewInfo: Codable {
     public var playableContainerIdentifier: PlayableContainerIdentifier?
     public var indexPath: IndexPath?
@@ -87,6 +95,12 @@ class BasicTableViewController: KeyCommandTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.keyboardDismissMode = .onDrag
+        
+        #if targetEnvironment(macCatalyst)
+        if #available(macCatalyst 16.0, *) {
+            self.navigationController?.navigationBar.preferredBehavioralStyle = .pad
+        }
+        #endif
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -149,11 +163,15 @@ class BasicTableViewController: KeyCommandTableViewController {
         searchController.searchBar.autocapitalizationType = .none
         searchController.searchBar.scopeButtonTitles = scopeButtonTitles
         searchController.searchBar.placeholder = placeholder
-        
+
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
         if #available(iOS 16.0, *) {
+            #if targetEnvironment(macCatalyst)
+            navigationItem.preferredSearchBarPlacement = .inline
+            #else
             navigationItem.preferredSearchBarPlacement = .stacked
+            #endif
         }
         
         searchController.delegate = self

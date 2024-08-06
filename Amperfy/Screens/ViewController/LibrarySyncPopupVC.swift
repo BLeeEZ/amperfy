@@ -69,6 +69,7 @@ class LibrarySyncPopupVC: UIViewController {
         self.iconBackgroundLabel.backgroundColor = popupColor
         
         iconImage.image = icon
+        self.iconImage.tintColor = .white
     }
     
     override func viewWillAppear(_ animated: Bool) {

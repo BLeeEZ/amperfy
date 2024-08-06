@@ -30,10 +30,17 @@ class BasicCollectionViewController: UICollectionViewController {
     var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
     var playContextAtIndexPathCallback: PlayContextAtIndexPathCallback?
     var isIndexTitelsHidden = false
-    
+    var refreshControl: UIRefreshControl?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.collectionView.keyboardDismissMode = .onDrag
+        
+        #if targetEnvironment(macCatalyst)
+        if #available(macCatalyst 16.0, *) {
+            self.navigationController?.navigationBar.preferredBehavioralStyle = .pad
+        }
+        #endif
     }
     
     override func viewWillAppear(_ animated: Bool) {

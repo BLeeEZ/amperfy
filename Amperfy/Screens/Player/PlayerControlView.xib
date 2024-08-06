@@ -3,7 +3,7 @@
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -54,7 +54,7 @@
                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="SoI-ny-Hw0" userLabel="Control  Stack">
                     <rect key="frame" x="22.5" y="116" width="330" height="50"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Skip Backward Button">
+                        <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Skip Backward Button">
                             <rect key="frame" x="0.0" y="6.5" width="66" height="37.5"/>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal" image="gobackward.10" catalog="system">
@@ -65,7 +65,7 @@
                                 <action selector="skipBackwardButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="GNs-ds-sdw"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jhy-pc-jwZ" userLabel="Previous Button">
+                        <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="Jhy-pc-jwZ" userLabel="Previous Button">
                             <rect key="frame" x="66" y="11" width="66" height="28"/>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal" image="backward.fill" catalog="system">
@@ -76,7 +76,7 @@
                                 <action selector="previousButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="UBQ-J2-BCO"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Byk-rx-3Lv">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="Byk-rx-3Lv">
                             <rect key="frame" x="132" y="3.5" width="66" height="43.5"/>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
@@ -88,7 +88,7 @@
                                 <action selector="playButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="x3u-6i-ytK"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E3q-DK-jgm" userLabel="Next Button">
+                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="E3q-DK-jgm" userLabel="Next Button">
                             <rect key="frame" x="198" y="11" width="66" height="28"/>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
@@ -100,7 +100,7 @@
                                 <action selector="nextButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="aSu-T2-0y0"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QO0-Ep-X2s" userLabel="Skip Forward Button">
+                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="QO0-Ep-X2s" userLabel="Skip Forward Button">
                             <rect key="frame" x="264" y="6.5" width="66" height="37.5"/>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
@@ -122,7 +122,7 @@
                 <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="xXq-r4-gI6">
                     <rect key="frame" x="37.5" y="186" width="300" height="28"/>
                     <subviews>
-                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l5j-2I-Ltc" userLabel="Airplay Button">
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="l5j-2I-Ltc" userLabel="Airplay Button">
                             <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="28" id="4pS-66-grn"/>
@@ -138,7 +138,7 @@
                                 <action selector="airplayButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YPY-8P-oS2"/>
                             </connections>
                         </button>
-                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
                             <rect key="frame" x="68" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="dHI-Uf-EN9"/>
@@ -158,7 +158,7 @@
                                 <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
                             </connections>
                         </button>
-                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MwT-Zv-e8l" userLabel="Lyrics Button">
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="MwT-Zv-e8l" userLabel="Lyrics Button">
                             <rect key="frame" x="136" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="28" id="Jaw-IB-PJv"/>
@@ -179,7 +179,7 @@
                                 <action selector="displayLyricsPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="T5I-A9-fTA"/>
                             </connections>
                         </button>
-                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change">
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change">
                             <rect key="frame" x="204" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="Iye-f4-Rd2"/>
@@ -197,7 +197,7 @@
                                 <action selector="playerModeChangePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="WMf-zb-HxJ"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0xq-hb-FZa" userLabel="Options Button">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="0xq-hb-FZa" userLabel="Options Button">
                             <rect key="frame" x="272" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="28" id="Ble-C9-owO"/>
@@ -214,7 +214,7 @@
                         <constraint firstAttribute="width" constant="300" id="dMH-9W-9do"/>
                     </constraints>
                 </stackView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dNu-q7-Vtb" userLabel="Sleep Timer Button">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="dNu-q7-Vtb" userLabel="Sleep Timer Button">
                     <rect key="frame" x="103.5" y="64" width="28" height="28"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="28" id="Dpt-Vx-nwj"/>
@@ -226,7 +226,7 @@
                         <imageReference key="image" image="moon.zzz.fill" catalog="system" symbolScale="small"/>
                     </buttonConfiguration>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f7L-lf-lJ6" userLabel="Playback Rate Button">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="f7L-lf-lJ6" userLabel="Playback Rate Button">
                     <rect key="frame" x="230" y="64" width="55" height="28"/>
                     <color key="tintColor" systemColor="labelColor"/>
                     <state key="normal" title="Button"/>

@@ -23,6 +23,9 @@ import UIKit
 import CoreMedia
 import AmperfyKit
 import PromiseKit
+#if targetEnvironment(macCatalyst)
+import LNPopupController_ObjC
+#endif
 
 class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
@@ -30,6 +33,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var largePlayerPlaceholderView: UIView!
     @IBOutlet weak var controlPlaceholderView: UIView!
     @IBOutlet weak var backgroundImage: UIImageView!
+    @IBOutlet weak var closeButtonPlaceholderView: UIView!
     
     @IBOutlet weak var controlPlaceholderHeightConstraint: NSLayoutConstraint!
     private let safetyMarginOnBottom = 20.0
@@ -52,9 +56,10 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         view.isHidden = true
         return view
     }()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
+
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.dragDelegate = self
@@ -63,8 +68,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         
         player = appDelegate.player
         player.addNotifier(notifier: self)
-        
+
         self.backgroundImage.setBackgroundBlur(style: .prominent)
+
         refreshCurrentlyPlayingPopupItem()
         
         controlPlaceholderHeightConstraint.constant = PlayerControlView.frameHeight + safetyMarginOnBottom
@@ -78,6 +84,11 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             createdLargeCurrentlyPlayingView.prepare(toWorkOnRootView: self)
             largePlayerPlaceholderView.addSubview(createdLargeCurrentlyPlayingView)
         }
+        #if targetEnvironment(macCatalyst)
+        closeButtonPlaceholderView.isHidden = false
+        #else
+        closeButtonPlaceholderView.isHidden = true
+        #endif
         
         self.setupTableView()
         self.fetchSongInfoAndUpdateViews()
@@ -101,7 +112,20 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         adjustLaoutMargins()
         refreshCellMasks()
     }
-    
+
+    #if targetEnvironment(macCatalyst)
+    override func positionPopupCloseButton(_ popupCloseButton: LNPopupCloseButton) -> Bool {
+        guard let placeholder = closeButtonPlaceholderView else { return false }
+        popupCloseButton.removeFromSuperview()
+        placeholder.addSubview(popupCloseButton)
+        NSLayoutConstraint.activate([
+            popupCloseButton.rightAnchor.constraint(equalTo: placeholder.rightAnchor, constant: 0),
+            popupCloseButton.topAnchor.constraint(equalTo: placeholder.topAnchor, constant: 0),
+        ])
+        return true
+    }
+    #endif
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         appDelegate.userStatistics.visited(.popupPlayer)

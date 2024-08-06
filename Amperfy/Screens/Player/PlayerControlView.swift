@@ -32,7 +32,11 @@ class PlayerControlView: UIView {
     
     private var player: PlayerFacade!
     private var rootView: PopupPlayerVC?
-    
+
+    #if targetEnvironment(macCatalyst)
+    private var airplayVolume: MPVolumeView
+    #endif
+
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var previousButton: UIButton!
     @IBOutlet weak var nextButton: UIButton!
@@ -53,12 +57,22 @@ class PlayerControlView: UIView {
     @IBOutlet weak var optionsButton: UIButton!
     
     required init?(coder aDecoder: NSCoder) {
+        #if targetEnvironment(macCatalyst)
+        airplayVolume = MPVolumeView(frame: .zero)
+        airplayVolume.showsVolumeSlider = false
+        airplayVolume.isHidden = true
+        #endif
+
         super.init(coder: aDecoder)
         self.layoutMargins = Self.margin
         player = appDelegate.player
         player.addNotifier(notifier: self)
+
+        #if targetEnvironment(macCatalyst)
+        self.addSubview(airplayVolume)
+        #endif
     }
-    
+
     func prepare(toWorkOnRootView: PopupPlayerVC? ) {
         self.rootView = toWorkOnRootView
         playButton.imageView?.tintColor = .label
@@ -127,8 +141,22 @@ class PlayerControlView: UIView {
         }
     }
     
-    @IBAction func airplayButtonPushed(_ sender: Any) {
+    @IBAction func airplayButtonPushed(_ sender: UIButton) {
         appDelegate.userStatistics.usedAction(.airplay)
+
+        #if targetEnvironment(macCatalyst)
+        // Position the popup correctly on macOS
+        if let buttonCenter = sender.superview?.convert(sender.center, to: self) {
+            airplayVolume.center = buttonCenter
+        }
+        
+        for view: UIView in airplayVolume.subviews {
+            if let button = view as? UIButton {
+                button.sendActions(for: .touchUpInside)
+                break
+            }
+        }
+        #else
         let rect = CGRect(x: -100, y: 0, width: 0, height: 0)
         let airplayVolume = MPVolumeView(frame: rect)
         airplayVolume.showsVolumeSlider = false
@@ -140,6 +168,9 @@ class PlayerControlView: UIView {
             }
         }
         airplayVolume.removeFromSuperview()
+        #endif
+
+
     }
     
     @IBAction func displayPlaylistPressed() {

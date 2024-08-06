@@ -26,6 +26,8 @@ import PromiseKit
 
 class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
+    override var sceneTitle: String? { "Library" }
+
     private var fetchedResultsController: PlaylistFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
     private var sortType: PlaylistSortType = .name
@@ -35,7 +37,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         appDelegate.userStatistics.visited(.playlists)
         
         change(sortType: appDelegate.storage.settings.playlistsSortSetting)
-
+        
         var searchTiles: [String]? = nil
         if appDelegate.backendApi.selectedApi == .ampache {
             searchTiles = ["All", "Cached", "User", "Smart"]
@@ -43,11 +45,16 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
             searchTiles = ["All", "Cached"]
         }
         configureSearchController(placeholder: "Search in \"Playlists\"", scopeButtonTitles: searchTiles, showSearchBarAtEnter: true)
+        setNavBarTitle(title: "Playlists")
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
-        
+        tableView.estimatedRowHeight = PlaylistTableCell.rowHeight
+
+        #if !targetEnvironment(macCatalyst)
+        self.refreshControl = UIRefreshControl()
+        #endif
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
-        
+
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath)
         }

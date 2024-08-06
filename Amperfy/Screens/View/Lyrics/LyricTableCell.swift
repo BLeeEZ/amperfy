@@ -79,7 +79,7 @@ class LyricTableCell: UITableViewCell {
     static func adjustContainerWidthForMargins(containerWidth: CGFloat) -> CGFloat {
         return containerWidth - (2*BasicTableCell.margin.right)
     }
-    
+
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         commonInit()

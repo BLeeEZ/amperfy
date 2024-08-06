@@ -61,6 +61,8 @@ class SearchDiffableDataSource: BasicUITableViewDiffableDataSource {
 
 class SearchVC: BasicTableViewController {
     
+    override var sceneTitle: String { "Search" }
+
     private static let categoryItemLimit = 10
     
     private var diffableDataSource: SearchDiffableDataSource?
@@ -169,6 +171,12 @@ class SearchVC: BasicTableViewController {
                 completionHandler(actionContext)
             }
         }
+        
+        #if targetEnvironment(macCatalyst)
+        if #available(macCatalyst 16.0, *) {
+            self.navigationController?.navigationBar.preferredBehavioralStyle = .mac
+        }
+        #endif
     }
     
     override func viewWillAppear(_ animated: Bool) {

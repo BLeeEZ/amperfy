@@ -23,7 +23,7 @@ import UIKit
 import AmperfyKit
 
 class SplitVC: UISplitViewController {
-    
+
     lazy var barPlayer = BarPlayerHandler(player: appDelegate.player, splitVC: self)
     
     var isCompact: Bool {
@@ -37,11 +37,32 @@ class SplitVC: UISplitViewController {
         if appDelegate.storage.settings.isOfflineMode {
             appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
         }
+        #if targetEnvironment(macCatalyst)
+        // hides the 'Hide Sidebar' button
+        self.presentsWithGesture = false
+        #endif
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        #if targetEnvironment(macCatalyst)
+        // set min and max sidebar width
+        self.minimumPrimaryColumnWidth = 350
+        self.maximumPrimaryColumnWidth = 450
+        #endif
     }
 
     override func viewDidAppear(_ animated: Bool) {
+        self.updateScene(title: self.viewControllers.last?.sceneTitle)
+        
         super.viewDidAppear(animated)
         setCorrectPlayerBarView(collapseMode: isCompact)
+        
+        #if !targetEnvironment(macCatalyst)
+        displayInfoPopups()
+        #endif
+    }
+    
+    func displayInfoPopups() {
         if !appDelegate.storage.isLibrarySyncInfoReadByUser {
             displaySyncInfo()
         } else {
@@ -71,6 +92,7 @@ class SplitVC: UISplitViewController {
             guard let compactVC = viewController(for: .compact) else { return }
             let vc = separateSecondary(from: compactVC)
             setViewController(vc, for: .secondary)
+            self.updateScene(title: vc?.sceneTitle)
         }
     }
     
@@ -185,6 +207,10 @@ class SplitVC: UISplitViewController {
     }
     
     private func setCorrectPlayerBarView(collapseMode: Bool) {
+        #if targetEnvironment(macCatalyst)
+        // always show the player in the sidebar on macOS
+        barPlayer.changeTo(vc: self.viewControllers.first!)
+        #else
         if collapseMode {
             let vc = self.viewController(for: .compact)
             guard let vc = vc else { return }
@@ -192,6 +218,7 @@ class SplitVC: UISplitViewController {
         } else {
             barPlayer.changeTo(vc: self)
         }
+        #endif
     }
     
     private var popupBarContainerVC: UIViewController? {
@@ -219,6 +246,10 @@ class SplitVC: UISplitViewController {
         }
     }
     
+    func updateScene(title: String?) {
+        self.view.window?.windowScene?.title = title ?? Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? ""
+    }
+
     public func pushReplaceNavLibrary(vc: UIViewController) {
         if isCompact {
            if let tabBar = self.viewController(for: .compact) as? TabBarVC,
@@ -231,6 +262,7 @@ class SplitVC: UISplitViewController {
         } else {
             setViewController(embeddInNavigation(vc: vc), for: .secondary)
         }
+        updateScene(title: vc.sceneTitle)
     }
     
     public func push(vc: UIViewController) {
@@ -247,6 +279,7 @@ class SplitVC: UISplitViewController {
                 secondaryVC.pushViewController(vc, animated: false)
             }
         }
+        updateScene(title: vc.sceneTitle)
     }
     
     public func visualizePopupPlayer(direction: PopupPlayerDirection, animated: Bool, completion completionBlock: (()->Void)? = nil) {
@@ -306,4 +339,13 @@ class SplitVC: UISplitViewController {
         }
     }
     
+}
+
+
+extension UIViewController {
+    @objc var sceneTitle: String? { nil }
+}
+
+extension UINavigationController {
+    override var sceneTitle: String? { self.topViewController?.sceneTitle }
 }

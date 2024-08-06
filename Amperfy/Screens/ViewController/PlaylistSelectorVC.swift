@@ -26,6 +26,8 @@ import PromiseKit
 
 class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
+    override var sceneTitle: String? { "Library" }
+
     var itemsToAdd: [AbstractPlayable]?
     
     private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
@@ -42,7 +44,8 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         configureSearchController(placeholder: "Search in \"Playlists\"", showSearchBarAtEnter: true)
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
-        
+        tableView.estimatedRowHeight = PlaylistTableCell.rowHeight
+
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight))
         if let newPlaylistTableHeaderView = ViewBuilder<NewPlaylistTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight)) {
             tableView.tableHeaderView?.addSubview(newPlaylistTableHeaderView)
@@ -75,7 +78,12 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         closeButton = CloseBarButton(target: self, selector: #selector(cancelBarButtonPressed))
         optionsButton = SortBarButton()
         optionsButton.menu = createSortButtonMenu()
+        #if targetEnvironment(macCatalyst)
+        navigationItem.rightBarButtonItems = [optionsButton]
+        navigationItem.leftBarButtonItems = [closeButton]
+        #else
         navigationItem.rightBarButtonItems = [closeButton, optionsButton]
+        #endif
     }
     
     private func createSortButtonMenu() -> UIMenu {

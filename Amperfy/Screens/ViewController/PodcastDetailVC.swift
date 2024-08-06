@@ -25,6 +25,8 @@ import PromiseKit
 
 class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO> {
 
+    override var sceneTitle: String? { "Library" }
+
     var podcast: Podcast!
     var episodeToScrollTo: PodcastEpisode?
     private var fetchedResultsController: PodcastEpisodesFetchedResultsController!
@@ -33,6 +35,11 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        #if !targetEnvironment(macCatalyst)
+        self.refreshControl = UIRefreshControl()
+        #endif
+        
         appDelegate.userStatistics.visited(.podcastDetail)
         fetchedResultsController = PodcastEpisodesFetchedResultsController(forPodcast: podcast, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
@@ -40,7 +47,8 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         configureSearchController(placeholder: "Search in \"Podcast\"", scopeButtonTitles: ["All", "Cached"])
         tableView.register(nibName: PodcastEpisodeTableCell.typeName)
         tableView.rowHeight = PodcastEpisodeTableCell.rowHeight
-         
+        tableView.estimatedRowHeight = PodcastEpisodeTableCell.rowHeight
+
         let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
             infoCB: { "\(self.podcast.episodes.count) Episode\(self.podcast.episodes.count == 1 ? "" : "s")" },
             playContextCb: {() in
@@ -57,7 +65,6 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: podcast, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig, descriptionText: podcast.depiction)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
-        
         optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu.lazyMenu {
             EntityPreviewActionBuilder(container: self.podcast, on: self).createMenu()

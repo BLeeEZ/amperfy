@@ -52,5 +52,4 @@ class BasicFetchedResultsTableViewController<ResultType>: BasicTableViewControll
     override func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
         return singleFetchController?.section(forSectionIndexTitle: title, at: index) ?? 0
     }
-
 }

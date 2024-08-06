@@ -168,7 +168,7 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
         lastIndex = indexOfCurrentLine
         let curIndexModel = lyricModels.object(at: indexOfCurrentLine)
         curIndexModel?.isActiveLine = true
-        
+
         if prevIndex != indexOfCurrentLine {
             if curIndexModel != nil {
                 reconfigureRows(at: [IndexPath(row: indexOfCurrentLine, section: 0)])

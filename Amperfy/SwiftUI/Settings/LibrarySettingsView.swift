@@ -178,6 +178,38 @@ struct LibrarySettingsView: View {
                         Text(completeCacheSize.description)
                             .foregroundColor(.secondary)
                     }
+
+                    #if targetEnvironment(macCatalyst)
+                    HStack {
+                        Text("Cache Size Limit")
+                        Spacer()
+                        Stepper {
+                            Text(cacheSelection[0])
+                        } onIncrement: {
+                            let cacheSize = (Int(cacheSelection[0]) ?? 0) + 1
+                            cacheSelection[0] = String(cacheSize)
+                        } onDecrement: {
+                            let cacheSize = max((Int(cacheSelection[0]) ?? 0) - 1, 0)
+                            cacheSelection[0] = String(cacheSize)
+                        }.frame(width: 50)
+                        Menu(cacheSelection[1]) {
+                            Button("MB", action: { 
+                                cacheSelection[1] = " MB" }
+                            )
+                            Button("GB", action: { 
+                                cacheSelection[1] = " GB" }
+                            )
+                        }.frame(width: 50)
+                    }.onChange(of: cacheSelection, perform: { cacheString in
+                        if cacheString[1] == "" {
+                            settings.cacheSizeLimit = 0
+                            cacheSelection = ["0"," MB"]
+                        }
+                        if let cacheInByte = (cacheString[0] + cacheString[1]).asByteCount {
+                            settings.cacheSizeLimit = cacheInByte
+                        }
+                    })
+                    #else
                     NavigationLink {
                         MultiPickerView(data: [("Size", byteValues),(" Bytes",[" MB"," GB"])], selection: $cacheSelection)
                         .navigationTitle("Cache Size Limit")
@@ -198,7 +230,8 @@ struct LibrarySettingsView: View {
                             settings.cacheSizeLimit = cacheInByte
                         }
                     })
-                    
+                    #endif
+
                     
                     Button(action: {
                         isShowDownloadSongsAlert = true

@@ -27,6 +27,7 @@ class PlaytimeSlider: UISlider {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        self.preferredBehavioralStyle = .pad
     }
     
     override func trackRect(forBounds bounds: CGRect) -> CGRect {

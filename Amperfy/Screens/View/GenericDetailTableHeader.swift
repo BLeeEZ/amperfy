@@ -70,6 +70,8 @@ class GenericDetailTableHeader: UIView {
         titleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         nameTextField.setContentCompressionResistancePriority(.required, for: .vertical)
         subtitleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        // Fix attributed text ignores tint
+        subtitleLabel.textColor = .tintColor
         infoLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         self.layoutMargins = UIView.defaultMarginTopElement
         if let playShuffleInfoConfig = self.config?.playShuffleInfoConfig {

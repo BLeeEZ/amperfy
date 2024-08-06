@@ -26,6 +26,10 @@ import AmperfyKit
 
 
 extension AppDelegate {
+    static func rootViewController() -> UIViewController? {
+        (UIApplication.shared.delegate as! AppDelegate).window?.rootViewController
+    }
+
     static func topViewController(base: UIViewController? = (UIApplication.shared.delegate as! AppDelegate).window?.rootViewController) -> UIViewController? {
         if base?.presentedViewController is UIAlertController {
             return base
@@ -55,15 +59,21 @@ extension AppDelegate: AlertDisplayable {
               else { return }
 
         let banner = FloatingNotificationBanner(title: title, subtitle: subtitle, style: BannerStyle.from(logType: style), colors: AmperfyBannerColors())
-        
+
         banner.onTap = {
             guard let topView = Self.topViewController(),
                   topView.presentedViewController == nil
             else { return }
             topView.present(popupVC, animated: true, completion: nil)
         }
-        
+     
+        #if targetEnvironment(macCatalyst)
+        banner.bannerHeight = 120
+        let topViewInset = UIEdgeInsets(top: 24, left: topView.view.frame.width - 300, bottom: 24, right: 24)
+        banner.show(queuePosition: QueuePosition.back, bannerPosition: BannerPosition.top, on: topView, edgeInsets: topViewInset, cornerRadius: 10, shadowOpacity: 0.5, shadowBlurRadius: 5)
+        #else
         banner.show(queuePosition: QueuePosition.back, bannerPosition: BannerPosition.top, on: topView, cornerRadius: 15, shadowBlurRadius: 10)
+        #endif
     }
     
     func display(popup popupVC: UIViewController) {

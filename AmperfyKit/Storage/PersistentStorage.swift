@@ -126,6 +126,7 @@ public enum StreamingFormatPreference: Int, CaseIterable {
     }
 }
 
+
 public enum ThemePreference: Int, CaseIterable {
     case blue = 0
     case green = 1
@@ -133,7 +134,8 @@ public enum ThemePreference: Int, CaseIterable {
     case yellow = 3
     case orange = 4
     case purple = 5
-    
+    case pink = 6
+
     public static let defaultValue: ThemePreference = .blue
     
     public var description: String {
@@ -150,6 +152,8 @@ public enum ThemePreference: Int, CaseIterable {
             return "Orange"
         case .purple:
             return "Purple"
+        case .pink:
+            return "Pink"
         }
     }
     
@@ -167,6 +171,8 @@ public enum ThemePreference: Int, CaseIterable {
             return .systemOrange
         case .purple:
             return .systemPurple
+        case .pink:
+            return .systemPink
         }
     }
 }
@@ -347,7 +353,7 @@ public class PersistentStorage {
             }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.ScreenLockPreventionPreference.rawValue) }
         }
-        
+
         public var themePreference: ThemePreference {
             get {
                 let themePreferenceRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ThemePreference.rawValue) as? Int ??

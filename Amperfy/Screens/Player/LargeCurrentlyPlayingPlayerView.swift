@@ -51,11 +51,10 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        lyricsView?.frame = CGRect(
-                x: 0,
-                y: 0,
-                width: upperContainerView.bounds.width,
-                height: upperContainerView.bounds.height)
+        // Force a layout to prevent wrong size on first appearance on macOS
+        self.upperContainerView.layoutIfNeeded()
+
+        lyricsView?.frame = upperContainerView.bounds
     }
     
     func prepare(toWorkOnRootView: PopupPlayerVC? ) {
@@ -65,7 +64,9 @@ class LargeCurrentlyPlayingPlayerView: UIView {
         artistLabel.applyAmperfyStyle()
         lyricsView = LyricsView()
         lyricsView!.frame = upperContainerView.bounds
+
         upperContainerView.addSubview(lyricsView!)
+
         refresh()
         initializeLyrics()
     }

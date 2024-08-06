@@ -22,30 +22,97 @@
 import SwiftUI
 import AmperfyKit
 
+// There is no way to hide the second navigationbar in catalyst
+// That is why we recreate a navigation view with a HStack
+
+enum NavigationTarget {
+    case displayAndInteraction
+    case server
+    case library
+    case player
+    case swipe
+    case artwork
+    case support
+    case license
+    case xcallback
+    case developer
+
+    func view() -> any View {
+        switch self {
+        case .displayAndInteraction: DisplaySettingsView()
+        case .server: ServerSettingsView()
+        case .library: LibrarySettingsView()
+        case .player: PlayerSettingsView()
+        case .swipe: SwipeSettingsView()
+        case .artwork: ArtworkSettingsView()
+        case .support: SupportSettingsView()
+        case .license: LicenseSettingsView()
+        case .xcallback: XCallbackURLsSetttingsView()
+        case .developer: DeveloperView()
+        }
+    }
+
+    var name: String {
+        switch self {
+        case .displayAndInteraction: "Display & Interaction"
+        case .server: "Server"
+        case .library: "Library"
+        case .player: "Player, Stream & Scrobble"
+        case .swipe: "Swipe"
+        case .artwork: "Artwork"
+        case .support: "Support"
+        case .license: "License"
+        case .xcallback: "X-Callback-URL Documentation"
+        case .developer: "Developer"
+        }
+    }
+}
+
 struct SettingsView: View {
-    
+
     @EnvironmentObject private var settings: Settings
-    
+
+    @State private var detailedItem: NavigationTarget = .displayAndInteraction
+
     func screenLockPreventionOffPressed() {
         settings.screenLockPreventionPreference = .never
         UIDevice.current.isBatteryMonitoringEnabled = false
         appDelegate.configureLockScreenPrevention()
     }
-    
+
     func screenLockPreventionOnPressed() {
         settings.screenLockPreventionPreference = .always
         UIDevice.current.isBatteryMonitoringEnabled = false
         appDelegate.configureLockScreenPrevention()
     }
-    
+
     func screenLockPreventionChargingPressed() {
         settings.screenLockPreventionPreference = .onlyIfCharging
         UIDevice.current.isBatteryMonitoringEnabled = true
         appDelegate.configureLockScreenPrevention()
     }
-    
+
+    func navigationLink(_ item: NavigationTarget) -> some View {
+        #if targetEnvironment(macCatalyst)
+        HStack {
+            Text(item.name)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .foregroundColor( detailedItem == item ? Color.white : nil )
+        }
+        .contentShape(Rectangle())
+        .onTapGesture { detailedItem = item }
+        .foregroundColor(detailedItem == item ? Color.white : nil)
+        .listRowBackground(detailedItem == item ? Color.accentColor : nil)
+        #else
+        NavigationLink(destination: AnyView(item.view())) {
+            Text(item.name)
+        }
+        #endif
+    }
+
     var body: some View {
-        NavigationView {
+        let list =
             List {
                 Section() {
                     HStack {
@@ -61,19 +128,18 @@ struct SettingsView: View {
                             .foregroundColor(.secondary)
                     }
                 }
-                
+
                 Section(content: {
                     HStack {
                         Text("Offline Mode")
                         Spacer()
                         Toggle(isOn: $settings.isOfflineMode) {}
                     }
- 
-                }
-                , footer: {
+
+                }, footer: {
                     Text("Songs, podcasts and artworks will not be downloaded when you are offline. Searches are restricted to device only. Playlists will not be synced with the server.")
                 })
-                
+
                 Section(content: {
                     HStack {
                         Text("Prevent Screen Lock")
@@ -85,51 +151,38 @@ struct SettingsView: View {
                         }
                     }
                 })
-                
+
                 Section() {
-                    NavigationLink(destination: DisplaySettingsView()) {
-                        Text("Display & Interaction")
-                    }
-                    NavigationLink(destination: ServerSettingsView()) {
-                        Text("Server")
-                    }
-                    NavigationLink(destination: LibrarySettingsView()) {
-                        Text("Library")
-                    }
-                    NavigationLink(destination: PlayerSettingsView()) {
-                        Text("Player, Stream & Scrobble")
-                    }
-                    NavigationLink(destination: SwipeSettingsView()) {
-                        Text("Swipe")
-                    }
-                    NavigationLink(destination: ArtworkSettingsView()) {
-                        Text("Artwork")
-                    }
+                    navigationLink(.displayAndInteraction)
+                    navigationLink(.server)
+                    navigationLink(.library)
+                    navigationLink(.player)
+                    navigationLink(.swipe)
+                    navigationLink(.artwork)
                 }
-                
+
                 Section() {
-                    NavigationLink(destination: SupportSettingsView()) {
-                        Text("Support")
-                    }
-                    NavigationLink(destination: LicenseSettingsView()) {
-                        Text("License")
-                    }
-                    NavigationLink(destination: XCallbackURLsSetttingsView()) {
-                        Text("X-Callback-URL Documentation")
-                    }
+                    navigationLink(.support)
+                    navigationLink(.license)
+                    navigationLink(.xcallback)
+
+                    #if false
+                    navigationLink(.developer)
+                    #endif
                 }
-                
-                #if false
-                Section() {
-                    NavigationLink(destination: DeveloperView()) {
-                        Text("Developer")
-                    }
-                }
-                #endif
             }
-            .navigationTitle("Settings")
+
+        #if targetEnvironment(macCatalyst)
+        HStack(spacing: 2.0) {
+            list
+            AnyView(detailedItem.view())
         }
-        .navigationViewStyle(.stack)
+        .background(Color.separator)
+        #else
+        NavigationView {
+            list.navigationTitle("Settings")
+        }.navigationViewStyle(.stack)
+        #endif
     }
 }
 
