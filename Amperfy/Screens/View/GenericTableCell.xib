@@ -122,6 +122,9 @@
                                                 <include reference="ser-uw-D7d"/>
                                             </mask>
                                         </variation>
+                                        <variation key="userInterfaceIdiom=mac-widthClass=regular">
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        </variation>
                                     </label>
                                 </subviews>
                                 <variation key="widthClass=regular" alignment="center" axis="horizontal" distribution="fill" spacing="8"/>

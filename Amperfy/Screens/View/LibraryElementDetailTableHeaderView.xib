@@ -3,7 +3,7 @@
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -29,6 +29,9 @@
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" systemColor="secondaryLabelColor"/>
                                             <nil key="highlightedColor"/>
+                                            <variation key="userInterfaceIdiom=mac-widthClass=regular">
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            </variation>
                                         </label>
                                     </subviews>
                                     <constraints>
@@ -48,6 +51,9 @@
                                             <state key="normal" title="Play" image="play.fill" catalog="system">
                                                 <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                             </state>
+                                            <variation key="userInterfaceIdiom=mac-widthClass=regular">
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            </variation>
                                             <connections>
                                                 <action selector="playAllButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="phc-Oa-Z7W"/>
                                             </connections>
@@ -61,6 +67,9 @@
                                             <state key="normal" title="Shuffle" image="shuffle" catalog="system">
                                                 <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                             </state>
+                                            <variation key="userInterfaceIdiom=mac-widthClass=regular">
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            </variation>
                                             <connections>
                                                 <action selector="addAllShuffledButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="jJy-6e-BVq"/>
                                             </connections>
@@ -74,7 +83,9 @@
                         <constraint firstAttribute="trailing" secondItem="k72-rC-wm7" secondAttribute="trailing" id="F1U-03-2pv"/>
                         <constraint firstAttribute="bottom" secondItem="k72-rC-wm7" secondAttribute="bottom" id="eGA-Am-7jb"/>
                         <constraint firstItem="k72-rC-wm7" firstAttribute="top" secondItem="Hvj-PC-W1q" secondAttribute="top" id="jbe-UQ-9su"/>
-                        <constraint firstAttribute="height" constant="40" id="ly1-i0-4WQ"/>
+                        <constraint firstAttribute="height" constant="40" id="ly1-i0-4WQ">
+                            <variation key="userInterfaceIdiom=mac-widthClass=regular" constant="26"/>
+                        </constraint>
                         <constraint firstItem="k72-rC-wm7" firstAttribute="leading" secondItem="Hvj-PC-W1q" secondAttribute="leading" id="tYS-Qk-B7E"/>
                     </constraints>
                 </view>
@@ -98,13 +109,13 @@
         <image name="play.fill" catalog="system" width="117" height="128"/>
         <image name="shuffle" catalog="system" width="128" height="95"/>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="secondarySystemFillColor">
-            <color red="0.47058823529999999" green="0.47058823529999999" blue="0.50196078430000002" alpha="0.16" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.47058823529411764" green="0.47058823529411764" blue="0.50196078431372548" alpha="0.16" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="tintColor">
-            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

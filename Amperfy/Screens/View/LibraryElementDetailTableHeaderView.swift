@@ -44,7 +44,11 @@ class LibraryElementDetailTableHeaderView: UIView {
     @IBOutlet weak var infoContainerView: UIView!
     @IBOutlet weak var infoLabel: UILabel!
 
+    #if targetEnvironment(macCatalyst)
+    static let frameHeight: CGFloat = 26.0 + margin.top + margin.bottom
+    #else
     static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
+    #endif
     static let margin = UIView.defaultMarginMiddleElement
     
     private var config: PlayShuffleInfoConfiguration?
