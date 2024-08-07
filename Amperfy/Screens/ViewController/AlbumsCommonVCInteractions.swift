@@ -86,7 +86,7 @@ class AlbumsCommonVCInteractions {
 
     public var rootVC: UIViewController?
     public var fetchedResultsController: AlbumFetchedResultsController!
-    public var optionsButton: UIBarButtonItem!
+    public var optionsButton: UIBarButtonItem = OptionsBarButton()
     public var displayFilter: DisplayCategoryFilter = .all
     public var sortType: AlbumElementSortType = .name
     public var filterTitle = "Albums"
@@ -200,7 +200,6 @@ class AlbumsCommonVCInteractions {
         }
             
         if !actions.isEmpty {
-            optionsButton = OptionsBarButton()
             optionsButton.menu = UIMenu(children: actions)
             rootVC?.navigationItem.rightBarButtonItems = [optionsButton]
         } else {

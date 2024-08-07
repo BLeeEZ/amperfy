@@ -95,12 +95,6 @@ class BasicTableViewController: KeyCommandTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.keyboardDismissMode = .onDrag
-        
-        #if targetEnvironment(macCatalyst)
-        if #available(macCatalyst 16.0, *) {
-            self.navigationController?.navigationBar.preferredBehavioralStyle = .pad
-        }
-        #endif
     }
     
     override func viewWillAppear(_ animated: Bool) {

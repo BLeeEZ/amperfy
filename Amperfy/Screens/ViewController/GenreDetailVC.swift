@@ -37,8 +37,11 @@ class GenreDetailVC: MultiSourceTableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
         appDelegate.userStatistics.visited(.genreDetail)
-        
+
+        optionsButton = OptionsBarButton()
+
         artistsFetchedResultsController = GenreArtistsFetchedResultsController(for: genre, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         artistsFetchedResultsController.delegate = self
         albumsFetchedResultsController = GenreAlbumsFetchedResultsController(for: genre, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
@@ -59,8 +62,7 @@ class GenreDetailVC: MultiSourceTableViewController {
             isInfoAlwaysHidden: true)
         let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: genre, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
-        
-        optionsButton = OptionsBarButton()
+
         optionsButton.menu = UIMenu.lazyMenu {
             EntityPreviewActionBuilder(container: self.genre, on: self).createMenu()
         }

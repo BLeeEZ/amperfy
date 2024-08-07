@@ -37,6 +37,8 @@ class PodcastsVC: MultiSourceTableViewController {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.podcasts)
         
+        optionsButton = SortBarButton()
+
         podcastsFetchedResultsController = PodcastFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         episodesFetchedResultsController = PodcastEpisodesReleaseDateFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
 
@@ -104,7 +106,6 @@ class PodcastsVC: MultiSourceTableViewController {
     }
     
     func updateRightBarButtonItems() {
-        optionsButton = SortBarButton()
         optionsButton.menu = createSortButtonMenu()
         navigationItem.rightBarButtonItem = optionsButton
     }

@@ -37,6 +37,9 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        optionsButton = SortBarButton()
+
         appDelegate.userStatistics.visited(.playlistSelector)
         
         change(sortType: appDelegate.storage.settings.playlistsSortSetting)
@@ -76,7 +79,6 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     func updateRightBarButtonItems() {
         closeButton = CloseBarButton(target: self, selector: #selector(cancelBarButtonPressed))
-        optionsButton = SortBarButton()
         optionsButton.menu = createSortButtonMenu()
         #if targetEnvironment(macCatalyst)
         navigationItem.rightBarButtonItems = [optionsButton]

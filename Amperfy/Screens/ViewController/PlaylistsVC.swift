@@ -36,6 +36,8 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.playlists)
         
+        optionsButton = SortBarButton()
+
         change(sortType: appDelegate.storage.settings.playlistsSortSetting)
         
         var searchTiles: [String]? = nil
@@ -102,7 +104,6 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     func updateRightBarButtonItems() {
         var barButtons = [UIBarButtonItem]()
-        optionsButton = SortBarButton()
         optionsButton.menu = createSortButtonMenu()
         barButtons.append(optionsButton)
         if appDelegate.storage.settings.isOnlineMode {
