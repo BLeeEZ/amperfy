@@ -22,6 +22,8 @@
 import UIKit
 import AmperfyKit
 
+let kTabbarSafeAreaTop = 52.0
+
 class SideBarVC: KeyCommandCollectionViewController {
 
     private var offsetData: [LibraryNavigatorItem] = {
@@ -41,9 +43,27 @@ class SideBarVC: KeyCommandCollectionViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         self.clearsSelectionOnViewWillAppear = false
         libraryItemConfigurator.viewDidLoad(navigationItem: navigationItem, collectionView: collectionView)
+
+        #if targetEnvironment(macCatalyst)
+        //self.navigationController?.navigationBar.isTranslucent = true
+        self.navigationController?.navigationBar.addObserver(self, forKeyPath: "center", options: [.new], context: nil)
+        #endif
     }
+
+    #if targetEnvironment(macCatalyst)
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+
+        guard keyPath == "center", 
+                let navbar = object as? UINavigationBar,
+                let newCenter = change?[NSKeyValueChangeKey.newKey] as? CGPoint else { return }
+        let dt = newCenter.y - kTabbarSafeAreaTop
+        self.collectionView.contentInset.top = min(0, -dt)
+        navbar.frame.origin.y -= dt
+    }
+    #endif
 
     override func viewDidAppear(_ animated: Bool) {
         self.becomeFirstResponder()

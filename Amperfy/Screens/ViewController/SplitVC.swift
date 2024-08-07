@@ -38,11 +38,29 @@ class SplitVC: UISplitViewController {
             appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
         }
         #if targetEnvironment(macCatalyst)
+        self.primaryBackgroundStyle = .sidebar
         // hides the 'Hide Sidebar' button
         self.presentsWithGesture = false
         #endif
     }
-    
+
+    #if targetEnvironment(macCatalyst)
+    // Forward touches in the navigationBar region to the sidebar
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let navbarController = self.viewControllers.first as? UINavigationController,
+              let sidebarVC = navbarController.topViewController as? SideBarVC,
+              var locationInSidebar = touches.first?.location(in: sidebarVC.view) else {
+            super.touchesBegan(touches, with: event)
+            return
+        }
+
+        locationInSidebar.y -= kTabbarSafeAreaTop
+        if let selectedIndexPath = sidebarVC.collectionView.indexPathForItem(at: locationInSidebar) {
+            sidebarVC.collectionView.selectItem(at: selectedIndexPath, animated: false, scrollPosition: .centeredHorizontally)
+        }
+    }
+    #endif
+
     override func viewWillAppear(_ animated: Bool) {
         #if targetEnvironment(macCatalyst)
         // set min and max sidebar width
