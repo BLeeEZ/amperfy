@@ -43,6 +43,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
         appDelegate.userStatistics.visited(.songs)
         
+        optionsButton = OptionsBarButton()
+
         applyFilter()
         configureSearchController(placeholder: "Search in \"\(self.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: PlayableTableCell.typeName)
@@ -110,7 +112,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         if appDelegate.storage.settings.isOnlineMode {
             actions.append(createActionButtonMenu())
         }
-        optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu(children: actions)
         navigationItem.rightBarButtonItems = [optionsButton]
     }

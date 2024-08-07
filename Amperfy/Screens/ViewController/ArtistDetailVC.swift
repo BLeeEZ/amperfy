@@ -39,6 +39,8 @@ class ArtistDetailVC: MultiSourceTableViewController {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.artistDetail)
         
+        optionsButton = OptionsBarButton()
+
         albumsFetchedResultsController = ArtistAlbumsItemsFetchedResultsController(for: artist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         albumsFetchedResultsController.delegate = self
         songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(for: artist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
@@ -59,7 +61,6 @@ class ArtistDetailVC: MultiSourceTableViewController {
         let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: artist, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
         
-        optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu.lazyMenu {
             EntityPreviewActionBuilder(container: self.artist, on: self).createMenu()
         }

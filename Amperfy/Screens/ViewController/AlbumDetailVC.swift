@@ -59,6 +59,9 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.albumDetail)
+
+        optionsButton = OptionsBarButton()
+
         fetchedResultsController = AlbumSongsFetchedResultsController(forAlbum: album, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
         singleFetchedResultsController?.delegate = self
@@ -78,7 +81,6 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
         let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: album, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
 
-        optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu.lazyMenu {
             EntityPreviewActionBuilder(container: self.album, on: self).createMenu()
         }

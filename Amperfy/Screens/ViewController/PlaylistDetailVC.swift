@@ -114,8 +114,8 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
         // Use a single button, two buttons don't work on catalyst
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(toggleEditing))
-        
         optionsButton = OptionsBarButton()
+
         optionsButton.menu = UIMenu.lazyMenu {
             EntityPreviewActionBuilder(container: self.playlist, on: self).createMenu()
         }

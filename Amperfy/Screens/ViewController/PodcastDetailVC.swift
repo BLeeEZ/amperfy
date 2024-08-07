@@ -40,6 +40,8 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         self.refreshControl = UIRefreshControl()
         #endif
         
+        optionsButton = OptionsBarButton()
+
         appDelegate.userStatistics.visited(.podcastDetail)
         fetchedResultsController = PodcastEpisodesFetchedResultsController(forPodcast: podcast, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         singleFetchedResultsController = fetchedResultsController
@@ -65,7 +67,6 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: podcast, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig, descriptionText: podcast.depiction)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
-        optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu.lazyMenu {
             EntityPreviewActionBuilder(container: self.podcast, on: self).createMenu()
         }

@@ -38,6 +38,8 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         super.viewDidLoad()
         appDelegate.userStatistics.visited(.artists)
         
+        optionsButton = OptionsBarButton()
+
         applyFilter()
         change(sortType: appDelegate.storage.settings.artistsSortSetting)
         change(filterType: appDelegate.storage.settings.artistsFilterSetting)
@@ -118,7 +120,6 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         if appDelegate.storage.settings.isOnlineMode {
             actions.append(createActionButtonMenu())
         }
-        optionsButton = OptionsBarButton()
         optionsButton.menu = UIMenu(children: actions)
         navigationItem.rightBarButtonItems = [optionsButton]
     }
