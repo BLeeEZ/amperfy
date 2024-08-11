@@ -26,7 +26,7 @@ import PromiseKit
 
 class PodcastsVC: MultiSourceTableViewController {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { "Podcasts" }
 
     private var podcastsFetchedResultsController: PodcastFetchedResultsController!
     private var episodesFetchedResultsController: PodcastEpisodesReleaseDateFetchedResultsController!
@@ -104,7 +104,12 @@ class PodcastsVC: MultiSourceTableViewController {
         podcastsFetchedResultsController?.delegate = nil
         episodesFetchedResultsController?.delegate = nil
     }
-    
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     func updateRightBarButtonItems() {
         optionsButton.menu = createSortButtonMenu()
         navigationItem.rightBarButtonItem = optionsButton

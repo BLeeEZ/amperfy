@@ -26,7 +26,7 @@ import PromiseKit
 
 class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { "Playlists" }
 
     var itemsToAdd: [AbstractPlayable]?
     
@@ -54,7 +54,12 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
             tableView.tableHeaderView?.addSubview(newPlaylistTableHeaderView)
         }
     }
-    
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     func change(sortType: PlaylistSortType) {
         self.sortType = sortType
         // sortType will not be saved permanently. This behaviour differs from PlaylistsVC

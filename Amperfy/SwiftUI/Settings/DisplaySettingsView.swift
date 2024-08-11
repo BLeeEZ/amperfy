@@ -29,11 +29,16 @@ struct DisplaySettingsView: View {
     func setThemePreference(preference: ThemePreference) {
         settings.themePreference = preference
         appDelegate.setAppTheme(color: preference.asColor)
-        // the following applies the tint color to already loaded views
-        guard let window = appDelegate.window else { return }
-        for view in window.subviews {
-            view.removeFromSuperview()
-            window.addSubview(view)
+        // the following applies the tint color to already loaded views in all windows
+
+        let windowScene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let windows = windowScene.flatMap { $0.windows }
+
+        for window in windows {
+            for view in window.subviews {
+                view.removeFromSuperview()
+                window.addSubview(view)
+            }
         }
     }
 

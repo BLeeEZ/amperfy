@@ -341,3 +341,33 @@ extension UIPickerView {
         return CGSize(width: UIView.noIntrinsicMetric , height: 150)
     }
 }
+
+
+#if targetEnvironment(macCatalyst)
+let kToolbarSafeAreaTop: CGFloat = 52.0
+
+extension Notification.Name {
+    static let SearchChanged = Notification.Name("de.familie-zimba.Amperfy.SearchChanged")
+    static let RequestSearchUpdate = Notification.Name("de.familie-zimba.Amperfy.RequestSearchUpdate")
+}
+
+extension UIViewController {
+    func extendSafeAreaToAccountForTabbar() {
+        let currentInsetTop = self.view.window?.safeAreaInsets.top ?? kToolbarSafeAreaTop
+        self.additionalSafeAreaInsets = UIEdgeInsets(top: currentInsetTop - kToolbarSafeAreaTop, left: 0, bottom: 0, right: 0)
+    }
+
+    func shrinkSafeAreaToAccountForTabbar() {
+        let currentInsetTop = self.view.window?.safeAreaInsets.top ?? kToolbarSafeAreaTop
+        self.additionalSafeAreaInsets = UIEdgeInsets(top:  kToolbarSafeAreaTop - currentInsetTop, left: 0, bottom: 0, right: 0)
+    }
+}
+
+#else
+
+extension UIViewController {
+    func extendSafeAreaToAccountForTabbar() { }
+    func shrinkSafeAreaToAccountForTabbar() { }
+}
+
+#endif

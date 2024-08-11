@@ -26,7 +26,10 @@ import PromiseKit
 
 class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { 
+        applyFilter()
+        return self.filterTitle
+    }
 
     private var fetchedResultsController: ArtistFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
@@ -111,6 +114,11 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         updateFromRemote()
     }
     
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     func updateRightBarButtonItems() {
         var actions = [UIMenu]()
         actions.append(createSortButtonMenu())

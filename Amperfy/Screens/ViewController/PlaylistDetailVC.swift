@@ -72,7 +72,7 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
 
 class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<PlaylistItemMO> {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { playlist.name }
 
     private var fetchedResultsController: PlaylistItemsFetchedResultsController!
     var playlist: Playlist!
@@ -160,7 +160,12 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
             self.detailOperationsView?.refresh()
         }
     }
-    
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     func refreshBarButtons() {
         var edititingBarButton: UIBarButtonItem? = nil
         if !tableView.isEditing {

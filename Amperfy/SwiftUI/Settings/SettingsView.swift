@@ -25,8 +25,8 @@ import AmperfyKit
 // There is no way to hide the second navigationbar in catalyst
 // That is why we recreate a navigation view with a HStack
 
-enum NavigationTarget {
-    case displayAndInteraction
+enum NavigationTarget: Int {
+    case displayAndInteraction = 0
     case server
     case library
     case player
@@ -72,7 +72,7 @@ struct SettingsView: View {
 
     @EnvironmentObject private var settings: Settings
 
-    @State private var detailedItem: NavigationTarget = .displayAndInteraction
+    @State var selection: Int?
 
     func screenLockPreventionOffPressed() {
         settings.screenLockPreventionPreference = .never
@@ -94,18 +94,20 @@ struct SettingsView: View {
 
     func navigationLink(_ item: NavigationTarget) -> some View {
         #if targetEnvironment(macCatalyst)
+        // Cell highlight color is broken on macOS
         HStack {
             Text(item.name)
             Spacer()
             Image(systemName: "chevron.right")
-                .foregroundColor( detailedItem == item ? Color.white : nil )
+                .foregroundColor( selection == item.rawValue ? Color.white : nil )
         }
         .contentShape(Rectangle())
-        .onTapGesture { detailedItem = item }
-        .foregroundColor(detailedItem == item ? Color.white : nil)
-        .listRowBackground(detailedItem == item ? Color.accentColor : nil)
+        .foregroundColor(selection == item.rawValue ? Color.white : nil)
+        .background(
+            NavigationLink(destination: AnyView(item.view()), tag: item.rawValue, selection: self.$selection) {}
+        )
         #else
-        NavigationLink(destination: AnyView(item.view())) {
+        NavigationLink(destination: AnyView(item.view()), tag: item.rawValue, selection: self.$selection) {
             Text(item.name)
         }
         #endif
@@ -173,11 +175,16 @@ struct SettingsView: View {
             }
 
         #if targetEnvironment(macCatalyst)
-        HStack(spacing: 2.0) {
+        NavigationView {
             list
-            AnyView(detailedItem.view())
-        }
-        .background(Color.separator)
+                .navigationTitle("Settings")
+                .listStyle(.grouped)
+                .onAppear {
+                    if self.selection == nil {
+                        self.selection = 0
+                    }
+                }
+        }.navigationViewStyle(.columns)
         #else
         NavigationView {
             list.navigationTitle("Settings")

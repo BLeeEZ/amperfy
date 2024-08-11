@@ -25,6 +25,7 @@ import UIKit
 import SwiftUI
 import Combine
 
+
 class SettingsHostVC: UIViewController {
 
     lazy var settings: Settings = {
@@ -33,7 +34,7 @@ class SettingsHostVC: UIViewController {
 
     var changesAgent: [AnyCancellable] = []
 
-    override var sceneTitle: String { "Settings" }
+    override var sceneTitle: String { kWindowSettingsTitle }
 
     override func viewDidLoad() {
         super.viewDidLoad()

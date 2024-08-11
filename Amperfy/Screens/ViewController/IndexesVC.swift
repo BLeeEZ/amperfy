@@ -26,7 +26,7 @@ import PromiseKit
 
 class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { musicFolder.name }
 
     var musicFolder: MusicFolder!
     private var fetchedResultsController: MusicFolderDirectoriesFetchedResultsController!
@@ -54,7 +54,12 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
             self.appDelegate.eventLogger.report(topic: "Indexes Sync", error: error)
         }
     }
-    
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
         let directory = fetchedResultsController.getWrappedEntity(at: indexPath)

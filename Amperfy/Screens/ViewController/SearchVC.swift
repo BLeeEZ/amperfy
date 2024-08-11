@@ -116,18 +116,8 @@ class SearchVC: BasicTableViewController {
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 0
-        
-        optionsButton = OptionsBarButton()
-        optionsButton.menu = UIMenu(children: [
-            UIAction(title: "Clear Search History", image: .clear, handler: { _ in
-                self.appDelegate.storage.main.library.deleteSearchHistory()
-                self.appDelegate.storage.main.library.saveContext()
-                self.searchHistory = []
-                self.updateDataSource(animated: true)
-            })
-        ])
-        navigationItem.rightBarButtonItem = optionsButton
-        
+
+
         containableAtIndexPathCallback = { (indexPath) in
             switch SearchSection(rawValue: indexPath.section) {
             case .History:
@@ -184,13 +174,70 @@ class SearchVC: BasicTableViewController {
         appDelegate.userStatistics.visited(.search)
     }
 
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
+    #if targetEnvironment(macCatalyst)
+    override func viewIsAppearing(_ animated: Bool) {
+        // Request a search update (in case we navigated back to the search)
+        NotificationCenter.default.post(name: .RequestSearchUpdate, object: self.view.window)
+        super.viewIsAppearing(animated)
+    }
+    #endif
+
     public func activateSearchBar() {
         if self.isViewLoaded {
             // activate searchBar
             self.searchController.searchBar.becomeFirstResponder()
         }
     }
-    
+
+    override func configureSearchController(placeholder: String?, scopeButtonTitles: [String]? = nil, showSearchBarAtEnter: Bool = false) {
+        super.configureSearchController(placeholder: placeholder, scopeButtonTitles: scopeButtonTitles, showSearchBarAtEnter: showSearchBarAtEnter)
+        
+        optionsButton = OptionsBarButton()
+        optionsButton.menu = UIMenu(children: [
+            UIAction(title: "Clear Search History", image: .clear, handler: { _ in
+                self.appDelegate.storage.main.library.deleteSearchHistory()
+                self.appDelegate.storage.main.library.saveContext()
+                self.searchHistory = []
+                self.updateDataSource(animated: true)
+            })
+        ])
+
+        #if targetEnvironment(macCatalyst)
+        // Remove the search bar from the navigationbar on macOS
+        navigationItem.searchController = nil
+
+        // Listen for search changes from the sidebar
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSearchUpdate(notification:)), name: .SearchChanged, object: nil)
+
+        // Add the scope buttons to the navigation bar instead
+        if let scopeButtonTitles {
+            let segmentedControl = UISegmentedControl(frame: .zero, actions: scopeButtonTitles.enumerated().map { (i, title) in
+                UIAction(title: title) { _ in self.searchController.searchBar.selectedScopeButtonIndex = i }
+            })
+            segmentedControl.selectedSegmentIndex = 0
+            let scopeButton = UIBarButtonItem(customView: segmentedControl)
+            navigationItem.rightBarButtonItems = [optionsButton, scopeButton]
+        } else {
+            navigationItem.rightBarButtonItem = optionsButton
+        }
+        #else
+        navigationItem.rightBarButtonItem = optionsButton
+        #endif
+    }
+
+    #if targetEnvironment(macCatalyst)
+    @objc func handleSearchUpdate(notification: Notification) {
+        // only update the search in this tab
+        guard notification.object as? UIWindow == self.view.window else { return }
+        self.searchController.searchBar.text = notification.userInfo?["searchText"] as? String
+    }
+    #endif
+
     func determSwipeActionContext(at indexPath: IndexPath, completionHandler: @escaping (_ actionContext: SwipeActionContext?) -> Void) {
         switch SearchSection(rawValue: indexPath.section) {
         case .History:

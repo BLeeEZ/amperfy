@@ -26,7 +26,7 @@ import PromiseKit
 
 class GenreDetailVC: MultiSourceTableViewController {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { genre.name }
 
     var genre: Genre!
     private var artistsFetchedResultsController: GenreArtistsFetchedResultsController!
@@ -148,6 +148,11 @@ class GenreDetailVC: MultiSourceTableViewController {
         songsFetchedResultsController?.delegate = nil
     }
     
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
         guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
         else { return nil }

@@ -65,7 +65,7 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
         case .settings: return .settings
         }
     }
-    
+
     var controller: UIViewController {
         switch self {
         case .search: return SearchVC.instantiateFromAppStoryboard()
@@ -73,6 +73,83 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
         }
     }
 }
+
+
+#if targetEnvironment(macCatalyst)
+class SearchNavigationItemContentView: UISearchBar, UIContentView, UISearchBarDelegate {
+    private var currentConfiguration: SearchNavigationItemConfiguration
+    var configuration: UIContentConfiguration {
+        get { self.currentConfiguration }
+        set {
+            guard let config = newValue as? SearchNavigationItemConfiguration else { return }
+            apply(config)
+        }
+    }
+
+    init(configuration: SearchNavigationItemConfiguration) {
+        self.currentConfiguration = configuration
+        super.init(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+
+        // We add the scope buttons, but never show them to the user. The user uses the navigatonbar items instead.
+        self.showsScopeBar = false
+        self.scopeButtonTitles = ["All", "Cached"]
+        self.searchBarStyle = .minimal
+        self.placeholder = "Playlists, songs and more"
+        self.delegate = self
+
+        apply(configuration)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSearchRequest(notification:)), name: .RequestSearchUpdate, object: nil)
+    }
+
+    @objc func handleSearchRequest(notification: Notification) {
+        guard let window = notification.object as? UIWindow, window == self.window else { return }
+        let userInfo = ["searchText": self.text ?? ""]
+        NotificationCenter.default.post(name: .SearchChanged, object: window, userInfo: userInfo)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func apply(_ config: SearchNavigationItemConfiguration) {
+        self.currentConfiguration = config
+        self.isUserInteractionEnabled = config.selected
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            if config.selected {
+                self.becomeFirstResponder()
+            } else {
+                self.resignFirstResponder()
+            }
+        }
+    }
+
+    // MARK: - Delegate
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        // Inform all SearchVC about the new search string
+        guard let sender = self.window else { return }
+        NotificationCenter.default.post(name: .SearchChanged, object: sender, userInfo: ["searchText": searchText])
+    }
+}
+
+struct SearchNavigationItemConfiguration: UIContentConfiguration, Hashable {
+    var selected: Bool = false
+
+    func updated(for state: any UIConfigurationState) -> SearchNavigationItemConfiguration {
+        let cellState = state as? UICellConfigurationState
+        var newState = self
+        newState.selected = cellState?.isSelected ?? false
+        return newState
+    }
+    
+    func makeContentView() -> UIView & UIContentView {
+        return SearchNavigationItemContentView(configuration: self)
+    }
+}
+#endif
+
 
 typealias SideBarDiffableDataSource = UICollectionViewDiffableDataSource<Int, LibraryNavigatorItem>
 
@@ -198,12 +275,13 @@ class LibraryNavigatorConfigurator: NSObject {
 
     private func configureDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, LibraryNavigatorItem> { (cell, indexPath, item) in
-            var content = cell.defaultContentConfiguration()
-            
             if !item.isInteractable {
+                var content = cell.defaultContentConfiguration()
                 content.text = item.title
                 content.textProperties.font = .preferredFont(forTextStyle: .headline)
+
                 #if targetEnvironment(macCatalyst)
+                content.textProperties.color = .secondaryLabel
                 // show edit on the right-hand side of the header
                 cell.accessories = [
                     .customView(configuration: .createEdit(target: self, action: #selector(self.editingPressed))),
@@ -212,7 +290,9 @@ class LibraryNavigatorConfigurator: NSObject {
                 #else
                 cell.accessories = []
                 #endif
+                cell.contentConfiguration = content
             } else if let libraryItem = item.library {
+                var content = cell.defaultContentConfiguration()
                 content.text = libraryItem.displayName
                 content.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
                 var imageSize = CGSize(width: 35.0, height: 25.0)
@@ -232,16 +312,28 @@ class LibraryNavigatorConfigurator: NSObject {
                 } else {
                     cell.accessories.append(.customView(configuration: .createUnSelected()))
                 }
+                cell.contentConfiguration = content
             } else if let tabItem = item.tab {
-                content.text = tabItem.title
-                content.image = tabItem.icon
                 #if targetEnvironment(macCatalyst)
                 cell.accessories = []
+                if tabItem == .search {
+                    let content = SearchNavigationItemConfiguration()
+                    cell.contentConfiguration = content
+                    cell.backgroundConfiguration = UIBackgroundConfiguration.clear()
+                } else {
+                    var content = cell.defaultContentConfiguration()
+                    content.text = tabItem.title
+                    content.image = tabItem.icon
+                    cell.contentConfiguration = content
+                }
                 #else
                 cell.accessories = [.disclosureIndicator()]
+                var content = cell.defaultContentConfiguration()
+                content.text = tabItem.title
+                content.image = tabItem.icon
+                cell.contentConfiguration = content
                 #endif
             }
-            cell.contentConfiguration = content
             cell.indentationLevel = 0
         }
         

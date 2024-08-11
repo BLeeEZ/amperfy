@@ -26,7 +26,7 @@ import PromiseKit
 
 class ArtistDetailVC: MultiSourceTableViewController {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { artist.name }
 
     var artist: Artist!
     var albumToScrollTo: Album?
@@ -144,7 +144,12 @@ class ArtistDetailVC: MultiSourceTableViewController {
         let adjustedIndexPath = IndexPath(row: indexPath.row, section: 0)
         tableView.scrollToRow(at: adjustedIndexPath, at: .top, animated: true)
     }
-    
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
         guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
         else { return nil }

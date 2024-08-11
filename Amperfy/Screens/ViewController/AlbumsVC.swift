@@ -109,7 +109,10 @@ class AlbumsDiffableDataSource: BasicUITableViewDiffableDataSource {
 
 class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { 
+        common.applyFilter()
+        return common.filterTitle
+    }
 
     private var common = AlbumsCommonVCInteractions()
     
@@ -200,6 +203,10 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
         common.updateFromRemote()
     }
 
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         common.listViewWillDisplayCell(at: indexPath, searchBarText: searchController.searchBar.text)

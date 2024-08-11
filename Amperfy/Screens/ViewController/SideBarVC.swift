@@ -22,19 +22,21 @@
 import UIKit
 import AmperfyKit
 
-let kTabbarSafeAreaTop = 52.0
 
 class SideBarVC: KeyCommandCollectionViewController {
 
     private var offsetData: [LibraryNavigatorItem] = {
+        #if targetEnvironment(macCatalyst)
+        return [LibraryNavigatorItem(title: "Search", tab: .search),
+                LibraryNavigatorItem(title: "Library", isInteractable: false)]
+        #else
         return [LibraryNavigatorItem(title: "Search", tab: .search),
                 LibraryNavigatorItem(title: "Settings", tab: .settings),
                 LibraryNavigatorItem(title: "Library", isInteractable: false)]
+        #endif
     }()
 
-    lazy var layoutConfig = {
-        return UICollectionLayoutListConfiguration(appearance: .sidebar)
-    }()
+    lazy var layoutConfig = UICollectionLayoutListConfiguration(appearance: .sidebar)
     lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(
         offsetData: offsetData,
         librarySettings: appDelegate.storage.settings.libraryDisplaySettings,
@@ -46,24 +48,7 @@ class SideBarVC: KeyCommandCollectionViewController {
 
         self.clearsSelectionOnViewWillAppear = false
         libraryItemConfigurator.viewDidLoad(navigationItem: navigationItem, collectionView: collectionView)
-
-        #if targetEnvironment(macCatalyst)
-        //self.navigationController?.navigationBar.isTranslucent = true
-        self.navigationController?.navigationBar.addObserver(self, forKeyPath: "center", options: [.new], context: nil)
-        #endif
     }
-
-    #if targetEnvironment(macCatalyst)
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-
-        guard keyPath == "center", 
-                let navbar = object as? UINavigationBar,
-                let newCenter = change?[NSKeyValueChangeKey.newKey] as? CGPoint else { return }
-        let dt = newCenter.y - kTabbarSafeAreaTop
-        self.collectionView.contentInset.top = min(0, -dt)
-        navbar.frame.origin.y -= dt
-    }
-    #endif
 
     override func viewDidAppear(_ animated: Bool) {
         self.becomeFirstResponder()

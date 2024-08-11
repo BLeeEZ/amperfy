@@ -27,7 +27,7 @@ import MarqueeLabel
 
 class PlainDetailsVC: UIViewController {
     
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { podcast?.name }
 
     @IBOutlet weak var headerLabel: UILabel!
     @IBOutlet weak var detailsTextView: UITextView!
@@ -53,6 +53,11 @@ class PlainDetailsVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         refresh()
+    }
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
     }
 
     func display(podcast: Podcast, on rootView: UIViewController) {
