@@ -66,7 +66,11 @@
 		<true/>
 	</dict>
 	<key>NSUserActivityTypes</key>
-	<array/>
+	<array>
+		<string>INPlayMediaIntent</string>
+		<string>PlayIDIntent</string>
+		<string>SearchAndPlayIntent</string>
+	</array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Font Awesome 5 Free-Solid-900.otf</string>

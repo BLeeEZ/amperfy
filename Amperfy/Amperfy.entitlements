@@ -10,5 +10,9 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>group.de.familie-zimba.amperfy-music</string>
+    </array>
 </dict>
 </plist>
