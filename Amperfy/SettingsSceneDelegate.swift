@@ -46,21 +46,40 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = UIWindow(windowScene: windowScene)
         self.appDelegate.window = self.window
 
-        if let titlebar = windowScene.titlebar {
-            windowScene.title = kWindowSettingsTitle
-            titlebar.toolbarStyle = .unified
-            titlebar.titleVisibility = .visible
-            titlebar.toolbar = nil
-        }
+        self.window?.backgroundColor = .secondarySystemBackground
+
+        let fixedSize = CGSize(width: 640, height: 640)
+        self.window?.windowScene?.sizeRestrictions?.minimumSize = fixedSize
+        self.window?.windowScene?.sizeRestrictions?.maximumSize = fixedSize
 
         #if targetEnvironment(macCatalyst)
-        AppDelegate.appKitController?.perform(NSSelectorFromString("configurePreferencesWindowForSceneIdentifier:"), with: windowScene.session.persistentIdentifier)
+        buildMacToolbar()
+
+        AppDelegate.configurePreferenceWindow(persistentIdentifier: windowScene.session.persistentIdentifier)
         #endif
 
-        self.window?.rootViewController = SettingsHostVC.instantiateFromAppStoryboard()
-        self.window?.makeKeyAndVisible()
+        selectTarget(.general)
 
+        self.window?.makeKeyAndVisible()
     }
+
+    #if targetEnvironment(macCatalyst)
+    func buildMacToolbar() {
+        guard let windowScene = window?.windowScene else {
+            return
+        }
+
+        windowScene.title = kWindowSettingsTitle
+
+        if let titleBar = windowScene.titlebar {
+            let toolbar = NSToolbar(identifier: "Settings")
+            toolbar.delegate = self
+            toolbar.selectedItemIdentifier = NavigationTarget.general.toolbarIdentifier
+            titleBar.toolbarStyle = .preference
+            titleBar.toolbar = toolbar
+        }
+    }
+    #endif
 
     /** Called when the user activates your application by selecting a shortcut on the Home Screen,
         and the window scene is already connected.
@@ -70,8 +89,6 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
                      performActionFor shortcutItem: UIApplicationShortcutItem,
                      completionHandler: @escaping (Bool) -> Void) {
         os_log("Settings: windowScene shortcutItem", log: self.log, type: .info)
-        let handled = appDelegate.quickActionsManager.handleShortCutItem(shortcutItem: shortcutItem)
-        completionHandler(handled)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -86,21 +103,18 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
         os_log("Settings: sceneDidBecomeActive", log: self.log, type: .info)
-        appDelegate.quickActionsManager.handleSavedShortCutItemIfSaved()
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
         // Called when the scene will move from an active state to an inactive state.
         // This may occur due to temporary interruptions (ex. an incoming phone call).
         os_log("Settings: sceneWillResignActive", log: self.log, type: .info)
-        appDelegate.quickActionsManager.configureQuickActions()
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
         os_log("Settings: sceneWillEnterForeground", log: self.log, type: .info)
-        AmperKit.shared.isInForeground = true
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
@@ -110,15 +124,10 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Save changes in the application's managed object context when the application transitions to the background.
         os_log("Settings: sceneDidEnterBackground", log: self.log, type: .info)
-        self.appDelegate.scheduleAppRefresh()
-        AmperKit.shared.isInForeground = false
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         os_log("Settings: openURLContexts", log: self.log, type: .info)
-        for URLContext in URLContexts {
-            _ = self.appDelegate.intentManager.handleIncoming(url: URLContext.url)
-        }
     }
 
     // This is the NSUserActivity that will be used to restore state when the Scene reconnects.
@@ -150,7 +159,6 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         os_log("Settings: scene launch via userActivity: %s", log: self.log, type: .info, userActivity.activityType)
-        _ = appDelegate.intentManager.handleIncomingIntent(userActivity: userActivity)
     }
 
     func scene(_ scene: UIScene, didFailToContinueUserActivityWithType userActivityType: String, error: Error) {
@@ -162,3 +170,55 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
 }
+
+#if targetEnvironment(macCatalyst)
+extension SettingsSceneDelegate: NSToolbarDelegate {
+
+    func toolbarIdentifiers() -> [NSToolbarItem.Identifier] {
+        return NavigationTarget.allCases.map {
+            NSToolbarItem.Identifier($0.rawValue)
+        }
+    }
+
+    func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        return toolbarIdentifiers()
+    }
+
+    func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        return toolbarIdentifiers()
+    }
+
+    func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        return toolbarIdentifiers()
+    }
+
+    func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+
+        let item = NSToolbarItem(itemIdentifier: itemIdentifier)
+
+        guard let navTarget = NavigationTarget(rawValue: itemIdentifier.rawValue) else {
+            return item
+        }
+
+        item.target = self
+        item.isBordered = false
+        item.image = navTarget.icon
+        item.label = navTarget.displayName
+        item.action = #selector(selectTab(_:))
+
+        return item
+    }
+
+    @objc func selectTab(_ item: NSToolbarItem) {
+        guard let navigationTarget = NavigationTarget(rawValue: item.itemIdentifier.rawValue) else { return }
+        self.selectTarget(navigationTarget)
+    }
+
+    func selectTarget(_ navigationTarget: NavigationTarget) {
+        let hostingController = SettingsHostVC(target: navigationTarget)
+        hostingController.view.backgroundColor = UIColor.clear
+        hostingController.view.isOpaque = false
+        self.window?.rootViewController = hostingController
+    }
+}
+#endif

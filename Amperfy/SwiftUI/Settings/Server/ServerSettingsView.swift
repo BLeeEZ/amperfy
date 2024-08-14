@@ -38,8 +38,14 @@ struct ServerSettingsView: View {
         self.appDelegate.restartByUser()
     }
     
+    #if targetEnvironment(macCatalyst)
+    typealias Container = NavigationView
+    #else
+    typealias Container = ZStack
+    #endif
+
     var body: some View {
-        ZStack{
+        Container {
             List {
                 Section() {
                     VStack(alignment: .leading) {
@@ -100,11 +106,14 @@ struct ServerSettingsView: View {
                         Alert(title: Text("Logout"), message: Text("This action leads to a user logout. Login credentials of the current user are removed. Amperfy needs to restart to perform a logout. After a successful login a resync of the remote library is neccessary.\n\nDo you want to logout and restart Amperfy?"),
                         primaryButton: .destructive(Text("Logout")) {
                             logout()
-                        },secondaryButton: .cancel())
+                        }, secondaryButton: .cancel())
                     }
                 }
             }
         }
+        #if targetEnvironment(macCatalyst)
+        .navigationViewStyle(.stack)
+        #endif
         .navigationTitle("Server")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPwUpdateDialogVisible) {

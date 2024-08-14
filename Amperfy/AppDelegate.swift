@@ -232,6 +232,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         #if targetEnvironment(macCatalyst)
         AppDelegate.loadAppKitIntegrationFramework()
+        AppDelegate.installAppKitColorHooks()
+        
+        // update color of AppKit controls
+        AppDelegate.updateAppKitControlColor()
 
         // whenever we change the window focus, we rebuild the menu
         NotificationCenter.default.addObserver(forName: .init("NSWindowDidBecomeMainNotification"), object: nil, queue: nil) { [weak self] notification in
@@ -307,6 +311,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return config
         }
 
+        // Support setting window on macOS
         #if targetEnvironment(macCatalyst)
         if options.userActivities.filter({$0.activityType == kSettingsWindowActivityType}).first != nil {
             let config =  UISceneConfiguration(name: "Settings", sessionRole: .windowApplication)
@@ -359,6 +364,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         if self.focusedWindowTitle == kWindowSettingsTitle {
             // Do any settings specific menu setup here
+            builder.remove(menu: .view)
         } else {
             builder.remove(menu: .sidebar)
         }
@@ -370,42 +376,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     #endif
 }
-
-
-#if targetEnvironment(macCatalyst)
-extension NSObject {
-    @objc public func _catalyst_setupWindow(_ sender:Any) {
-
-    }
-
-    @objc public func configurePreferencesWindowForSceneIdentifier(_ sceneIdentifier:String) {
-
-    }
-}
-
-extension AppDelegate {
-    static var appKitController:NSObject?
-
-    class func loadAppKitIntegrationFramework() {
-
-        if let frameworksPath = Bundle.main.privateFrameworksPath {
-            let bundlePath = "\(frameworksPath)/AppKitIntegration.framework"
-            do {
-                try Bundle(path: bundlePath)?.loadAndReturnError()
-
-                let bundle = Bundle(path: bundlePath)!
-                NSLog("[APPKIT BUNDLE] Loaded Successfully")
-
-                if let appKitControllerClass = bundle.classNamed("AppKitIntegration.AppKitController") as? NSObject.Type {
-                    appKitController = appKitControllerClass.init()
-
-                    NotificationCenter.default.addObserver(appKitController as Any, selector: #selector(_catalyst_setupWindow(_:)), name: NSNotification.Name("UISBHSDidCreateWindowForSceneNotification"), object: nil)
-                }
-            }
-            catch {
-                NSLog("[APPKIT BUNDLE] Error loading: \(error)")
-            }
-        }
-    }
-}
-#endif

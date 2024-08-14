@@ -22,23 +22,24 @@
 import SwiftUI
 import AmperfyKit
 
-// There is no way to hide the second navigationbar in catalyst
-// That is why we recreate a navigation view with a HStack
-
-enum NavigationTarget: Int {
-    case displayAndInteraction = 0
-    case server
-    case library
-    case player
-    case swipe
-    case artwork
-    case support
-    case license
-    case xcallback
-    case developer
+enum NavigationTarget: String, CaseIterable {
+    case general = "general"
+    case displayAndInteraction = "displayAndInteraction"
+    case server = "server"
+    case library = "library"
+    case player = "player"
+    case swipe = "swipe"
+    case artwork = "artwork"
+    case support = "support"
+    case license = "license"
+    case xcallback = "xcallback"
+    #if DEBUG
+    case developer = "developer"
+    #endif
 
     func view() -> any View {
         switch self {
+        case .general: SettingsView()
         case .displayAndInteraction: DisplaySettingsView()
         case .server: ServerSettingsView()
         case .library: LibrarySettingsView()
@@ -48,12 +49,25 @@ enum NavigationTarget: Int {
         case .support: SupportSettingsView()
         case .license: LicenseSettingsView()
         case .xcallback: XCallbackURLsSetttingsView()
+        #if DEBUG
         case .developer: DeveloperView()
+        #endif
         }
     }
 
-    var name: String {
+    func hostingController(settings: Settings, managedObjectContext: NSManagedObjectContext) -> UIHostingController<AnyView> {
+        return UIHostingController(
+            rootView: AnyView(
+                self.view()
+                    .environmentObject(settings)
+                    .environment(\.managedObjectContext, managedObjectContext)
+            )
+        )
+    }
+
+    var displayName: String {
         switch self {
+        case .general: "General"
         case .displayAndInteraction: "Display & Interaction"
         case .server: "Server"
         case .library: "Library"
@@ -63,16 +77,39 @@ enum NavigationTarget: Int {
         case .support: "Support"
         case .license: "License"
         case .xcallback: "X-Callback-URL Documentation"
+        #if DEBUG
         case .developer: "Developer"
+        #endif
         }
     }
+    
+    var icon: UIImage {
+        let img = switch self {
+        case .general: UIImage(systemName: "gear")
+        case .displayAndInteraction: UIImage(systemName: "display")
+        case .server: UIImage(systemName: "server.rack")
+        case .library: UIImage(systemName: "music.note.house.fill")
+        case .player: UIImage(systemName: "play.circle.fill")
+        case .swipe: UIImage(systemName: "arrow.right.circle.fill")
+        case .artwork: UIImage(systemName: "photo.fill")
+        case .support: UIImage(systemName: "person.circle")
+        case .license: UIImage(systemName: "doc.fill")
+        case .xcallback: UIImage(systemName: "arrowshape.turn.up.backward.circle.fill")
+        #if DEBUG
+        case .developer: UIImage(systemName: "hammer.circle.fill")
+        #endif
+        }
+        return img!
+    }
+
+    #if targetEnvironment(macCatalyst)
+    var toolbarIdentifier: NSToolbarItem.Identifier { return NSToolbarItem.Identifier(self.rawValue) }
+    #endif
 }
 
 struct SettingsView: View {
 
     @EnvironmentObject private var settings: Settings
-
-    @State var selection: Int?
 
     func screenLockPreventionOffPressed() {
         settings.screenLockPreventionPreference = .never
@@ -93,28 +130,13 @@ struct SettingsView: View {
     }
 
     func navigationLink(_ item: NavigationTarget) -> some View {
-        #if targetEnvironment(macCatalyst)
-        // Cell highlight color is broken on macOS
-        HStack {
-            Text(item.name)
-            Spacer()
-            Image(systemName: "chevron.right")
-                .foregroundColor( selection == item.rawValue ? Color.white : nil )
+        NavigationLink(destination: AnyView(item.view())) {
+            Text(item.displayName)
         }
-        .contentShape(Rectangle())
-        .foregroundColor(selection == item.rawValue ? Color.white : nil)
-        .background(
-            NavigationLink(destination: AnyView(item.view()), tag: item.rawValue, selection: self.$selection) {}
-        )
-        #else
-        NavigationLink(destination: AnyView(item.view()), tag: item.rawValue, selection: self.$selection) {
-            Text(item.name)
-        }
-        #endif
     }
 
     var body: some View {
-        let list =
+        NavigationView {
             List {
                 Section() {
                     HStack {
@@ -154,6 +176,7 @@ struct SettingsView: View {
                     }
                 })
 
+                #if !targetEnvironment(macCatalyst)
                 Section() {
                     navigationLink(.displayAndInteraction)
                     navigationLink(.server)
@@ -168,28 +191,16 @@ struct SettingsView: View {
                     navigationLink(.license)
                     navigationLink(.xcallback)
 
-                    #if false
+                    #if DEBUG
                     navigationLink(.developer)
                     #endif
                 }
+                #endif
             }
-
-        #if targetEnvironment(macCatalyst)
-        NavigationView {
-            list
-                .navigationTitle("Settings")
-                .listStyle(.grouped)
-                .onAppear {
-                    if self.selection == nil {
-                        self.selection = 0
-                    }
-                }
-        }.navigationViewStyle(.columns)
-        #else
-        NavigationView {
-            list.navigationTitle("Settings")
+            #if !targetEnvironment(macCatalyst)
+            .navigationTitle("Settings")
+            #endif
         }.navigationViewStyle(.stack)
-        #endif
     }
 }
 

@@ -16,6 +16,30 @@ class AppKitController: NSObject {
 	
 	var preferencesSceneIdentifier: String?
 
+    @objc static var controlAccentAppColor: NSColor? = .clear
+
+    @objc public func updateControlAccentColor(_ color: CGColor) {
+        AppKitController.controlAccentAppColor = NSColor(cgColor: color)
+
+        // Update the appearance of AppKit controls e.g. the ToolbarItems in the settings window
+        let newAppearance = NSAppearance()
+        NSApp.appearance = newAppearance
+
+        // Redraw the window
+        NSApp.windows.forEach { 
+            $0.appearance = nil
+            $0.appearance = newAppearance
+        }
+    }
+
+    @objc public func installControlAccentColorHook() {
+        guard let swizzledMethod = class_getClassMethod(AppKitController.self, #selector(getter: AppKitController.controlAccentAppColor)) else { return }
+
+        // Style NSToolbarItem
+        guard let method = class_getClassMethod(NSColor.self, #selector(getter: NSColor.controlAccentColor)) else { return }
+        method_exchangeImplementations(method, swizzledMethod)
+    }
+
 	@objc public func _catalyst_setupWindow(_ note: Notification) {
 
 		guard let preferencesSceneIdentifier = preferencesSceneIdentifier else { return }
@@ -26,9 +50,9 @@ class AppKitController: NSObject {
 				
 				if appDelegate.responds(to: #selector(hostWindowForSceneIdentifier(_:))) {
 					guard let hostWindow = appDelegate.hostWindowForSceneIdentifier(sceneIdentifier) else { return }
-					
+
 					hostWindow.collectionBehavior = [.fullScreenAuxiliary]
-                    hostWindow.styleMask = [.closable, .titled, .fullSizeContentView]
+                    hostWindow.styleMask = [.closable, .titled]
 					hostWindow.isRestorable = false
 				}
 			}

@@ -28,8 +28,14 @@ struct SupportSettingsView: View {
     @State var result: Result<MFMailComposeResult, Error>? = nil
     @State var isShowingMailView = false
     
+    #if targetEnvironment(macCatalyst)
+    typealias Container = NavigationView
+    #else
+    typealias Container = ZStack
+    #endif
+
     var body: some View {
-        ZStack{
+        Container {
             List {
                 Section() {
                     
@@ -71,6 +77,9 @@ struct SupportSettingsView: View {
                          attachments: [MailAttachment(data: LogData.collectInformation(amperfyData: AmperKit.shared).asJSONData(), mimeType: "application/json", fileName: "AmperfyLog.json")])
             }
         }
+        #if targetEnvironment(macCatalyst)
+        .navigationViewStyle(.stack)
+        #endif
         .navigationTitle("Support")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

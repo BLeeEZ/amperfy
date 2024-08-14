@@ -42,8 +42,14 @@ struct ArtworkSettingsView: View {
         }.catch { error in }
     }
     
+    #if targetEnvironment(macCatalyst)
+    typealias Container = NavigationView
+    #else
+    typealias Container = ZStack
+    #endif
+
     var body: some View {
-        ZStack {
+        Container {
             List {
                 Section {
                     HStack {
@@ -81,6 +87,9 @@ struct ArtworkSettingsView: View {
                 }
             }
         }
+        #if targetEnvironment(macCatalyst)
+        .navigationViewStyle(.stack)
+        #endif
         .navigationTitle("Artwork")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

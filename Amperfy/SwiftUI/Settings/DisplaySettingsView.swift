@@ -29,8 +29,11 @@ struct DisplaySettingsView: View {
     func setThemePreference(preference: ThemePreference) {
         settings.themePreference = preference
         appDelegate.setAppTheme(color: preference.asColor)
-        // the following applies the tint color to already loaded views in all windows
 
+        // the following applies the tint color to already loaded views in all windows (AppKit)
+        AppDelegate.updateAppKitControlColor()
+
+        // the following applies the tint color to already loaded views in all windows (UIKit)
         let windowScene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
         let windows = windowScene.flatMap { $0.windows }
 
@@ -81,7 +84,7 @@ struct DisplaySettingsView: View {
                         }
                     }
                 })
-                
+
                 Section(content: {
                     HStack {
                         Text("Haptic Feedback")
@@ -197,6 +200,7 @@ struct DisplaySettingsView: View {
                 })
             }
         }
+        //.listStyle(.grouped)
         .navigationTitle("Display")
         .navigationBarTitleDisplayMode(.inline)
     }

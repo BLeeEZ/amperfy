@@ -36,13 +36,23 @@ class SettingsHostVC: UIViewController {
 
     override var sceneTitle: String { kWindowSettingsTitle }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        #if targetEnvironment(macCatalyst)
-        self.title = "Main"
-        #endif
+    #if targetEnvironment(macCatalyst)
+    init(target: NavigationTarget) {
+        super.init(nibName: nil, bundle: nil)
+        self.title = target.displayName
+
+        let hostingVC = target.hostingController(settings: settings, managedObjectContext: appDelegate.storage.main.context)
+        self.addChild(hostingVC)
+        self.view.addSubview(hostingVC.view)
+        hostingVC.view.frame = self.view.bounds
+        hostingVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        hostingVC.view.backgroundColor = .clear
     }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+    #endif
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
