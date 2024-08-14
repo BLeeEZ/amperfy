@@ -56,9 +56,9 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
         buildMacToolbar()
 
         AppDelegate.configurePreferenceWindow(persistentIdentifier: windowScene.session.persistentIdentifier)
-        #endif
-
+        
         selectTarget(.general)
+        #endif
 
         self.window?.makeKeyAndVisible()
     }

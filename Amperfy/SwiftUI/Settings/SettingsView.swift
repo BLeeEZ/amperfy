@@ -55,16 +55,6 @@ enum NavigationTarget: String, CaseIterable {
         }
     }
 
-    func hostingController(settings: Settings, managedObjectContext: NSManagedObjectContext) -> UIHostingController<AnyView> {
-        return UIHostingController(
-            rootView: AnyView(
-                self.view()
-                    .environmentObject(settings)
-                    .environment(\.managedObjectContext, managedObjectContext)
-            )
-        )
-    }
-
     var displayName: String {
         switch self {
         case .general: "General"
@@ -104,6 +94,16 @@ enum NavigationTarget: String, CaseIterable {
 
     #if targetEnvironment(macCatalyst)
     var toolbarIdentifier: NSToolbarItem.Identifier { return NSToolbarItem.Identifier(self.rawValue) }
+
+    func hostingController(settings: Settings, managedObjectContext: NSManagedObjectContext) -> UIHostingController<AnyView> {
+        return UIHostingController(
+            rootView: AnyView(
+                self.view()
+                    .environmentObject(settings)
+                    .environment(\.managedObjectContext, managedObjectContext)
+            )
+        )
+    }
     #endif
 }
 

@@ -30,8 +30,10 @@ struct DisplaySettingsView: View {
         settings.themePreference = preference
         appDelegate.setAppTheme(color: preference.asColor)
 
+        #if targetEnvironment(macCatalyst)
         // the following applies the tint color to already loaded views in all windows (AppKit)
         AppDelegate.updateAppKitControlColor()
+        #endif
 
         // the following applies the tint color to already loaded views in all windows (UIKit)
         let windowScene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
