@@ -1,8 +1,23 @@
-/*
-2021 Steven Troughton-Smith (@stroughtonsmith)
-Provided as sample code to do with as you wish.
-No license or attribution required.
-*/
+//
+//  AppKitController.swift
+//  Amperfy
+//
+//  Created by David Klopp on 14.08.22.
+//  Copyright (c) 2022 Maximilian Bauer. All rights reserved.
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 import AppKit
 
@@ -26,7 +41,7 @@ class AppKitController: NSObject {
         NSApp.appearance = newAppearance
 
         // Redraw the window
-        NSApp.windows.forEach { 
+        NSApp.windows.forEach {
             $0.appearance = nil
             $0.appearance = newAppearance
         }

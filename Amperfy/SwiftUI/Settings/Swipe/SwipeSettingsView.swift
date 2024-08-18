@@ -77,6 +77,9 @@ struct SwipeSettingsView: View {
                             Image.plus
                         }
                     }
+                    #if targetEnvironment(macCatalyst)
+                    .padding(.top, 32)
+                    #endif
                 ) {
                     ForEach(leading, id: \.self) { swipe in
                         SwipeCellView(swipe: swipe)

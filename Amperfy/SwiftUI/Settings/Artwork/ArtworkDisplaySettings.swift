@@ -34,6 +34,16 @@ struct ArtworkDisplaySettings: View {
     
     var body: some View {
         ZStack {
+            #if targetEnvironment(macCatalyst)
+            Menu(self.activeOption.description) {
+                ForEach(settingOptions, id: \.self) { option in
+                    Button(option.description, action: {
+                        appDelegate.storage.settings.artworkDisplayPreference = option
+                        updateValues()
+                    })
+                }
+            }
+            #else
             List {
                 Section {
                     ForEach(settingOptions, id: \.self) { option in
@@ -54,6 +64,7 @@ struct ArtworkDisplaySettings: View {
                     }
                 }
             }
+            #endif
         }
         .navigationTitle("Artwork Display")
         .onAppear {

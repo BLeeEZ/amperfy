@@ -34,8 +34,11 @@ struct EventLogSettingsView: View {
                     EventLogCellView(entry: LogEntry(managedObject: entry))
                 }
             }
-            .listStyle(GroupedListStyle())
-                
+            #if targetEnvironment(macCatalyst)
+            .listStyle(.plain)
+            #else
+            .listStyle(.grouped)
+            #endif
         }
         .navigationTitle("Event Log")
     }

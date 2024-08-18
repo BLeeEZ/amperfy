@@ -34,6 +34,16 @@ struct ArtworkDownloadSettingsView: View {
     
     var body: some View {
         ZStack {
+            #if targetEnvironment(macCatalyst)
+            Menu(self.activeOption.description) {
+                ForEach(settingOptions, id: \.self) { option in
+                    Button(option.description, action: {
+                        appDelegate.storage.settings.artworkDownloadSetting = option
+                        updateValues()
+                    })
+                }
+            }
+            #else
             List {
                 Section {
                     ForEach(settingOptions, id: \.self) { option in
@@ -54,6 +64,7 @@ struct ArtworkDownloadSettingsView: View {
                     }
                 }
             }
+            #endif
         }
         .navigationTitle("Artwork Download")
         .onAppear {

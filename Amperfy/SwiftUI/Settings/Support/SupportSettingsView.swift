@@ -24,43 +24,43 @@ import AmperfyKit
 import MessageUI
 
 struct SupportSettingsView: View {
-    
+    let kSplit = 0.15
+
     @State var result: Result<MFMailComposeResult, Error>? = nil
     @State var isShowingMailView = false
-    
-    #if targetEnvironment(macCatalyst)
-    typealias Container = NavigationView
-    #else
-    typealias Container = ZStack
-    #endif
 
     var body: some View {
-        Container {
+        ZStack {
             List {
-                Section() {
-                    
-                    Button(action: {
+                SettingsSection {
+                    SettingsButtonRow(title: "Contact", label: "Report an issue on GitHub", splitPercentage: kSplit) {
                         if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {
                             UIApplication.shared.open(url)
                         }
-                    }) {
-                        Text("Report an issue on GitHub")
                     }
-                    Button(action: {
+                    SettingsButtonRow(label: "Send issue or feedback to developer", splitPercentage: kSplit) {
                         if MFMailComposeViewController.canSendMail() {
                             self.isShowingMailView.toggle()
                         } else {
                             appDelegate.eventLogger.info(topic: "Email Info", statusCode: .emailError, message: "Email is not configured in settings app or Amperfy is not able to send an email.", displayPopup: true)
                         }
-                    }) {
-                        Text("Send issue or feedback to developer")
                     }
                 }
 
-                Section() {
+                SettingsSection() {
+                    #if targetEnvironment(macCatalyst)
+                    SettingsRow(title: "Event Log", splitPercentage: kSplit) {
+                        EventLogSettingsView()
+                            .background(Color.white)
+                            .frame(width: 500, height: 200)
+                            .padding(.top, 10)
+                    }
+                    .frame(height: 220)
+                    #else
                     NavigationLink(destination: EventLogSettingsView()) {
                         Text("Event Log")
                     }
+                    #endif
                 }
             }
             .sheet(isPresented: $isShowingMailView) {

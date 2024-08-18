@@ -301,8 +301,8 @@ THE SOFTWARE.
                 Text(licenseText)
                     .font(.caption)
                     .foregroundColor(.primary)
+                    .padding([.leading, .trailing, .top, .bottom], 16)
             }
-            .padding([.leading, .trailing], 16)
         }
         .navigationTitle("Licenses")
         .navigationBarTitleDisplayMode(.inline)

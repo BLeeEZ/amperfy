@@ -1,8 +1,8 @@
 //
-//  SceneDelegate.swift
+//  SettingsSceneDelegate.swift
 //  Amperfy
 //
-//  Created by Maximilian Bauer on 17.08.22.
+//  Created by David Klopp on 14.08.22.
 //  Copyright (c) 2022 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -47,10 +47,6 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.appDelegate.window = self.window
 
         self.window?.backgroundColor = .secondarySystemBackground
-
-        let fixedSize = CGSize(width: 640, height: 640)
-        self.window?.windowScene?.sizeRestrictions?.minimumSize = fixedSize
-        self.window?.windowScene?.sizeRestrictions?.maximumSize = fixedSize
 
         #if targetEnvironment(macCatalyst)
         buildMacToolbar()
@@ -219,6 +215,11 @@ extension SettingsSceneDelegate: NSToolbarDelegate {
         hostingController.view.backgroundColor = UIColor.clear
         hostingController.view.isOpaque = false
         self.window?.rootViewController = hostingController
+
+        // Change the window size for the selected tab
+        let fixedSize = navigationTarget.fittingWindowSize
+        self.window?.windowScene?.sizeRestrictions?.minimumSize = fixedSize
+        self.window?.windowScene?.sizeRestrictions?.maximumSize = fixedSize
     }
 }
 #endif

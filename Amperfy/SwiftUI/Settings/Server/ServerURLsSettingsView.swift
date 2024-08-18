@@ -28,7 +28,8 @@ struct ServerURLsSettingsView: View {
     @State var serverURLs = [String]()
     @State var activeServerURL: String =  ""
     @State var isAddDialogVisible: Bool = false
-    
+    @State private var selection: String?
+
     func reload() {
         serverURLs = appDelegate.storage.alternativeServerURLs
         activeServerURL = appDelegate.storage.loginCredentials?.serverUrl ?? ""
@@ -59,10 +60,10 @@ struct ServerURLsSettingsView: View {
             self.appDelegate.storage.alternativeServerURLs = altURLs
         }
     }
-    
+
     var body: some View {
-        ZStack{
-            List {
+        ZStack {
+            List(selection: $selection) {
                 ForEach(serverURLs, id: \.self) { url in
                     HStack {
                         Text(url)
@@ -71,6 +72,7 @@ struct ServerURLsSettingsView: View {
                             Image.checkmark
                         }
                     }
+                    .id(url)
                     .deleteDisabled(url == activeServerURL)
                     .onTapGesture {
                         setAsActiveURL(url: url)
@@ -81,12 +83,46 @@ struct ServerURLsSettingsView: View {
                     deleteURL(url: serverURLs[index])
                     serverURLs.remove(atOffsets: indexSet)
                 }
+                .onChange(of: self.selection) { newSelection in
+                    #if targetEnvironment(macCatalyst)
+                    // Disable selection of the active element
+                    if newSelection == activeServerURL {
+                        self.selection = nil
+                    }
+                    #else
+                    // Disable selection of all elements on iOS
+                    self.selection = nil
+                    #endif
+                }
             }
+            #if targetEnvironment(macCatalyst)
+            .listStyle(.plain)
+            .border(Color.separator, width: 1.0)
+            #endif
         }
-        .navigationTitle("Server URLs")
         .sheet(isPresented: $isAddDialogVisible) {
             AlternativeURLAddDialogView(isVisible: $isAddDialogVisible, activeServerURL: $activeServerURL, serverURLs: $serverURLs)
         }
+        #if targetEnvironment(macCatalyst)
+        .background {
+            Color.systemBackground
+        }
+        .listToolbar {
+            Button(action: {
+                withPopupAnimation { isAddDialogVisible = true }
+            }) {
+                Image.plus
+            }.buttonStyle(BorderlessButtonStyle())
+            Button(action: {
+                guard let selection = self.selection, let index = self.serverURLs.firstIndex(of: selection) else { return }
+                deleteURL(url: selection)
+                serverURLs.remove(at: index)
+            }) {
+                Image.minus
+            }.buttonStyle(BorderlessButtonStyle())
+        }
+        #else
+        .navigationTitle("Server URLs")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 EditButton()
@@ -97,6 +133,7 @@ struct ServerURLsSettingsView: View {
                 }
             }
         }
+        #endif
         .onAppear {
             reload()
         }

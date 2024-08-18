@@ -105,6 +105,7 @@ extension Color {
 
 extension Image {
     static let plus = Image(systemName: "plus")
+    static let minus = Image(systemName: "minus")
     static let checkmark = Image(systemName: "checkmark")
 }
 

@@ -74,12 +74,12 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         refreshCurrentlyPlayingPopupItem()
         
         controlPlaceholderHeightConstraint.constant = PlayerControlView.frameHeight + safetyMarginOnBottom
-        if let createdPlayerControlView = ViewBuilder<PlayerControlView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: controlPlaceholderView.bounds.size.width, height: controlPlaceholderView.bounds.size.height)) {
+        if let createdPlayerControlView = ViewCreator<PlayerControlView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: controlPlaceholderView.bounds.size.width, height: controlPlaceholderView.bounds.size.height)) {
             controlView = createdPlayerControlView
             createdPlayerControlView.prepare(toWorkOnRootView: self)
             controlPlaceholderView.addSubview(createdPlayerControlView)
         }
-        if let createdLargeCurrentlyPlayingView = ViewBuilder<LargeCurrentlyPlayingPlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: largePlayerPlaceholderView.bounds.size.width, height: largePlayerPlaceholderView.bounds.size.height)) {
+        if let createdLargeCurrentlyPlayingView = ViewCreator<LargeCurrentlyPlayingPlayerView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: largePlayerPlaceholderView.bounds.size.width, height: largePlayerPlaceholderView.bounds.size.height)) {
             largeCurrentlyPlayingView = createdLargeCurrentlyPlayingView
             createdLargeCurrentlyPlayingView.prepare(toWorkOnRootView: self)
             largePlayerPlaceholderView.addSubview(createdLargeCurrentlyPlayingView)
@@ -93,15 +93,15 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         self.setupTableView()
         self.fetchSongInfoAndUpdateViews()
         
-        if let sectionView = ViewBuilder<ContextQueuePrevSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ContextQueuePrevSectionHeader.frameHeight)) {
+        if let sectionView = ViewCreator<ContextQueuePrevSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ContextQueuePrevSectionHeader.frameHeight)) {
             contextPrevQueueSectionHeader = sectionView
             contextPrevQueueSectionHeader?.display(name: "Previous")
         }
-        if let sectionView = ViewBuilder<UserQueueSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: UserQueueSectionHeader.frameHeight)) {
+        if let sectionView = ViewCreator<UserQueueSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: UserQueueSectionHeader.frameHeight)) {
             userQueueSectionHeader = sectionView
             userQueueSectionHeader?.display(name: "Next from Queue", buttonPressAction: clearUserQueue)
         }
-        if let sectionView = ViewBuilder<ContextQueueNextSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ContextQueueNextSectionHeader.frameHeight)) {
+        if let sectionView = ViewCreator<ContextQueueNextSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ContextQueueNextSectionHeader.frameHeight)) {
             contextNextQueueSectionHeader = sectionView
             contextNextQueueSectionHeader?.prepare(toWorkOnRootView: self)
         }

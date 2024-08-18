@@ -50,7 +50,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         tableView.estimatedRowHeight = PlaylistTableCell.rowHeight
 
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight))
-        if let newPlaylistTableHeaderView = ViewBuilder<NewPlaylistTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight)) {
+        if let newPlaylistTableHeaderView = ViewCreator<NewPlaylistTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight)) {
             tableView.tableHeaderView?.addSubview(newPlaylistTableHeaderView)
         }
     }

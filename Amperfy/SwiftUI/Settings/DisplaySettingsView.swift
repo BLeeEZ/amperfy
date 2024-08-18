@@ -57,10 +57,8 @@ struct DisplaySettingsView: View {
     var body: some View {
         ZStack{
             List {
-                Section(content: {
-                    HStack {
-                        Text("Theme Color")
-                        Spacer()
+                SettingsSection {
+                    SettingsRow(title: "Theme Color") {
                         Menu(settings.themePreference.description) {
                             Button(ThemePreference.blue.description) {
                                 setThemePreference(preference: .blue)
@@ -85,124 +83,73 @@ struct DisplaySettingsView: View {
                             }
                         }
                     }
-                })
-
-                Section(content: {
-                    HStack {
-                        Text("Haptic Feedback")
-                        Spacer()
-                        Toggle(isOn: $settings.isHapticsEnabled) {}
-                    }
                 }
-                , footer: {
-                    Text("Certain interactions provide haptic feedback. Long pressing to display the details menu will always trigger haptic feedback.")
-                })
 
-                Section(content: {
-                    HStack {
-                        Text("Music Player Skip Buttons")
-                        Spacer()
-                        Toggle(isOn: $settings.isShowMusicPlayerSkipButtons) {}
-                    }
-                    
-                }
-                , footer: {
-                    Text("Display skip forward button and skip backward button in music player in addition to previous/next buttons.")
-                })
+                #if !targetEnvironment(macCatalyst)
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(label: "Haptic Feedback", isOn: $settings.isHapticsEnabled)
+                }, footer:
+                    "Certain interactions provide haptic feedback. Long pressing to display the details menu will always trigger haptic feedback."
+                )
+                #endif
+
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(title: "Music Player", label: "Music Player Skip Buttons", isOn: $settings.isShowMusicPlayerSkipButtons)
+                }, footer:
+                    "Display skip forward button and skip backward button in music player in addition to previous/next buttons."
+                )
                 
                 if appDelegate.backendApi.selectedApi != .ampache {
-                    Section(content: {
-                        HStack {
-                            Text("Music Player Lyrics Button")
-                            Spacer()
-                            Toggle(isOn: Binding<Bool>(
-                                get: { !settings.isAlwaysHidePlayerLyricsButton },
-                                set: { _ in tooglePlayerLyricsButtonPreference() }
-                            )) {}
-                        }
-                        
-                    }
-                    , footer: {
-                        Text("Display lyrics button in music player.")
-                    })
+                    SettingsSection(content: {
+                        SettingsCheckBoxRow(label: "Music Player Lyrics Button", isOn: Binding<Bool>(
+                            get: { !settings.isAlwaysHidePlayerLyricsButton },
+                            set: { _ in tooglePlayerLyricsButtonPreference() }
+                        ))
+                    }, footer:
+                        "Display lyrics button in music player."
+                    )
                     
-                    Section(content: {
-                        HStack {
-                            Text("Lyrics Smooth Scrolling")
-                            Spacer()
-                            Toggle(isOn: $settings.isLyricsSmoothScrolling) {}
-                        }
-                        
-                    }
-                    , footer: {
-                        Text("Lyrics are smoothly scrolled to next line. Deactivating will result in jumping from line to line.")
-                    })
+                    SettingsSection(content: {
+                        SettingsCheckBoxRow(label: "Lyrics Smooth Scrolling", isOn: $settings.isLyricsSmoothScrolling)
+                    }, footer:
+                        "Lyrics are smoothly scrolled to next line. Deactivating will result in jumping from line to line."
+                    )
                 }
                 
-                Section(content: {
-                    HStack {
-                        Text("Detailed Information")
-                        Spacer()
-                        Toggle(isOn: $settings.isShowDetailedInfo) {}
-                    }
- 
-                }
-                , footer: {
-                    Text("Display detailed information (bitrate, ID) and button \"Copy ID to Clipboard\".")
-                })
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(title: "Information", label: "Detailed Information", isOn: $settings.isShowDetailedInfo)
+                }, footer:
+                    "Display detailed information (bitrate, ID) and button \"Copy ID to Clipboard\"."
+                )
                 
-                Section(content: {
-                    HStack {
-                        Text("Song Duration")
-                        Spacer()
-                        Toggle(isOn: $settings.isShowSongDuration) {}
-                    }
- 
-                }
-                , footer: {
-                    Text("Display song duration in table rows.")
-                })
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(label: "Song Duration", isOn: $settings.isShowSongDuration)
+                }, footer:
+                    "Display song duration in table rows."
+                )
                 
-                Section(content: {
-                    HStack {
-                        Text("Album Duration")
-                        Spacer()
-                        Toggle(isOn: $settings.isShowAlbumDuration) {}
-                    }
- 
-                }
-                , footer: {
-                    Text("Display album duration in table rows.")
-                })
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(label: "Album Duration", isOn: $settings.isShowAlbumDuration)
+                }, footer:
+                    "Display album duration in table rows."
+                )
                 
-                Section(content: {
-                    HStack {
-                        Text("Artist Duration")
-                        Spacer()
-                        Toggle(isOn: $settings.isShowArtistDuration) {}
-                    }
- 
-                }
-                , footer: {
-                    Text("Display artist duration in table rows.")
-                })
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(label: "Artist Duration", isOn: $settings.isShowArtistDuration)
+                }, footer:
+                    "Display artist duration in table rows."
+                )
                 
-                Section(content: {
-                    HStack {
-                        Text("Disable Player Shuffle Button")
-                        Spacer()
-                        Toggle(isOn: Binding<Bool>(
-                            get: { !settings.isPlayerShuffleButtonEnabled },
-                            set: { settings.isPlayerShuffleButtonEnabled = !$0 }
-                        )) {}
-                    }
-                }
-                , footer: {
-                    Text("Player Shuffle Button is displayed but it can't be interacted with.")
-                })
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(title: "Shuffle", label: "Disable Player Shuffle Button", isOn: Binding<Bool>(
+                        get: { !settings.isPlayerShuffleButtonEnabled },
+                        set: { settings.isPlayerShuffleButtonEnabled = !$0 }
+                    ))
+                }, footer:
+                    "Player Shuffle Button is displayed but it can't be interacted with."
+                )
             }
         }
-        //.listStyle(.grouped)
         .navigationTitle("Display")
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -20,7 +20,7 @@
 		5007CE4721EF6A8E00BC5CBA /* PlaylistDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5007CE4621EF6A8E00BC5CBA /* PlaylistDetailVC.swift */; };
 		500B7D4521EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500B7D4421EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib */; };
 		500B7D4721EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */; };
-		500B7D4921EDD6250083ED6F /* ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4821EDD6250083ED6F /* ViewBuilder.swift */; };
+		500B7D4921EDD6250083ED6F /* ViewCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B7D4821EDD6250083ED6F /* ViewCreator.swift */; };
 		500B97CD2B7BC680005554BF /* EntityPreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B97CC2B7BC67F005554BF /* EntityPreviewVC.swift */; };
 		500B97D02B7C9555005554BF /* EntityPreviewVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500B97CF2B7C9546005554BF /* EntityPreviewVC.xib */; };
 		501944182B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501944172B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift */; };
@@ -428,6 +428,11 @@
 		50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */; };
 		50FF311B2BBC4D8000C2C3B9 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FF311A2BBC4D8000C2C3B9 /* NetworkMonitor.swift */; };
 		631C16652C6BA7E60085F62E /* AppDelegateAppKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C16642C6BA7E60085F62E /* AppDelegateAppKitExtension.swift */; };
+		631C166B2C6D3D9A0085F62E /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166A2C6D3D9A0085F62E /* SettingsRow.swift */; };
+		631C166D2C6D61110085F62E /* NavigationTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166C2C6D61110085F62E /* NavigationTarget.swift */; };
+		631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166E2C6D63510085F62E /* SettingsSection.swift */; };
+		631C16712C6D6AA30085F62E /* BehavioralStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C16702C6D6AA30085F62E /* BehavioralStylable.swift */; };
+		6333C8E12C6FDB5200CCA50A /* SecondaryText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
 		63DCDB962C67515C00522F68 /* AppKitIntegration.framework in Embed AppKitIntegration */ = {isa = PBXBuildFile; fileRef = 63DCDB912C67508E00522F68 /* AppKitIntegration.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		63DCDB9E2C67536800522F68 /* AppKitController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB992C6752F000522F68 /* AppKitController.swift */; };
@@ -531,7 +536,7 @@
 		500B7D4221ECFCDD0083ED6F /* LibraryElementEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryElementEnum.swift; sourceTree = "<group>"; };
 		500B7D4421EDB05F0083ED6F /* LibraryElementDetailTableHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LibraryElementDetailTableHeaderView.xib; sourceTree = "<group>"; };
 		500B7D4621EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryElementDetailTableHeaderView.swift; sourceTree = "<group>"; };
-		500B7D4821EDD6250083ED6F /* ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewBuilder.swift; sourceTree = "<group>"; };
+		500B7D4821EDD6250083ED6F /* ViewCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCreator.swift; sourceTree = "<group>"; };
 		500B97CC2B7BC67F005554BF /* EntityPreviewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityPreviewVC.swift; sourceTree = "<group>"; };
 		500B97CF2B7C9546005554BF /* EntityPreviewVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EntityPreviewVC.xib; sourceTree = "<group>"; };
 		500BB45521CAA73700D367CF /* PersistentStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistentStorage.swift; sourceTree = "<group>"; };
@@ -945,6 +950,11 @@
 		50FF31192BBB27AC00C2C3B9 /* Amperfy v36.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v36.xcdatamodel"; sourceTree = "<group>"; };
 		50FF311A2BBC4D8000C2C3B9 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		631C16642C6BA7E60085F62E /* AppDelegateAppKitExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateAppKitExtension.swift; sourceTree = "<group>"; };
+		631C166A2C6D3D9A0085F62E /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
+		631C166C2C6D61110085F62E /* NavigationTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTarget.swift; sourceTree = "<group>"; };
+		631C166E2C6D63510085F62E /* SettingsSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsSection.swift; sourceTree = "<group>"; };
+		631C16702C6D6AA30085F62E /* BehavioralStylable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehavioralStylable.swift; sourceTree = "<group>"; };
+		6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryText.swift; sourceTree = "<group>"; };
 		63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSceneDelegate.swift; sourceTree = "<group>"; };
 		63DCDB912C67508E00522F68 /* AppKitIntegration.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppKitIntegration.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		63DCDB992C6752F000522F68 /* AppKitController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKitController.swift; sourceTree = "<group>"; };
@@ -1024,7 +1034,7 @@
 				5002565625E69DC700674CE1 /* SpinnerViewController.swift */,
 				50675E6C25F61163005737FD /* BasicTableCell.swift */,
 				5005939028E42F66008C8DF6 /* BasicCollectionCell.swift */,
-				500B7D4821EDD6250083ED6F /* ViewBuilder.swift */,
+				500B7D4821EDD6250083ED6F /* ViewCreator.swift */,
 				500EB36725F8B3EB00B4B998 /* Corners.swift */,
 				509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */,
 				500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */,
@@ -1171,6 +1181,10 @@
 		50791E7D28D363CA006CE6E5 /* Basics */ = {
 			isa = PBXGroup;
 			children = (
+				6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */,
+				631C16702C6D6AA30085F62E /* BehavioralStylable.swift */,
+				631C166A2C6D3D9A0085F62E /* SettingsRow.swift */,
+				631C166E2C6D63510085F62E /* SettingsSection.swift */,
 				50791E7E28D363F0006CE6E5 /* InfoBannerView.swift */,
 				504B442128D8EBB20033982C /* MailView.swift */,
 				50AC4E5528D99A410091FF33 /* ButtonStyles.swift */,
@@ -1182,13 +1196,14 @@
 		50791E8228D36EAD006CE6E5 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				631C166C2C6D61110085F62E /* NavigationTarget.swift */,
 				50E77DB628D2163F00BDF882 /* SettingsView.swift */,
 				5078AFB12B40CA5E0038FD17 /* DisplaySettingsView.swift */,
-				50791E8428D36F1F006CE6E5 /* LibrarySettingsView.swift */,
+				50AE79AB2C1CCBEC0085CBB3 /* DeveloperView.swift */,
 				50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */,
+				50791E8428D36F1F006CE6E5 /* LibrarySettingsView.swift */,
 				504B441828D6F0920033982C /* LicenseSettingsView.swift */,
 				504B441C28D7A6330033982C /* XCallbackURLsSetttingsView.swift */,
-				50AE79AB2C1CCBEC0085CBB3 /* DeveloperView.swift */,
 				50CFB59828D5006100A47D44 /* Artwork */,
 				50CFB59528D4848300A47D44 /* Swipe */,
 				50791E8328D36EBD006CE6E5 /* Server */,
@@ -2086,6 +2101,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				504B441D28D7A6330033982C /* XCallbackURLsSetttingsView.swift in Sources */,
+				631C166B2C6D3D9A0085F62E /* SettingsRow.swift in Sources */,
 				507361E02632BA3B005F151D /* GenresVC.swift in Sources */,
 				501A7D4D26820B080055A51B /* PodcastsVC.swift in Sources */,
 				5077F936221E6D0E0099CA91 /* DownloadsVC.swift in Sources */,
@@ -2093,9 +2109,11 @@
 				50C16C1E21E7A35C00F086F0 /* GenericTableCell.swift in Sources */,
 				505CA2092B88E8F400AA81CD /* BasicCollectionViewController.swift in Sources */,
 				5064F3982B96FBAE00DE61C1 /* NotificationDetailVC.swift in Sources */,
+				631C16712C6D6AA30085F62E /* BehavioralStylable.swift in Sources */,
 				5003D8FB267B3390006946BF /* LibrarySyncPopupVC.swift in Sources */,
 				501944182B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift in Sources */,
 				5007CE4121EF5F4300BC5CBA /* PlaylistsVC.swift in Sources */,
+				631C166D2C6D61110085F62E /* NavigationTarget.swift in Sources */,
 				50E77DB728D2163F00BDF882 /* SettingsView.swift in Sources */,
 				50C16C1A21E704EC00F086F0 /* ArtistDetailVC.swift in Sources */,
 				50DEEE04265E25A40073FF20 /* MusicFoldersVC.swift in Sources */,
@@ -2110,6 +2128,7 @@
 				500B7D4721EDB0890083ED6F /* LibraryElementDetailTableHeaderView.swift in Sources */,
 				641708592C13BF5100BA2619 /* Haptics.swift in Sources */,
 				50CCD0592B6C388B0073793B /* PlainDetailsVC.swift in Sources */,
+				6333C8E12C6FDB5200CCA50A /* SecondaryText.swift in Sources */,
 				50A30E4F2B73DDC800722894 /* PlayerControlView.swift in Sources */,
 				509001B82716C8F400A8056D /* AppDelegateNotificationExtensions.swift in Sources */,
 				50A30E5C2B7556FB00722894 /* PopupPlayer+TableViewExtension.swift in Sources */,
@@ -2151,7 +2170,7 @@
 				50C9D70F2850759B007F18D0 /* BasicButton.swift in Sources */,
 				50BA930021CFDEBD00E5901D /* LibraryVC.swift in Sources */,
 				50BA92FA21CC37F800E5901D /* SongsVC.swift in Sources */,
-				500B7D4921EDD6250083ED6F /* ViewBuilder.swift in Sources */,
+				500B7D4921EDD6250083ED6F /* ViewCreator.swift in Sources */,
 				508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */,
 				50C9D7152850759B007F18D0 /* AnimatedGradientLayer.swift in Sources */,
 				5023D9B22BDAA48200310144 /* UpdateVC.swift in Sources */,
@@ -2170,6 +2189,7 @@
 				504262B42BF5FC3D00B5EF38 /* NSUserActivity+IntentData.swift in Sources */,
 				50C16C1021E5463E00F086F0 /* ArtistsVC.swift in Sources */,
 				50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */,
+				631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */,
 				50A30E542B7408DB00722894 /* ContextQueueNextSectionHeader.swift in Sources */,
 				50791E8528D36F1F006CE6E5 /* LibrarySettingsView.swift in Sources */,
 				50DE29ED2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift in Sources */,
@@ -2554,6 +2574,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -2612,6 +2633,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -2633,7 +2655,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.devdav.amperfy-music";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.schlaubi.amperfy-music";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -2662,7 +2684,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.devdav.amperfy-music";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.schlaubi.amperfy-music";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -2702,7 +2724,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
-				PRODUCT_BUNDLE_IDENTIFIER = "de.devdav.amperfy-music.AmperfyKit";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.schlaubi.amperfy-music.AmperfyKit";
 				PRODUCT_NAME = AmperfyKit;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -2745,7 +2767,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
-				PRODUCT_BUNDLE_IDENTIFIER = "de.devdav.amperfy-music.AmperfyKit";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.schlaubi.amperfy-music.AmperfyKit";
 				PRODUCT_NAME = AmperfyKit;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -2771,7 +2793,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.devdav.AmpertyKitTests;
+				PRODUCT_BUNDLE_IDENTIFIER = de.schlaubi.AmpertyKitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -2794,7 +2816,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.devdav.AmpertyKitTests;
+				PRODUCT_BUNDLE_IDENTIFIER = de.schlaubi.AmpertyKitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -2834,7 +2856,7 @@
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.devdav.amperfy-AppKitIntegration";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.schlaubi.amperfy-AppKitIntegration";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -2872,7 +2894,7 @@
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.devdav.amperfy-AppKitIntegration";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.schlaubi.amperfy-AppKitIntegration";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;

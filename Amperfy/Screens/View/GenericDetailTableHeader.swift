@@ -58,7 +58,7 @@ class GenericDetailTableHeader: UIView {
     
     public static func createTableHeader(configuration: DetailHeaderConfiguration) -> GenericDetailTableHeader? {
         configuration.rootView.tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: configuration.rootView.view.bounds.size.width, height: GenericDetailTableHeader.frameHeight(traitCollection: configuration.rootView.traitCollection)))
-        let genericDetailTableHeaderView = ViewBuilder<GenericDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: configuration.rootView.view.bounds.size.width, height: GenericDetailTableHeader.frameHeight(traitCollection: configuration.rootView.traitCollection)))!
+        let genericDetailTableHeaderView = ViewCreator<GenericDetailTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: configuration.rootView.view.bounds.size.width, height: GenericDetailTableHeader.frameHeight(traitCollection: configuration.rootView.traitCollection)))!
         genericDetailTableHeaderView.prepare(configuration: configuration)
         configuration.rootView.tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
         return genericDetailTableHeaderView
@@ -75,7 +75,7 @@ class GenericDetailTableHeader: UIView {
         infoLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         self.layoutMargins = UIView.defaultMarginTopElement
         if let playShuffleInfoConfig = self.config?.playShuffleInfoConfig {
-            playShuffleInfoView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib()
+            playShuffleInfoView = ViewCreator<LibraryElementDetailTableHeaderView>.createFromNib()
             playShuffleInfoPlaceholderStack.addArrangedSubview(playShuffleInfoView!)
             playShuffleInfoView?.prepare(configuration: playShuffleInfoConfig)
         }

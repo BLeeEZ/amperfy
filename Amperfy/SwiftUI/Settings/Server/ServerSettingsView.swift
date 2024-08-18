@@ -23,7 +23,8 @@ import SwiftUI
 import AmperfyKit
 
 struct ServerSettingsView: View {
-    
+    let kSplit = 0.25
+
     @State var isPwUpdateDialogVisible = false
     @State var isShowLogoutAlert = false
     
@@ -37,70 +38,59 @@ struct ServerSettingsView: View {
         self.appDelegate.quickActionsManager.configureQuickActions()
         self.appDelegate.restartByUser()
     }
-    
-    #if targetEnvironment(macCatalyst)
-    typealias Container = NavigationView
-    #else
-    typealias Container = ZStack
-    #endif
 
     var body: some View {
-        Container {
+        ZStack {
             List {
-                Section() {
-                    VStack(alignment: .leading) {
-                        Text("URL")
-                            .padding([.bottom], 2)
-                        Text(appDelegate.storage.loginCredentials?.serverUrl ?? "")
-                            .foregroundColor(.secondary)
+                SettingsSection {
+                    SettingsRow(title: "URL", orientation: .vertical, splitPercentage: kSplit) {
+                        SecondaryText(appDelegate.storage.loginCredentials?.serverUrl ?? "")
                     }
-                    VStack(alignment: .leading) {
-                        Text("Username")
-                            .padding([.bottom], 2)
-                        Text(appDelegate.storage.loginCredentials?.username ?? "")
-                            .foregroundColor(.secondary)
+                    SettingsRow(title: "Username", orientation: .vertical, splitPercentage: kSplit) {
+                        SecondaryText(appDelegate.storage.loginCredentials?.username ?? "")
                     }
                 }
 
-                Section() {
-                    HStack {
-                        Text("Backend API")
-                        Spacer()
+                SettingsSection {
+                    SettingsRow(title: "Backend API", splitPercentage: kSplit) {
                         Text(appDelegate.storage.loginCredentials?.backendApi.description ?? "")
                             .foregroundColor(.secondary)
+                            .help(appDelegate.storage.loginCredentials?.backendApi.description ?? "")
                     }
-                    HStack {
-                        Text("Server API Version")
-                        Spacer()
+
+                    SettingsRow(title: "Server API Version", splitPercentage: kSplit) {
                         Text(appDelegate.backendApi.serverApiVersion)
                             .foregroundColor(.secondary)
+                            .help(appDelegate.backendApi.serverApiVersion)
                     }
-                    HStack {
-                        Text("Client API Version")
-                        Spacer()
+                    SettingsRow(title: "Client API Version", splitPercentage: kSplit) {
                         Text(appDelegate.backendApi.clientApiVersion)
                             .foregroundColor(.secondary)
+                            .help(appDelegate.backendApi.clientApiVersion)
                     }
                 }
                 
-                Section() {
+                SettingsSection() {
+                    #if targetEnvironment(macCatalyst)
+                    SettingsRow(title: "Manage Server URLs", splitPercentage: kSplit) {
+                        ServerURLsSettingsView()
+                            .frame(width: 450, height: 150)
+                    }
+                    .frame(height: 150)
+                    .padding(.bottom, 10)
+                    #else
                     NavigationLink(destination: ServerURLsSettingsView()) {
                         Text("Manage Server URLs")
                     }
+                    #endif
                 }
                 
-                Section() {
-                    Button(action: {
+                SettingsSection {
+                    SettingsButtonRow(title: "Account", label: "Update Password") {
                         withPopupAnimation { isPwUpdateDialogVisible = true }
-                    }) {
-                        Text("Update Password")
                     }
-
-                    Button(action: {
+                    SettingsButtonRow(label: "Logout", actionType: .destructive) {
                         isShowLogoutAlert = true
-                    }) {
-                        Text("Logout")
-                            .foregroundColor(.red)
                     }
                     .alert(isPresented: $isShowLogoutAlert) {
                         Alert(title: Text("Logout"), message: Text("This action leads to a user logout. Login credentials of the current user are removed. Amperfy needs to restart to perform a logout. After a successful login a resync of the remote library is neccessary.\n\nDo you want to logout and restart Amperfy?"),
@@ -108,12 +98,10 @@ struct ServerSettingsView: View {
                             logout()
                         }, secondaryButton: .cancel())
                     }
+
                 }
             }
         }
-        #if targetEnvironment(macCatalyst)
-        .navigationViewStyle(.stack)
-        #endif
         .navigationTitle("Server")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPwUpdateDialogVisible) {
