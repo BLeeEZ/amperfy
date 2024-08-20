@@ -25,7 +25,7 @@ import AmperfyKit
 
 class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
     
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { "Downloads" }
 
     private var fetchedResultsController: DownloadsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
@@ -65,7 +65,12 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
         super.viewWillAppear(animated)
         fetchedResultsController.fetch()
     }
-    
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
         guard let indexPath = tableView.indexPath(for: cell) else { return nil }
         let downdload = fetchedResultsController.getWrappedEntity(at: indexPath)

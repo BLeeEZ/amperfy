@@ -35,7 +35,7 @@ class AlbumDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
 
 class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { album.name }
 
     var album: Album!
     var songToScrollTo: Song?
@@ -120,6 +120,11 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
         tableView.scrollToRow(at: indexPath, at: .top, animated: true)
     }
     
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
         guard let songs = self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
         else { return nil }

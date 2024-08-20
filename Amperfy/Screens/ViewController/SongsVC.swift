@@ -26,7 +26,10 @@ import PromiseKit
 
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? {
+        applyFilter()
+        return self.filterTitle
+    }
 
     private var fetchedResultsController: SongsFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
@@ -72,7 +75,12 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             completionHandler(SwipeActionContext(containable: song, playContext: playContext))
         }
     }
-    
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     func applyFilter() {
         switch displayFilter {
         case .all:

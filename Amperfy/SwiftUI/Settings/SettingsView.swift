@@ -22,57 +22,9 @@
 import SwiftUI
 import AmperfyKit
 
-// There is no way to hide the second navigationbar in catalyst
-// That is why we recreate a navigation view with a HStack
-
-enum NavigationTarget {
-    case displayAndInteraction
-    case server
-    case library
-    case player
-    case swipe
-    case artwork
-    case support
-    case license
-    case xcallback
-    case developer
-
-    func view() -> any View {
-        switch self {
-        case .displayAndInteraction: DisplaySettingsView()
-        case .server: ServerSettingsView()
-        case .library: LibrarySettingsView()
-        case .player: PlayerSettingsView()
-        case .swipe: SwipeSettingsView()
-        case .artwork: ArtworkSettingsView()
-        case .support: SupportSettingsView()
-        case .license: LicenseSettingsView()
-        case .xcallback: XCallbackURLsSetttingsView()
-        case .developer: DeveloperView()
-        }
-    }
-
-    var name: String {
-        switch self {
-        case .displayAndInteraction: "Display & Interaction"
-        case .server: "Server"
-        case .library: "Library"
-        case .player: "Player, Stream & Scrobble"
-        case .swipe: "Swipe"
-        case .artwork: "Artwork"
-        case .support: "Support"
-        case .license: "License"
-        case .xcallback: "X-Callback-URL Documentation"
-        case .developer: "Developer"
-        }
-    }
-}
-
 struct SettingsView: View {
 
     @EnvironmentObject private var settings: Settings
-
-    @State private var detailedItem: NavigationTarget = .displayAndInteraction
 
     func screenLockPreventionOffPressed() {
         settings.screenLockPreventionPreference = .never
@@ -93,66 +45,41 @@ struct SettingsView: View {
     }
 
     func navigationLink(_ item: NavigationTarget) -> some View {
-        #if targetEnvironment(macCatalyst)
-        HStack {
-            Text(item.name)
-            Spacer()
-            Image(systemName: "chevron.right")
-                .foregroundColor( detailedItem == item ? Color.white : nil )
-        }
-        .contentShape(Rectangle())
-        .onTapGesture { detailedItem = item }
-        .foregroundColor(detailedItem == item ? Color.white : nil)
-        .listRowBackground(detailedItem == item ? Color.accentColor : nil)
-        #else
         NavigationLink(destination: AnyView(item.view())) {
-            Text(item.name)
+            Text(item.displayName)
         }
-        #endif
     }
 
     var body: some View {
-        let list =
+        NavigationView {
             List {
-                Section() {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text(AppDelegate.version)
-                            .foregroundColor(.secondary)
+                SettingsSection {
+                    SettingsRow(title: "Version") {
+                        SecondaryText(AppDelegate.version)
                     }
-                    HStack {
-                        Text("Build Number")
-                        Spacer()
-                        Text(AppDelegate.buildNumber)
-                            .foregroundColor(.secondary)
+                    SettingsRow(title: "Build Number") {
+                        SecondaryText(AppDelegate.buildNumber)
                     }
                 }
 
-                Section(content: {
-                    HStack {
-                        Text("Offline Mode")
-                        Spacer()
-                        Toggle(isOn: $settings.isOfflineMode) {}
-                    }
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(label: "Offline Mode", isOn: $settings.isOfflineMode)
+                }, footer:
+                    "Songs, podcasts and artworks will not be downloaded when you are offline. Searches are restricted to device only. Playlists will not be synced with the server."
+                )
 
-                }, footer: {
-                    Text("Songs, podcasts and artworks will not be downloaded when you are offline. Searches are restricted to device only. Playlists will not be synced with the server.")
-                })
-
-                Section(content: {
-                    HStack {
-                        Text("Prevent Screen Lock")
-                        Spacer()
+                SettingsSection {
+                    SettingsRow(title: "Prevent Screen Lock") {
                         Menu(settings.screenLockPreventionPreference.description) {
                             Button(ScreenLockPreventionPreference.never.description, action: screenLockPreventionOffPressed)
                             Button(ScreenLockPreventionPreference.always.description, action: screenLockPreventionOnPressed)
                             Button(ScreenLockPreventionPreference.onlyIfCharging.description, action: screenLockPreventionChargingPressed)
                         }
                     }
-                })
+                }
 
-                Section() {
+                #if !targetEnvironment(macCatalyst)
+                SettingsSection {
                     navigationLink(.displayAndInteraction)
                     navigationLink(.server)
                     navigationLink(.library)
@@ -161,28 +88,21 @@ struct SettingsView: View {
                     navigationLink(.artwork)
                 }
 
-                Section() {
+                SettingsSection {
                     navigationLink(.support)
                     navigationLink(.license)
                     navigationLink(.xcallback)
 
-                    #if false
+                    #if DEBUG
                     navigationLink(.developer)
                     #endif
                 }
+                #endif
             }
-
-        #if targetEnvironment(macCatalyst)
-        HStack(spacing: 2.0) {
-            list
-            AnyView(detailedItem.view())
-        }
-        .background(Color.separator)
-        #else
-        NavigationView {
-            list.navigationTitle("Settings")
+            #if !targetEnvironment(macCatalyst)
+            .navigationTitle("Settings")
+            #endif
         }.navigationViewStyle(.stack)
-        #endif
     }
 }
 

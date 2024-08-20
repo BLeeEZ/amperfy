@@ -26,7 +26,7 @@ import PromiseKit
 
 class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { "Directories" }
 
     private var fetchedResultsController: MusicFolderFetchedResultsController!
     
@@ -53,7 +53,12 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
             self.appDelegate.eventLogger.report(topic: "Music Folders Sync", error: error)
         }
     }
-    
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
         let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)

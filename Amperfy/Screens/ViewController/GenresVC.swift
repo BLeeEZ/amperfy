@@ -26,7 +26,7 @@ import PromiseKit
 
 class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { "Genres" }
 
     private var fetchedResultsController: GenreFetchedResultsController!
     
@@ -66,6 +66,11 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
                 completionHandler(SwipeActionContext(containable: genre))
             }
         }
+    }
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

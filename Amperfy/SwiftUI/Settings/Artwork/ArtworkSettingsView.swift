@@ -41,27 +41,19 @@ struct ArtworkSettingsView: View {
                 self.cachedArtworksCountText = String(cachedArtworkCount)
         }.catch { error in }
     }
-    
+
     var body: some View {
         ZStack {
             List {
-                Section {
-                    HStack {
-                        Text("Not checked Artworks")
-                        Spacer()
-                        Text(artworkNotCheckedCountText)
-                            .foregroundColor(.secondary)
+                SettingsSection {
+                    SettingsRow(title: "Not checked Artworks") {
+                        SecondaryText(artworkNotCheckedCountText)
                     }
-                    HStack {
-                        Text("Cached Artworks")
-                        Spacer()
-                        Text(cachedArtworksCountText)
-                            .foregroundColor(.secondary)
+                    SettingsRow(title: "Cached Artworks") {
+                        SecondaryText(cachedArtworksCountText)
                     }
-                    Button(action: {
+                    SettingsButtonRow(label: "Download all artworks in library") {
                         isShowDownloadArtworksAlert = true
-                    }) {
-                        Text("Download all artworks in library")
                     }
                     .alert(isPresented: $isShowDownloadArtworksAlert) {
                         Alert(title: Text("Download all artworks in library"), message: Text("This action will add all uncached artworks to the download queue. With this action a lot network traffic can be generated and device storage capacity will be taken. Continue?"),
@@ -71,13 +63,22 @@ struct ArtworkSettingsView: View {
                         },secondaryButton: .cancel())
                     }
                 }
-                Section() {
+                SettingsSection() {
+                    #if targetEnvironment(macCatalyst)
+                    SettingsRow(title: "Artwork Download Settings") {
+                        ArtworkDownloadSettingsView()
+                    }
+                    SettingsRow(title: "Artwork Display Settings") {
+                        ArtworkDisplaySettings()
+                    }
+                    #else
                     NavigationLink(destination: ArtworkDownloadSettingsView()) {
                         Text("Artwork Download Settings")
                     }
                     NavigationLink(destination: ArtworkDisplaySettings()) {
                         Text("Artwork Display Settings")
                     }
+                    #endif
                 }
             }
         }

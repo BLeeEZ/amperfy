@@ -60,7 +60,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     
     public static func createTableHeader(rootView: BasicTableViewController, configuration: PlayShuffleInfoConfiguration) -> LibraryElementDetailTableHeaderView? {
         rootView.tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: rootView.view.bounds.size.width, height: Self.frameHeight))
-        let genericDetailTableHeaderView = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: rootView.view.bounds.size.width, height: Self.frameHeight))!
+        let genericDetailTableHeaderView = ViewCreator<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: rootView.view.bounds.size.width, height: Self.frameHeight))!
         genericDetailTableHeaderView.prepare(configuration: configuration)
         rootView.tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
         return genericDetailTableHeaderView

@@ -36,7 +36,7 @@ class CommonCollectionSectionHeader: UICollectionReusableView {
     }
     
     func displayPlayHeader(configuration: PlayShuffleInfoConfiguration) {
-        detailHeader = ViewBuilder<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
+        detailHeader = ViewCreator<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
         detailHeader?.prepare(configuration: configuration)
         detailHeader?.traitCollectionDidChange(nil)
         if let detailHeader = detailHeader {

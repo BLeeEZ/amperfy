@@ -24,37 +24,43 @@ import AmperfyKit
 import MessageUI
 
 struct SupportSettingsView: View {
-    
+    let splitPercentage = 0.15
+
     @State var result: Result<MFMailComposeResult, Error>? = nil
     @State var isShowingMailView = false
-    
+
     var body: some View {
-        ZStack{
+        ZStack {
             List {
-                Section() {
-                    
-                    Button(action: {
+                SettingsSection {
+                    SettingsButtonRow(title: "Contact", label: "Report an issue on GitHub", splitPercentage: splitPercentage) {
                         if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {
                             UIApplication.shared.open(url)
                         }
-                    }) {
-                        Text("Report an issue on GitHub")
                     }
-                    Button(action: {
+                    SettingsButtonRow(label: "Send issue or feedback to developer", splitPercentage: splitPercentage) {
                         if MFMailComposeViewController.canSendMail() {
                             self.isShowingMailView.toggle()
                         } else {
                             appDelegate.eventLogger.info(topic: "Email Info", statusCode: .emailError, message: "Email is not configured in settings app or Amperfy is not able to send an email.", displayPopup: true)
                         }
-                    }) {
-                        Text("Send issue or feedback to developer")
                     }
                 }
 
-                Section() {
+                SettingsSection() {
+                    #if targetEnvironment(macCatalyst)
+                    SettingsRow(title: "Event Log", splitPercentage: splitPercentage) {
+                        EventLogSettingsView()
+                            .background(Color.white)
+                            .frame(width: 500, height: 200)
+                            .padding(.top, 10)
+                    }
+                    .frame(height: 220)
+                    #else
                     NavigationLink(destination: EventLogSettingsView()) {
                         Text("Event Log")
                     }
+                    #endif
                 }
             }
             .sheet(isPresented: $isShowingMailView) {
@@ -71,6 +77,9 @@ struct SupportSettingsView: View {
                          attachments: [MailAttachment(data: LogData.collectInformation(amperfyData: AmperKit.shared).asJSONData(), mimeType: "application/json", fileName: "AmperfyLog.json")])
             }
         }
+        #if targetEnvironment(macCatalyst)
+        .navigationViewStyle(.stack)
+        #endif
         .navigationTitle("Support")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

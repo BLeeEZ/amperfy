@@ -27,6 +27,9 @@ import AmperfyKit
 import PromiseKit
 import Intents
 
+let windowSettingsTitle = "Settings"
+let settingsWindowActivityType = "amperfy.settings"
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
@@ -43,7 +46,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static let maxPlayablesDownloadsToAddAtOnceWithoutWarning = 200
     
     var window: UIWindow?
-    
+    var focusedWindowTitle: String?
+
     lazy var player: PlayerFacade = {
         UIApplication.shared.beginReceivingRemoteControlEvents()
         return AmperKit.shared.player
@@ -103,6 +107,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return QuickActionsHandler(storage: self.storage, player: self.player, application: UIApplication.shared, displaySearchTabCB: self.displaySearchTab)
     }()
     
+    var settingsSceneSession: UISceneSession?
+
     var sleepTimer: Timer?
     var autoActivateSearchTabSearchBar = false
 
@@ -223,6 +229,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             startManagerForNormalOperation()
         }
         userStatistics.sessionStarted()
+
+        #if targetEnvironment(macCatalyst)
+        AppDelegate.loadAppKitIntegrationFramework()
+        AppDelegate.installAppKitColorHooks()
+        
+        // update color of AppKit controls
+        AppDelegate.updateAppKitControlColor()
+
+        // whenever we change the window focus, we rebuild the menu
+        NotificationCenter.default.addObserver(forName: .init("NSWindowDidBecomeMainNotification"), object: nil, queue: nil) { [weak self] notification in
+            
+            self?.focusedWindowTitle = (notification.object as? AnyObject)?.value(forKey: "title") as? String
+            UIMenuSystem.main.setNeedsRebuild()
+        }
+        #endif
+
         return true
     }
     
@@ -288,6 +310,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             config.delegateClass = CarPlaySceneDelegate.self
             return config
         }
+
+        // Support setting window on macOS
+        #if targetEnvironment(macCatalyst)
+        if options.userActivities.filter({$0.activityType == settingsWindowActivityType}).first != nil {
+            let config =  UISceneConfiguration(name: "Settings", sessionRole: .windowApplication)
+            config.delegateClass = SettingsSceneDelegate.self
+            return config
+        }
+        #endif
+
         let config = UISceneConfiguration(name: "Default Configuration", sessionRole: .windowApplication)
         config.delegateClass = SceneDelegate.self
         return config
@@ -312,5 +344,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         return nil
     }
-    
+
+    #if targetEnvironment(macCatalyst)
+
+    override func buildMenu(with builder: any UIMenuBuilder) {
+        super.buildMenu(with: builder)
+
+        guard builder.system == .main else { return }
+
+        // Add a settings menu
+        let settingsMenu = UIMenu(options: .displayInline, children: [
+           UIKeyCommand(title: "Settings…", action: #selector(showSettings), input: ",", modifierFlags: .command)
+        ])
+        builder.insertSibling(settingsMenu, afterMenu: .about)
+        builder.remove(menu: .toolbar)
+
+        // Multi-window does not work, so remove it.
+        builder.remove(menu: .newScene)
+
+        if self.focusedWindowTitle == windowSettingsTitle {
+            // Do any settings specific menu setup here
+            builder.remove(menu: .view)
+        } else {
+            builder.remove(menu: .sidebar)
+        }
+    }
+
+    @objc func showSettings(sender: Any) {
+        let settingsActivity = NSUserActivity(activityType: settingsWindowActivityType)
+        UIApplication.shared.requestSceneSessionActivation(settingsSceneSession, userActivity: settingsActivity, options: nil, errorHandler: nil)
+    }
+    #endif
 }

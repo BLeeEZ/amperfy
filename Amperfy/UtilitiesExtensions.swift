@@ -105,6 +105,7 @@ extension Color {
 
 extension Image {
     static let plus = Image(systemName: "plus")
+    static let minus = Image(systemName: "minus")
     static let checkmark = Image(systemName: "checkmark")
 }
 
@@ -341,3 +342,33 @@ extension UIPickerView {
         return CGSize(width: UIView.noIntrinsicMetric , height: 150)
     }
 }
+
+
+#if targetEnvironment(macCatalyst)
+let toolbarSafeAreaTop: CGFloat = 52.0
+
+extension Notification.Name {
+    static let SearchChanged = Notification.Name("de.familie-zimba.Amperfy.SearchChanged")
+    static let RequestSearchUpdate = Notification.Name("de.familie-zimba.Amperfy.RequestSearchUpdate")
+}
+
+extension UIViewController {
+    func extendSafeAreaToAccountForTabbar() {
+        let currentInsetTop = self.view.window?.safeAreaInsets.top ?? toolbarSafeAreaTop
+        self.additionalSafeAreaInsets = UIEdgeInsets(top: currentInsetTop - toolbarSafeAreaTop, left: 0, bottom: 0, right: 0)
+    }
+
+    func shrinkSafeAreaToAccountForTabbar() {
+        let currentInsetTop = self.view.window?.safeAreaInsets.top ?? toolbarSafeAreaTop
+        self.additionalSafeAreaInsets = UIEdgeInsets(top:  toolbarSafeAreaTop - currentInsetTop, left: 0, bottom: 0, right: 0)
+    }
+}
+
+#else
+
+extension UIViewController {
+    func extendSafeAreaToAccountForTabbar() { }
+    func shrinkSafeAreaToAccountForTabbar() { }
+}
+
+#endif

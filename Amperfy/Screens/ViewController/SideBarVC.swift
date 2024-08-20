@@ -25,14 +25,17 @@ import AmperfyKit
 class SideBarVC: KeyCommandCollectionViewController {
 
     private var offsetData: [LibraryNavigatorItem] = {
+        #if targetEnvironment(macCatalyst)
+        return [LibraryNavigatorItem(title: "Search", tab: .search),
+                LibraryNavigatorItem(title: "Library", isInteractable: false)]
+        #else
         return [LibraryNavigatorItem(title: "Search", tab: .search),
                 LibraryNavigatorItem(title: "Settings", tab: .settings),
                 LibraryNavigatorItem(title: "Library", isInteractable: false)]
+        #endif
     }()
 
-    lazy var layoutConfig = {
-        return UICollectionLayoutListConfiguration(appearance: .sidebar)
-    }()
+    lazy var layoutConfig = UICollectionLayoutListConfiguration(appearance: .sidebar)
     lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(
         offsetData: offsetData,
         librarySettings: appDelegate.storage.settings.libraryDisplaySettings,
@@ -41,6 +44,7 @@ class SideBarVC: KeyCommandCollectionViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         self.clearsSelectionOnViewWillAppear = false
         libraryItemConfigurator.viewDidLoad(navigationItem: navigationItem, collectionView: collectionView)
     }

@@ -117,31 +117,23 @@ struct PlayerSettingsView: View {
     var body: some View {
         ZStack{
             List {
-                Section(content: {
-                    HStack {
-                        Text("Auto cache played Songs")
-                        Spacer()
-                        Toggle(isOn: $settings.isPlayerAutoCachePlayedItems) {
-                        }
-                    }
-                }, header: {
-                })
-                
-                Section(content: {
-                    HStack {
-                        Text("Scrobble streamed Songs")
-                        Spacer()
-                        Toggle(isOn: $settings.isScrobbleStreamedItems) {}
-                    }
+                SettingsSection {
+                    SettingsCheckBoxRow(label: "Auto cache played Songs", isOn: $settings.isPlayerAutoCachePlayedItems)
                 }
-                , footer: {
-                    Text("Some server count streamed Songs already as played. When enabled, all streamed Songs are consistently scrobbled.")
-                })
                 
-                Section(content: {
-                    HStack {
-                        Text("Max Bitrate for Streaming (WiFi)")
-                        Spacer()
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(label: "Scrobble streamed Songs", isOn: $settings.isScrobbleStreamedItems)
+                }, footer: "Some server count streamed Songs already as played. When enabled, all streamed Songs are consistently scrobbled."
+                )
+
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(label: "Start audio playback only on explicit press on Play", isOn: $settings.isPlaybackStartOnlyOnPlay)
+                }, footer:
+                    "When enabled, audio playback starts only when the Play button is actively pressed. Otherwise, audio playback starts automatically."
+                )
+
+                SettingsSection(content: {
+                    SettingsRow(title: "Max Bitrate for Streaming (WiFi)") {
                         Menu(settings.streamingMaxBitrateWifiPreference.description) {
                             Button(StreamingMaxBitratePreference.noLimit.description, action: streamingMaxBitrateWifiNoLimit)
                             Button(StreamingMaxBitratePreference.limit32.description, action: streamingMaxBitrateWifi32)
@@ -153,15 +145,12 @@ struct PlayerSettingsView: View {
                             Button(StreamingMaxBitratePreference.limit320.description, action: streamingMaxBitrateWifi320)
                         }
                     }
-                }
-                , footer: {
-                    Text("Lower bitrate saves bandwidth. This takes only affect when streaming and connected via WiFi.")
-                })
-                
-                Section(content: {
-                    HStack {
-                        Text("Max Bitrate for Streaming (Cellular)")
-                        Spacer()
+                }, footer:
+                    "Lower bitrate saves bandwidth. This takes only affect when streaming and connected via WiFi."
+                )
+
+                SettingsSection(content: {
+                    SettingsRow(title: "Max Bitrate for Streaming (Cellular)") {
                         Menu(settings.streamingMaxBitrateCellularPreference.description) {
                             Button(StreamingMaxBitratePreference.noLimit.description, action: streamingMaxBitrateCellularNoLimit)
                             Button(StreamingMaxBitratePreference.limit32.description, action: streamingMaxBitrateCellular32)
@@ -173,49 +162,31 @@ struct PlayerSettingsView: View {
                             Button(StreamingMaxBitratePreference.limit320.description, action: streamingMaxBitrateCellular320)
                         }
                     }
-                }
-                , footer: {
-                    Text("Lower bitrate saves bandwidth. This takes only affect when streaming and connected via Cellular.")
-                })
+                }, footer:
+                    "Lower bitrate saves bandwidth. This takes only affect when streaming and connected via Cellular."
+                )
                 
-                Section(content: {
-                    HStack {
-                        Text("Streaming Format (Transcoding)")
-                        Spacer()
+                SettingsSection(content: {
+                    SettingsRow(title: "Streaming Format (Transcoding)") {
                         Menu(settings.streamingFormatPreference.description) {
                             Button(StreamingFormatPreference.mp3.description, action: streamingFormatMp3)
                             Button(StreamingFormatPreference.raw.description, action: streamingFormatRaw)
                         }
                     }
-                }
-                , footer: {
-                    Text("Transcoding is recommended due to incompatibility with some formats. This takes only affect when streaming.")
-                })
+                }, footer:
+                    "Transcoding is recommended due to incompatibility with some formats. This takes only affect when streaming."
+                )
                 
-                Section(content: {
-                    HStack {
-                        Text("Cache Format (Transcoding)")
-                        Spacer()
+                SettingsSection(content: {
+                    SettingsRow(title: "Cache Format (Transcoding)") {
                         Menu(settings.cacheTranscodingFormatPreference.description) {
                             Button(CacheTranscodingFormatPreference.mp3.description, action: cacheFormatMp3)
                             Button(CacheTranscodingFormatPreference.raw.description, action: cacheFormatRaw)
                         }
                     }
-                }
-                , footer: {
-                    Text("Transcoding is recommended due to incompatibility with some formats. Changes will not effect already downloaded songs, if this is wanted: Clear cache and redownload. \(((appDelegate.storage.loginCredentials?.backendApi ?? .ampache) == .ampache) ? "" : "\nIf cache format 'raw' is selected Amperfy will use the Subsonic API action 'download' for caching. Every other option requires Amperfy to use the Subsonic API action 'stream' for caching. Only 'stream' allows server side transcoding. Please check for correct server configuration regarding the active API action.")")
-                })
-                
-                Section(content: {
-                    HStack {
-                        Text("Start audio playback only on explicit press on Play")
-                        Spacer()
-                        Toggle(isOn: $settings.isPlaybackStartOnlyOnPlay) {}
-                    }
-                }
-                , footer: {
-                    Text("When enabled, audio playback starts only when the Play button is actively pressed. Otherwise, audio playback starts automatically.")
-                })
+                }, footer:
+                    "Transcoding is recommended due to incompatibility with some formats. Changes will not effect already downloaded songs, if this is wanted: Clear cache and redownload. \(((appDelegate.storage.loginCredentials?.backendApi ?? .ampache) == .ampache) ? "" : "\nIf cache format 'raw' is selected Amperfy will use the Subsonic API action 'download' for caching. Every other option requires Amperfy to use the Subsonic API action 'stream' for caching. Only 'stream' allows server side transcoding. Please check for correct server configuration regarding the active API action.")"
+                )
             }
         }
         .navigationTitle("Player, Stream & Scrobble")

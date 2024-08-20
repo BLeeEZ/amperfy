@@ -91,116 +91,56 @@ struct LibrarySettingsView: View {
     var body: some View {
         ZStack{
             List {
-                Section(content: {
-                    HStack {
-                        Text("Playlists")
-                        Spacer()
-                        Text(playlistCount.description)
-                            .foregroundColor(.secondary)
+                SettingsSection(content: {
+                    SettingsRow(title: "Playlists") {
+                        SecondaryText(playlistCount.description)
                     }
-                    HStack {
-                        Text("Artists")
-                        Spacer()
-                        Text(artistCount.description)
-                            .foregroundColor(.secondary)
+                    SettingsRow(title: "Artists") {
+                        SecondaryText(artistCount.description)
                     }
-                    HStack {
-                        Text("Albums")
-                        Spacer()
-                        Text(albumCount.description)
-                            .foregroundColor(.secondary)
+                    SettingsRow(title: "Albums") {
+                        SecondaryText(albumCount.description)
                     }
-                    HStack {
-                        Text("Songs")
-                        Spacer()
-                        Text(songCount.description)
-                            .foregroundColor(.secondary)
+                    SettingsRow(title: "Songs") {
+                        SecondaryText(songCount.description)
                     }
-                    HStack {
-                        Text("Podcasts")
-                        Spacer()
-                        Text(podcastCount.description)
-                            .foregroundColor(.secondary)
+                    SettingsRow(title: "Podcasts") {
+                        SecondaryText(podcastCount.description)
                     }
-                    HStack {
-                        Text("Podcast Episodes")
-                        Spacer()
-                        Text(podcastEpisodeCount.description)
-                            .foregroundColor(.secondary)
+                    SettingsRow(title: "Podcast Episodes") {
+                        SecondaryText(podcastEpisodeCount.description)
                     }
-                }, header: {
                 })
 
-                Section(content: {
-                    HStack {
-                        Text("Progress")
-                        Spacer()
-                        Text(autoSyncProgressText)
-                            .foregroundColor(.secondary)
-                    }
-                }, header: {
-                    Text("Background song sync")
-                })
-                
-                Section(content: {
-                    HStack {
-                        Text("Newest Songs")
-                        Spacer()
-                        Toggle(isOn: $settings.isAutoCacheLatestSongs) {
-                        }
-                    }
-                    HStack {
-                        Text("Newest Podcast Episodes")
-                        Spacer()
-                        Toggle(isOn: $settings.isAutoCacheLatestPodcastEpisodes) {
-                        }
-                    }
-                }, header: {
-                    Text("Auto Cache")
-                })
-                
-                Section(content: {
-                    HStack {
-                        Text("Cached Songs")
-                        Spacer()
-                        Text(cachedSongCount.description)
-                            .foregroundColor(.secondary)
-                    }
-                    HStack {
-                        Text("Cached Podcast Episodes")
-                        Spacer()
-                        Text(cachedPodcastEpisodesCount.description)
-                            .foregroundColor(.secondary)
-                    }
-                    HStack {
-                        Text("Complete Cache Size")
-                        Spacer()
-                        Text(completeCacheSize.description)
-                            .foregroundColor(.secondary)
-                    }
 
-                    #if targetEnvironment(macCatalyst)
-                    HStack {
-                        Text("Cache Size Limit")
-                        Spacer()
-                        Stepper {
-                            Text(cacheSelection[0])
-                        } onIncrement: {
-                            let cacheSize = (Int(cacheSelection[0]) ?? 0) + 1
-                            cacheSelection[0] = String(cacheSize)
-                        } onDecrement: {
-                            let cacheSize = max((Int(cacheSelection[0]) ?? 0) - 1, 0)
-                            cacheSelection[0] = String(cacheSize)
-                        }.frame(width: 50)
-                        Menu(cacheSelection[1]) {
-                            Button("MB", action: { 
-                                cacheSelection[1] = " MB" }
-                            )
-                            Button("GB", action: { 
-                                cacheSelection[1] = " GB" }
-                            )
-                        }.frame(width: 50)
-                    }.onChange(of: cacheSelection, perform: { cacheString in
+                #if targetEnvironment(macCatalyst)
+                let progressTitle = "Background song sync progress"
+                #else
+                let progressTitle = "Progress"
+                #endif
+
+                SettingsSection(content: {
+                    SettingsRow(title: progressTitle) {
+                        SecondaryText(autoSyncProgressText)
+                    }
+                }, header: "Background song sync")
+
+
+                SettingsSection(content: {
+                    SettingsCheckBoxRow(
+                        title: "Auto Cache",
+                        label: "Newest Songs",
+                        isOn: $settings.isAutoCacheLatestSongs
+                    )
+                    SettingsCheckBoxRow(
+                        label: "Newest Podcast Episodes",
+                        isOn: $settings.isAutoCacheLatestPodcastEpisodes
+                    )
+                }, header: "Auto Cache")
+                
+
+                SettingsSection(content: {
+                    let changeHandler: ([String]) -> () = { cacheString in
                         if cacheString[1] == "" {
                             settings.cacheSizeLimit = 0
                             cacheSelection = ["0"," MB"]
@@ -208,78 +148,78 @@ struct LibrarySettingsView: View {
                         if let cacheInByte = (cacheString[0] + cacheString[1]).asByteCount {
                             settings.cacheSizeLimit = cacheInByte
                         }
-                    })
+                    }
+
+                    #if targetEnvironment(macCatalyst)
+                    SettingsRow(title: "Cache") { SecondaryText("\(cachedSongCount.description) - Songs") }
+                    SettingsRow() { SecondaryText("\(cachedPodcastEpisodesCount.description) - Podcast Episodes") }
+                    SettingsRow() { SecondaryText("\(completeCacheSize.description) - Cache Size") }
+                    SettingsRow(title: "Cache Size Limit") {
+                        MultiPickerView(data: [("Size", byteValues),(" Bytes",[" MB"," GB"])], selection: $cacheSelection)
+                            .frame(width: 250, height: 25)
+                            .alignmentGuide(.top, computeValue: { _ in 0 })
+                    }
+                    .frame(height: 25)
+                    .onChange(of: cacheSelection, perform: changeHandler)
+                    .padding(.bottom, 10)
                     #else
+                    SettingsRow(title: "Cached Songs") { SecondaryText(cachedSongCount.description) }
+                    SettingsRow(title: "Cached Podcast Episodes") { SecondaryText(cachedPodcastEpisodesCount.description) }
+                    SettingsRow(title: "Complete Cache Size") { SecondaryText(completeCacheSize.description) }
+
                     NavigationLink {
                         MultiPickerView(data: [("Size", byteValues),(" Bytes",[" MB"," GB"])], selection: $cacheSelection)
                         .navigationTitle("Cache Size Limit")
                     } label: {
-                        HStack {
-                            Text("Cache Size Limit")
-                            Spacer()
-                            Text(cacheSizeLimit.description)
-                                .foregroundColor(.secondary)
+                        SettingsRow(title: "Cache Size Limit") {
+                            SecondaryText(cacheSizeLimit.description)
                         }
                     }
-                    .onChange(of: cacheSelection, perform: { cacheString in
-                        if cacheString[1] == "" {
-                            settings.cacheSizeLimit = 0
-                            cacheSelection = ["0"," MB"]
-                        }
-                        if let cacheInByte = (cacheString[0] + cacheString[1]).asByteCount {
-                            settings.cacheSizeLimit = cacheInByte
-                        }
-                    })
+                    .onChange(of: cacheSelection, perform: changeHandler)
                     #endif
 
-                    
-                    Button(action: {
+
+                    SettingsButtonRow(title: "Downloads", label: "Download all songs in library") {
                         isShowDownloadSongsAlert = true
-                    }) {
-                        Text("Download all songs in library")
                     }
                     .alert(isPresented: $isShowDownloadSongsAlert) {
                         Alert(title: Text("Download all songs in library"), message: Text("This action will add all uncached songs in \"Library -> Songs\" to the download queue. High network traffic can be generated and device storage capacity will be taken. Continue?"),
                         primaryButton: .default(Text("OK")) {
                             let allSongsToDownload = self.appDelegate.storage.main.library.getSongsForCompleteLibraryDownload()
                             self.appDelegate.playableDownloadManager.download(objects: allSongsToDownload)
-                        },secondaryButton: .cancel())
+                        }, secondaryButton: .cancel())
                     }
-                    
-                    Button(action: {
-                        isShowDeleteCacheAlert = true
-                    }) {
-                        Text("Delete downloaded Songs and Podcast Episodes")
-                            .foregroundColor(.red)
+
+                    SettingsButtonRow(label: "Delete downloaded Songs and Podcast Episodes", actionType: .destructive) {
+                            isShowDeleteCacheAlert = true
+                    }.alert(isPresented: $isShowDeleteCacheAlert) {
+                        Alert(
+                            title: Text("Delete Cache"),
+                            message: Text("Are you sure to delete all downloaded Songs and Podcast Episodes?"),
+                            primaryButton: .destructive(Text("Delete"))
+                            {
+                                self.appDelegate.player.stop()
+                                self.appDelegate.playableDownloadManager.stop()
+                                self.appDelegate.storage.main.library.deletePlayableCachePaths()
+                                self.appDelegate.storage.main.library.saveContext()
+                                self.fileManager.deletePlayableCache()
+                                self.appDelegate.playableDownloadManager.start()
+                            }, secondaryButton: .cancel()
+                        )
                     }
-                    .alert(isPresented: $isShowDeleteCacheAlert) {
-                        Alert(title: Text("Delete Cache"), message: Text("Are you sure to delete all downloaded Songs and Podcast Episodes?"),
-                        primaryButton: .destructive(Text("Delete")) {
-                            self.appDelegate.player.stop()
-                            self.appDelegate.playableDownloadManager.stop()
-                            self.appDelegate.storage.main.library.deletePlayableCachePaths()
-                            self.appDelegate.storage.main.library.saveContext()
-                            self.fileManager.deletePlayableCache()
-                            self.appDelegate.playableDownloadManager.start()
-                        },secondaryButton: .cancel())
-                    }
-                }, header: {
-                    Text("Cache")
-                })
+                }, header: "Cache")
+
                 
-                Section() {
-                    Button(action: {
+                SettingsSection() {
+                    SettingsButtonRow(title: "Sync", label: "Resync Library") {
                         isShowResyncLibraryAlert = true
-                    }) {
-                        Text("Resync Library")
-                            .foregroundColor(.red)
-                    }
-                    .alert(isPresented: $isShowResyncLibraryAlert) {
+                    }.alert(isPresented: $isShowResyncLibraryAlert) {
                         Alert(title: Text("Resync Library"), message: Text("This action resets your local library and starts the sync process from remote. Amperfy needs to restart to perform a resync.\n\nDo you want to resync your library and restart Amperfy?"),
                         primaryButton: .destructive(Text("Resync")) {
                             resyncLibrary()
-                        },secondaryButton: .cancel())
+                        }, secondaryButton: .cancel())
                     }
+
                 }
             }
         }

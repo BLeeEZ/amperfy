@@ -615,7 +615,7 @@ class EntityPreviewActionBuilder {
 
 class EntityPreviewVC: UIViewController {
     
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { entityContainer?.name }
 
     static let margin = UIEdgeInsets(top: UIView.defaultMarginX, left: UIView.defaultMarginX, bottom: UIView.defaultMarginX, right: UIView.defaultMarginX)
     
@@ -654,6 +654,11 @@ class EntityPreviewVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         refresh()
+    }
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
     }
 
     func display(container: PlayableContainable, on rootView: UIViewController) {

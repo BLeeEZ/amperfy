@@ -146,7 +146,10 @@ class AlbumsCollectionDiffableDataSource: BasicUICollectionViewDiffableDataSourc
 
 class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<AlbumMO> {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { 
+        common.applyFilter()
+        return common.filterTitle
+    }
 
     fileprivate var common = AlbumsCommonVCInteractions()
 
@@ -224,6 +227,11 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
         super.viewWillAppear(animated)
         common.updateRightBarButtonItems()
         common.updateFromRemote()
+    }
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
     }
 
     func createCell(_ collectionView: UICollectionView, forItemAt indexPath: IndexPath, album: Album) -> UICollectionViewCell {

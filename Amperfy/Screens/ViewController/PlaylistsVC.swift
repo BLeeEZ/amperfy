@@ -26,7 +26,7 @@ import PromiseKit
 
 class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
-    override var sceneTitle: String? { "Library" }
+    override var sceneTitle: String? { "Playlists" }
 
     private var fetchedResultsController: PlaylistFetchedResultsController!
     private var optionsButton: UIBarButtonItem!
@@ -101,7 +101,12 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
             self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
         }
     }
-    
+
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+
     func updateRightBarButtonItems() {
         var barButtons = [UIBarButtonItem]()
         optionsButton.menu = createSortButtonMenu()

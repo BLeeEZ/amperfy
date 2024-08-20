@@ -40,7 +40,13 @@ struct MultiPickerView: View {
                                 .tag(self.data[column].1[row])
                         }
                     }
-                    .pickerStyle(WheelPickerStyle())
+                    // Hack to get the picker to reload its data. Otherwise the picker is not updated with .menu style.
+                    .id(self.data[column].1.firstIndex(where: { entry in self.selection[column] == entry }))
+                    #if targetEnvironment(macCatalyst)
+                    .pickerStyle(.menu)
+                    #else
+                    .pickerStyle(.wheel)
+                    #endif
                     .frame(width: geometry.size.width / CGFloat(self.data.count), height: geometry.size.height)
                     .clipped()
                     Spacer()
