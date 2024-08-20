@@ -72,7 +72,6 @@
                                         </variation>
                                     </label>
                                 </subviews>
-                                <variation key="userInterfaceIdiom=mac" alignment="center" axis="horizontal" distribution="fillEqually" spacing="8"/>
                                 <variation key="widthClass=regular" alignment="center" axis="horizontal" distribution="fillEqually" spacing="8"/>
                             </stackView>
                         </subviews>
@@ -203,10 +202,10 @@
         <image name="arrow.down.circle" catalog="system" width="128" height="123"/>
         <image name="suit.heart.fill" catalog="system" width="128" height="107"/>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
