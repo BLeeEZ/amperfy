@@ -69,7 +69,7 @@ extension AppDelegate: AlertDisplayable {
      
         #if targetEnvironment(macCatalyst)
         banner.bannerHeight = 120
-        let topViewInset = UIEdgeInsets(top: 24, left: topView.view.frame.width - 300, bottom: 24, right: 24)
+        let topViewInset = UIEdgeInsets(top: 40, left: topView.view.frame.width - 400, bottom: 24, right: 24)
         banner.show(queuePosition: QueuePosition.back, bannerPosition: BannerPosition.top, on: topView, edgeInsets: topViewInset, cornerRadius: 10, shadowOpacity: 0.5, shadowBlurRadius: 5)
         #else
         banner.show(queuePosition: QueuePosition.back, bannerPosition: BannerPosition.top, on: topView, cornerRadius: 15, shadowBlurRadius: 10)

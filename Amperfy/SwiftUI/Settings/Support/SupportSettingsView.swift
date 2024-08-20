@@ -24,7 +24,7 @@ import AmperfyKit
 import MessageUI
 
 struct SupportSettingsView: View {
-    let kSplit = 0.15
+    let splitPercentage = 0.15
 
     @State var result: Result<MFMailComposeResult, Error>? = nil
     @State var isShowingMailView = false
@@ -33,12 +33,12 @@ struct SupportSettingsView: View {
         ZStack {
             List {
                 SettingsSection {
-                    SettingsButtonRow(title: "Contact", label: "Report an issue on GitHub", splitPercentage: kSplit) {
+                    SettingsButtonRow(title: "Contact", label: "Report an issue on GitHub", splitPercentage: splitPercentage) {
                         if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {
                             UIApplication.shared.open(url)
                         }
                     }
-                    SettingsButtonRow(label: "Send issue or feedback to developer", splitPercentage: kSplit) {
+                    SettingsButtonRow(label: "Send issue or feedback to developer", splitPercentage: splitPercentage) {
                         if MFMailComposeViewController.canSendMail() {
                             self.isShowingMailView.toggle()
                         } else {
@@ -49,7 +49,7 @@ struct SupportSettingsView: View {
 
                 SettingsSection() {
                     #if targetEnvironment(macCatalyst)
-                    SettingsRow(title: "Event Log", splitPercentage: kSplit) {
+                    SettingsRow(title: "Event Log", splitPercentage: splitPercentage) {
                         EventLogSettingsView()
                             .background(Color.white)
                             .frame(width: 500, height: 200)

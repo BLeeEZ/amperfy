@@ -22,7 +22,6 @@
 import UIKit
 import OSLog
 import AmperfyKit
-import SwiftUI
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     

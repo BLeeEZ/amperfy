@@ -2,8 +2,8 @@
 //  SettingsSceneDelegate.swift
 //  Amperfy
 //
-//  Created by David Klopp on 14.08.22.
-//  Copyright (c) 2022 Maximilian Bauer. All rights reserved.
+//  Created by David Klopp on 14.08.24.
+//  Copyright (c) 2024 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
 
-        windowScene.title = kWindowSettingsTitle
+        windowScene.title = windowSettingsTitle
 
         if let titleBar = windowScene.titlebar {
             let toolbar = NSToolbar(identifier: "Settings")

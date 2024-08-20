@@ -23,7 +23,7 @@ import SwiftUI
 import AmperfyKit
 
 struct ServerSettingsView: View {
-    let kSplit = 0.25
+    let splitPercentage = 0.25
 
     @State var isPwUpdateDialogVisible = false
     @State var isShowLogoutAlert = false
@@ -43,27 +43,27 @@ struct ServerSettingsView: View {
         ZStack {
             List {
                 SettingsSection {
-                    SettingsRow(title: "URL", orientation: .vertical, splitPercentage: kSplit) {
+                    SettingsRow(title: "URL", orientation: .vertical, splitPercentage: splitPercentage) {
                         SecondaryText(appDelegate.storage.loginCredentials?.serverUrl ?? "")
                     }
-                    SettingsRow(title: "Username", orientation: .vertical, splitPercentage: kSplit) {
+                    SettingsRow(title: "Username", orientation: .vertical, splitPercentage: splitPercentage) {
                         SecondaryText(appDelegate.storage.loginCredentials?.username ?? "")
                     }
                 }
 
                 SettingsSection {
-                    SettingsRow(title: "Backend API", splitPercentage: kSplit) {
+                    SettingsRow(title: "Backend API", splitPercentage: splitPercentage) {
                         Text(appDelegate.storage.loginCredentials?.backendApi.description ?? "")
                             .foregroundColor(.secondary)
                             .help(appDelegate.storage.loginCredentials?.backendApi.description ?? "")
                     }
 
-                    SettingsRow(title: "Server API Version", splitPercentage: kSplit) {
+                    SettingsRow(title: "Server API Version", splitPercentage: splitPercentage) {
                         Text(appDelegate.backendApi.serverApiVersion)
                             .foregroundColor(.secondary)
                             .help(appDelegate.backendApi.serverApiVersion)
                     }
-                    SettingsRow(title: "Client API Version", splitPercentage: kSplit) {
+                    SettingsRow(title: "Client API Version", splitPercentage: splitPercentage) {
                         Text(appDelegate.backendApi.clientApiVersion)
                             .foregroundColor(.secondary)
                             .help(appDelegate.backendApi.clientApiVersion)
@@ -72,7 +72,7 @@ struct ServerSettingsView: View {
                 
                 SettingsSection() {
                     #if targetEnvironment(macCatalyst)
-                    SettingsRow(title: "Manage Server URLs", splitPercentage: kSplit) {
+                    SettingsRow(title: "Manage Server URLs", splitPercentage: splitPercentage) {
                         ServerURLsSettingsView()
                             .frame(width: 450, height: 150)
                     }

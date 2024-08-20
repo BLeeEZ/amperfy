@@ -22,7 +22,6 @@
 import UIKit
 import AmperfyKit
 
-
 class SideBarVC: KeyCommandCollectionViewController {
 
     private var offsetData: [LibraryNavigatorItem] = {

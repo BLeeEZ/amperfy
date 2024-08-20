@@ -27,8 +27,8 @@ import AmperfyKit
 import PromiseKit
 import Intents
 
-let kWindowSettingsTitle = "Settings"
-let kSettingsWindowActivityType = "amperfy.settings"
+let windowSettingsTitle = "Settings"
+let settingsWindowActivityType = "amperfy.settings"
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -313,7 +313,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Support setting window on macOS
         #if targetEnvironment(macCatalyst)
-        if options.userActivities.filter({$0.activityType == kSettingsWindowActivityType}).first != nil {
+        if options.userActivities.filter({$0.activityType == settingsWindowActivityType}).first != nil {
             let config =  UISceneConfiguration(name: "Settings", sessionRole: .windowApplication)
             config.delegateClass = SettingsSceneDelegate.self
             return config
@@ -362,7 +362,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Multi-window does not work, so remove it.
         builder.remove(menu: .newScene)
 
-        if self.focusedWindowTitle == kWindowSettingsTitle {
+        if self.focusedWindowTitle == windowSettingsTitle {
             // Do any settings specific menu setup here
             builder.remove(menu: .view)
         } else {
@@ -371,7 +371,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     @objc func showSettings(sender: Any) {
-        let settingsActivity = NSUserActivity(activityType: kSettingsWindowActivityType)
+        let settingsActivity = NSUserActivity(activityType: settingsWindowActivityType)
         UIApplication.shared.requestSceneSessionActivation(settingsSceneSession, userActivity: settingsActivity, options: nil, errorHandler: nil)
     }
     #endif

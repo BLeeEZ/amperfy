@@ -1,9 +1,9 @@
 //
-//  SettingsView.swift
+//  NavigationTarget.swift
 //  Amperfy
 //
 //  Created by David Klopp on 15.08.24.
-//  Copyright (c) 2022 Maximilian Bauer. All rights reserved.
+//  Copyright (c) 2024 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
