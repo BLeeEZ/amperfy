@@ -109,14 +109,12 @@ class SearchVC: BasicTableViewController {
         searchHistory = appDelegate.storage.main.library.getSearchHistory()
         updateDataSource(animated: false)
         
-        configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 0
-
 
         containableAtIndexPathCallback = { (indexPath) in
             switch SearchSection(rawValue: indexPath.section) {
@@ -186,6 +184,10 @@ class SearchVC: BasicTableViewController {
         super.viewIsAppearing(animated)
     }
     #endif
+    
+    override func viewDidAppear(_ animated: Bool) {
+        configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
+    }
 
     public func activateSearchBar() {
         if self.isViewLoaded {
