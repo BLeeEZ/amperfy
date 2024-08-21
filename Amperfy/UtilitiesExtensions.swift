@@ -366,7 +366,7 @@ extension UIViewController {
     func addPlayerControls() {
         let player = appDelegate.player
         self.navigationItem.leftBarButtonItems = [
-            FlexibleSpaceBarItem(),
+            FlexibleSpaceBarItem(maxSpace: 20),
             PreviousBarButton(player: player),
             PlayBarButton(player: player),
             NextBarButton(player: player),

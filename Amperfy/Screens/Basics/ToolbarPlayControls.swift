@@ -329,7 +329,6 @@ extension NowPlayingInfoView: MusicPlayable {
             if !self.timeSlider.isTracking {
                 self.timeSlider.value = Float(player.elapsedTime)
             }
-            let progress = Float(player.elapsedTime / player.duration)
         } else {
             self.timeSlider.minimumValue = 0.0
             self.timeSlider.maximumValue = 1.0
@@ -410,10 +409,7 @@ class NowPlayingBarItem: UIBarButtonItem {
 
 // Hack: built-in flexible space navigation bar item is not working, so we use this workaround
 class FlexibleSpaceBarItem: UIBarButtonItem {
-    let MaxSpace: CGFloat = 1000
-    let MinSpace: CGFloat = 10
-
-    override init() {
+    init(minSpace: CGFloat = 0, maxSpace: CGFloat = 1000) {
         super.init()
 
         let clearView = UIView(frame: .zero)
@@ -421,8 +417,8 @@ class FlexibleSpaceBarItem: UIBarButtonItem {
 
         clearView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            clearView.widthAnchor.constraint(lessThanOrEqualToConstant: MaxSpace),
-            clearView.widthAnchor.constraint(greaterThanOrEqualToConstant: MinSpace),
+            clearView.widthAnchor.constraint(lessThanOrEqualToConstant: maxSpace),
+            clearView.widthAnchor.constraint(greaterThanOrEqualToConstant: minSpace),
             // This allows us to still grab and move the window when clicking the empty space
             clearView.heightAnchor.constraint(equalToConstant: 0)
         ])
