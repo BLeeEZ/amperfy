@@ -24,7 +24,7 @@ import UIKit
 class PlaytimeSlider: UISlider {
     
     private var thumbTouchSize = CGSize(width: 50, height: 30)
-    
+
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.preferredBehavioralStyle = .pad

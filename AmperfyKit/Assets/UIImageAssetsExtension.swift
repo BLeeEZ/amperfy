@@ -118,8 +118,6 @@ extension UIImage {
     public static let sleep = UIImage.create(systemName: "moon.zzz")
     public static let sleepFill = UIImage.create(systemName: "moon.zzz.fill")
     public static let cache = download
-    public static let forward = UIImage.create(systemName: "forward.filled")
-    public static let backward = UIImage.create(systemName: "backward.filled")
     public static let skipForward30 = UIImage.create(systemName: "goforward.30")
     public static let skipBackward15 = UIImage.create(systemName: "gobackward.15")
     public static let repeatAll = UIImage.create(systemName: "repeat")
@@ -136,6 +134,15 @@ extension UIImage {
     public static let exclamation = UIImage.create(systemName: "exclamationmark")
     public static let bell = UIImage.create(systemName: "bell.fill")
     public static let resize = UIImage.create(systemName: "arrow.down.left.and.arrow.up.right")
+    public static let display = UIImage.create(systemName: "display")
+    public static let server = UIImage.create(systemName: "server.rack")
+    public static let playCircle = UIImage.create(systemName: "play.circle.fill")
+    public static let arrowRight = UIImage.create(systemName: "arrow.right.circle.fill")
+    public static let photo = UIImage.create(systemName: "photo.fill")
+    public static let person = UIImage.create(systemName: "person.circle")
+    public static let doc = UIImage.create(systemName: "doc.fill")
+    public static let arrowTurnUp = UIImage.create(systemName: "arrowshape.turn.up.backward.circle.fill")
+    public static let hammer = UIImage.create(systemName: "hammer.circle.fill")
 
 /// Asset symbol generation is enabled by default for both new and old projects but can be disabled by setting the build setting "Generate Asset Symbols" (ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS) to NO.
 #if false
@@ -345,7 +352,7 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
-    
+
     public static func numberToImage(number: Int) -> UIImage {
         let fontSize = 40.0
         let textFont = UIFont(name: "Helvetica Bold", size: fontSize)!
@@ -372,5 +379,11 @@ extension UIImage {
         UIGraphicsEndImageContext()
 
         return newImage!
+    }
+
+    public func styleForNavigationBar(pointSize: CGFloat = 22) -> UIImage {
+        let navBarSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: pointSize)
+        let img = self.applyingSymbolConfiguration(navBarSymbolConfiguration) ?? UIImage()
+        return img.withTintColor(.secondaryLabel)
     }
 }

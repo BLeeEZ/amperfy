@@ -521,21 +521,44 @@ extension UIAlertAction {
 }
 
 extension UISlider {
-    public func setUnicolorThumbImage(thumbSize: CGFloat, color: UIColor, for state: UIControl.State){
-        let thumbImage = createThumbImage(size: thumbSize, color: color)
+    public func setUnicolorThumbImage(thumbSize: CGFloat, color: UIColor, for state: UIControl.State) {
+        let layerFrame = CGRect(x: 0, y: 0, width: thumbSize, height: thumbSize)
+        let path = CGPath(ellipseIn: layerFrame.insetBy(dx: 1, dy: 1), transform: nil)
+
+        let thumbImage = createImage(path: path, inFrame: layerFrame, color: color)
         self.setThumbImage(thumbImage, for: state)
     }
 
-    private func createThumbImage(size: CGFloat, color: UIColor) -> UIImage {
-        let layerFrame = CGRect(x: 0, y: 0, width: size, height: size)
+    public func setUnicolorRectangularThumbImage(thumbSize: CGSize, color: UIColor, for state: UIControl.State) {
+        let layerFrame = CGRect(origin: .zero, size: thumbSize)
+        let path = UIBezierPath(roundedRect: layerFrame, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: thumbSize.width/2, height: thumbSize.height/2)).cgPath
+        let thumbImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
+        self.setThumbImage(thumbImage, for: state)
+    }
 
+    public func setUnicolorRectangularMinimumTrackImage(trackHeight: CGFloat, color: UIColor, for state: UIControl.State) {
+        let layerFrame = CGRect(origin: .zero, size: CGSize(width: 1, height: trackHeight))
+        let path = CGPath(rect: layerFrame, transform: nil)
+        let trackImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
+        self.setMinimumTrackImage(trackImage, for: .normal)
+    }
+
+    public func setUnicolorRectangularMaximumTrackImage(trackHeight: CGFloat, color: UIColor, for state: UIControl.State) {
+        let layerFrame = CGRect(origin: .zero, size: CGSize(width: 1, height: trackHeight))
+        let path = CGPath(rect: layerFrame, transform: nil)
+        let trackImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
+        self.setMaximumTrackImage(trackImage, for: .normal)
+    }
+
+    private func createImage(path: CGPath, inFrame frame: CGRect, color: UIColor, lineWidth: CGFloat = 1, strokeColor: UIColor? = nil) -> UIImage {
         let shapeLayer = CAShapeLayer()
-        shapeLayer.path = CGPath(ellipseIn: layerFrame.insetBy(dx: 1, dy: 1), transform: nil)
+        shapeLayer.path = path
         shapeLayer.fillColor = color.cgColor
-        shapeLayer.strokeColor = color.withAlphaComponent(0.65).cgColor
+        shapeLayer.lineWidth = lineWidth
+        shapeLayer.strokeColor = (strokeColor ?? color.withAlphaComponent(0.65)).cgColor
 
         let layer = CALayer.init()
-        layer.frame = layerFrame
+        layer.frame = frame.insetBy(dx: -lineWidth, dy: -lineWidth)
         layer.addSublayer(shapeLayer)
         return self.imageFromLayer(layer: layer)
     }

@@ -52,7 +52,7 @@ class SplitVC: UISplitViewController {
     override func viewWillAppear(_ animated: Bool) {
         #if targetEnvironment(macCatalyst)
         // set min and max sidebar width
-        self.minimumPrimaryColumnWidth = 350
+        self.minimumPrimaryColumnWidth = 250
         self.maximumPrimaryColumnWidth = 450
         #endif
     }

@@ -362,6 +362,19 @@ extension UIViewController {
         let currentInsetTop = self.view.window?.safeAreaInsets.top ?? toolbarSafeAreaTop
         self.additionalSafeAreaInsets = UIEdgeInsets(top:  toolbarSafeAreaTop - currentInsetTop, left: 0, bottom: 0, right: 0)
     }
+
+    func addPlayerControls() {
+        let player = appDelegate.player
+        self.navigationItem.leftBarButtonItems = [
+            FlexibleSpaceBarItem(),
+            PreviousBarButton(player: player),
+            PlayBarButton(player: player),
+            NextBarButton(player: player),
+            FlexibleSpaceBarItem(),
+            NowPlayingBarItem(player: player),
+            FlexibleSpaceBarItem()
+        ]
+    }
 }
 
 #else
