@@ -144,6 +144,8 @@ extension UIImage {
     public static let arrowTurnUp = UIImage.create(systemName: "arrowshape.turn.up.backward.circle.fill")
     public static let hammer = UIImage.create(systemName: "hammer.circle.fill")
 
+    public static let chevronLeft = UIImage.create(systemName: "chevron.left")
+
 /// Asset symbol generation is enabled by default for both new and old projects but can be disabled by setting the build setting "Generate Asset Symbols" (ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS) to NO.
 #if false
     public static let gauge = UIImage.create("gauge") // SF-Symbols 5 Regular:  gauge.open.with.lines.needle.33percent.badge.arrow.down
@@ -381,7 +383,7 @@ extension UIImage {
         return newImage!
     }
 
-    public func styleForNavigationBar(pointSize: CGFloat = 22) -> UIImage {
+    public func styleForNavigationBar(pointSize: CGFloat) -> UIImage {
         let navBarSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: pointSize)
         let img = self.applyingSymbolConfiguration(navBarSymbolConfiguration) ?? UIImage()
         return img.withTintColor(.secondaryLabel)

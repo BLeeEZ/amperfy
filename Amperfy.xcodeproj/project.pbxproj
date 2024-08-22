@@ -433,7 +433,12 @@
 		631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166E2C6D63510085F62E /* SettingsSection.swift */; };
 		631C16712C6D6AA30085F62E /* BehavioralStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C16702C6D6AA30085F62E /* BehavioralStylable.swift */; };
 		6333C8E12C6FDB5200CCA50A /* SecondaryText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */; };
-		637A28A82C75318C0082FACC /* ToolbarPlayControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28A72C75318C0082FACC /* ToolbarPlayControls.swift */; };
+		637A28A82C75318C0082FACC /* NowPlayingBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */; };
+		637A28AB2C77BB8E0082FACC /* Refreshable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28AA2C77BB8E0082FACC /* Refreshable.swift */; };
+		637A28AD2C77BB9A0082FACC /* ControlBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28AC2C77BB9A0082FACC /* ControlBarButton.swift */; };
+		637A28AF2C77C5140082FACC /* SpaceBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28AE2C77C5140082FACC /* SpaceBarItem.swift */; };
+		637A28B12C77C8D40082FACC /* BackButtonBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B02C77C8D40082FACC /* BackButtonBarItem.swift */; };
+		637A28B32C77D1520082FACC /* CustomBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B22C77D1520082FACC /* CustomBarButton.swift */; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
 		63DCDB962C67515C00522F68 /* AppKitIntegration.framework in Embed AppKitIntegration */ = {isa = PBXBuildFile; fileRef = 63DCDB912C67508E00522F68 /* AppKitIntegration.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		63DCDB9E2C67536800522F68 /* AppKitController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB992C6752F000522F68 /* AppKitController.swift */; };
@@ -956,7 +961,12 @@
 		631C166E2C6D63510085F62E /* SettingsSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsSection.swift; sourceTree = "<group>"; };
 		631C16702C6D6AA30085F62E /* BehavioralStylable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehavioralStylable.swift; sourceTree = "<group>"; };
 		6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryText.swift; sourceTree = "<group>"; };
-		637A28A72C75318C0082FACC /* ToolbarPlayControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarPlayControls.swift; sourceTree = "<group>"; };
+		637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingBarItem.swift; sourceTree = "<group>"; };
+		637A28AA2C77BB8E0082FACC /* Refreshable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Refreshable.swift; sourceTree = "<group>"; };
+		637A28AC2C77BB9A0082FACC /* ControlBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlBarButton.swift; sourceTree = "<group>"; };
+		637A28AE2C77C5140082FACC /* SpaceBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceBarItem.swift; sourceTree = "<group>"; };
+		637A28B02C77C8D40082FACC /* BackButtonBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackButtonBarItem.swift; sourceTree = "<group>"; };
+		637A28B22C77D1520082FACC /* CustomBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBarButton.swift; sourceTree = "<group>"; };
 		63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSceneDelegate.swift; sourceTree = "<group>"; };
 		63DCDB912C67508E00522F68 /* AppKitIntegration.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppKitIntegration.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		63DCDB992C6752F000522F68 /* AppKitController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKitController.swift; sourceTree = "<group>"; };
@@ -1030,7 +1040,7 @@
 		5009863A2208CB170057A1A6 /* Basics */ = {
 			isa = PBXGroup;
 			children = (
-				637A28A72C75318C0082FACC /* ToolbarPlayControls.swift */,
+				637A28A92C77BB7E0082FACC /* Toolbar */,
 				5009863B2208CB650057A1A6 /* OptionsButton.swift */,
 				5009863D2208CC1E0057A1A6 /* BasicButton.swift */,
 				5077F95022279DF40099CA91 /* PlaytimeSlider.swift */,
@@ -1821,6 +1831,19 @@
 			path = Player;
 			sourceTree = "<group>";
 		};
+		637A28A92C77BB7E0082FACC /* Toolbar */ = {
+			isa = PBXGroup;
+			children = (
+				637A28AA2C77BB8E0082FACC /* Refreshable.swift */,
+				637A28B22C77D1520082FACC /* CustomBarButton.swift */,
+				637A28AC2C77BB9A0082FACC /* ControlBarButton.swift */,
+				637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */,
+				637A28AE2C77C5140082FACC /* SpaceBarItem.swift */,
+				637A28B02C77C8D40082FACC /* BackButtonBarItem.swift */,
+			);
+			path = Toolbar;
+			sourceTree = "<group>";
+		};
 		63DCDB9B2C6752F000522F68 /* AppKitIntegration */ = {
 			isa = PBXGroup;
 			children = (
@@ -2115,6 +2138,7 @@
 				631C16712C6D6AA30085F62E /* BehavioralStylable.swift in Sources */,
 				5003D8FB267B3390006946BF /* LibrarySyncPopupVC.swift in Sources */,
 				501944182B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift in Sources */,
+				637A28B32C77D1520082FACC /* CustomBarButton.swift in Sources */,
 				5007CE4121EF5F4300BC5CBA /* PlaylistsVC.swift in Sources */,
 				631C166D2C6D61110085F62E /* NavigationTarget.swift in Sources */,
 				50E77DB728D2163F00BDF882 /* SettingsView.swift in Sources */,
@@ -2145,6 +2169,7 @@
 				50791E8728D3B7BF006CE6E5 /* PlayerSettingsView.swift in Sources */,
 				505CA20A2B88E94800AA81CD /* MultiSourceTableViewController.swift in Sources */,
 				50DEEE0C265E3F9D0073FF20 /* DirectoriesVC.swift in Sources */,
+				637A28AB2C77BB8E0082FACC /* Refreshable.swift in Sources */,
 				500B97CD2B7BC680005554BF /* EntityPreviewVC.swift in Sources */,
 				50791E7C28D32B8A006CE6E5 /* AlternativeURLAddDialogView.swift in Sources */,
 				502E56BC27561AD900638BD2 /* UserQueueSectionHeader.swift in Sources */,
@@ -2167,6 +2192,7 @@
 				5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */,
 				50CFB59A28D5009200A47D44 /* ArtworkDownloadSettingsView.swift in Sources */,
 				50DF1E5628DDE3FA00F3EA00 /* AlbumCollectionCell.swift in Sources */,
+				637A28AD2C77BB9A0082FACC /* ControlBarButton.swift in Sources */,
 				50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */,
 				501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */,
 				504B441928D6F0920033982C /* LicenseSettingsView.swift in Sources */,
@@ -2197,6 +2223,7 @@
 				50791E8528D36F1F006CE6E5 /* LibrarySettingsView.swift in Sources */,
 				50DE29ED2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift in Sources */,
 				5019441D2B7ACB0800082D2E /* PopupPlayer+Animations.swift in Sources */,
+				637A28AF2C77C5140082FACC /* SpaceBarItem.swift in Sources */,
 				50BA92F821CC318D00E5901D /* PlayableTableCell.swift in Sources */,
 				50791E8128D365E9006CE6E5 /* UpdatePasswordView.swift in Sources */,
 				5005939928E5C5E5008C8DF6 /* MultiPickerView.swift in Sources */,
@@ -2211,6 +2238,7 @@
 				508AA57D2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift in Sources */,
 				5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */,
 				509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */,
+				637A28B12C77C8D40082FACC /* BackButtonBarItem.swift in Sources */,
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
 				50C9D7142850759B007F18D0 /* Corners.swift in Sources */,
 				50AC4E5828D9D12D0091FF33 /* ObservableSettings.swift in Sources */,
@@ -2228,7 +2256,7 @@
 				50C9D7082850759B007F18D0 /* SpinnerViewController.swift in Sources */,
 				63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */,
 				505CA20C2B88E9D300AA81CD /* FetchUpdateHandler.swift in Sources */,
-				637A28A82C75318C0082FACC /* ToolbarPlayControls.swift in Sources */,
+				637A28A82C75318C0082FACC /* NowPlayingBarItem.swift in Sources */,
 				508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */,
 				50DE29EB2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift in Sources */,
 			);

@@ -99,6 +99,11 @@ class BasicTableViewController: KeyCommandTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+
+        #if targetEnvironment(macCatalyst)
+        self.addPlayerControls()
+        #endif
+
         if searchController.searchBar.scopeButtonTitles?.count ?? 0 > 1, appDelegate.storage.settings.isOfflineMode {
             searchController.searchBar.selectedScopeButtonIndex = 1
         } else {
@@ -158,15 +163,18 @@ class BasicTableViewController: KeyCommandTableViewController {
         searchController.searchBar.scopeButtonTitles = scopeButtonTitles
         searchController.searchBar.placeholder = placeholder
 
+        //if #available(iOS 16.0, *) {
+            // This breaks when tabs are display
+            //navigationItem.preferredSearchBarPlacement = .stacked
+
+        //}
+
+        #if targetEnvironment(macCatalyst)
+        navigationItem.searchController = nil
+        #else
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
-        if #available(iOS 16.0, *) {
-            #if targetEnvironment(macCatalyst)
-            navigationItem.preferredSearchBarPlacement = .inline
-            #else
-            navigationItem.preferredSearchBarPlacement = .stacked
-            #endif
-        }
+        #endif
         
         searchController.delegate = self
         searchController.obscuresBackgroundDuringPresentation = false

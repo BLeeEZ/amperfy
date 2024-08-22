@@ -44,7 +44,7 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.appDelegate.settingsSceneSession = session
 
         self.window = UIWindow(windowScene: windowScene)
-        self.appDelegate.window = self.window
+        //self.appDelegate.window = self.window
 
         self.window?.backgroundColor = .secondarySystemBackground
 

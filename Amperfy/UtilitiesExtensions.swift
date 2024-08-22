@@ -365,11 +365,22 @@ extension UIViewController {
         self.additionalSafeAreaInsets = UIEdgeInsets(top:  toolbarSafeAreaTop - currentInsetTop, left: 0, bottom: 0, right: 0)
     }
 
+    #if targetEnvironment(macCatalyst)
+    
     func addPlayerControls() {
-        let toolbarItems = appDelegate.toolbarPlayerControls
+        // We exploit the fact that the NavigationController already knows the window.
+        // That way, we can reuse the cashed toolbarItems for this scene (aka. Tab on macOS).
+        let window = self.navigationController?.view.window
+        guard let sceneDelegate = window?.windowScene?.delegate as? SceneDelegate else { return }
+        // Update the back button to interact with the correct UINavigationController
+        sceneDelegate.backButton.navigationController = self.navigationController
+        let toolbarItems = sceneDelegate.toolbarPlayerControls
         self.navigationItem.leftBarButtonItems = toolbarItems
+        self.navigationItem.leftItemsSupplementBackButton = false
         toolbarItems.forEach { ($0 as? Refreshable)?.reload() }
     }
+
+    #endif
 }
 
 #else

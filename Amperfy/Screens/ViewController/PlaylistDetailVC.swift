@@ -144,6 +144,14 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
                 completionHandler(SwipeActionContext(containable: song, playContext: playContext))
             }
         }
+
+        //if #available(iOS 16.0, *) {
+        //    navigationItem.preferredSearchBarPlacement = .stacked
+        //}
+
+        #if targetEnvironment(macCatalyst)
+        self.addPlayerControls()
+        #endif
     }
     
     override func viewWillAppear(_ animated: Bool) {

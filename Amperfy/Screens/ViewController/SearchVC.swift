@@ -229,7 +229,6 @@ class SearchVC: BasicTableViewController {
         super.configureSearchController(placeholder: placeholder, scopeButtonTitles: scopeButtonTitles, showSearchBarAtEnter: showSearchBarAtEnter)
         
         #if targetEnvironment(macCatalyst)
-        // Install the player controls
         self.addPlayerControls()
 
         // Remove the search bar from the navigationbar on macOS

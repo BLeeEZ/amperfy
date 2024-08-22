@@ -52,10 +52,19 @@ class BasicCollectionViewController: UICollectionViewController {
         searchController.searchBar.autocapitalizationType = .none
         searchController.searchBar.scopeButtonTitles = scopeButtonTitles
         searchController.searchBar.placeholder = placeholder
-        
+
+        //if #available(iOS 16.0, *) {
+        //    navigationItem.preferredSearchBarPlacement = .stacked
+        //}
+
+        #if targetEnvironment(macCatalyst)
+        self.addPlayerControls()
+        navigationItem.searchController = nil
+        #else
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
-        
+        #endif
+
         searchController.delegate = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self // Monitor when the search button is tapped.

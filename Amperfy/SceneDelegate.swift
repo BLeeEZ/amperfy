@@ -30,7 +30,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }()
     
     var window: UIWindow?
-    
+
+    #if targetEnvironment(macCatalyst)
+    // For performance reasons we initialize these once for each Scene.
+    // Otherwise the navigation bar appears slowly one item at a time
+    // Do not move this to AppDelagate, otherwise it breaks multiple tabs.
+    var toolbarPlayerControls: [UIBarButtonItem] = []
+    var backButton = BackButtonBarItem()
+    #endif
+
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         os_log("willConnectTo", log: self.log, type: .info)
@@ -55,6 +63,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         var initialViewController: UIViewController?
 
         #if targetEnvironment(macCatalyst)
+
+        let player = appDelegate.player
+        self.toolbarPlayerControls = [
+            // Always show a back button to prevent "jumping" views in the toolbar
+            backButton,
+            SpaceBarItem(fixedSpace: 20),
+            PreviousBarButton(player: player),
+            PlayBarButton(player: player),
+            NextBarButton(player: player),
+            SpaceBarItem(),
+            NowPlayingBarItem(player: player),
+            SpaceBarItem(priority: .defaultLow)
+        ]
+
         let splitVC = SplitVC.instantiateFromAppStoryboard()
 
         if AmperKit.shared.storage.loginCredentials == nil {
