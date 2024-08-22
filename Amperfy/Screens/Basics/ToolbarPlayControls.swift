@@ -11,7 +11,11 @@ import UIKit
 import AmperfyKit
 import MarqueeLabel
 
-class ControlBarButton: UIBarButtonItem, MusicPlayable {
+protocol Refreshable {
+    func reload()
+}
+
+class ControlBarButton: UIBarButtonItem, MusicPlayable, Refreshable {
     var player: PlayerFacade?
 
     var inUIButton: UIButton? {
@@ -19,7 +23,8 @@ class ControlBarButton: UIBarButtonItem, MusicPlayable {
     }
 
     func updateImage(image: UIImage) {
-        self.inUIButton?.setImage(image.styleForNavigationBar(), for: .normal)
+        self.inUIButton?.configuration?.image = image.styleForNavigationBar()
+        //self.inUIButton?.setImage(image.styleForNavigationBar(), for: .normal)
     }
 
     fileprivate func createInUIButton(config: UIButton.Configuration, size: CGSize) -> UIButton? {
@@ -44,6 +49,7 @@ class ControlBarButton: UIBarButtonItem, MusicPlayable {
         button?.addTarget(self, action: #selector(self.clicked(_:)), for: .touchUpInside)
 
         self.customView = button
+
         self.player?.addNotifier(notifier: self)
 
         // Recreate the system button background highlight
@@ -75,6 +81,8 @@ class ControlBarButton: UIBarButtonItem, MusicPlayable {
 
     }
 
+    func reload() {}
+
     func didStartPlaying() {}
     func didPause() {}
     func didStopPlaying() {}
@@ -89,6 +97,10 @@ class ControlBarButton: UIBarButtonItem, MusicPlayable {
 
 
 class PlayBarButton: ControlBarButton {
+    override var title: String? {
+        get { return "Play / Pause" }
+        set { }
+    }
 
     override fileprivate func createInUIButton(config: UIButton.Configuration, size: CGSize) -> UIButton? {
         // We need an initial image, otherwise catalyst calculates the wrong button size
@@ -112,9 +124,21 @@ class PlayBarButton: ControlBarButton {
     override func didStopPlaying() {
         self.updateImage(image: .play)
     }
+
+    override func reload() {
+        if player?.isPlaying ?? false {
+            self.updateImage(image: .pause)
+        } else {
+            self.updateImage(image: .play)
+        }
+    }
 }
 
 class NextBarButton: ControlBarButton {
+    override var title: String? {
+        get { return "Next" }
+        set { }
+    }
 
     override fileprivate func createInUIButton(config: UIButton.Configuration, size: CGSize) -> UIButton? {
         var configuration = config
@@ -131,7 +155,11 @@ class NextBarButton: ControlBarButton {
 }
 
 class PreviousBarButton: ControlBarButton {
-    
+    override var title: String? {
+        get { return "Previous" }
+        set { }
+    }
+
     override fileprivate func createInUIButton(config: UIButton.Configuration, size: CGSize) -> UIButton? {
         var configuration = config
         configuration.image = .backwardFill.styleForNavigationBar(pointSize: 18)
@@ -310,7 +338,7 @@ fileprivate class NowPlayingInfoView: UIView {
     }
 }
 
-extension NowPlayingInfoView: MusicPlayable {
+extension NowPlayingInfoView: MusicPlayable, Refreshable {
     private func refreshTitle() {
         let song = player?.currentlyPlaying?.asSong
         let title = song?.title
@@ -383,6 +411,8 @@ extension NowPlayingInfoView: MusicPlayable {
 class NowPlayingBarItem: UIBarButtonItem {
     init(player: PlayerFacade) {
         super.init()
+
+        self.title = "Now Playing"
 
         let height = toolbarSafeAreaTop - 8
 

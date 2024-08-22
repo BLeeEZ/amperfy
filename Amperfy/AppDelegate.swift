@@ -48,6 +48,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var focusedWindowTitle: String?
 
+    // For performance reasons we initialize these once
+    // Otherwise the navigation bar appears slowly one item at a time
+    var toolbarPlayerControls: [UIBarButtonItem] = []
+
     lazy var player: PlayerFacade = {
         UIApplication.shared.beginReceivingRemoteControlEvents()
         return AmperKit.shared.player
@@ -231,6 +235,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         userStatistics.sessionStarted()
 
         #if targetEnvironment(macCatalyst)
+        
+        self.toolbarPlayerControls = [
+            FlexibleSpaceBarItem(maxSpace: 20),
+            PreviousBarButton(player: player),
+            PlayBarButton(player: player),
+            NextBarButton(player: player),
+            FlexibleSpaceBarItem(),
+            NowPlayingBarItem(player: player),
+            FlexibleSpaceBarItem()
+        ]
+
         AppDelegate.loadAppKitIntegrationFramework()
         AppDelegate.installAppKitColorHooks()
         

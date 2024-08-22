@@ -207,6 +207,7 @@ class SearchVC: BasicTableViewController {
                 })
             })
         ]
+        optionsButton.title = "Options"
         #else
         let additionalDropDownMenus: [UIMenu] = []
         #endif

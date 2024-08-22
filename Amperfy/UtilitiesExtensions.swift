@@ -352,6 +352,8 @@ extension Notification.Name {
     static let RequestSearchUpdate = Notification.Name("de.familie-zimba.Amperfy.RequestSearchUpdate")
 }
 
+
+
 extension UIViewController {
     func extendSafeAreaToAccountForTabbar() {
         let currentInsetTop = self.view.window?.safeAreaInsets.top ?? toolbarSafeAreaTop
@@ -364,16 +366,9 @@ extension UIViewController {
     }
 
     func addPlayerControls() {
-        let player = appDelegate.player
-        self.navigationItem.leftBarButtonItems = [
-            FlexibleSpaceBarItem(maxSpace: 20),
-            PreviousBarButton(player: player),
-            PlayBarButton(player: player),
-            NextBarButton(player: player),
-            FlexibleSpaceBarItem(),
-            NowPlayingBarItem(player: player),
-            FlexibleSpaceBarItem()
-        ]
+        let toolbarItems = appDelegate.toolbarPlayerControls
+        self.navigationItem.leftBarButtonItems = toolbarItems
+        toolbarItems.forEach { ($0 as? Refreshable)?.reload() }
     }
 }
 
