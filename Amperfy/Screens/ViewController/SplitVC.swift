@@ -214,8 +214,8 @@ class SplitVC: UISplitViewController {
     
     private func setCorrectPlayerBarView(collapseMode: Bool) {
         #if targetEnvironment(macCatalyst)
-        // always show the player in the sidebar on macOS
-        barPlayer.changeTo(vc: self.viewControllers.first!)
+        // Disable barPlayer on macOS
+        barPlayer.isPopupBarDisplayed = false
         #else
         if collapseMode {
             let vc = self.viewController(for: .compact)

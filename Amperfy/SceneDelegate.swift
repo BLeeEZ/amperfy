@@ -72,7 +72,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             PreviousBarButton(player: player),
             PlayBarButton(player: player),
             NextBarButton(player: player),
-            SpaceBarItem(),
+            SpaceBarItem(minSpace: 20),
             NowPlayingBarItem(player: player),
             SpaceBarItem(priority: .defaultLow)
         ]

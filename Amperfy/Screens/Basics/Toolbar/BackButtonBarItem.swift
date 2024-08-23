@@ -29,6 +29,9 @@ class BackButtonBarItem: CustomBarButton {
 
     override func reload() {
         let vcs = self.navigationController?.viewControllers.count ?? 0
+        // Let the hover gesture fail
+        self.customView?.gestureRecognizers?.forEach { $0.isEnabled = false }
+        self.customView?.gestureRecognizers?.forEach { $0.isEnabled = (vcs > 1) }
         self.isEnabled = (vcs > 1)
     }
 }

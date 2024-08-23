@@ -211,6 +211,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
         #if !targetEnvironment(macCatalyst)
         refreshControl = UIRefreshControl()
         #endif
+        
         refreshControl?.addTarget(common, action: #selector(AlbumsCommonVCInteractions.handleRefresh), for: UIControl.Event.valueChanged)
         collectionView.refreshControl = refreshControl
 

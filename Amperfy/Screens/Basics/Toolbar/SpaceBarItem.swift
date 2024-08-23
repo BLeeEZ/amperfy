@@ -17,7 +17,7 @@ class SpaceBarItem: UIBarButtonItem {
         self.init(minSpace: fixedSpace, maxSpace: fixedSpace, priority: priority)
     }
 
-    init(minSpace: CGFloat = 0, maxSpace: CGFloat = 1000, priority: UILayoutPriority = .defaultHigh) {
+    init(minSpace: CGFloat = 0, maxSpace: CGFloat = 10000, priority: UILayoutPriority = .defaultHigh) {
         super.init()
 
         let clearView = UIView(frame: .zero)

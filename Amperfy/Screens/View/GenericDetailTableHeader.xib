@@ -50,9 +50,13 @@
                                                         </view>
                                                     </subviews>
                                                     <constraints>
-                                                        <constraint firstItem="3rO-9J-GXf" firstAttribute="top" secondItem="rst-3T-hzJ" secondAttribute="top" id="3dy-SC-tCL"/>
+                                                        <constraint firstItem="3rO-9J-GXf" firstAttribute="top" secondItem="rst-3T-hzJ" secondAttribute="top" id="3dy-SC-tCL">
+                                                            <variation key="userInterfaceIdiom=mac-widthClass=regular" constant="10"/>
+                                                        </constraint>
                                                         <constraint firstItem="3rO-9J-GXf" firstAttribute="centerX" secondItem="rst-3T-hzJ" secondAttribute="centerX" id="6J5-uB-2am"/>
-                                                        <constraint firstAttribute="bottom" secondItem="3rO-9J-GXf" secondAttribute="bottom" id="Kq8-Em-Gcf"/>
+                                                        <constraint firstAttribute="bottom" secondItem="3rO-9J-GXf" secondAttribute="bottom" id="Kq8-Em-Gcf">
+                                                            <variation key="userInterfaceIdiom=mac-widthClass=regular" constant="10"/>
+                                                        </constraint>
                                                         <constraint firstItem="3rO-9J-GXf" firstAttribute="width" secondItem="rst-3T-hzJ" secondAttribute="width" id="WR8-oW-LuR"/>
                                                         <constraint firstAttribute="width" secondItem="rst-3T-hzJ" secondAttribute="height" multiplier="1:1" id="pEz-TL-VG1"/>
                                                         <constraint firstItem="3rO-9J-GXf" firstAttribute="leading" secondItem="rst-3T-hzJ" secondAttribute="leading" id="vcp-Wq-suj"/>
@@ -202,7 +206,9 @@
                                                         <constraint firstItem="hN4-ai-kZb" firstAttribute="leading" secondItem="ulT-f1-D2c" secondAttribute="leading" id="8Ny-7k-QhG"/>
                                                         <constraint firstAttribute="bottom" secondItem="hN4-ai-kZb" secondAttribute="bottom" id="Whh-pE-mHY"/>
                                                         <constraint firstAttribute="trailing" secondItem="hN4-ai-kZb" secondAttribute="trailing" id="btS-uw-rVF"/>
-                                                        <constraint firstAttribute="height" constant="155" id="qb1-LU-seD"/>
+                                                        <constraint firstAttribute="height" constant="155" id="qb1-LU-seD">
+                                                            <variation key="userInterfaceIdiom=mac-widthClass=regular" constant="165"/>
+                                                        </constraint>
                                                     </constraints>
                                                     <variation key="widthClass=regular">
                                                         <mask key="constraints">

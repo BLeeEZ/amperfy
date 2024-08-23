@@ -65,13 +65,35 @@ fileprivate class NowPlayingSlider: UISlider {
 }
 
 
-fileprivate class NowPlayingInfoView: UIView {
+class NowPlayingInfoView: UIView {
     var player: PlayerFacade?
 
     lazy var artworkView: UIImageView = {
         let imageView: UIImageView = UIImageView()
         imageView.backgroundColor = .clear
         return imageView
+    }()
+
+    lazy var artworkOverlay: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black.withAlphaComponent(0.4)
+        view.isHidden = true
+
+        let imageView: UIImageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = .white
+        imageView.image = .miniPlayer.withRenderingMode(.alwaysTemplate)
+
+        view.addSubview(imageView)
+        NSLayoutConstraint.activate([
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            imageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+            imageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.8)
+        ])
+
+        return view
     }()
 
     lazy var titleLabel: UILabel = {
@@ -149,16 +171,29 @@ fileprivate class NowPlayingInfoView: UIView {
             }
         })
 
+        self.artworkOverlay.translatesAutoresizingMaskIntoConstraints = false
         self.artworkView.translatesAutoresizingMaskIntoConstraints = false
         self.detailContainer.translatesAutoresizingMaskIntoConstraints = false
 
         self.addSubview(self.detailContainer)
         self.addSubview(self.artworkView)
+        self.artworkView.addSubview(self.artworkOverlay)
+
+        let miniPlayerHoverGesture = UIHoverGestureRecognizer(target: self, action: #selector(self.artworkHovered(_:)))
+        let miniPlayerTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.artworkClicked(_:)))
+
+        self.artworkView.isUserInteractionEnabled = true
+        self.artworkView.addGestureRecognizer(miniPlayerHoverGesture)
+        self.artworkView.addGestureRecognizer(miniPlayerTapGesture)
 
         NSLayoutConstraint.activate([
             self.artworkView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0),
             self.artworkView.heightAnchor.constraint(equalTo: self.heightAnchor),
             self.artworkView.widthAnchor.constraint(equalTo: self.heightAnchor),
+            self.artworkOverlay.topAnchor.constraint(equalTo: self.artworkView.topAnchor, constant: 0),
+            self.artworkOverlay.bottomAnchor.constraint(equalTo: self.artworkView.bottomAnchor, constant: 0),
+            self.artworkOverlay.leadingAnchor.constraint(equalTo: self.artworkView.leadingAnchor, constant: 0),
+            self.artworkOverlay.trailingAnchor.constraint(equalTo: self.artworkView.trailingAnchor, constant: 0),
             self.detailContainer.topAnchor.constraint(equalTo: self.topAnchor),
             self.detailContainer.leadingAnchor.constraint(equalTo: self.artworkView.trailingAnchor),
             self.detailContainer.trailingAnchor.constraint(equalTo: self.trailingAnchor),
@@ -170,6 +205,27 @@ fileprivate class NowPlayingInfoView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    @objc func artworkHovered(_ sender: UIHoverGestureRecognizer) {
+        switch sender.state {
+        case .began:
+            self.artworkOverlay.isHidden = false
+        case .ended, .cancelled, .failed:
+            self.artworkOverlay.isHidden = true
+        default:
+            break
+        }
+    }
+
+    @objc func artworkClicked(_ sender: UITapGestureRecognizer) {
+        switch sender.state {
+        case .ended:
+            print("Show mini player....")
+            break
+        default:
+            break
+        }
     }
 
     @objc func timeSliderChanged(_ slider: UISlider) {
