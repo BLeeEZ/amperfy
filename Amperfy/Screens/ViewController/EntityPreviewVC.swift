@@ -656,11 +656,6 @@ class EntityPreviewVC: UIViewController {
         refresh()
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func display(container: PlayableContainable, on rootView: UIViewController) {
         self.rootView = rootView
         self.entityContainer = container

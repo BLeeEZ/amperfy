@@ -113,11 +113,6 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         updateRightBarButtonItems()
         updateFromRemote()
     }
-    
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
 
     func updateRightBarButtonItems() {
         var actions = [UIMenu]()

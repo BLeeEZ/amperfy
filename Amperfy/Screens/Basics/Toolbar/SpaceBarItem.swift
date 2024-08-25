@@ -14,10 +14,10 @@ import UIKit
 // Hack: built-in flexible space navigation bar item is not working, so we use this workaround
 class SpaceBarItem: UIBarButtonItem {
     convenience init(fixedSpace: CGFloat, priority: UILayoutPriority = .defaultHigh) {
-        self.init(minSpace: fixedSpace, maxSpace: fixedSpace, priority: priority)
+        self.init(minSpace: fixedSpace, maxSpace: fixedSpace)
     }
 
-    init(minSpace: CGFloat = 0, maxSpace: CGFloat = 10000, priority: UILayoutPriority = .defaultHigh) {
+    init(minSpace: CGFloat = 0, maxSpace: CGFloat = 10000) {
         super.init()
 
         let clearView = UIView(frame: .zero)
@@ -25,11 +25,8 @@ class SpaceBarItem: UIBarButtonItem {
 
         clearView.translatesAutoresizingMaskIntoConstraints = false
 
-        let maxWidthConstraint = clearView.widthAnchor.constraint(lessThanOrEqualToConstant: maxSpace)
-        maxWidthConstraint.priority = priority
-
         NSLayoutConstraint.activate([
-            maxWidthConstraint,
+            clearView.widthAnchor.constraint(lessThanOrEqualToConstant: maxSpace),
             clearView.widthAnchor.constraint(greaterThanOrEqualToConstant: minSpace),
             // This allows us to still grab and move the window when clicking the empty space
             clearView.heightAnchor.constraint(equalToConstant: 0)

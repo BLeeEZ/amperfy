@@ -249,6 +249,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self?.focusedWindowTitle = (notification.object as? AnyObject)?.value(forKey: "title") as? String
             UIMenuSystem.main.setNeedsRebuild()
         }
+
+        self.player.addNotifier(notifier: self)
         #endif
 
         return true
@@ -358,12 +360,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func closeMainWindow() {
-        guard let sceneSession = self.window?.windowScene?.session else { return }
-
-        let options = UIWindowSceneDestructionRequestOptions()
-        options.windowDismissalAnimation = .standard
-
-        UIApplication.shared.requestSceneSessionDestruction(sceneSession, options: options, errorHandler: nil)
+        // Close all main sessions (this might be more than one with multiple tabs open)
+        UIApplication.shared.windows
+            .filter { ($0.rootViewController as? SplitVC) != nil }
+            .compactMap { $0.windowScene?.session }
+            .forEach {
+                let options = UIWindowSceneDestructionRequestOptions()
+                options.windowDismissalAnimation = .standard
+                UIApplication.shared.requestSceneSessionDestruction($0, options: options, errorHandler: nil)
+            }
     }
 
     func openMainWindow() {
@@ -385,9 +390,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
            UIKeyCommand(title: "Settings…", action: #selector(showSettings), input: ",", modifierFlags: .command)
         ])
         builder.insertSibling(settingsMenu, afterMenu: .about)
-        builder.remove(menu: .toolbar)
+        // Add media controls
+        builder.insertSibling(buildControlsMenu(), afterMenu: .view)
 
-        // Multi-window does not work, so remove it.
+        // Remove "new window" and toolbar options
+        builder.remove(menu: .toolbar)
         builder.remove(menu: .newScene)
 
         if (self.focusedWindowTitle == windowSettingsTitle) || (self.focusedWindowTitle == windowMiniPlayerTitle)  {
@@ -396,6 +403,63 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             builder.remove(menu: .sidebar)
         }
+    }
+
+    @objc private func keyCommandPause() {
+        self.player.pause()
+    }
+
+    @objc private func keyCommandPlay() {
+        self.player.play()
+    }
+
+    @objc private func keyCommandStop() {
+        self.player.stop()
+    }
+
+    @objc private func keyCommandNext() {
+        self.player.playNext()
+    }
+
+    @objc private func keyCommandPrevious() {
+        self.player.playPreviousOrReplay()
+    }
+
+    @objc private func keyCommandShuffleOn() {
+        guard !self.player.isShuffle else { return }
+        self.player.toggleShuffle()
+    }
+
+    @objc private func keyCommandShuffleOff() {
+        guard self.player.isShuffle else { return }
+        self.player.toggleShuffle()
+    }
+
+    private func buildControlsMenu() -> UIMenu {
+        let isPlaying = self.player.isPlaying
+        let isShuffle = self.player.isShuffle
+
+        return UIMenu(title: "Controls", children: [
+            UIKeyCommand(title: isPlaying ? "Pause" : "Play", action: isPlaying ? #selector(self.keyCommandPause) : #selector(self.keyCommandPlay), input: " "),
+            UIKeyCommand(title: "Stop", action: #selector(self.keyCommandStop), input: ".", modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
+            UIKeyCommand(title: "Next Track", action: #selector(self.keyCommandNext), input: UIKeyCommand.inputRightArrow, modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
+            UIKeyCommand(title: "Previous Track", action: #selector(self.keyCommandPrevious), input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
+            UIMenu(options: .displayInline),
+            UIMenu(title: "Shuffle", children: [
+                UIAction(title: "On", state: isShuffle ? .on : .off) { [weak self] _ in self?.keyCommandShuffleOn() },
+                UIAction(title: "Off", state: !isShuffle ? .on : .off) { [weak self] _ in self?.keyCommandShuffleOff() }
+            ]),
+            UIMenu(title: "Repeat", children: RepeatMode.allCases.map { mode in
+                UIAction(title: mode.description, state: mode == self.player.repeatMode ? .on : .off) { _ in
+                    self.player.setRepeatMode(mode)
+                }
+            }),
+            UIMenu(title: "Playback Rate", children: PlaybackRate.allCases.map { rate in
+                UIAction(title: rate.description, state: rate == self.player.playbackRate ? .on : .off) { _ in
+                    self.player.setPlaybackRate(rate)
+                }
+            })
+        ])
     }
 
     @objc func showSettings(sender: Any) {
@@ -409,3 +473,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     #endif
 }
+
+#if targetEnvironment(macCatalyst)
+extension AppDelegate: MusicPlayable {
+    func didStartPlaying() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+    
+    func didPause() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+    
+    func didStopPlaying() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+    
+    func didShuffleChange() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+    func didRepeatChange() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+    func didPlaybackRateChange() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+
+    func didStartPlayingFromBeginning() {}
+    func didElapsedTimeChange() {}
+    func didPlaylistChange() {}
+    func didArtworkChange() {}
+}
+#endif

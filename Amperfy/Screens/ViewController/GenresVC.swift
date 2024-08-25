@@ -68,11 +68,6 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         }
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
         let genre = fetchedResultsController.getWrappedEntity(at: indexPath)

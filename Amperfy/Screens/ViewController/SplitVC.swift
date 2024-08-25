@@ -22,6 +22,15 @@
 import UIKit
 import AmperfyKit
 
+#if targetEnvironment(macCatalyst)
+class MacToolbarHostingViewController: UIViewController {
+    override func viewWillLayoutSubviews() {
+        self.extendSafeAreaToAccountForTabbar()
+        super.viewWillLayoutSubviews()
+    }
+}
+#endif
+
 class SplitVC: UISplitViewController {
 
     lazy var barPlayer = BarPlayerHandler(player: appDelegate.player, splitVC: self)
@@ -63,7 +72,10 @@ class SplitVC: UISplitViewController {
         super.viewDidAppear(animated)
         setCorrectPlayerBarView(collapseMode: isCompact)
         
-        #if !targetEnvironment(macCatalyst)
+        #if targetEnvironment(macCatalyst)
+        guard let window = self.view.window else { return }
+        self.macToolbarHostingViewController?.addPlayerControls(inWindow: window)
+        #else
         displayInfoPopups()
         #endif
     }
@@ -75,28 +87,44 @@ class SplitVC: UISplitViewController {
             displayNotificationAuthorization()
         }
     }
-    
+
+    #if targetEnvironment(macCatalyst)
+    var macToolbarHostingViewController: UIViewController? {
+        guard self.viewControllers.count >= 1 else { return nil }
+        let navController = self.viewControllers[1] as? UINavigationController
+        return navController?.topViewController
+    }
+    #endif
+
     func embeddInNavigation(vc: UIViewController) -> UINavigationController {
         let navController = UINavigationController(rootViewController: vc)
         #if targetEnvironment(macCatalyst)
-            // Display the "real" navigation bar in .pad style
-            if #available(macCatalyst 16.0, *) {
-                navController.navigationBar.preferredBehavioralStyle = .pad
-            }
-            let childVC = UIViewController()
+            // We can not directly nest UINavigationController.
+            // That is, encapsulate the inner UIavigationController in a UIViewController fist.
+            let childVC = MacToolbarHostingViewController()
             childVC.addChild(navController)
             childVC.view.addSubview(navController.view)
 
-            print("Window::: ", self.view.window)
+            // Hide the navigation title
+            navController.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.clear]
+
             if let window = self.view.window {
                 childVC.addPlayerControls(inWindow: window)
             }
 
             // This navigation controller hosts the toolbar with the player controls
-            return UINavigationController(rootViewController: childVC)
-            #else
+            let toolbarNavController = UINavigationController(rootViewController: childVC)
+
+            // Display the "real" navigation bar in .pad style and the toolbar in mac style
+            if #available(macCatalyst 16.0, *) {
+                navController.navigationBar.preferredBehavioralStyle = .pad
+                toolbarNavController.navigationBar.preferredBehavioralStyle = .mac
+            }
+
+            return toolbarNavController
+        #else
             return navController
-            #endif
+        #endif
     }
     
     var defaultSecondaryVC: UINavigationController {
@@ -354,7 +382,7 @@ class SplitVC: UISplitViewController {
                 }
             } else {
                 let searchVC = TabNavigatorItem.search.controller
-                self.setViewController(UINavigationController(rootViewController: searchVC), for: .secondary)
+                self.setViewController(self.embeddInNavigation(vc: searchVC), for: .secondary)
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
                     if let activeSearchVC = searchVC as? SearchVC {
                         activeSearchVC.activateSearchBar()

@@ -145,11 +145,6 @@ class ArtistDetailVC: MultiSourceTableViewController {
         tableView.scrollToRow(at: adjustedIndexPath, at: .top, animated: true)
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
         guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
         else { return nil }

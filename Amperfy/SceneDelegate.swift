@@ -36,7 +36,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Otherwise the navigation bar appears slowly one item at a time
     // Do not move this to AppDelagate, otherwise it breaks multiple tabs.
     var toolbarPlayerControls: [UIBarButtonItem] = []
-    var backButton = BackButtonBarItem()
     #endif
 
 
@@ -66,15 +65,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let player = appDelegate.player
         self.toolbarPlayerControls = [
-            // Always show a back button to prevent "jumping" views in the toolbar
-            backButton,
             SpaceBarItem(fixedSpace: 20),
             PreviousBarButton(player: player),
             PlayBarButton(player: player),
             NextBarButton(player: player),
             SpaceBarItem(minSpace: 20),
             NowPlayingBarItem(player: player),
-            SpaceBarItem(priority: .defaultLow)
+            SpaceBarItem(),
+            AirplayButtonBarItem(),
+            SpaceBarItem(fixedSpace: 20),
+
         ]
 
         let splitVC = SplitVC.instantiateFromAppStoryboard()

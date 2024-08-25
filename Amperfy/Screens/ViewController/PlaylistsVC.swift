@@ -102,12 +102,16 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func updateRightBarButtonItems() {
+        #if targetEnvironment(macCatalyst)
+        optionsButton.menu = createSortButtonMenu()
+
+        navigationItem.leftItemsSupplementBackButton = true
+        navigationItem.rightBarButtonItem = optionsButton
+        if appDelegate.storage.settings.isOnlineMode {
+            navigationItem.leftBarButtonItem = editButtonItem
+        }
+        #else
         var barButtons = [UIBarButtonItem]()
         optionsButton.menu = createSortButtonMenu()
         barButtons.append(optionsButton)
@@ -115,6 +119,7 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
             barButtons.append(editButtonItem)
         }
         navigationItem.rightBarButtonItems = barButtons
+        #endif
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

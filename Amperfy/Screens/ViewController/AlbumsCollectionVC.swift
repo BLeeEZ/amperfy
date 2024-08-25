@@ -230,11 +230,6 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
         common.updateFromRemote()
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func createCell(_ collectionView: UICollectionView, forItemAt indexPath: IndexPath, album: Album) -> UICollectionViewCell {
         let cell: AlbumCollectionCell = collectionView.dequeueReusableCell(withReuseIdentifier: AlbumCollectionCell.typeName, for: indexPath) as! AlbumCollectionCell
         if let album = (diffableDataSource as? AlbumsCollectionDiffableDataSource)?.getAlbum(at: indexPath) {

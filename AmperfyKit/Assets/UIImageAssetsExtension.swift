@@ -144,7 +144,6 @@ extension UIImage {
     public static let arrowTurnUp = UIImage.create(systemName: "arrowshape.turn.up.backward.circle.fill")
     public static let hammer = UIImage.create(systemName: "hammer.circle.fill")
 
-    public static let chevronLeft = UIImage.create(systemName: "chevron.left")
     public static let miniPlayer = UIImage.create(systemName: "play.rectangle.on.rectangle")
 
 /// Asset symbol generation is enabled by default for both new and old projects but can be disabled by setting the build setting "Generate Asset Symbols" (ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS) to NO.

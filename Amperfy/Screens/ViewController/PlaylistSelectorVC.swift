@@ -55,11 +55,6 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func change(sortType: PlaylistSortType) {
         self.sortType = sortType
         // sortType will not be saved permanently. This behaviour differs from PlaylistsVC

@@ -66,11 +66,6 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
         fetchedResultsController.fetch()
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
         guard let indexPath = tableView.indexPath(for: cell) else { return nil }
         let downdload = fetchedResultsController.getWrappedEntity(at: indexPath)

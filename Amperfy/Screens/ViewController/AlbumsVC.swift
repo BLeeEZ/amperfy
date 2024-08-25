@@ -202,11 +202,6 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
         common.updateRightBarButtonItems()
         common.updateFromRemote()
     }
-
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         common.listViewWillDisplayCell(at: indexPath, searchBarText: searchController.searchBar.text)

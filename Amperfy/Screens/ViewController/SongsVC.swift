@@ -76,11 +76,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         }
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func applyFilter() {
         switch displayFilter {
         case .all:

@@ -171,11 +171,6 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         }
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func refreshBarButtons() {
         var edititingBarButton: UIBarButtonItem? = nil
         if !tableView.isEditing {
@@ -193,7 +188,13 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
             edititingBarButton?.style = .done
         }
 
+        #if targetEnvironment(macCatalyst)
+        navigationItem.leftItemsSupplementBackButton = true
+        navigationItem.rightBarButtonItem = optionsButton
+        navigationItem.leftBarButtonItem = edititingBarButton
+        #else
         navigationItem.rightBarButtonItems = [optionsButton, edititingBarButton].compactMap{$0}
+        #endif
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
@@ -209,9 +210,6 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     }
 
     @objc private func toggleEditing(sender: UIBarButtonItem) {
-        // Hack for catalyst, since isEnabled is ignored
-        guard sender.isEnabled else { return }
-
         if tableView.isEditing {
             self.endEditing()
         } else {
@@ -220,15 +218,15 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     }
 
     private func startEditing() {
-        tableView.isEditing = true
         (diffableDataSource as? PlaylistDetailDiffableDataSource)?.isEditing = true
+        tableView.isEditing = true
         detailOperationsView?.startEditing()
         refreshBarButtons()
     }
     
     private func endEditing() {
-        tableView.isEditing = false
         (diffableDataSource as? PlaylistDetailDiffableDataSource)?.isEditing = false
+        tableView.isEditing = false
         detailOperationsView?.endEditing()
         refreshBarButtons()
     }

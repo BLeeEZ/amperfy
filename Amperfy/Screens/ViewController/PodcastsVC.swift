@@ -105,11 +105,6 @@ class PodcastsVC: MultiSourceTableViewController {
         episodesFetchedResultsController?.delegate = nil
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func updateRightBarButtonItems() {
         optionsButton.menu = createSortButtonMenu()
         navigationItem.rightBarButtonItem = optionsButton

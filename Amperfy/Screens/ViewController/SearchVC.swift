@@ -159,22 +159,11 @@ class SearchVC: BasicTableViewController {
                 completionHandler(actionContext)
             }
         }
-        
-        #if targetEnvironment(macCatalyst)
-        if #available(macCatalyst 16.0, *) {
-            self.navigationController?.navigationBar.preferredBehavioralStyle = .mac
-        }
-        #endif
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         appDelegate.userStatistics.visited(.search)
-    }
-
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
     }
 
     #if targetEnvironment(macCatalyst)
@@ -196,22 +185,9 @@ class SearchVC: BasicTableViewController {
         }
     }
 
-    func updateOptionsMenu(scopeButtonTitles: [String]) {
-        #if targetEnvironment(macCatalyst)
-        let selectedScopeButtonIndex = self.searchController.searchBar.selectedScopeButtonIndex
-        let additionalDropDownMenus = [
-            UIMenu(title: "Filter", image: .filter, options: [], children: scopeButtonTitles.enumerated().map { (i, title) in
-                UIAction(title: title, image: selectedScopeButtonIndex == i ? .check : nil, handler: { [weak self] action in
-                    self?.searchController.searchBar.selectedScopeButtonIndex = i
-                    self?.updateOptionsMenu(scopeButtonTitles: scopeButtonTitles)
-                })
-            })
-        ]
-        optionsButton.title = "Options"
-        #else
-        let additionalDropDownMenus: [UIMenu] = []
-        #endif
-
+    override func configureSearchController(placeholder: String?, scopeButtonTitles: [String]? = nil, showSearchBarAtEnter: Bool = false) {
+        super.configureSearchController(placeholder: placeholder, scopeButtonTitles: scopeButtonTitles, showSearchBarAtEnter: showSearchBarAtEnter)
+        
         // Install the options button
         optionsButton.menu = UIMenu(children: [
             UIAction(title: "Clear Search History", image: .clear, handler: { _ in
@@ -220,25 +196,28 @@ class SearchVC: BasicTableViewController {
                 self.searchHistory = []
                 self.updateDataSource(animated: true)
             }),
-        ] + additionalDropDownMenus)
+        ])
 
-        navigationItem.rightBarButtonItem = optionsButton
-    }
-
-    override func configureSearchController(placeholder: String?, scopeButtonTitles: [String]? = nil, showSearchBarAtEnter: Bool = false) {
-        super.configureSearchController(placeholder: placeholder, scopeButtonTitles: scopeButtonTitles, showSearchBarAtEnter: showSearchBarAtEnter)
-        
         #if targetEnvironment(macCatalyst)
-        //self.addPlayerControls()
+        let scopeButtonSegmentedControl = UISegmentedControl(items:
+            (scopeButtonTitles ?? [])?.enumerated().map { (i, title) in
+                UIAction(title: title, handler: { [weak self] action in
+                    self?.searchController.searchBar.selectedScopeButtonIndex = i
+                })
+        })
+        scopeButtonSegmentedControl.selectedSegmentIndex = self.searchController.searchBar.selectedScopeButtonIndex
 
         // Remove the search bar from the navigationbar on macOS
         navigationItem.searchController = nil
+        navigationItem.rightBarButtonItems = [optionsButton, UIBarButtonItem(customView: scopeButtonSegmentedControl)]
 
         // Listen for search changes from the sidebar
         NotificationCenter.default.addObserver(self, selector: #selector(handleSearchUpdate(notification:)), name: .SearchChanged, object: nil)
+        #else
+        navigationItem.rightBarButtonItems = [optionsButton]
         #endif
 
-        self.updateOptionsMenu(scopeButtonTitles: scopeButtonTitles ?? [])
+
     }
 
     #if targetEnvironment(macCatalyst)

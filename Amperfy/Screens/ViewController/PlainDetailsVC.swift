@@ -55,11 +55,6 @@ class PlainDetailsVC: UIViewController {
         refresh()
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func display(podcast: Podcast, on rootView: UIViewController) {
         self.rootView = rootView
         self.podcast = podcast
