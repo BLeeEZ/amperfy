@@ -367,11 +367,11 @@ extension UIViewController {
 
     #if targetEnvironment(macCatalyst)
     
-    func addPlayerControls() {
+    func addPlayerControls(inWindow window: UIWindow) {
         // We exploit the fact that the NavigationController already knows the window.
         // That way, we can reuse the cashed toolbarItems for this scene (aka. Tab on macOS).
-        let window = self.navigationController?.view.window
-        guard let sceneDelegate = window?.windowScene?.delegate as? SceneDelegate else { return }
+        //let window = self.navigationController?.view.window
+        guard let sceneDelegate = window.windowScene?.delegate as? SceneDelegate else { return }
         // Update the back button to interact with the correct UINavigationController
         sceneDelegate.backButton.navigationController = self.navigationController
         let toolbarItems = sceneDelegate.toolbarPlayerControls

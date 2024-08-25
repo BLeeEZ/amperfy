@@ -221,8 +221,7 @@ class NowPlayingInfoView: UIView {
     @objc func artworkClicked(_ sender: UITapGestureRecognizer) {
         switch sender.state {
         case .ended:
-            print("Show mini player....")
-            break
+            self.appDelegate.showMiniPlayer()
         default:
             break
         }

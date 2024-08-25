@@ -150,7 +150,9 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         //}
 
         #if targetEnvironment(macCatalyst)
-        self.addPlayerControls()
+            if #available(iOS 16.0, *) {
+                navigationItem.preferredSearchBarPlacement = .inline
+            }
         #endif
     }
     

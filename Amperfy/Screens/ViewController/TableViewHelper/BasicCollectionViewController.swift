@@ -57,12 +57,13 @@ class BasicCollectionViewController: UICollectionViewController {
         //    navigationItem.preferredSearchBarPlacement = .stacked
         //}
 
-        #if targetEnvironment(macCatalyst)
-        self.addPlayerControls()
-        navigationItem.searchController = nil
-        #else
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
+
+        #if targetEnvironment(macCatalyst)
+            if #available(iOS 16.0, *) {
+                navigationItem.preferredSearchBarPlacement = .inline
+            }
         #endif
 
         searchController.delegate = self

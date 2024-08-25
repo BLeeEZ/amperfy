@@ -28,7 +28,11 @@ import PromiseKit
 import Intents
 
 let windowSettingsTitle = "Settings"
+let windowMiniPlayerTitle = "MiniPlayer"
+
 let settingsWindowActivityType = "amperfy.settings"
+let miniPlayerWindowActivityType = "amperfy.miniplayer"
+let defaultWindowActivityType = "amperfy.main"
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -108,6 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }()
     
     var settingsSceneSession: UISceneSession?
+    var miniPlayerSceneSession: UISceneSession?
 
     var sleepTimer: Timer?
     var autoActivateSearchTabSearchBar = false
@@ -319,6 +324,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             config.delegateClass = SettingsSceneDelegate.self
             return config
         }
+
+        if options.userActivities.filter({$0.activityType == miniPlayerWindowActivityType}).first != nil {
+            let config =  UISceneConfiguration(name: "MiniPlayer", sessionRole: .windowApplication)
+            config.delegateClass = MiniPlayerSceneDelegate.self
+            return config
+        }
         #endif
 
         let config = UISceneConfiguration(name: "Default Configuration", sessionRole: .windowApplication)
@@ -346,9 +357,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return nil
     }
 
+    func closeMainWindow() {
+        guard let sceneSession = self.window?.windowScene?.session else { return }
+
+        let options = UIWindowSceneDestructionRequestOptions()
+        options.windowDismissalAnimation = .standard
+
+        UIApplication.shared.requestSceneSessionDestruction(sceneSession, options: options, errorHandler: nil)
+    }
+
+    func openMainWindow() {
+        let defaultActivity = NSUserActivity(activityType: defaultWindowActivityType)
+        UIApplication.shared.requestSceneSessionActivation(nil, userActivity: defaultActivity, options: nil, errorHandler: nil)
+    }
+
     #if targetEnvironment(macCatalyst)
 
     override func buildMenu(with builder: any UIMenuBuilder) {
+        // TODO: Add option to restore main window / aka show the main window. There must only ever be a single instance of the window
+
         super.buildMenu(with: builder)
 
         guard builder.system == .main else { return }
@@ -363,7 +390,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Multi-window does not work, so remove it.
         builder.remove(menu: .newScene)
 
-        if self.focusedWindowTitle == windowSettingsTitle {
+        if (self.focusedWindowTitle == windowSettingsTitle) || (self.focusedWindowTitle == windowMiniPlayerTitle)  {
             // Do any settings specific menu setup here
             builder.remove(menu: .view)
         } else {
@@ -374,6 +401,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     @objc func showSettings(sender: Any) {
         let settingsActivity = NSUserActivity(activityType: settingsWindowActivityType)
         UIApplication.shared.requestSceneSessionActivation(settingsSceneSession, userActivity: settingsActivity, options: nil, errorHandler: nil)
+    }
+
+    @objc func showMiniPlayer(sender: Any? = nil) {
+        let miniPlayerActivity = NSUserActivity(activityType: miniPlayerWindowActivityType)
+        UIApplication.shared.requestSceneSessionActivation(miniPlayerSceneSession, userActivity: miniPlayerActivity, options: nil, errorHandler: nil)
     }
     #endif
 }

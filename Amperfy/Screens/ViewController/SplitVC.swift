@@ -77,7 +77,26 @@ class SplitVC: UISplitViewController {
     }
     
     func embeddInNavigation(vc: UIViewController) -> UINavigationController {
-        return UINavigationController(rootViewController: vc)
+        let navController = UINavigationController(rootViewController: vc)
+        #if targetEnvironment(macCatalyst)
+            // Display the "real" navigation bar in .pad style
+            if #available(macCatalyst 16.0, *) {
+                navController.navigationBar.preferredBehavioralStyle = .pad
+            }
+            let childVC = UIViewController()
+            childVC.addChild(navController)
+            childVC.view.addSubview(navController.view)
+
+            print("Window::: ", self.view.window)
+            if let window = self.view.window {
+                childVC.addPlayerControls(inWindow: window)
+            }
+
+            // This navigation controller hosts the toolbar with the player controls
+            return UINavigationController(rootViewController: childVC)
+            #else
+            return navController
+            #endif
     }
     
     var defaultSecondaryVC: UINavigationController {
