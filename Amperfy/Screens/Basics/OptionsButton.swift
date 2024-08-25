@@ -63,14 +63,17 @@ class OptionsBarButton: UIBarButtonItem {
     
     lazy var inUIButton = {
         var config = UIButton.Configuration.gray()
-        #if !targetEnvironment(macCatalyst)
+        #if targetEnvironment(macCatalyst)
+        config.macIdiomStyle = .borderless
+        config.image = .filter
+        #else
         config.buttonSize = .small
         config.cornerStyle = .capsule
         #endif
         
         let button = UIButton(configuration: config)
         #if targetEnvironment(macCatalyst)
-        button.setTitle("\(CommonString.threeMiddleDots)  ", for: .normal)
+        button.preferredBehavioralStyle = .mac
         #else
         button.setImage(.ellipsis, for: .normal)
         #endif
@@ -98,14 +101,17 @@ class SortBarButton: UIBarButtonItem {
     
     lazy var inUIButton = {
         var config = UIButton.Configuration.gray()
-        #if !targetEnvironment(macCatalyst)
+        #if targetEnvironment(macCatalyst)
+        config.macIdiomStyle = .borderless
+        config.image = .filter
+        #else
         config.buttonSize = .small
         config.cornerStyle = .capsule
         #endif
 
         let button = UIButton(configuration: config)
         #if targetEnvironment(macCatalyst)
-        button.setTitle("\(CommonString.threeMiddleDots)  ", for: .normal)
+        button.preferredBehavioralStyle = .mac
         #else
         button.setImage(.filter, for: .normal)
         #endif
