@@ -43,7 +43,7 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
         }
     }
 
-    init(image: UIImage?, pointSize: CGFloat = 22) {
+    init(image: UIImage?, pointSize: CGFloat = 18) {
         self.pointSize = pointSize
         super.init()
 
