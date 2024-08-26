@@ -103,31 +103,31 @@ class SplitVC: UISplitViewController {
     func embeddInNavigation(vc: UIViewController) -> UINavigationController {
         let navController = UINavigationController(rootViewController: vc)
         #if targetEnvironment(macCatalyst)
-            // We can not directly nest UINavigationController.
-            // That is, encapsulate the inner UIavigationController in a UIViewController fist.
-            let childVC = MacToolbarHostingViewController()
-            childVC.addChild(navController)
-            childVC.view.addSubview(navController.view)
+        // We can not directly nest UINavigationController.
+        // That is, encapsulate the inner UIavigationController in a UIViewController fist.
+        let childVC = MacToolbarHostingViewController()
+        childVC.addChild(navController)
+        childVC.view.addSubview(navController.view)
 
-            // Hide the navigation title
-            navController.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.clear]
+        // Hide the navigation title
+        navController.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.clear]
 
-            if let window = self.view.window {
-                childVC.addPlayerControls(inWindow: window)
-            }
+        if let window = self.view.window {
+            childVC.addPlayerControls(inWindow: window)
+        }
 
-            // This navigation controller hosts the toolbar with the player controls
-            let toolbarNavController = UINavigationController(rootViewController: childVC)
+        // This navigation controller hosts the toolbar with the player controls
+        let toolbarNavController = UINavigationController(rootViewController: childVC)
 
-            // Display the "real" navigation bar in .pad style and the toolbar in mac style
-            if #available(macCatalyst 16.0, *) {
-                navController.navigationBar.preferredBehavioralStyle = .pad
-                toolbarNavController.navigationBar.preferredBehavioralStyle = .mac
-            }
+        // Display the "real" navigation bar in .pad style and the toolbar in mac style
+        if #available(macCatalyst 16.0, *) {
+            navController.navigationBar.preferredBehavioralStyle = .pad
+            toolbarNavController.navigationBar.preferredBehavioralStyle = .mac
+        }
 
-            return toolbarNavController
+        return toolbarNavController
         #else
-            return navController
+        return navController
         #endif
     }
     
