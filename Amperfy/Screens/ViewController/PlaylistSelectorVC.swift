@@ -81,8 +81,8 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         closeButton = CloseBarButton(target: self, selector: #selector(cancelBarButtonPressed))
         optionsButton.menu = createSortButtonMenu()
         #if targetEnvironment(macCatalyst)
-        navigationItem.rightBarButtonItems = [optionsButton]
-        navigationItem.leftBarButtonItems = [closeButton]
+        navigationItem.rightBarButtonItem = optionsButton
+        navigationItem.leftBarButtonItem = closeButton
         #else
         navigationItem.rightBarButtonItems = [closeButton, optionsButton]
         #endif

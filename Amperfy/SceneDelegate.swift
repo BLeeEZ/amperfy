@@ -32,7 +32,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     #if targetEnvironment(macCatalyst)
-    // For performance reasons we initialize these once for each Scene.
+    // For performance reasons we initialize these once for each scene.
     // Otherwise the navigation bar appears slowly one item at a time
     // Do not move this to AppDelagate, otherwise it breaks multiple tabs.
     var toolbarPlayerControls: [UIBarButtonItem] = []

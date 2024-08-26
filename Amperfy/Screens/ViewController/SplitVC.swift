@@ -50,6 +50,7 @@ class SplitVC: UISplitViewController {
         if appDelegate.storage.settings.isOfflineMode {
             appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
         }
+        
         #if targetEnvironment(macCatalyst)
         self.primaryBackgroundStyle = .sidebar
         // hides the 'Hide Sidebar' button
@@ -62,13 +63,13 @@ class SplitVC: UISplitViewController {
         super.viewWillLayoutSubviews()
     }
 
+    #if targetEnvironment(macCatalyst)
     override func viewWillAppear(_ animated: Bool) {
-        #if targetEnvironment(macCatalyst)
         // set min and max sidebar width
         self.minimumPrimaryColumnWidth = 250
         self.maximumPrimaryColumnWidth = 450
-        #endif
     }
+    #endif
 
     override func viewDidAppear(_ animated: Bool) {
         self.updateScene(title: self.viewControllers.last?.sceneTitle)

@@ -214,7 +214,7 @@ class SearchVC: BasicTableViewController {
         // Listen for search changes from the sidebar
         NotificationCenter.default.addObserver(self, selector: #selector(handleSearchUpdate(notification:)), name: .SearchChanged, object: nil)
         #else
-        navigationItem.rightBarButtonItems = [optionsButton]
+        navigationItem.rightBarButtonItem = optionsButton
         #endif
 
 

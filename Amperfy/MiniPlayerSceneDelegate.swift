@@ -70,7 +70,6 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 
         windowScene.sizeRestrictions?.minimumSize = minSize
-        //windowScene.sizeRestrictions?.maximumSize = fixedSize
 
         #endif
 

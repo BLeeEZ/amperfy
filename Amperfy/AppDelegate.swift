@@ -319,7 +319,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return config
         }
 
-        // Support setting window on macOS
         #if targetEnvironment(macCatalyst)
         if options.userActivities.filter({$0.activityType == settingsWindowActivityType}).first != nil {
             let config =  UISceneConfiguration(name: "Settings", sessionRole: .windowApplication)
@@ -379,8 +378,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     #if targetEnvironment(macCatalyst)
 
     override func buildMenu(with builder: any UIMenuBuilder) {
-        // TODO: Add option to restore main window / aka show the main window. There must only ever be a single instance of the window
-
         super.buildMenu(with: builder)
 
         guard builder.system == .main else { return }
