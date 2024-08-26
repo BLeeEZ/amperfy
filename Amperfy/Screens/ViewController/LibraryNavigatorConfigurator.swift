@@ -113,6 +113,8 @@ class SearchNavigationItemContentView: UISearchBar, UIContentView, UISearchBarDe
     }
 
     private func apply(_ config: SearchNavigationItemConfiguration) {
+        guard config != self.currentConfiguration else { return }
+        
         self.currentConfiguration = config
         self.isUserInteractionEnabled = config.selected
 

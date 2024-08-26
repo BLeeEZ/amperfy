@@ -610,7 +610,6 @@ class EntityPreviewActionBuilder {
             }
         }])
     }
-
 }
 
 class EntityPreviewVC: UIViewController {

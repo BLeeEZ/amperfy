@@ -66,7 +66,8 @@ fileprivate class NowPlayingSlider: UISlider {
 
 
 class NowPlayingInfoView: UIView {
-    var player: PlayerFacade?
+    var player: PlayerFacade
+    var rootViewController: UIViewController
 
     lazy var artworkView: UIImageView = {
         let imageView: UIImageView = UIImageView()
@@ -106,6 +107,20 @@ class NowPlayingInfoView: UIView {
         return label
     }()
 
+    var moreButtonWidthConstraint: NSLayoutConstraint?
+    var moreButtonTrailingConstrait: NSLayoutConstraint?
+
+    lazy var moreButton: UIButton = {
+        var config = UIButton.Configuration.borderless()
+        config.image = .ellipsis
+        config.background = .clear()
+        let button = UIButton(configuration: config)
+        button.preferredBehavioralStyle = .pad
+        button.showsMenuAsPrimaryAction = true
+        button.isHidden = true
+        return button
+    }()
+
     lazy var subtitleLabel: UILabel = {
         let label = MarqueeLabel(frame: .zero)
         label.applyAmperfyStyle()
@@ -125,16 +140,25 @@ class NowPlayingInfoView: UIView {
     private lazy var labelContainer: UIView = {
         self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.moreButton.translatesAutoresizingMaskIntoConstraints = false
 
         let view = UIView()
         view.addSubview(self.titleLabel)
+        view.addSubview(self.moreButton)
         view.addSubview(self.subtitleLabel)
 
+        self.moreButtonWidthConstraint = self.moreButton.widthAnchor.constraint(equalToConstant: 0)
+        self.moreButtonTrailingConstrait = self.moreButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0)
+
         NSLayoutConstraint.activate([
+            self.moreButtonWidthConstraint!,
+            self.moreButtonTrailingConstrait!,
+            self.moreButton.centerYAnchor.constraint(equalTo: self.titleLabel.centerYAnchor),
+            self.titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 5),
             self.titleLabel.heightAnchor.constraint(equalTo: self.subtitleLabel.heightAnchor),
-            self.subtitleLabel.topAnchor.constraint(equalTo: self.titleLabel.bottomAnchor),
             self.titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
-            self.titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            self.titleLabel.trailingAnchor.constraint(equalTo: self.moreButton.leadingAnchor, constant: -10),
+            self.subtitleLabel.topAnchor.constraint(equalTo: self.titleLabel.bottomAnchor),
             self.subtitleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
             self.subtitleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
         ])
@@ -159,8 +183,9 @@ class NowPlayingInfoView: UIView {
         return container
     }()
 
-    init(player: PlayerFacade) {
+    init(player: PlayerFacade, rootViewController: UIViewController) {
         self.player = player
+        self.rootViewController = rootViewController
         super.init(frame: .zero)
 
         self.backgroundColor = UIColor(dynamicProvider: { traitCollection in
@@ -174,6 +199,10 @@ class NowPlayingInfoView: UIView {
         self.artworkOverlay.translatesAutoresizingMaskIntoConstraints = false
         self.artworkView.translatesAutoresizingMaskIntoConstraints = false
         self.detailContainer.translatesAutoresizingMaskIntoConstraints = false
+
+        let detailsHoverGesture = UIHoverGestureRecognizer(target: self, action: #selector(self.detailsHovered(_:)))
+        self.detailContainer.isUserInteractionEnabled = true
+        self.detailContainer.addGestureRecognizer(detailsHoverGesture)
 
         self.addSubview(self.detailContainer)
         self.addSubview(self.artworkView)
@@ -207,7 +236,19 @@ class NowPlayingInfoView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    @objc func detailsHovered(_ sender: UIHoverGestureRecognizer) {
+        switch sender.state {
+        case .began:
+            self.refreshMoreButton(hovered: true)
+        case .ended, .cancelled, .failed:
+            self.refreshMoreButton(hovered: false)
+        default:
+            break
+        }
+    }
+
     @objc func artworkHovered(_ sender: UIHoverGestureRecognizer) {
+        let hasSong = player.currentlyPlaying != nil
         switch sender.state {
         case .began:
             self.artworkOverlay.isHidden = false
@@ -228,13 +269,41 @@ class NowPlayingInfoView: UIView {
     }
 
     @objc func timeSliderChanged(_ slider: UISlider) {
-        self.player?.seek(toSecond: Double(self.timeSlider.value))
+        self.player.seek(toSecond: Double(self.timeSlider.value))
     }
 }
 
 extension NowPlayingInfoView: MusicPlayable, Refreshable {
+    private func refreshMoreButton(hovered: Bool = false) {
+        let currentlyPlaying = player.currentlyPlaying
+        let hasSong = currentlyPlaying != nil
+
+        if hasSong && hovered {
+            self.moreButton.isHidden = false
+            self.moreButtonWidthConstraint?.constant = 10
+            self.moreButtonTrailingConstrait?.constant = -10
+            if let currentlyPlaying,
+               let splitVC = self.rootViewController as? SplitVC,
+               let toolbarHostingVC = splitVC.macToolbarHostingViewController,
+               let navController = toolbarHostingVC.children.first as? UINavigationController,
+               let topVC = navController.topViewController
+            {
+                self.moreButton.menu = UIMenu.lazyMenu {
+                    return EntityPreviewActionBuilder(container: currentlyPlaying, on: topVC).createMenu()
+                }
+            }
+        } else {
+            self.moreButton.isHidden = true
+            self.moreButtonWidthConstraint?.constant = 0
+            self.moreButtonTrailingConstrait?.constant = 0
+            self.moreButton.menu = nil
+        }
+
+
+    }
+
     private func refreshTitle() {
-        let song = player?.currentlyPlaying?.asSong
+        let song = player.currentlyPlaying?.asSong
         let title = song?.title
         let artist = song?.artist?.name ?? ""
         let album = song?.album?.name ?? ""
@@ -244,8 +313,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
     }
 
     private func refreshElapsedTime() {
-        guard let player = self.player else { return }
-        if player.currentlyPlaying != nil {
+        if self.player.currentlyPlaying != nil {
             self.timeSlider.minimumValue = 0.0
             self.timeSlider.maximumValue = Float(player.duration)
             if !self.timeSlider.isTracking {
@@ -260,16 +328,14 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
 
     private func refreshArtwork() {
         var artwork: UIImage?
-        if let playableInfo = player?.currentlyPlaying {
+        if let playableInfo = self.player.currentlyPlaying {
             artwork = playableInfo.image(theme: appDelegate.storage.settings.themePreference, setting: appDelegate.storage.settings.artworkDisplayPreference)
         } else {
-            switch player?.playerMode {
+            switch self.player.playerMode {
             case .music:
                 artwork = .getGeneratedArtwork(theme: appDelegate.storage.settings.themePreference, artworkType: .song)
             case .podcast:
                 artwork = .getGeneratedArtwork(theme: appDelegate.storage.settings.themePreference, artworkType: .podcastEpisode)
-            case .none:
-                break
             }
         }
         self.artworkView.image = artwork
@@ -279,6 +345,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
         self.refreshTitle()
         self.refreshElapsedTime()
         self.refreshArtwork()
+        self.refreshMoreButton()
     }
 
     func didStartPlaying() {
@@ -295,7 +362,9 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
 
     func didStartPlayingFromBeginning() {}
     func didPause() {}
-    func didStopPlaying() {}
+    func didStopPlaying() {
+        self.refreshMoreButton()
+    }
     func didPlaylistChange() {}
     func didShuffleChange() {}
     func didRepeatChange() {}
@@ -303,14 +372,14 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
 }
 
 class NowPlayingBarItem: UIBarButtonItem {
-    init(player: PlayerFacade) {
+    init(player: PlayerFacade, rootViewController: UIViewController) {
         super.init()
 
         self.title = "Now Playing"
 
         let height = toolbarSafeAreaTop - 8
 
-        let nowPlayingView = NowPlayingInfoView(player: player)
+        let nowPlayingView = NowPlayingInfoView(player: player, rootViewController: rootViewController)
         nowPlayingView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             nowPlayingView.widthAnchor.constraint(equalToConstant: 300),

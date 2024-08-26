@@ -63,6 +63,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         #if targetEnvironment(macCatalyst)
 
+        let splitVC = SplitVC.instantiateFromAppStoryboard()
+
         let player = appDelegate.player
         self.toolbarPlayerControls = [
             SpaceBarItem(fixedSpace: 20),
@@ -70,14 +72,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             PlayBarButton(player: player),
             NextBarButton(player: player),
             SpaceBarItem(minSpace: 20),
-            NowPlayingBarItem(player: player),
+            NowPlayingBarItem(player: player, rootViewController: splitVC),
             SpaceBarItem(),
             AirplayButtonBarItem(),
             SpaceBarItem(fixedSpace: 20),
 
         ]
-
-        let splitVC = SplitVC.instantiateFromAppStoryboard()
 
         if AmperKit.shared.storage.loginCredentials == nil {
             initialViewController = LoginVC.instantiateFromAppStoryboard()

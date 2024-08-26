@@ -23,9 +23,6 @@ import UIKit
 import CoreMedia
 import AmperfyKit
 import PromiseKit
-#if targetEnvironment(macCatalyst)
-import LNPopupController_ObjC
-#endif
 
 class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
@@ -84,12 +81,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             createdLargeCurrentlyPlayingView.prepare(toWorkOnRootView: self)
             largePlayerPlaceholderView.addSubview(createdLargeCurrentlyPlayingView)
         }
-        #if targetEnvironment(macCatalyst)
-        closeButtonPlaceholderView.isHidden = false
-        #else
+
         closeButtonPlaceholderView.isHidden = true
-        #endif
-        
+
         self.setupTableView()
         self.fetchSongInfoAndUpdateViews()
         
@@ -112,19 +106,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         adjustLaoutMargins()
         refreshCellMasks()
     }
-
-    #if targetEnvironment(macCatalyst)
-    override func positionPopupCloseButton(_ popupCloseButton: LNPopupCloseButton) -> Bool {
-        guard let placeholder = closeButtonPlaceholderView else { return false }
-        popupCloseButton.removeFromSuperview()
-        placeholder.addSubview(popupCloseButton)
-        NSLayoutConstraint.activate([
-            popupCloseButton.rightAnchor.constraint(equalTo: placeholder.rightAnchor, constant: 0),
-            popupCloseButton.topAnchor.constraint(equalTo: placeholder.topAnchor, constant: 0),
-        ])
-        return true
-    }
-    #endif
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
