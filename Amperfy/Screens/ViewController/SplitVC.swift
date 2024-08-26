@@ -50,7 +50,7 @@ class SplitVC: UISplitViewController {
         if appDelegate.storage.settings.isOfflineMode {
             appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
         }
-        
+
         #if targetEnvironment(macCatalyst)
         self.primaryBackgroundStyle = .sidebar
         // hides the 'Hide Sidebar' button

@@ -248,7 +248,6 @@ class NowPlayingInfoView: UIView {
     }
 
     @objc func artworkHovered(_ sender: UIHoverGestureRecognizer) {
-        let hasSong = player.currentlyPlaying != nil
         switch sender.state {
         case .began:
             self.artworkOverlay.isHidden = false

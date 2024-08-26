@@ -100,10 +100,12 @@ struct ServerURLsSettingsView: View {
             .border(Color.separator, width: 1.0)
             #endif
         }
-        .sheet(isPresented: $isAddDialogVisible) {
-            AlternativeURLAddDialogView(isVisible: $isAddDialogVisible, activeServerURL: $activeServerURL, serverURLs: $serverURLs)
-        }
         #if targetEnvironment(macCatalyst)
+        .formSheet(isPresented: $isAddDialogVisible) {
+            AlternativeURLAddDialogView(isVisible: $isAddDialogVisible, activeServerURL: $activeServerURL, serverURLs: $serverURLs)
+                .frame(width: 400, height: 260)
+                .environment(\.managedObjectContext, appDelegate.storage.main.context)
+        }
         .background {
             Color.systemBackground
         }
@@ -122,6 +124,9 @@ struct ServerURLsSettingsView: View {
             }.buttonStyle(BorderlessButtonStyle())
         }
         #else
+        .sheet(isPresented: $isAddDialogVisible) {
+            AlternativeURLAddDialogView(isVisible: $isAddDialogVisible, activeServerURL: $activeServerURL, serverURLs: $serverURLs)
+        }
         .navigationTitle("Server URLs")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {

@@ -104,9 +104,17 @@ struct ServerSettingsView: View {
         }
         .navigationTitle("Server")
         .navigationBarTitleDisplayMode(.inline)
+        #if targetEnvironment(macCatalyst)
+        .formSheet(isPresented: $isPwUpdateDialogVisible) {
+            UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
+                .frame(width: 400, height: 150)
+                .environment(\.managedObjectContext, appDelegate.storage.main.context)
+        }
+        #else
         .sheet(isPresented: $isPwUpdateDialogVisible) {
             UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
         }
+        #endif
     }
 }
 

@@ -25,8 +25,8 @@ import AmperfyKit
 struct AddSwipeActionView: View {
     
     @EnvironmentObject private var settings: Settings
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    
+    @Binding var isVisible: Bool
+
     var swipePosition: SwipePosition
     @State private var actionNotInUse = [SwipeActionType]()
     var addCB : (_ swipePosition: SwipePosition, _ elementToAdd: SwipeActionType) -> ()
@@ -46,20 +46,23 @@ struct AddSwipeActionView: View {
             List {
                 ForEach(actionNotInUse, id: \.self) { swipe in
                     SwipeCellView(swipe: swipe)
-                    .onTapGesture {
-                        addCB(swipePosition, swipe)
-                        self.presentationMode.wrappedValue.dismiss()
-                    }
+                        .onTapGesture {
+                            addCB(swipePosition, swipe)
+                            self.isVisible = false
+                        }
                 }
             }
-            .listStyle(GroupedListStyle())
-            
-            Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
+            .listStyle(.grouped)
+
+            Button(action: { self.isVisible = false }) {
                 Text("Cancel")
                     .fontWeight(.bold)
             }
             .padding()
         }
+        #if targetEnvironment(macCatalyst)
+        .background { Color.systemGroupedBackground }
+        #endif
         .onAppear {
             reload()
         }
@@ -68,8 +71,9 @@ struct AddSwipeActionView: View {
 
 struct AddSwipeActionView_Previews: PreviewProvider {
     @State static var settings = Settings()
-    
+    @State static var isVisible = true
+
     static var previews: some View {
-        AddSwipeActionView(swipePosition: .trailing, addCB: {_,_ in}).environmentObject(settings)
+        AddSwipeActionView(isVisible: $isVisible, swipePosition: .trailing, addCB: {_,_ in}).environmentObject(settings)
     }
 }

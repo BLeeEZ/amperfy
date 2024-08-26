@@ -108,8 +108,16 @@ struct UpdatePasswordView: View {
                         .padding([.top], 8)
                     }
                 }
+                #if targetEnvironment(macCatalyst)
+                .listRowBackground(Color.clear)
+                #else
                 .padding()
+                #endif
             }
+            #if targetEnvironment(macCatalyst)
+            .listStyle(.plain)
+            .background { Color.systemGroupedBackground }
+            #endif
         }
         .onAppear {
             resetStatus()

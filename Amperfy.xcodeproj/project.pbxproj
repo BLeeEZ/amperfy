@@ -432,6 +432,7 @@
 		631C166D2C6D61110085F62E /* NavigationTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166C2C6D61110085F62E /* NavigationTarget.swift */; };
 		631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166E2C6D63510085F62E /* SettingsSection.swift */; };
 		631C16712C6D6AA30085F62E /* BehavioralStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C16702C6D6AA30085F62E /* BehavioralStylable.swift */; };
+		632F511C2C7D2ACE0032860D /* FormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511B2C7D2ACE0032860D /* FormSheet.swift */; };
 		6333C8E12C6FDB5200CCA50A /* SecondaryText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */; };
 		637A28A82C75318C0082FACC /* NowPlayingBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */; };
 		637A28AB2C77BB8E0082FACC /* Refreshable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28AA2C77BB8E0082FACC /* Refreshable.swift */; };
@@ -961,6 +962,7 @@
 		631C166C2C6D61110085F62E /* NavigationTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTarget.swift; sourceTree = "<group>"; };
 		631C166E2C6D63510085F62E /* SettingsSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsSection.swift; sourceTree = "<group>"; };
 		631C16702C6D6AA30085F62E /* BehavioralStylable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehavioralStylable.swift; sourceTree = "<group>"; };
+		632F511B2C7D2ACE0032860D /* FormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormSheet.swift; sourceTree = "<group>"; };
 		6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryText.swift; sourceTree = "<group>"; };
 		637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingBarItem.swift; sourceTree = "<group>"; };
 		637A28AA2C77BB8E0082FACC /* Refreshable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Refreshable.swift; sourceTree = "<group>"; };
@@ -1196,6 +1198,7 @@
 		50791E7D28D363CA006CE6E5 /* Basics */ = {
 			isa = PBXGroup;
 			children = (
+				632F511B2C7D2ACE0032860D /* FormSheet.swift */,
 				6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */,
 				631C16702C6D6AA30085F62E /* BehavioralStylable.swift */,
 				631C166A2C6D3D9A0085F62E /* SettingsRow.swift */,
@@ -2244,6 +2247,7 @@
 				509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */,
 				637A28B12C77C8D40082FACC /* AirplayButtonBarItem.swift in Sources */,
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
+				632F511C2C7D2ACE0032860D /* FormSheet.swift in Sources */,
 				50C9D7142850759B007F18D0 /* Corners.swift in Sources */,
 				50AC4E5828D9D12D0091FF33 /* ObservableSettings.swift in Sources */,
 				50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */,
