@@ -24,6 +24,10 @@ import AmperfyKit
 
 #if targetEnvironment(macCatalyst)
 class MacToolbarHostingViewController: UIViewController {
+    override var sceneTitle: String? {
+        self.children.first?.sceneTitle
+    }
+
     override func viewWillLayoutSubviews() {
         self.extendSafeAreaToAccountForTabbar()
         super.viewWillLayoutSubviews()
@@ -42,7 +46,7 @@ class SplitVC: UISplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setViewController(defaultSecondaryVC, for: .secondary)
-        
+
         if appDelegate.storage.settings.isOfflineMode {
             appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
         }
@@ -377,6 +381,7 @@ class SplitVC: UISplitViewController {
                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
                         if let searchTabVC = searchTabNavVC.visibleViewController as? SearchVC {
                             searchTabVC.activateSearchBar()
+                            self.updateScene(title: searchTabVC.sceneTitle)
                         }
                     }
                 }
@@ -388,6 +393,7 @@ class SplitVC: UISplitViewController {
                         activeSearchVC.activateSearchBar()
                     }
                 }
+                self.updateScene(title: searchVC.sceneTitle)
             }
         }
     }
