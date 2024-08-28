@@ -1,5 +1,5 @@
 //
-//  BackButtonBarItem.swift
+//  AirplayBarButton.swift
 //  Amperfy
 //
 //  Created by David Klopp on 22.08.24.
@@ -12,7 +12,7 @@ import MediaPlayer
 
 #if targetEnvironment(macCatalyst)
 
-class AirplayButtonBarItem: CustomBarButton {
+class AirplayBarButton: CustomBarButton {
     private lazy var airplayVolume: MPVolumeView = {
         let volumeView = MPVolumeView(frame: .zero)
         volumeView.showsVolumeSlider = false

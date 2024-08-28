@@ -183,9 +183,9 @@ class NowPlayingInfoView: UIView {
         return container
     }()
 
-    init(player: PlayerFacade, rootViewController: UIViewController) {
+    init(player: PlayerFacade, splitViewController: SplitVC) {
         self.player = player
-        self.rootViewController = rootViewController
+        self.rootViewController = splitViewController
         super.init(frame: .zero)
 
         self.backgroundColor = UIColor(dynamicProvider: { traitCollection in
@@ -371,14 +371,14 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
 }
 
 class NowPlayingBarItem: UIBarButtonItem {
-    init(player: PlayerFacade, rootViewController: UIViewController) {
+    init(player: PlayerFacade, splitViewController: SplitVC) {
         super.init()
 
         self.title = "Now Playing"
 
         let height = toolbarSafeAreaTop - 8
 
-        let nowPlayingView = NowPlayingInfoView(player: player, rootViewController: rootViewController)
+        let nowPlayingView = NowPlayingInfoView(player: player, splitViewController: splitViewController)
         nowPlayingView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             nowPlayingView.widthAnchor.constraint(equalToConstant: 300),

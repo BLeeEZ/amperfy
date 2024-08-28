@@ -22,19 +22,6 @@
 import UIKit
 import AmperfyKit
 
-#if targetEnvironment(macCatalyst)
-class MacToolbarHostingViewController: UIViewController {
-    override var sceneTitle: String? {
-        self.children.first?.sceneTitle
-    }
-
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-}
-#endif
-
 class SplitVC: UISplitViewController {
 
     lazy var barPlayer = BarPlayerHandler(player: appDelegate.player, splitVC: self)
@@ -79,7 +66,7 @@ class SplitVC: UISplitViewController {
         
         #if targetEnvironment(macCatalyst)
         guard let window = self.view.window else { return }
-        self.macToolbarHostingViewController?.addPlayerControls(inWindow: window)
+        self.macToolbarHostingViewController?.addPlayerControls(forWindow: window)
         #else
         displayInfoPopups()
         #endif
@@ -94,31 +81,39 @@ class SplitVC: UISplitViewController {
     }
 
     #if targetEnvironment(macCatalyst)
-    var macToolbarHostingViewController: UIViewController? {
+    var macToolbarHostingViewController: MacToolbarHostingViewController? {
         guard self.viewControllers.count >= 1 else { return nil }
         let navController = self.viewControllers[1] as? UINavigationController
-        return navController?.topViewController
+        return navController?.topViewController as? MacToolbarHostingViewController
     }
+
+    // TODO: Figure out a way to keep the popup open / reopen it when selecting a new sidebar item
+    var sliderOverMenuViewController: UIViewController = {
+        let vc = QueueVC()
+        vc.view.addLeftSideBorder()
+        return vc
+    }()
     #endif
 
     func embeddInNavigation(vc: UIViewController) -> UINavigationController {
         let navController = UINavigationController(rootViewController: vc)
         #if targetEnvironment(macCatalyst)
         // We can not directly nest UINavigationController.
-        // That is, encapsulate the inner UIavigationController in a UIViewController fist.
-        let childVC = MacToolbarHostingViewController()
-        childVC.addChild(navController)
-        childVC.view.addSubview(navController.view)
+        // That is, encapsulate the inner UIavigationController in a UIViewController first.
+        let toolbarHostingVC = MacToolbarHostingViewController(
+            primaryViewController: navController,
+            slideOverViewController: self.sliderOverMenuViewController
+        )
 
         // Hide the navigation title
         navController.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.clear]
 
         if let window = self.view.window {
-            childVC.addPlayerControls(inWindow: window)
+            toolbarHostingVC.addPlayerControls(forWindow: window)
         }
 
         // This navigation controller hosts the toolbar with the player controls
-        let toolbarNavController = UINavigationController(rootViewController: childVC)
+        let toolbarNavController = UINavigationController(rootViewController: toolbarHostingVC)
 
         // Display the "real" navigation bar in .pad style and the toolbar in mac style
         if #available(macCatalyst 16.0, *) {

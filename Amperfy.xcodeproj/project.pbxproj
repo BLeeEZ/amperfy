@@ -433,12 +433,15 @@
 		631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166E2C6D63510085F62E /* SettingsSection.swift */; };
 		631C16712C6D6AA30085F62E /* BehavioralStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C16702C6D6AA30085F62E /* BehavioralStylable.swift */; };
 		632F511C2C7D2ACE0032860D /* FormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511B2C7D2ACE0032860D /* FormSheet.swift */; };
+		632F511E2C7FD54A0032860D /* QueueBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511D2C7FD54A0032860D /* QueueBarButton.swift */; };
+		632F51202C7FD8240032860D /* MacToolbarHostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511F2C7FD8240032860D /* MacToolbarHostingViewController.swift */; };
+		632F51222C7FD8680032860D /* QueueVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F51212C7FD8680032860D /* QueueVC.swift */; };
 		6333C8E12C6FDB5200CCA50A /* SecondaryText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */; };
 		637A28A82C75318C0082FACC /* NowPlayingBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */; };
 		637A28AB2C77BB8E0082FACC /* Refreshable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28AA2C77BB8E0082FACC /* Refreshable.swift */; };
 		637A28AD2C77BB9A0082FACC /* ControlBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28AC2C77BB9A0082FACC /* ControlBarButton.swift */; };
 		637A28AF2C77C5140082FACC /* SpaceBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28AE2C77C5140082FACC /* SpaceBarItem.swift */; };
-		637A28B12C77C8D40082FACC /* AirplayButtonBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B02C77C8D40082FACC /* AirplayButtonBarItem.swift */; };
+		637A28B12C77C8D40082FACC /* AirplayBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B02C77C8D40082FACC /* AirplayBarButton.swift */; };
 		637A28B32C77D1520082FACC /* CustomBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B22C77D1520082FACC /* CustomBarButton.swift */; };
 		637A28B52C79409C0082FACC /* MiniPlayerSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
@@ -963,12 +966,15 @@
 		631C166E2C6D63510085F62E /* SettingsSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsSection.swift; sourceTree = "<group>"; };
 		631C16702C6D6AA30085F62E /* BehavioralStylable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehavioralStylable.swift; sourceTree = "<group>"; };
 		632F511B2C7D2ACE0032860D /* FormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormSheet.swift; sourceTree = "<group>"; };
+		632F511D2C7FD54A0032860D /* QueueBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueBarButton.swift; sourceTree = "<group>"; };
+		632F511F2C7FD8240032860D /* MacToolbarHostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacToolbarHostingViewController.swift; path = Amperfy/Screens/ViewController/MacToolbarHostingViewController.swift; sourceTree = SOURCE_ROOT; };
+		632F51212C7FD8680032860D /* QueueVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueVC.swift; sourceTree = "<group>"; };
 		6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryText.swift; sourceTree = "<group>"; };
 		637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingBarItem.swift; sourceTree = "<group>"; };
 		637A28AA2C77BB8E0082FACC /* Refreshable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Refreshable.swift; sourceTree = "<group>"; };
 		637A28AC2C77BB9A0082FACC /* ControlBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlBarButton.swift; sourceTree = "<group>"; };
 		637A28AE2C77C5140082FACC /* SpaceBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceBarItem.swift; sourceTree = "<group>"; };
-		637A28B02C77C8D40082FACC /* AirplayButtonBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirplayButtonBarItem.swift; sourceTree = "<group>"; };
+		637A28B02C77C8D40082FACC /* AirplayBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirplayBarButton.swift; sourceTree = "<group>"; };
 		637A28B22C77D1520082FACC /* CustomBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBarButton.swift; sourceTree = "<group>"; };
 		637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerSceneDelegate.swift; sourceTree = "<group>"; };
 		63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSceneDelegate.swift; sourceTree = "<group>"; };
@@ -1563,6 +1569,8 @@
 		50C16C0D21E533B600F086F0 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
+				632F511F2C7FD8240032860D /* MacToolbarHostingViewController.swift */,
+				632F51212C7FD8680032860D /* QueueVC.swift */,
 				505CA20B2B88E95400AA81CD /* TableViewHelper */,
 				50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */,
 				50DE29EA2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift */,
@@ -1845,7 +1853,8 @@
 				637A28AC2C77BB9A0082FACC /* ControlBarButton.swift */,
 				637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */,
 				637A28AE2C77C5140082FACC /* SpaceBarItem.swift */,
-				637A28B02C77C8D40082FACC /* AirplayButtonBarItem.swift */,
+				637A28B02C77C8D40082FACC /* AirplayBarButton.swift */,
+				632F511D2C7FD54A0032860D /* QueueBarButton.swift */,
 			);
 			path = Toolbar;
 			sourceTree = "<group>";
@@ -2152,6 +2161,7 @@
 				50DEEE04265E25A40073FF20 /* MusicFoldersVC.swift in Sources */,
 				50DEEE0A265E392C0073FF20 /* IndexesVC.swift in Sources */,
 				50E1D39A2B8BEA540001A572 /* SplitVC.swift in Sources */,
+				632F51222C7FD8680032860D /* QueueVC.swift in Sources */,
 				50CFB59728D4FC0100A47D44 /* ArtworkSettingsView.swift in Sources */,
 				5005939128E42F66008C8DF6 /* BasicCollectionCell.swift in Sources */,
 				5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */,
@@ -2225,8 +2235,10 @@
 				504262B42BF5FC3D00B5EF38 /* NSUserActivity+IntentData.swift in Sources */,
 				50C16C1021E5463E00F086F0 /* ArtistsVC.swift in Sources */,
 				50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */,
+				632F51202C7FD8240032860D /* MacToolbarHostingViewController.swift in Sources */,
 				631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */,
 				50A30E542B7408DB00722894 /* ContextQueueNextSectionHeader.swift in Sources */,
+				632F511E2C7FD54A0032860D /* QueueBarButton.swift in Sources */,
 				50791E8528D36F1F006CE6E5 /* LibrarySettingsView.swift in Sources */,
 				50DE29ED2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift in Sources */,
 				5019441D2B7ACB0800082D2E /* PopupPlayer+Animations.swift in Sources */,
@@ -2245,7 +2257,7 @@
 				508AA57D2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift in Sources */,
 				5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */,
 				509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */,
-				637A28B12C77C8D40082FACC /* AirplayButtonBarItem.swift in Sources */,
+				637A28B12C77C8D40082FACC /* AirplayBarButton.swift in Sources */,
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
 				632F511C2C7D2ACE0032860D /* FormSheet.swift in Sources */,
 				50C9D7142850759B007F18D0 /* Corners.swift in Sources */,

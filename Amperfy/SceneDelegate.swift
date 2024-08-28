@@ -72,11 +72,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             PlayBarButton(player: player),
             NextBarButton(player: player),
             SpaceBarItem(minSpace: 20),
-            NowPlayingBarItem(player: player, rootViewController: splitVC),
+            NowPlayingBarItem(player: player, splitViewController: splitVC),
             SpaceBarItem(),
-            AirplayButtonBarItem(),
+            AirplayBarButton(),
+            QueueBarButton(splitViewController: splitVC),
             SpaceBarItem(fixedSpace: 20),
-
         ]
 
         if AmperKit.shared.storage.loginCredentials == nil {

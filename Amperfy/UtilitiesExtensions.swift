@@ -158,6 +158,20 @@ extension UIView {
         blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.insertSubview(blurEffectView, at: 0)
     }
+
+    func addLeftSideBorder() {
+        let separator = UIView()
+        separator.backgroundColor = .separator
+        self.addSubview(separator)
+        separator.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            separator.widthAnchor.constraint(equalToConstant: 1),
+            separator.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            separator.topAnchor.constraint(equalTo: self.topAnchor),
+            separator.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+        ])
+    }
 }
 
 extension UINavigationController {
@@ -363,7 +377,7 @@ extension UIViewController {
         self.additionalSafeAreaInsets = UIEdgeInsets(top:  toolbarSafeAreaTop - currentInsetTop, left: 0, bottom: 0, right: 0)
     }
 
-    func addPlayerControls(inWindow window: UIWindow) {
+    func addPlayerControls(forWindow window: UIWindow) {
         guard let sceneDelegate = window.windowScene?.delegate as? SceneDelegate else { return }
         let toolbarItems = sceneDelegate.toolbarPlayerControls
         self.navigationItem.leftBarButtonItems = toolbarItems

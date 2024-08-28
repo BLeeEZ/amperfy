@@ -145,6 +145,7 @@ extension UIImage {
     public static let hammer = UIImage.create(systemName: "hammer.circle.fill")
 
     public static let miniPlayer = UIImage.create(systemName: "play.rectangle.on.rectangle")
+    public static let listBullet = UIImage.create(systemName: "list.bullet")
 
 /// Asset symbol generation is enabled by default for both new and old projects but can be disabled by setting the build setting "Generate Asset Symbols" (ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS) to NO.
 #if false
