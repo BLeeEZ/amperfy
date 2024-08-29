@@ -127,9 +127,9 @@ class SplitVC: UISplitViewController {
         if #available(macCatalyst 16.0, *) {
             navController.navigationBar.preferredBehavioralStyle = .pad
         }
-        // Reuse the existing slideOverHostingController. This has two advantages:
-        // 1. We do not need to reload the mac toolbar, which is slow
-        // 2. We keep the slide over menu open even when switching tabs
+        // This is a little bit hacky. We reuse the existing slideOverHostingController. This has two advantages:
+        // 1. We do not need to reload the mac toolbar, which is slow.
+        // 2. We keep the slide over menu open even when switching tabs.
         self.slideOverHostingController.primaryViewController = navController
         return self.macToolbarNavigationController
         #else

@@ -60,12 +60,6 @@ class QueueVC: UINavigationController {
         }
         #endif
 
-        /*let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        self.navigationBar.standardAppearance = appearance
-        self.navigationBar.scrollEdgeAppearance = appearance
-        self.navigationBar.compactAppearance = appearance*/
-
         self.viewController = [self.userQueueViewController, self.contextQueueViewController]
 
         self.segmentedControl = UISegmentedControl(items: self.viewController.enumerated().map { (i, vc) in

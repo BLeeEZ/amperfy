@@ -12,6 +12,7 @@ import MediaPlayer
 
 #if targetEnvironment(macCatalyst)
 
+// TODO: Make this a toggle button, so that I stays pushed in
 class QueueBarButton: CustomBarButton {
     let splitViewController: SplitVC
 

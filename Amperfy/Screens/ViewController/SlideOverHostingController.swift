@@ -14,7 +14,7 @@ import UIKit
 // from the right hand side.
 class SlideOverHostingController: UIViewController {
     override var sceneTitle: String? {
-        self.children.first?.sceneTitle
+        self.primaryViewController?.sceneTitle
     }
 
     var sliderOverWidth: CGFloat = 300 {
