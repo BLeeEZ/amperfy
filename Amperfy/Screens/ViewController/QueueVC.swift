@@ -54,9 +54,11 @@ class QueueVC: UINavigationController {
         self.rootVC = UIViewController()
         super.init(rootViewController: self.rootVC)
         
+        #if targetEnvironment(macCatalyst)
         if #available(macCatalyst 16.0, *) {
             self.navigationBar.preferredBehavioralStyle = .pad
         }
+        #endif
 
         /*let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()

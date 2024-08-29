@@ -9,7 +9,10 @@
 import UIKit
 
 #if targetEnvironment(macCatalyst)
-class MacToolbarHostingViewController: UIViewController {
+
+// A view controller with a primary view controller and a slide over view controller that can be displayed
+// from the right hand side.
+class SlideOverHostingController: UIViewController {
     override var sceneTitle: String? {
         self.children.first?.sceneTitle
     }
@@ -21,7 +24,31 @@ class MacToolbarHostingViewController: UIViewController {
         }
     }
 
-    let primaryViewController: UIViewController
+    var _primaryViewController: UIViewController?
+
+    var primaryViewController: UIViewController? {
+        get { return self._primaryViewController }
+        set(newValue) {
+            self._primaryViewController?.view.removeFromSuperview()
+            self._primaryViewController?.removeFromParent()
+            self._primaryViewController?.didMove(toParent: nil)
+
+            guard let vc = newValue else { return }
+
+            self.addChild(vc)
+            self.view.insertSubview(vc.view, at: 0)
+            vc.view.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                vc.view.topAnchor.constraint(equalTo: self.view.topAnchor),
+                vc.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+                vc.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+                vc.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
+            ])
+            vc.didMove(toParent: self)
+
+            self._primaryViewController = vc
+        }
+    }
 
     let slideOverViewController: UIViewController
 
@@ -31,22 +58,9 @@ class MacToolbarHostingViewController: UIViewController {
         self.slideOverTrailingConstraint?.constant == 0
     }
 
-    init(primaryViewController: UIViewController, slideOverViewController: UIViewController) {
-        self.primaryViewController = primaryViewController
+    init(slideOverViewController: UIViewController) {
         self.slideOverViewController = slideOverViewController
         super.init(nibName: nil, bundle: nil)
-
-        // Add the primary view controller
-        self.addChild(primaryViewController)
-        self.view.addSubview(self.primaryViewController.view)
-        self.primaryViewController.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            self.primaryViewController.view.topAnchor.constraint(equalTo: self.view.topAnchor),
-            self.primaryViewController.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            self.primaryViewController.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-            self.primaryViewController.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
-        ])
-        self.primaryViewController.didMove(toParent: self)
 
         // Add the slide over view controller
         self.addChild(slideOverViewController)

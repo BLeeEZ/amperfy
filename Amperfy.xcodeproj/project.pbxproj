@@ -434,7 +434,7 @@
 		631C16712C6D6AA30085F62E /* BehavioralStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C16702C6D6AA30085F62E /* BehavioralStylable.swift */; };
 		632F511C2C7D2ACE0032860D /* FormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511B2C7D2ACE0032860D /* FormSheet.swift */; };
 		632F511E2C7FD54A0032860D /* QueueBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511D2C7FD54A0032860D /* QueueBarButton.swift */; };
-		632F51202C7FD8240032860D /* MacToolbarHostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511F2C7FD8240032860D /* MacToolbarHostingViewController.swift */; };
+		632F51202C7FD8240032860D /* SlideOverHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511F2C7FD8240032860D /* SlideOverHostingController.swift */; };
 		632F51222C7FD8680032860D /* QueueVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F51212C7FD8680032860D /* QueueVC.swift */; };
 		6333C8E12C6FDB5200CCA50A /* SecondaryText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */; };
 		637A28A82C75318C0082FACC /* NowPlayingBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */; };
@@ -967,7 +967,7 @@
 		631C16702C6D6AA30085F62E /* BehavioralStylable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehavioralStylable.swift; sourceTree = "<group>"; };
 		632F511B2C7D2ACE0032860D /* FormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormSheet.swift; sourceTree = "<group>"; };
 		632F511D2C7FD54A0032860D /* QueueBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueBarButton.swift; sourceTree = "<group>"; };
-		632F511F2C7FD8240032860D /* MacToolbarHostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacToolbarHostingViewController.swift; path = Amperfy/Screens/ViewController/MacToolbarHostingViewController.swift; sourceTree = SOURCE_ROOT; };
+		632F511F2C7FD8240032860D /* SlideOverHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SlideOverHostingController.swift; path = Amperfy/Screens/ViewController/SlideOverHostingController.swift; sourceTree = SOURCE_ROOT; };
 		632F51212C7FD8680032860D /* QueueVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueVC.swift; sourceTree = "<group>"; };
 		6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryText.swift; sourceTree = "<group>"; };
 		637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingBarItem.swift; sourceTree = "<group>"; };
@@ -1569,7 +1569,7 @@
 		50C16C0D21E533B600F086F0 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				632F511F2C7FD8240032860D /* MacToolbarHostingViewController.swift */,
+				632F511F2C7FD8240032860D /* SlideOverHostingController.swift */,
 				632F51212C7FD8680032860D /* QueueVC.swift */,
 				505CA20B2B88E95400AA81CD /* TableViewHelper */,
 				50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */,
@@ -2235,7 +2235,7 @@
 				504262B42BF5FC3D00B5EF38 /* NSUserActivity+IntentData.swift in Sources */,
 				50C16C1021E5463E00F086F0 /* ArtistsVC.swift in Sources */,
 				50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */,
-				632F51202C7FD8240032860D /* MacToolbarHostingViewController.swift in Sources */,
+				632F51202C7FD8240032860D /* SlideOverHostingController.swift in Sources */,
 				631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */,
 				50A30E542B7408DB00722894 /* ContextQueueNextSectionHeader.swift in Sources */,
 				632F511E2C7FD54A0032860D /* QueueBarButton.swift in Sources */,

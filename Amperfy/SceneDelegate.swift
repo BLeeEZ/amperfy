@@ -31,14 +31,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
 
-    #if targetEnvironment(macCatalyst)
-    // For performance reasons we initialize these once for each scene.
-    // Otherwise the navigation bar appears slowly one item at a time
-    // Do not move this to AppDelagate, otherwise it breaks multiple tabs.
-    var toolbarPlayerControls: [UIBarButtonItem] = []
-    #endif
-
-
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         os_log("willConnectTo", log: self.log, type: .info)
         /** Process the quick action if the user selected one to launch the app.
@@ -65,20 +57,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let splitVC = SplitVC.instantiateFromAppStoryboard()
 
-        let player = appDelegate.player
-        self.toolbarPlayerControls = [
-            SpaceBarItem(fixedSpace: 20),
-            PreviousBarButton(player: player),
-            PlayBarButton(player: player),
-            NextBarButton(player: player),
-            SpaceBarItem(minSpace: 20),
-            NowPlayingBarItem(player: player, splitViewController: splitVC),
-            SpaceBarItem(),
-            AirplayBarButton(),
-            QueueBarButton(splitViewController: splitVC),
-            SpaceBarItem(fixedSpace: 20),
-        ]
-
         if AmperKit.shared.storage.loginCredentials == nil {
             initialViewController = LoginVC.instantiateFromAppStoryboard()
         } else if !AmperKit.shared.storage.isLibrarySynced {
@@ -91,6 +69,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             windowScene.title = "Search"
             titlebar.toolbarStyle = .unified
             titlebar.titleVisibility = .hidden
+            titlebar.separatorStyle = .automatic
             titlebar.toolbar = nil
         }
 

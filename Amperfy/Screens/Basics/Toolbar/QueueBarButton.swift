@@ -25,7 +25,7 @@ class QueueBarButton: CustomBarButton {
     }
 
     override func clicked(_ sender: UIButton) {
-        self.splitViewController.macToolbarHostingViewController?.toggleSlideOverView()
+        self.splitViewController.slideOverHostingController.toggleSlideOverView()
     }
 }
 

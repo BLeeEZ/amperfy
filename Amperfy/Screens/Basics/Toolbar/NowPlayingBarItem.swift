@@ -281,10 +281,10 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
             self.moreButton.isHidden = false
             self.moreButtonWidthConstraint?.constant = 10
             self.moreButtonTrailingConstrait?.constant = -10
+
             if let currentlyPlaying,
                let splitVC = self.rootViewController as? SplitVC,
-               let toolbarHostingVC = splitVC.macToolbarHostingViewController,
-               let navController = toolbarHostingVC.children.first as? UINavigationController,
+               let navController = splitVC.slideOverHostingController.primaryViewController as? UINavigationController,
                let topVC = navController.topViewController
             {
                 self.moreButton.menu = UIMenu.lazyMenu {

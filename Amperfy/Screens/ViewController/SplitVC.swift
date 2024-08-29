@@ -64,10 +64,7 @@ class SplitVC: UISplitViewController {
         super.viewDidAppear(animated)
         setCorrectPlayerBarView(collapseMode: isCompact)
         
-        #if targetEnvironment(macCatalyst)
-        guard let window = self.view.window else { return }
-        self.macToolbarHostingViewController?.addPlayerControls(forWindow: window)
-        #else
+        #if !targetEnvironment(macCatalyst)
         displayInfoPopups()
         #endif
     }
@@ -81,14 +78,41 @@ class SplitVC: UISplitViewController {
     }
 
     #if targetEnvironment(macCatalyst)
-    var macToolbarHostingViewController: MacToolbarHostingViewController? {
-        guard self.viewControllers.count >= 1 else { return nil }
-        let navController = self.viewControllers[1] as? UINavigationController
-        return navController?.topViewController as? MacToolbarHostingViewController
-    }
+    lazy var macToolbarNavigationController: UINavigationController = {
+        let toolbarHostingVC = self.slideOverHostingController
+        // This navigation controller hosts the toolbar with the player controls
+        let toolbarNavController = UINavigationController(rootViewController: toolbarHostingVC)
+        // Fake a NSTitlebarSeparatorStyle.line but only for the secondary view controller
+        toolbarNavController.navigationBar.addTopSideBorder()
+        // Display the toolbar in mac style
+        if #available(macCatalyst 16.0, *) {
+            toolbarNavController.navigationBar.preferredBehavioralStyle = .mac
+        }
+        return toolbarNavController
+    }()
 
-    // TODO: Figure out a way to keep the popup open / reopen it when selecting a new sidebar item
-    var sliderOverMenuViewController: UIViewController = {
+    lazy var slideOverHostingController: SlideOverHostingController = {
+        let hostingVC = SlideOverHostingController(slideOverViewController: self.slideOverMenuViewController)
+        let player = appDelegate.player
+        // Add the media player controls to the view's navigation item
+        hostingVC.navigationItem.leftItemsSupplementBackButton = false
+        hostingVC.navigationItem.leftBarButtonItems = [
+            SpaceBarItem(fixedSpace: 20),
+            PreviousBarButton(player: player),
+            PlayBarButton(player: player),
+            NextBarButton(player: player),
+            SpaceBarItem(minSpace: 20),
+            NowPlayingBarItem(player: player, splitViewController: self),
+            SpaceBarItem(),
+            AirplayBarButton(),
+            QueueBarButton(splitViewController: self),
+            SpaceBarItem(fixedSpace: 20),
+        ]
+        hostingVC.navigationItem.leftBarButtonItems?.forEach { ($0 as? Refreshable)?.reload() }
+        return hostingVC
+    }()
+
+    var slideOverMenuViewController: UIViewController = {
         let vc = QueueVC()
         vc.view.addLeftSideBorder()
         return vc
@@ -98,30 +122,16 @@ class SplitVC: UISplitViewController {
     func embeddInNavigation(vc: UIViewController) -> UINavigationController {
         let navController = UINavigationController(rootViewController: vc)
         #if targetEnvironment(macCatalyst)
-        // We can not directly nest UINavigationController.
-        // That is, encapsulate the inner UIavigationController in a UIViewController first.
-        let toolbarHostingVC = MacToolbarHostingViewController(
-            primaryViewController: navController,
-            slideOverViewController: self.sliderOverMenuViewController
-        )
-
-        // Hide the navigation title
+        // Hide the navigation title in the "subbar"
         navController.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.clear]
-
-        if let window = self.view.window {
-            toolbarHostingVC.addPlayerControls(forWindow: window)
-        }
-
-        // This navigation controller hosts the toolbar with the player controls
-        let toolbarNavController = UINavigationController(rootViewController: toolbarHostingVC)
-
-        // Display the "real" navigation bar in .pad style and the toolbar in mac style
         if #available(macCatalyst 16.0, *) {
             navController.navigationBar.preferredBehavioralStyle = .pad
-            toolbarNavController.navigationBar.preferredBehavioralStyle = .mac
         }
-
-        return toolbarNavController
+        // Reuse the existing slideOverHostingController. This has two advantages:
+        // 1. We do not need to reload the mac toolbar, which is slow
+        // 2. We keep the slide over menu open even when switching tabs
+        self.slideOverHostingController.primaryViewController = navController
+        return self.macToolbarNavigationController
         #else
         return navController
         #endif
