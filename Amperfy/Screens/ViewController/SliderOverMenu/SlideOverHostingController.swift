@@ -11,7 +11,7 @@ import UIKit
 #if targetEnvironment(macCatalyst)
 
 // A view controller with a primary view controller and a slide over view controller that can be displayed
-// from the right hand side.
+// from the right hand side as an overlay.
 class SlideOverHostingController: UIViewController {
     override var sceneTitle: String? {
         self.primaryViewController?.sceneTitle

@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import AmperfyKit
 import MarqueeLabel
+import PromiseKit
 
 #if targetEnvironment(macCatalyst)
 
@@ -340,6 +341,20 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
         self.artworkView.image = artwork
     }
 
+    private func fetchSongInfoAndReload() {
+        guard self.appDelegate.storage.settings.isOnlineMode,
+              let song = self.player.currentlyPlaying?.asSong
+        else { return }
+
+        firstly {
+            self.appDelegate.librarySyncer.sync(song: song)
+        }.done {
+            self.reload()
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
+        }
+    }
+
     func reload() {
         self.refreshTitle()
         self.refreshElapsedTime()
@@ -348,7 +363,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
     }
 
     func didStartPlaying() {
-        self.reload()
+        self.fetchSongInfoAndReload()
     }
 
     func didElapsedTimeChange() {

@@ -51,6 +51,20 @@ class LyricsVC: SliderOverItemVC {
         self.refreshLyrics()
     }
 
+    private func fetchSongInfoAndUpdateLyrics() {
+        guard self.appDelegate.storage.settings.isOnlineMode,
+              let song = player.currentlyPlaying?.asSong
+        else { return }
+
+        firstly {
+            self.appDelegate.librarySyncer.sync(song: song)
+        }.done {
+            self.refreshLyrics()
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
+        }
+    }
+
     private func showLyrics(structuredLyrics: StructuredLyrics) {
         self.lyricsView?.display(lyrics: structuredLyrics, scrollAnimation: appDelegate.storage.settings.isLyricsSmoothScrolling)
     }
@@ -94,6 +108,10 @@ class LyricsVC: SliderOverItemVC {
 
 
 extension LyricsVC: MusicPlayable {
+    func didStartPlayingFromBeginning() {
+        self.fetchSongInfoAndUpdateLyrics()
+    }
+
     func didStartPlaying() {
         self.refreshLyrics()
     }
@@ -105,7 +123,6 @@ extension LyricsVC: MusicPlayable {
     func didPause() {}
     func didStopPlaying() {}
     func didElapsedTimeChange() {}
-    func didStartPlayingFromBeginning() {}
     func didPlaylistChange() {}
     func didArtworkChange() {}
     func didShuffleChange() {}

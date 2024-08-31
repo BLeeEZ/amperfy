@@ -969,7 +969,7 @@
 		631C16702C6D6AA30085F62E /* BehavioralStylable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehavioralStylable.swift; sourceTree = "<group>"; };
 		632F511B2C7D2ACE0032860D /* FormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormSheet.swift; sourceTree = "<group>"; };
 		632F511D2C7FD54A0032860D /* QueueBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueBarButton.swift; sourceTree = "<group>"; };
-		632F511F2C7FD8240032860D /* SlideOverHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SlideOverHostingController.swift; path = Amperfy/Screens/ViewController/SlideOverHostingController.swift; sourceTree = SOURCE_ROOT; };
+		632F511F2C7FD8240032860D /* SlideOverHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SlideOverHostingController.swift; path = Amperfy/Screens/ViewController/SliderOverMenu/SlideOverHostingController.swift; sourceTree = SOURCE_ROOT; };
 		632F51212C7FD8680032860D /* SlideOverVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideOverVC.swift; sourceTree = "<group>"; };
 		632F51232C83A7970032860D /* QueueVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueVC.swift; sourceTree = "<group>"; };
 		632F51252C83A8400032860D /* LyricsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsVC.swift; sourceTree = "<group>"; };
@@ -1573,10 +1573,7 @@
 		50C16C0D21E533B600F086F0 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				632F511F2C7FD8240032860D /* SlideOverHostingController.swift */,
-				632F51212C7FD8680032860D /* SlideOverVC.swift */,
-				632F51252C83A8400032860D /* LyricsVC.swift */,
-				632F51232C83A7970032860D /* QueueVC.swift */,
+				632F51272C83DC9D0032860D /* SliderOverMenu */,
 				505CA20B2B88E95400AA81CD /* TableViewHelper */,
 				50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */,
 				50DE29EA2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift */,
@@ -1849,6 +1846,17 @@
 				5086F8822239A2B700546F5A /* ScrobbleSyncer.swift */,
 			);
 			path = Player;
+			sourceTree = "<group>";
+		};
+		632F51272C83DC9D0032860D /* SliderOverMenu */ = {
+			isa = PBXGroup;
+			children = (
+				632F511F2C7FD8240032860D /* SlideOverHostingController.swift */,
+				632F51212C7FD8680032860D /* SlideOverVC.swift */,
+				632F51252C83A8400032860D /* LyricsVC.swift */,
+				632F51232C83A7970032860D /* QueueVC.swift */,
+			);
+			path = SliderOverMenu;
 			sourceTree = "<group>";
 		};
 		637A28A92C77BB7E0082FACC /* Toolbar */ = {
