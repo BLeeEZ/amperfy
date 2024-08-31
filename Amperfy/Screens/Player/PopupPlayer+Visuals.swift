@@ -54,7 +54,7 @@ extension PopupPlayerVC {
     }
     
     func refreshOptionButton(button: UIButton, rootView: UIViewController?) {
-        var config = getPlayerRoundButtonConfiguration()
+        var config = UIButton.Configuration.playerRound()
         config.image = .ellipsis
         config.baseForegroundColor = .label
         button.isEnabled = true
@@ -73,7 +73,7 @@ extension PopupPlayerVC {
     }
     
     func refreshFavoriteButton(button: UIButton) {
-        var config = getPlayerRoundButtonConfiguration()
+        var config = UIButton.Configuration.playerRound()
         switch player.playerMode {
         case .music:
             if let playableInfo = player.currentlyPlaying {
@@ -171,27 +171,6 @@ extension PopupPlayerVC {
                 artworkImage.display(image: .getGeneratedArtwork(theme: appDelegate.storage.settings.themePreference, artworkType: .podcastEpisode))
             }
         }
-    }
-    
-    func getPlayerRoundButtonConfiguration() -> UIButton.Configuration {
-        var config = UIButton.Configuration.gray()
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
-        config.buttonSize = .small
-        return config
-    }
-    
-    func getPlayerButtonConfiguration(isSelected: Bool) -> UIButton.Configuration {
-        var config = UIButton.Configuration.tinted()
-        if isSelected {
-            config.background.strokeColor = .label
-            config.background.strokeWidth = 1.0
-            config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
-        }
-        config.buttonSize = .small
-        config.baseForegroundColor = !isSelected ? .label : .systemBackground
-        config.baseBackgroundColor = !isSelected ? .clear : .label
-        config.cornerStyle = .medium
-        return config
     }
     
     // handle dark/light mode change

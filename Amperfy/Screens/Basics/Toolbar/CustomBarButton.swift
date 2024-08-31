@@ -19,8 +19,33 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
         self.customView as? UIButton
     }
 
+    var hovered: Bool = false {
+        didSet {
+            if (self.hovered) {
+                self.inUIButton?.backgroundColor = .systemGray2.withAlphaComponent(0.2)
+            } else {
+                self.inUIButton?.backgroundColor = .clear
+            }
+        }
+    }
+
+    var active: Bool = false {
+        didSet{
+            guard let image = self.inUIButton?.configuration?.image else { return }
+            self.updateImage(image: image)
+        }
+    }
+
+    private var currentTint: UIColor {
+        if (self.active) {
+            .label
+        } else {
+            .secondaryLabel
+        }
+    }
+
     func updateImage(image: UIImage) {
-        self.inUIButton?.configuration?.image = image.styleForNavigationBar(pointSize: self.pointSize)
+        self.inUIButton?.configuration?.image = image.styleForNavigationBar(pointSize: self.pointSize, tintColor: self.currentTint)
     }
 
     func createInUIButton(config: UIButton.Configuration, size: CGSize) -> UIButton? {
@@ -49,10 +74,10 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
 
         var config = UIButton.Configuration.gray()
         config.macIdiomStyle = .borderless
-        config.image = image?.styleForNavigationBar(pointSize: self.pointSize)
+        config.image = image?.styleForNavigationBar(pointSize: self.pointSize, tintColor: self.currentTint)
         let button = createInUIButton(config: config, size: CGSize(width: 32, height: 22))
         button?.addTarget(self, action: #selector(self.clicked(_:)), for: .touchUpInside)
-
+        button?.layer.cornerRadius = 5
         self.customView = button
 
         // Recreate the system button background highlight
@@ -71,10 +96,9 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
     @objc private func hoverButton(_ recognizer: UIHoverGestureRecognizer) {
         switch recognizer.state {
         case .began:
-            self.inUIButton?.backgroundColor = .systemGray2.withAlphaComponent(0.2)
-            self.inUIButton?.layer.cornerRadius = 5
+            self.hovered = true
         case .ended, .cancelled, .failed:
-            self.inUIButton?.backgroundColor = .clear
+            self.hovered = self.active
         default:
             break
         }

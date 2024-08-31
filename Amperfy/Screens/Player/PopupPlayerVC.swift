@@ -137,14 +137,26 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
         }
     }
-    
+
+    #if targetEnvironment(macCatalyst)
+    // Fix the mini player on macOS
+    override var traitCollection: UITraitCollection {
+        let compactHorizontalCollection = UITraitCollection(horizontalSizeClass: .compact)
+        let compactVerticalCollection = UITraitCollection(verticalSizeClass: .compact)
+        let newCollection = UITraitCollection(traitsFrom: [
+            super.traitCollection, compactHorizontalCollection, compactVerticalCollection
+        ])
+        return newCollection
+    }
+    #endif
+
     func reloadData() {
         tableView.reloadData()
         scrollToCurrentlyPlayingRow()
     }
     
     func scrollToCurrentlyPlayingRow() {
-        return tableView.scrollToRow(at: IndexPath(row: 0, section: PlayerSectionCategory.currentlyPlaying.rawValue), at: .top, animated: false);
+        tableView.scrollToRow(at: IndexPath(row: 0, section: PlayerSectionCategory.currentlyPlaying.rawValue), at: .top, animated: false);
     }
 
     func favoritePressed() {

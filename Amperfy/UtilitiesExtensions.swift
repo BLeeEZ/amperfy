@@ -121,6 +121,33 @@ extension View {
     }
 }
 
+extension UIColor {
+    static let slideOverBackgroundColor: UIColor = .systemBackground.withAlphaComponent(0.5)
+}
+
+extension UIButton.Configuration {
+    static func player(isSelected: Bool) -> UIButton.Configuration {
+        var config = UIButton.Configuration.tinted()
+        if isSelected {
+            config.background.strokeColor = .label
+            config.background.strokeWidth = 1.0
+            config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
+        }
+        config.buttonSize = .small
+        config.baseForegroundColor = !isSelected ? .label : .systemBackground
+        config.baseBackgroundColor = !isSelected ? .clear : .label
+        config.cornerStyle = .medium
+        return config
+    }
+
+    static func playerRound() -> UIButton.Configuration {
+        var config = UIButton.Configuration.gray()
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
+        config.buttonSize = .small
+        return config
+    }
+}
+
 extension UIView {
     static let forceTouchClickLimit: Float = 1.0
 

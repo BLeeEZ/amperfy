@@ -384,9 +384,9 @@ extension UIImage {
         return newImage!
     }
 
-    public func styleForNavigationBar(pointSize: CGFloat) -> UIImage {
+    public func styleForNavigationBar(pointSize: CGFloat, tintColor: UIColor) -> UIImage {
         let navBarSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: pointSize)
         let img = self.applyingSymbolConfiguration(navBarSymbolConfiguration) ?? UIImage()
-        return img.withTintColor(.secondaryLabel)
+        return img.withTintColor(tintColor)
     }
 }

@@ -12,7 +12,6 @@ import MediaPlayer
 
 #if targetEnvironment(macCatalyst)
 
-// TODO: Make this a toggle button, so that I stays pushed in
 class QueueBarButton: CustomBarButton {
     let splitViewController: SplitVC
 
@@ -27,6 +26,8 @@ class QueueBarButton: CustomBarButton {
 
     override func clicked(_ sender: UIButton) {
         self.splitViewController.slideOverHostingController.toggleSlideOverView()
+        // Add toggle behaviour
+        self.active = !self.active
     }
 }
 

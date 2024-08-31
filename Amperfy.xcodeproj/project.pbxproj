@@ -435,7 +435,9 @@
 		632F511C2C7D2ACE0032860D /* FormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511B2C7D2ACE0032860D /* FormSheet.swift */; };
 		632F511E2C7FD54A0032860D /* QueueBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511D2C7FD54A0032860D /* QueueBarButton.swift */; };
 		632F51202C7FD8240032860D /* SlideOverHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511F2C7FD8240032860D /* SlideOverHostingController.swift */; };
-		632F51222C7FD8680032860D /* QueueVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F51212C7FD8680032860D /* QueueVC.swift */; };
+		632F51222C7FD8680032860D /* SlideOverVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F51212C7FD8680032860D /* SlideOverVC.swift */; };
+		632F51242C83A7970032860D /* QueueVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F51232C83A7970032860D /* QueueVC.swift */; };
+		632F51262C83A8400032860D /* LyricsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F51252C83A8400032860D /* LyricsVC.swift */; };
 		6333C8E12C6FDB5200CCA50A /* SecondaryText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */; };
 		637A28A82C75318C0082FACC /* NowPlayingBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */; };
 		637A28AB2C77BB8E0082FACC /* Refreshable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28AA2C77BB8E0082FACC /* Refreshable.swift */; };
@@ -968,7 +970,9 @@
 		632F511B2C7D2ACE0032860D /* FormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormSheet.swift; sourceTree = "<group>"; };
 		632F511D2C7FD54A0032860D /* QueueBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueBarButton.swift; sourceTree = "<group>"; };
 		632F511F2C7FD8240032860D /* SlideOverHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SlideOverHostingController.swift; path = Amperfy/Screens/ViewController/SlideOverHostingController.swift; sourceTree = SOURCE_ROOT; };
-		632F51212C7FD8680032860D /* QueueVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueVC.swift; sourceTree = "<group>"; };
+		632F51212C7FD8680032860D /* SlideOverVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideOverVC.swift; sourceTree = "<group>"; };
+		632F51232C83A7970032860D /* QueueVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueVC.swift; sourceTree = "<group>"; };
+		632F51252C83A8400032860D /* LyricsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsVC.swift; sourceTree = "<group>"; };
 		6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryText.swift; sourceTree = "<group>"; };
 		637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingBarItem.swift; sourceTree = "<group>"; };
 		637A28AA2C77BB8E0082FACC /* Refreshable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Refreshable.swift; sourceTree = "<group>"; };
@@ -1570,7 +1574,9 @@
 			isa = PBXGroup;
 			children = (
 				632F511F2C7FD8240032860D /* SlideOverHostingController.swift */,
-				632F51212C7FD8680032860D /* QueueVC.swift */,
+				632F51212C7FD8680032860D /* SlideOverVC.swift */,
+				632F51252C83A8400032860D /* LyricsVC.swift */,
+				632F51232C83A7970032860D /* QueueVC.swift */,
 				505CA20B2B88E95400AA81CD /* TableViewHelper */,
 				50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */,
 				50DE29EA2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift */,
@@ -2161,7 +2167,7 @@
 				50DEEE04265E25A40073FF20 /* MusicFoldersVC.swift in Sources */,
 				50DEEE0A265E392C0073FF20 /* IndexesVC.swift in Sources */,
 				50E1D39A2B8BEA540001A572 /* SplitVC.swift in Sources */,
-				632F51222C7FD8680032860D /* QueueVC.swift in Sources */,
+				632F51222C7FD8680032860D /* SlideOverVC.swift in Sources */,
 				50CFB59728D4FC0100A47D44 /* ArtworkSettingsView.swift in Sources */,
 				5005939128E42F66008C8DF6 /* BasicCollectionCell.swift in Sources */,
 				5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */,
@@ -2173,6 +2179,7 @@
 				50CCD0592B6C388B0073793B /* PlainDetailsVC.swift in Sources */,
 				6333C8E12C6FDB5200CCA50A /* SecondaryText.swift in Sources */,
 				50A30E4F2B73DDC800722894 /* PlayerControlView.swift in Sources */,
+				632F51262C83A8400032860D /* LyricsVC.swift in Sources */,
 				509001B82716C8F400A8056D /* AppDelegateNotificationExtensions.swift in Sources */,
 				50A30E5C2B7556FB00722894 /* PopupPlayer+TableViewExtension.swift in Sources */,
 				637A28B52C79409C0082FACC /* MiniPlayerSceneDelegate.swift in Sources */,
@@ -2182,6 +2189,7 @@
 				50791E8928D3BC4D006CE6E5 /* SwipeSettingsView.swift in Sources */,
 				50AC4E5428D909730091FF33 /* EventLogCellView.swift in Sources */,
 				508FDE4C21F58AFC005A0724 /* AppStoryboard.swift in Sources */,
+				632F51242C83A7970032860D /* QueueVC.swift in Sources */,
 				50791E7828D25845006CE6E5 /* ServerSettingsView.swift in Sources */,
 				50791E8728D3B7BF006CE6E5 /* PlayerSettingsView.swift in Sources */,
 				505CA20A2B88E94800AA81CD /* MultiSourceTableViewController.swift in Sources */,

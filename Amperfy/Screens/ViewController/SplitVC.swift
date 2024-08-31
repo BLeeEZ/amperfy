@@ -113,7 +113,7 @@ class SplitVC: UISplitViewController {
     }()
 
     var slideOverMenuViewController: UIViewController = {
-        let vc = QueueVC()
+        let vc = SlideOverVC()
         vc.view.addLeftSideBorder()
         return vc
     }()
