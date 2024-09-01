@@ -15,9 +15,9 @@ import UIKit
 class ControlBarButton: CustomBarButton, MusicPlayable {
     var player: PlayerFacade?
 
-    init(player: PlayerFacade, image: UIImage) {
+    init(player: PlayerFacade, image: UIImage, pointSize: CGFloat = ControlBarButton.defaultPointSize) {
         self.player = player
-        super.init(image: image)
+        super.init(image: image, pointSize: pointSize)
         self.player?.addNotifier(notifier: self)
     }
 
@@ -124,6 +124,104 @@ class PreviousBarButton: ControlBarButton {
 
     override func clicked(_ sender: UIButton) {
         self.player?.playPreviousOrReplay()
+    }
+}
+
+class ShuffleBarButton: ControlBarButton {
+    override var title: String? {
+        get { return "Shuffle" }
+        set { }
+    }
+
+    init(player: PlayerFacade) {
+        super.init(player: player, image: .shuffle, pointSize: ControlBarButton.smallPointSize)
+        self.reload()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var currentTintColor: UIColor {
+        if (self.active) {
+            appDelegate.storage.settings.themePreference.asColor
+        } else {
+            super.currentTintColor
+        }
+    }
+
+    override var currentBackgroundColor: UIColor {
+        if (self.hovered) {
+            .hoveredBackgroundColor
+        } else {
+            .clear
+        }
+    }
+
+    override func clicked(_ sender: UIButton) {
+        self.player?.toggleShuffle()
+        self.reload()
+    }
+
+    override func reload() {
+        self.active = self.player?.isShuffle ?? false
+    }
+
+    override func didShuffleChange() {
+        self.reload()
+    }
+}
+
+class RepeatBarButton: ControlBarButton {
+    override var title: String? {
+        get { return "Repeat" }
+        set { }
+    }
+
+    init(player: PlayerFacade) {
+        super.init(player: player, image: .repeatOff, pointSize: ControlBarButton.smallPointSize)
+        self.reload()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var currentTintColor: UIColor {
+        if (self.active) {
+            appDelegate.storage.settings.themePreference.asColor
+        } else {
+            super.currentTintColor
+        }
+    }
+
+    override var currentBackgroundColor: UIColor {
+        if (self.hovered) {
+            .hoveredBackgroundColor
+        } else {
+            .clear
+        }
+    }
+
+    override func clicked(_ sender: UIButton) {
+        guard let player = self.player else { return }
+        player.setRepeatMode(player.repeatMode.nextMode)
+        self.reload()
+    }
+
+    override func reload() {
+        guard let player = self.player else { return }
+        self.active = player.repeatMode != .off
+        switch (player.repeatMode) {
+        case .off: self.updateImage(image: .repeatOff)
+        case .single: self.updateImage(image: .repeatOne)
+        case .all: self.updateImage(image: .repeatAll)
+        }
+
+    }
+
+    override func didRepeatChange() {
+        self.reload()
     }
 }
 

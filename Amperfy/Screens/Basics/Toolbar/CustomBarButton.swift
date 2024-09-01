@@ -13,6 +13,9 @@ import UIKit
 
 // MacOS BarButtonItems can not be disabled. Thats, why we create a custom BarButtonItem.
 class CustomBarButton: UIBarButtonItem, Refreshable {
+    static let defaultPointSize: CGFloat = 18.0
+    static let smallPointSize: CGFloat = 14.0
+
     let pointSize: CGFloat
 
     var inUIButton: UIButton? {
@@ -21,11 +24,7 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
 
     var hovered: Bool = false {
         didSet {
-            if (self.hovered) {
-                self.inUIButton?.backgroundColor = .systemGray2.withAlphaComponent(0.2)
-            } else {
-                self.inUIButton?.backgroundColor = .clear
-            }
+            self.updateButtonBackgroundColor()
         }
     }
 
@@ -33,10 +32,11 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
         didSet{
             guard let image = self.inUIButton?.configuration?.image else { return }
             self.updateImage(image: image)
+            self.updateButtonBackgroundColor()
         }
     }
 
-    private var currentTint: UIColor {
+    var currentTintColor: UIColor {
         if (self.active) {
             .label
         } else {
@@ -44,8 +44,20 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
         }
     }
 
+    var currentBackgroundColor: UIColor {
+        if (self.hovered || self.active) {
+            .hoveredBackgroundColor
+        } else {
+            .clear
+        }
+    }
+
+    func updateButtonBackgroundColor() {
+        self.inUIButton?.backgroundColor = self.currentBackgroundColor
+    }
+
     func updateImage(image: UIImage) {
-        self.inUIButton?.configuration?.image = image.styleForNavigationBar(pointSize: self.pointSize, tintColor: self.currentTint)
+        self.inUIButton?.configuration?.image = image.styleForNavigationBar(pointSize: self.pointSize, tintColor: self.currentTintColor)
     }
 
     func createInUIButton(config: UIButton.Configuration, size: CGSize) -> UIButton? {
@@ -68,13 +80,13 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
         }
     }
 
-    init(image: UIImage?, pointSize: CGFloat = 18) {
+    init(image: UIImage?, pointSize: CGFloat = ControlBarButton.defaultPointSize) {
         self.pointSize = pointSize
         super.init()
 
         var config = UIButton.Configuration.gray()
         config.macIdiomStyle = .borderless
-        config.image = image?.styleForNavigationBar(pointSize: self.pointSize, tintColor: self.currentTint)
+        config.image = image?.styleForNavigationBar(pointSize: self.pointSize, tintColor: self.currentTintColor)
         let button = createInUIButton(config: config, size: CGSize(width: 32, height: 22))
         button?.addTarget(self, action: #selector(self.clicked(_:)), for: .touchUpInside)
         button?.layer.cornerRadius = 5
@@ -98,7 +110,7 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
         case .began:
             self.hovered = true
         case .ended, .cancelled, .failed:
-            self.hovered = self.active
+            self.hovered = false
         default:
             break
         }

@@ -123,6 +123,7 @@ extension View {
 
 extension UIColor {
     static let slideOverBackgroundColor: UIColor = .systemBackground.withAlphaComponent(0.5)
+    static let hoveredBackgroundColor: UIColor = .systemGray2.withAlphaComponent(0.2)
 }
 
 extension UIButton.Configuration {

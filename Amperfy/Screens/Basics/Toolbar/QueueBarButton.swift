@@ -13,6 +13,11 @@ import MediaPlayer
 #if targetEnvironment(macCatalyst)
 
 class QueueBarButton: CustomBarButton {
+    override var title: String? {
+        get { return "Toggle Menu" }
+        set { }
+    }
+
     let splitViewController: SplitVC
 
     init(splitViewController: SplitVC) {

@@ -13,6 +13,11 @@ import MediaPlayer
 #if targetEnvironment(macCatalyst)
 
 class AirplayBarButton: CustomBarButton {
+    override var title: String? {
+        get { return "Airplay" }
+        set { }
+    }
+
     private lazy var airplayVolume: MPVolumeView = {
         let volumeView = MPVolumeView(frame: .zero)
         volumeView.showsVolumeSlider = false

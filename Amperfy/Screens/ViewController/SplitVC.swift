@@ -94,20 +94,30 @@ class SplitVC: UISplitViewController {
     lazy var slideOverHostingController: SlideOverHostingController = {
         let hostingVC = SlideOverHostingController(slideOverViewController: self.slideOverMenuViewController)
         let player = appDelegate.player
+        let shuffleEnabled = appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+
         // Add the media player controls to the view's navigation item
         hostingVC.navigationItem.leftItemsSupplementBackButton = false
-        hostingVC.navigationItem.leftBarButtonItems = [
-            SpaceBarItem(fixedSpace: 20),
-            PreviousBarButton(player: player),
-            PlayBarButton(player: player),
-            NextBarButton(player: player),
-            SpaceBarItem(minSpace: 20),
-            NowPlayingBarItem(player: player, splitViewController: self),
-            SpaceBarItem(),
-            AirplayBarButton(),
-            QueueBarButton(splitViewController: self),
-            SpaceBarItem(fixedSpace: 20),
-        ]
+
+        let defaultSpacing: CGFloat = 10
+        hostingVC.navigationItem.leftBarButtonItems =
+            (shuffleEnabled ? [
+                SpaceBarItem(fixedSpace: defaultSpacing),
+                ShuffleBarButton(player: player)
+            ] : [
+                SpaceBarItem(fixedSpace: defaultSpacing)
+            ]) + [
+                PreviousBarButton(player: player),
+                PlayBarButton(player: player),
+                NextBarButton(player: player),
+                RepeatBarButton(player: player),
+                SpaceBarItem(minSpace: defaultSpacing),
+                NowPlayingBarItem(player: player, splitViewController: self),
+                SpaceBarItem(),
+                AirplayBarButton(),
+                QueueBarButton(splitViewController: self),
+                SpaceBarItem(fixedSpace: defaultSpacing),
+            ]
         hostingVC.navigationItem.leftBarButtonItems?.forEach { ($0 as? Refreshable)?.reload() }
         return hostingVC
     }()
