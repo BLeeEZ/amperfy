@@ -74,6 +74,13 @@ public enum PlayerMode: Int16 {
     public var nextMode: PlayerMode {
         return self == .music ? .podcast : .music
     }
+
+    public var description: String {
+        switch (self) {
+        case .music: "Music"
+        case .podcast: "Podcast"
+        }
+    }
 }
 
 public class PlayerData: NSObject {

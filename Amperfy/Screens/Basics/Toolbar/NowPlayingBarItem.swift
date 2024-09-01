@@ -275,10 +275,10 @@ class NowPlayingInfoView: UIView {
 
 extension NowPlayingInfoView: MusicPlayable, Refreshable {
     private func refreshMoreButton(hovered: Bool = false) {
-        let currentlyPlaying = player.currentlyPlaying
-        let hasSong = currentlyPlaying != nil
+        let currentlyPlaying = self.player.currentlyPlaying
+        let hasPlayable = currentlyPlaying != nil
 
-        if hasSong && hovered {
+        if hasPlayable && hovered {
             self.moreButton.isHidden = false
             self.moreButtonWidthConstraint?.constant = 10
             self.moreButtonTrailingConstrait?.constant = -10
@@ -298,18 +298,42 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
             self.moreButtonTrailingConstrait?.constant = 0
             self.moreButton.menu = nil
         }
-
-
     }
 
     private func refreshTitle() {
-        let song = player.currentlyPlaying?.asSong
-        let title = song?.title
-        let artist = song?.artist?.name ?? ""
-        let album = song?.album?.name ?? ""
-        let artistAlbum = "\(artist) - \(album)"
-        self.titleLabel.text = title
-        self.subtitleLabel.text = artistAlbum
+        guard let currentPlaying = self.player.currentlyPlaying else {
+            switch self.player.playerMode {
+            case .music:
+                self.titleLabel.text = "No music playing"
+                self.subtitleLabel.text = ""
+            case .podcast:
+                self.titleLabel.text = "No podcast playing"
+                self.subtitleLabel.text = ""
+            }
+            return
+        }
+        
+        switch self.player.playerMode {
+        case .music:
+            let song = currentPlaying.asSong
+            let title = song?.title ?? ""
+            let artist = song?.artist?.name ?? ""
+            let album = song?.album?.name ?? ""
+            let subtitle = switch ((artist.isEmpty, album.isEmpty)) {
+                case (false, false): "\(artist) - \(album)"
+                case (false, true): artist
+                case (true, false): album
+                case _: ""
+            }
+            self.titleLabel.text = title
+            self.subtitleLabel.text = subtitle
+        case .podcast:
+            let podcast = currentPlaying.asPodcastEpisode
+            let title = podcast?.creatorName
+            let subtitle = podcast?.subtitle ?? ""
+            self.titleLabel.text = title
+            self.subtitleLabel.text = subtitle
+        }
     }
 
     private func refreshElapsedTime() {
@@ -363,7 +387,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
     }
 
     func didStartPlaying() {
-        self.fetchSongInfoAndReload()
+        self.reload()
     }
 
     func didElapsedTimeChange() {
@@ -374,12 +398,17 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
         self.refreshArtwork()
     }
 
-    func didStartPlayingFromBeginning() {}
+    func didStartPlayingFromBeginning() {
+        self.fetchSongInfoAndReload()
+    }
     func didPause() {}
     func didStopPlaying() {
         self.refreshMoreButton()
     }
-    func didPlaylistChange() {}
+    func didPlaylistChange() {
+        // Trigger the reload to correct switch between podcast and music view
+        self.reload()
+    }
     func didShuffleChange() {}
     func didRepeatChange() {}
     func didPlaybackRateChange() {}

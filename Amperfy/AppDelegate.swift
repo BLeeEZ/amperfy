@@ -455,7 +455,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 UIAction(title: rate.description, state: rate == self.player.playbackRate ? .on : .off) { _ in
                     self.player.setPlaybackRate(rate)
                 }
-            })
+            }),
+            UIMenu(options: .displayInline),
+            UIAction(title: self.player.playerMode.nextMode.description) { _ in
+                self.player.setPlayerMode(self.player.playerMode.nextMode)
+            }
         ])
     }
 
