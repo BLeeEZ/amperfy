@@ -12,6 +12,9 @@ import AmperfyKit
 
 #if targetEnvironment(macCatalyst)
 
+// Found by trial and error
+let scrollbarZPosition: CGFloat = 1000
+
 class QueueVC: SlideOverItemVC {
     var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
     var userQueueSectionHeader: UserQueueSectionHeader?
@@ -62,21 +65,21 @@ class QueueVC: SlideOverItemVC {
             sectionView.setBackgroundBlur(style: .prominent)
             sectionView.backgroundColor = .clear
             // Workaround for an OS bug, where the cell is suddenly rendered above the section header after reorder
-            sectionView.layer.zPosition = .greatestFiniteMagnitude
+            sectionView.layer.zPosition = scrollbarZPosition - 1
             contextPrevQueueSectionHeader = sectionView
             contextPrevQueueSectionHeader?.display(name: "Previous")
         }
         if let sectionView = ViewCreator<UserQueueSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: UserQueueSectionHeader.frameHeight)) {
             sectionView.setBackgroundBlur(style: .prominent)
             sectionView.backgroundColor = .clear
-            sectionView.layer.zPosition = .greatestFiniteMagnitude
+            sectionView.layer.zPosition = scrollbarZPosition - 1
             userQueueSectionHeader = sectionView
             userQueueSectionHeader?.display(name: "Next from Queue", buttonPressAction: clearUserQueue)
         }
         if let sectionView = ViewCreator<ContextQueueNextSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ContextQueueNextSectionHeader.frameHeight)) {
             sectionView.setBackgroundBlur(style: .prominent)
             sectionView.backgroundColor = .clear
-            sectionView.layer.zPosition = .greatestFiniteMagnitude
+            sectionView.layer.zPosition = scrollbarZPosition - 1
             contextNextQueueSectionHeader = sectionView
         }
 
