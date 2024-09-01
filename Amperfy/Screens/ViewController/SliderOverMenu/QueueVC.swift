@@ -61,18 +61,22 @@ class QueueVC: SliderOverItemVC {
         if let sectionView = ViewCreator<ContextQueuePrevSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ContextQueuePrevSectionHeader.frameHeight)) {
             sectionView.setBackgroundBlur(style: .prominent)
             sectionView.backgroundColor = .clear
+            // Workaround for an OS bug, where the cell is suddenly rendered above the section header after reorder
+            sectionView.layer.zPosition = .greatestFiniteMagnitude
             contextPrevQueueSectionHeader = sectionView
             contextPrevQueueSectionHeader?.display(name: "Previous")
         }
         if let sectionView = ViewCreator<UserQueueSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: UserQueueSectionHeader.frameHeight)) {
             sectionView.setBackgroundBlur(style: .prominent)
             sectionView.backgroundColor = .clear
+            sectionView.layer.zPosition = .greatestFiniteMagnitude
             userQueueSectionHeader = sectionView
             userQueueSectionHeader?.display(name: "Next from Queue", buttonPressAction: clearUserQueue)
         }
         if let sectionView = ViewCreator<ContextQueueNextSectionHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: ContextQueueNextSectionHeader.frameHeight)) {
             sectionView.setBackgroundBlur(style: .prominent)
             sectionView.backgroundColor = .clear
+            sectionView.layer.zPosition = .greatestFiniteMagnitude
             contextNextQueueSectionHeader = sectionView
         }
 

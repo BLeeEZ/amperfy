@@ -312,7 +312,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
             }
             return
         }
-        
+
         switch self.player.playerMode {
         case .music:
             let song = currentPlaying.asSong
@@ -406,7 +406,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
         self.refreshMoreButton()
     }
     func didPlaylistChange() {
-        // Trigger the reload to correct switch between podcast and music view
+        // Trigger the reload to correctly switch between podcast and music view
         self.reload()
     }
     func didShuffleChange() {}
