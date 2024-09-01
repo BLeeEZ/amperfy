@@ -68,6 +68,7 @@ class PlayBarButton: ControlBarButton {
     }
 
     override func reload() {
+        super.reload()
         if player?.isPlaying ?? false {
             self.updateImage(image: .pause)
         } else {
@@ -164,6 +165,7 @@ class ShuffleBarButton: ControlBarButton {
     }
 
     override func reload() {
+        super.reload()
         self.active = self.player?.isShuffle ?? false
     }
 
@@ -210,6 +212,7 @@ class RepeatBarButton: ControlBarButton {
     }
 
     override func reload() {
+        super.reload()
         guard let player = self.player else { return }
         self.active = player.repeatMode != .off
         switch (player.repeatMode) {

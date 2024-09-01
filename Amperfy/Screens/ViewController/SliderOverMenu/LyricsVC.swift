@@ -14,7 +14,7 @@ import PromiseKit
 
 #if targetEnvironment(macCatalyst)
 
-class LyricsVC: SliderOverItemVC {
+class LyricsVC: SlideOverItemVC {
     override var title: String? {
         get { return "Lyrics" }
         set {}

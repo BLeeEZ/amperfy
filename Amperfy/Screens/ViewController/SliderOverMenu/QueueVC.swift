@@ -12,7 +12,7 @@ import AmperfyKit
 
 #if targetEnvironment(macCatalyst)
 
-class QueueVC: SliderOverItemVC {
+class QueueVC: SlideOverItemVC {
     var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
     var userQueueSectionHeader: UserQueueSectionHeader?
     var contextNextQueueSectionHeader: ContextQueueNextSectionHeader?

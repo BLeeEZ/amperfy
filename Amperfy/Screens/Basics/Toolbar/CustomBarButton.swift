@@ -120,7 +120,11 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
 
     }
 
-    func reload() {}
+    func reload() {
+        self.updateButtonBackgroundColor()
+        guard let image = self.inUIButton?.configuration?.image else { return }
+        self.updateImage(image: image)
+    }
 }
 
 #endif

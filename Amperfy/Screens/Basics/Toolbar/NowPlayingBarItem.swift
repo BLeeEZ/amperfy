@@ -38,8 +38,8 @@ fileprivate class NowPlayingSlider: UISlider {
 
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        self.refreshSliderDesign()
         super.traitCollectionDidChange(previousTraitCollection)
+        self.refreshSliderDesign()
     }
 
     override func trackRect(forBounds bounds: CGRect) -> CGRect {
@@ -275,6 +275,8 @@ class NowPlayingInfoView: UIView {
 
 extension NowPlayingInfoView: MusicPlayable, Refreshable {
     private func refreshMoreButton(hovered: Bool = false) {
+        self.moreButton.tintColor = appDelegate.storage.settings.themePreference.asColor
+        
         let currentlyPlaying = self.player.currentlyPlaying
         let hasPlayable = currentlyPlaying != nil
 

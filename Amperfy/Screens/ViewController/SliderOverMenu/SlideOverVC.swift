@@ -11,7 +11,7 @@ import UIKit
 #if targetEnvironment(macCatalyst)
 
 // ViewController representing a single item in the slide over menu
-class SliderOverItemVC: UIViewController {
+class SlideOverItemVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.setBackgroundBlur(style: .prominent)
@@ -32,7 +32,10 @@ class SliderOverItemVC: UIViewController {
 
 // ViewController used to manage the slide over menu in macOS.
 class SlideOverVC: UINavigationController {
-    private(set) var viewController: [SliderOverItemVC] = []
+    lazy var queueVC = QueueVC()
+    lazy var lyricsVC = LyricsVC()
+
+    private(set) var viewController: [SlideOverItemVC] = []
 
     private var segmentedControl: UISegmentedControl?
 
@@ -63,20 +66,31 @@ class SlideOverVC: UINavigationController {
         self.navigationBar.compactScrollEdgeAppearance = defaultAppearance
 
         // Add all view controllers and create the segmented control to select them
-        self.initializeViewController()
+        self.updateNavigationItem()
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.view.addLeftSideBorder()
+    }
+
+    private func updateNavigationItem() {
+        var newVC: [SlideOverItemVC] = [self.queueVC]
+        if (self.isLyricsButtonAllowedToDisplay) {
+            newVC += [self.lyricsVC]
+        }
+        
+        guard newVC != self.viewController else { return }
+        self.viewController = newVC
 
         self.segmentedControl = UISegmentedControl(items: self.viewController.enumerated().map { (i, vc) in
             vc.title ?? "View: \(i)"
         })
         self.segmentedControl?.addTarget(self, action: #selector(self.selectionChanged(_:)), for: .valueChanged)
         self.segmentedControl?.selectedSegmentIndex = UISegmentedControl.noSegment
-    }
 
-    private func initializeViewController() {
-        self.viewController = [QueueVC()]
-        if (isLyricsButtonAllowedToDisplay) {
-            self.viewController += [LyricsVC()]
-        }
+        self.segmentedControl?.selectedSegmentIndex = 0
+        self.selectionChanged(self.segmentedControl)
     }
 
     @objc private func selectionChanged(_ sender: UISegmentedControl?) {
@@ -95,14 +109,8 @@ class SlideOverVC: UINavigationController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        guard self.segmentedControl?.selectedSegmentIndex == UISegmentedControl.noSegment else {
-            return
-        }
-        self.segmentedControl?.selectedSegmentIndex = 0
-        self.selectionChanged(self.segmentedControl)
+    func settingsDidChange() {
+        self.updateNavigationItem()
     }
 }
 
