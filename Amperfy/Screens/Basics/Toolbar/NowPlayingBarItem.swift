@@ -29,17 +29,11 @@ fileprivate class NowPlayingSlider: UISlider {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func refreshSliderDesign() {
+    fileprivate func refreshSliderDesign() {
         let tint = appDelegate.storage.settings.themePreference.asColor
         self.setUnicolorRectangularMinimumTrackImage(trackHeight: NowPlayingSlider.sliderHeight, color: tint, for: .normal)
         self.setUnicolorRectangularMaximumTrackImage(trackHeight: NowPlayingSlider.sliderHeight, color: .systemGray6, for: .normal)
         self.setUnicolorRectangularThumbImage(thumbSize: CGSize(width: 5, height: NowPlayingSlider.sliderHeight*2), color: .systemGray, for: .normal)
-    }
-
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        self.refreshSliderDesign()
     }
 
     override func trackRect(forBounds bounds: CGRect) -> CGRect {
@@ -70,13 +64,13 @@ class NowPlayingInfoView: UIView {
     var player: PlayerFacade
     var rootViewController: UIViewController
 
-    lazy var artworkView: UIImageView = {
+    fileprivate lazy var artworkView: UIImageView = {
         let imageView: UIImageView = UIImageView()
         imageView.backgroundColor = .clear
         return imageView
     }()
 
-    lazy var artworkOverlay: UIView = {
+    fileprivate lazy var artworkOverlay: UIView = {
         let view = UIView()
         view.backgroundColor = .black.withAlphaComponent(0.4)
         view.isHidden = true
@@ -98,7 +92,7 @@ class NowPlayingInfoView: UIView {
         return view
     }()
 
-    lazy var titleLabel: UILabel = {
+    fileprivate lazy var titleLabel: UILabel = {
         let label = MarqueeLabel(frame: .zero)
         label.applyAmperfyStyle()
         label.backgroundColor = .clear
@@ -111,7 +105,7 @@ class NowPlayingInfoView: UIView {
     var moreButtonWidthConstraint: NSLayoutConstraint?
     var moreButtonTrailingConstrait: NSLayoutConstraint?
 
-    lazy var moreButton: UIButton = {
+    fileprivate lazy var moreButton: UIButton = {
         var config = UIButton.Configuration.borderless()
         config.image = .ellipsis
         config.background = .clear()
@@ -122,7 +116,7 @@ class NowPlayingInfoView: UIView {
         return button
     }()
 
-    lazy var subtitleLabel: UILabel = {
+    fileprivate lazy var subtitleLabel: UILabel = {
         let label = MarqueeLabel(frame: .zero)
         label.applyAmperfyStyle()
         label.backgroundColor = .clear
@@ -132,7 +126,7 @@ class NowPlayingInfoView: UIView {
         return label
     }()
 
-    lazy var timeSlider: UISlider = {
+    fileprivate lazy var timeSlider: NowPlayingSlider = {
         let slider = NowPlayingSlider(frame: .zero)
         slider.addTarget(self, action: #selector(timeSliderChanged(_:)), for: .valueChanged)
         return slider
@@ -386,6 +380,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
         self.refreshElapsedTime()
         self.refreshArtwork()
         self.refreshMoreButton()
+        self.timeSlider.refreshSliderDesign()
     }
 
     func didStartPlaying() {
@@ -416,7 +411,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
     func didPlaybackRateChange() {}
 }
 
-class NowPlayingBarItem: UIBarButtonItem {
+class NowPlayingBarItem: UIBarButtonItem, Refreshable {
     init(player: PlayerFacade, splitViewController: SplitVC) {
         super.init()
 
@@ -441,6 +436,10 @@ class NowPlayingBarItem: UIBarButtonItem {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    func reload() {
+        (self.customView as? NowPlayingInfoView)?.reload()
     }
 }
 
