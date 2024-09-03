@@ -437,16 +437,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let isPlaying = self.player.isPlaying
         let isShuffle = self.player.isShuffle
 
-        return UIMenu(title: "Controls", children: [
+        let section1 = [
             UIKeyCommand(title: isPlaying ? "Pause" : "Play", action: isPlaying ? #selector(self.keyCommandPause) : #selector(self.keyCommandPlay), input: " "),
             UIKeyCommand(title: "Stop", action: #selector(self.keyCommandStop), input: ".", modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
             UIKeyCommand(title: "Next Track", action: #selector(self.keyCommandNext), input: UIKeyCommand.inputRightArrow, modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
             UIKeyCommand(title: "Previous Track", action: #selector(self.keyCommandPrevious), input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
-            UIMenu(options: .displayInline),
-            UIMenu(title: "Shuffle", children: [
-                UIAction(title: "On", state: isShuffle ? .on : .off) { [weak self] _ in self?.keyCommandShuffleOn() },
-                UIAction(title: "Off", state: !isShuffle ? .on : .off) { [weak self] _ in self?.keyCommandShuffleOff() }
-            ]),
+        ]
+
+        var section2 = [
             UIMenu(title: "Repeat", children: RepeatMode.allCases.map { mode in
                 UIAction(title: mode.description, state: mode == self.player.repeatMode ? .on : .off) { _ in
                     self.player.setRepeatMode(mode)
@@ -456,12 +454,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 UIAction(title: rate.description, state: rate == self.player.playbackRate ? .on : .off) { _ in
                     self.player.setPlaybackRate(rate)
                 }
-            }),
-            UIMenu(options: .displayInline),
+            })
+        ]
+
+        if (appDelegate.storage.settings.isPlayerShuffleButtonEnabled) {
+            let shuffleMenu = UIMenu(title: "Shuffle", children: [
+                UIAction(title: "On", state: isShuffle ? .on : .off) { [weak self] _ in self?.keyCommandShuffleOn() },
+                UIAction(title: "Off", state: !isShuffle ? .on : .off) { [weak self] _ in self?.keyCommandShuffleOff() }
+            ])
+            section2.insert(shuffleMenu, at: 0)
+        }
+
+        let section3 = [
             UIAction(title: self.player.playerMode.nextMode.description) { _ in
                 self.player.setPlayerMode(self.player.playerMode.nextMode)
             }
-        ])
+        ]
+
+        let section4 = [
+            UIAction(title: self.isShowingMiniPlayer ? "Main Window" :  "Mini Player") { _ in
+                if self.isShowingMiniPlayer {
+                    self.closeMiniPlayer()
+                    // Is automatically opened
+                    //self.openMainWindow()
+                } else {
+                    self.closeMainWindow()
+                    self.showMiniPlayer()
+                }
+            }
+        ]
+
+        let sections: [[UIMenuElement]] = [section1, section2, section3, section4]
+
+        return UIMenu(title: "Controls", children: sections.reduce([], { (result, section) in
+            result + [UIMenu(options: .displayInline)] + section
+        }))
     }
 
     @objc func showSettings(sender: Any) {
@@ -469,9 +496,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.shared.requestSceneSessionActivation(settingsSceneSession, userActivity: settingsActivity, options: nil, errorHandler: nil)
     }
 
+    var isShowingMiniPlayer: Bool {
+        return UIApplication.shared.connectedScenes.contains(where: { $0.session == miniPlayerSceneSession })
+    }
+
     @objc func showMiniPlayer(sender: Any? = nil) {
         let miniPlayerActivity = NSUserActivity(activityType: miniPlayerWindowActivityType)
         UIApplication.shared.requestSceneSessionActivation(miniPlayerSceneSession, userActivity: miniPlayerActivity, options: nil, errorHandler: nil)
+    }
+
+    func closeMiniPlayer() {
+        UIApplication.shared.connectedScenes
+            .filter { $0.session == miniPlayerSceneSession }
+            .forEach {
+                let options = UIWindowSceneDestructionRequestOptions()
+                options.windowDismissalAnimation = .standard
+                UIApplication.shared.requestSceneSessionDestruction($0.session, options: options, errorHandler: nil)
+            }
     }
     #endif
 }

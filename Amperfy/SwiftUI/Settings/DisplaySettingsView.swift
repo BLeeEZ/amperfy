@@ -143,7 +143,10 @@ struct DisplaySettingsView: View {
                 SettingsSection(content: {
                     SettingsCheckBoxRow(title: "Shuffle", label: "Disable Player Shuffle Button", isOn: Binding<Bool>(
                         get: { !settings.isPlayerShuffleButtonEnabled },
-                        set: { settings.isPlayerShuffleButtonEnabled = !$0 }
+                        set: { 
+                            settings.isPlayerShuffleButtonEnabled = !$0
+                            UIMenuSystem.main.setNeedsRebuild()
+                        }
                     ))
                 }, footer:
                     "Player Shuffle Button is displayed but it can't be interacted with."
