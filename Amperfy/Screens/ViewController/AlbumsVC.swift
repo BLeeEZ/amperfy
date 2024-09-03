@@ -110,8 +110,7 @@ class AlbumsDiffableDataSource: BasicUITableViewDiffableDataSource {
 class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
 
     override var sceneTitle: String? { 
-        common.applyFilter()
-        return common.filterTitle
+        return common.rootVC?.sceneTitle
     }
 
     private var common = AlbumsCommonVCInteractions()

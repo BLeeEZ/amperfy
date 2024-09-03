@@ -147,8 +147,7 @@ class AlbumsCollectionDiffableDataSource: BasicUICollectionViewDiffableDataSourc
 class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<AlbumMO> {
 
     override var sceneTitle: String? { 
-        common.applyFilter()
-        return common.filterTitle
+        self.common.sceneTitle
     }
 
     fileprivate var common = AlbumsCommonVCInteractions()

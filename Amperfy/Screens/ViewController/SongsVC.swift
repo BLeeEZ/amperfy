@@ -27,8 +27,10 @@ import PromiseKit
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override var sceneTitle: String? {
-        applyFilter()
-        return self.filterTitle
+        switch (self.displayFilter) {
+        case .all, .newest, .recent: "Songs"
+        case .favorites: "Favorite Songs"
+        }
     }
 
     private var fetchedResultsController: SongsFetchedResultsController!

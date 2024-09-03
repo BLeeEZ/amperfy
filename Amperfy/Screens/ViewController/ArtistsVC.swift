@@ -27,8 +27,10 @@ import PromiseKit
 class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
 
     override var sceneTitle: String? { 
-        applyFilter()
-        return self.filterTitle
+        return switch (self.displayFilter) {
+        case .albumArtists, .all: "Artists"
+        case .favorites: "Favorite Artists"
+        }
     }
 
     private var fetchedResultsController: ArtistFetchedResultsController!

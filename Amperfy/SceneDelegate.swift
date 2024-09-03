@@ -66,7 +66,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
 
         if let titlebar = windowScene.titlebar {
-            windowScene.title = "Search"
             titlebar.toolbarStyle = .unified
             titlebar.titleVisibility = .hidden
             titlebar.separatorStyle = .automatic

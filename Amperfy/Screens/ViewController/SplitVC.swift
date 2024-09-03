@@ -22,6 +22,7 @@
 import UIKit
 import AmperfyKit
 
+
 class SplitVC: UISplitViewController {
 
     lazy var barPlayer = BarPlayerHandler(player: appDelegate.player, splitVC: self)
@@ -59,8 +60,6 @@ class SplitVC: UISplitViewController {
     #endif
 
     override func viewDidAppear(_ animated: Bool) {
-        self.updateScene(title: self.viewControllers.last?.sceneTitle)
-        
         super.viewDidAppear(animated)
         setCorrectPlayerBarView(collapseMode: isCompact)
         
@@ -101,20 +100,15 @@ class SplitVC: UISplitViewController {
     #endif
 
     func embeddInNavigation(vc: UIViewController) -> UINavigationController {
-        let navController = UINavigationController(rootViewController: vc)
         #if targetEnvironment(macCatalyst)
-        // Hide the navigation title in the "subbar"
-        navController.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.clear]
-        if #available(macCatalyst 16.0, *) {
-            navController.navigationBar.preferredBehavioralStyle = .pad
-        }
+        let navController = InnerNavigationController(rootViewController: vc)
         // This is a little bit hacky. We reuse the existing slideOverHostingController. This has two advantages:
         // 1. We do not need to reload the mac toolbar, which is slow.
         // 2. We keep the slide over menu open even when switching tabs.
         self.slideOverHostingController.primaryViewController = navController
         return self.macToolbarNavigationController
         #else
-        return navController
+        return UINavigationController(rootViewController: vc)
         #endif
     }
     
@@ -136,7 +130,6 @@ class SplitVC: UISplitViewController {
             guard let compactVC = viewController(for: .compact) else { return }
             let vc = separateSecondary(from: compactVC)
             setViewController(vc, for: .secondary)
-            self.updateScene(title: vc?.sceneTitle)
         }
     }
     
@@ -289,10 +282,7 @@ class SplitVC: UISplitViewController {
             push(vc: vc)
         }
     }
-    
-    func updateScene(title: String?) {
-        self.view.window?.windowScene?.title = title ?? Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? ""
-    }
+
 
     public func pushReplaceNavLibrary(vc: UIViewController) {
         if isCompact {
@@ -306,7 +296,6 @@ class SplitVC: UISplitViewController {
         } else {
             setViewController(embeddInNavigation(vc: vc), for: .secondary)
         }
-        updateScene(title: vc.sceneTitle)
     }
     
     public func push(vc: UIViewController) {
@@ -323,7 +312,6 @@ class SplitVC: UISplitViewController {
                 secondaryVC.pushViewController(vc, animated: false)
             }
         }
-        updateScene(title: vc.sceneTitle)
     }
     
     public func visualizePopupPlayer(direction: PopupPlayerDirection, animated: Bool, completion completionBlock: (()->Void)? = nil) {
@@ -368,7 +356,6 @@ class SplitVC: UISplitViewController {
                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
                         if let searchTabVC = searchTabNavVC.visibleViewController as? SearchVC {
                             searchTabVC.activateSearchBar()
-                            self.updateScene(title: searchTabVC.sceneTitle)
                         }
                     }
                 }
@@ -380,17 +367,8 @@ class SplitVC: UISplitViewController {
                         activeSearchVC.activateSearchBar()
                     }
                 }
-                self.updateScene(title: searchVC.sceneTitle)
             }
         }
     }
     
-}
-
-extension UIViewController {
-    @objc var sceneTitle: String? { nil }
-}
-
-extension UINavigationController {
-    override var sceneTitle: String? { self.topViewController?.sceneTitle }
 }

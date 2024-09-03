@@ -432,9 +432,10 @@
 		631C166D2C6D61110085F62E /* NavigationTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166C2C6D61110085F62E /* NavigationTarget.swift */; };
 		631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166E2C6D63510085F62E /* SettingsSection.swift */; };
 		631C16712C6D6AA30085F62E /* BehavioralStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C16702C6D6AA30085F62E /* BehavioralStylable.swift */; };
+		63298D0D2C87BA2C0064CD67 /* SlideOverHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63298D0C2C87BA2C0064CD67 /* SlideOverHostingController.swift */; };
+		63298D0F2C87BA390064CD67 /* InnerNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63298D0E2C87BA390064CD67 /* InnerNavigationController.swift */; };
 		632F511C2C7D2ACE0032860D /* FormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511B2C7D2ACE0032860D /* FormSheet.swift */; };
 		632F511E2C7FD54A0032860D /* QueueBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511D2C7FD54A0032860D /* QueueBarButton.swift */; };
-		632F51202C7FD8240032860D /* SlideOverHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F511F2C7FD8240032860D /* SlideOverHostingController.swift */; };
 		632F51222C7FD8680032860D /* SlideOverVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F51212C7FD8680032860D /* SlideOverVC.swift */; };
 		632F51242C83A7970032860D /* QueueVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F51232C83A7970032860D /* QueueVC.swift */; };
 		632F51262C83A8400032860D /* LyricsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F51252C83A8400032860D /* LyricsVC.swift */; };
@@ -967,9 +968,10 @@
 		631C166C2C6D61110085F62E /* NavigationTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTarget.swift; sourceTree = "<group>"; };
 		631C166E2C6D63510085F62E /* SettingsSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsSection.swift; sourceTree = "<group>"; };
 		631C16702C6D6AA30085F62E /* BehavioralStylable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehavioralStylable.swift; sourceTree = "<group>"; };
+		63298D0C2C87BA2C0064CD67 /* SlideOverHostingController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlideOverHostingController.swift; sourceTree = "<group>"; };
+		63298D0E2C87BA390064CD67 /* InnerNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerNavigationController.swift; sourceTree = "<group>"; };
 		632F511B2C7D2ACE0032860D /* FormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormSheet.swift; sourceTree = "<group>"; };
 		632F511D2C7FD54A0032860D /* QueueBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueBarButton.swift; sourceTree = "<group>"; };
-		632F511F2C7FD8240032860D /* SlideOverHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SlideOverHostingController.swift; path = Amperfy/Screens/ViewController/SliderOverMenu/SlideOverHostingController.swift; sourceTree = SOURCE_ROOT; };
 		632F51212C7FD8680032860D /* SlideOverVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideOverVC.swift; sourceTree = "<group>"; };
 		632F51232C83A7970032860D /* QueueVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueVC.swift; sourceTree = "<group>"; };
 		632F51252C83A8400032860D /* LyricsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsVC.swift; sourceTree = "<group>"; };
@@ -1054,7 +1056,7 @@
 		5009863A2208CB170057A1A6 /* Basics */ = {
 			isa = PBXGroup;
 			children = (
-				637A28A92C77BB7E0082FACC /* Toolbar */,
+				637A28A92C77BB7E0082FACC /* Mac - Toolbar */,
 				5009863B2208CB650057A1A6 /* OptionsButton.swift */,
 				5009863D2208CC1E0057A1A6 /* BasicButton.swift */,
 				5077F95022279DF40099CA91 /* PlaytimeSlider.swift */,
@@ -1573,7 +1575,7 @@
 		50C16C0D21E533B600F086F0 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				632F51272C83DC9D0032860D /* SliderOverMenu */,
+				63298D0B2C87BA050064CD67 /* Mac - Navigation */,
 				505CA20B2B88E95400AA81CD /* TableViewHelper */,
 				50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */,
 				50DE29EA2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift */,
@@ -1848,10 +1850,19 @@
 			path = Player;
 			sourceTree = "<group>";
 		};
+		63298D0B2C87BA050064CD67 /* Mac - Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				63298D0E2C87BA390064CD67 /* InnerNavigationController.swift */,
+				632F51272C83DC9D0032860D /* SliderOverMenu */,
+			);
+			path = "Mac - Navigation";
+			sourceTree = "<group>";
+		};
 		632F51272C83DC9D0032860D /* SliderOverMenu */ = {
 			isa = PBXGroup;
 			children = (
-				632F511F2C7FD8240032860D /* SlideOverHostingController.swift */,
+				63298D0C2C87BA2C0064CD67 /* SlideOverHostingController.swift */,
 				632F51212C7FD8680032860D /* SlideOverVC.swift */,
 				632F51252C83A8400032860D /* LyricsVC.swift */,
 				632F51232C83A7970032860D /* QueueVC.swift */,
@@ -1859,7 +1870,7 @@
 			path = SliderOverMenu;
 			sourceTree = "<group>";
 		};
-		637A28A92C77BB7E0082FACC /* Toolbar */ = {
+		637A28A92C77BB7E0082FACC /* Mac - Toolbar */ = {
 			isa = PBXGroup;
 			children = (
 				637A28AA2C77BB8E0082FACC /* Refreshable.swift */,
@@ -1870,7 +1881,7 @@
 				637A28B02C77C8D40082FACC /* AirplayBarButton.swift */,
 				632F511D2C7FD54A0032860D /* QueueBarButton.swift */,
 			);
-			path = Toolbar;
+			path = "Mac - Toolbar";
 			sourceTree = "<group>";
 		};
 		63DCDB9B2C6752F000522F68 /* AppKitIntegration */ = {
@@ -2202,6 +2213,7 @@
 				50791E8728D3B7BF006CE6E5 /* PlayerSettingsView.swift in Sources */,
 				505CA20A2B88E94800AA81CD /* MultiSourceTableViewController.swift in Sources */,
 				50DEEE0C265E3F9D0073FF20 /* DirectoriesVC.swift in Sources */,
+				63298D0F2C87BA390064CD67 /* InnerNavigationController.swift in Sources */,
 				637A28AB2C77BB8E0082FACC /* Refreshable.swift in Sources */,
 				500B97CD2B7BC680005554BF /* EntityPreviewVC.swift in Sources */,
 				50791E7C28D32B8A006CE6E5 /* AlternativeURLAddDialogView.swift in Sources */,
@@ -2251,7 +2263,6 @@
 				504262B42BF5FC3D00B5EF38 /* NSUserActivity+IntentData.swift in Sources */,
 				50C16C1021E5463E00F086F0 /* ArtistsVC.swift in Sources */,
 				50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */,
-				632F51202C7FD8240032860D /* SlideOverHostingController.swift in Sources */,
 				631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */,
 				50A30E542B7408DB00722894 /* ContextQueueNextSectionHeader.swift in Sources */,
 				632F511E2C7FD54A0032860D /* QueueBarButton.swift in Sources */,
@@ -2280,6 +2291,7 @@
 				50AC4E5828D9D12D0091FF33 /* ObservableSettings.swift in Sources */,
 				50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */,
 				50AC4E5628D99A410091FF33 /* ButtonStyles.swift in Sources */,
+				63298D0D2C87BA2C0064CD67 /* SlideOverHostingController.swift in Sources */,
 				505CA2082B88E8F400AA81CD /* BasicTableViewController.swift in Sources */,
 				50C16C1C21E7051700F086F0 /* AlbumDetailVC.swift in Sources */,
 				50AE79C32C2070F40085CBB3 /* LyricTableCell.swift in Sources */,
