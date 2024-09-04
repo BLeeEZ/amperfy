@@ -41,9 +41,8 @@ extension AppDelegate {
         appKitController?.perform(#selector(installControlAccentColorHook))
     }
 
-    class func updateAppKitControlColor() {
-        let accentColor = UIView.appearance().tintColor.cgColor
-        appKitController?.perform(#selector(updateControlAccentColor(_:)), with: accentColor)
+    class func updateAppKitControlColor(_ color: UIColor) {
+        appKitController?.perform(#selector(updateControlAccentColor(_:)), with: color.cgColor)
     }
 
     class func configureUtilityWindow(persistentIdentifier: String, properties: [String: Any] = [:]) {

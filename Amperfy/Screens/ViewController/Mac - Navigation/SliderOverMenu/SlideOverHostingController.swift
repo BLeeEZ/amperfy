@@ -107,6 +107,17 @@ class SlideOverHostingController: UIViewController {
         // Add the media player controls to the view's navigation item
         self.navigationItem.leftItemsSupplementBackButton = false
         let defaultSpacing: CGFloat = 10
+
+        let rightToolbarButtons =
+            if #available(macCatalyst 17.0, *) {
+                [AirplayBarButton(),
+                QueueBarButton(splitViewController: splitViewController),
+                SpaceBarItem(fixedSpace: defaultSpacing)]
+            } else {
+                [QueueBarButton(splitViewController: splitViewController),
+                SpaceBarItem(fixedSpace: defaultSpacing)]
+            }
+
         self.navigationItem.leftBarButtonItems = [
                 SpaceBarItem(fixedSpace: defaultSpacing),
                 self.shuffleButton,
@@ -116,11 +127,9 @@ class SlideOverHostingController: UIViewController {
                 RepeatBarButton(player: player),
                 SpaceBarItem(minSpace: defaultSpacing),
                 NowPlayingBarItem(player: player, splitViewController: splitViewController),
-                SpaceBarItem(),
-                AirplayBarButton(),
-                QueueBarButton(splitViewController: splitViewController),
-                SpaceBarItem(fixedSpace: defaultSpacing),
-            ]
+                SpaceBarItem()
+        ] + rightToolbarButtons
+
         self.updateShuffleVisibility()
         self.navigationItem.leftBarButtonItems?.forEach { ($0 as? Refreshable)?.reload() }
     }

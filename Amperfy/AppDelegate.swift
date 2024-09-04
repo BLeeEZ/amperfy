@@ -199,6 +199,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        print("Finish launching....")
+
         if let options = launchOptions {
             os_log("application launch with options:", log: self.log, type: .info)
             options.forEach{ os_log("- key: %s", log: self.log, type: .info, $0.key.rawValue.description) }
@@ -214,6 +216,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         initEventLogger()
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
+        #if targetEnvironment(macCatalyst)
+        AppDelegate.loadAppKitIntegrationFramework()
+        AppDelegate.installAppKitColorHooks()
+
+        // update color of AppKit controls
+        AppDelegate.updateAppKitControlColor(storage.settings.themePreference.asColor)
+
+        // whenever we change the window focus, we rebuild the menu
+        NotificationCenter.default.addObserver(forName: .init("NSWindowDidBecomeMainNotification"), object: nil, queue: nil) { [weak self] notification in
+
+            self?.focusedWindowTitle = (notification.object as? AnyObject)?.value(forKey: "title") as? String
+            UIMenuSystem.main.setNeedsRebuild()
+        }
+
+        self.player.addNotifier(notifier: self)
+        #endif
+
         guard let credentials = storage.loginCredentials else {
             return true
         }
@@ -234,24 +253,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             startManagerForNormalOperation()
         }
         userStatistics.sessionStarted()
-
-        #if targetEnvironment(macCatalyst)
-
-        AppDelegate.loadAppKitIntegrationFramework()
-        AppDelegate.installAppKitColorHooks()
-        
-        // update color of AppKit controls
-        AppDelegate.updateAppKitControlColor()
-
-        // whenever we change the window focus, we rebuild the menu
-        NotificationCenter.default.addObserver(forName: .init("NSWindowDidBecomeMainNotification"), object: nil, queue: nil) { [weak self] notification in
-            
-            self?.focusedWindowTitle = (notification.object as? AnyObject)?.value(forKey: "title") as? String
-            UIMenuSystem.main.setNeedsRebuild()
-        }
-
-        self.player.addNotifier(notifier: self)
-        #endif
 
         return true
     }

@@ -32,7 +32,7 @@ struct DisplaySettingsView: View {
 
         #if targetEnvironment(macCatalyst)
         // the following applies the tint color to already loaded views in all windows (AppKit)
-        AppDelegate.updateAppKitControlColor()
+        AppDelegate.updateAppKitControlColor(preference.asColor)
         #endif
 
         // the following applies the tint color to already loaded views in all windows (UIKit)
