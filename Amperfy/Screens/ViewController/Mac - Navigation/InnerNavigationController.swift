@@ -9,10 +9,12 @@
 import Foundation
 import UIKit
 
-#if targetEnvironment(macCatalyst)
 extension UIViewController {
     @objc var sceneTitle: String? { nil }
 }
+
+
+#if targetEnvironment(macCatalyst)
 
 class InnerNavigationController: UINavigationController {
 
