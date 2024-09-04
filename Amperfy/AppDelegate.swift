@@ -199,8 +199,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        print("Finish launching....")
-
+        
         if let options = launchOptions {
             os_log("application launch with options:", log: self.log, type: .info)
             options.forEach{ os_log("- key: %s", log: self.log, type: .info, $0.key.rawValue.description) }
