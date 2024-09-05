@@ -108,7 +108,9 @@ enum NavigationTarget: String, CaseIterable {
         case .swipe: 340
         case .artwork: 210
         case .support: 340
+        #if DEBUG
         case .developer: 84
+        #endif
         default: 300
         }
         return CGSize(width: width, height: height)
