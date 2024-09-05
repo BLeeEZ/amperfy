@@ -198,6 +198,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+    #if targetEnvironment(macCatalyst)
+    @objc private func padStyle() -> UIBehavioralStyle {
+        return .pad
+    }
+
+    private func patchMPVolumeViewPreSonoma() {
+        // we must always force .pad style for MPVolumeSlider below MacOS 17. Otherwise the App crashes
+        if #unavailable(macCatalyst 17.0) {
+            let originalClass: AnyClass? = NSClassFromString("MPVolumeSlider")
+            let originalSelector = NSSelectorFromString("preferredBehavioralStyle")
+            guard let originalMethod = class_getInstanceMethod(originalClass, originalSelector),
+                  let swizzleMethod = class_getInstanceMethod(AppDelegate.self, #selector(self.padStyle))
+                else { return }
+            method_exchangeImplementations(originalMethod, swizzleMethod)
+        }
+    }
+    #endif
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         if let options = launchOptions {
@@ -216,6 +234,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
         #if targetEnvironment(macCatalyst)
+        self.patchMPVolumeViewPreSonoma()
+
         AppDelegate.loadAppKitIntegrationFramework()
         AppDelegate.installAppKitColorHooks()
 
