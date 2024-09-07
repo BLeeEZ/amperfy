@@ -62,7 +62,6 @@ class AppKitController: NSObject {
     }
 
 	@objc public func _catalyst_setupWindow(_ note: Notification) {
-
 		if let userInfo = note.userInfo, let sceneIdentifier = userInfo["SceneIdentifier"] as? String {
             let kv = utilitySceneIdentifier.first(where: { sceneIdentifier.hasSuffix($0.key) })
             if let kv {

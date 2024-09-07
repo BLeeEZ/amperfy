@@ -69,6 +69,9 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
 
 
+        if #available(macCatalyst 16.0, *) {
+            windowScene.sizeRestrictions?.allowsFullScreen = false
+        }
         windowScene.sizeRestrictions?.minimumSize = minSize
 
         #endif
