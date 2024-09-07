@@ -25,6 +25,8 @@ import AmperfyKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
+    static let mainWindowSize = CGSizeMake(SplitVC.sidebarWidth + 700, 580)
+    
     public lazy var log = {
         return AmperKit.shared.log
     }()
@@ -54,6 +56,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         var initialViewController: UIViewController?
 
         #if targetEnvironment(macCatalyst)
+        self.window?.windowScene?.sizeRestrictions?.minimumSize = Self.mainWindowSize
 
         let splitVC = SplitVC.instantiateFromAppStoryboard()
 

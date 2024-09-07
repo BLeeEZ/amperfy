@@ -25,6 +25,8 @@ import AmperfyKit
 
 class SplitVC: UISplitViewController {
 
+    public static let sidebarWidth: CGFloat = 230
+    
     lazy var barPlayer = BarPlayerHandler(player: appDelegate.player, splitVC: self)
     
     var isCompact: Bool {
@@ -54,8 +56,8 @@ class SplitVC: UISplitViewController {
     #if targetEnvironment(macCatalyst)
     override func viewWillAppear(_ animated: Bool) {
         // set min and max sidebar width
-        self.minimumPrimaryColumnWidth = 250
-        self.maximumPrimaryColumnWidth = 450
+        self.minimumPrimaryColumnWidth = Self.sidebarWidth
+        self.maximumPrimaryColumnWidth = Self.sidebarWidth
     }
     #endif
 
