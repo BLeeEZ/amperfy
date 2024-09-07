@@ -41,7 +41,7 @@ struct ServerSettingsView: View {
 
     var body: some View {
         ZStack {
-            List {
+            SettingsList {
                 SettingsSection {
                     SettingsRow(title: "URL", orientation: .vertical, splitPercentage: splitPercentage) {
                         SecondaryText(appDelegate.storage.loginCredentials?.serverUrl ?? "")

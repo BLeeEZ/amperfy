@@ -31,6 +31,7 @@ class FormSheetWrapper<Content: View>: UIViewController, UIPopoverPresentationCo
         let vc = UIHostingController(rootView: content())
 
         vc.view.sizeToFit()
+        vc.view.backgroundColor = .clear
         vc.preferredContentSize = vc.view.frame.size
         vc.modalPresentationStyle = .formSheet
         vc.presentationController?.delegate = self

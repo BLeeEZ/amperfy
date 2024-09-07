@@ -27,7 +27,7 @@ struct AddSwipeActionView: View {
     @EnvironmentObject private var settings: Settings
     @Binding var isVisible: Bool
 
-    var swipePosition: SwipePosition
+    @Binding var swipePosition: SwipePosition
     @State private var actionNotInUse = [SwipeActionType]()
     var addCB : (_ swipePosition: SwipePosition, _ elementToAdd: SwipeActionType) -> ()
     
@@ -52,8 +52,12 @@ struct AddSwipeActionView: View {
                         }
                 }
             }
+            #if targetEnvironment(macCatalyst)
+            .listStyle(.plain)
+            #else
             .listStyle(.grouped)
-
+            #endif
+            
             Button(action: { self.isVisible = false }) {
                 Text("Cancel")
                     .fontWeight(.bold)
@@ -61,7 +65,7 @@ struct AddSwipeActionView: View {
             .padding()
         }
         #if targetEnvironment(macCatalyst)
-        .background { Color.systemGroupedBackground }
+        .background { Color.clear }
         #endif
         .onAppear {
             reload()
@@ -72,8 +76,9 @@ struct AddSwipeActionView: View {
 struct AddSwipeActionView_Previews: PreviewProvider {
     @State static var settings = Settings()
     @State static var isVisible = true
+    @State static var swipePosition: SwipePosition = .trailing
 
     static var previews: some View {
-        AddSwipeActionView(isVisible: $isVisible, swipePosition: .trailing, addCB: {_,_ in}).environmentObject(settings)
+        AddSwipeActionView(isVisible: $isVisible, swipePosition: $swipePosition, addCB: {_,_ in}).environmentObject(settings)
     }
 }

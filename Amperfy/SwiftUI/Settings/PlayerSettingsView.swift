@@ -116,7 +116,7 @@ struct PlayerSettingsView: View {
     
     var body: some View {
         ZStack{
-            List {
+            SettingsList {
                 SettingsSection {
                     SettingsCheckBoxRow(label: "Auto cache played Songs", isOn: $settings.isPlayerAutoCachePlayedItems)
                 }

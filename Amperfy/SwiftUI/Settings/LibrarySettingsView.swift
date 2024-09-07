@@ -90,7 +90,7 @@ struct LibrarySettingsView: View {
     
     var body: some View {
         ZStack{
-            List {
+            SettingsList {
                 SettingsSection(content: {
                     SettingsRow(title: "Playlists") {
                         SecondaryText(playlistCount.description)

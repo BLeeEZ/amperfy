@@ -116,7 +116,6 @@ struct UpdatePasswordView: View {
             }
             #if targetEnvironment(macCatalyst)
             .listStyle(.plain)
-            .background { Color.systemGroupedBackground }
             #endif
         }
         .onAppear {

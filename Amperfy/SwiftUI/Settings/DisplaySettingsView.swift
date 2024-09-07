@@ -56,7 +56,7 @@ struct DisplaySettingsView: View {
     
     var body: some View {
         ZStack{
-            List {
+            SettingsList {
                 SettingsSection {
                     SettingsRow(title: "Theme Color") {
                         Menu(settings.themePreference.description) {

@@ -44,9 +44,7 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.appDelegate.settingsSceneSession = session
 
         self.window = UIWindow(windowScene: windowScene)
-        //self.appDelegate.window = self.window
-
-        self.window?.backgroundColor = .secondarySystemBackground
+        self.window?.backgroundColor = .clear
 
         #if targetEnvironment(macCatalyst)
         buildMacToolbar()
@@ -212,8 +210,6 @@ extension SettingsSceneDelegate: NSToolbarDelegate {
 
     func selectTarget(_ navigationTarget: NavigationTarget) {
         let hostingController = SettingsHostVC(target: navigationTarget)
-        hostingController.view.backgroundColor = UIColor.clear
-        hostingController.view.isOpaque = false
         self.window?.rootViewController = hostingController
 
         // Change the window size for the selected tab

@@ -447,6 +447,7 @@
 		637A28B12C77C8D40082FACC /* AirplayBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B02C77C8D40082FACC /* AirplayBarButton.swift */; };
 		637A28B32C77D1520082FACC /* CustomBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B22C77D1520082FACC /* CustomBarButton.swift */; };
 		637A28B52C79409C0082FACC /* MiniPlayerSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */; };
+		638920F02C8C8E9000932EE8 /* SettingsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638920EF2C8C8E9000932EE8 /* SettingsList.swift */; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
 		63DCDB962C67515C00522F68 /* AppKitIntegration.framework in Embed AppKitIntegration */ = {isa = PBXBuildFile; fileRef = 63DCDB912C67508E00522F68 /* AppKitIntegration.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		63DCDB9E2C67536800522F68 /* AppKitController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB992C6752F000522F68 /* AppKitController.swift */; };
@@ -983,6 +984,7 @@
 		637A28B02C77C8D40082FACC /* AirplayBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirplayBarButton.swift; sourceTree = "<group>"; };
 		637A28B22C77D1520082FACC /* CustomBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBarButton.swift; sourceTree = "<group>"; };
 		637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerSceneDelegate.swift; sourceTree = "<group>"; };
+		638920EF2C8C8E9000932EE8 /* SettingsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsList.swift; sourceTree = "<group>"; };
 		63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSceneDelegate.swift; sourceTree = "<group>"; };
 		63DCDB912C67508E00522F68 /* AppKitIntegration.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppKitIntegration.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		63DCDB992C6752F000522F68 /* AppKitController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKitController.swift; sourceTree = "<group>"; };
@@ -1213,8 +1215,9 @@
 				632F511B2C7D2ACE0032860D /* FormSheet.swift */,
 				6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */,
 				631C16702C6D6AA30085F62E /* BehavioralStylable.swift */,
-				631C166A2C6D3D9A0085F62E /* SettingsRow.swift */,
+				638920EF2C8C8E9000932EE8 /* SettingsList.swift */,
 				631C166E2C6D63510085F62E /* SettingsSection.swift */,
+				631C166A2C6D3D9A0085F62E /* SettingsRow.swift */,
 				50791E7E28D363F0006CE6E5 /* InfoBannerView.swift */,
 				504B442128D8EBB20033982C /* MailView.swift */,
 				50AC4E5528D99A410091FF33 /* ButtonStyles.swift */,
@@ -2166,6 +2169,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				638920F02C8C8E9000932EE8 /* SettingsList.swift in Sources */,
 				504B441D28D7A6330033982C /* XCallbackURLsSetttingsView.swift in Sources */,
 				631C166B2C6D3D9A0085F62E /* SettingsRow.swift in Sources */,
 				507361E02632BA3B005F151D /* GenresVC.swift in Sources */,

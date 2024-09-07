@@ -44,7 +44,7 @@ struct ArtworkSettingsView: View {
 
     var body: some View {
         ZStack {
-            List {
+            SettingsList {
                 SettingsSection {
                     SettingsRow(title: "Not checked Artworks") {
                         SecondaryText(artworkNotCheckedCountText)

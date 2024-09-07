@@ -65,7 +65,7 @@ struct SwipeSettingsView: View {
     
     var body: some View {
         ZStack {
-            List {
+            SettingsList {
                 Section(header:
                     HStack {
                         Text("Leading")
@@ -121,14 +121,14 @@ struct SwipeSettingsView: View {
             .listStyle(GroupedListStyle())
             #if targetEnvironment(macCatalyst)
             .formSheet(isPresented: $isShowingAddView) {
-                AddSwipeActionView(isVisible: $isShowingAddView, swipePosition: addPositionType, addCB: self.add)
+                AddSwipeActionView(isVisible: $isShowingAddView, swipePosition: $addPositionType, addCB: self.add)
                     .frame(width: 400, height: 340)
                     .environmentObject(settings)
                     .environment(\.managedObjectContext, appDelegate.storage.main.context)
             }
             #else
             .sheet(isPresented: $isShowingAddView) {
-                AddSwipeActionView(isVisible: $isShowingAddView, swipePosition: addPositionType, addCB: self.add)
+                AddSwipeActionView(isVisible: $isShowingAddView, swipePosition: $addPositionType, addCB: self.add)
             }
             #endif
         }
