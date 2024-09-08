@@ -101,7 +101,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return AmperKit.shared.backgroundFetchTriggeredSyncer
     }()
     public lazy var intentManager = {
-        return IntentManager(storage: storage, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager, library: storage.main.library, player: player)
+        return IntentManager(storage: storage, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager, library: storage.main.library, player: player, eventLogger: eventLogger)
     }()
     public lazy var quickActionsManager = {
         return QuickActionsHandler(storage: self.storage, player: self.player, application: UIApplication.shared, displaySearchTabCB: self.displaySearchTab)

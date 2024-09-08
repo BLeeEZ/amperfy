@@ -51,6 +51,10 @@ public class EventLogger {
         self.storage = storage
     }
     
+    public func debug(topic: String, message: String) {
+        report(topic: topic, statusCode: .info, shortMessage: message, detailMessage: message, logType: .debug, displayPopup: false)
+    }
+    
     public func info(topic: String, message: String, displayPopup: Bool = true) {
         report(topic: topic, statusCode: .info, shortMessage: message, detailMessage: message, logType: .info, displayPopup: displayPopup)
     }

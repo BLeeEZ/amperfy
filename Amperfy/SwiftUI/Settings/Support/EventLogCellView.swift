@@ -47,6 +47,13 @@ struct EventLogCellView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+        }.contextMenu {
+            Button(action: {
+                UIPasteboard.general.string = entry.message
+            }) {
+                Text("Copy to Clipboard")
+                Image(uiImage: .clipboard)
+            }
         }
     }
 }
