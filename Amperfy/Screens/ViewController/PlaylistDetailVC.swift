@@ -145,10 +145,6 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
             }
         }
 
-        //if #available(iOS 16.0, *) {
-        //    navigationItem.preferredSearchBarPlacement = .stacked
-        //}
-
         #if targetEnvironment(macCatalyst)
             if #available(iOS 16.0, *) {
                 navigationItem.preferredSearchBarPlacement = .inline

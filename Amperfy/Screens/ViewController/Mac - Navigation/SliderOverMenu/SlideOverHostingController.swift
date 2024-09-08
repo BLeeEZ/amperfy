@@ -1,12 +1,27 @@
 //
-//  MacToolbarHostingViewController.swift
+//  SlideOverHostingController.swift
 //  Amperfy
 //
 //  Created by David Klopp on 29.08.24.
-//  Copyright © 2024 Maximilian Bauer. All rights reserved.
+//  Copyright (c) 2024 Maximilian Bauer. All rights reserved.
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
 import UIKit
+import AmperfyKit
+import MediaPlayer
 
 #if targetEnvironment(macCatalyst)
 
@@ -85,6 +100,8 @@ class SlideOverHostingController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.appDelegate.player.addNotifier(notifier: self)
 
         // Listen for setting changes to adjust the toolbar and slide over menu
         NotificationCenter.default.addObserver(self, selector: #selector(self.settingsDidChange), name: UserDefaults.didChangeNotification, object: nil)
@@ -99,6 +116,16 @@ class SlideOverHostingController: UIViewController {
         let player = appDelegate.player
         return ShuffleBarButton(player: player)
     }()
+    private lazy var shufflePlaceholderButton: UIBarButtonItem = {
+        return SpaceBarItem(fixedSpace: CustomBarButton.defaultSize.width)
+    }()
+    private lazy var repeatButton: UIBarButtonItem = {
+        let player = appDelegate.player
+        return RepeatBarButton(player: player)
+    }()
+    private lazy var repeatPlaceholderButton: UIBarButtonItem = {
+        return SpaceBarItem(fixedSpace: CustomBarButton.defaultSize.width)
+    }()
 
     private func setupToolbar() {
         guard let splitViewController = self.splitViewController as? SplitVC else { return }
@@ -111,10 +138,12 @@ class SlideOverHostingController: UIViewController {
         self.navigationItem.leftBarButtonItems = [
                 SpaceBarItem(fixedSpace: defaultSpacing),
                 self.shuffleButton,
+                self.shufflePlaceholderButton,
                 PreviousBarButton(player: player),
                 PlayBarButton(player: player),
                 NextBarButton(player: player),
-                RepeatBarButton(player: player),
+                self.repeatButton,
+                self.repeatPlaceholderButton,
                 SpaceBarItem(minSpace: defaultSpacing),
                 NowPlayingBarItem(player: player, splitViewController: splitViewController),
                 SpaceBarItem(),
@@ -123,28 +152,53 @@ class SlideOverHostingController: UIViewController {
                 SpaceBarItem(fixedSpace: defaultSpacing)
         ]
 
-        self.updateShuffleVisibility()
+        self.updateButtonVisibility()
         self.navigationItem.leftBarButtonItems?.forEach { ($0 as? Refreshable)?.reload() }
     }
 
-    private func updateShuffleVisibility() {
-        let shuffleEnabled = appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+    private func updateButtonVisibility() {
+        let isShuffleEnabled = appDelegate.storage.settings.isPlayerShuffleButtonEnabled &&
+                              (appDelegate.player.playerMode == .music)
+        let isRepeatEnabled = appDelegate.player.playerMode == .music
+
         if #available(macCatalyst 16.0, *) {
             // We can not remove toolbar items in `mac` style, therefore we hide them
-            self.shuffleButton.isHidden = !shuffleEnabled
+            self.shuffleButton.isHidden = !isShuffleEnabled
+            self.shufflePlaceholderButton.isHidden = isShuffleEnabled
+            self.repeatButton.isHidden = !isRepeatEnabled
+            self.repeatPlaceholderButton.isHidden = isRepeatEnabled
         } else {
             // Below 16.0 there is no `mac` style and .isHidden is not available.
-            if (shuffleEnabled) {
+            if let index = self.navigationItem.leftBarButtonItems?.firstIndex(of: self.shuffleButton) {
+                self.navigationItem.leftBarButtonItems?.remove(at: index)
+            }
+            if let index = self.navigationItem.leftBarButtonItems?.firstIndex(of: self.shufflePlaceholderButton) {
+                self.navigationItem.leftBarButtonItems?.remove(at: index)
+            }
+            if let index = self.navigationItem.leftBarButtonItems?.firstIndex(of: self.repeatButton) {
+                self.navigationItem.leftBarButtonItems?.remove(at: index)
+            }
+            if let index = self.navigationItem.leftBarButtonItems?.firstIndex(of: self.repeatPlaceholderButton) {
+                self.navigationItem.leftBarButtonItems?.remove(at: index)
+            }
+            
+            if (isShuffleEnabled) {
                 self.navigationItem.leftBarButtonItems?.insert(self.shuffleButton, at: 1)
             } else {
-                self.navigationItem.leftBarButtonItems?.remove(at: 1)
+                self.navigationItem.leftBarButtonItems?.insert(self.shufflePlaceholderButton, at: 1)
+            }
+            
+            if (isRepeatEnabled) {
+                self.navigationItem.leftBarButtonItems?.insert(self.repeatButton, at: 5)
+            } else {
+                self.navigationItem.leftBarButtonItems?.insert(self.repeatPlaceholderButton, at: 5)
             }
         }
     }
 
     @objc func settingsDidChange() {
         self.navigationItem.leftBarButtonItems?.forEach { ($0 as? Refreshable)?.reload() }
-        self.updateShuffleVisibility()
+        self.updateButtonVisibility()
         self.slideOverViewController.settingsDidChange()
     }
 
@@ -175,4 +229,21 @@ class SlideOverHostingController: UIViewController {
         super.viewWillLayoutSubviews()
     }
 }
+
+extension SlideOverHostingController: MusicPlayable {
+    func didStartPlayingFromBeginning() {}
+    func didStartPlaying() {}
+    func didLyricsTimeChange(time: CMTime) {}
+    func didPause() {}
+    func didStopPlaying() {}
+    func didElapsedTimeChange() {}
+    func didPlaylistChange() {
+        settingsDidChange()
+    }
+    func didArtworkChange() {}
+    func didShuffleChange() {}
+    func didRepeatChange() {}
+    func didPlaybackRateChange() {}
+}
+
 #endif

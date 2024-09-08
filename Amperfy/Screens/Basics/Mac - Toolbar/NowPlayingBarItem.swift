@@ -1,9 +1,22 @@
 //
-//  PlayButton.swift
+//  NowPlayingBarItem.swift
 //  Amperfy
 //
 //  Created by David Klopp on 20.08.24.
-//  Copyright © 2024 Maximilian Bauer. All rights reserved.
+//  Copyright (c) 2024 Maximilian Bauer. All rights reserved.
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
 import Foundation
@@ -15,6 +28,7 @@ import PromiseKit
 #if targetEnvironment(macCatalyst)
 
 fileprivate class NowPlayingSlider: UISlider {
+    
     static var sliderHeight: CGFloat = 5.0
 
     private var thumbTouchSize = CGSize(width: 50, height: 20)
@@ -31,9 +45,9 @@ fileprivate class NowPlayingSlider: UISlider {
 
     fileprivate func refreshSliderDesign() {
         let tint = appDelegate.storage.settings.themePreference.asColor
-        self.setUnicolorRectangularMinimumTrackImage(trackHeight: NowPlayingSlider.sliderHeight, color: tint, for: .normal)
-        self.setUnicolorRectangularMaximumTrackImage(trackHeight: NowPlayingSlider.sliderHeight, color: .systemGray6, for: .normal)
-        self.setUnicolorRectangularThumbImage(thumbSize: CGSize(width: 5, height: NowPlayingSlider.sliderHeight*2), color: .systemGray, for: .normal)
+        self.setUnicolorRectangularMinimumTrackImage(trackHeight: Self.sliderHeight, color: tint, for: .normal)
+        self.setUnicolorRectangularMaximumTrackImage(trackHeight: Self.sliderHeight, color: .systemGray6, for: .normal)
+        self.setUnicolorRectangularThumbImage(thumbSize: CGSize(width: 5, height: Self.sliderHeight*2), color: .systemGray, for: .normal)
     }
 
     override func trackRect(forBounds bounds: CGRect) -> CGRect {
@@ -61,6 +75,7 @@ fileprivate class NowPlayingSlider: UISlider {
 
 
 class NowPlayingInfoView: UIView {
+    
     var player: PlayerFacade
     var rootViewController: UIViewController
 
@@ -325,7 +340,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
             self.subtitleLabel.text = subtitle
         case .podcast:
             let podcast = currentPlaying.asPodcastEpisode
-            let title = podcast?.creatorName
+            let title = podcast?.title ?? ""
             let subtitle = podcast?.subtitle ?? ""
             self.titleLabel.text = title
             self.subtitleLabel.text = subtitle

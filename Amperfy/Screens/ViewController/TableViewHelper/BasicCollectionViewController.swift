@@ -52,11 +52,7 @@ class BasicCollectionViewController: UICollectionViewController {
         searchController.searchBar.autocapitalizationType = .none
         searchController.searchBar.scopeButtonTitles = scopeButtonTitles
         searchController.searchBar.placeholder = placeholder
-
-        //if #available(iOS 16.0, *) {
-        //    navigationItem.preferredSearchBarPlacement = .stacked
-        //}
-
+        
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
 

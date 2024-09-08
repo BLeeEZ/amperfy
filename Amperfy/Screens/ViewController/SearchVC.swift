@@ -216,8 +216,6 @@ class SearchVC: BasicTableViewController {
         #else
         navigationItem.rightBarButtonItem = optionsButton
         #endif
-
-
     }
 
     #if targetEnvironment(macCatalyst)
