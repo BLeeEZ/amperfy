@@ -49,7 +49,7 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
         #if targetEnvironment(macCatalyst)
         buildMacToolbar()
 
-        AppDelegate.configureUtilityWindow(persistentIdentifier: windowScene.session.persistentIdentifier)
+        AppDelegate.configureUtilityWindow(persistentIdentifier: windowScene.session.persistentIdentifier, properties: [:])
         
         selectTarget(.general)
         #endif
@@ -214,6 +214,12 @@ extension SettingsSceneDelegate: NSToolbarDelegate {
 
         // Change the window size for the selected tab
         let fixedSize = navigationTarget.fittingWindowSize
+        self.window?.frame.size = fixedSize
+        
+        // This line is important to guarantee that the fullscreen option is not enabled after switching a tab
+        if #available(macCatalyst 16.0, *) {
+            self.window?.windowScene?.sizeRestrictions?.allowsFullScreen = false
+        }
         self.window?.windowScene?.sizeRestrictions?.minimumSize = fixedSize
         self.window?.windowScene?.sizeRestrictions?.maximumSize = fixedSize
     }

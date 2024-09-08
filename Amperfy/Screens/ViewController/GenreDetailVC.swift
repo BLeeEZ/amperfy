@@ -243,6 +243,19 @@ class GenreDetailVC: MultiSourceTableViewController {
         }
     }
     
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch indexPath.section+1 {
+        case LibraryElement.Artist.rawValue:
+            return GenericTableCell.rowHeight
+        case LibraryElement.Album.rawValue:
+            return GenericTableCell.rowHeight
+        case LibraryElement.Song.rawValue:
+            return PlayableTableCell.rowHeight
+        default:
+            return 0.0
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.section+1 {
         case LibraryElement.Artist.rawValue:
