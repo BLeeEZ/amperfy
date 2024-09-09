@@ -31,11 +31,13 @@ class SyncVC: UIViewController {
     var parsedObjectCount: Int = 0
     var parsedObjectPercent: Float = 0.0
     var libObjectsToParseCount: Int = 1
+    var syncFinished = false
     
     @IBOutlet weak var progressBar: UIProgressView!
     @IBOutlet weak var progressLabel: UILabel!
     @IBOutlet weak var progressInfo: UILabel!
     @IBOutlet weak var activitySpinner: UIActivityIndicatorView!
+    @IBOutlet weak var skipButton: BasicButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,29 +59,40 @@ class SyncVC: UIViewController {
         
         firstly {
             self.appDelegate.librarySyncer.syncInitial(statusNotifyier: self)
+        }.done {
+            self.appDelegate.storage.initialSyncCompletionStatus = .completed
         }.catch { error in
+            guard !self.syncFinished else { return }
             self.appDelegate.eventLogger.report(topic: "Initial Sync", error: error, displayPopup: false)
+            self.appDelegate.storage.initialSyncCompletionStatus = .aborded
         }.finally {
-            self.progressInfo.text = "Done"
-            self.activitySpinner.stopAnimating()
-            self.activitySpinner.isHidden = true
-            self.progressLabel.isHidden = true
-            
-            self.appDelegate.storage.librarySyncVersion = .newestVersion
-            self.appDelegate.storage.isLibrarySynced = true
-            self.appDelegate.startManagerAfterSync()
-            self.appDelegate.isKeepScreenAlive = false
-            self.appDelegate.eventLogger.supressAlerts = false
-
-            #if targetEnvironment(macCatalyst)
-            AppDelegate.rootViewController()?.dismiss(animated: true) {
-                guard let splitVC = AppDelegate.rootViewController() as? SplitVC else { return }
-                splitVC.displayInfoPopups()
-            }
-            #else
-            self.performSegue(withIdentifier: "toLibrary", sender: self)
-            #endif
+            self.finishSync()
         }
+    }
+    
+    private func finishSync() {
+        guard !self.syncFinished else { return }
+
+        self.syncFinished = true
+        self.progressInfo.text = "Done"
+        self.activitySpinner.stopAnimating()
+        self.activitySpinner.isHidden = true
+        self.progressLabel.isHidden = true
+        
+        self.appDelegate.storage.librarySyncVersion = .newestVersion
+        self.appDelegate.storage.isLibrarySynced = true
+        self.appDelegate.startManagerAfterSync()
+        self.appDelegate.isKeepScreenAlive = false
+        self.appDelegate.eventLogger.supressAlerts = false
+
+        #if targetEnvironment(macCatalyst)
+        AppDelegate.rootViewController()?.dismiss(animated: true) {
+            guard let splitVC = AppDelegate.rootViewController() as? SplitVC else { return }
+            splitVC.displayInfoPopups()
+        }
+        #else
+        self.performSegue(withIdentifier: "toLibrary", sender: self)
+        #endif
     }
     
     private func updateSyncInfo(infoText: String? = nil, percentParsed: Float = 0.0) {
@@ -92,6 +105,18 @@ class SyncVC: UIViewController {
         }
     }
 
+    @IBAction func skipPressed(_ sender: Any) {
+        let alert = UIAlertController(title: "Skip Sync", message: "Skipping initial sync results in an incomplete library. Missing library elements can later be synced via various search/update functionalities.", preferredStyle: .alert)
+        let skip = UIAlertAction(title: "Skip", style: .destructive, handler: { (action) -> Void in
+            self.appDelegate.storage.initialSyncCompletionStatus = .skipped
+            self.finishSync()
+        })
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alert.addAction(skip)
+        alert.addAction(cancel)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
 }
 
 extension SyncVC: SyncCallbacks {

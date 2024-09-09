@@ -216,7 +216,7 @@ class SplitVC: UISplitViewController {
         let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
         popupVC.setContent(
             topic: "Synchronization",
-            detailMessage: "Your music collection is constantly updating. Already synced library items are offline available. If library items (artists/albums/songs) are not shown in your  collection please use the various search functionalities to synchronize with the server.",
+            detailMessage: "Your music collection is constantly updating. Already synced library items are offline available. If library items (artists/albums/songs) are not shown in your collection please use the various search functionalities to synchronize with the server.",
             customIcon: .refresh,
             customAnimation: .rotate,
             onClosePressed: { _ in

@@ -36,7 +36,9 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     }
     
     func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void> {
-        return firstly { () -> Promise<APIDataResponse> in
+        return firstly {
+            super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
+        }.then { () -> Promise<APIDataResponse> in
             statusNotifyier?.notifySyncStarted(ofType: .genre, totalCount: 0)
             return self.subsonicServerApi.requestGenres()
         }.then { response in
@@ -118,8 +120,6 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                     try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
                 }
             }
-        }.then {
-            super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
         }
     }
     

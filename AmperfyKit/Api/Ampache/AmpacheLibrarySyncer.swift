@@ -36,7 +36,9 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     
     func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void> {
         return firstly {
-            ampacheXmlServerApi.requesetLibraryMetaData()
+            super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
+        }.then {
+            self.ampacheXmlServerApi.requesetLibraryMetaData()
         }.then { auth -> Promise<APIDataResponse> in
             statusNotifyier?.notifySyncStarted(ofType: .genre, totalCount: auth.genreCount)
             return self.ampacheXmlServerApi.requestGenres()
@@ -100,8 +102,6 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                     try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
                 }
             }
-        }.then {
-            super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
         }
     }
     

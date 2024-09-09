@@ -110,6 +110,9 @@ struct LibrarySettingsView: View {
                     SettingsRow(title: "Podcast Episodes") {
                         SecondaryText(podcastEpisodeCount.description)
                     }
+                    SettingsRow(title: "Initial Sync") {
+                        SecondaryText(self.appDelegate.storage.initialSyncCompletionStatus.description)
+                    }
                 })
 
 
