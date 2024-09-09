@@ -118,7 +118,7 @@ class NowPlayingInfoView: UIView {
     }()
 
     var moreButtonWidthConstraint: NSLayoutConstraint?
-    var moreButtonTrailingConstrait: NSLayoutConstraint?
+    var moreButtonTrailingConstraint: NSLayoutConstraint?
 
     fileprivate lazy var moreButton: UIButton = {
         var config = UIButton.Configuration.borderless()
@@ -141,38 +141,90 @@ class NowPlayingInfoView: UIView {
         return label
     }()
 
+    var elapsedTimeLabelWidthConstraint: NSLayoutConstraint?
+    var elapsedTimeLabelLeadingConstraint: NSLayoutConstraint?
+    
+    fileprivate lazy var elapsedTimeLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .secondaryLabel
+        label.textAlignment = .left
+        label.numberOfLines = 1
+        label.backgroundColor = .clear
+        label.isHidden = true
+        return label
+    }()
+    
+    var durationLabelWidthConstraint: NSLayoutConstraint?
+    var durationLabelTrailingConstraint: NSLayoutConstraint?
+    
+    fileprivate lazy var durationLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .secondaryLabel
+        label.textAlignment = .right
+        label.numberOfLines = 1
+        label.backgroundColor = .clear
+        label.isHidden = true
+        return label
+    }()
+    
     fileprivate lazy var timeSlider: NowPlayingSlider = {
         let slider = NowPlayingSlider(frame: .zero)
         slider.addTarget(self, action: #selector(timeSliderChanged(_:)), for: .valueChanged)
         return slider
     }()
-
+    
+    fileprivate lazy var elapsedAndDurationLabelWidth: CGFloat = {
+        let dummy = UILabel()
+        dummy.text = "--:--"
+        dummy.sizeToFit()
+        return dummy.frame.width
+    }()
+    
     private lazy var labelContainer: UIView = {
         self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.moreButton.translatesAutoresizingMaskIntoConstraints = false
+        self.elapsedTimeLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.durationLabel.translatesAutoresizingMaskIntoConstraints = false
 
         let view = UIView()
         view.addSubview(self.titleLabel)
         view.addSubview(self.moreButton)
         view.addSubview(self.subtitleLabel)
+        view.addSubview(self.elapsedTimeLabel)
+        view.addSubview(self.durationLabel)
 
+        self.elapsedTimeLabel.text = "--:--"
+        self.elapsedTimeLabel.sizeToFit()
+        let labelWidth = elapsedTimeLabel.frame.width
+        
         self.moreButtonWidthConstraint = self.moreButton.widthAnchor.constraint(equalToConstant: 0)
-        self.moreButtonTrailingConstrait = self.moreButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0)
-
+        self.moreButtonTrailingConstraint = self.moreButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0)
+        
+        self.elapsedTimeLabelWidthConstraint = self.elapsedTimeLabel.widthAnchor.constraint(equalToConstant: 0)
+        self.elapsedTimeLabelLeadingConstraint = self.elapsedTimeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        self.durationLabelWidthConstraint = self.durationLabel.widthAnchor.constraint(equalToConstant: 0)
+        self.durationLabelTrailingConstraint = self.durationLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        
         NSLayoutConstraint.activate([
             self.moreButtonWidthConstraint!,
-            self.moreButtonTrailingConstrait!,
+            self.moreButtonTrailingConstraint!,
             self.moreButton.centerYAnchor.constraint(equalTo: self.titleLabel.centerYAnchor),
             self.titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 5),
             self.titleLabel.heightAnchor.constraint(equalTo: self.subtitleLabel.heightAnchor),
             self.titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
             self.titleLabel.trailingAnchor.constraint(equalTo: self.moreButton.leadingAnchor, constant: -10),
             self.subtitleLabel.topAnchor.constraint(equalTo: self.titleLabel.bottomAnchor),
-            self.subtitleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
-            self.subtitleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            self.subtitleLabel.leadingAnchor.constraint(equalTo: self.elapsedTimeLabel.trailingAnchor, constant: 10),
+            self.subtitleLabel.trailingAnchor.constraint(equalTo: self.durationLabel.leadingAnchor, constant: -10),
+            self.elapsedTimeLabel.topAnchor.constraint(equalTo: self.titleLabel.bottomAnchor),
+            self.elapsedTimeLabelWidthConstraint!,
+            self.elapsedTimeLabelLeadingConstraint!,
+            self.durationLabel.topAnchor.constraint(equalTo: self.titleLabel.bottomAnchor),
+            self.durationLabelTrailingConstraint!,
+            self.durationLabelWidthConstraint!
         ])
-
+        
         return view
     }()
 
@@ -249,8 +301,10 @@ class NowPlayingInfoView: UIView {
     @objc func detailsHovered(_ sender: UIHoverGestureRecognizer) {
         switch sender.state {
         case .began:
+            self.refreshTimeLabels(hovered: true)
             self.refreshMoreButton(hovered: true)
         case .ended, .cancelled, .failed:
+            self.refreshTimeLabels(hovered: false)
             self.refreshMoreButton(hovered: false)
         default:
             break
@@ -283,6 +337,24 @@ class NowPlayingInfoView: UIView {
 }
 
 extension NowPlayingInfoView: MusicPlayable, Refreshable {
+    
+    private func refreshTimeLabels(hovered: Bool = false) {
+        if (hovered) {
+            self.elapsedTimeLabelWidthConstraint?.constant = self.elapsedAndDurationLabelWidth
+            self.elapsedTimeLabelLeadingConstraint?.constant = 10
+            self.durationLabelWidthConstraint?.constant = self.elapsedAndDurationLabelWidth
+            self.durationLabelTrailingConstraint?.constant = -10
+        } else {
+            self.elapsedTimeLabelWidthConstraint?.constant = 0
+            self.elapsedTimeLabelLeadingConstraint?.constant = 0
+            self.durationLabelWidthConstraint?.constant = 0
+            self.durationLabelTrailingConstraint?.constant = 0
+        }
+        
+        self.elapsedTimeLabel.isHidden = !hovered
+        self.durationLabel.isHidden = !hovered
+    }
+    
     private func refreshMoreButton(hovered: Bool = false) {
         self.moreButton.tintColor = appDelegate.storage.settings.themePreference.asColor
         
@@ -292,7 +364,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
         if hasPlayable && hovered {
             self.moreButton.isHidden = false
             self.moreButtonWidthConstraint?.constant = 10
-            self.moreButtonTrailingConstrait?.constant = -10
+            self.moreButtonTrailingConstraint?.constant = -10
 
             if let currentlyPlaying,
                let splitVC = self.rootViewController as? SplitVC,
@@ -306,7 +378,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
         } else {
             self.moreButton.isHidden = true
             self.moreButtonWidthConstraint?.constant = 0
-            self.moreButtonTrailingConstrait?.constant = 0
+            self.moreButtonTrailingConstraint?.constant = 0
             self.moreButton.menu = nil
         }
     }
@@ -346,15 +418,27 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
             self.subtitleLabel.text = subtitle
         }
     }
-
-    private func refreshElapsedTime() {
+    
+    private func refreshElapsedTimeAndDuration() {
         if self.player.currentlyPlaying != nil {
             self.timeSlider.minimumValue = 0.0
             self.timeSlider.maximumValue = Float(player.duration)
             if !self.timeSlider.isTracking {
                 self.timeSlider.value = Float(player.elapsedTime)
             }
+            
+            let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
+            self.elapsedTimeLabel.text = elapsedClockTime.asShortString()
+            let duration = Int(player.duration)
+            if duration > 0 {
+                durationLabel.text = ClockTime(timeInSeconds: duration).asShortString()
+            } else {
+                durationLabel.text = "--:--"
+            }
+
         } else {
+            self.elapsedTimeLabel.text = "--:--"
+            self.durationLabel.text = "--:--"
             self.timeSlider.minimumValue = 0.0
             self.timeSlider.maximumValue = 1.0
             self.timeSlider.value = 0.0
@@ -392,7 +476,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
 
     func reload() {
         self.refreshTitle()
-        self.refreshElapsedTime()
+        self.refreshElapsedTimeAndDuration()
         self.refreshArtwork()
         self.refreshMoreButton()
         self.timeSlider.refreshSliderDesign()
@@ -403,7 +487,7 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
     }
 
     func didElapsedTimeChange() {
-        self.refreshElapsedTime()
+        self.refreshElapsedTimeAndDuration()
     }
 
     func didArtworkChange() {

@@ -214,7 +214,6 @@ extension SettingsSceneDelegate: NSToolbarDelegate {
 
         // Change the window size for the selected tab
         let fixedSize = navigationTarget.fittingWindowSize
-        self.window?.frame.size = fixedSize
         
         // This line is important to guarantee that the fullscreen option is not enabled after switching a tab
         if #available(macCatalyst 16.0, *) {
