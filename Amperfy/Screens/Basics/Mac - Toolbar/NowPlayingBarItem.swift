@@ -193,10 +193,6 @@ class NowPlayingInfoView: UIView {
         view.addSubview(self.subtitleLabel)
         view.addSubview(self.elapsedTimeLabel)
         view.addSubview(self.durationLabel)
-
-        self.elapsedTimeLabel.text = "--:--"
-        self.elapsedTimeLabel.sizeToFit()
-        let labelWidth = elapsedTimeLabel.frame.width
         
         self.moreButtonWidthConstraint = self.moreButton.widthAnchor.constraint(equalToConstant: 0)
         self.moreButtonTrailingConstraint = self.moreButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0)
