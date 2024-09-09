@@ -288,15 +288,7 @@ class AlbumsCommonVCInteractions {
         if let popoverPresentationController = popoverContentController.popoverPresentationController {
             popoverPresentationController.permittedArrowDirections = .up
             popoverPresentationController.delegate = popoverContentController
-            // Try to position the popover more nicely and fallback to the default if it does not work
-            if let optionsView = optionsButton.customView {
-                popoverPresentationController.sourceView = optionsView
-                var frame = optionsView.bounds
-                frame.origin.x = optionsView.frame.midX - 3
-                popoverPresentationController.sourceRect = frame
-            } else {
-                popoverPresentationController.barButtonItem = optionsButton
-            }
+            popoverPresentationController.barButtonItem = optionsButton
             rootVC.present(popoverContentController, animated: true, completion: nil)
         }
      }
