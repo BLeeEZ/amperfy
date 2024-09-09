@@ -231,7 +231,8 @@ class EntityPreviewActionBuilder {
                    (!song.isCached && appDelegate.storage.settings.isOfflineMode))
         isShuffle = !((playContextCb == nil) ||
                       playerIndexCb != nil ||
-                      (!song.isCached && appDelegate.storage.settings.isOfflineMode))
+                      (!song.isCached && appDelegate.storage.settings.isOfflineMode)) &&
+                    appDelegate.storage.settings.isPlayerShuffleButtonEnabled
         isMusicQueue = !((playContextCb == nil) ||
                          playerIndexCb != nil ||
                          (!song.isCached && appDelegate.storage.settings.isOfflineMode))
@@ -264,7 +265,8 @@ class EntityPreviewActionBuilder {
     
     private func configureFor(playlist: Playlist) {
         isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
-        isShuffle = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+        isShuffle = (appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems) &&
+                    appDelegate.storage.settings.isPlayerShuffleButtonEnabled
         isMusicQueue = true
         isPodcastQueue = false
         isShowAlbum = false
@@ -277,7 +279,8 @@ class EntityPreviewActionBuilder {
     
     private func configureFor(genre: Genre) {
         isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
-        isShuffle = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+        isShuffle = (appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems) &&
+                    appDelegate.storage.settings.isPlayerShuffleButtonEnabled
         isMusicQueue = true
         isPodcastQueue = false
         isShowAlbum = false
@@ -289,7 +292,8 @@ class EntityPreviewActionBuilder {
     }
     
     private func configureFor(podcast: Podcast) {
-        isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+        isPlay = (appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems) &&
+                appDelegate.storage.settings.isPlayerShuffleButtonEnabled
         isShuffle = false
         isMusicQueue = false
         isShowAlbum = false
@@ -303,7 +307,8 @@ class EntityPreviewActionBuilder {
     
     private func configureFor(artist: Artist) {
         isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
-        isShuffle = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+        isShuffle = (appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems) &&
+                    appDelegate.storage.settings.isPlayerShuffleButtonEnabled
         isMusicQueue = true
         isPodcastQueue = false
         isShowAlbum = false
@@ -316,7 +321,8 @@ class EntityPreviewActionBuilder {
     
     private func configureFor(album: Album) {
         isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
-        isShuffle = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+        isShuffle = (appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems) &&
+                    appDelegate.storage.settings.isPlayerShuffleButtonEnabled
         isMusicQueue = true
         isPodcastQueue = false
         isShowAlbum = false
@@ -329,7 +335,8 @@ class EntityPreviewActionBuilder {
     
     private func configureFor(directory: Directory) {
         isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
-        isShuffle = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+        isShuffle = (appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems) &&
+                    appDelegate.storage.settings.isPlayerShuffleButtonEnabled
         isMusicQueue = true
         isPodcastQueue = false
         isShowAlbum = false

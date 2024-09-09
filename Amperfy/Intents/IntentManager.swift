@@ -95,14 +95,16 @@ public class IntentManager {
     private let playableDownloadManager: DownloadManageable
     private let library: LibraryStorage
     private let player: PlayerFacade
+    private let eventLogger: EventLogger
     private var lastResult: AmperfyMediaIntentItemResult?
     
-    init(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable, library: LibraryStorage, player: PlayerFacade) {
+    init(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable, library: LibraryStorage, player: PlayerFacade, eventLogger: EventLogger) {
         self.storage = storage
         self.librarySyncer = librarySyncer
         self.playableDownloadManager = playableDownloadManager
         self.library = library
         self.player = player
+        self.eventLogger = eventLogger
         self.documentation = [XCallbackActionDocu]()
     }
     
@@ -592,13 +594,12 @@ public class IntentManager {
     public func handleIncomingPlayMediaIntent(playMediaIntent: INPlayMediaIntent) -> AmperfyMediaIntentItemResult? {
         // intent interpretion is only working if media search is provided
         guard let mediaSearch = playMediaIntent.mediaSearch else {
-            os_log("No media search provided", log: self.log, type: .error)
+            eventLogger.debug(topic: "Siri Play Media Intent", message: "Error: No media search provided")
             return nil
         }
-#if false // use for debug only
-        os_log("playMediaIntent: %s", log: self.log, type: .debug, playMediaIntent.debugDescription)
-        os_log("mediaSearch: %s", log: self.log, type: .debug, mediaSearch.debugDescription)
-#endif
+        
+        eventLogger.debug(topic: "Siri Play Media Intent", message: "Request details:\n \(playMediaIntent.description)\n\(mediaSearch.description)")
+        
         var result: AmperfyMediaIntentItemResult?
         let playableContainerType = PlayableContainerType.fromINMediaItemType(type: mediaSearch.mediaType)
         if playableContainerType != .unknown ||
@@ -729,8 +730,22 @@ public class IntentManager {
                 }
             }
         }
-        if result == nil {
+        if let result = result {
+            var playableDetailString = "-"
+            if let playableContainer = result.playableContainer {
+                playableDetailString = String(describing: playableContainer)
+                playableDetailString += ": " + playableContainer.name
+                if let subtitle = playableContainer.subtitle {
+                    playableDetailString += " - " + subtitle
+                }
+                if let subsubtitle = playableContainer.subsubtitle {
+                    playableDetailString += " - " + subsubtitle
+                }
+            }
+            eventLogger.debug(topic: "Siri Play Media Intent", message: "Response:\n\(result.item.description)\nLibrary Element: \(playableDetailString)\nShuffle/Random Items Count: \(result.playableElements?.count ?? 0)")
+        } else {
             os_log("No playable container found", log: self.log, type: .info)
+            eventLogger.debug(topic: "Siri Play Media Intent", message: "Response: No media found")
         }
         lastResult = result
         return result
@@ -854,7 +869,7 @@ public class IntentManager {
             return play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else if let playableElements = lastResult.playableElements{
             os_log("Play Music (shuffle: %s, repeat: %s)", log: self.log, type: .info, shuffleOption.description, repeatOption.description)
-            return play(context: PlayContext(name: "Siri Command", playables: playableElements), shuffleOption: shuffleOption, repeatOption: repeatOption)
+            return play(context: PlayContext(name: "Siri Intent", playables: playableElements), shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else {
             return Guarantee<Bool>.value(false)
         }

@@ -127,7 +127,7 @@ class LibraryElementDetailTableHeaderView: UIView {
     
     func activate() {
         playAllButton.isEnabled = true
-        playShuffledButton.isEnabled = true
+        playShuffledButton.isEnabled = (!(self.config?.isShuffleOnContextNeccessary ?? true)) || appDelegate.storage.settings.isPlayerShuffleButtonEnabled
     }
     
     func deactivate() {
