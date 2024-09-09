@@ -94,7 +94,7 @@ class SearchNavigationItemContentView: UISearchBar, UIContentView, UISearchBarDe
         self.showsScopeBar = false
         self.scopeButtonTitles = ["All", "Cached"]
         self.searchBarStyle = .minimal
-        self.placeholder = "Playlists, songs and more"
+        self.placeholder = "Search"
         self.delegate = self
 
         apply(configuration)
