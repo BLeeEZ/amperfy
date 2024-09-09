@@ -147,11 +147,6 @@ class GenreDetailVC: MultiSourceTableViewController {
         albumsFetchedResultsController?.delegate = nil
         songsFetchedResultsController?.delegate = nil
     }
-    
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
 
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
         guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
@@ -236,6 +231,19 @@ class GenreDetailVC: MultiSourceTableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch indexPath.section+1 {
+        case LibraryElement.Artist.rawValue:
+            return GenericTableCell.rowHeight
+        case LibraryElement.Album.rawValue:
+            return GenericTableCell.rowHeight
+        case LibraryElement.Song.rawValue:
+            return PlayableTableCell.rowHeight
+        default:
+            return 0.0
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         switch indexPath.section+1 {
         case LibraryElement.Artist.rawValue:
             return GenericTableCell.rowHeight

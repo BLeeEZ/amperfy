@@ -27,8 +27,10 @@ import PromiseKit
 class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
 
     override var sceneTitle: String? { 
-        applyFilter()
-        return self.filterTitle
+        return switch (self.displayFilter) {
+        case .albumArtists, .all: "Artists"
+        case .favorites: "Favorite Artists"
+        }
     }
 
     private var fetchedResultsController: ArtistFetchedResultsController!
@@ -112,11 +114,6 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         super.viewWillAppear(animated)
         updateRightBarButtonItems()
         updateFromRemote()
-    }
-    
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
     }
 
     func updateRightBarButtonItems() {

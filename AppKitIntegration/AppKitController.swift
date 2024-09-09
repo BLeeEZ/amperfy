@@ -28,8 +28,14 @@ extension NSObject {
 }
 
 class AppKitController: NSObject {
-	
-	var preferencesSceneIdentifier: String?
+    // we currently support:
+    // - fullSizeContentView: Bool
+    // - miniaturizable: Bool
+    // - resizable: Bool
+    // - aspectRatio: CGSize
+    typealias WindowProperties = [String: Any]
+
+	var utilitySceneIdentifier: [String: WindowProperties] = [:]
 
     @objc static var controlAccentAppColor: NSColor? = .clear
 
@@ -56,25 +62,40 @@ class AppKitController: NSObject {
     }
 
 	@objc public func _catalyst_setupWindow(_ note: Notification) {
-
-		guard let preferencesSceneIdentifier = preferencesSceneIdentifier else { return }
-		
 		if let userInfo = note.userInfo, let sceneIdentifier = userInfo["SceneIdentifier"] as? String {
-			if sceneIdentifier.hasSuffix(preferencesSceneIdentifier) {
+            let kv = utilitySceneIdentifier.first(where: { sceneIdentifier.hasSuffix($0.key) })
+            if let kv {
+                let windowProperties = kv.value
+                var styleMask: NSWindow.StyleMask = [.closable, .titled]
+                if windowProperties["fullSizeContentView"] as? Bool == true {
+                    styleMask.insert(.fullSizeContentView)
+                }
+                if windowProperties["miniaturizable"] as? Bool == true {
+                    styleMask.insert(.miniaturizable)
+                }
+                if windowProperties["resizable"] as? Bool == true {
+                    styleMask.insert(.resizable)
+                }
+
 				guard let appDelegate = NSApp.delegate as? NSObject else { return }
 				
 				if appDelegate.responds(to: #selector(hostWindowForSceneIdentifier(_:))) {
 					guard let hostWindow = appDelegate.hostWindowForSceneIdentifier(sceneIdentifier) else { return }
 
-					hostWindow.collectionBehavior = [.fullScreenAuxiliary]
-                    hostWindow.styleMask = [.closable, .titled]
+                    hostWindow.collectionBehavior = [.fullScreenAuxiliary]
+                    hostWindow.styleMask = styleMask
 					hostWindow.isRestorable = false
+
+                    if let ratio = windowProperties["aspectRatio"] as? CGSize {
+                        hostWindow.aspectRatio = ratio
+                        hostWindow.setFrame(CGRect(origin: hostWindow.frame.origin, size: hostWindow.minSize), display: true)
+                    }
 				}
 			}
 		}
 	}
 	
-	@objc public func configurePreferencesWindowForSceneIdentifier(_ sceneIdentifier: String) {
-		preferencesSceneIdentifier = sceneIdentifier
+	@objc public func configureUtilityWindowForSceneIdentifier(_ sceneIdentifier: String, properties: WindowProperties) {
+        utilitySceneIdentifier[sceneIdentifier] = properties
 	}
 }

@@ -121,6 +121,34 @@ extension View {
     }
 }
 
+extension UIColor {
+    static let slideOverBackgroundColor: UIColor = .systemBackground.withAlphaComponent(0.5)
+    static let hoveredBackgroundColor: UIColor = .systemGray2.withAlphaComponent(0.2)
+}
+
+extension UIButton.Configuration {
+    static func player(isSelected: Bool) -> UIButton.Configuration {
+        var config = UIButton.Configuration.tinted()
+        if isSelected {
+            config.background.strokeColor = .label
+            config.background.strokeWidth = 1.0
+            config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
+        }
+        config.buttonSize = .small
+        config.baseForegroundColor = !isSelected ? .label : .systemBackground
+        config.baseBackgroundColor = !isSelected ? .clear : .label
+        config.cornerStyle = .medium
+        return config
+    }
+
+    static func playerRound() -> UIButton.Configuration {
+        var config = UIButton.Configuration.gray()
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
+        config.buttonSize = .small
+        return config
+    }
+}
+
 extension UIView {
     static let forceTouchClickLimit: Float = 1.0
 
@@ -157,6 +185,34 @@ extension UIView {
         blurEffectView.frame = self.bounds
         blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.insertSubview(blurEffectView, at: 0)
+    }
+
+    func addLeftSideBorder() {
+        let separator = UIView()
+        separator.backgroundColor = .separator
+        self.addSubview(separator)
+        separator.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            separator.widthAnchor.constraint(equalToConstant: 1),
+            separator.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            separator.topAnchor.constraint(equalTo: self.topAnchor),
+            separator.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+        ])
+    }
+
+    func addTopSideBorder() {
+        let separator = UIView()
+        separator.backgroundColor = .separator
+        self.addSubview(separator)
+        separator.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            separator.heightAnchor.constraint(equalToConstant: 1),
+            separator.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            separator.topAnchor.constraint(equalTo: self.topAnchor),
+            separator.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+        ])
     }
 }
 

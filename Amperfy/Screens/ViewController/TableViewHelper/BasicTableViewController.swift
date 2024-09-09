@@ -99,6 +99,7 @@ class BasicTableViewController: KeyCommandTableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+
         if searchController.searchBar.scopeButtonTitles?.count ?? 0 > 1, appDelegate.storage.settings.isOfflineMode {
             searchController.searchBar.selectedScopeButtonIndex = 1
         } else {
@@ -160,14 +161,13 @@ class BasicTableViewController: KeyCommandTableViewController {
 
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
-        if #available(iOS 16.0, *) {
-            #if targetEnvironment(macCatalyst)
-            navigationItem.preferredSearchBarPlacement = .inline
-            #else
-            navigationItem.preferredSearchBarPlacement = .stacked
-            #endif
-        }
-        
+
+        #if targetEnvironment(macCatalyst)
+            if #available(iOS 16.0, *) {
+                navigationItem.preferredSearchBarPlacement = .inline
+            }
+        #endif
+
         searchController.delegate = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self // Monitor when the search button is tapped.

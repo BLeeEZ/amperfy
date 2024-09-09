@@ -55,11 +55,6 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
         }
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
         let directory = fetchedResultsController.getWrappedEntity(at: indexPath)

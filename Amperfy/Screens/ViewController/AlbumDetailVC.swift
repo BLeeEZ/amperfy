@@ -119,11 +119,6 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
         else { return }
         tableView.scrollToRow(at: indexPath, at: .top, animated: true)
     }
-    
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
 
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
         guard let songs = self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)

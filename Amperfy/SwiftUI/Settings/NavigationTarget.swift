@@ -77,22 +77,21 @@ enum NavigationTarget: String, CaseIterable {
     }
 
     var icon: UIImage {
-        let img = switch self {
-        case .general: UIImage(systemName: "gear")
-        case .displayAndInteraction: UIImage(systemName: "display")
-        case .server: UIImage(systemName: "server.rack")
-        case .library: UIImage(systemName: "music.note.house.fill")
-        case .player: UIImage(systemName: "play.circle.fill")
-        case .swipe: UIImage(systemName: "arrow.right.circle.fill")
-        case .artwork: UIImage(systemName: "photo.fill")
-        case .support: UIImage(systemName: "person.circle")
-        case .license: UIImage(systemName: "doc.fill")
-        case .xcallback: UIImage(systemName: "arrowshape.turn.up.backward.circle.fill")
+        switch self {
+        case .general: .settings
+        case .displayAndInteraction: .display
+        case .server: .server
+        case .library: .musicLibrary
+        case .player: .playCircle
+        case .swipe: .arrowRight
+        case .artwork: .photo
+        case .support: .person
+        case .license: .doc
+        case .xcallback: .arrowTurnUp
         #if DEBUG
-        case .developer: UIImage(systemName: "hammer.circle.fill")
+        case .developer: .hammer
         #endif
         }
-        return img!
     }
 
     #if targetEnvironment(macCatalyst)
@@ -109,7 +108,9 @@ enum NavigationTarget: String, CaseIterable {
         case .swipe: 340
         case .artwork: 210
         case .support: 340
+        #if DEBUG
         case .developer: 84
+        #endif
         default: 300
         }
         return CGSize(width: width, height: height)

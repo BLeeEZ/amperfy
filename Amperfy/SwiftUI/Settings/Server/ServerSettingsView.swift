@@ -41,7 +41,7 @@ struct ServerSettingsView: View {
 
     var body: some View {
         ZStack {
-            List {
+            SettingsList {
                 SettingsSection {
                     SettingsRow(title: "URL", orientation: .vertical, splitPercentage: splitPercentage) {
                         SecondaryText(appDelegate.storage.loginCredentials?.serverUrl ?? "")
@@ -104,9 +104,17 @@ struct ServerSettingsView: View {
         }
         .navigationTitle("Server")
         .navigationBarTitleDisplayMode(.inline)
+        #if targetEnvironment(macCatalyst)
+        .formSheet(isPresented: $isPwUpdateDialogVisible) {
+            UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
+                .frame(width: 400, height: 150)
+                .environment(\.managedObjectContext, appDelegate.storage.main.context)
+        }
+        #else
         .sheet(isPresented: $isPwUpdateDialogVisible) {
             UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
         }
+        #endif
     }
 }
 

@@ -100,10 +100,12 @@ struct ServerURLsSettingsView: View {
             .border(Color.separator, width: 1.0)
             #endif
         }
-        .sheet(isPresented: $isAddDialogVisible) {
-            AlternativeURLAddDialogView(isVisible: $isAddDialogVisible, activeServerURL: $activeServerURL, serverURLs: $serverURLs)
-        }
         #if targetEnvironment(macCatalyst)
+        .formSheet(isPresented: $isAddDialogVisible) {
+            AlternativeURLAddDialogView(isVisible: $isAddDialogVisible, activeServerURL: $activeServerURL, serverURLs: $serverURLs)
+                .frame(width: 400, height: 260)
+                .environment(\.managedObjectContext, appDelegate.storage.main.context)
+        }
         .background {
             Color.systemBackground
         }
@@ -112,16 +114,23 @@ struct ServerURLsSettingsView: View {
                 withPopupAnimation { isAddDialogVisible = true }
             }) {
                 Image.plus
-            }.buttonStyle(BorderlessButtonStyle())
+            }
+            .buttonStyle(BorderlessButtonStyle())
+            .tint(Color.init(uiColor: appDelegate.storage.settings.themePreference.asColor))
             Button(action: {
                 guard let selection = self.selection, let index = self.serverURLs.firstIndex(of: selection) else { return }
                 deleteURL(url: selection)
                 serverURLs.remove(at: index)
             }) {
                 Image.minus
-            }.buttonStyle(BorderlessButtonStyle())
+            }
+            .buttonStyle(BorderlessButtonStyle())
+            .tint(Color.init(uiColor: appDelegate.storage.settings.themePreference.asColor))
         }
         #else
+        .sheet(isPresented: $isAddDialogVisible) {
+            AlternativeURLAddDialogView(isVisible: $isAddDialogVisible, activeServerURL: $activeServerURL, serverURLs: $serverURLs)
+        }
         .navigationTitle("Server URLs")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {

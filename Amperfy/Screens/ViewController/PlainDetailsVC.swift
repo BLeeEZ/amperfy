@@ -31,7 +31,7 @@ class PlainDetailsVC: UIViewController {
 
     @IBOutlet weak var headerLabel: UILabel!
     @IBOutlet weak var detailsTextView: UITextView!
-    
+
     private var rootView: UIViewController?
     private var podcast: Podcast?
     private var podcastEpisode: PodcastEpisode?
@@ -40,6 +40,7 @@ class PlainDetailsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.setBackgroundBlur(style: .prominent)
+        self.detailsTextView.textAlignment = .center
 
         if let presentationController = presentationController as? UISheetPresentationController {
             presentationController.detents = [
@@ -53,11 +54,6 @@ class PlainDetailsVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         refresh()
-    }
-
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
     }
 
     func display(podcast: Podcast, on rootView: UIViewController) {

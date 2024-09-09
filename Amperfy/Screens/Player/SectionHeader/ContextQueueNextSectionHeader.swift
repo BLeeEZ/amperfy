@@ -69,9 +69,8 @@ class ContextQueueNextSectionHeader: UIView {
     }
     
     func refreshRepeatButton() {
-        guard let rootView = rootView else { return }
         repeatButton.isSelected = player.repeatMode != .off
-        var config = rootView.getPlayerButtonConfiguration(isSelected: repeatButton.isSelected)
+        var config = UIButton.Configuration.player(isSelected: repeatButton.isSelected)
         switch player.repeatMode {
         case .off:
             config.image = .repeatOff
@@ -84,10 +83,9 @@ class ContextQueueNextSectionHeader: UIView {
     }
     
     func refreshShuffleButton() {
-        guard let rootView = rootView else { return }
         shuffleButton.isEnabled = appDelegate.storage.settings.isPlayerShuffleButtonEnabled
         shuffleButton.isSelected = player.isShuffle
-        var config = rootView.getPlayerButtonConfiguration(isSelected: shuffleButton.isSelected)
+        var config = UIButton.Configuration.player(isSelected: shuffleButton.isSelected)
         config.image = .shuffle
         shuffleButton.configuration = config
     }
@@ -116,6 +114,7 @@ extension ContextQueueNextSectionHeader: MusicPlayable {
     func didPause() {
     }
     
+
     func didStopPlaying() {
         refreshCurrentlyPlayingInfo()
     }

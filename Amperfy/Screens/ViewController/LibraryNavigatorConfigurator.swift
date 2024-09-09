@@ -94,7 +94,7 @@ class SearchNavigationItemContentView: UISearchBar, UIContentView, UISearchBarDe
         self.showsScopeBar = false
         self.scopeButtonTitles = ["All", "Cached"]
         self.searchBarStyle = .minimal
-        self.placeholder = "Playlists, songs and more"
+        self.placeholder = "Search"
         self.delegate = self
 
         apply(configuration)
@@ -113,6 +113,8 @@ class SearchNavigationItemContentView: UISearchBar, UIContentView, UISearchBarDe
     }
 
     private func apply(_ config: SearchNavigationItemConfiguration) {
+        guard config != self.currentConfiguration else { return }
+        
         self.currentConfiguration = config
         self.isUserInteractionEnabled = config.selected
 

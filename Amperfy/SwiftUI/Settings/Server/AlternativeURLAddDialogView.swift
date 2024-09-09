@@ -92,7 +92,7 @@ struct AlternativeURLAddDialogView: View {
 
     var body: some View {
         ZStack {
-            List {
+            SettingsList {
                 Section {
                     VStack {
                         VStack(spacing: 20) {
@@ -145,8 +145,15 @@ struct AlternativeURLAddDialogView: View {
                         .padding([.top], 8)
                     }
                 }
+                #if targetEnvironment(macCatalyst)
+                .listRowBackground(Color.clear)
+                #else
                 .padding()
+                #endif
             }
+            #if targetEnvironment(macCatalyst)
+            .listStyle(.plain)
+            #endif
         }
         .onAppear {
             resetStatus()

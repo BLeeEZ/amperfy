@@ -106,11 +106,6 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         tableView.scrollToRow(at: indexPath, at: .top, animated: true)
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: PodcastEpisodeTableCell = dequeueCell(for: tableView, at: indexPath)
         let episode = fetchedResultsController.getWrappedEntity(at: indexPath)

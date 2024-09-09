@@ -25,12 +25,13 @@ import AmperfyKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
+    static let mainWindowSize = CGSizeMake(SplitVC.sidebarWidth + 700, 580)
+    
     public lazy var log = {
         return AmperKit.shared.log
     }()
     
     var window: UIWindow?
-    
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         os_log("willConnectTo", log: self.log, type: .info)
@@ -55,6 +56,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         var initialViewController: UIViewController?
 
         #if targetEnvironment(macCatalyst)
+        self.window?.windowScene?.sizeRestrictions?.minimumSize = Self.mainWindowSize
+
         let splitVC = SplitVC.instantiateFromAppStoryboard()
 
         if AmperKit.shared.storage.loginCredentials == nil {
@@ -66,9 +69,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
 
         if let titlebar = windowScene.titlebar {
-            windowScene.title = "Search"
             titlebar.toolbarStyle = .unified
-            titlebar.titleVisibility = .visible
+            titlebar.titleVisibility = .hidden
+            titlebar.separatorStyle = .automatic
             titlebar.toolbar = nil
         }
 

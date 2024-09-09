@@ -76,6 +76,15 @@ class SliderMenuView: UIView {
 
 class AlbumsCommonVCInteractions {
     
+    var sceneTitle: String? {
+        return switch (self.displayFilter) {
+        case .all: "Albums"
+        case .newest: "Newest Albums"
+        case .recent: "Recently Played Albums"
+        case .favorites: "Favorite Albums"
+        }
+    }
+
     public var isIndexTitelsHiddenCB: VoidFunctionCallback?
     public var reloadListViewCB: VoidFunctionCallback?
     public var updateSearchResultsCB: VoidFunctionCallback?

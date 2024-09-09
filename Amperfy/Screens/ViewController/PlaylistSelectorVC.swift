@@ -55,11 +55,6 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func change(sortType: PlaylistSortType) {
         self.sortType = sortType
         // sortType will not be saved permanently. This behaviour differs from PlaylistsVC
@@ -86,8 +81,8 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         closeButton = CloseBarButton(target: self, selector: #selector(cancelBarButtonPressed))
         optionsButton.menu = createSortButtonMenu()
         #if targetEnvironment(macCatalyst)
-        navigationItem.rightBarButtonItems = [optionsButton]
-        navigationItem.leftBarButtonItems = [closeButton]
+        navigationItem.rightBarButtonItem = optionsButton
+        navigationItem.leftBarButtonItem = closeButton
         #else
         navigationItem.rightBarButtonItems = [closeButton, optionsButton]
         #endif

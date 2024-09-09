@@ -617,7 +617,6 @@ class EntityPreviewActionBuilder {
             }
         }])
     }
-
 }
 
 class EntityPreviewVC: UIViewController {
@@ -661,11 +660,6 @@ class EntityPreviewVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         refresh()
-    }
-
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
     }
 
     func display(container: PlayableContainable, on rootView: UIViewController) {

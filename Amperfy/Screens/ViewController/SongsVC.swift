@@ -27,8 +27,10 @@ import PromiseKit
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     
     override var sceneTitle: String? {
-        applyFilter()
-        return self.filterTitle
+        switch (self.displayFilter) {
+        case .all, .newest, .recent: "Songs"
+        case .favorites: "Favorite Songs"
+        }
     }
 
     private var fetchedResultsController: SongsFetchedResultsController!
@@ -74,11 +76,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
             completionHandler(SwipeActionContext(containable: song, playContext: playContext))
         }
-    }
-
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
     }
 
     func applyFilter() {

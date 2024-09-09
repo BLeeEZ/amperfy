@@ -32,7 +32,7 @@ struct DisplaySettingsView: View {
 
         #if targetEnvironment(macCatalyst)
         // the following applies the tint color to already loaded views in all windows (AppKit)
-        AppDelegate.updateAppKitControlColor()
+        AppDelegate.updateAppKitControlColor(preference.asColor)
         #endif
 
         // the following applies the tint color to already loaded views in all windows (UIKit)
@@ -56,7 +56,7 @@ struct DisplaySettingsView: View {
     
     var body: some View {
         ZStack{
-            List {
+            SettingsList {
                 SettingsSection {
                     SettingsRow(title: "Theme Color") {
                         Menu(settings.themePreference.description) {
@@ -143,7 +143,10 @@ struct DisplaySettingsView: View {
                 SettingsSection(content: {
                     SettingsCheckBoxRow(title: "Shuffle", label: "Disable Player Shuffle Button", isOn: Binding<Bool>(
                         get: { !settings.isPlayerShuffleButtonEnabled },
-                        set: { settings.isPlayerShuffleButtonEnabled = !$0 }
+                        set: { 
+                            settings.isPlayerShuffleButtonEnabled = !$0
+                            UIMenuSystem.main.setNeedsRebuild()
+                        }
                     ))
                 }, footer:
                     "Player Shuffle Button is displayed but it can't be interacted with."

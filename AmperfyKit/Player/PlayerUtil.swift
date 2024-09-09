@@ -48,7 +48,7 @@ extension MusicPlayable {
     func errorOccured(error: Error) {}
 }
 
-public enum RepeatMode: Int16 {
+public enum RepeatMode: Int16, CaseIterable {
     case off
     case all
     case single

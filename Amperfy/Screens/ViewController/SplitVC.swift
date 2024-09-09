@@ -22,8 +22,11 @@
 import UIKit
 import AmperfyKit
 
+
 class SplitVC: UISplitViewController {
 
+    public static let sidebarWidth: CGFloat = 230
+    
     lazy var barPlayer = BarPlayerHandler(player: appDelegate.player, splitVC: self)
     
     var isCompact: Bool {
@@ -33,10 +36,11 @@ class SplitVC: UISplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setViewController(defaultSecondaryVC, for: .secondary)
-        
+
         if appDelegate.storage.settings.isOfflineMode {
             appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
         }
+
         #if targetEnvironment(macCatalyst)
         self.primaryBackgroundStyle = .sidebar
         // hides the 'Hide Sidebar' button
@@ -49,17 +53,15 @@ class SplitVC: UISplitViewController {
         super.viewWillLayoutSubviews()
     }
 
+    #if targetEnvironment(macCatalyst)
     override func viewWillAppear(_ animated: Bool) {
-        #if targetEnvironment(macCatalyst)
         // set min and max sidebar width
-        self.minimumPrimaryColumnWidth = 350
-        self.maximumPrimaryColumnWidth = 450
-        #endif
+        self.minimumPrimaryColumnWidth = Self.sidebarWidth
+        self.maximumPrimaryColumnWidth = Self.sidebarWidth
     }
+    #endif
 
     override func viewDidAppear(_ animated: Bool) {
-        self.updateScene(title: self.viewControllers.last?.sceneTitle)
-        
         super.viewDidAppear(animated)
         setCorrectPlayerBarView(collapseMode: isCompact)
         
@@ -75,9 +77,41 @@ class SplitVC: UISplitViewController {
             displayNotificationAuthorization()
         }
     }
-    
+
+    #if targetEnvironment(macCatalyst)
+    lazy var macToolbarNavigationController: UINavigationController = {
+        let toolbarHostingVC = self.slideOverHostingController
+        // This navigation controller hosts the toolbar with the player controls
+        let toolbarNavController = UINavigationController(rootViewController: toolbarHostingVC)
+        // Fake a NSTitlebarSeparatorStyle.line but only for the secondary view controller
+        toolbarNavController.navigationBar.addTopSideBorder()
+        // Display the toolbar in mac style
+        if #available(macCatalyst 16.0, *) {
+            toolbarNavController.navigationBar.preferredBehavioralStyle = .mac
+        }
+        return toolbarNavController
+    }()
+
+    lazy var slideOverHostingController: SlideOverHostingController = {
+        return SlideOverHostingController(slideOverViewController: self.slideOverMenuViewController)
+    }()
+
+    var slideOverMenuViewController: SlideOverVC = {
+        return SlideOverVC()
+    }()
+    #endif
+
     func embeddInNavigation(vc: UIViewController) -> UINavigationController {
+        #if targetEnvironment(macCatalyst)
+        let navController = InnerNavigationController(rootViewController: vc)
+        // This is a little bit hacky. We reuse the existing slideOverHostingController. This has two advantages:
+        // 1. We do not need to reload the mac toolbar, which is slow.
+        // 2. We keep the slide over menu open even when switching tabs.
+        self.slideOverHostingController.primaryViewController = navController
+        return self.macToolbarNavigationController
+        #else
         return UINavigationController(rootViewController: vc)
+        #endif
     }
     
     var defaultSecondaryVC: UINavigationController {
@@ -98,7 +132,6 @@ class SplitVC: UISplitViewController {
             guard let compactVC = viewController(for: .compact) else { return }
             let vc = separateSecondary(from: compactVC)
             setViewController(vc, for: .secondary)
-            self.updateScene(title: vc?.sceneTitle)
         }
     }
     
@@ -214,8 +247,8 @@ class SplitVC: UISplitViewController {
     
     private func setCorrectPlayerBarView(collapseMode: Bool) {
         #if targetEnvironment(macCatalyst)
-        // always show the player in the sidebar on macOS
-        barPlayer.changeTo(vc: self.viewControllers.first!)
+        // Disable barPlayer on macOS
+        barPlayer.isPopupBarDisplayed = false
         #else
         if collapseMode {
             let vc = self.viewController(for: .compact)
@@ -251,10 +284,7 @@ class SplitVC: UISplitViewController {
             push(vc: vc)
         }
     }
-    
-    func updateScene(title: String?) {
-        self.view.window?.windowScene?.title = title ?? Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? ""
-    }
+
 
     public func pushReplaceNavLibrary(vc: UIViewController) {
         if isCompact {
@@ -268,7 +298,6 @@ class SplitVC: UISplitViewController {
         } else {
             setViewController(embeddInNavigation(vc: vc), for: .secondary)
         }
-        updateScene(title: vc.sceneTitle)
     }
     
     public func push(vc: UIViewController) {
@@ -285,7 +314,6 @@ class SplitVC: UISplitViewController {
                 secondaryVC.pushViewController(vc, animated: false)
             }
         }
-        updateScene(title: vc.sceneTitle)
     }
     
     public func visualizePopupPlayer(direction: PopupPlayerDirection, animated: Bool, completion completionBlock: (()->Void)? = nil) {
@@ -335,7 +363,7 @@ class SplitVC: UISplitViewController {
                 }
             } else {
                 let searchVC = TabNavigatorItem.search.controller
-                self.setViewController(UINavigationController(rootViewController: searchVC), for: .secondary)
+                self.setViewController(self.embeddInNavigation(vc: searchVC), for: .secondary)
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
                     if let activeSearchVC = searchVC as? SearchVC {
                         activeSearchVC.activateSearchBar()
@@ -345,12 +373,4 @@ class SplitVC: UISplitViewController {
         }
     }
     
-}
-
-extension UIViewController {
-    @objc var sceneTitle: String? { nil }
-}
-
-extension UINavigationController {
-    override var sceneTitle: String? { self.topViewController?.sceneTitle }
 }

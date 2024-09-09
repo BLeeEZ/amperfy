@@ -139,11 +139,6 @@ class DirectoriesVC: MultiSourceTableViewController {
         songsFetchedResultsController?.delegate = nil
     }
 
-    override func viewWillLayoutSubviews() {
-        self.extendSafeAreaToAccountForTabbar()
-        super.viewWillLayoutSubviews()
-    }
-
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
         guard let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
         else { return nil }
@@ -194,6 +189,17 @@ class DirectoriesVC: MultiSourceTableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch indexPath.section {
+        case 0:
+            return DirectoryTableCell.rowHeight
+        case 1:
+            return PlayableTableCell.rowHeight
+        default:
+            return 0.0
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         switch indexPath.section {
         case 0:
             return DirectoryTableCell.rowHeight

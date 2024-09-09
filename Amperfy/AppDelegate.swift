@@ -28,7 +28,11 @@ import PromiseKit
 import Intents
 
 let windowSettingsTitle = "Settings"
+let windowMiniPlayerTitle = "MiniPlayer"
+
 let settingsWindowActivityType = "amperfy.settings"
+let miniPlayerWindowActivityType = "amperfy.miniplayer"
+let defaultWindowActivityType = "amperfy.main"
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -108,6 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }()
     
     var settingsSceneSession: UISceneSession?
+    var miniPlayerSceneSession: UISceneSession?
 
     var sleepTimer: Timer?
     var autoActivateSearchTabSearchBar = false
@@ -193,7 +198,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+    #if targetEnvironment(macCatalyst)
+    @objc private func padStyle() -> UIBehavioralStyle {
+        return .pad
+    }
+
+    private func patchMPVolumeViewPreSonoma() {
+        // we must always force .pad style for MPVolumeSlider below MacOS 17. Otherwise the App crashes
+        if #unavailable(macCatalyst 17.0) {
+            let originalClass: AnyClass? = NSClassFromString("MPVolumeSlider")
+            let originalSelector = NSSelectorFromString("preferredBehavioralStyle")
+            guard let originalMethod = class_getInstanceMethod(originalClass, originalSelector),
+                  let swizzleMethod = class_getInstanceMethod(AppDelegate.self, #selector(self.padStyle))
+                else { return }
+            method_exchangeImplementations(originalMethod, swizzleMethod)
+        }
+    }
+    #endif
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
         if let options = launchOptions {
             os_log("application launch with options:", log: self.log, type: .info)
             options.forEach{ os_log("- key: %s", log: self.log, type: .info, $0.key.rawValue.description) }
@@ -209,6 +233,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         initEventLogger()
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
+        #if targetEnvironment(macCatalyst)
+        self.patchMPVolumeViewPreSonoma()
+
+        AppDelegate.loadAppKitIntegrationFramework()
+        AppDelegate.installAppKitColorHooks()
+
+        // update color of AppKit controls
+        AppDelegate.updateAppKitControlColor(storage.settings.themePreference.asColor)
+
+        // whenever we change the window focus, we rebuild the menu
+        NotificationCenter.default.addObserver(forName: .init("NSWindowDidBecomeMainNotification"), object: nil, queue: nil) { [weak self] notification in
+
+            self?.focusedWindowTitle = (notification.object as? AnyObject)?.value(forKey: "title") as? String
+            UIMenuSystem.main.setNeedsRebuild()
+        }
+
+        self.player.addNotifier(notifier: self)
+        #endif
+
         guard let credentials = storage.loginCredentials else {
             return true
         }
@@ -229,21 +272,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             startManagerForNormalOperation()
         }
         userStatistics.sessionStarted()
-
-        #if targetEnvironment(macCatalyst)
-        AppDelegate.loadAppKitIntegrationFramework()
-        AppDelegate.installAppKitColorHooks()
-        
-        // update color of AppKit controls
-        AppDelegate.updateAppKitControlColor()
-
-        // whenever we change the window focus, we rebuild the menu
-        NotificationCenter.default.addObserver(forName: .init("NSWindowDidBecomeMainNotification"), object: nil, queue: nil) { [weak self] notification in
-            
-            self?.focusedWindowTitle = (notification.object as? AnyObject)?.value(forKey: "title") as? String
-            UIMenuSystem.main.setNeedsRebuild()
-        }
-        #endif
 
         return true
     }
@@ -311,11 +339,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return config
         }
 
-        // Support setting window on macOS
         #if targetEnvironment(macCatalyst)
         if options.userActivities.filter({$0.activityType == settingsWindowActivityType}).first != nil {
             let config =  UISceneConfiguration(name: "Settings", sessionRole: .windowApplication)
             config.delegateClass = SettingsSceneDelegate.self
+            return config
+        }
+
+        if options.userActivities.filter({$0.activityType == miniPlayerWindowActivityType}).first != nil {
+            let config =  UISceneConfiguration(name: "MiniPlayer", sessionRole: .windowApplication)
+            config.delegateClass = MiniPlayerSceneDelegate.self
             return config
         }
         #endif
@@ -345,6 +378,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return nil
     }
 
+    func closeMainWindow() {
+        // Close all main sessions (this might be more than one with multiple tabs open)
+        UIApplication.shared.connectedScenes
+            .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
+            .filter { ($0.rootViewController as? SplitVC) != nil }
+            .compactMap { $0.windowScene?.session }
+            .forEach {
+                let options = UIWindowSceneDestructionRequestOptions()
+                options.windowDismissalAnimation = .standard
+                UIApplication.shared.requestSceneSessionDestruction($0, options: options, errorHandler: nil)
+            }
+    }
+
+    func openMainWindow() {
+        let defaultActivity = NSUserActivity(activityType: defaultWindowActivityType)
+        UIApplication.shared.requestSceneSessionActivation(nil, userActivity: defaultActivity, options: nil, errorHandler: nil)
+    }
+
     #if targetEnvironment(macCatalyst)
 
     override func buildMenu(with builder: any UIMenuBuilder) {
@@ -357,12 +408,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
            UIKeyCommand(title: "Settings…", action: #selector(showSettings), input: ",", modifierFlags: .command)
         ])
         builder.insertSibling(settingsMenu, afterMenu: .about)
-        builder.remove(menu: .toolbar)
+        // Add media controls
+        builder.insertSibling(buildControlsMenu(), afterMenu: .view)
 
-        // Multi-window does not work, so remove it.
+        // Remove "new window" and toolbar options
+        builder.remove(menu: .toolbar)
         builder.remove(menu: .newScene)
 
-        if self.focusedWindowTitle == windowSettingsTitle {
+        if (self.focusedWindowTitle == windowSettingsTitle) || (self.focusedWindowTitle == windowMiniPlayerTitle)  {
             // Do any settings specific menu setup here
             builder.remove(menu: .view)
         } else {
@@ -370,9 +423,147 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+    @objc private func keyCommandPause() {
+        self.player.pause()
+    }
+
+    @objc private func keyCommandPlay() {
+        self.player.play()
+    }
+
+    @objc private func keyCommandStop() {
+        self.player.stop()
+    }
+
+    @objc private func keyCommandNext() {
+        self.player.playNext()
+    }
+
+    @objc private func keyCommandPrevious() {
+        self.player.playPreviousOrReplay()
+    }
+
+    @objc private func keyCommandShuffleOn() {
+        guard !self.player.isShuffle else { return }
+        self.player.toggleShuffle()
+    }
+
+    @objc private func keyCommandShuffleOff() {
+        guard self.player.isShuffle else { return }
+        self.player.toggleShuffle()
+    }
+
+    private func buildControlsMenu() -> UIMenu {
+        let isPlaying = self.player.isPlaying
+        let isShuffle = self.player.isShuffle
+
+        let section1 = [
+            UIKeyCommand(title: isPlaying ? "Pause" : "Play", action: isPlaying ? #selector(self.keyCommandPause) : #selector(self.keyCommandPlay), input: " "),
+            UIKeyCommand(title: "Stop", action: #selector(self.keyCommandStop), input: ".", modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
+            UIKeyCommand(title: "Next Track", action: #selector(self.keyCommandNext), input: UIKeyCommand.inputRightArrow, modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
+            UIKeyCommand(title: "Previous Track", action: #selector(self.keyCommandPrevious), input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
+        ]
+
+        var section2 = [
+            UIMenu(title: "Repeat", children: RepeatMode.allCases.map { mode in
+                UIAction(title: mode.description, state: mode == self.player.repeatMode ? .on : .off) { _ in
+                    self.player.setRepeatMode(mode)
+                }
+            }),
+            UIMenu(title: "Playback Rate", children: PlaybackRate.allCases.map { rate in
+                UIAction(title: rate.description, state: rate == self.player.playbackRate ? .on : .off) { _ in
+                    self.player.setPlaybackRate(rate)
+                }
+            })
+        ]
+
+        if (appDelegate.storage.settings.isPlayerShuffleButtonEnabled) {
+            let shuffleMenu = UIMenu(title: "Shuffle", children: [
+                UIAction(title: "On", state: isShuffle ? .on : .off) { [weak self] _ in self?.keyCommandShuffleOn() },
+                UIAction(title: "Off", state: !isShuffle ? .on : .off) { [weak self] _ in self?.keyCommandShuffleOff() }
+            ])
+            section2.insert(shuffleMenu, at: 0)
+        }
+
+        let section3 = [
+            UIAction(title: self.player.playerMode.nextMode.description) { _ in
+                self.player.setPlayerMode(self.player.playerMode.nextMode)
+            }
+        ]
+
+        let section4 = [
+            UIAction(title: self.isShowingMiniPlayer ? "Main Window" :  "Mini Player") { _ in
+                if self.isShowingMiniPlayer {
+                    self.closeMiniPlayer()
+                    // Is automatically opened
+                    //self.openMainWindow()
+                } else {
+                    self.closeMainWindow()
+                    self.showMiniPlayer()
+                }
+            }
+        ]
+
+        let sections: [[UIMenuElement]] = [section1, section2, section3, section4]
+
+        return UIMenu(title: "Controls", children: sections.reduce([], { (result, section) in
+            result + [UIMenu(options: .displayInline)] + section
+        }))
+    }
+
     @objc func showSettings(sender: Any) {
         let settingsActivity = NSUserActivity(activityType: settingsWindowActivityType)
         UIApplication.shared.requestSceneSessionActivation(settingsSceneSession, userActivity: settingsActivity, options: nil, errorHandler: nil)
     }
+
+    var isShowingMiniPlayer: Bool {
+        return UIApplication.shared.connectedScenes.contains(where: { $0.session == miniPlayerSceneSession })
+    }
+
+    @objc func showMiniPlayer(sender: Any? = nil) {
+        let miniPlayerActivity = NSUserActivity(activityType: miniPlayerWindowActivityType)
+        UIApplication.shared.requestSceneSessionActivation(miniPlayerSceneSession, userActivity: miniPlayerActivity, options: nil, errorHandler: nil)
+    }
+
+    func closeMiniPlayer() {
+        UIApplication.shared.connectedScenes
+            .filter { $0.session == miniPlayerSceneSession }
+            .forEach {
+                let options = UIWindowSceneDestructionRequestOptions()
+                options.windowDismissalAnimation = .standard
+                UIApplication.shared.requestSceneSessionDestruction($0.session, options: options, errorHandler: nil)
+            }
+    }
     #endif
 }
+
+#if targetEnvironment(macCatalyst)
+extension AppDelegate: MusicPlayable {
+    func didStartPlaying() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+    
+    func didPause() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+    
+    func didStopPlaying() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+    
+    func didShuffleChange() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+    func didRepeatChange() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+    func didPlaybackRateChange() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
+
+    func didStartPlayingFromBeginning() {}
+    func didElapsedTimeChange() {}
+    func didPlaylistChange() {}
+    func didArtworkChange() {}
+}
+#endif

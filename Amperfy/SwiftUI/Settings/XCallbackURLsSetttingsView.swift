@@ -25,7 +25,7 @@ struct XCallbackURLsSetttingsView: View {
     
     var body: some View {
         ZStack {
-            List {
+            SettingsList {
                 Section {
                     Text("Amperfy's X-Callback-URL API can be used to perform actions from other Apps or via Siri Shortcuts. All available actions with their detail information can be found below:")
                         .font(.caption)

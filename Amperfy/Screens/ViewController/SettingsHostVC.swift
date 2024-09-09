@@ -41,11 +41,15 @@ class SettingsHostVC: UIViewController {
         self.title = target.displayName
 
         let hostingVC = target.hostingController(settings: settings, managedObjectContext: appDelegate.storage.main.context)
-        self.addChild(hostingVC)
-        self.view.addSubview(hostingVC.view)
+        self.view.backgroundColor = .clear
         hostingVC.view.frame = self.view.bounds
         hostingVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         hostingVC.view.backgroundColor = .clear
+        
+        hostingVC.willMove(toParent: self)
+        self.addChild(hostingVC)
+        self.view.addSubview(hostingVC.view)
+        hostingVC.didMove(toParent: self)
     }
 
     required init?(coder: NSCoder) {

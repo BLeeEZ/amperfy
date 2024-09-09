@@ -31,7 +31,7 @@ struct SupportSettingsView: View {
 
     var body: some View {
         ZStack {
-            List {
+            SettingsList {
                 SettingsSection {
                     SettingsButtonRow(title: "Contact", label: "Report an issue on GitHub", splitPercentage: splitPercentage) {
                         if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {

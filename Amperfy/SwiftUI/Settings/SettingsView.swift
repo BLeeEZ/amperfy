@@ -51,8 +51,8 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        NavigationView {
-            List {
+        let list =
+            SettingsList {
                 SettingsSection {
                     SettingsRow(title: "Version") {
                         SecondaryText(AppDelegate.version)
@@ -99,10 +99,18 @@ struct SettingsView: View {
                 }
                 #endif
             }
-            #if !targetEnvironment(macCatalyst)
-            .navigationTitle("Settings")
-            #endif
-        }.navigationViewStyle(.stack)
+    
+        #if targetEnvironment(macCatalyst)
+        ZStack {
+            list
+        }
+        #else
+        NavigationView {
+            list
+        }
+        .navigationTitle("Settings")
+        .navigationViewStyle(.stack)
+        #endif
     }
 }
 

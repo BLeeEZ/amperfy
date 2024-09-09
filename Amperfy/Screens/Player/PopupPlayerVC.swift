@@ -23,9 +23,6 @@ import UIKit
 import CoreMedia
 import AmperfyKit
 import PromiseKit
-#if targetEnvironment(macCatalyst)
-import LNPopupController_ObjC
-#endif
 
 class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
@@ -84,12 +81,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             createdLargeCurrentlyPlayingView.prepare(toWorkOnRootView: self)
             largePlayerPlaceholderView.addSubview(createdLargeCurrentlyPlayingView)
         }
-        #if targetEnvironment(macCatalyst)
-        closeButtonPlaceholderView.isHidden = false
-        #else
+
         closeButtonPlaceholderView.isHidden = true
-        #endif
-        
+
         self.setupTableView()
         self.fetchSongInfoAndUpdateViews()
         
@@ -112,19 +106,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         adjustLaoutMargins()
         refreshCellMasks()
     }
-
-    #if targetEnvironment(macCatalyst)
-    override func positionPopupCloseButton(_ popupCloseButton: LNPopupCloseButton) -> Bool {
-        guard let placeholder = closeButtonPlaceholderView else { return false }
-        popupCloseButton.removeFromSuperview()
-        placeholder.addSubview(popupCloseButton)
-        NSLayoutConstraint.activate([
-            popupCloseButton.rightAnchor.constraint(equalTo: placeholder.rightAnchor, constant: 0),
-            popupCloseButton.topAnchor.constraint(equalTo: placeholder.topAnchor, constant: 0),
-        ])
-        return true
-    }
-    #endif
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -156,14 +137,26 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
         }
     }
-    
+
+    #if targetEnvironment(macCatalyst)
+    // Fix the mini player on macOS
+    override var traitCollection: UITraitCollection {
+        let compactHorizontalCollection = UITraitCollection(horizontalSizeClass: .compact)
+        let compactVerticalCollection = UITraitCollection(verticalSizeClass: .compact)
+        let newCollection = UITraitCollection(traitsFrom: [
+            super.traitCollection, compactHorizontalCollection, compactVerticalCollection
+        ])
+        return newCollection
+    }
+    #endif
+
     func reloadData() {
         tableView.reloadData()
         scrollToCurrentlyPlayingRow()
     }
     
     func scrollToCurrentlyPlayingRow() {
-        return tableView.scrollToRow(at: IndexPath(row: 0, section: PlayerSectionCategory.currentlyPlaying.rawValue), at: .top, animated: false);
+        tableView.scrollToRow(at: IndexPath(row: 0, section: PlayerSectionCategory.currentlyPlaying.rawValue), at: .top, animated: false);
     }
 
     func favoritePressed() {

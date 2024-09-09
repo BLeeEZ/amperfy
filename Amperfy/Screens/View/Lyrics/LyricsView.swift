@@ -99,7 +99,12 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
         guard let model = self.lyricModels.object(at: indexPath.row) else { return 0.0 }
         return lineSpacing + model.calcHeight(containerWidth: self.bounds.width)
     }
-    
+
+    public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard let model = self.lyricModels.object(at: indexPath.row) else { return 0.0 }
+        return lineSpacing + model.calcHeight(containerWidth: self.bounds.width)
+    }
+
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = dequeueReusableCell(withIdentifier: LyricTableCell.typeName, for: indexPath) as! LyricTableCell
         if let model = self.lyricModels.object(at: indexPath.row) {
@@ -134,7 +139,11 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
     }
     
     func reloadInsets() {
+        #if targetEnvironment(macCatalyst)
+        contentInset = UIEdgeInsets(top: 40, left: 0, bottom: frame.height / 2, right: 0)
+        #else
         contentInset = UIEdgeInsets(top: frame.height / 2, left: 0, bottom: frame.height / 2, right: 0)
+        #endif
     }
     
     func scroll(toTime time: CMTime) {

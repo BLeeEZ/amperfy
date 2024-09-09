@@ -25,9 +25,9 @@ import AmperfyKit
 struct AddSwipeActionView: View {
     
     @EnvironmentObject private var settings: Settings
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    
-    var swipePosition: SwipePosition
+    @Binding var isVisible: Bool
+
+    @Binding var swipePosition: SwipePosition
     @State private var actionNotInUse = [SwipeActionType]()
     var addCB : (_ swipePosition: SwipePosition, _ elementToAdd: SwipeActionType) -> ()
     
@@ -46,20 +46,27 @@ struct AddSwipeActionView: View {
             List {
                 ForEach(actionNotInUse, id: \.self) { swipe in
                     SwipeCellView(swipe: swipe)
-                    .onTapGesture {
-                        addCB(swipePosition, swipe)
-                        self.presentationMode.wrappedValue.dismiss()
-                    }
+                        .onTapGesture {
+                            addCB(swipePosition, swipe)
+                            self.isVisible = false
+                        }
                 }
             }
-            .listStyle(GroupedListStyle())
+            #if targetEnvironment(macCatalyst)
+            .listStyle(.plain)
+            #else
+            .listStyle(.grouped)
+            #endif
             
-            Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
+            Button(action: { self.isVisible = false }) {
                 Text("Cancel")
                     .fontWeight(.bold)
             }
             .padding()
         }
+        #if targetEnvironment(macCatalyst)
+        .background { Color.clear }
+        #endif
         .onAppear {
             reload()
         }
@@ -68,8 +75,10 @@ struct AddSwipeActionView: View {
 
 struct AddSwipeActionView_Previews: PreviewProvider {
     @State static var settings = Settings()
-    
+    @State static var isVisible = true
+    @State static var swipePosition: SwipePosition = .trailing
+
     static var previews: some View {
-        AddSwipeActionView(swipePosition: .trailing, addCB: {_,_ in}).environmentObject(settings)
+        AddSwipeActionView(isVisible: $isVisible, swipePosition: $swipePosition, addCB: {_,_ in}).environmentObject(settings)
     }
 }

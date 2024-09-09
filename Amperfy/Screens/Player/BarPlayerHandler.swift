@@ -57,15 +57,8 @@ class BarPlayerHandler {
         appearance.subtitleTextAttributes = AttributeContainer()
             .foregroundColor(.label)
         vc.popupBar.standardAppearance = appearance
-        #if targetEnvironment(macCatalyst)
-        // allow dimissing the popup with the scroll wheel or a button
-        vc.popupContentView.popupCloseButtonStyle = .round
-        vc.popupContentView.popupInteractionGestureRecognizer.allowedScrollTypesMask = .continuous
-        vc.popupInteractionStyle = .drag
-        #else
         vc.popupContentView.popupCloseButtonStyle = .chevron
         vc.popupInteractionStyle = .snap
-        #endif
         isPopupBarDisplayed = false
         handlePopupBar()
     }

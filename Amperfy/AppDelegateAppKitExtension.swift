@@ -31,7 +31,7 @@ extension AppKitController {
     @objc public func installControlAccentColorHook() {}
 
     @objc public func _catalyst_setupWindow(_ sender:Any) {}
-    @objc public func configurePreferencesWindowForSceneIdentifier(_ sceneIdentifier: String) {}
+    @objc public func configureUtilityWindowForSceneIdentifier(_ sceneIdentifier: String, properties: [String: Any]) {}
 }
 
 extension AppDelegate {
@@ -41,13 +41,12 @@ extension AppDelegate {
         appKitController?.perform(#selector(installControlAccentColorHook))
     }
 
-    class func updateAppKitControlColor() {
-        let accentColor = UIView.appearance().tintColor.cgColor
-        appKitController?.perform(#selector(updateControlAccentColor(_:)), with: accentColor)
+    class func updateAppKitControlColor(_ color: UIColor) {
+        appKitController?.perform(#selector(updateControlAccentColor(_:)), with: color.cgColor)
     }
 
-    class func configurePreferenceWindow(persistentIdentifier: String) {
-        appKitController?.perform(#selector(configurePreferencesWindowForSceneIdentifier(_:)), with: persistentIdentifier)
+    class func configureUtilityWindow(persistentIdentifier: String, properties: [String: Any] = [:]) {
+        appKitController?.perform(#selector(configureUtilityWindowForSceneIdentifier(_:properties:)), with: persistentIdentifier, with: properties)
     }
 
     class func loadAppKitIntegrationFramework() {

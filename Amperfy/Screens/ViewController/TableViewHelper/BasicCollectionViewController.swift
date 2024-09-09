@@ -55,7 +55,13 @@ class BasicCollectionViewController: UICollectionViewController {
         
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
-        
+
+        #if targetEnvironment(macCatalyst)
+            if #available(iOS 16.0, *) {
+                navigationItem.preferredSearchBarPlacement = .inline
+            }
+        #endif
+
         searchController.delegate = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self // Monitor when the search button is tapped.

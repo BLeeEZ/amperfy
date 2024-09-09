@@ -366,9 +366,8 @@ class PlayerControlView: UIView {
     }
     
     func refreshSleepTimerButton() {
-        guard let rootView = rootView else { return }
         let isSelected = appDelegate.sleepTimer != nil || self.appDelegate.player.isShouldPauseAfterFinishedPlaying
-        var config = rootView.getPlayerButtonConfiguration(isSelected: isSelected)
+        var config = UIButton.Configuration.player(isSelected: isSelected)
         config.image = UIImage.sleepFill
         sleepTimerButton.isSelected = isSelected
         sleepTimerButton.configuration = config
@@ -525,9 +524,8 @@ class PlayerControlView: UIView {
     }
     
     func refreshDisplayPlaylistButton() {
-        guard let rootView = rootView else { return }
         let isSelected = appDelegate.storage.settings.playerDisplayStyle == .compact
-        var config = rootView.getPlayerButtonConfiguration(isSelected: isSelected)
+        var config = UIButton.Configuration.player(isSelected: isSelected)
         config.image = .playlistDisplayStyle
         displayPlaylistButton.isSelected = isSelected
         displayPlaylistButton.configuration = config
@@ -538,7 +536,7 @@ class PlayerControlView: UIView {
         displayLyricsButton.isHidden = !(rootView.largeCurrentlyPlayingView?.isLyricsButtonAllowedToDisplay ?? false)
              
         let isSelected = appDelegate.storage.settings.isPlayerLyricsDisplayed
-        var config = rootView.getPlayerButtonConfiguration(isSelected: isSelected)
+        var config = UIButton.Configuration.player(isSelected: isSelected)
         config.image = .lyrics
         displayLyricsButton.isSelected = isSelected
         displayLyricsButton.configuration = config
