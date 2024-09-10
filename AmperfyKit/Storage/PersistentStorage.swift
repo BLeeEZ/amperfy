@@ -126,6 +126,25 @@ public enum StreamingFormatPreference: Int, CaseIterable {
     }
 }
 
+public enum SyncCompletionStatus: Int, CaseIterable {
+    case completed = 0
+    case skipped = 1
+    case aborded = 2
+
+    public static let defaultValue: SyncCompletionStatus = .completed
+    
+    public var description: String {
+        switch self {
+        case .completed:
+            return "Completed"
+        case .skipped:
+            return "Skipped"
+        case .aborded:
+            return "Aborded"
+        }
+    }
+}
+
 
 public enum ThemePreference: Int, CaseIterable {
     case blue = 0
@@ -279,6 +298,7 @@ public class PersistentStorage {
         case Password = "password"
         case BackendApi = "backendApi"
         case LibraryIsSynced = "libraryIsSynced"
+        case InitialSyncCompletionStatus = "initialSyncCompletionStatus"
         case ArtworkDownloadSetting = "artworkDownloadSetting"
         case ArtworkDisplayPreference = "artworkDisplayPreference"
         case SleepTimerInterval = "sleepTimerInterval" // not used anymore !!! 
@@ -628,6 +648,14 @@ public class PersistentStorage {
     public var isLibrarySynced: Bool {
         get { return UserDefaults.standard.object(forKey: UserDefaultsKey.LibraryIsSynced.rawValue) as? Bool ?? false }
         set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.LibraryIsSynced.rawValue) }
+    }
+    
+    public var initialSyncCompletionStatus: SyncCompletionStatus {
+        get {
+            let initialSyncCompletionStatusRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.InitialSyncCompletionStatus.rawValue) as? Int ?? SyncCompletionStatus.defaultValue.rawValue
+            return SyncCompletionStatus(rawValue: initialSyncCompletionStatusRaw) ?? SyncCompletionStatus.defaultValue
+        }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.InitialSyncCompletionStatus.rawValue) }
     }
     
     public var librarySyncVersion: LibrarySyncVersion {

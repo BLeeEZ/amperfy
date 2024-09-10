@@ -108,7 +108,6 @@
 		508FDE5021F64ED6005A0724 /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4F21F64ED6005A0724 /* TabBarVC.swift */; };
 		509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */; };
 		509001B82716C8F400A8056D /* AppDelegateNotificationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509001B72716C8F400A8056D /* AppDelegateNotificationExtensions.swift */; };
-		509B430B2B722B4D005E8130 /* Fuse in Frameworks */ = {isa = PBXBuildFile; productRef = 509B430A2B722B4D005E8130 /* Fuse */; };
 		509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */ = {isa = PBXBuildFile; productRef = 509D55F7281274F500E0E0B5 /* VYPlayIndicator */; };
 		50A30E4F2B73DDC800722894 /* PlayerControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A30E4D2B73DDC800722894 /* PlayerControlView.swift */; };
 		50A30E502B73DFE500722894 /* PlayerControlView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50A30E4E2B73DDC800722894 /* PlayerControlView.xib */; };
@@ -426,6 +425,7 @@
 		50E77DB728D2163F00BDF882 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB628D2163F00BDF882 /* SettingsView.swift */; };
 		50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */; };
 		50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */; };
+		50F40A3B2C9088B30097FE63 /* IfritStatic in Frameworks */ = {isa = PBXBuildFile; productRef = 50F40A3A2C9088B30097FE63 /* IfritStatic */; };
 		50FF311B2BBC4D8000C2C3B9 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FF311A2BBC4D8000C2C3B9 /* NetworkMonitor.swift */; };
 		631C16652C6BA7E60085F62E /* AppDelegateAppKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C16642C6BA7E60085F62E /* AppDelegateAppKitExtension.swift */; };
 		631C166B2C6D3D9A0085F62E /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166A2C6D3D9A0085F62E /* SettingsRow.swift */; };
@@ -1015,12 +1015,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */,
+				50F40A3B2C9088B30097FE63 /* IfritStatic in Frameworks */,
 				507DFE682B1E5A1A002BBB1D /* PromiseKit in Frameworks */,
 				50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */,
 				507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */,
 				507DFE662B1E5A0E002BBB1D /* PMKAlamofire in Frameworks */,
 				50BE5DA7285714A200156FC6 /* CallbackURLKit in Frameworks */,
-				509B430B2B722B4D005E8130 /* Fuse in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1963,7 +1963,7 @@
 				507DFE652B1E5A0E002BBB1D /* PMKAlamofire */,
 				507DFE672B1E5A1A002BBB1D /* PromiseKit */,
 				507DFE692B1E62C9002BBB1D /* ID3TagEditor */,
-				509B430A2B722B4D005E8130 /* Fuse */,
+				50F40A3A2C9088B30097FE63 /* IfritStatic */,
 			);
 			productName = AmpertyKit;
 			productReference = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */;
@@ -2062,7 +2062,7 @@
 				507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */,
 				507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */,
 				507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */,
-				509B43092B722AA9005E8130 /* XCRemoteSwiftPackageReference "fuse-swift" */,
+				50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */,
 			);
 			productRefGroup = 508385E521C5965B00C4BB32 /* Products */;
 			projectDirPath = "";
@@ -3091,14 +3091,6 @@
 				version = 4.0.0;
 			};
 		};
-		509B43092B722AA9005E8130 /* XCRemoteSwiftPackageReference "fuse-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/krisk/fuse-swift";
-			requirement = {
-				kind = exactVersion;
-				version = 1.4.0;
-			};
-		};
 		509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/obrhoff/VYPlayIndicator";
@@ -3113,6 +3105,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 3.0.0;
+			};
+		};
+		50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ukushu/Ifrit";
+			requirement = {
+				kind = exactVersion;
+				version = 2.0.3;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -3183,11 +3183,6 @@
 			package = 50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */;
 			productName = CallbackURLKit;
 		};
-		509B430A2B722B4D005E8130 /* Fuse */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 509B43092B722AA9005E8130 /* XCRemoteSwiftPackageReference "fuse-swift" */;
-			productName = Fuse;
-		};
 		509D55F7281274F500E0E0B5 /* VYPlayIndicator */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */;
@@ -3197,6 +3192,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */;
 			productName = CallbackURLKit;
+		};
+		50F40A3A2C9088B30097FE63 /* IfritStatic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */;
+			productName = IfritStatic;
 		};
 /* End XCSwiftPackageProductDependency section */
 

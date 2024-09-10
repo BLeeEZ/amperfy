@@ -24,7 +24,7 @@ import PromiseKit
 import AmperfyKit
 import Intents
 import CallbackURLKit
-import Fuse
+import Ifrit
 import OSLog
 
 extension RepeatMode {
