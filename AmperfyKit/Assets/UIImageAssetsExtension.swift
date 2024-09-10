@@ -183,7 +183,7 @@ extension UIImage {
             case .podcastEpisode:
                 img = UIImage(imageLiteralResourceName: "BluePodcastEpisode")
             case .playlist:
-                img = UIImage(imageLiteralResourceName: "BluePaylist")
+                img = UIImage(imageLiteralResourceName: "BluePlaylist")
             case .folder:
                 img = UIImage(imageLiteralResourceName: "BlueFolder")
             }
