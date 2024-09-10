@@ -19,7 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Fuse
+import Ifrit
 
 public struct MatchResult {
     public let item: PlayableContainable

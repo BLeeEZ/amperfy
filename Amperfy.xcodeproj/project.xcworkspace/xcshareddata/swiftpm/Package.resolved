@@ -1,5 +1,5 @@
 {
-  "originHash" : "70a01fdf9409b7c9d627c861db06c96ca795b94d4904e6737c15fe775aea4559",
+  "originHash" : "540dfab39b5c5850aef4501328da3e2e3788f4596df4484419f102c3d45ae514",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -20,21 +20,21 @@
       }
     },
     {
-      "identity" : "fuse-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/krisk/fuse-swift",
-      "state" : {
-        "revision" : "26ba868691b2d8b7bf2b1322951eb591be70ccca",
-        "version" : "1.4.0"
-      }
-    },
-    {
       "identity" : "id3tageditor",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/chicio/ID3TagEditor",
       "state" : {
         "revision" : "3ccc31eafae0ded1fea8c9acd5e7ef7dfdbf1e8e",
         "version" : "4.6.0"
+      }
+    },
+    {
+      "identity" : "ifrit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ukushu/Ifrit",
+      "state" : {
+        "revision" : "e610cdf4eddec1e76a9c7ae5db37738c7f73150b",
+        "version" : "2.0.3"
       }
     },
     {
