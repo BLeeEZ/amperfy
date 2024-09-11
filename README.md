@@ -60,7 +60,7 @@ For more information, and to participate in the public beta releases, please vis
 - [Alamofire](https://github.com/Alamofire/Alamofire) by [Alamofire](https://github.com/Alamofire) is licensed under [MIT License](https://github.com/Alamofire/Alamofire/blob/master/LICENSE)
 - [PromiseKit](https://github.com/mxcl/PromiseKit) by [Max Howell](https://github.com/mxcl) is licensed under [MIT License](https://github.com/mxcl/PromiseKit/blob/master/LICENSE)
 - [PMKAlamofire](https://github.com/PromiseKit/PMKAlamofire) by [Max Howell](https://github.com/mxcl) is licensed under [MIT License](https://github.com/PromiseKit/PMKAlamofire/blob/master/LICENSE)
-- [Fuse](https://github.com/krisk/fuse-swift) by [Kiro Risk](https://github.com/krisk) is licensed under [MIT License](https://github.com/krisk/fuse-swift/blob/master/LICENSE)
+- [Ifrit](https://github.com/ukushu/Ifrit) by [Andrii Vynnychenko](https://github.com/ukushu) is licensed under [MIT License](https://github.com/ukushu/Ifrit/blob/main/LICENSE.md)
 
 **Amperfy license:** [GPLv3](https://github.com/BLeeEZ/Amperfy/blob/master/LICENSE)
 

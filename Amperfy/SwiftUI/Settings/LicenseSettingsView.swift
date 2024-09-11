@@ -272,9 +272,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 __________________________________
 
-Fuse
+Ifrit
 The MIT License (MIT)
-Copyright (c) 2017 Kirollos Risk <kirollos@gmail.com>
+Copyright (c) 2024 Andrii Vynnychenko, Kirollos Risk(original "fuse-swift" repository code)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
