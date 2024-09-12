@@ -225,6 +225,8 @@
 		50C16C2021E7A37000F086F0 /* Segues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C1F21E7A37000F086F0 /* Segues.swift */; };
 		50C16C2621E7CBA500F086F0 /* GenericTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50C16C2521E7CBA500F086F0 /* GenericTableCell.xib */; };
 		50C16C2821E8680A00F086F0 /* CommonScreenOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */; };
+		50C1CD982C93319D00629993 /* AppKitController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB992C6752F000522F68 /* AppKitController.swift */; };
+		50C1CD9F2C93342900629993 /* AppKitIntegration.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50C1CD912C93316100629993 /* AppKitIntegration.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		50C9D609284FA847007F18D0 /* AmperfyKit.docc in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D608284FA847007F18D0 /* AmperfyKit.docc */; };
 		50C9D60F284FA847007F18D0 /* AmperfyKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */; };
 		50C9D616284FA847007F18D0 /* AmpertyKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D615284FA847007F18D0 /* AmpertyKitTests.swift */; };
@@ -449,12 +451,17 @@
 		637A28B52C79409C0082FACC /* MiniPlayerSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */; };
 		638920F02C8C8E9000932EE8 /* SettingsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638920EF2C8C8E9000932EE8 /* SettingsList.swift */; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
-		63DCDB962C67515C00522F68 /* AppKitIntegration.framework in Embed AppKitIntegration */ = {isa = PBXBuildFile; fileRef = 63DCDB912C67508E00522F68 /* AppKitIntegration.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		63DCDB9E2C67536800522F68 /* AppKitController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB992C6752F000522F68 /* AppKitController.swift */; };
 		641708592C13BF5100BA2619 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641708582C13BF5100BA2619 /* Haptics.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		50C1CD9C2C93324B00629993 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 508385DC21C5965B00C4BB32 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 50C1CD902C93316100629993;
+			remoteInfo = AppKitIntegration;
+		};
 		50C9D610284FA847007F18D0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 508385DC21C5965B00C4BB32 /* Project object */;
@@ -475,13 +482,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 50C9D604284FA847007F18D0;
 			remoteInfo = AmpertyKit;
-		};
-		63DCDB972C67528700522F68 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 508385DC21C5965B00C4BB32 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 63DCDB902C67508E00522F68;
-			remoteInfo = AppKitIntegration;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -508,15 +508,14 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		63DCDB8B2C674F6D00522F68 /* Embed AppKitIntegration */ = {
+		50C1CD9E2C93340900629993 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				63DCDB962C67515C00522F68 /* AppKitIntegration.framework in Embed AppKitIntegration */,
+				50C1CD9F2C93342900629993 /* AppKitIntegration.framework in CopyFiles */,
 			);
-			name = "Embed AppKitIntegration";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -847,6 +846,7 @@
 		50C16C2721E8680A00F086F0 /* CommonScreenOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonScreenOperations.swift; sourceTree = "<group>"; };
 		50C16C3121EA77C700F086F0 /* AmpacheArtworkDownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheArtworkDownloadDelegate.swift; sourceTree = "<group>"; };
 		50C16C3321EB454100F086F0 /* LibraryUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryUpdater.swift; sourceTree = "<group>"; };
+		50C1CD912C93316100629993 /* AppKitIntegration.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AppKitIntegration.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		50C80F2726831DB40022F710 /* SsPodcastEpisodeParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPodcastEpisodeParserDelegate.swift; sourceTree = "<group>"; };
 		50C86CA22B23545400385328 /* Amperfy v29.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v29.xcdatamodel"; sourceTree = "<group>"; };
 		50C9D605284FA847007F18D0 /* AmperfyKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AmperfyKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -986,9 +986,7 @@
 		637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerSceneDelegate.swift; sourceTree = "<group>"; };
 		638920EF2C8C8E9000932EE8 /* SettingsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsList.swift; sourceTree = "<group>"; };
 		63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSceneDelegate.swift; sourceTree = "<group>"; };
-		63DCDB912C67508E00522F68 /* AppKitIntegration.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppKitIntegration.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		63DCDB992C6752F000522F68 /* AppKitController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKitController.swift; sourceTree = "<group>"; };
-		63DCDB9A2C6752F000522F68 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		641708582C13BF5100BA2619 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1007,6 +1005,13 @@
 				507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */,
 				507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */,
 				50C9D61A284FA847007F18D0 /* AmperfyKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		50C1CD8E2C93316100629993 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1030,13 +1035,6 @@
 			files = (
 				50C9D60F284FA847007F18D0 /* AmperfyKit.framework in Frameworks */,
 				507DFE6E2B1E6DFE002BBB1D /* PromiseKit in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		63DCDB8E2C67508E00522F68 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1275,7 +1273,7 @@
 				508385E421C5965B00C4BB32 /* Amperfy.app */,
 				50C9D605284FA847007F18D0 /* AmperfyKit.framework */,
 				50C9D60E284FA847007F18D0 /* AmperfyKitTests.xctest */,
-				63DCDB912C67508E00522F68 /* AppKitIntegration.framework */,
+				50C1CD912C93316100629993 /* AppKitIntegration.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1891,7 +1889,6 @@
 			isa = PBXGroup;
 			children = (
 				63DCDB992C6752F000522F68 /* AppKitController.swift */,
-				63DCDB9A2C6752F000522F68 /* Info.plist */,
 			);
 			path = AppKitIntegration;
 			sourceTree = SOURCE_ROOT;
@@ -1899,6 +1896,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		50C1CD8C2C93316100629993 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		50C9D600284FA847007F18D0 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1918,14 +1922,14 @@
 				508385E121C5965B00C4BB32 /* Frameworks */,
 				508385E221C5965B00C4BB32 /* Resources */,
 				5054687F2625CC61008005EC /* Embed Frameworks */,
-				63DCDB8B2C674F6D00522F68 /* Embed AppKitIntegration */,
 				50253FA1284A5EEB00BCCFB2 /* Embed Foundation Extensions */,
+				50C1CD9E2C93340900629993 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				63DCDB982C67528700522F68 /* PBXTargetDependency */,
 				50C9D619284FA847007F18D0 /* PBXTargetDependency */,
+				50C1CD9D2C93324B00629993 /* PBXTargetDependency */,
 			);
 			name = Amperfy;
 			packageProductDependencies = (
@@ -1942,6 +1946,24 @@
 			productName = Amperfy;
 			productReference = 508385E421C5965B00C4BB32 /* Amperfy.app */;
 			productType = "com.apple.product-type.application";
+		};
+		50C1CD902C93316100629993 /* AppKitIntegration */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 50C1CD952C93316100629993 /* Build configuration list for PBXNativeTarget "AppKitIntegration" */;
+			buildPhases = (
+				50C1CD8C2C93316100629993 /* Headers */,
+				50C1CD8D2C93316100629993 /* Sources */,
+				50C1CD8E2C93316100629993 /* Frameworks */,
+				50C1CD8F2C93316100629993 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AppKitIntegration;
+			productName = AppKitIntegration;
+			productReference = 50C1CD912C93316100629993 /* AppKitIntegration.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 		50C9D604284FA847007F18D0 /* AmperfyKit */ = {
 			isa = PBXNativeTarget;
@@ -1991,23 +2013,6 @@
 			productReference = 50C9D60E284FA847007F18D0 /* AmperfyKitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		63DCDB902C67508E00522F68 /* AppKitIntegration */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 63DCDB922C67508E00522F68 /* Build configuration list for PBXNativeTarget "AppKitIntegration" */;
-			buildPhases = (
-				63DCDB8D2C67508E00522F68 /* Sources */,
-				63DCDB8E2C67508E00522F68 /* Frameworks */,
-				63DCDB8F2C67508E00522F68 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = AppKitIntegration;
-			productName = AppKitIntegration;
-			productReference = 63DCDB912C67508E00522F68 /* AppKitIntegration.framework */;
-			productType = "com.apple.product-type.bundle";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2031,15 +2036,15 @@
 							};
 						};
 					};
+					50C1CD902C93316100629993 = {
+						CreatedOnToolsVersion = 15.3;
+					};
 					50C9D604284FA847007F18D0 = {
 						CreatedOnToolsVersion = 13.3.1;
 					};
 					50C9D60D284FA847007F18D0 = {
 						CreatedOnToolsVersion = 13.3.1;
 						TestTargetID = 508385E321C5965B00C4BB32;
-					};
-					63DCDB902C67508E00522F68 = {
-						CreatedOnToolsVersion = 15.4;
 					};
 				};
 			};
@@ -2071,7 +2076,7 @@
 				508385E321C5965B00C4BB32 /* Amperfy */,
 				50C9D604284FA847007F18D0 /* AmperfyKit */,
 				50C9D60D284FA847007F18D0 /* AmperfyKitTests */,
-				63DCDB902C67508E00522F68 /* AppKitIntegration */,
+				50C1CD902C93316100629993 /* AppKitIntegration */,
 			);
 		};
 /* End PBXProject section */
@@ -2105,6 +2110,13 @@
 				508385ED21C5965B00C4BB32 /* Main.storyboard in Resources */,
 				500B97D02B7C9555005554BF /* EntityPreviewVC.xib in Resources */,
 				50A30E642B756CF100722894 /* CurrentlyPlayingTableCell.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		50C1CD8F2C93316100629993 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2152,13 +2164,6 @@
 				50BE5D5B2850F4F600156FC6 /* musicFolders_example_1.xml in Resources */,
 				50BE5D622850F4F600156FC6 /* directory_example_1.xml in Resources */,
 				50BE5D5E2850F4F600156FC6 /* indexes_example_1.xml in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		63DCDB8F2C67508E00522F68 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2311,6 +2316,14 @@
 				637A28A82C75318C0082FACC /* NowPlayingBarItem.swift in Sources */,
 				508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */,
 				50DE29EB2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		50C1CD8D2C93316100629993 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50C1CD982C93319D00629993 /* AppKitController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2550,17 +2563,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		63DCDB8D2C67508E00522F68 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				63DCDB9E2C67536800522F68 /* AppKitController.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		50C1CD9D2C93324B00629993 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = maccatalyst;
+			target = 50C1CD902C93316100629993 /* AppKitIntegration */;
+			targetProxy = 50C1CD9C2C93324B00629993 /* PBXContainerItemProxy */;
+		};
 		50C9D611284FA847007F18D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 50C9D604284FA847007F18D0 /* AmperfyKit */;
@@ -2575,12 +2586,6 @@
 			isa = PBXTargetDependency;
 			target = 50C9D604284FA847007F18D0 /* AmperfyKit */;
 			targetProxy = 50C9D618284FA847007F18D0 /* PBXContainerItemProxy */;
-		};
-		63DCDB982C67528700522F68 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			platformFilter = maccatalyst;
-			target = 63DCDB902C67508E00522F68 /* AppKitIntegration */;
-			targetProxy = 63DCDB972C67528700522F68 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2782,6 +2787,87 @@
 			};
 			name = Release;
 		};
+		50C1CD962C93316100629993 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = U3R6D65S8W;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Maximilian Bauer. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-music.AppKitIntegration";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		50C1CD972C93316100629993 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = U3R6D65S8W;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Maximilian Bauer. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-music.AppKitIntegration";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 		50C9D61D284FA847007F18D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2910,82 +2996,6 @@
 			};
 			name = Release;
 		};
-		63DCDB932C67508E00522F68 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = U3R6D65S8W;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = AppKitIntegration/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Maximilian Bauer. All rights reserved.";
-				INFOPLIST_KEY_NSPrincipalClass = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-AppKitIntegration";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				WRAPPER_EXTENSION = framework;
-			};
-			name = Debug;
-		};
-		63DCDB942C67508E00522F68 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = U3R6D65S8W;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = AppKitIntegration/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Maximilian Bauer. All rights reserved.";
-				INFOPLIST_KEY_NSPrincipalClass = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-AppKitIntegration";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				WRAPPER_EXTENSION = framework;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3007,6 +3017,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		50C1CD952C93316100629993 /* Build configuration list for PBXNativeTarget "AppKitIntegration" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				50C1CD962C93316100629993 /* Debug */,
+				50C1CD972C93316100629993 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		50C9D61C284FA847007F18D0 /* Build configuration list for PBXNativeTarget "AmperfyKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -3021,15 +3040,6 @@
 			buildConfigurations = (
 				50C9D620284FA847007F18D0 /* Debug */,
 				50C9D621284FA847007F18D0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		63DCDB922C67508E00522F68 /* Build configuration list for PBXNativeTarget "AppKitIntegration" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				63DCDB932C67508E00522F68 /* Debug */,
-				63DCDB942C67508E00522F68 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
