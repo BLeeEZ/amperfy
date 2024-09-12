@@ -448,9 +448,10 @@
 		637A28B32C77D1520082FACC /* CustomBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B22C77D1520082FACC /* CustomBarButton.swift */; };
 		637A28B52C79409C0082FACC /* MiniPlayerSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */; };
 		638920F02C8C8E9000932EE8 /* SettingsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638920EF2C8C8E9000932EE8 /* SettingsList.swift */; };
+		638DAC3A2C93178100F99861 /* AppKitIntegration.h in Headers */ = {isa = PBXBuildFile; fileRef = 638DAC392C93178100F99861 /* AppKitIntegration.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		638DAC3F2C9317A200F99861 /* AppKitController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638DAC3E2C9317A200F99861 /* AppKitController.swift */; };
+		638DAC412C93180A00F99861 /* AppKitIntegration.framework in Embed AppKitIntegration */ = {isa = PBXBuildFile; fileRef = 638DAC372C93178100F99861 /* AppKitIntegration.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
-		63DCDB962C67515C00522F68 /* AppKitIntegration.framework in Embed AppKitIntegration */ = {isa = PBXBuildFile; fileRef = 63DCDB912C67508E00522F68 /* AppKitIntegration.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		63DCDB9E2C67536800522F68 /* AppKitController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB992C6752F000522F68 /* AppKitController.swift */; };
 		641708592C13BF5100BA2619 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641708582C13BF5100BA2619 /* Haptics.swift */; };
 /* End PBXBuildFile section */
 
@@ -476,11 +477,11 @@
 			remoteGlobalIDString = 50C9D604284FA847007F18D0;
 			remoteInfo = AmpertyKit;
 		};
-		63DCDB972C67528700522F68 /* PBXContainerItemProxy */ = {
+		638DAC422C93184E00F99861 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 508385DC21C5965B00C4BB32 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 63DCDB902C67508E00522F68;
+			remoteGlobalIDString = 638DAC362C93178100F99861;
 			remoteInfo = AppKitIntegration;
 		};
 /* End PBXContainerItemProxy section */
@@ -514,7 +515,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				63DCDB962C67515C00522F68 /* AppKitIntegration.framework in Embed AppKitIntegration */,
+				638DAC412C93180A00F99861 /* AppKitIntegration.framework in Embed AppKitIntegration */,
 			);
 			name = "Embed AppKitIntegration";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -985,10 +986,10 @@
 		637A28B22C77D1520082FACC /* CustomBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBarButton.swift; sourceTree = "<group>"; };
 		637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerSceneDelegate.swift; sourceTree = "<group>"; };
 		638920EF2C8C8E9000932EE8 /* SettingsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsList.swift; sourceTree = "<group>"; };
+		638DAC372C93178100F99861 /* AppKitIntegration.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AppKitIntegration.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		638DAC392C93178100F99861 /* AppKitIntegration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppKitIntegration.h; sourceTree = "<group>"; };
+		638DAC3E2C9317A200F99861 /* AppKitController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKitController.swift; sourceTree = "<group>"; };
 		63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSceneDelegate.swift; sourceTree = "<group>"; };
-		63DCDB912C67508E00522F68 /* AppKitIntegration.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppKitIntegration.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		63DCDB992C6752F000522F68 /* AppKitController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKitController.swift; sourceTree = "<group>"; };
-		63DCDB9A2C6752F000522F68 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		641708582C13BF5100BA2619 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1033,7 +1034,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		63DCDB8E2C67508E00522F68 /* Frameworks */ = {
+		638DAC342C93178100F99861 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1262,8 +1263,8 @@
 			children = (
 				508385E621C5965B00C4BB32 /* Amperfy */,
 				50C9D606284FA847007F18D0 /* AmperfyKit */,
-				63DCDB9B2C6752F000522F68 /* AppKitIntegration */,
 				50C9D614284FA847007F18D0 /* AmperfyKitTests */,
+				638DAC382C93178100F99861 /* AppKitIntegration */,
 				508385E521C5965B00C4BB32 /* Products */,
 				5091857E23A753C800A8891E /* Frameworks */,
 			);
@@ -1275,7 +1276,7 @@
 				508385E421C5965B00C4BB32 /* Amperfy.app */,
 				50C9D605284FA847007F18D0 /* AmperfyKit.framework */,
 				50C9D60E284FA847007F18D0 /* AmperfyKitTests.xctest */,
-				63DCDB912C67508E00522F68 /* AppKitIntegration.framework */,
+				638DAC372C93178100F99861 /* AppKitIntegration.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1887,14 +1888,14 @@
 			path = "Mac - Toolbar";
 			sourceTree = "<group>";
 		};
-		63DCDB9B2C6752F000522F68 /* AppKitIntegration */ = {
+		638DAC382C93178100F99861 /* AppKitIntegration */ = {
 			isa = PBXGroup;
 			children = (
-				63DCDB992C6752F000522F68 /* AppKitController.swift */,
-				63DCDB9A2C6752F000522F68 /* Info.plist */,
+				638DAC392C93178100F99861 /* AppKitIntegration.h */,
+				638DAC3E2C9317A200F99861 /* AppKitController.swift */,
 			);
 			path = AppKitIntegration;
-			sourceTree = SOURCE_ROOT;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -1904,6 +1905,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				50C9D617284FA847007F18D0 /* AmperfyKit.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		638DAC322C93178100F99861 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				638DAC3A2C93178100F99861 /* AppKitIntegration.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1924,7 +1933,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				63DCDB982C67528700522F68 /* PBXTargetDependency */,
+				638DAC432C93184E00F99861 /* PBXTargetDependency */,
 				50C9D619284FA847007F18D0 /* PBXTargetDependency */,
 			);
 			name = Amperfy;
@@ -1991,13 +2000,14 @@
 			productReference = 50C9D60E284FA847007F18D0 /* AmperfyKitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		63DCDB902C67508E00522F68 /* AppKitIntegration */ = {
+		638DAC362C93178100F99861 /* AppKitIntegration */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 63DCDB922C67508E00522F68 /* Build configuration list for PBXNativeTarget "AppKitIntegration" */;
+			buildConfigurationList = 638DAC3B2C93178100F99861 /* Build configuration list for PBXNativeTarget "AppKitIntegration" */;
 			buildPhases = (
-				63DCDB8D2C67508E00522F68 /* Sources */,
-				63DCDB8E2C67508E00522F68 /* Frameworks */,
-				63DCDB8F2C67508E00522F68 /* Resources */,
+				638DAC322C93178100F99861 /* Headers */,
+				638DAC332C93178100F99861 /* Sources */,
+				638DAC342C93178100F99861 /* Frameworks */,
+				638DAC352C93178100F99861 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -2005,8 +2015,8 @@
 			);
 			name = AppKitIntegration;
 			productName = AppKitIntegration;
-			productReference = 63DCDB912C67508E00522F68 /* AppKitIntegration.framework */;
-			productType = "com.apple.product-type.bundle";
+			productReference = 638DAC372C93178100F99861 /* AppKitIntegration.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
@@ -2038,8 +2048,9 @@
 						CreatedOnToolsVersion = 13.3.1;
 						TestTargetID = 508385E321C5965B00C4BB32;
 					};
-					63DCDB902C67508E00522F68 = {
+					638DAC362C93178100F99861 = {
 						CreatedOnToolsVersion = 15.4;
+						LastSwiftMigration = 1540;
 					};
 				};
 			};
@@ -2071,7 +2082,7 @@
 				508385E321C5965B00C4BB32 /* Amperfy */,
 				50C9D604284FA847007F18D0 /* AmperfyKit */,
 				50C9D60D284FA847007F18D0 /* AmperfyKitTests */,
-				63DCDB902C67508E00522F68 /* AppKitIntegration */,
+				638DAC362C93178100F99861 /* AppKitIntegration */,
 			);
 		};
 /* End PBXProject section */
@@ -2155,7 +2166,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		63DCDB8F2C67508E00522F68 /* Resources */ = {
+		638DAC352C93178100F99861 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2550,11 +2561,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		63DCDB8D2C67508E00522F68 /* Sources */ = {
+		638DAC332C93178100F99861 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				63DCDB9E2C67536800522F68 /* AppKitController.swift in Sources */,
+				638DAC3F2C9317A200F99861 /* AppKitController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2576,11 +2587,11 @@
 			target = 50C9D604284FA847007F18D0 /* AmperfyKit */;
 			targetProxy = 50C9D618284FA847007F18D0 /* PBXContainerItemProxy */;
 		};
-		63DCDB982C67528700522F68 /* PBXTargetDependency */ = {
+		638DAC432C93184E00F99861 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			platformFilter = maccatalyst;
-			target = 63DCDB902C67508E00522F68 /* AppKitIntegration */;
-			targetProxy = 63DCDB972C67528700522F68 /* PBXContainerItemProxy */;
+			target = 638DAC362C93178100F99861 /* AppKitIntegration */;
+			targetProxy = 638DAC422C93184E00F99861 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2731,7 +2742,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = U3R6D65S8W;
+				DEVELOPMENT_TEAM = YJ8XYES89R;
 				INFOPLIST_FILE = Amperfy/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2740,7 +2751,7 @@
 				);
 				MARKETING_VERSION = 1.2.2;
 				"MARKETING_VERSION[sdk=macosx*]" = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-music";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.schlaubi.amperfy-music";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -2761,7 +2772,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = U3R6D65S8W;
+				DEVELOPMENT_TEAM = YJ8XYES89R;
 				INFOPLIST_FILE = Amperfy/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2770,7 +2781,7 @@
 				);
 				MARKETING_VERSION = 1.2.2;
 				"MARKETING_VERSION[sdk=macosx*]" = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-music";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.schlaubi.amperfy-music";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -2792,6 +2803,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = U3R6D65S8W;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YJ8XYES89R;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = YJ8XYES89R;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -2808,7 +2821,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
-				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-music.AmperfyKit";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.schlaubi.amperfy-music.AmperfyKit";
 				PRODUCT_NAME = AmperfyKit;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -2833,6 +2846,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = U3R6D65S8W;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YJ8XYES89R;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = YJ8XYES89R;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -2849,7 +2864,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
-				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-music.AmperfyKit";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.schlaubi.amperfy-music.AmperfyKit";
 				PRODUCT_NAME = AmperfyKit;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -2871,11 +2886,11 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = U3R6D65S8W;
+				DEVELOPMENT_TEAM = YJ8XYES89R;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.AmpertyKitTests";
+				PRODUCT_BUNDLE_IDENTIFIER = de.schlaubi.AmpertyKitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -2894,11 +2909,11 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = U3R6D65S8W;
+				DEVELOPMENT_TEAM = YJ8XYES89R;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.AmpertyKitTests";
+				PRODUCT_BUNDLE_IDENTIFIER = de.schlaubi.AmpertyKitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -2910,79 +2925,89 @@
 			};
 			name = Release;
 		};
-		63DCDB932C67508E00522F68 /* Debug */ = {
+		638DAC3C2C93178100F99861 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = U3R6D65S8W;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = YJ8XYES89R;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = AppKitIntegration/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Maximilian Bauer. All rights reserved.";
-				INFOPLIST_KEY_NSPrincipalClass = "";
+				INFOPLIST_KEY_NSPrincipalClass = AppKitIntegration.AppKitController;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-AppKitIntegration";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = de.schlaubi.AppKitIntegration;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				WRAPPER_EXTENSION = framework;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
 		};
-		63DCDB942C67508E00522F68 /* Release */ = {
+		638DAC3D2C93178100F99861 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = U3R6D65S8W;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = YJ8XYES89R;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = AppKitIntegration/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Maximilian Bauer. All rights reserved.";
-				INFOPLIST_KEY_NSPrincipalClass = "";
+				INFOPLIST_KEY_NSPrincipalClass = AppKitIntegration.AppKitController;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-AppKitIntegration";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = de.schlaubi.AppKitIntegration;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_VERSION = 5.0;
-				WRAPPER_EXTENSION = framework;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -3025,11 +3050,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		63DCDB922C67508E00522F68 /* Build configuration list for PBXNativeTarget "AppKitIntegration" */ = {
+		638DAC3B2C93178100F99861 /* Build configuration list for PBXNativeTarget "AppKitIntegration" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				63DCDB932C67508E00522F68 /* Debug */,
-				63DCDB942C67508E00522F68 /* Release */,
+				638DAC3C2C93178100F99861 /* Debug */,
+				638DAC3D2C93178100F99861 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
