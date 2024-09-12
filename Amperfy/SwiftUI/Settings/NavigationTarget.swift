@@ -100,18 +100,15 @@ enum NavigationTarget: String, CaseIterable {
     var fittingWindowSize: CGSize {
         let width = 680
         let height = switch self {
-        case .general: 180
+        case .general: 250
         case .displayAndInteraction: 320
-        case .server: 430
-        case .library: 530
-        case .player: 260
-        case .swipe: 340
-        case .artwork: 210
-        case .support: 340
-        #if DEBUG
-        case .developer: 84
-        #endif
-        default: 300
+        case .server: 480
+        case .library: 620
+        case .player: 350
+        case .swipe: 450
+        case .artwork: 280
+        case .support: 400
+        default: 400
         }
         return CGSize(width: width, height: height)
     }
