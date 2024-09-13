@@ -465,11 +465,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ]
 
         var section2 = [
-            UIMenu(title: "Repeat", children: RepeatMode.allCases.map { mode in
-                UIAction(title: mode.description, state: mode == self.player.repeatMode ? .on : .off) { _ in
-                    self.player.setRepeatMode(mode)
-                }
-            }),
             UIMenu(title: "Playback Rate", children: PlaybackRate.allCases.map { rate in
                 UIAction(title: rate.description, state: rate == self.player.playbackRate ? .on : .off) { _ in
                     self.player.setPlaybackRate(rate)
@@ -477,7 +472,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             })
         ]
 
-        if (appDelegate.storage.settings.isPlayerShuffleButtonEnabled) {
+        if appDelegate.player.playerMode == .music {
+            let repeatMenu = UIMenu(title: "Repeat", children: RepeatMode.allCases.map { mode in
+                UIAction(title: mode.description, state: mode == self.player.repeatMode ? .on : .off) { _ in
+                    self.player.setRepeatMode(mode)
+                }
+            })
+            section2.insert(repeatMenu, at: 0)
+        }
+        if appDelegate.player.playerMode == .music, appDelegate.storage.settings.isPlayerShuffleButtonEnabled {
             let shuffleMenu = UIMenu(title: "Shuffle", children: [
                 UIAction(title: "On", state: isShuffle ? .on : .off) { [weak self] _ in self?.keyCommandShuffleOn() },
                 UIAction(title: "Off", state: !isShuffle ? .on : .off) { [weak self] _ in self?.keyCommandShuffleOff() }
