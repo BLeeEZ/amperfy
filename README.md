@@ -1,14 +1,26 @@
 # ![Logo](https://github.com/BLeeEZ/amperfy/blob/master/AmperfyKit/Assets/Assets.xcassets/AppIcon.appiconset/Icon-40.png) Amperfy
 
-<a href="https://apps.apple.com/app/amperfy-music/id1530145038#?platform=iphone"><img src=".github/AppStore/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg" height="45" /></a>
-
 ## Basics
 
-Amperfy is an iOS app written in Swift to interact with an [Ampache](http://ampache.github.io) or [Subsonic](http://www.subsonic.org) server.
+Amperfy is an iOS/iPadOS/macOS app written in Swift to interact with an [Ampache](http://ampache.github.io) or [Subsonic](http://www.subsonic.org) server.
+
+### iOS
+
+<a href="https://apps.apple.com/app/amperfy-music/id1530145038#?platform=iphone">
+  <img src=".github/AppStore/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg" height="45" />
+</a>
 
 <img src=".github/Screenshots/Player.jpg" width="250" alt="Screenshot of the Amperfy player" /> &nbsp;
 <img src=".github/Screenshots/AlbumDetail.jpg" width="250" alt="Screenshot of the Amperfy artist detail view" /> &nbsp;
 <img src=".github/Screenshots/Library.jpg" width="250" alt="Screenshot of the Amperfy library view" />
+
+### macOS
+
+<a href="https://apps.apple.com/app/amperfy-music/id1530145038#?platform=mac">
+  <img src=".github/AppStore/Download_on_the_Mac_App_Store_Badge_US-UK_RGB_blk_092917.svg" height="45" />
+</a>
+
+<img src=".github/Screenshots/macOS-Playlist.png" width="750" alt="Screenshot of the Amperfy playlist view in macOS" />
 
 ## Features
 
