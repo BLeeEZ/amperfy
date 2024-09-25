@@ -3052,7 +3052,7 @@
 			repositoryURL = "https://github.com/LeoNatan/LNPopupController";
 			requirement = {
 				kind = exactVersion;
-				version = 2.18.4;
+				version = 2.19.6;
 			};
 		};
 		507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
