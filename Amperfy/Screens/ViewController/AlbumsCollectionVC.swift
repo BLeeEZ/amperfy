@@ -232,7 +232,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     func createCell(_ collectionView: UICollectionView, forItemAt indexPath: IndexPath, album: Album) -> UICollectionViewCell {
         let cell: AlbumCollectionCell = collectionView.dequeueReusableCell(withReuseIdentifier: AlbumCollectionCell.typeName, for: indexPath) as! AlbumCollectionCell
         if let album = (diffableDataSource as? AlbumsCollectionDiffableDataSource)?.getAlbum(at: indexPath) {
-            cell.display(container: album, rootView: self)
+            cell.display(container: album, rootView: self, rootFlowLayout: self, initialIndexPath: indexPath)
         }
         return cell
     }
