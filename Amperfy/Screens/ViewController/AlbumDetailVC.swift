@@ -28,8 +28,8 @@ class AlbumDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
         return false
     }
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return false
+        // Return true to be enable swipe
+        return true
     }
 }
 
