@@ -111,7 +111,23 @@ class SlideOverHostingController: UIViewController {
         super.viewWillAppear(animated)
         self.setupToolbar()
     }
-
+    
+    private lazy var skipBackwardBarButton: UIBarButtonItem = {
+        let player = appDelegate.player
+        return SkipBackwardBarButton(player: player)
+    }()
+    private lazy var previousBarButton: UIBarButtonItem = {
+        let player = appDelegate.player
+        return PreviousBarButton(player: player)
+    }()
+    private lazy var nextBarButton: UIBarButtonItem = {
+        let player = appDelegate.player
+        return NextBarButton(player: player)
+    }()
+    private lazy var skipForwardBarButton: UIBarButtonItem = {
+        let player = appDelegate.player
+        return SkipForwardBarButton(player: player)
+    }()
     private lazy var shuffleButton: UIBarButtonItem = {
         let player = appDelegate.player
         return ShuffleBarButton(player: player)
@@ -139,9 +155,11 @@ class SlideOverHostingController: UIViewController {
                 SpaceBarItem(fixedSpace: defaultSpacing),
                 self.shuffleButton,
                 self.shufflePlaceholderButton,
-                PreviousBarButton(player: player),
+                self.skipBackwardBarButton,
+                self.previousBarButton,
                 PlayBarButton(player: player),
-                NextBarButton(player: player),
+                self.nextBarButton,
+                self.skipForwardBarButton,
                 self.repeatButton,
                 self.repeatPlaceholderButton,
                 SpaceBarItem(minSpace: defaultSpacing),
@@ -163,12 +181,30 @@ class SlideOverHostingController: UIViewController {
 
         if #available(macCatalyst 16.0, *) {
             // We can not remove toolbar items in `mac` style, therefore we hide them
+            self.skipBackwardBarButton.isHidden = appDelegate.player.playerMode == .music
+            self.previousBarButton.isHidden = appDelegate.player.playerMode == .podcast
+            self.nextBarButton.isHidden = appDelegate.player.playerMode == .podcast
+            self.skipForwardBarButton.isHidden = appDelegate.player.playerMode == .music
+            
             self.shuffleButton.isHidden = !isShuffleEnabled
             self.shufflePlaceholderButton.isHidden = isShuffleEnabled
             self.repeatButton.isHidden = !isRepeatEnabled
             self.repeatPlaceholderButton.isHidden = isRepeatEnabled
         } else {
             // Below 16.0 there is no `mac` style and .isHidden is not available.
+            if let index = self.navigationItem.leftBarButtonItems?.firstIndex(of: self.skipBackwardBarButton) {
+                self.navigationItem.leftBarButtonItems?.remove(at: index)
+            }
+            if let index = self.navigationItem.leftBarButtonItems?.firstIndex(of: self.previousBarButton) {
+                self.navigationItem.leftBarButtonItems?.remove(at: index)
+            }
+            if let index = self.navigationItem.leftBarButtonItems?.firstIndex(of: self.nextBarButton) {
+                self.navigationItem.leftBarButtonItems?.remove(at: index)
+            }
+            if let index = self.navigationItem.leftBarButtonItems?.firstIndex(of: self.skipForwardBarButton) {
+                self.navigationItem.leftBarButtonItems?.remove(at: index)
+            }
+            
             if let index = self.navigationItem.leftBarButtonItems?.firstIndex(of: self.shuffleButton) {
                 self.navigationItem.leftBarButtonItems?.remove(at: index)
             }
@@ -186,6 +222,15 @@ class SlideOverHostingController: UIViewController {
                 self.navigationItem.leftBarButtonItems?.insert(self.shuffleButton, at: 1)
             } else {
                 self.navigationItem.leftBarButtonItems?.insert(self.shufflePlaceholderButton, at: 1)
+            }
+            
+            switch appDelegate.player.playerMode {
+            case .music:
+                self.navigationItem.leftBarButtonItems?.insert(self.previousBarButton, at: 2)
+                self.navigationItem.leftBarButtonItems?.insert(self.nextBarButton, at: 4)
+            case .podcast:
+                self.navigationItem.leftBarButtonItems?.insert(self.skipBackwardBarButton, at: 2)
+                self.navigationItem.leftBarButtonItems?.insert(self.skipForwardBarButton, at: 4)
             }
             
             if (isRepeatEnabled) {

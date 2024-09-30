@@ -165,6 +165,23 @@ extension PlayerFacade {
     public var skipBackwardPodcastInterval: Double { return 15.0 }
     public var skipForwardMusicInterval: Double { return 10.0 }
     public var skipBackwardMusicInterval: Double { return 10.0 }
+    
+    public var skipForwardInterval: Double {
+        switch self.playerMode {
+        case .music:
+            return skipForwardMusicInterval
+        case .podcast:
+            return skipForwardPodcastInterval
+        }
+    }
+    public var skipBackwardInterval: Double {
+        switch self.playerMode {
+        case .music:
+            return skipBackwardMusicInterval
+        case .podcast:
+            return skipBackwardPodcastInterval
+        }
+    }
 }
 
 class PlayerFacadeImpl: PlayerFacade {

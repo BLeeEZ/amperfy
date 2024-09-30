@@ -442,6 +442,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     @objc private func keyCommandPrevious() {
         self.player.playPreviousOrReplay()
     }
+    
+    @objc private func keyCommandSkipForward() {
+        player.skipForward(interval: player.skipForwardInterval)
+    }
+    
+    @objc private func keyCommandSkipBackward() {
+        player.skipBackward(interval: player.skipBackwardInterval)
+    }
 
     @objc private func keyCommandShuffleOn() {
         guard !self.player.isShuffle else { return }
@@ -462,6 +470,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UIKeyCommand(title: "Stop", action: #selector(self.keyCommandStop), input: ".", modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
             UIKeyCommand(title: "Next Track", action: #selector(self.keyCommandNext), input: UIKeyCommand.inputRightArrow, modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
             UIKeyCommand(title: "Previous Track", action: #selector(self.keyCommandPrevious), input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
+            UIKeyCommand(title: "Skip Forward: " + Int(self.player.skipForwardInterval).description + " sec.", action: #selector(self.keyCommandSkipForward), input: UIKeyCommand.inputRightArrow, modifierFlags: [.shift, .command], attributes: isPlaying ? [] : [.disabled]),
+            UIKeyCommand(title: "Skip Backward: " + Int(self.player.skipBackwardInterval).description + " sec.", action: #selector(self.keyCommandSkipBackward), input: UIKeyCommand.inputLeftArrow, modifierFlags: [.shift, .command], attributes: isPlaying ? [] : [.disabled]),
         ]
 
         var section2 = [

@@ -141,6 +141,60 @@ class PreviousBarButton: ControlBarButton {
     }
 }
 
+class SkipBackwardBarButton: ControlBarButton {
+    override var title: String? {
+        get { return "Skip Backward" }
+        set { }
+    }
+
+    init(player: PlayerFacade) {
+        super.init(player: player, image: .skipBackward15)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func createInUIButton(config: UIButton.Configuration, size: CGSize) -> UIButton? {
+        // Increase the highlighted area
+        var newSize = size
+        newSize.width = 38
+        return super.createInUIButton(config: config, size: newSize)
+    }
+
+    override func clicked(_ sender: UIButton) {
+        guard let player = player else { return }
+        player.skipForward(interval: player.skipBackwardInterval)
+    }
+}
+
+class SkipForwardBarButton: ControlBarButton {
+    override var title: String? {
+        get { return "Skip Forward" }
+        set { }
+    }
+
+    init(player: PlayerFacade) {
+        super.init(player: player, image: .skipForward30)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func createInUIButton(config: UIButton.Configuration, size: CGSize) -> UIButton? {
+        // Increase the highlighted area
+        var newSize = size
+        newSize.width = 38
+        return super.createInUIButton(config: config, size: newSize)
+    }
+
+    override func clicked(_ sender: UIButton) {
+        guard let player = player else { return }
+        player.skipForward(interval: player.skipForwardInterval)
+    }
+}
+
 class ShuffleBarButton: ControlBarButton {
     override var title: String? {
         get { return "Shuffle" }
