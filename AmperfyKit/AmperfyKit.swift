@@ -83,6 +83,7 @@ public class AmperKit {
         let queueHandler = PlayQueueHandler(playerData: playerData)
         let curPlayer = AudioPlayer(coreData: playerData, queueHandler: queueHandler, backendAudioPlayer: backendAudioPlayer, settings: storage.settings, userStatistics: userStatistics)
         audioSessionHandler.musicPlayer = curPlayer
+        audioSessionHandler.eventLogger = eventLogger
         audioSessionHandler.configureObserverForAudioSessionInterruption()
         
         let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(playerStatus: playerData, queueHandler: queueHandler, playableDownloadManager: playableDownloadManager)
