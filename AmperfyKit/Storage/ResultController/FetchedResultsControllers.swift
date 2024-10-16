@@ -435,25 +435,61 @@ public class ArtistAlbumsItemsFetchedResultsController: BasicFetchedResultsContr
 public class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsController<SongMO> {
 
     let artist: Artist
+    let displayFilter: ArtistCategoryFilter
     
-    public init(for artist: Artist, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
+    public init(for artist: Artist, displayFilter: ArtistCategoryFilter, coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         self.artist = artist
+        self.displayFilter = displayFilter
         let fetchRequest = SongMO.alphabeticSortedFetchRequest
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-            coreDataCompanion.library.getFetchPredicate(forArtist: artist)
-        ])
+        switch self.displayFilter {
+        case .all, .favorites:
+            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+                coreDataCompanion.library.getFetchPredicate(forArtist: artist)
+            ])
+        case .albumArtists:
+            fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+                NSCompoundPredicate(andPredicateWithSubpredicates: [
+                    SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+                    coreDataCompanion.library.getFetchPredicate(forArtist: artist)
+                ]),
+                NSCompoundPredicate(andPredicateWithSubpredicates: [
+                    SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+                    coreDataCompanion.library.getFetchPredicate(forSongsOfArtistWithCommonAlbum: artist)
+                ])
+            ])
+        }
+
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
     public func search(searchText: String, onlyCachedSongs: Bool) {
         if searchText.count > 0 || onlyCachedSongs {
-            let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-                coreDataCompanion.library.getFetchPredicate(forArtist: artist),
-                SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
-                coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
-            ])
+            var predicate = NSCompoundPredicate()
+            switch self.displayFilter {
+            case .all, .favorites:
+                predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                    SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+                    coreDataCompanion.library.getFetchPredicate(forArtist: artist),
+                    SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                    coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+                ])
+            case .albumArtists:
+                predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+                    NSCompoundPredicate(andPredicateWithSubpredicates: [
+                        SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+                        coreDataCompanion.library.getFetchPredicate(forArtist: artist),
+                        SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                        coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+                    ]),
+                    NSCompoundPredicate(andPredicateWithSubpredicates: [
+                        SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+                        coreDataCompanion.library.getFetchPredicate(forSongsOfArtistWithCommonAlbum: artist),
+                        SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+                        coreDataCompanion.library.getFetchPredicate(onlyCachedSongs: onlyCachedSongs)
+                    ])
+                ])
+            }
             search(predicate: predicate)
         } else {
             showAllResults()

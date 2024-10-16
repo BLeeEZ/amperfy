@@ -35,12 +35,14 @@ public struct DetailInfoType {
     public var isShowDetailedInfo: Bool
     public var isShowAlbumDuration: Bool
     public var isShowArtistDuration: Bool
-    
+    public var artistFilterSetting: ArtistCategoryFilter
+
     public init(type: DetailType, settings: PersistentStorage.Settings) {
         self.type = type
         self.isShowDetailedInfo = settings.isShowDetailedInfo
         self.isShowAlbumDuration = settings.isShowAlbumDuration
         self.isShowArtistDuration = settings.isShowArtistDuration
+        self.artistFilterSetting = settings.artistsFilterSetting
     }
 }
 

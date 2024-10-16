@@ -43,7 +43,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
 
         albumsFetchedResultsController = ArtistAlbumsItemsFetchedResultsController(for: artist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         albumsFetchedResultsController.delegate = self
-        songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(for: artist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
+        songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(for: artist, displayFilter: appDelegate.storage.settings.artistsFilterSetting, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
         songsFetchedResultsController.delegate = self
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.register(nibName: PlayableTableCell.typeName)

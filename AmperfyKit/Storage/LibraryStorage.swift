@@ -608,6 +608,10 @@ public class LibraryStorage: PlayableFileCachable {
         }
     }
     
+    func getFetchPredicate(forSongsOfArtistWithCommonAlbum artist: Artist) -> NSPredicate {
+        return NSPredicate(format: "%K == %@", #keyPath(SongMO.album.artist), artist.managedObject.objectID)
+    }
+    
     func getFetchPredicate(onlyCachedPlaylistItems: Bool) -> NSPredicate {
         if onlyCachedPlaylistItems {
             return NSPredicate(format: "%K != nil", #keyPath(PlaylistItemMO.playable.relFilePath))
@@ -958,6 +962,26 @@ public class LibraryStorage: PlayableFileCachable {
         let found = try? context.fetch(fetchRequest)
         let wrapped = found?.compactMap{ Song(managedObject: $0) }
         return wrapped ?? [Song]()
+    }
+    
+    
+    public func getSongs(whichContainsSongsWithArtist artist: Artist, onlyCached: Bool = false) -> [Song] {
+        let fetchRequest = SongMO.identifierSortedFetchRequest
+        fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+            NSCompoundPredicate(andPredicateWithSubpredicates: [
+                SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+                getFetchPredicate(forArtist: artist),
+                getFetchPredicate(onlyCachedSongs: onlyCached)
+            ]),
+            NSCompoundPredicate(andPredicateWithSubpredicates: [
+                SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+                getFetchPredicate(forSongsOfArtistWithCommonAlbum: artist),
+                getFetchPredicate(onlyCachedSongs: onlyCached)
+            ])
+        ])
+        let foundSongs = try? context.fetch(fetchRequest)
+        let songs = foundSongs?.compactMap{ Song(managedObject: $0) }
+        return songs ?? [Song]()
     }
     
     public func getRandomSongs(count: Int = 100, onlyCached: Bool) -> [Song] {

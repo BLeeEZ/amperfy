@@ -130,7 +130,16 @@ extension Artist: PlayableContainable  {
             infoContent.append("\(albumCount) Albums")
         }
         
-        if songs.count == 1 {
+        if details.artistFilterSetting == .albumArtists,
+           let managedObjectContext = managedObject.managedObjectContext {
+            let library = LibraryStorage(context: managedObjectContext)
+            let relatedSongsCount = library.getSongs(whichContainsSongsWithArtist: self).count
+            if relatedSongsCount == 1 {
+                infoContent.append("1 Song")
+            } else if relatedSongsCount > 1 {
+                infoContent.append("\(relatedSongsCount) Songs")
+            }
+        } else if songs.count == 1 {
             infoContent.append("1 Song")
         } else if songs.count > 1 {
             infoContent.append("\(songCount) Songs")
