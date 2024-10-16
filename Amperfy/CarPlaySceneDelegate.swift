@@ -245,7 +245,9 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             let item = CPListItem(text: "Music", detailText: "", image: UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .none)
             item.handler = { [weak self] item, completion in
                 guard let `self` = self else { completion(); return }
-                appDelegate.player.setPlayerMode(.music)
+                if appDelegate.player.playerMode != .music {
+                    appDelegate.player.setPlayerMode(.music)
+                }
                 appDelegate.player.play()
                 self.displayNowPlaying { completion() }
             }
@@ -255,7 +257,9 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             let item = CPListItem(text: "Podcasts", detailText: "", image: UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: .none)
             item.handler = { [weak self] item, completion in
                 guard let `self` = self else { completion(); return }
-                appDelegate.player.setPlayerMode(.podcast)
+                if appDelegate.player.playerMode != .podcast {
+                    appDelegate.player.setPlayerMode(.podcast)
+                }
                 appDelegate.player.play()
                 self.displayNowPlaying { completion() }
             }
