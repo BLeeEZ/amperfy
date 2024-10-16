@@ -34,6 +34,8 @@ class NowPlayingInfoCenterHandler {
         self.backendAudioPlayer = backendAudioPlayer
         self.nowPlayingInfoCenter = nowPlayingInfoCenter
         self.storage = storage
+        
+        nowPlayingInfoCenter.playbackState = .stopped
     }
 
     func updateNowPlayingInfo(playable: AbstractPlayable) {
@@ -70,6 +72,7 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
         if let curPlayable = musicPlayer.currentlyPlaying {
             updateNowPlayingInfo(playable: curPlayable)
         }
+        nowPlayingInfoCenter.playbackState = .playing
     }
     
     func didPause() {
@@ -77,10 +80,12 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
             updateNowPlayingInfo(playable: curPlayable)
         }
         nowPlayingInfoCenter.nowPlayingInfo = [:]
+        nowPlayingInfoCenter.playbackState = .paused
     }
     
     func didStopPlaying() {
         nowPlayingInfoCenter.nowPlayingInfo = nil
+        nowPlayingInfoCenter.playbackState = .stopped
     }
     
     func didElapsedTimeChange() {
