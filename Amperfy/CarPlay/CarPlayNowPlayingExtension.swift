@@ -33,14 +33,14 @@ extension CarPlaySceneDelegate {
                 self.appDelegate.player.setRepeatMode(self.appDelegate.player.repeatMode.nextMode)
             })
         )
-        buttons.append(
-            CPNowPlayingShuffleButton(handler: { [weak self] button in
-                guard let `self` = self else { return }
-                self.appDelegate.player.toggleShuffle()
-            })
-        )
         if appDelegate.player.playerMode == .music {
-            let isFavorite =  appDelegate.player.currentlyPlaying?.isFavorite ?? false
+            buttons.append(
+                CPNowPlayingShuffleButton(handler: { [weak self] button in
+                    guard let `self` = self else { return }
+                    self.appDelegate.player.toggleShuffle()
+                })
+            )
+            let isFavorite = appDelegate.player.currentlyPlaying?.isFavorite ?? false
             buttons.append(
                 CPNowPlayingImageButton(image: isFavorite ? .heartFill : .heartEmpty, handler: { [weak self] button in
                     guard let `self` = self else { return }
