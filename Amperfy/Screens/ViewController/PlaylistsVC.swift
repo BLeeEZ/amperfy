@@ -103,9 +103,11 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
 
     func updateRightBarButtonItems() {
+        var actions = [UIMenu]()
+        actions.append(createSortButtonMenu())
+        actions.append(createOptionsButtonMenu())
+        optionsButton.menu = UIMenu(children: actions)
         #if targetEnvironment(macCatalyst)
-        optionsButton.menu = createSortButtonMenu()
-
         navigationItem.leftItemsSupplementBackButton = true
         navigationItem.rightBarButtonItem = optionsButton
         if appDelegate.storage.settings.isOnlineMode {
@@ -113,7 +115,6 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
         #else
         var barButtons = [UIBarButtonItem]()
-        optionsButton.menu = createSortButtonMenu()
         barButtons.append(optionsButton)
         if appDelegate.storage.settings.isOnlineMode {
             barButtons.append(editButtonItem)
@@ -178,6 +179,27 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
             self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         return UIMenu(title: "Sort", image: .sort, options: [.displayInline], children: [sortByName, sortByLastTimePlayed, sortByChangeDate, sortByDuration])
+    }
+    
+    private func createOptionsButtonMenu() -> UIMenu {
+        let fetchAllPlaylists = UIAction(title: "Sync All Playlists", image: .refresh, handler: { _ in
+            self.appDelegate.storage.async.perform { asyncCompanion in
+                let playlists = asyncCompanion.library.getPlaylists()
+                firstly {
+                    let playlistPromises: [() -> Promise<Void>] = playlists.compactMap { playlist in return {
+                        firstly {
+                            playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                        }
+                    }}
+                    return playlistPromises.resolveSequentially()
+                }.done {
+                    self.appDelegate.eventLogger.info(topic: "Sync All Playlists", message: "All playlists have been synced.")
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Sync All Playlists", error: error)
+                }
+            }.catch { error in }
+        })
+        return UIMenu(title: "Options", image: .sort, options: [.displayInline], children: [fetchAllPlaylists])
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
