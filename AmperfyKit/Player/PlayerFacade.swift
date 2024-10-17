@@ -295,6 +295,7 @@ class PlayerFacadeImpl: PlayerFacade {
         musicPlayer.stopButRemainIndex()
         playerStatus.playerMode = newValue
         musicPlayer.notifyPlaylistUpdated()
+        musicPlayer.activateSongContinueProgress()
     }
     
     var streamingMaxBitrates: StreamingMaxBitrates {

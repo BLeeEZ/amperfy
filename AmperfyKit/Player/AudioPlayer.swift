@@ -40,6 +40,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         return queueHandler.currentPodcastItem
     }
     var isShouldPauseAfterFinishedPlaying = false
+    private var isContinueSongProgress = true
 
     private var playerStatus: PlayerStatusPersistent
     private var queueHandler: PlayQueueHandler
@@ -140,6 +141,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
             stop()
             return
         }
+        isContinueSongProgress = false
         insertIntoPlayer(playable: playable)
     }
     
@@ -182,6 +184,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     
     //BackendAudioPlayerNotifiable
     func stop() {
+        isContinueSongProgress = false
         backendAudioPlayer.stop()
         playerStatus.stop()
         notifyPlayerStopped()
@@ -190,6 +193,10 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     func stopButRemainIndex() {
         backendAudioPlayer.stop()
         notifyPlayerStopped()
+    }
+    
+    func activateSongContinueProgress() {
+        isContinueSongProgress = true
     }
     
     func togglePlayPause() {
@@ -201,9 +208,12 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     }
     
     private func seekToLastStoppedPlayTime() {
-        if let playable = currentlyPlaying, playable.isPodcastEpisode, playable.playProgress > 0 {
+        if let playable = currentlyPlaying,
+           playable.playProgress > 0,
+           playable.isPodcastEpisode || isContinueSongProgress {
             backendAudioPlayer.seek(toSecond: Double(playable.playProgress))
         }
+        isContinueSongProgress = false
     }
 
     //BackendAudioPlayerNotifiable
