@@ -20,8 +20,6 @@
 //
 
 import Foundation
-
-import Foundation
 import UIKit
 
 public enum LibraryDisplayType: Int, CaseIterable {
@@ -43,31 +41,31 @@ public enum LibraryDisplayType: Int, CaseIterable {
     public var displayName: String {
         switch self {
         case .artists:
-            return "Artists"
+            return String.artists
         case .albums:
-            return "Albums"
+            return String.albums
         case .songs:
-            return "Songs"
+            return String.songs
         case .genres:
-            return "Genres"
+            return String.genres
         case .directories:
-            return "Directories"
+            return String.directories
         case .playlists:
-            return "Playlists"
+            return String.playlists
         case .podcasts:
-            return "Podcasts"
+            return String.podcasts
         case .downloads:
-            return "Downloads"
+            return String.downloads
         case .favoriteSongs:
-            return "Favorite Songs"
+            return String.favoriteSongs
         case .favoriteAlbums:
-            return "Favorite Albums"
+            return String.favoriteAlbums
         case .favoriteArtists:
-            return "Favorite Artists"
+            return String.favoriteArtists
         case .newestAlbums:
-            return "Newest Albums"
+            return String.newestAlbums
         case .recentAlbums:
-            return "Recently Played Albums"
+            return String.recentlyPlayedAlbums
         }
     }
 
