@@ -144,7 +144,7 @@ class RemoteCommandCenterHandler {
 #endif
         
         remoteCommandCenter.likeCommand.isEnabled = true
-        remoteCommandCenter.likeCommand.localizedTitle = NSLocalizedString("Favorite", comment: "Marks the currently playing element as favorite")
+        remoteCommandCenter.likeCommand.localizedTitle = String.favorite
         remoteCommandCenter.likeCommand.addTarget(handler: { (event) in
             guard let command = event as? MPFeedbackCommandEvent,
                   let currentItem = self.musicPlayer.currentlyPlaying,

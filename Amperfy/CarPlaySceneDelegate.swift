@@ -314,9 +314,9 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     var playlistDetailFetchController: PlaylistItemsFetchedResultsController?
     var podcastDetailFetchController: PodcastEpisodesFetchedResultsController?
     
-    static let queueButtonText = NSLocalizedString("Queue", comment: "Button title on CarPlay player to display queue")
+    static let queueButtonText = String.queue
     
-
+    
     private func createArtistItems(from fetchedController: BasicFetchedResultsController<ArtistMO>?, onlyCached: Bool) -> [CPListTemplateItem] {
         var items = [CPListTemplateItem]()
         guard let fetchedController = fetchedController else { return items }

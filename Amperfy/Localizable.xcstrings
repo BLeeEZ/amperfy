@@ -69,6 +69,24 @@
         }
       }
     },
+    "favorite" : {
+      "comment" : "Marks the currently playing element as favorite",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorite"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorito"
+          }
+        }
+      }
+    },
     "favorite_albums" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -188,6 +206,24 @@
         }
       }
     },
+    "queue" : {
+      "comment" : "Button title on CarPlay player to display queue",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queue"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coda"
+          }
+        }
+      }
+    },
     "recently_played_albums" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -221,7 +257,7 @@
           }
         }
       }
-    },
+    }
   },
   "version" : "1.0"
 }

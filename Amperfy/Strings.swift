@@ -21,9 +21,8 @@
 
 import Foundation
 
-
 // for iOS15+ use String(localized: "key")
-// otherwise use NSLocalizedString("key", comment: "comment")
+// otherwise use NSLocalizedString("artists", comment: "artists")
 extension String {
     static let artists = String(localized: "artists")
     static let albums = String(localized:"albums")
@@ -38,4 +37,6 @@ extension String {
     static let favoriteArtists = String(localized:"favorite_artists")
     static let newestAlbums = String(localized:"newest_albums")
     static let recentlyPlayedAlbums = String(localized:"recently_played_albums")
+    static let queue = String(localized: "queue")
+    static let favorite = String(localized: "favorite")
 }
