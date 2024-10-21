@@ -41,13 +41,16 @@ enum PlayType {
     case cache
 }
 
+public typealias CreateAVPlayerCallback = () -> AVPlayer
+
 class BackendAudioPlayer: NSObject {
     
     private let playableDownloader: DownloadManageable
     private let cacheProxy: PlayableFileCachable
     private let backendApi: BackendApi
     private let userStatistics: UserStatistics
-    private let player: AVPlayer
+    private let createAVPlayerCB: CreateAVPlayerCallback
+    private var player: AVPlayer
     private let eventLogger: EventLogger
     private let networkMonitor: NetworkMonitorFacade
     private let updateElapsedTimeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
@@ -99,8 +102,9 @@ class BackendAudioPlayer: NSObject {
         return player.currentItem != nil
     }
     
-    init(mediaPlayer: AVPlayer, audioSessionHandler: AudioSessionHandler, eventLogger: EventLogger, backendApi: BackendApi, networkMonitor: NetworkMonitorFacade, playableDownloader: DownloadManageable, cacheProxy: PlayableFileCachable, userStatistics: UserStatistics) {
-        self.player = mediaPlayer
+    init(createAVPlayerCB: @escaping CreateAVPlayerCallback, audioSessionHandler: AudioSessionHandler, eventLogger: EventLogger, backendApi: BackendApi, networkMonitor: NetworkMonitorFacade, playableDownloader: DownloadManageable, cacheProxy: PlayableFileCachable, userStatistics: UserStatistics) {
+        self.createAVPlayerCB = createAVPlayerCB
+        self.player = createAVPlayerCB()
         self.audioSessionHandler = audioSessionHandler
         self.backendApi = backendApi
         self.networkMonitor = networkMonitor
@@ -110,8 +114,13 @@ class BackendAudioPlayer: NSObject {
         self.userStatistics = userStatistics
         
         super.init()
-
-        self.player.allowsExternalPlayback = false // Disable video transmission via AirPlay -> only audio
+        
+        initAVPlayer()
+    }
+    
+    private func initAVPlayer() {
+        player = createAVPlayerCB()
+        player.allowsExternalPlayback = false // Disable video transmission via AirPlay -> only audio
         player.addPeriodicTimeObserver(forInterval: updateElapsedTimeInterval, queue: DispatchQueue.main) { [weak self] time in
             if let self = self {
                 self.responder?.didElapsedTimeChange()
@@ -229,7 +238,7 @@ class BackendAudioPlayer: NSObject {
     private func clearPlayer() {
         playType = nil
         player.pause()
-        replacePlayerItem(item: nil)
+        removeOldObserversAndReinitPlayer(item: nil)
     }
     
     private func insertCachedPlayable(playable: AbstractPlayable) {
@@ -258,7 +267,7 @@ class BackendAudioPlayer: NSObject {
         player.pause()
         audioSessionHandler.configureBackgroundPlayback()
 
-        replacePlayerItem(item: nil)
+        removeOldObserversAndReinitPlayer(item: nil)
         var item: AVPlayerItem?
         if let mimeType = playable.iOsCompatibleContentType {
             let asset: AVURLAsset = AVURLAsset(url: url, options: ["AVURLAssetOutOfBandMIMETypeKey" : mimeType])
@@ -267,17 +276,21 @@ class BackendAudioPlayer: NSObject {
             item = AVPlayerItem(url: url)
         }
         item?.preferredPeakBitRate = streamingMaxBitrate.asBitsPerSecondAV
-        replacePlayerItem(item: item)
+        removeOldObserversAndReinitPlayer(item: item)
         NotificationCenter.default.addObserver(self, selector: #selector(itemFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(itemPlaybackStalled(_:)), name: NSNotification.Name.AVPlayerItemPlaybackStalled, object: player.currentItem)
         item?.addObserver(self, forKeyPath: "status", options: .new, context: nil)
     }
     
-    private func replacePlayerItem(item: AVPlayerItem?) {
+    private func removeOldObserversAndReinitPlayer(item: AVPlayerItem?) {
         NotificationCenter.default.removeObserver(self, name: Notification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
         NotificationCenter.default.removeObserver(self, name: Notification.Name.AVPlayerItemPlaybackStalled, object: player.currentItem)
         player.currentItem?.removeObserver(self, forKeyPath: "status", context: nil)
-        player.replaceCurrentItem(with: item)
+        player.replaceCurrentItem(with: nil)
+        if let item = item {
+            initAVPlayer()
+            player.replaceCurrentItem(with: item)
+        }
     }
 
 }

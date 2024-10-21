@@ -73,7 +73,7 @@ public class AmperKit {
     public private(set) var scrobbleSyncer: ScrobbleSyncer?
     public lazy var player: PlayerFacade = {
         let audioSessionHandler = AudioSessionHandler()
-        let backendAudioPlayer = BackendAudioPlayer(mediaPlayer: AVPlayer(), audioSessionHandler: audioSessionHandler, eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
+        let backendAudioPlayer = BackendAudioPlayer(createAVPlayerCB: { return AVPlayer() }, audioSessionHandler: audioSessionHandler, eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: playableDownloadManager, cacheProxy: storage.main.library, userStatistics: userStatistics)
         networkMonitor.connectionTypeChangedCB = { isWiFiConnected in
             backendAudioPlayer.streamingMaxBitrates = StreamingMaxBitrates(
                 wifi: self.storage.settings.streamingMaxBitrateWifiPreference,

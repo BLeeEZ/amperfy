@@ -228,7 +228,7 @@ class MusicPlayerTest: XCTestCase {
         userStatistics = library.getUserStatistics(appVersion: "")
         backendApi = MOCK_BackendApi()
         networkMonitor = MOCK_NetworkMonitor()
-        backendPlayer = BackendAudioPlayer(mediaPlayer: mockAVPlayer, audioSessionHandler: AudioSessionHandler(), eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)
+        backendPlayer = BackendAudioPlayer(createAVPlayerCB: { return self.mockAVPlayer }, audioSessionHandler: AudioSessionHandler(), eventLogger: eventLogger, backendApi: backendApi, networkMonitor: networkMonitor, playableDownloader: songDownloader, cacheProxy: library, userStatistics: userStatistics)
         mockMusicPlayable = MOCK_MusicPlayable()
         playerData = library.getPlayerData()
         testQueueHandler = PlayQueueHandler(playerData: playerData)
