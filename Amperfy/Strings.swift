@@ -25,18 +25,26 @@ import Foundation
 // otherwise use NSLocalizedString("artists", comment: "artists")
 extension String {
     static let artists = String(localized: "artists")
-    static let albums = String(localized:"albums")
-    static let songs = String(localized:"songs")
-    static let genres = String(localized:"genres")
-    static let directories = String(localized:"directories")
-    static let playlists = String(localized:"playlists")
-    static let podcasts = String(localized:"podcasts")
-    static let downloads = String(localized:"downloads")
-    static let favoriteSongs = String(localized:"favorite_songs")
-    static let favoriteAlbums = String(localized:"favorite_albums")
-    static let favoriteArtists = String(localized:"favorite_artists")
-    static let newestAlbums = String(localized:"newest_albums")
-    static let recentlyPlayedAlbums = String(localized:"recently_played_albums")
-    static let queue = String(localized: "queue")
+    static let albums = String(localized: "albums")
+    
+    static let directories = String(localized: "directories")
+    static let downloads = String(localized: "downloads")
+    
     static let favorite = String(localized: "favorite")
+    static let favoriteAlbums = String(localized: "favorite_albums")
+    static let favoriteArtists = String(localized: "favorite_artists")
+    static let favoriteSongs = String(localized: "favorite_songs")
+
+    static let genres = String(localized: "genres")
+    
+    static let newestAlbums = String(localized: "newest_albums")
+
+    static let playlists = String(localized: "playlists")
+    static let podcasts = String(localized: "podcasts")
+
+    static let recentlyPlayedAlbums = String(localized: "recently_played_albums")
+    
+    static let songs = String(localized: "songs")
+
+    static let queue = String(localized: "queue")
 }
