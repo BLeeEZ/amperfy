@@ -37,6 +37,8 @@ extension String {
 
     static let genres = String(localized: "genres")
     
+    static let library = String(localized: "library")
+    
     static let newestAlbums = String(localized: "newest_albums")
 
     static let playlists = String(localized: "playlists")
@@ -44,6 +46,9 @@ extension String {
 
     static let recentlyPlayedAlbums = String(localized: "recently_played_albums")
     
+    static let search = String(localized: "search")
+    static let searchIn = String(localized: "search_in")
+    static let settings = String(localized: "settings")
     static let songs = String(localized: "songs")
 
     static let queue = String(localized: "queue")

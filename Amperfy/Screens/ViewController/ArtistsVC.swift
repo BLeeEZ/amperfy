@@ -37,7 +37,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     private var optionsButton: UIBarButtonItem!
     public var displayFilter: ArtistCategoryFilter = .all
     private var sortType: ArtistElementSortType = .name
-    private var filterTitle = "Artists"
+    private var filterTitle = String.artists
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,7 +48,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         applyFilter()
         change(sortType: appDelegate.storage.settings.artistsSortSetting)
         change(filterType: appDelegate.storage.settings.artistsFilterSetting)
-        configureSearchController(placeholder: "Search in \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
+        configureSearchController(placeholder: "\(String.searchIn) \"\(filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
         tableView.estimatedRowHeight = GenericTableCell.rowHeight
@@ -80,11 +80,11 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     func applyFilter() {
         switch displayFilter {
         case .all:
-            self.filterTitle = "Artists"
+            self.filterTitle = String.artists
         case .favorites:
-            self.filterTitle = "Favorite Artists"
+            self.filterTitle = String.favoriteArtists
         case .albumArtists:
-            self.filterTitle = "Album Artists"
+            self.filterTitle = String.recentlyPlayedAlbums
         }
         setNavBarTitle(title: self.filterTitle)
     }

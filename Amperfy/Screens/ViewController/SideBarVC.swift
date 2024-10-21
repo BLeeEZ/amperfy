@@ -26,12 +26,12 @@ class SideBarVC: KeyCommandCollectionViewController {
 
     private var offsetData: [LibraryNavigatorItem] = {
         #if targetEnvironment(macCatalyst)
-        return [LibraryNavigatorItem(title: "Search", tab: .search),
-                LibraryNavigatorItem(title: "Library", isInteractable: false)]
+        return [LibraryNavigatorItem(title: String.search, tab: .search),
+                LibraryNavigatorItem(title: String.library, isInteractable: false)]
         #else
-        return [LibraryNavigatorItem(title: "Search", tab: .search),
-                LibraryNavigatorItem(title: "Settings", tab: .settings),
-                LibraryNavigatorItem(title: "Library", isInteractable: false)]
+        return [LibraryNavigatorItem(title: String.search, tab: .search),
+                LibraryNavigatorItem(title: String.settings, tab: .settings),
+                LibraryNavigatorItem(title: String.library, isInteractable: false)]
         #endif
     }()
 

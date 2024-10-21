@@ -51,7 +51,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         optionsButton = OptionsBarButton()
 
         applyFilter()
-        configureSearchController(placeholder: "Search in \"\(self.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
+        configureSearchController(placeholder: "\(String.searchIn) \"\(self.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
         tableView.estimatedRowHeight = PlayableTableCell.rowHeight

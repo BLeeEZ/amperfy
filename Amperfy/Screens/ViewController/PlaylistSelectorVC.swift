@@ -44,7 +44,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         
         change(sortType: appDelegate.storage.settings.playlistsSortSetting)
         
-        configureSearchController(placeholder: "Search in \"Playlists\"", showSearchBarAtEnter: true)
+        configureSearchController(placeholder: "\(String.searchIn) \"Playlists\"", showSearchBarAtEnter: true)
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         tableView.estimatedRowHeight = PlaylistTableCell.rowHeight

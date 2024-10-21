@@ -58,7 +58,7 @@ enum NavigationTarget: String, CaseIterable {
         case .general: "General"
         case .displayAndInteraction: "Display & Interaction"
         case .server: "Server"
-        case .library: "Library"
+        case .library: String.library
         case .swipe: "Swipe"
         case .artwork: "Artwork"
         case .support: "Support"

@@ -226,7 +226,7 @@ struct LibrarySettingsView: View {
                 }
             }
         }
-        .navigationTitle("Library")
+        .navigationTitle(String.library)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             updateValues()

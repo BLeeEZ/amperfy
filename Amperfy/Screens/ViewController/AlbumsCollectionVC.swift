@@ -196,7 +196,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
         }
         
         common.applyFilter()
-        configureSearchController(placeholder: "Search in \"\(common.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
+        configureSearchController(placeholder: "\(String.searchIn) \"\(common.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         collectionView.register(UINib(nibName: CommonCollectionSectionHeader.typeName, bundle: .main), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CommonCollectionSectionHeader.typeName)
         collectionView.register(UINib(nibName: AlbumCollectionCell.typeName, bundle: .main), forCellWithReuseIdentifier: AlbumCollectionCell.typeName)
         

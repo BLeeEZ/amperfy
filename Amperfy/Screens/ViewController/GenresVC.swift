@@ -42,8 +42,8 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         fetchedResultsController = GenreFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: true)
         singleFetchedResultsController = fetchedResultsController
         
-        configureSearchController(placeholder: "Search in \"Genres\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
-        setNavBarTitle(title: "Genres")
+        configureSearchController(placeholder: "\(String.searchIn) \"\(String.genres)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
+        setNavBarTitle(title: String.genres)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeightWithoutImage
         tableView.estimatedRowHeight = GenericTableCell.rowHeightWithoutImage

@@ -46,8 +46,8 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         } else if appDelegate.backendApi.selectedApi == .subsonic {
             searchTiles = ["All", "Cached"]
         }
-        configureSearchController(placeholder: "Search in \"Playlists\"", scopeButtonTitles: searchTiles, showSearchBarAtEnter: true)
-        setNavBarTitle(title: "Playlists")
+        configureSearchController(placeholder: "\(String.searchIn) \"\(String.playlists)\"", scopeButtonTitles: searchTiles, showSearchBarAtEnter: true)
+        setNavBarTitle(title: String.playlists)
         tableView.register(nibName: PlaylistTableCell.typeName)
         tableView.rowHeight = PlaylistTableCell.rowHeight
         tableView.estimatedRowHeight = PlaylistTableCell.rowHeight

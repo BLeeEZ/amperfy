@@ -166,7 +166,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
         }
 
         common.applyFilter()
-        configureSearchController(placeholder: "Search in \"\(common.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
+        configureSearchController(placeholder: "\(String.searchIn) \"\(common.filterTitle)\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: GenericTableCell.typeName)
         tableView.rowHeight = GenericTableCell.rowHeight
         tableView.estimatedRowHeight = GenericTableCell.rowHeight
