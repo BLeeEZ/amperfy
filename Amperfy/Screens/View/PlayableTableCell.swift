@@ -97,8 +97,8 @@ class PlayableTableCell: BasicTableCell {
             playIndicator?.display(playable: playable, rootView: self.trackNumberLabel)
             trackNumberLabel.isHidden = false
             entityImage.isHidden = true
-            trackNumberTrailingTitleConstaint.priority = .defaultHigh
-            artworkTrailingTitleConstaint.priority = .defaultLow
+            trackNumberTrailingTitleConstaint.isActive = true
+            artworkTrailingTitleConstaint.isActive = false
         } else {
             playIndicator?.willDisplayIndicatorCB = nil
             playIndicator?.willHideIndicatorCB = nil
@@ -110,8 +110,8 @@ class PlayableTableCell: BasicTableCell {
             }
             trackNumberLabel.isHidden = true
             entityImage.isHidden = false
-            trackNumberTrailingTitleConstaint.priority = .defaultLow
-            artworkTrailingTitleConstaint.priority = .defaultHigh
+            trackNumberTrailingTitleConstaint.isActive = false
+            artworkTrailingTitleConstaint.isActive = true
         }
         
         if playerIndexCb != nil {
@@ -153,19 +153,19 @@ class PlayableTableCell: BasicTableCell {
         } else {
             if playable.isCached {
                 cacheIconImage.isHidden = false
-                labelTrailingCacheConstraint.priority = .defaultHigh
-                labelTrailingDurationConstraint.priority = .defaultLow
-                labelTrailingCellConstraint.priority = .defaultLow
+                labelTrailingCacheConstraint.isActive = true
+                labelTrailingDurationConstraint.isActive = false
+                labelTrailingCellConstraint.isActive = false
             } else if isDurationVisible {
                 cacheIconImage.isHidden = true
-                labelTrailingCacheConstraint.priority = .defaultLow
-                labelTrailingDurationConstraint.priority = .defaultHigh
-                labelTrailingCellConstraint.priority = .defaultLow
+                labelTrailingCacheConstraint.isActive = false
+                labelTrailingDurationConstraint.isActive = true
+                labelTrailingCellConstraint.isActive = false
             } else {
                 cacheIconImage.isHidden = true
-                labelTrailingCacheConstraint.priority = .defaultLow
-                labelTrailingDurationConstraint.priority = .defaultLow
-                labelTrailingCellConstraint.priority = .defaultHigh
+                labelTrailingCacheConstraint.isActive = false
+                labelTrailingDurationConstraint.isActive = false
+                labelTrailingCellConstraint.isActive = true
             }
         }
         
@@ -175,11 +175,11 @@ class PlayableTableCell: BasicTableCell {
         durationLabel.isHidden = !isDurationVisible
         if isDurationVisible {
             durationLabel.text = playable.duration.asColonDurationString
-            cacheTrailingDurationConstaint.priority = .defaultHigh
-            cacheTrailingCellConstaint.priority = .defaultLow
+            cacheTrailingDurationConstaint.isActive = true
+            cacheTrailingCellConstaint.isActive = false
         } else {
-            cacheTrailingDurationConstaint.priority = .defaultLow
-            cacheTrailingCellConstaint.priority = .defaultHigh
+            cacheTrailingDurationConstaint.isActive = false
+            cacheTrailingCellConstaint.isActive = true
         }
     }
     
