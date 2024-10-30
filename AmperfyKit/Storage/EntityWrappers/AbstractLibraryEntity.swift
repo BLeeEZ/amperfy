@@ -49,6 +49,10 @@ public class AbstractLibraryEntity {
         get { return managedObject.isFavorite }
         set { managedObject.isFavorite = newValue }
     }
+    public var starredDate: Date? {
+        get { return managedObject.starredDate }
+        set { if managedObject.starredDate != newValue { managedObject.starredDate = newValue } }
+    }
     public var rating: Int {
         get { return Int(managedObject.rating) }
         set {

@@ -99,6 +99,16 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
                     songBuffer?.genre = genre
                 }
             }
+            
+            if let starredDate = attributeDict["starred"] {
+                let dateFormatter = ISO8601DateFormatter()
+                dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                if let date = dateFormatter.date(from: starredDate) {
+                    songBuffer?.managedObject.starredDate = date
+                } else {
+                    songBuffer?.managedObject.starredDate = Date.distantPast
+                }
+            }
         }
         
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
