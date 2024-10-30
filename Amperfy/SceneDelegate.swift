@@ -59,8 +59,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.appDelegate.window = self.window
         var initialViewController: UIViewController?
 
+
         #if targetEnvironment(macCatalyst)
-        self.window?.windowScene?.sizeRestrictions?.minimumSize = Self.mainWindowSize
+
+        windowScene.sizeRestrictions?.minimumSize = Self.mainWindowSize
+
+        // Restore window size between restarts
+        AppDelegate.configureUtilityWindow(persistentIdentifier: windowScene.session.persistentIdentifier, properties: ["autosaveName": "mainWindow"])
 
         let splitVC = SplitVC.instantiateFromAppStoryboard()
 

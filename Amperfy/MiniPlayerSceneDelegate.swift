@@ -61,6 +61,7 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
         AppDelegate.configureUtilityWindow(
             persistentIdentifier: windowScene.session.persistentIdentifier,
             properties: [
+                "auxiliary": true,
                 "fullSizeContentView": true,
                 "miniaturizable": true,
                 "resizable": true,
