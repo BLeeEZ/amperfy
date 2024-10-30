@@ -89,7 +89,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         case .favorites:
             self.filterTitle = "Favorite Songs"
             self.isIndexTitelsHidden = false
-            change(sortType: appDelegate.storage.settings.songsSortSetting)
+            change(sortType: appDelegate.storage.settings.favoriteSortSetting)
         }
         setNavBarTitle(title: self.filterTitle)
     }
@@ -154,6 +154,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             return CommonScreenOperations.tableSectionHeightLarge
         case .duration:
             return 0.0
+        case .starredDate:
+            return 0.0
         }
     }
     
@@ -168,6 +170,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                 return "Not rated"
             }
         case .duration:
+            return nil
+        case .starredDate:
             return nil
         }
     }
@@ -201,6 +205,14 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         tableView.reloadData()
     }
     
+    private func saveSortPreference(preference: SongElementSortType) {
+        if displayFilter == .favorites {
+            self.appDelegate.storage.settings.favoriteSortSetting = preference
+        } else {
+            self.appDelegate.storage.settings.songsSortSetting = preference
+        }
+    }
+    
     private func handleHeaderPlay() -> PlayContext {
         guard let displayedSongsMO = self.fetchedResultsController.fetchedObjects else { return PlayContext(name: filterTitle, playables: []) }
         if displayedSongsMO.count > appDelegate.player.maxSongsToAddOnce {
@@ -226,23 +238,34 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     private func createSortButtonMenu() -> UIMenu {
         let sortByName = UIAction(title: "Name", image: sortType == .name ? .check : nil, handler: { _ in
             self.change(sortType: .name)
-            self.appDelegate.storage.settings.songsSortSetting = .name
+            self.saveSortPreference(preference: .name)
             self.updateSearchResults(for: self.searchController)
             self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByRating = UIAction(title: "Rating", image: sortType == .rating ? .check : nil, handler: { _ in
             self.change(sortType: .rating)
-            self.appDelegate.storage.settings.songsSortSetting = .rating
+            self.saveSortPreference(preference: .rating)
             self.updateSearchResults(for: self.searchController)
             self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
         let sortByDuration = UIAction(title: "Duration", image: sortType == .duration ? .check : nil, handler: { _ in
             self.change(sortType: .duration)
-            self.appDelegate.storage.settings.songsSortSetting = .duration
+            self.saveSortPreference(preference: .duration)
             self.updateSearchResults(for: self.searchController)
             self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
         })
-        return UIMenu(title: "Sort", image: .sort, options: [], children: [sortByName, sortByRating, sortByDuration])
+        let sortByStarredDate = UIAction(title: "Starred date", image: sortType == .starredDate ? .check : nil, handler: { _ in
+            self.change(sortType: .starredDate)
+            self.saveSortPreference(preference: .starredDate)
+            self.updateSearchResults(for: self.searchController)
+            self.appDelegate.notificationHandler.post(name: .fetchControllerSortChanged, object: nil, userInfo: nil)
+        })
+        if displayFilter == .favorites {
+            return UIMenu(title: "Sort", image: .sort, options: [], children: [sortByName, sortByRating, sortByDuration, sortByStarredDate])
+        } else {
+            return UIMenu(title: "Sort", image: .sort, options: [], children: [sortByName, sortByRating, sortByDuration])
+        }
+        
     }
     
     private func createActionButtonMenu() -> UIMenu {

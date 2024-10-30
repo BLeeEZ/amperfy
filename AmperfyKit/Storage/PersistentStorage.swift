@@ -325,6 +325,7 @@ public class PersistentStorage {
         case ArtistsSortSetting = "artistsSortSetting"
         case AlbumsSortSetting = "albumsSortSetting"
         case SongsSortSetting = "songsSortSetting"
+        case FavoriteSortSetting = "favoriteSortSetting"
         case ArtistsFilterSetting = "artistsFilterSetting"
         case AlbumsDisplayStyleSetting = "albumsDisplayStyleSetting"
         case AlbumsGridSizeSetting = "albumsGridSizeSetting"
@@ -491,7 +492,20 @@ public class PersistentStorage {
                 let songsSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.SongsSortSetting.rawValue) as? Int ?? SongElementSortType.defaultValue.rawValue
                 return SongElementSortType(rawValue: songsSortSettingRaw) ?? SongElementSortType.defaultValue
             }
-            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.SongsSortSetting.rawValue) }
+            set {
+                guard (newValue != SongElementSortType.starredDate) else {
+                    UserDefaults.standard.set(SongElementSortType.defaultValue.rawValue, forKey: UserDefaultsKey.SongsSortSetting.rawValue)
+                    return
+                }
+                UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.SongsSortSetting.rawValue) }
+        }
+        
+        public var favoriteSortSetting: SongElementSortType {
+            get {
+                let favoriteSortSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.FavoriteSortSetting.rawValue) as? Int ?? SongElementSortType.defaultValue.rawValue
+                return SongElementSortType(rawValue: favoriteSortSettingRaw) ?? SongElementSortType.defaultValue
+            }
+            set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.FavoriteSortSetting.rawValue) }
         }
         
         public var artistsFilterSetting: ArtistCategoryFilter {
