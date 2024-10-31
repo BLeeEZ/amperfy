@@ -450,7 +450,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 try self.parse(response: response, delegate: parserDelegate)
                 
                 let notFavoriteArtistsAnymore = oldFavoriteArtists.subtracting(parserDelegate.artistsParsed)
-                notFavoriteArtistsAnymore.forEach { $0.isFavorite = false }
+                notFavoriteArtistsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
             }
         }.then {
             self.ampacheXmlServerApi.requestFavoriteAlbums()
@@ -463,7 +463,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 try self.parse(response: response, delegate: parserDelegate)
                 
                 let notFavoriteAlbumsAnymore = oldFavoriteAlbums.subtracting(parserDelegate.albumsParsedSet)
-                notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false }
+                notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
             }
         }.then {
             self.ampacheXmlServerApi.requestFavoriteSongs()
@@ -476,7 +476,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 try self.parse(response: response, delegate: parserDelegate)
                 
                 let notFavoriteSongsAnymore = oldFavoriteSongs.subtracting(parserDelegate.parsedSongs)
-                notFavoriteSongsAnymore.forEach { $0.isFavorite = false }
+                notFavoriteSongsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
             }
         }
     }

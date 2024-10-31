@@ -101,9 +101,11 @@ public enum SongElementSortType: Int {
     case name = 0
     case rating = 1
     case duration = 3
+    case starredDate = 4
     
     public static let defaultValue: SongElementSortType = .name
-    
+    public static let defaultValueForFavorite: SongElementSortType = .starredDate
+
     public var asSectionIndexType: SectionIndexType {
         switch(self) {
         case .name:
@@ -112,6 +114,21 @@ public enum SongElementSortType: Int {
             return .rating
         case .duration:
             return .durationSong
+        case .starredDate:
+            return .none
+        }
+    }
+    
+    public var hasSectionTitles: Bool {
+        switch(self) {
+        case .name:
+            return true
+        case .rating:
+            return true
+        case .duration:
+            return true
+        case .starredDate:
+            return false
         }
     }
 }
@@ -554,6 +571,8 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
             fetchRequest = SongMO.ratingSortedFetchRequest
         case .duration:
             fetchRequest = SongMO.durationSortedFetchRequest
+        case .starredDate:
+            fetchRequest = SongMO.starredDateSortedFetchRequest
         }
         fetchRequest.fetchLimit = fetchLimit ?? 0
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
