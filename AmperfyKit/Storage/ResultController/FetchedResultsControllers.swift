@@ -104,7 +104,8 @@ public enum SongElementSortType: Int {
     case starredDate = 4
     
     public static let defaultValue: SongElementSortType = .name
-    
+    public static let defaultValueForFavorite: SongElementSortType = .starredDate
+
     public var asSectionIndexType: SectionIndexType {
         switch(self) {
         case .name:
@@ -115,6 +116,19 @@ public enum SongElementSortType: Int {
             return .durationSong
         case .starredDate:
             return .none
+        }
+    }
+    
+    public var hasSectionTitles: Bool {
+        switch(self) {
+        case .name:
+            return true
+        case .rating:
+            return true
+        case .duration:
+            return true
+        case .starredDate:
+            return false
         }
     }
 }

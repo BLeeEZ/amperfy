@@ -699,12 +699,19 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             createAlbumsFavoritesCachedFetchController()
             albumsFavoriteCachedSection.updateSections([CPListSection(items: createAlbumItems(from: albumsFavoritesCachedFetchController, onlyCached: true))])
         }
-        if templates.contains(songsFavoriteSection), songsFavoritesFetchController?.sortType != appDelegate.storage.settings.songsSortSetting {
+        if templates.contains(songsFavoriteSection),
+           (appDelegate.backendApi.selectedApi != .ampache) ?
+            (songsFavoritesFetchController?.sortType != appDelegate.storage.settings.favoriteSongSortSetting) :
+            (songsFavoritesFetchController?.sortType != appDelegate.storage.settings.songsSortSetting) {
             os_log("CarPlay: RefreshSort: SongsFavoritesFetchController", log: self.log, type: .info)
             createSongsFavoritesFetchController()
             songsFavoriteSection.updateSections([CPListSection(items: createSongItems(from: songsFavoritesFetchController))])
         }
-        if templates.contains(songsFavoriteCachedSection), songsFavoritesCachedFetchController?.sortType != appDelegate.storage.settings.songsSortSetting {
+        if templates.contains(songsFavoriteCachedSection),
+           (appDelegate.backendApi.selectedApi != .ampache) ?
+            (songsFavoritesCachedFetchController?.sortType != appDelegate.storage.settings.favoriteSongSortSetting) :
+            (songsFavoritesCachedFetchController?.sortType != appDelegate.storage.settings.songsSortSetting)
+        {
             os_log("CarPlay: RefreshSort: SongsFavoritesCachedFetchController", log: self.log, type: .info)
             createSongsFavoritesCachedFetchController()
             songsFavoriteCachedSection.updateSections([CPListSection(items: createSongItems(from: songsFavoritesCachedFetchController))])

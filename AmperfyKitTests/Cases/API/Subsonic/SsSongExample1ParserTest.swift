@@ -46,6 +46,9 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
         let songs = library.getSongs().sorted(by: {$0.id < $1.id} )
         XCTAssertEqual(songs.count, 8)
         
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
         var song = songs[6]
         XCTAssertEqual(song.id, "71463")
         XCTAssertEqual(song.title, "The Jack")
@@ -61,6 +64,8 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.remoteDuration, 352)
         XCTAssertEqual(song.year, 0)
         XCTAssertEqual(song.bitrate, 128000)
+        XCTAssertEqual(song.isFavorite, true)
+        XCTAssertEqual(song.starredDate, dateFormatter.date(from: "2024-07-21T20:02:24.995815902Z"))
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 5624132)
@@ -85,6 +90,8 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.remoteDuration, 315)
         XCTAssertEqual(song.year, 1976)
         XCTAssertEqual(song.bitrate, 128000)
+        XCTAssertEqual(song.isFavorite, true)
+        XCTAssertEqual(song.starredDate, dateFormatter.date(from: "2022-09-12T13:08:58Z"))
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 5037357)
@@ -109,6 +116,8 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.remoteDuration, 290)
         XCTAssertEqual(song.year, 1976)
         XCTAssertEqual(song.bitrate, 128000)
+        XCTAssertEqual(song.isFavorite, false)
+        XCTAssertEqual(song.starredDate, nil)
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 4651866)

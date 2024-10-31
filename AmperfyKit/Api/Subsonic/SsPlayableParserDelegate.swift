@@ -59,7 +59,19 @@ class SsPlayableParserDelegate: SsXmlLibWithArtworkParser {
                 playableBuffer?.disk = disk
             }
             playableBuffer?.rating = Int(attributeDict["userRating"] ?? "0") ?? 0
-            playableBuffer?.isFavorite = attributeDict["starred"] != nil
+            if let starredDate = attributeDict["starred"] {
+                playableBuffer?.isFavorite = true
+                let dateFormatter = ISO8601DateFormatter()
+                dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                if let date = dateFormatter.date(from: starredDate) {
+                    playableBuffer?.starredDate = date
+                } else {
+                    playableBuffer?.starredDate = nil
+                }
+            } else {
+                playableBuffer?.isFavorite = false
+                playableBuffer?.starredDate = nil
+            }
             if let coverArtId = attributeDict["coverArt"] {
                 playableBuffer?.artwork = parseArtwork(id: coverArtId)
             }
