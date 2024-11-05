@@ -79,7 +79,7 @@ class BarPlayerHandler {
         let popupPlayer = PopupPlayerVC()
         popupPlayer.hostingSplitVC = splitVC
         isPopupBarDisplayed = true
-        vc.presentPopupBar(withContentViewController: popupPlayer, animated: true, completion: nil)
+        vc.presentPopupBar(with: popupPlayer, animated: true, completion: nil)
     }
     
     private func hidePopupPlayer() {
