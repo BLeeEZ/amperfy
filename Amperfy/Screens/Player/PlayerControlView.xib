@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -52,7 +52,7 @@
                     </variation>
                 </label>
                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="SoI-ny-Hw0" userLabel="Control  Stack">
-                    <rect key="frame" x="22.5" y="116" width="330" height="50"/>
+                    <rect key="frame" x="22.5" y="81" width="330" height="50"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Skip Backward Button">
                             <rect key="frame" x="0.0" y="6.5" width="66" height="37.5"/>
@@ -66,7 +66,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="Jhy-pc-jwZ" userLabel="Previous Button">
-                            <rect key="frame" x="66" y="11" width="66" height="28"/>
+                            <rect key="frame" x="66" y="11.5" width="66" height="27.5"/>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal" image="backward.fill" catalog="system">
                                 <color key="titleColor" systemColor="labelColor"/>
@@ -77,7 +77,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="Byk-rx-3Lv">
-                            <rect key="frame" x="132" y="3.5" width="66" height="43.5"/>
+                            <rect key="frame" x="132" y="3.5" width="66" height="43"/>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
@@ -89,7 +89,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="E3q-DK-jgm" userLabel="Next Button">
-                            <rect key="frame" x="198" y="11" width="66" height="28"/>
+                            <rect key="frame" x="198" y="11.5" width="66" height="27.5"/>
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
@@ -120,7 +120,7 @@
                     </constraints>
                 </stackView>
                 <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="xXq-r4-gI6">
-                    <rect key="frame" x="37.5" y="186" width="300" height="28"/>
+                    <rect key="frame" x="37.5" y="151" width="300" height="28"/>
                     <subviews>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="l5j-2I-Ltc" userLabel="Airplay Button">
                             <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -139,7 +139,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
-                            <rect key="frame" x="68" y="0.0" width="28" height="28"/>
+                            <rect key="frame" x="90.5" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="dHI-Uf-EN9"/>
                                 <constraint firstAttribute="height" constant="28" id="dOb-nc-wBt"/>
@@ -158,29 +158,8 @@
                                 <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
                             </connections>
                         </button>
-                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="MwT-Zv-e8l" userLabel="Lyrics Button">
-                            <rect key="frame" x="136" y="0.0" width="28" height="28"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="28" id="Jaw-IB-PJv"/>
-                                <constraint firstAttribute="width" secondItem="MwT-Zv-e8l" secondAttribute="height" multiplier="1:1" id="ORF-qP-V4k"/>
-                                <constraint firstAttribute="width" secondItem="MwT-Zv-e8l" secondAttribute="height" multiplier="1:1" id="r7H-ic-qIC"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                            <color key="tintColor" systemColor="labelColor"/>
-                            <state key="normal">
-                                <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="rectangle.portrait.inset.filled" catalog="system" symbolScale="medium"/>
-                            </state>
-                            <buttonConfiguration key="configuration" style="gray" cornerStyle="medium" buttonSize="small">
-                                <imageReference key="image" image="lyrics" symbolScale="small"/>
-                                <backgroundConfiguration key="background"/>
-                            </buttonConfiguration>
-                            <connections>
-                                <action selector="displayLyricsPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="T5I-A9-fTA"/>
-                            </connections>
-                        </button>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change">
-                            <rect key="frame" x="204" y="0.0" width="28" height="28"/>
+                            <rect key="frame" x="181.5" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="Iye-f4-Rd2"/>
                                 <constraint firstAttribute="width" constant="28" id="O0l-F2-ebZ"/>
@@ -214,65 +193,38 @@
                         <constraint firstAttribute="width" constant="300" id="dMH-9W-9do"/>
                     </constraints>
                 </stackView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="dNu-q7-Vtb" userLabel="Sleep Timer Button">
-                    <rect key="frame" x="103.5" y="64" width="28" height="28"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="28" id="Dpt-Vx-nwj"/>
-                        <constraint firstAttribute="width" secondItem="dNu-q7-Vtb" secondAttribute="height" multiplier="1:1" id="t0n-6J-qRS"/>
-                    </constraints>
-                    <color key="tintColor" systemColor="labelColor"/>
-                    <state key="normal" title="Button"/>
-                    <buttonConfiguration key="configuration" style="gray" cornerStyle="medium" buttonSize="small">
-                        <imageReference key="image" image="moon.zzz.fill" catalog="system" symbolScale="small"/>
-                    </buttonConfiguration>
-                </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="f7L-lf-lJ6" userLabel="Playback Rate Button">
-                    <rect key="frame" x="230" y="64" width="55" height="28"/>
-                    <color key="tintColor" systemColor="labelColor"/>
-                    <state key="normal" title="Button"/>
-                    <buttonConfiguration key="configuration" style="gray" title="1,75x" cornerStyle="medium" buttonSize="small">
-                        <backgroundConfiguration key="background" strokeWidth="1"/>
-                    </buttonConfiguration>
-                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <gestureRecognizers/>
             <constraints>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="3yB-kd-VKC"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="4ed-LA-PXc"/>
-                <constraint firstItem="f7L-lf-lJ6" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="70" id="6j6-pM-uFw"/>
                 <constraint firstItem="SoI-ny-Hw0" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="8yb-bt-h2J"/>
                 <constraint firstAttribute="trailingMargin" secondItem="SoI-ny-Hw0" secondAttribute="trailing" priority="999" id="9wH-XK-zJU"/>
                 <constraint firstAttribute="trailingMargin" secondItem="t1c-hF-UMw" secondAttribute="trailing" id="QUi-S2-Eme"/>
-                <constraint firstItem="dNu-q7-Vtb" firstAttribute="top" secondItem="okd-ac-nGY" secondAttribute="bottom" constant="-15" id="S7u-07-1uM"/>
-                <constraint firstItem="dNu-q7-Vtb" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="-70" id="bW8-ea-8Uu"/>
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="centerY" secondItem="okd-ac-nGY" secondAttribute="centerY" id="lCh-dw-03A"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="msH-gV-d4u"/>
                 <constraint firstItem="xXq-r4-gI6" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="nkB-6e-9fV"/>
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="top" secondItem="42q-l9-IXM" secondAttribute="bottom" constant="-7" id="pOd-F6-MOG"/>
-                <constraint firstItem="SoI-ny-Hw0" firstAttribute="top" secondItem="42q-l9-IXM" secondAttribute="bottom" constant="50" id="rmF-Wl-3ol"/>
+                <constraint firstItem="SoI-ny-Hw0" firstAttribute="top" secondItem="42q-l9-IXM" secondAttribute="bottom" constant="15" id="rmF-Wl-3ol"/>
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" constant="-159" id="sAk-2J-JEK"/>
                 <constraint firstItem="okd-ac-nGY" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="tbM-wh-ia0"/>
-                <constraint firstItem="f7L-lf-lJ6" firstAttribute="centerY" secondItem="dNu-q7-Vtb" secondAttribute="centerY" id="uYa-sw-bOQ"/>
                 <constraint firstAttribute="leadingMargin" secondItem="okd-ac-nGY" secondAttribute="trailing" constant="-159" id="vQu-6h-oG4"/>
                 <constraint firstItem="xXq-r4-gI6" firstAttribute="top" secondItem="SoI-ny-Hw0" secondAttribute="bottom" constant="20" id="zg3-MD-JbT"/>
             </constraints>
             <connections>
                 <outlet property="airplayButton" destination="l5j-2I-Ltc" id="ENH-UT-6ix"/>
-                <outlet property="displayLyricsButton" destination="MwT-Zv-e8l" id="5fb-7U-tR6"/>
                 <outlet property="displayPlaylistButton" destination="ZVN-JG-VAA" id="2Rh-6V-CMd"/>
                 <outlet property="elapsedTimeLabel" destination="okd-ac-nGY" id="MFD-Qa-B7r"/>
                 <outlet property="nextButton" destination="E3q-DK-jgm" id="MGI-Lm-8TL"/>
                 <outlet property="optionsButton" destination="0xq-hb-FZa" id="5AH-yU-Tbd"/>
                 <outlet property="playButton" destination="Byk-rx-3Lv" id="03r-73-6Na"/>
-                <outlet property="playbackRateButton" destination="f7L-lf-lJ6" id="IC6-o7-Eax"/>
                 <outlet property="playerModeButton" destination="7xb-YR-9X6" id="yNk-04-nkT"/>
                 <outlet property="playerModeChangeButton" destination="7xb-YR-9X6" id="nyN-I8-ZUJ"/>
                 <outlet property="previousButton" destination="Jhy-pc-jwZ" id="3vl-Xj-JHn"/>
                 <outlet property="remainingTimeLabel" destination="t1c-hF-UMw" id="hPl-lK-efe"/>
                 <outlet property="skipBackwardButton" destination="PZj-JS-NGq" id="q0L-Ve-YvK"/>
                 <outlet property="skipForwardButton" destination="QO0-Ep-X2s" id="idR-HQ-cSv"/>
-                <outlet property="sleepTimerButton" destination="dNu-q7-Vtb" id="zWZ-5a-1Pb"/>
                 <outlet property="timeSlider" destination="42q-l9-IXM" id="Uit-8D-ekQ"/>
                 <outletCollection property="gestureRecognizers" destination="UMb-bk-6ia" appends="YES" id="Btr-RL-2lg"/>
             </connections>
@@ -286,15 +238,13 @@
     </objects>
     <resources>
         <image name="airplayaudio" catalog="system" width="128" height="123"/>
-        <image name="backward.fill" catalog="system" width="128" height="77"/>
+        <image name="backward.fill" catalog="system" width="128" height="76"/>
         <image name="ellipsis" catalog="system" width="128" height="37"/>
-        <image name="forward.fill" catalog="system" width="128" height="77"/>
+        <image name="forward.fill" catalog="system" width="128" height="76"/>
         <image name="gobackward.10" catalog="system" width="119" height="128"/>
         <image name="goforward.10" catalog="system" width="119" height="128"/>
         <image name="list.bullet" catalog="system" width="128" height="87"/>
-        <image name="lyrics" width="10" height="13"/>
-        <image name="moon.zzz.fill" catalog="system" width="117" height="128"/>
-        <image name="play.fill" catalog="system" width="117" height="128"/>
+        <image name="play.fill" catalog="system" width="120" height="128"/>
         <image name="podcast" width="448" height="512"/>
         <image name="rectangle.portrait.inset.filled" catalog="system" width="115" height="128"/>
         <systemColor name="labelColor">
