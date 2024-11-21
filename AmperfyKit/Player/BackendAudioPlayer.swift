@@ -42,6 +42,7 @@ enum PlayType {
 }
 
 public typealias CreateAVPlayerCallback = () -> AVPlayer
+public typealias TriggerReinsertPlayableCallback = () -> Void
 
 class BackendAudioPlayer: NSObject {
     
@@ -57,11 +58,14 @@ class BackendAudioPlayer: NSObject {
     private let updateLyricsTimeInterval = CMTime(seconds: 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     private let fileManager = CacheFileManager.shared
     private var audioSessionHandler: AudioSessionHandler
+    private var isTriggerReinsertPlayableAllowed = true
+    private var wasPlayingBeforeErrorOccured: Bool = false
 
     private var userDefinedPlaybackRate: PlaybackRate = .one
     
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
+    public var triggerReinsertPlayableCB: TriggerReinsertPlayableCallback?
     public var streamingMaxBitrates: StreamingMaxBitrates = .init() {
         didSet {
             let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: self.networkMonitor)
@@ -72,6 +76,7 @@ class BackendAudioPlayer: NSObject {
         }
     }
     public private(set) var isPlaying: Bool = false
+    public private(set) var isErrorOccured: Bool = false
     public private(set) var playType: PlayType?
     
     var responder: BackendAudioPlayerNotifiable?
@@ -149,16 +154,30 @@ class BackendAudioPlayer: NSObject {
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if let item = object as? AVPlayerItem {
-            if keyPath == "status", item.status == .failed {
-                if let statusError = item.error {
-                    eventLogger.report(topic: "Player Status", error: statusError)
-                    responder?.notifyErrorOccured(error: statusError)
-                    player.pause()
+            if keyPath == "status" {
+                if item.status == .failed,
+                   let statusError = item.error {
+                    handleError(error: statusError)
+                } else {
+                    isTriggerReinsertPlayableAllowed = true
+                    isErrorOccured = false
                 }
             }
         }
     }
     
+    private func handleError(error: Error) {
+        isErrorOccured = true
+        wasPlayingBeforeErrorOccured = isPlaying
+        pause()
+        initAVPlayer()
+        eventLogger.report(topic: "Player Status", error: error)
+        responder?.notifyErrorOccured(error: error)
+        if isTriggerReinsertPlayableAllowed {
+            isTriggerReinsertPlayableAllowed = false
+            triggerReinsertPlayableCB?()
+        }
+    }
     
     func continuePlay() {
         isPlaying = true
@@ -194,7 +213,7 @@ class BackendAudioPlayer: NSObject {
                 return
             }
             insertCachedPlayable(playable: playable)
-            if autoStartPlayback {
+            if (!self.isErrorOccured && autoStartPlayback) || (self.isErrorOccured && self.wasPlayingBeforeErrorOccured) {
                 self.continuePlay()
             } else {
                 isPlaying = false
@@ -212,7 +231,7 @@ class BackendAudioPlayer: NSObject {
                 if self.isAutoCachePlayedItems {
                     self.playableDownloader.download(object: playable)
                 }
-                if autoStartPlayback {
+                if (!self.isErrorOccured && autoStartPlayback) || (self.isErrorOccured && self.wasPlayingBeforeErrorOccured) {
                     self.continuePlay()
                 } else {
                     self.isPlaying = false
