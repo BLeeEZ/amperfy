@@ -378,6 +378,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return nil
     }
 
+#if targetEnvironment(macCatalyst)
+    var isMainOrMiniPlayerPlayerOpen: Bool {
+        return isMainWindowOpen || isShowingMiniPlayer
+    }
+    
+    var isMainWindowOpen: Bool {
+        return !UIApplication.shared.connectedScenes
+            .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
+            .filter { ($0.rootViewController as? SplitVC) != nil }
+            .isEmpty
+    }
+
     func closeMainWindow() {
         // Close all main sessions (this might be more than one with multiple tabs open)
         UIApplication.shared.connectedScenes
@@ -395,25 +407,60 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let defaultActivity = NSUserActivity(activityType: defaultWindowActivityType)
         UIApplication.shared.requestSceneSessionActivation(nil, userActivity: defaultActivity, options: nil, errorHandler: nil)
     }
-
-    #if targetEnvironment(macCatalyst)
+    
+    public func rebuildMainMenu() {
+        UIMenuSystem.main.setNeedsRebuild()
+    }
 
     override func buildMenu(with builder: any UIMenuBuilder) {
         super.buildMenu(with: builder)
 
         guard builder.system == .main else { return }
 
-        // Add a settings menu
-        let settingsMenu = UIMenu(options: .displayInline, children: [
-           UIKeyCommand(title: "Settings…", action: #selector(showSettings), input: ",", modifierFlags: .command)
+        // Add File menu
+        let fileMenu =  UIMenu(title: "File", children: [
+            UIMenu(options: .displayInline, children: [
+                UIAction(title: "Open Player Window", attributes: self.isMainOrMiniPlayerPlayerOpen ? .disabled : []) { _ in
+                    self.openMainWindow()
+                },
+                UIAction(title: "Close Player Window", attributes: !self.isMainOrMiniPlayerPlayerOpen ? .disabled : []) { _ in
+                    if self.isMainWindowOpen {
+                        self.closeMainWindow()
+                    } else if self.isShowingMiniPlayer {
+                        self.closeMiniPlayer()
+                    }
+                }
+            ]),
+            UIMenu(options: .displayInline, children: [
+                UIAction(title: "Switch Library/Mini Player") { _ in
+                    if self.isShowingMiniPlayer {
+                        self.closeMiniPlayer()
+                        self.openMainWindow()
+                    } else {
+                        self.closeMainWindow()
+                        self.showMiniPlayer()
+                    }
+                }
+            ]),
+            // Add a settings menu
+            UIMenu(options: .displayInline, children: [
+               UIKeyCommand(title: "Open Settings", action: #selector(showSettings), input: ",", modifierFlags: .command)
+            ])
         ])
-        builder.insertSibling(settingsMenu, afterMenu: .about)
+        builder.insertSibling(fileMenu, beforeMenu: .view)
+        
         // Add media controls
         builder.insertSibling(buildControlsMenu(), afterMenu: .view)
 
-        // Remove "new window" and toolbar options
+        // Remove not needed default menu items
         builder.remove(menu: .toolbar)
-        builder.remove(menu: .newScene)
+        builder.remove(menu: .file)
+        builder.remove(menu: .edit)
+        builder.remove(menu: .format)
+        builder.remove(menu: .font)
+        builder.remove(menu: .text)
+        builder.remove(menu: .services)
+        builder.remove(menu: .help)
 
         if (self.focusedWindowTitle == windowSettingsTitle) || (self.focusedWindowTitle == windowMiniPlayerTitle)  {
             // Do any settings specific menu setup here
@@ -499,25 +546,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         let section3 = [
-            UIAction(title: self.player.playerMode.nextMode.description) { _ in
+            UIAction(title: "Switch Music/Podcast mode") { _ in
                 self.player.setPlayerMode(self.player.playerMode.nextMode)
             }
         ]
 
-        let section4 = [
-            UIAction(title: self.isShowingMiniPlayer ? "Main Window" :  "Mini Player") { _ in
-                if self.isShowingMiniPlayer {
-                    self.closeMiniPlayer()
-                    // Is automatically opened
-                    //self.openMainWindow()
-                } else {
-                    self.closeMainWindow()
-                    self.showMiniPlayer()
-                }
-            }
-        ]
-
-        let sections: [[UIMenuElement]] = [section1, section2, section3, section4]
+        let sections: [[UIMenuElement]] = [section1, section2, section3]
 
         return UIMenu(title: "Controls", children: sections.reduce([], { (result, section) in
             result + [UIMenu(options: .displayInline)] + section
@@ -547,7 +581,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 UIApplication.shared.requestSceneSessionDestruction($0.session, options: options, errorHandler: nil)
             }
     }
-    #endif
+#endif
 }
 
 #if targetEnvironment(macCatalyst)
