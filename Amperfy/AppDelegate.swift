@@ -447,15 +447,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                UIKeyCommand(title: "Open Settings", action: #selector(showSettings), input: ",", modifierFlags: .command)
             ])
         ])
-        builder.insertSibling(fileMenu, beforeMenu: .view)
+        builder.insertSibling(fileMenu, beforeMenu: .edit)
         
         // Add media controls
         builder.insertSibling(buildControlsMenu(), afterMenu: .view)
+        
+        // Add Help menu
+        let helpMenu =  UIMenu(title: "Help", children: [
+            UIMenu(options: .displayInline, children: [
+                UIAction(title: "Report an issue on GitHub") { _ in
+                    if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {
+                        UIApplication.shared.open(url)
+                    }
+                }
+            ])
+        ])
+        builder.insertSibling(helpMenu, afterMenu: .window)
 
         // Remove not needed default menu items
         builder.remove(menu: .toolbar)
         builder.remove(menu: .file)
-        builder.remove(menu: .edit)
         builder.remove(menu: .format)
         builder.remove(menu: .font)
         builder.remove(menu: .text)
