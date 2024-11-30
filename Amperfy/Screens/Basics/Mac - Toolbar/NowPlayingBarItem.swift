@@ -78,6 +78,11 @@ class NowPlayingInfoView: UIView {
     
     var player: PlayerFacade
     var rootViewController: UIViewController
+    
+    /// override this to allow snapshots: this is needed in macOS to show all tabs and create a new tab
+    override func drawHierarchy(in rect: CGRect, afterScreenUpdates afterUpdates: Bool) -> Bool {
+        return true
+    }
 
     fileprivate lazy var artworkView: UIImageView = {
         let imageView: UIImageView = UIImageView()

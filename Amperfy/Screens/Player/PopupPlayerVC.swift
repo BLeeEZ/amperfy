@@ -100,10 +100,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             contextNextQueueSectionHeader?.prepare(toWorkOnRootView: self)
         }
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        adjustLaoutMargins()
         refreshCellMasks()
     }
 

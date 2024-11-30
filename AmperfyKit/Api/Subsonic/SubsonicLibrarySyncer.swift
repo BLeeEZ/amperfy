@@ -353,21 +353,21 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 let parserDelegateArtist = SsArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                 try self.parse(response: response, delegate: parserDelegateArtist)
                 let notFavoriteArtistsAnymore = oldFavoriteArtists.subtracting(parserDelegateArtist.parsedArtists)
-                notFavoriteArtistsAnymore.forEach { $0.isFavorite = false }
+                notFavoriteArtistsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
 
                 os_log("Sync favorite albums", log: self.log, type: .info)
                 let oldFavoriteAlbums = Set(asyncCompanion.library.getFavoriteAlbums())
                 let parserDelegateAlbum = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                 try self.parse(response: response, delegate: parserDelegateAlbum)
                 let notFavoriteAlbumsAnymore = oldFavoriteAlbums.subtracting(parserDelegateAlbum.parsedAlbums)
-                notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false }
+                notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
             
                 os_log("Sync favorite songs", log: self.log, type: .info)
                 let oldFavoriteSongs = Set(asyncCompanion.library.getFavoriteSongs())
                 let parserDelegateSong = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                 try self.parse(response: response, delegate: parserDelegateSong)
                 let notFavoriteSongsAnymore = oldFavoriteSongs.subtracting(parserDelegateSong.parsedSongs)
-                notFavoriteSongsAnymore.forEach { $0.isFavorite = false }
+                notFavoriteSongsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
             }
         }
     }

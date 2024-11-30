@@ -125,6 +125,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Release any resources associated with this scene that can be re-created the next time the scene connects.
         // The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead).
         os_log("sceneDidDisconnect", log: self.log, type: .info)
+#if targetEnvironment(macCatalyst)
+        appDelegate.rebuildMainMenu()
+#endif
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
@@ -132,6 +135,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
         os_log("sceneDidBecomeActive", log: self.log, type: .info)
         appDelegate.quickActionsManager.handleSavedShortCutItemIfSaved()
+        #if targetEnvironment(macCatalyst)
+        appDelegate.rebuildMainMenu()
+        #endif
     }
 
     func sceneWillResignActive(_ scene: UIScene) {

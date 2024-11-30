@@ -85,4 +85,13 @@ extension SongMO: CoreDataIdentifyable {
         return fetchRequest
     }
     
+    static var starredDateSortedFetchRequest: NSFetchRequest<SongMO> {
+        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(SongMO.starredDate), ascending: false),
+            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
+            NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
+        ]
+        return fetchRequest
+    }
 }

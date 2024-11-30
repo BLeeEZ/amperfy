@@ -24,6 +24,15 @@ import UIKit
 
 #if targetEnvironment(macCatalyst)
 
+class MacSnapshotButton: UIButton {
+
+    /// override this to allow snapshots: this is needed in macOS to show all tabs and create a new tab
+    override func drawHierarchy(in rect: CGRect, afterScreenUpdates afterUpdates: Bool) -> Bool {
+        return true
+    }
+    
+}
+
 // MacOS BarButtonItems can not be disabled. Thats, why we create a custom BarButtonItem.
 class CustomBarButton: UIBarButtonItem, Refreshable {
     static let defaultPointSize: CGFloat = 18.0
@@ -75,7 +84,7 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
     }
 
     func createInUIButton(config: UIButton.Configuration, size: CGSize) -> UIButton? {
-        let button = UIButton(configuration: config)
+        let button = MacSnapshotButton(configuration: config)
         button.imageView?.contentMode = .scaleAspectFit
 
         // influence the highlighted area

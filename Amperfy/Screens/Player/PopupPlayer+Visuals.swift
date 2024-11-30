@@ -176,6 +176,7 @@ extension PopupPlayerVC {
     // handle dark/light mode change
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
+        adjustLaoutMargins()
         refresh()
     }
     
