@@ -49,8 +49,8 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
         #if targetEnvironment(macCatalyst)
         buildMacToolbar()
 
-        AppDelegate.configureUtilityWindow(persistentIdentifier: windowScene.session.persistentIdentifier, properties: [:])
-        
+        AppDelegate.configureUtilityWindow(persistentIdentifier: windowScene.session.persistentIdentifier, properties: ["auxiliary": true])
+
         selectTarget(.general)
         #endif
 

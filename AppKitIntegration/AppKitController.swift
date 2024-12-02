@@ -82,9 +82,15 @@ class AppKitController: NSObject {
 				if appDelegate.responds(to: #selector(hostWindowForSceneIdentifier(_:))) {
 					guard let hostWindow = appDelegate.hostWindowForSceneIdentifier(sceneIdentifier) else { return }
 
-                    hostWindow.collectionBehavior = [.fullScreenAuxiliary]
-                    hostWindow.styleMask = styleMask
-					hostWindow.isRestorable = false
+                    if windowProperties["auxiliary"] as? Bool == true {
+                        hostWindow.collectionBehavior = [.fullScreenAuxiliary]
+                        hostWindow.styleMask = styleMask
+                        hostWindow.isRestorable = false
+                    }
+
+                    if let autosaveName = windowProperties["autosaveName"] as? String {
+                        hostWindow.setFrameAutosaveName(autosaveName)
+                    }
 
                     if let ratio = windowProperties["aspectRatio"] as? CGSize {
                         hostWindow.aspectRatio = ratio
