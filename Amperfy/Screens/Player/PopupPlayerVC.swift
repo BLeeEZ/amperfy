@@ -41,6 +41,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     var controlView: PlayerControlView?
     var largeCurrentlyPlayingView: LargeCurrentlyPlayingPlayerView?
     var hostingSplitVC: SplitVC?
+    var layoutMarginsChangeRequestCount = 0
     
     var currentlyPlayingTableCell: CurrentlyPlayingTableCell?
     var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
@@ -104,6 +105,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         refreshCellMasks()
+        adjustLaoutMargins()
     }
 
     override func viewWillAppear(_ animated: Bool) {
