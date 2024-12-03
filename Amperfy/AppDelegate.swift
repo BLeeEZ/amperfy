@@ -441,14 +441,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         self.showMiniPlayer()
                     }
                 }
-            ]),
-            // Add a settings menu
-            UIMenu(options: .displayInline, children: [
-               UIKeyCommand(title: "Open Settings", action: #selector(showSettings), input: ",", modifierFlags: .command)
             ])
         ])
         builder.insertSibling(fileMenu, beforeMenu: .edit)
-        
+        let openSettingsMenu = UIMenu(options: .displayInline, children: [
+           UIKeyCommand(title: "Settings…", action: #selector(showSettings), input: ",", modifierFlags: .command)
+        ])
+        builder.insertSibling(openSettingsMenu, afterMenu: .about)
+
         // Add media controls
         builder.insertSibling(buildControlsMenu(), afterMenu: .view)
         
