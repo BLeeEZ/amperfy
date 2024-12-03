@@ -172,7 +172,17 @@ extension Array where Element: Song {
     }
     
     public func sortByTrackNumber() -> [Element] {
-        return self.sorted{ $0.track < $1.track }
+        return self.sorted{
+            if $0.disk != $1.disk {
+                return $0.disk ?? "" < $1.disk ?? ""
+            } else if $0.track != $1.track {
+                return $0.track < $1.track
+            } else if $0.title != $1.title {
+                return $0.title < $1.title
+            } else {
+                return $0.id < $1.id
+            }
+        }
     }
     
     public func sortByAlbum() -> [Element] {

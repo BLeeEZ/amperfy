@@ -210,7 +210,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     private func seekToLastStoppedPlayTime() {
         if let playable = currentlyPlaying,
            playable.playProgress > 0,
-           playable.isPodcastEpisode || isContinueSongProgress {
+           backendAudioPlayer.isErrorOccured || playable.isPodcastEpisode || isContinueSongProgress {
             backendAudioPlayer.seek(toSecond: Double(playable.playProgress))
         }
         isContinueSongProgress = false

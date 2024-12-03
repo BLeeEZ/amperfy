@@ -27,7 +27,7 @@ import PromiseKit
 
 class PlayerControlView: UIView {
   
-    static let frameHeight: CGFloat = 210
+    static let frameHeight: CGFloat = 175
     static private let margin = UIEdgeInsets(top: 0, left: UIView.defaultMarginX, bottom: 20, right: UIView.defaultMarginX)
     
     private var player: PlayerFacade!
@@ -51,9 +51,6 @@ class PlayerControlView: UIView {
     @IBOutlet weak var airplayButton: UIButton!
     @IBOutlet weak var playerModeChangeButton: UIButton!
     @IBOutlet weak var displayPlaylistButton: UIButton!
-    @IBOutlet weak var displayLyricsButton: UIButton!
-    @IBOutlet weak var playbackRateButton: UIButton!
-    @IBOutlet weak var sleepTimerButton: UIButton!
     @IBOutlet weak var optionsButton: UIButton!
     
     required init?(coder aDecoder: NSCoder) {
@@ -80,8 +77,6 @@ class PlayerControlView: UIView {
         nextButton.tintColor = .label
         skipBackwardButton.tintColor = .label
         skipForwardButton.tintColor = .label
-        playbackRateButton.setTitleColor(.label, for: .normal)
-        playbackRateButton.setTitleColor(.label, for: .highlighted)
         airplayButton.tintColor = .label
         playerModeChangeButton.tintColor = .label
         optionsButton.imageView?.tintColor = .label
@@ -169,20 +164,12 @@ class PlayerControlView: UIView {
         }
         airplayVolume.removeFromSuperview()
         #endif
-
-
     }
     
     @IBAction func displayPlaylistPressed() {
         rootView?.switchDisplayStyleOptionPersistent()
         refreshDisplayPlaylistButton()
         refreshPlayerOptions()
-    }
-    
-    @IBAction func displayLyricsPressed(_ sender: Any) {
-        appDelegate.storage.settings.isPlayerLyricsDisplayed.toggle()
-        rootView?.largeCurrentlyPlayingView?.initializeLyrics()
-        refreshDisplayLyricsButton()
     }
     
     @IBAction func playerModeChangePressed(_ sender: Any) {
@@ -331,10 +318,7 @@ class PlayerControlView: UIView {
         refreshPopupBarButtonItmes()
         refreshTimeInfo()
         refreshPrevNextButtons()
-        refreshPlaybackRateButton()
-        refreshSleepTimerButton()
         refreshDisplayPlaylistButton()
-        refreshDisplayLyricsButton()
         refreshPlayerModeChangeButton()
         refreshPlayerOptions()
     }
@@ -352,88 +336,67 @@ class PlayerControlView: UIView {
         }
     }
     
-    func refreshPlaybackRateButton() {
+    func createPlaybackRateMenu() -> UIMenuElement {
         let playerPlaybackRate = self.player.playbackRate
-        playbackRateButton.setTitle(playerPlaybackRate.description, for: .normal)
-        
         let availablePlaybackRates: [UIAction] = PlaybackRate.allCases.compactMap { playbackRate in
             return UIAction(title: playbackRate.description, image: playbackRate == playerPlaybackRate ? .check : nil, handler: { _ in
                 self.player.setPlaybackRate(playbackRate)
             })
         }
-        playbackRateButton.menu = UIMenu(title: "Playback Rate", children: availablePlaybackRates)
-        playbackRateButton.showsMenuAsPrimaryAction = true
+        return UIMenu(title: "Playback Rate", subtitle: playerPlaybackRate.description, children: availablePlaybackRates)
     }
     
-    func refreshSleepTimerButton() {
-        let isSelected = appDelegate.sleepTimer != nil || self.appDelegate.player.isShouldPauseAfterFinishedPlaying
-        var config = UIButton.Configuration.player(isSelected: isSelected)
-        config.image = UIImage.sleepFill
-        sleepTimerButton.isSelected = isSelected
-        sleepTimerButton.configuration = config
-        
+    func createSleepTimeMenu() -> UIMenuElement {
         if let timer = appDelegate.sleepTimer {
             let deactivate = UIAction(title: "Off", image: nil, handler: { _ in
                 self.appDelegate.sleepTimer?.invalidate()
                 self.appDelegate.sleepTimer = nil
-                self.refreshSleepTimerButton()
             })
-            sleepTimerButton.menu = UIMenu(title: "Will pause at: \(timer.fireDate.asShortHrMinString)", children: [deactivate])
+            return UIMenu(title: "Sleep Timer", subtitle: "Will pause at: \(timer.fireDate.asShortHrMinString)", children: [deactivate])
         } else if self.appDelegate.player.isShouldPauseAfterFinishedPlaying {
             let deactivate = UIAction(title: "Off", image: nil, handler: { _ in
                 self.appDelegate.player.isShouldPauseAfterFinishedPlaying = false
-                self.refreshSleepTimerButton()
             })
             switch player.playerMode {
             case .music:
-                sleepTimerButton.menu = UIMenu(title: "Will pause at end of song", children: [deactivate])
+                return UIMenu(title: "Sleep Timer", subtitle: "Will pause at end of song", children: [deactivate])
             case .podcast:
-                sleepTimerButton.menu = UIMenu(title: "Will pause at end of episode", children: [deactivate])
+                return UIMenu(title: "Sleep Timer", subtitle: "Will pause at end of episode", children: [deactivate])
             }
         } else {
             let endOfTrack = UIAction(title: "End of song or episode", image: nil, handler: { _ in
                 self.appDelegate.player.isShouldPauseAfterFinishedPlaying = true
-                self.refreshSleepTimerButton()
             })
             let sleep5 = UIAction(title: "5 Minutes", image: nil, handler: { _ in
                 self.activateSleepTimer(timeInterval: TimeInterval(5 * 60))
-                self.refreshSleepTimerButton()
             })
             let sleep10 = UIAction(title: "10 Minutes", image: nil, handler: { _ in
                 self.activateSleepTimer(timeInterval: TimeInterval(10 * 60))
-                self.refreshSleepTimerButton()
             })
             let sleep15 = UIAction(title: "15 Minutes", image: nil, handler: { _ in
                 self.activateSleepTimer(timeInterval: TimeInterval(15 * 60))
-                self.refreshSleepTimerButton()
             })
             let sleep30 = UIAction(title: "30 Minutes", image: nil, handler: { _ in
                 self.activateSleepTimer(timeInterval: TimeInterval(30 * 60))
-                self.refreshSleepTimerButton()
             })
             let sleep45 = UIAction(title: "45 Minutes", image: nil, handler: { _ in
                 self.activateSleepTimer(timeInterval: TimeInterval(45 * 60))
-                self.refreshSleepTimerButton()
             })
             let sleep60 = UIAction(title: "1 Hour", image: nil, handler: { _ in
                 self.activateSleepTimer(timeInterval: TimeInterval(60 * 60))
-                self.refreshSleepTimerButton()
             })
             let sleep120 = UIAction(title: "2 Hours", image: nil, handler: { _ in
                 self.activateSleepTimer(timeInterval: TimeInterval(2 * 60 * 60))
-                self.refreshSleepTimerButton()
             })
             let sleep240 = UIAction(title: "4 Hours", image: nil, handler: { _ in
                 self.activateSleepTimer(timeInterval: TimeInterval(4 * 60 * 60))
-                self.refreshSleepTimerButton()
             })
-            sleepTimerButton.menu = UIMenu(title: "Sleep Timer", children: [endOfTrack, sleep5, sleep10, sleep15, sleep30, sleep45, sleep60, sleep120, sleep240])
+            return UIMenu(title: "Sleep Timer", children: [endOfTrack, sleep5, sleep10, sleep15, sleep30, sleep45, sleep60, sleep120, sleep240])
         }
-        sleepTimerButton.showsMenuAsPrimaryAction = true
     }
     
     func createPlayerOptionsMenu() -> UIMenu {
-        var menuActions = [UIAction]()
+        var menuActions = [UIMenuElement]()
         if player.currentlyPlaying != nil || player.prevQueue.count > 0 || player.userQueue.count > 0 || player.nextQueue.count > 0 {
             let clearPlayer = UIAction(title: "Clear Player", image: .clear, handler: { _ in
                 self.player.clearQueues()
@@ -445,6 +408,31 @@ class PlayerControlView: UIView {
                 self.rootView?.clearUserQueue()
             })
             menuActions.append(clearUserQueue)
+        }
+        
+        menuActions.append(createSleepTimeMenu())
+        menuActions.append(createPlaybackRateMenu())
+        
+        if self.rootView?.largeCurrentlyPlayingView?.isLyricsButtonAllowedToDisplay ?? false {
+            if !appDelegate.storage.settings.isPlayerLyricsDisplayed ||
+                appDelegate.storage.settings.playerDisplayStyle != .large {
+                let showLyricsAction = UIAction(title: "Show Lyrics", image: .lyrics, handler: { _ in
+                    if !self.appDelegate.storage.settings.isPlayerLyricsDisplayed {
+                        self.appDelegate.storage.settings.isPlayerLyricsDisplayed.toggle()
+                        self.rootView?.largeCurrentlyPlayingView?.initializeLyrics()
+                    }
+                    if self.appDelegate.storage.settings.playerDisplayStyle != .large {
+                        self.displayPlaylistPressed()
+                    }
+                })
+                menuActions.append(showLyricsAction)
+            } else {
+                let hideLyricsAction = UIAction(title: "Hide Lyrics", image: .lyrics, handler: { _ in
+                    self.appDelegate.storage.settings.isPlayerLyricsDisplayed.toggle()
+                    self.rootView?.largeCurrentlyPlayingView?.initializeLyrics()
+                })
+                menuActions.append(hideLyricsAction)
+            }
         }
         
         switch player.playerMode {
@@ -516,10 +504,9 @@ class PlayerControlView: UIView {
         appDelegate.sleepTimer?.invalidate()
         appDelegate.sleepTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { (t) in
             self.appDelegate.player.pause()
-            self.appDelegate.eventLogger.info(topic: "Sleep Timer", message: "Sleep timer paused playback.")
+            self.appDelegate.eventLogger.info(topic: "Sleep Timer", message: "Sleep Timer paused playback.")
             self.appDelegate.sleepTimer?.invalidate()
             self.appDelegate.sleepTimer = nil
-            self.refreshSleepTimerButton()
         }
     }
     
@@ -529,17 +516,6 @@ class PlayerControlView: UIView {
         config.image = .playlistDisplayStyle
         displayPlaylistButton.isSelected = isSelected
         displayPlaylistButton.configuration = config
-    }
-    
-    func refreshDisplayLyricsButton() {
-        guard let rootView = rootView else { return }
-        displayLyricsButton.isHidden = !(rootView.largeCurrentlyPlayingView?.isLyricsButtonAllowedToDisplay ?? false)
-             
-        let isSelected = appDelegate.storage.settings.isPlayerLyricsDisplayed
-        var config = UIButton.Configuration.player(isSelected: isSelected)
-        config.image = .lyrics
-        displayLyricsButton.isSelected = isSelected
-        displayLyricsButton.configuration = config
     }
     
     func refreshPlayerModeChangeButton() {
@@ -554,7 +530,7 @@ class PlayerControlView: UIView {
 }
 
 extension PlayerControlView: MusicPlayable {
-    
+
     func didStartPlayingFromBeginning() { }
     
     func didStartPlaying() {
@@ -572,7 +548,6 @@ extension PlayerControlView: MusicPlayable {
 
     func didElapsedTimeChange() {
         refreshTimeInfo()
-        refreshPlayerOptions()
     }
     
     func didPlaylistChange() {
@@ -590,8 +565,6 @@ extension PlayerControlView: MusicPlayable {
         refreshPopupBarButtonItmes()
     }
     
-    func didPlaybackRateChange() {
-        refreshPlaybackRateButton()
-    }
+    func didPlaybackRateChange() { }
 
 }
