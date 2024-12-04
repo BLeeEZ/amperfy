@@ -418,6 +418,15 @@ public class LibraryStorage: PlayableFileCachable {
         episodes.forEach{ $0.relFilePath = nil }
     }
     
+    public func deleteRemoteArtworkCachePaths() {
+        let fetchRequest = ArtworkMO.fetchRequest()
+        guard let artworksMO = try? context.fetch(fetchRequest) else { return }
+        for artworkMO in artworksMO {
+            artworkMO.status = ImageStatus.NotChecked.rawValue
+            artworkMO.relFilePath = nil
+        }
+    }
+    
     func createEmbeddedArtwork() -> EmbeddedArtwork {
         return EmbeddedArtwork(managedObject: EmbeddedArtworkMO(context: context))
     }
