@@ -57,12 +57,14 @@ extension AppDelegate {
                 try Bundle(path: bundlePath)?.loadAndReturnError()
 
                 let bundle = Bundle(path: bundlePath)!
-                NSLog("[APPKIT BUNDLE] Loaded Successfully")
 
-                if let appKitControllerClass = bundle.classNamed("AppKitIntegration.AppKitController") as? NSObject.Type {
+                if let appKitControllerClass = bundle.principalClass as? NSObject.Type {
                     appKitController = appKitControllerClass.init()
+                    NSLog("[APPKIT BUNDLE] Loaded Successfully")
 
                     NotificationCenter.default.addObserver(appKitController as Any, selector: #selector(_catalyst_setupWindow(_:)), name: NSNotification.Name("UISBHSDidCreateWindowForSceneNotification"), object: nil)
+                } else {
+                    NSLog("[APPKIT BUNDLE] Error loading: Can not load AppKitController")
                 }
             }
             catch {
