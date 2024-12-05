@@ -20,18 +20,21 @@
 //
 
 import SwiftUI
+import AmperfyKit
 
 struct ArtworkSettingsView: View {
     
     static let artworkNotCheckedThreshold = 10
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    let fileManager = CacheFileManager.shared
     
     @State var artworkNotCheckedCountText = ""
     @State var cachedArtworksCountText = ""
     
     @State var isShowDownloadArtworksAlert = false
-    
+    @State var isShowDeleteArtworksAlert = false
+
     func updateValues() {
         appDelegate.storage.async.perform { asyncCompanion in
             let artworkNotCheckedCount = asyncCompanion.library.artworkNotCheckedCount
@@ -60,6 +63,21 @@ struct ArtworkSettingsView: View {
                         primaryButton: .default(Text("OK")) {
                             let allArtworksToDownload = self.appDelegate.storage.main.library.getArtworksForCompleteLibraryDownload()
                             self.appDelegate.artworkDownloadManager.download(objects: allArtworksToDownload)
+                        },secondaryButton: .cancel())
+                    }
+                    SettingsButtonRow(label: "Delete all downloaded artworks") {
+                        isShowDeleteArtworksAlert = true
+                    }
+                    .alert(isPresented: $isShowDeleteArtworksAlert) {
+                        Alert(title: Text("Delete all downloaded artworks"), message: Text("This action will delete all downloaded artworks. Artworks embedded in song/podcast episode files will be kept. Continue?"),
+                        primaryButton: .destructive(Text("Delete")) {
+                            self.appDelegate.artworkDownloadManager.stop()
+                            self.appDelegate.artworkDownloadManager.cancelDownloads()
+                            self.appDelegate.artworkDownloadManager.clearFinishedDownloads()
+                            self.appDelegate.storage.main.library.deleteRemoteArtworkCachePaths()
+                            self.appDelegate.storage.main.library.saveContext()
+                            self.fileManager.deleteRemoteArtworkCache()
+                            self.appDelegate.artworkDownloadManager.start()
                         },secondaryButton: .cancel())
                     }
                 }

@@ -106,7 +106,7 @@ enum NavigationTarget: String, CaseIterable {
         case .library: 620
         case .player: 350
         case .swipe: 450
-        case .artwork: 280
+        case .artwork: 300
         case .support: 400
         default: 400
         }

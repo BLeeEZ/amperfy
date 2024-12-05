@@ -101,6 +101,12 @@ public class CacheFileManager {
         }
     }
     
+    public func deleteRemoteArtworkCache() {
+        if let absArtworksDir = getAbsoluteAmperfyPath(relFilePath: Self.artworksDir) {
+            try? fileManager.removeItem(at: absArtworksDir)
+        }
+    }
+    
     public var playableCacheSize: Int64 {
         var bytes = Int64(0)
         if let absSongsDir = getAbsoluteAmperfyPath(relFilePath: Self.songsDir) {
