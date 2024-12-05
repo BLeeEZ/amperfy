@@ -35,13 +35,13 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mUX-sN-oa8">
-                        <rect key="frame" x="72" y="16" width="454" height="38"/>
+                        <rect key="frame" x="72" y="16" width="517" height="38"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ZWf-gf-epS">
-                                <rect key="frame" x="0.0" y="0.0" width="454" height="38"/>
+                                <rect key="frame" x="0.0" y="0.0" width="517" height="38"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hPr-VQ-rTt">
-                                        <rect key="frame" x="0.0" y="0.0" width="454" height="22"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="517" height="22"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="22" id="XXp-uK-dh5"/>
                                         </constraints>
@@ -53,7 +53,7 @@
                                         </variation>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nJe-7h-3tU">
-                                        <rect key="frame" x="0.0" y="22" width="454" height="16"/>
+                                        <rect key="frame" x="0.0" y="22" width="517" height="16"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="16" id="Lp3-VV-zM5">
                                                 <variation key="widthClass=regular" constant="22"/>
@@ -135,66 +135,36 @@
                 <constraints>
                     <constraint firstItem="HnA-Bb-1UQ" firstAttribute="left" secondItem="WOq-tb-OTF" secondAttribute="leftMargin" id="0uP-N3-DaP"/>
                     <constraint firstItem="mUX-sN-oa8" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="1M6-yt-wX0"/>
+                    <constraint firstAttribute="rightMargin" secondItem="mUX-sN-oa8" secondAttribute="right" id="46w-nK-8d4"/>
                     <constraint firstItem="4NS-Qv-02y" firstAttribute="leading" secondItem="mUX-sN-oa8" secondAttribute="leading" id="4Fr-bx-vmN"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="2Xe-ur-neX" secondAttribute="trailing" priority="999" id="689-Vc-7ao"/>
-                    <constraint firstItem="2Xe-ur-neX" firstAttribute="leading" secondItem="mUX-sN-oa8" secondAttribute="trailing" constant="4" id="7Pv-5E-gkm"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="2Xe-ur-neX" secondAttribute="trailing" constant="44" id="689-Vc-7ao"/>
                     <constraint firstItem="ZTB-B7-OZR" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leading" id="CSu-Tb-lqZ"/>
                     <constraint firstItem="Uwb-Vy-dE7" firstAttribute="leading" secondItem="ZTB-B7-OZR" secondAttribute="trailing" id="Coh-TC-C5u"/>
                     <constraint firstItem="2Xe-ur-neX" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="Evs-mq-aoE"/>
-                    <constraint firstItem="mUX-sN-oa8" firstAttribute="leading" secondItem="HnA-Bb-1UQ" secondAttribute="trailing" priority="999" constant="16" id="Fh1-jc-iMX"/>
-                    <constraint firstItem="XQO-xE-pLx" firstAttribute="leading" secondItem="2Xe-ur-neX" secondAttribute="trailing" constant="4" id="IeP-20-CsZ">
-                        <variation key="widthClass=regular" constant="8"/>
-                    </constraint>
                     <constraint firstAttribute="bottomMargin" secondItem="4NS-Qv-02y" secondAttribute="bottom" id="Sxk-IV-5P0"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="mUX-sN-oa8" secondAttribute="trailing" constant="80" id="XSd-DE-MgM"/>
-                    <constraint firstItem="mUX-sN-oa8" firstAttribute="leading" secondItem="Uwb-Vy-dE7" secondAttribute="trailing" constant="8" id="XXa-cv-hEs"/>
+                    <constraint firstItem="mUX-sN-oa8" firstAttribute="left" secondItem="WOq-tb-OTF" secondAttribute="leftMargin" constant="56" id="XXa-cv-hEs"/>
                     <constraint firstItem="Uwb-Vy-dE7" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="b4X-h3-kb4"/>
                     <constraint firstItem="HnA-Bb-1UQ" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="cj6-KU-NTA"/>
                     <constraint firstItem="XQO-xE-pLx" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="evm-GL-FO9"/>
                     <constraint firstAttribute="trailingMargin" secondItem="XQO-xE-pLx" secondAttribute="trailing" id="ew4-ya-VWk"/>
                     <constraint firstAttribute="rightMargin" secondItem="4NS-Qv-02y" secondAttribute="right" id="gV9-QO-4Ah"/>
                     <constraint firstItem="Uwb-Vy-dE7" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leadingMargin" id="gsz-pP-Pmt"/>
-                    <constraint firstAttribute="trailing" secondItem="mUX-sN-oa8" secondAttribute="trailing" priority="999" id="nIp-de-9oL"/>
                     <constraint firstAttribute="bottomMargin" secondItem="Uwb-Vy-dE7" secondAttribute="bottom" id="qSm-jS-v60"/>
                     <constraint firstItem="ZTB-B7-OZR" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="uNb-qq-0ME"/>
-                    <constraint firstItem="XQO-xE-pLx" firstAttribute="leading" secondItem="mUX-sN-oa8" secondAttribute="trailing" priority="999" constant="8" id="xUH-ZW-LLy"/>
                 </constraints>
-                <variation key="default">
-                    <mask key="constraints">
-                        <exclude reference="XSd-DE-MgM"/>
-                        <exclude reference="nIp-de-9oL"/>
-                    </mask>
-                </variation>
-                <variation key="widthClass=regular">
-                    <mask key="constraints">
-                        <include reference="XSd-DE-MgM"/>
-                        <exclude reference="nIp-de-9oL"/>
-                        <exclude reference="7Pv-5E-gkm"/>
-                        <exclude reference="xUH-ZW-LLy"/>
-                    </mask>
-                </variation>
-                <variation key="userInterfaceIdiom=mac-widthClass=regular">
-                    <mask key="constraints">
-                        <include reference="nIp-de-9oL"/>
-                    </mask>
-                </variation>
             </tableViewCellContentView>
             <connections>
                 <outlet property="artistLabel" destination="nJe-7h-3tU" id="SlX-ew-mVM"/>
-                <outlet property="artworkTrailingTitleConstaint" destination="XXa-cv-hEs" id="5ID-Oc-DJw"/>
                 <outlet property="cacheIconImage" destination="2Xe-ur-neX" id="Wt7-D7-TTG"/>
                 <outlet property="cacheTrailingCellConstaint" destination="689-Vc-7ao" id="6J7-6Z-UNH"/>
-                <outlet property="cacheTrailingDurationConstaint" destination="IeP-20-CsZ" id="kkn-pl-tHX"/>
                 <outlet property="downloadProgress" destination="4NS-Qv-02y" id="vZf-uL-wef"/>
                 <outlet property="durationLabel" destination="XQO-xE-pLx" id="LV8-46-i0Q"/>
                 <outlet property="entityImage" destination="Uwb-Vy-dE7" id="hLh-iq-m4X"/>
                 <outlet property="favoriteIconImage" destination="ww2-RJ-EgX" id="Mbz-hq-RMS"/>
-                <outlet property="labelTrailingCacheConstraint" destination="7Pv-5E-gkm" id="nRO-nz-c3R"/>
-                <outlet property="labelTrailingCellConstraint" destination="nIp-de-9oL" id="Ri9-As-Jjt"/>
-                <outlet property="labelTrailingDurationConstraint" destination="xUH-ZW-LLy" id="b40-6T-AHW"/>
+                <outlet property="labelTrailingCellConstraint" destination="46w-nK-8d4" id="LaG-cJ-Yxk"/>
+                <outlet property="titleContainerLeadingConstraint" destination="XXa-cv-hEs" id="5ID-Oc-DJw"/>
                 <outlet property="titleLabel" destination="hPr-VQ-rTt" id="Gwv-hx-ZdG"/>
                 <outlet property="trackNumberLabel" destination="HnA-Bb-1UQ" id="UGY-2E-Agh"/>
-                <outlet property="trackNumberTrailingTitleConstaint" destination="Fh1-jc-iMX" id="2Bx-hT-DXw"/>
             </connections>
             <point key="canvasLocation" x="219" y="-213"/>
         </tableViewCell>

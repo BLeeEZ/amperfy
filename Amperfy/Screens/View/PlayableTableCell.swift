@@ -36,14 +36,8 @@ class PlayableTableCell: BasicTableCell {
     @IBOutlet weak private var cacheIconImage: UIImageView!
     @IBOutlet weak private var favoriteIconImage: UIImageView!
     
-    @IBOutlet weak var labelTrailingCacheConstraint: NSLayoutConstraint!
-    @IBOutlet weak var labelTrailingDurationConstraint: NSLayoutConstraint!
+    @IBOutlet weak var titleContainerLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var labelTrailingCellConstraint: NSLayoutConstraint!
-    
-    @IBOutlet weak var trackNumberTrailingTitleConstaint: NSLayoutConstraint!
-    @IBOutlet weak var artworkTrailingTitleConstaint: NSLayoutConstraint!
-    
-    @IBOutlet weak var cacheTrailingDurationConstaint: NSLayoutConstraint!
     @IBOutlet weak var cacheTrailingCellConstaint: NSLayoutConstraint!
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
@@ -97,8 +91,7 @@ class PlayableTableCell: BasicTableCell {
             playIndicator?.display(playable: playable, rootView: self.trackNumberLabel)
             trackNumberLabel.isHidden = false
             entityImage.isHidden = true
-            trackNumberTrailingTitleConstaint.isActive = true
-            artworkTrailingTitleConstaint.isActive = false
+            titleContainerLeadingConstraint.constant = 21 + 16 // track lable width + offset
         } else {
             playIndicator?.willDisplayIndicatorCB = nil
             playIndicator?.willHideIndicatorCB = nil
@@ -110,8 +103,7 @@ class PlayableTableCell: BasicTableCell {
             }
             trackNumberLabel.isHidden = true
             entityImage.isHidden = false
-            trackNumberTrailingTitleConstaint.isActive = false
-            artworkTrailingTitleConstaint.isActive = true
+            titleContainerLeadingConstraint.constant = 48 + 8 // artwork width + offset
         }
         
         if playerIndexCb != nil {
@@ -146,40 +138,41 @@ class PlayableTableCell: BasicTableCell {
     
     func refreshCacheAndDuration() {
         guard let playable = playable else { return }
-        let isDurationVisible = appDelegate.storage.settings.isShowSongDuration || (traitCollection.horizontalSizeClass == .regular)
-        if traitCollection.horizontalSizeClass == .regular {
-            cacheIconImage.isHidden = !playable.isCached
-            // only one distant constaint is active for regular
-        } else {
-            if playable.isCached {
-                cacheIconImage.isHidden = false
-                labelTrailingCacheConstraint.isActive = true
-                labelTrailingDurationConstraint.isActive = false
-                labelTrailingCellConstraint.isActive = false
-            } else if isDurationVisible {
-                cacheIconImage.isHidden = true
-                labelTrailingCacheConstraint.isActive = false
-                labelTrailingDurationConstraint.isActive = true
-                labelTrailingCellConstraint.isActive = false
-            } else {
-                cacheIconImage.isHidden = true
-                labelTrailingCacheConstraint.isActive = false
-                labelTrailingDurationConstraint.isActive = false
-                labelTrailingCellConstraint.isActive = true
-            }
-        }
-        
         favoriteIconImage.isHidden = !playable.isFavorite
         favoriteIconImage.tintColor = .red
         
+        let isDurationVisible = appDelegate.storage.settings.isShowSongDuration || (traitCollection.horizontalSizeClass == .regular)
+        let cacheIconWidth = (traitCollection.horizontalSizeClass == .regular) ? 17.0 : 15.0
+        let durationWidth = (traitCollection.horizontalSizeClass == .regular &&
+                             traitCollection.userInterfaceIdiom != .mac) ? 49.0 : 40.0
+        
+        // macOS & iPadOS regular
+        //|title|x|Cache|4|Duration|
+        //|title|        80        |
+        // compact
+        //|title|4|Cache|4|Duration|
+        //|title|4|  15 |4|   40   |
+        //|title|4|  15 |-|   --   |
+        //|title|8|  -- |-|   40   |
+        if traitCollection.horizontalSizeClass == .regular {
+            labelTrailingCellConstraint.constant = 80
+        } else {
+            var lableTrailing = 0.0
+            if playable.isCached, isDurationVisible {
+                lableTrailing = 4 + cacheIconWidth + 4 + durationWidth
+            } else if playable.isCached {
+                lableTrailing = 4 + cacheIconWidth
+            } else if isDurationVisible {
+                lableTrailing = 8 + durationWidth
+            }
+            labelTrailingCellConstraint.constant = lableTrailing
+        }
+        
+        cacheIconImage.isHidden = !playable.isCached
+        cacheTrailingCellConstaint.constant = isDurationVisible ? (4.0 + durationWidth) : 0.0
         durationLabel.isHidden = !isDurationVisible
         if isDurationVisible {
             durationLabel.text = playable.duration.asColonDurationString
-            cacheTrailingDurationConstaint.isActive = true
-            cacheTrailingCellConstaint.isActive = false
-        } else {
-            cacheTrailingDurationConstaint.isActive = false
-            cacheTrailingCellConstaint.isActive = true
         }
     }
     
