@@ -577,6 +577,8 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
         fetchRequest.fetchLimit = fetchLimit ?? 0
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+        // CPU load for song VCs is high when background sync is active
+        // reduce the CPU load on song VCs by turning updates off for those VCs
         keepAllResultsUpdated = false
     }
     

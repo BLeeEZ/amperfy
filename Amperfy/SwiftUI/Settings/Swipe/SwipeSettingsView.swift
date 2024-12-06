@@ -120,6 +120,9 @@ struct SwipeSettingsView: View {
             }.environment(\.editMode, .constant(.active))
             .listStyle(GroupedListStyle())
             #if targetEnvironment(macCatalyst)
+            // Set a background color to allow the move gesture to work...
+            // This bug only appears on macOS. If anybody knows a better workaround let me know!
+            .background(Color.white.opacity(0.001))
             .formSheet(isPresented: $isShowingAddView) {
                 AddSwipeActionView(isVisible: $isShowingAddView, swipePosition: $addPositionType, addCB: self.add)
                     .frame(width: 400, height: 340)
