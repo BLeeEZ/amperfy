@@ -417,6 +417,8 @@ class EntityPreviewActionBuilder {
             entityContainer.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+        }.finally {
+            self.reloadRootView()
         }
     }
     
@@ -546,9 +548,7 @@ class EntityPreviewActionBuilder {
             self.appDelegate.playableDownloadManager.removeFinishedDownload(for: self.entityPlayables)
             self.appDelegate.storage.main.library.deleteCache(of: self.entityPlayables)
             self.appDelegate.storage.main.saveContext()
-            if let rootTableView = self.rootView as? UITableViewController{
-                rootTableView.tableView.reloadData()
-            }
+            self.reloadRootView()
         }
     }
     
@@ -616,6 +616,19 @@ class EntityPreviewActionBuilder {
                 UIPasteboard.general.string = self.entityContainer.id
             }
         }])
+    }
+    
+    private func reloadRootView() {
+        if let rootTableView = self.rootView as? UITableViewController{
+            rootTableView.tableView.reloadData()
+        } else if let popupPlayer = self.rootView as? PopupPlayerVC{
+            popupPlayer.tableView.reloadData()
+        }
+#if targetEnvironment(macCatalyst)
+        if let queueVC = self.rootView as? QueueVC {
+            queueVC.tableView?.reloadData()
+        }
+#endif
     }
 }
 
