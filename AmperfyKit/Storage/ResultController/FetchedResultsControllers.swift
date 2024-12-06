@@ -577,7 +577,6 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
         fetchRequest.fetchLimit = fetchLimit ?? 0
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
-        keepAllResultsUpdated = false
     }
     
     public func search(searchText: String, onlyCachedSongs: Bool, displayFilter: DisplayCategoryFilter) {
