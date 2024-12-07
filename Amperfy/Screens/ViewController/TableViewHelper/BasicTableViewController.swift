@@ -234,6 +234,9 @@ class BasicTableViewController: KeyCommandTableViewController {
                     self.appDelegate.playableDownloadManager.removeFinishedDownload(for: actionContext.playables)
                     self.appDelegate.storage.main.library.deleteCache(of: actionContext.playables)
                     self.appDelegate.storage.main.saveContext()
+                    if let cell = self.tableView.cellForRow(at: indexPath) as? PlayableTableCell {
+                        cell.refresh()
+                    }
                 case .addToPlaylist:
                     let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
                     selectPlaylistVC.itemsToAdd = actionContext.playables
@@ -256,6 +259,10 @@ class BasicTableViewController: KeyCommandTableViewController {
                         actionContext.containable.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
                     }.catch { error in
                         self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+                    }.finally {
+                        if let cell = self.tableView.cellForRow(at: indexPath) as? PlayableTableCell {
+                            cell.refresh()
+                        }
                     }
                 }
             }
