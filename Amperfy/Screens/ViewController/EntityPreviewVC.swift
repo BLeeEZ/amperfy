@@ -116,10 +116,10 @@ class EntityPreviewActionBuilder {
         if !gotoActions.isEmpty {
             menuActions.append(UIMenu(options: .displayInline, children: gotoActions))
         }
-        if let libraryEntity = entityContainer as? AbstractLibraryEntity, entityContainer.isFavoritable {
+        if let libraryEntity = entityContainer as? AbstractLibraryEntity, entityContainer.isFavoritable, appDelegate.storage.settings.isOnlineMode {
             ratingFavActions.append(createFavoriteMenu(libraryEntity: libraryEntity))
         }
-        if let libraryEntity = entityContainer as? AbstractLibraryEntity, entityContainer.isRateable {
+        if let libraryEntity = entityContainer as? AbstractLibraryEntity, entityContainer.isRateable, appDelegate.storage.settings.isOnlineMode {
             ratingFavActions.append(createRatingMenu(libraryEntity: libraryEntity))
         }
         if !ratingFavActions.isEmpty {
