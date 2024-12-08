@@ -33,6 +33,7 @@
 		5021B1282BC723F400893C33 /* FuzzySearcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5021B1272BC723F400893C33 /* FuzzySearcher.swift */; };
 		5023D9B02BD9A55E00310144 /* CacheFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5023D9AF2BD9A55E00310144 /* CacheFileManager.swift */; };
 		5023D9B22BDAA48200310144 /* UpdateVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5023D9B12BDAA48200310144 /* UpdateVC.swift */; };
+		502B98ED2D03A02D000FE187 /* PlaylistEditVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502B98EC2D03A02D000FE187 /* PlaylistEditVC.swift */; };
 		502E56BC27561AD900638BD2 /* UserQueueSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502E56BB27561AD900638BD2 /* UserQueueSectionHeader.swift */; };
 		502E56BD27561C2700638BD2 /* UserQueueSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* UserQueueSectionHeader.xib */; };
 		504262A52BF48ADF00B5EF38 /* CommonLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504262A42BF48ADF00B5EF38 /* CommonLibrarySyncer.swift */; };
@@ -614,6 +615,7 @@
 		5029288C2657B78B00DA3A8F /* UserStatisticsMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserStatisticsMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		5029288D2657B78B00DA3A8F /* UserStatisticsMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserStatisticsMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		5029E0382235A8EC0027F96F /* CommonString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonString.swift; sourceTree = "<group>"; };
+		502B98EC2D03A02D000FE187 /* PlaylistEditVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditVC.swift; sourceTree = "<group>"; };
 		502C0044224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubsonicArtworkDownloadDelegate.swift; sourceTree = "<group>"; };
 		502E56BA27561AD900638BD2 /* UserQueueSectionHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UserQueueSectionHeader.xib; sourceTree = "<group>"; };
 		502E56BB27561AD900638BD2 /* UserQueueSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserQueueSectionHeader.swift; sourceTree = "<group>"; };
@@ -1603,6 +1605,7 @@
 				50BA92F921CC37F800E5901D /* SongsVC.swift */,
 				5007CE4021EF5F4300BC5CBA /* PlaylistsVC.swift */,
 				5007CE4621EF6A8E00BC5CBA /* PlaylistDetailVC.swift */,
+				502B98EC2D03A02D000FE187 /* PlaylistEditVC.swift */,
 				50065EB321F0584D0066FC32 /* PlaylistSelectorVC.swift */,
 				50C16C0521E241B200F086F0 /* SearchVC.swift */,
 				5077F935221E6D0E0099CA91 /* DownloadsVC.swift */,
@@ -2247,6 +2250,7 @@
 				5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */,
 				50CFB59A28D5009200A47D44 /* ArtworkDownloadSettingsView.swift in Sources */,
 				50DF1E5628DDE3FA00F3EA00 /* AlbumCollectionCell.swift in Sources */,
+				502B98ED2D03A02D000FE187 /* PlaylistEditVC.swift in Sources */,
 				637A28AD2C77BB9A0082FACC /* ControlBarButton.swift in Sources */,
 				50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */,
 				501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */,

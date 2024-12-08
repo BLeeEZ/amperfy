@@ -27,19 +27,18 @@ import CoreData
 class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
     
     var playlist: Playlist!
-    var isEditing = false
-    
-    #if targetEnvironment(macCatalyst)
+    var isMoveAllowed = false
+    var isEditAllowed = true
+
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the item to be re-orderable.
-        return isEditing
+        return isMoveAllowed
     }
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return true to be enable swipe
-        return true
+        return isEditAllowed
     }
-    #endif
 
     override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         exectueAfterAnimation {
@@ -114,7 +113,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         tableView.estimatedRowHeight = PlayableTableCell.rowHeight
 
         // Use a single button, two buttons don't work on catalyst
-        editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(toggleEditing))
+        editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(openEditView))
         optionsButton = OptionsBarButton()
 
         optionsButton.menu = UIMenu.lazyMenu {
@@ -126,7 +125,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
             playContextCb: {() in PlayContext(containable: self.playlist, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
             player: appDelegate.player,
             isInfoAlwaysHidden: true)
-        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: playlist, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
+        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: playlist, rootView: self, tableView: tableView, playShuffleInfoConfig: playShuffleInfoConfig)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         
@@ -170,28 +169,23 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
     func refreshBarButtons() {
         var edititingBarButton: UIBarButtonItem? = nil
-        if !tableView.isEditing {
-            if appDelegate.storage.settings.isOnlineMode {
-                edititingBarButton = editButton
-                edititingBarButton?.title = "Edit"
-                edititingBarButton?.style = .plain
-                if playlist?.isSmartPlaylist ?? false {
-                    edititingBarButton?.isEnabled = false
-                }
-            }
-        } else {
-            edititingBarButton = editButton
-            edititingBarButton?.title = "Done"
-            edititingBarButton?.style = .done
-        }
 
-        #if targetEnvironment(macCatalyst)
+        if appDelegate.storage.settings.isOnlineMode {
+            edititingBarButton = editButton
+            edititingBarButton?.title = "Edit"
+            edititingBarButton?.style = .plain
+            if playlist?.isSmartPlaylist ?? false {
+                edititingBarButton?.isEnabled = false
+            }
+        }
+        
+#if targetEnvironment(macCatalyst)
         navigationItem.leftItemsSupplementBackButton = true
         navigationItem.rightBarButtonItem = optionsButton
         navigationItem.leftBarButtonItem = edititingBarButton
-        #else
+#else
         navigationItem.rightBarButtonItems = [optionsButton, edititingBarButton].compactMap{$0}
-        #endif
+#endif
     }
     
     func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
@@ -206,41 +200,23 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         return convertIndexPathToPlayContext(songIndexPath: IndexPath(row: indexPath.row, section: 0))
     }
 
-    @objc private func toggleEditing(sender: UIBarButtonItem) {
-        if tableView.isEditing {
-            self.endEditing()
-        } else {
-            self.startEditing()
+    @objc private func openEditView(sender: UIBarButtonItem) {
+        let playlistDetailVC = PlaylistEditVC.instantiateFromAppStoryboard()
+        playlistDetailVC.playlist = self.playlist
+        let playlistDetailNav = UINavigationController(rootViewController: playlistDetailVC)
+        playlistDetailVC.onDoneCB = {
+            self.detailOperationsView?.refresh()
+            self.tableView.reloadData()
         }
+        self.present(playlistDetailNav, animated: true, completion: nil)
     }
 
-    private func startEditing() {
-        (diffableDataSource as? PlaylistDetailDiffableDataSource)?.isEditing = true
-        tableView.isEditing = true
-        detailOperationsView?.startEditing()
-        refreshBarButtons()
-    }
-    
-    private func endEditing() {
-        (diffableDataSource as? PlaylistDetailDiffableDataSource)?.isEditing = false
-        tableView.isEditing = false
-        detailOperationsView?.endEditing()
-        refreshBarButtons()
-    }
-    
     func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, playlistItem: PlaylistItem) -> UITableViewCell {
         let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
         if let playable = playlistItem.playable, let song = playable.asSong {
             cell.display(playable: song, playContextCb: convertCellViewToPlayContext, rootView: self)
         }
         return cell
-    }
-    
-    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-        if tableView.isEditing {
-            return .delete
-        }
-        return .none
     }
     
     override func updateSearchResults(for searchController: UISearchController) {

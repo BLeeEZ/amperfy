@@ -78,7 +78,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
             playContextCb: {() in PlayContext(containable: self.album, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
             player: appDelegate.player,
             isInfoAlwaysHidden: true)
-        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: album, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
+        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: album, rootView: self, tableView: tableView, playShuffleInfoConfig: playShuffleInfoConfig)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
 
         optionsButton.menu = UIMenu.lazyMenu {

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="ipad12_9rounded" orientation="landscape" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -277,17 +277,19 @@
                 <outlet property="entityImage" destination="3rO-9J-GXf" id="YmA-Of-PFc"/>
                 <outlet property="infoLabel" destination="iPX-Fa-tH3" id="j5o-NT-gP7"/>
                 <outlet property="nameTextField" destination="5tB-lt-aqS" id="fqU-iW-Y7N"/>
+                <outlet property="playShuffleInfoContainerView" destination="qxL-Fz-Vwm" id="SSL-Vb-1Vu"/>
                 <outlet property="playShuffleInfoPlaceholderStack" destination="3ks-ab-Tsv" id="0DN-Rf-Ps8"/>
                 <outlet property="subtitleLabel" destination="Mie-tL-VVX" id="Uq3-yR-wnF"/>
                 <outlet property="subtitleView" destination="Qob-Cu-9TI" id="2aq-o8-Oaf"/>
                 <outlet property="titleLabel" destination="XhW-hw-pIz" id="ick-V4-fQl"/>
+                <outlet property="titlePlayButtonContainerHeightConstraint" destination="qb1-LU-seD" id="9j2-7e-laW"/>
             </connections>
             <point key="canvasLocation" x="89.165446559297209" y="-82.32421875"/>
         </view>
     </objects>
     <resources>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

@@ -58,7 +58,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
             },
             player: appDelegate.player,
             isInfoAlwaysHidden: true)
-        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: artist, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
+        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: artist, rootView: self, tableView: tableView, playShuffleInfoConfig: playShuffleInfoConfig)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
         
         optionsButton.menu = UIMenu.lazyMenu {

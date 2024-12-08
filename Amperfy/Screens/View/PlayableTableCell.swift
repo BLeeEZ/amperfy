@@ -25,6 +25,12 @@ import AmperfyKit
 typealias GetPlayContextFromTableCellCallback = (UITableViewCell) -> PlayContext?
 typealias GetPlayerIndexFromTableCellCallback = (PlayableTableCell) -> PlayerIndex?
 
+enum DisplayMode {
+    case normal
+    case selection
+    case reorder
+}
+
 class PlayableTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
@@ -50,23 +56,28 @@ class PlayableTableCell: BasicTableCell {
     private var rootView: UIViewController?
     private var playIndicator: PlayIndicator?
     private var isDislayAlbumTrackNumberStyle: Bool = false
+    private var displayMode: DisplayMode = .normal
+    
+    public var isMarked = false
 
     override func awakeFromNib() {
         super.awakeFromNib()
         playContextCb = nil
     }
     
-    func display(playable: AbstractPlayable, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, isDislayAlbumTrackNumberStyle: Bool = false, download: Download? = nil) {
+    func display(playable: AbstractPlayable, displayMode: DisplayMode = .normal, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, isDislayAlbumTrackNumberStyle: Bool = false, download: Download? = nil, isMarked: Bool = false) {
         if playIndicator == nil {
             playIndicator = PlayIndicator(rootViewTypeName: rootView.typeName)
         }
         self.playable = playable
+        self.displayMode = displayMode
         self.playContextCb = playContextCb
         self.playerIndexCb = playerIndexCb
         self.rootView = rootView
         self.isDislayAlbumTrackNumberStyle = isDislayAlbumTrackNumberStyle
         self.download = download
-        self.selectionStyle = .none
+        self.selectionStyle = .default
+        self.isMarked = isMarked
         refresh()
     }
 
@@ -106,7 +117,11 @@ class PlayableTableCell: BasicTableCell {
             titleContainerLeadingConstraint.constant = 48 + 8 // artwork width + offset
         }
         
-        if playerIndexCb != nil {
+        if displayMode == .selection {
+            let img = UIImageView(image: isMarked ? .checkmark : .circle)
+            img.tintColor = isMarked ? appDelegate.storage.settings.themePreference.asColor : .secondaryLabelColor
+            accessoryView = img
+        } else if displayMode == .reorder || playerIndexCb != nil {
             let img = UIImageView(image: .bars)
             img.tintColor = .labelColor
             accessoryView = img
@@ -195,7 +210,9 @@ class PlayableTableCell: BasicTableCell {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        playThisSong()
+        if displayMode == .normal {
+           playThisSong()
+        }
     }
     
     func playThisSong() {

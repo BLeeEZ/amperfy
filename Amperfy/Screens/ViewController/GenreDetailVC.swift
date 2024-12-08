@@ -60,7 +60,7 @@ class GenreDetailVC: MultiSourceTableViewController {
             playContextCb: {() in PlayContext(containable: self.genre, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
             player: appDelegate.player,
             isInfoAlwaysHidden: true)
-        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: genre, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig)
+        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: genre, rootView: self, tableView: tableView, playShuffleInfoConfig: playShuffleInfoConfig)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
 
         optionsButton.menu = UIMenu.lazyMenu {

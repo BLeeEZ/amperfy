@@ -64,7 +64,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
             customPlayName: "Newest Episode",
             isShuffleHidden: true
         )
-        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: podcast, rootView: self, playShuffleInfoConfig: playShuffleInfoConfig, descriptionText: podcast.depiction)
+        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: podcast, rootView: self, tableView: tableView, playShuffleInfoConfig: playShuffleInfoConfig, descriptionText: podcast.depiction)
         detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
         optionsButton.menu = UIMenu.lazyMenu {
