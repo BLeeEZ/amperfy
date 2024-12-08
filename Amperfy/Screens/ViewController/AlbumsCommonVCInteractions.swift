@@ -259,7 +259,7 @@ class AlbumsCommonVCInteractions {
 
         if UIDevice.current.userInterfaceIdiom == .mac {
             sliderMenuView.slider.minimumValue = 3
-            sliderMenuView.slider.maximumValue = 7
+            sliderMenuView.slider.maximumValue =  11
         } else if UIDevice.current.userInterfaceIdiom == .pad {
             sliderMenuView.slider.minimumValue = 3
             sliderMenuView.slider.maximumValue = 7

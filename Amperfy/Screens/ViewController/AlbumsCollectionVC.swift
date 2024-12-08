@@ -152,6 +152,8 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
 
     fileprivate var common = AlbumsCommonVCInteractions()
 
+    private var previousSize: CGSize = .zero
+
     public var displayFilter: DisplayCategoryFilter {
         set { common.displayFilter = newValue }
         get { return common.displayFilter }
@@ -265,6 +267,16 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
         collectionView.reloadData()
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        // Recalculate the layout when the viewController is resized
+        let currentSize = view.bounds.size
+        if currentSize != previousSize {
+            previousSize = currentSize
+            collectionView.collectionViewLayout.invalidateLayout()
+        }
+    }
  }
 
 extension AlbumsCollectionVC: UICollectionViewDelegateFlowLayout {

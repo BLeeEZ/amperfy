@@ -37,6 +37,8 @@ class AppKitController: NSObject {
 
 	var utilitySceneIdentifier: [String: WindowProperties] = [:]
 
+    var sceneIdentifierToQualifiedSceneIdentifier: [String: String] = [:]
+
     @objc static var controlAccentAppColor: NSColor? = .clear
 
     @objc public func updateControlAccentColor(_ color: CGColor) {
@@ -62,9 +64,10 @@ class AppKitController: NSObject {
     }
 
 	@objc public func _catalyst_setupWindow(_ note: Notification) {
-		if let userInfo = note.userInfo, let sceneIdentifier = userInfo["SceneIdentifier"] as? String {
-            let kv = utilitySceneIdentifier.first(where: { sceneIdentifier.hasSuffix($0.key) })
+		if let userInfo = note.userInfo, let qualifiedSceneIdentifier = userInfo["SceneIdentifier"] as? String {
+            let kv = utilitySceneIdentifier.first(where: { qualifiedSceneIdentifier.hasSuffix($0.key) })
             if let kv {
+                sceneIdentifierToQualifiedSceneIdentifier[kv.key] = qualifiedSceneIdentifier
                 let windowProperties = kv.value
                 var styleMask: NSWindow.StyleMask = [.closable, .titled]
                 if windowProperties["fullSizeContentView"] as? Bool == true {
@@ -80,7 +83,7 @@ class AppKitController: NSObject {
 				guard let appDelegate = NSApp.delegate as? NSObject else { return }
 				
 				if appDelegate.responds(to: #selector(hostWindowForSceneIdentifier(_:))) {
-					guard let hostWindow = appDelegate.hostWindowForSceneIdentifier(sceneIdentifier) else { return }
+					guard let hostWindow = appDelegate.hostWindowForSceneIdentifier(qualifiedSceneIdentifier) else { return }
 
                     if windowProperties["auxiliary"] as? Bool == true {
                         hostWindow.collectionBehavior = [.fullScreenAuxiliary]
@@ -104,4 +107,16 @@ class AppKitController: NSObject {
 	@objc public func configureUtilityWindowForSceneIdentifier(_ sceneIdentifier: String, properties: WindowProperties) {
         utilitySceneIdentifier[sceneIdentifier] = properties
 	}
+
+    @objc public func saveWindowFrameForSceneIdentifier(_  sceneIdentifier: String, autosaveName: String) {
+        guard let appDelegate = NSApp.delegate as? NSObject,
+              let qualifiedSceneIdentifier = sceneIdentifierToQualifiedSceneIdentifier[sceneIdentifier] else {
+                return
+            }
+
+        if appDelegate.responds(to: #selector(hostWindowForSceneIdentifier(_:))) {
+            guard let hostWindow = appDelegate.hostWindowForSceneIdentifier(qualifiedSceneIdentifier) else { return }
+            hostWindow.saveFrame(usingName: autosaveName)
+        }
+    }
 }
