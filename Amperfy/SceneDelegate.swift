@@ -145,6 +145,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This may occur due to temporary interruptions (ex. an incoming phone call).
         os_log("sceneWillResignActive", log: self.log, type: .info)
         appDelegate.quickActionsManager.configureQuickActions()
+        // Save the size of the window
+        AppDelegate.saveWindowFrame(scene.session.persistentIdentifier, autosaveName: "mainWindow")
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {

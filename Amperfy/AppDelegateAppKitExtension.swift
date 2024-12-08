@@ -32,6 +32,7 @@ extension AppKitController {
 
     @objc public func _catalyst_setupWindow(_ sender:Any) {}
     @objc public func configureUtilityWindowForSceneIdentifier(_ sceneIdentifier: String, properties: [String: Any]) {}
+    @objc public func saveWindowFrameForSceneIdentifier(_  sceneIdentifier: String, autosaveName: String) {}
 }
 
 extension AppDelegate {
@@ -47,6 +48,10 @@ extension AppDelegate {
 
     class func configureUtilityWindow(persistentIdentifier: String, properties: [String: Any] = [:]) {
         appKitController?.perform(#selector(configureUtilityWindowForSceneIdentifier(_:properties:)), with: persistentIdentifier, with: properties)
+    }
+
+    class func saveWindowFrame(_  sceneIdentifier: String, autosaveName: String) {
+        appKitController?.perform(#selector(saveWindowFrameForSceneIdentifier(_:autosaveName:)), with: sceneIdentifier, with: autosaveName)
     }
 
     class func loadAppKitIntegrationFramework() {
