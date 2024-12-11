@@ -74,7 +74,7 @@ public class AmperKit {
     public lazy var player: PlayerFacade = {
         let audioSessionHandler = AudioSessionHandler()
         let backendAudioPlayer = BackendAudioPlayer(
-            createAVPlayerCB: { return AVPlayer() },
+            createAVPlayerCB: { return AVQueuePlayer() },
             audioSessionHandler: audioSessionHandler,
             eventLogger: eventLogger,
             backendApi: backendApi,

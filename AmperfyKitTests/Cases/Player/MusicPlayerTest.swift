@@ -31,7 +31,7 @@ class MOCK_AVPlayerItem: AVPlayerItem {
     }
 }
 
-class MOCK_AVPlayer: AVPlayer {
+class MOCK_AVPlayer: AVQueuePlayer {
     var useMockCurrentItem = false
     
     override var currentItem: AVPlayerItem? {

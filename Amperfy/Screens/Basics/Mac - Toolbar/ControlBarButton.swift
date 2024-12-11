@@ -69,7 +69,7 @@ class PlayBarButton: ControlBarButton {
     }
 
     override func didStartPlaying() {
-        self.updateImage(image: .pause)
+        self.updateImage(image: (player?.isPlaying ?? false) ? .pause : .play)
     }
 
     override func didPause() {
