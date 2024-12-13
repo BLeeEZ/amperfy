@@ -106,12 +106,18 @@ struct PlayerSettingsView: View {
     func streamingFormatRaw() {
         settings.streamingFormatPreference = .raw
     }
+    func streamingFormatServerConfig() {
+        settings.streamingFormatPreference = .serverConfig
+    }
     
     func cacheFormatMp3() {
         settings.cacheTranscodingFormatPreference = .mp3
     }
     func cacheFormatRaw() {
         settings.cacheTranscodingFormatPreference = .raw
+    }
+    func cacheFormatServerConfig() {
+        settings.cacheTranscodingFormatPreference = .serverConfig
     }
     
     var body: some View {
@@ -171,6 +177,7 @@ struct PlayerSettingsView: View {
                         Menu(settings.streamingFormatPreference.description) {
                             Button(StreamingFormatPreference.mp3.description, action: streamingFormatMp3)
                             Button(StreamingFormatPreference.raw.description, action: streamingFormatRaw)
+                            Button(StreamingFormatPreference.serverConfig.description, action: streamingFormatServerConfig)
                         }
                     }
                 }, footer:
@@ -182,6 +189,7 @@ struct PlayerSettingsView: View {
                         Menu(settings.cacheTranscodingFormatPreference.description) {
                             Button(CacheTranscodingFormatPreference.mp3.description, action: cacheFormatMp3)
                             Button(CacheTranscodingFormatPreference.raw.description, action: cacheFormatRaw)
+                            Button(CacheTranscodingFormatPreference.serverConfig.description, action: cacheFormatServerConfig)
                         }
                     }
                 }, footer:

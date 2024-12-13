@@ -725,6 +725,8 @@ class AmpacheXmlServerApi: URLCleanser {
                     urlComp.addQueryItem(name: "format", value: "mp3")
                 case .raw:
                     urlComp.addQueryItem(name: "format", value: "raw")
+                case .serverConfig:
+                    break // do nothing
                 }
                 switch maxBitrate {
                 case .noLimit:

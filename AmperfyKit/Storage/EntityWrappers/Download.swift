@@ -35,6 +35,7 @@ public class Download: NSObject {
     }
     
     public var fileURL: URL? // Will not be saved in CoreData
+    public var mimeType: String? // Will not be saved in CoreData
 
     public var title: String {
         return element?.displayString ?? ""

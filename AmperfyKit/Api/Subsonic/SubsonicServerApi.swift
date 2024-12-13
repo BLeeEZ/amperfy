@@ -271,6 +271,11 @@ class SubsonicServerApi: URLCleanser {
                     urlComp.addQueryItem(name: "format", value: "mp3")
                     let url = try self.createUrl(from: urlComp)
                     seal.fulfill(url)
+                case .serverConfig:
+                    var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiID)
+                    // let the server decide which format to use
+                    let url = try self.createUrl(from: urlComp)
+                    seal.fulfill(url)
                 case .raw:
                     let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "download", id: apiID)
                     let url = try self.createUrl(from: urlComp)
@@ -292,6 +297,8 @@ class SubsonicServerApi: URLCleanser {
                     urlComp.addQueryItem(name: "format", value: "mp3")
                 case .raw:
                     urlComp.addQueryItem(name: "format", value: "raw")
+                case .serverConfig:
+                    break // do nothing
                 }
                 switch maxBitrate {
                 case .noLimit:

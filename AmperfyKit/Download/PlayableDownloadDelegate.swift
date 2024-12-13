@@ -73,7 +73,7 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
                 return seal(Void())
             }
             firstly {
-                self.savePlayableDataAsync(playable: playable, downloadUrl: url, fileURL: fileURL, storage: storage)
+                self.savePlayableDataAsync(playable: playable, downloadUrl: url, fileURL: fileURL, fileMimeType: download.mimeType, storage: storage)
             }.then {
                 self.artworkExtractor.extractEmbeddedArtwork(storage: storage, playable: playable)
             }.catch { error in
@@ -85,12 +85,12 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     }
     
     /// save downloaded playable async to avoid memory overflow issues due to kept references
-    func savePlayableDataAsync(playable: AbstractPlayable, downloadUrl: URL, fileURL: URL, storage: PersistentStorage) -> Promise<Void> {
+    func savePlayableDataAsync(playable: AbstractPlayable, downloadUrl: URL, fileURL: URL, fileMimeType: String?, storage: PersistentStorage) -> Promise<Void> {
         return storage.async.perform { companion in
             guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else { return }
             let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
             let transcodingInfo = self.backendApi.determTranscodingInfo(url: downloadUrl)
-            playableAsync.contentTypeTranscoded = transcodingInfo.format?.asMIMETypeString
+            playableAsync.contentTypeTranscoded = fileMimeType ?? transcodingInfo.format?.asMIMETypeString
             // transcoding info needs to available to generate a correct file extension
             guard let relFilePath = self.fileManager.createRelPath(for: playableAsync),
                   let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)

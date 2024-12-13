@@ -182,18 +182,19 @@ class DownloadManager: NSObject, DownloadManageable {
         storage.main.library.saveContext()
     }
     
-    func finishDownload(download: Download, fileURL: URL) {
+    func finishDownload(download: Download, fileURL: URL, fileMimeType: String?) {
         self.activeTasks.signal()
         self.triggerBackgroundDownload()
         
         download.fileURL = fileURL
+        download.mimeType = fileMimeType
         if let responseError = downloadDelegate.validateDownloadedData(download: download) {
             os_log("Fetching %s API-ERROR StatusCode: %d, Message: %s", log: log, type: .error, download.title, responseError.statusCode, responseError.message)
             eventLogger.report(topic: "Download", error: responseError, displayPopup: isFailWithPopupError)
             finishDownload(download: download, error: .apiErrorResponse)
             return
         }
-        os_log("Fetching %s SUCCESS (%{iec-bytes}d)", log: self.log, type: .info, download.title, fileManager.getFileSize(url: fileURL) ?? 0)
+        os_log("Fetching %s SUCCESS (%{iec-bytes}d) (%s)", log: self.log, type: .info, download.title, fileManager.getFileSize(url: fileURL) ?? 0, fileMimeType ?? "no MIME type")
         firstly {
             downloadDelegate.completedDownload(download: download, storage: self.storage)
         }.done {

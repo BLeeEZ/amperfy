@@ -33,6 +33,8 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         guard let requestUrl = downloadTask.originalRequest?.url?.absoluteString else { return }
         let filePath = try? fileManager.moveItemToTempDirectoryWithUniqueName(at: location)
+        let fileMimeType = downloadTask.response?.mimeType
+        
         // didFinishDownloadingTo location
         // A file URL for the temporary file. Because the file is temporary, you must either open the file for
         // reading or move it to a permanent location in your app’s sandbox container directory before returning from this delegate method.
@@ -57,7 +59,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
                 if let activeError = downloadError {
                     self.finishDownload(download: download, error: activeError)
                 } else if let filePath = filePath {
-                    self.finishDownload(download: download, fileURL: filePath)
+                    self.finishDownload(download: download, fileURL: filePath, fileMimeType: fileMimeType)
                 } else {
                     self.finishDownload(download: download, error: .emptyFile)
                 }

@@ -113,6 +113,7 @@ public enum StreamingMaxBitratePreference: Int, CaseIterable {
 public enum StreamingFormatPreference: Int, CaseIterable {
     case mp3 = 0
     case raw = 1
+    case serverConfig = 2 // omit the format to let the server decide which codec should be used
     
     public static let defaultValue: StreamingFormatPreference = .mp3
     
@@ -122,6 +123,8 @@ public enum StreamingFormatPreference: Int, CaseIterable {
             return "mp3 (default)"
         case .raw:
             return "Raw/Original"
+        case .serverConfig:
+            return "Server chooses Codec"
         }
     }
 }
@@ -199,6 +202,7 @@ public enum ThemePreference: Int, CaseIterable {
 public enum CacheTranscodingFormatPreference: Int, CaseIterable {
     case raw = 0
     case mp3 = 1
+    case serverConfig = 2 // omit the format to let the server decide which codec should be used
     
     public static let defaultValue: CacheTranscodingFormatPreference = .mp3
     
@@ -208,6 +212,8 @@ public enum CacheTranscodingFormatPreference: Int, CaseIterable {
             return "raw"
         case .mp3:
             return "mp3"
+        case .serverConfig:
+            return "raw"
         }
     }
     
@@ -228,6 +234,8 @@ public enum CacheTranscodingFormatPreference: Int, CaseIterable {
             return nil
         case .mp3:
             return "audio/mpeg"
+        case .serverConfig:
+            return nil
         }
     }
     
@@ -246,6 +254,8 @@ public enum CacheTranscodingFormatPreference: Int, CaseIterable {
             return "mp3 (default)"
         case .raw:
             return "Raw/Original"
+        case .serverConfig:
+            return "Server chooses Codec"
         }
     }
 }
