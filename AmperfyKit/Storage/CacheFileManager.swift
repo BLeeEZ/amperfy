@@ -20,6 +20,60 @@
 //
 
 import Foundation
+import UniformTypeIdentifiers
+
+public class MimeFileConverter {
+    static let filenameExtensionUnknown = "unknown"
+    static let mimeTypeUnknown = "application/octet-stream"
+    
+    static let mimeTypes = [
+        "ogg": "audio/ogg",
+        "ogx": "application/ogg",
+        "flac": "audio/x-flac" // the case "audio/flac" is already covered by UTType
+    ]
+    
+    static let iOSIncompatibleMimeTypes = [
+        "audio/x-ms-wma",
+        "audio/ogg",
+        "application/ogg",
+        mimeTypeUnknown
+    ]
+    
+    static let conversionNeededMimeTypes = [
+        "audio/x-flac": "audio/flac",
+        "audio/m4a": "audio/mp4"
+    ]
+    
+    static func convertToValidMimeTypeWhenNeccessary(mimeType: String) -> String {
+        let mimeTypeLowerCased = mimeType.lowercased()
+        return Self.conversionNeededMimeTypes[mimeTypeLowerCased] ?? mimeTypeLowerCased
+    }
+    
+    static func isMimeTypePlayableOniOS(mimeType: String) -> Bool {
+        return !iOSIncompatibleMimeTypes.contains(where: { $0 == mimeType.lowercased() })
+    }
+    
+    static func getMIMEType(filenameExtension: String?) -> String? {
+        guard let filenameExtension = filenameExtension?.lowercased(),
+                  filenameExtension != "raw"
+        else { return nil }
+        
+        let mimeType = UTType(filenameExtension: filenameExtension)?.preferredMIMEType ??
+                       mimeTypes[filenameExtension] ??
+                       Self.mimeTypeUnknown
+        return mimeType
+    }
+    
+    static func getFilenameExtension(mimeType: String?) -> String {
+        guard let mimeType = mimeType?.lowercased()
+        else { return Self.filenameExtensionUnknown }
+        
+        let fileExt = UTType(mimeType: mimeType)?.preferredFilenameExtension ??
+                      mimeTypes.findKey(forValue: mimeType) ??
+                      Self.filenameExtensionUnknown
+        return fileExt
+    }
+}
 
 public class CacheFileManager {
     
@@ -150,7 +204,7 @@ public class CacheFileManager {
         let url: URL
         let id: String
         let fileType: String
-        let transcodingType: CacheTranscodingFormatPreference
+        let mimeType: String?
         let relFilePath: URL?
     }
     
@@ -174,12 +228,12 @@ public class CacheFileManager {
             let fileName = url.lastPathComponent
             var id = fileName
             let pathExtension = url.pathExtension
-            var transcodingType = CacheTranscodingFormatPreference.raw
+            var mimeType: String?
             if !pathExtension.isEmpty {
                 id = (fileName as NSString).deletingPathExtension
-                transcodingType = CacheTranscodingFormatPreference.createFromFileFormatString(pathExtension) ?? .raw
+                mimeType = MimeFileConverter.getMIMEType(filenameExtension: pathExtension)
             }
-            cacheInfo.append(PlayableCacheInfo(url: url, id: id, fileType: pathExtension, transcodingType: transcodingType, relFilePath: Self.songsDir.appendingPathComponent(fileName)))
+            cacheInfo.append(PlayableCacheInfo(url: url, id: id, fileType: pathExtension, mimeType: mimeType, relFilePath: Self.songsDir.appendingPathComponent(fileName)))
         }
         return cacheInfo
     }
@@ -204,12 +258,12 @@ public class CacheFileManager {
             let fileName = url.lastPathComponent
             var id = fileName
             let pathExtension = url.pathExtension
-            var transcodingType = CacheTranscodingFormatPreference.raw
+            var mimeType: String?
             if !pathExtension.isEmpty {
                 id = (fileName as NSString).deletingPathExtension
-                transcodingType = CacheTranscodingFormatPreference.createFromFileFormatString(pathExtension) ?? .raw
+                mimeType = MimeFileConverter.getMIMEType(filenameExtension: pathExtension)
             }
-            cacheInfo.append(PlayableCacheInfo(url: url, id: id, fileType: pathExtension, transcodingType: transcodingType, relFilePath: Self.episodesDir.appendingPathComponent(fileName)))
+            cacheInfo.append(PlayableCacheInfo(url: url, id: id, fileType: pathExtension, mimeType: mimeType, relFilePath: Self.episodesDir.appendingPathComponent(fileName)))
         }
         return cacheInfo
     }
@@ -360,15 +414,21 @@ public class CacheFileManager {
     
     public func createRelPath(for playable: AbstractPlayable) -> URL? {
         guard !playable.playableManagedObject.id.isEmpty else { return nil }
-        var transcodingType = CacheTranscodingFormatPreference.createFromMIMETypeString(playable.contentTypeTranscoded)
-        // check if the original format is mp3
-        if transcodingType == .raw {
-            transcodingType = CacheTranscodingFormatPreference.createFromMIMETypeString(playable.contentType)
-        }
+        
+        let fileExtension: String = {
+            if let mimeType = playable.contentTypeTranscoded {
+                return MimeFileConverter.getFilenameExtension(mimeType: mimeType)
+            } else if let mimeType = playable.contentType {
+                return MimeFileConverter.getFilenameExtension(mimeType: mimeType)
+            } else {
+                return MimeFileConverter.filenameExtensionUnknown
+            }
+        }()
+
         if playable.isSong {
-            return Self.songsDir.appendingPathComponent(playable.playableManagedObject.id).appendingPathExtension(transcodingType.asFileFormatString)
+            return Self.songsDir.appendingPathComponent(playable.playableManagedObject.id).appendingPathExtension(fileExtension)
         } else {
-            return Self.episodesDir.appendingPathComponent(playable.playableManagedObject.id).appendingPathExtension(transcodingType.asFileFormatString)
+            return Self.episodesDir.appendingPathComponent(playable.playableManagedObject.id).appendingPathExtension(fileExtension)
         }
     }
     

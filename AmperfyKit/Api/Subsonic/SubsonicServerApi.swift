@@ -272,7 +272,7 @@ class SubsonicServerApi: URLCleanser {
                     let url = try self.createUrl(from: urlComp)
                     seal.fulfill(url)
                 case .serverConfig:
-                    var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiID)
+                    let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiID)
                     // let the server decide which format to use
                     let url = try self.createUrl(from: urlComp)
                     seal.fulfill(url)
@@ -323,26 +323,6 @@ class SubsonicServerApi: URLCleanser {
         }.then { version in
             Promise<URL>.value(try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "getCoverArt", id: coverArtId)))
         }
-    }
-    
-    func determTranscodingInfo(url: URL) -> TranscodingInfo {
-        var info = TranscodingInfo()
-        let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        if let queryItems = urlComp?.queryItems {
-            for queryItem in queryItems {
-                if queryItem.name == "format",
-                   let formatRaw = queryItem.value,
-                   let format = CacheTranscodingFormatPreference.createFromFileFormatString(formatRaw) {
-                    info.format = format
-                } else if queryItem.name == "maxBitRate",
-                          let bitrateRawString = queryItem.value,
-                          let bitrateRawInt = Int(bitrateRawString),
-                          let bitrate = StreamingMaxBitratePreference(rawValue: bitrateRawInt) {
-                    info.bitrate = bitrate
-                }
-            }
-        }
-        return info
     }
     
     private func requestServerApiVersionPromise(providedCredentials: LoginCredentials? = nil) -> Promise<SubsonicVersion> {

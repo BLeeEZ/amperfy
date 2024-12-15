@@ -754,26 +754,6 @@ class AmpacheXmlServerApi: URLCleanser {
         return ResponseError.createFromAmpacheError(cleansedURL: response.url?.asCleansedURL(cleanser: self), error: ampacheError, data: response.data)
     }
     
-    func determTranscodingInfo(url: URL) -> TranscodingInfo {
-        var info = TranscodingInfo()
-        let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        if let queryItems = urlComp?.queryItems {
-            for queryItem in queryItems {
-                if queryItem.name == "format",
-                   let formatRaw = queryItem.value,
-                   let format = CacheTranscodingFormatPreference.createFromFileFormatString(formatRaw) {
-                    info.format = format
-                } else if queryItem.name == "bitrate",
-                          let bitrateRawString = queryItem.value,
-                          let bitrateRawInt = Int(bitrateRawString),
-                          let bitrate = StreamingMaxBitratePreference(rawValue: bitrateRawInt) {
-                    info.bitrate = bitrate
-                }
-            }
-        }
-        return info
-    }
-    
     func updateUrlToken(urlString: String) -> Promise<URL> {
         return firstly {
             reauthenticate()

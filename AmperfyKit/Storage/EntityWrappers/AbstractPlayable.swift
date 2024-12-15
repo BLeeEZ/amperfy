@@ -170,22 +170,11 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     }
     public var iOsCompatibleContentType: String? {
         guard isPlayableOniOS, let type = fileContentType else { return nil }
-        if type == "audio/x-flac" {
-            return "audio/flac"
-        }
-        if type == "audio/m4a" {
-            return "audio/mp4"
-        }
-        return type
+        return MimeFileConverter.convertToValidMimeTypeWhenNeccessary(mimeType: type)
     }
     public var isPlayableOniOS: Bool {
         guard let originalContenType = fileContentType else { return true }
-        if originalContenType == "audio/x-ms-wma" ||
-           originalContenType == "audio/ogg" ||
-           originalContenType == "application/ogg" {
-            return false
-        }
-        return true
+        return MimeFileConverter.isMimeTypePlayableOniOS(mimeType: originalContenType)
     }
     public var disk: String? {
         get { return playableManagedObject.disk }

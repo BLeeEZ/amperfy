@@ -327,10 +327,6 @@ extension BackendProxy: BackendApi {
         return activeApi.generateUrl(forArtwork: artwork)
     }
     
-    public func determTranscodingInfo(url: URL) -> TranscodingInfo {
-        return activeApi.determTranscodingInfo(url: url)
-    }
-    
     public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
         return activeApi.checkForErrorResponse(response: response)
     }

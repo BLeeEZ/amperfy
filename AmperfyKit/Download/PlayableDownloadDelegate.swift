@@ -89,8 +89,7 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
         return storage.async.perform { companion in
             guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else { return }
             let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
-            let transcodingInfo = self.backendApi.determTranscodingInfo(url: downloadUrl)
-            playableAsync.contentTypeTranscoded = fileMimeType ?? transcodingInfo.format?.asMIMETypeString
+            playableAsync.contentTypeTranscoded = fileMimeType
             // transcoding info needs to available to generate a correct file extension
             guard let relFilePath = self.fileManager.createRelPath(for: playableAsync),
                   let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)

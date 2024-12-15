@@ -206,48 +206,6 @@ public enum CacheTranscodingFormatPreference: Int, CaseIterable {
     
     public static let defaultValue: CacheTranscodingFormatPreference = .mp3
     
-    public var asFileFormatString: String {
-        switch self {
-        case .raw:
-            return "raw"
-        case .mp3:
-            return "mp3"
-        case .serverConfig:
-            return "raw"
-        }
-    }
-    
-    public static func createFromFileFormatString(_ value: String) -> CacheTranscodingFormatPreference? {
-        switch value {
-        case "raw":
-            return .raw
-        case "mp3":
-            return .mp3
-        default:
-            return nil
-        }
-    }
-    
-    public var asMIMETypeString: String? {
-        switch self {
-        case .raw:
-            return nil
-        case .mp3:
-            return "audio/mpeg"
-        case .serverConfig:
-            return nil
-        }
-    }
-    
-    public static func createFromMIMETypeString(_ value: String?) -> CacheTranscodingFormatPreference {
-        switch value {
-        case "audio/mpeg":
-            return .mp3
-        default:
-            return .raw
-        }
-    }
-    
     public var description: String {
         switch self {
         case .mp3:

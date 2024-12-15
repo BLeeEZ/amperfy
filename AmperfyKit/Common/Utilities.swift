@@ -205,6 +205,12 @@ extension String {
     }
 }
 
+extension Dictionary where Value: Equatable {
+    public func findKey(forValue val: Value) -> Key? {
+        return first(where: { $1 == val })?.key
+    }
+}
+
 extension Array {
     public func object(at: Int) -> Element? {
         return at < self.count ? self[at] : nil

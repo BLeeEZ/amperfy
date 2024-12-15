@@ -184,7 +184,6 @@ public protocol BackendApi: URLCleanser {
     func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL>
     func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL>
     func generateUrl(forArtwork artwork: Artwork) -> Promise<URL>
-    func determTranscodingInfo(url: URL) -> TranscodingInfo
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate

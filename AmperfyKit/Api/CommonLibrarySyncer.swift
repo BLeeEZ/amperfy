@@ -70,14 +70,14 @@ class CommonLibrarySyncer {
                 let song = asyncCompanion.library.createSong()
                 song.id = cachedSong.id
                 song.relFilePath = cachedSong.relFilePath
-                song.contentTypeTranscoded = cachedSong.transcodingType.asMIMETypeString
+                song.contentTypeTranscoded = cachedSong.mimeType
                 statusNotifyier?.notifyParsedObject(ofType: .cache)
             }
             for cachedEpisode in cachedEpisodes {
                 let episode = asyncCompanion.library.createPodcastEpisode()
                 episode.id = cachedEpisode.id
                 episode.relFilePath = cachedEpisode.relFilePath
-                episode.contentTypeTranscoded = cachedEpisode.transcodingType.asMIMETypeString
+                episode.contentTypeTranscoded = cachedEpisode.mimeType
                 statusNotifyier?.notifyParsedObject(ofType: .cache)
             }
             // match embedded artworks after songs/episods so that owner are already created
