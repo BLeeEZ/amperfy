@@ -24,16 +24,25 @@ import CoreData
 import AmperfyKit
 import PromiseKit
 
+enum AddToPlaylistSelectMode {
+    case single
+    case multi
+}
+
 class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
     override var sceneTitle: String? { "Playlists" }
 
     var itemsToAdd: [AbstractPlayable]?
-    
+    private var selectedPlaylits = [Playlist]()
+
     private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
     private var sortType: PlaylistSortType = .name
-    var optionsButton: UIBarButtonItem!
-    var closeButton: UIBarButtonItem!
+    private var selectMode = AddToPlaylistSelectMode.single
+    private var optionsButton: UIBarButtonItem!
+    private var closeButton: UIBarButtonItem!
+    private var selectBarButton: UIBarButtonItem!
+    private var addBarButton: UIBarButtonItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,6 +62,13 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         if let newPlaylistTableHeaderView = ViewCreator<NewPlaylistTableHeader>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: NewPlaylistTableHeader.frameHeight)) {
             tableView.tableHeaderView?.addSubview(newPlaylistTableHeaderView)
         }
+        
+        navigationController?.setToolbarHidden(false, animated: false)
+        let flexible = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: self, action: nil)
+        selectBarButton = UIBarButtonItem(title: "Select", style: .plain, target: self, action: #selector(selectBarButtonPressed))
+        addBarButton = UIBarButtonItem(image: .plus, style: .plain, target: self, action: #selector(addBarButtonPressed))
+        self.toolbarItems = [selectBarButton, flexible, addBarButton]
+        refreshAddButton()
     }
 
     func change(sortType: PlaylistSortType) {
@@ -80,12 +96,58 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     func updateRightBarButtonItems() {
         closeButton = CloseBarButton(target: self, selector: #selector(cancelBarButtonPressed))
         optionsButton.menu = createSortButtonMenu()
-        #if targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
         navigationItem.rightBarButtonItem = optionsButton
         navigationItem.leftBarButtonItem = closeButton
-        #else
+#else
         navigationItem.rightBarButtonItems = [closeButton, optionsButton]
-        #endif
+#endif
+    }
+    
+    @IBAction func addBarButtonPressed(_ sender: UIBarButtonItem) {
+        addSongsToSelectedPlaylists()
+        refreshAddButton()
+        dismiss()
+    }
+    
+    func addSongsToSelectedPlaylists() {
+        guard let items = itemsToAdd else { return }
+        let songsToAdd = items.compactMap{ $0.asSong }
+        var syncPromises = [() -> Promise<Void>]()
+
+        syncPromises = selectedPlaylits.compactMap { playlist in
+            { return firstly {
+                self.appDelegate.librarySyncer.syncUpload(playlistToAddSongs: playlist, songs: songsToAdd)
+            }.then {
+                playlist.append(playables: songsToAdd)
+                return Promise.value
+            }}
+        }
+        
+        firstly {
+            syncPromises.resolveSequentially()
+        }
+        .catch { error in
+            self.appDelegate.eventLogger.report(topic: "Playlist Add Songs", error: error)
+        }
+          
+        selectedPlaylits.removeAll()
+    }
+    
+    @IBAction func selectBarButtonPressed(_ sender: Any) {
+        selectMode = ((selectMode == .single) ? .multi : .single)
+        selectBarButton.isSelected = (selectMode == .multi)
+        refreshAddButton()
+        selectedPlaylits.removeAll()
+        tableView.reloadData()
+    }
+    
+    func refreshAddButton() {
+        addBarButton.isEnabled = !selectedPlaylits.isEmpty
+    }
+    
+    @IBAction func cancelBarButtonPressed(_ sender: UIBarButtonItem) {
+        dismiss()
     }
     
     private func createSortButtonMenu() -> UIMenu {
@@ -112,10 +174,6 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         return UIMenu(title: "Sort", image: .sort, options: [], children: [sortByName, sortByLastTimePlayed, sortByChangeDate, sortByDuration])
     }
     
-    @IBAction func cancelBarButtonPressed(_ sender: UIBarButtonItem) {
-        dismiss()
-    }
-    
     private func dismiss() {
         searchController.dismiss(animated: false, completion: nil)
         dismiss(animated: true, completion: nil)
@@ -125,20 +183,36 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(playlist: playlist, rootView: nil)
+        
+        if selectMode == .multi {
+            let isMarked = (selectedPlaylits.firstIndex(where: { $0 == playlist }) != nil)
+            let img = UIImageView(image: isMarked ? .checkmark : .circle)
+            img.tintColor = isMarked ? appDelegate.storage.settings.themePreference.asColor : .secondaryLabelColor
+            cell.accessoryView = img
+        } else {
+            cell.accessoryView = nil
+        }
+        
         return cell
     }
-    
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        defer { dismiss() }
+        tableView.deselectRow(at: indexPath, animated: false)
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
-        guard let items = itemsToAdd else { return }
-        playlist.append(playables: items)
-        guard appDelegate.storage.settings.isOnlineMode else { return }
-        let songsToAdd = items.compactMap{ $0.asSong }
-        firstly {
-            self.appDelegate.librarySyncer.syncUpload(playlistToAddSongs: playlist, songs: songsToAdd)
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Playlist Add Songs", error: error)
+        
+        let markedIndex = selectedPlaylits.firstIndex { $0 == playlist }
+        if let markedIndex = markedIndex {
+            selectedPlaylits.remove(at: markedIndex)
+        } else {
+            selectedPlaylits.append(playlist)
+        }
+        tableView.reconfigureRows(at: [indexPath])
+        
+        if selectMode == .single {
+            addSongsToSelectedPlaylists()
+            dismiss()
+        } else {
+            refreshAddButton()
         }
     }
     
