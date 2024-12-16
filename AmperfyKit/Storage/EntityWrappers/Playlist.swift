@@ -24,6 +24,7 @@ import CoreData
 import os.log
 import UIKit
 import PromiseKit
+import Collections
 
 public class Playlist: Identifyable {
     
@@ -152,7 +153,19 @@ public class Playlist: Identifyable {
         return internalPlayables ?? [AbstractPlayable]()
     }
     
-
+    /// returns number of playables that are already contained in playlist
+    public func contains(playables playablesToCheck: [AbstractPlayable]) -> OrderedSet<AbstractPlayable> {
+        let playableSet = OrderedSet<AbstractPlayable>(playables)
+        let playablesToCheckSet = OrderedSet<AbstractPlayable>(playablesToCheck)
+        return playableSet.intersection(playablesToCheckSet)
+    }
+    
+    /// return a set of playables that are not already part of this playlist
+    public func notContaines(playables playablesToCheck: [AbstractPlayable]) -> OrderedSet<AbstractPlayable> {
+        let playableSet = OrderedSet<AbstractPlayable>(playables)
+        let playablesToCheckSet = OrderedSet<AbstractPlayable>(playablesToCheck)
+        return playablesToCheckSet.subtracting(playableSet)
+    }
     
     public var songCount: Int {
         get { return Int(managedObject.songCount) }

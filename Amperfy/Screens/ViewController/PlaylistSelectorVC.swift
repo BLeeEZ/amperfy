@@ -34,7 +34,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     override var sceneTitle: String? { "Playlists" }
 
     var itemsToAdd: [AbstractPlayable]?
-    private var selectedPlaylits = [Playlist]()
+    private var selectedPlaylits = [Playlist : [Song]]()
 
     private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
     private var sortType: PlaylistSortType = .name
@@ -50,6 +50,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         optionsButton = SortBarButton()
 
         appDelegate.userStatistics.visited(.playlistSelector)
+        setNavBarTitle(title: ((itemsToAdd?.count ?? 0) > 1) ? "Add \(itemsToAdd?.count ?? 0) Songs to Playlist" : "Add to Playlist")
         
         change(sortType: appDelegate.storage.settings.playlistsSortSetting)
         
@@ -111,15 +112,16 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
     
     func addSongsToSelectedPlaylists() {
-        guard let items = itemsToAdd else { return }
-        let songsToAdd = items.compactMap{ $0.asSong }
         var syncPromises = [() -> Promise<Void>]()
+        
+        defer { selectedPlaylits.removeAll() }
+        guard !selectedPlaylits.isEmpty else { return }
 
-        syncPromises = selectedPlaylits.compactMap { playlist in
+        syncPromises = selectedPlaylits.compactMap { playlist, songs in
             { return firstly {
-                self.appDelegate.librarySyncer.syncUpload(playlistToAddSongs: playlist, songs: songsToAdd)
+                self.appDelegate.librarySyncer.syncUpload(playlistToAddSongs: playlist, songs: songs)
             }.then {
-                playlist.append(playables: songsToAdd)
+                playlist.append(playables: songs)
                 return Promise.value
             }}
         }
@@ -130,8 +132,6 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         .catch { error in
             self.appDelegate.eventLogger.report(topic: "Playlist Add Songs", error: error)
         }
-          
-        selectedPlaylits.removeAll()
     }
     
     @IBAction func selectBarButtonPressed(_ sender: Any) {
@@ -185,7 +185,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         cell.display(playlist: playlist, rootView: nil)
         
         if selectMode == .multi {
-            let isMarked = (selectedPlaylits.firstIndex(where: { $0 == playlist }) != nil)
+            let isMarked = (selectedPlaylits[playlist] != nil)
             let img = UIImageView(image: isMarked ? .checkmark : .circle)
             img.tintColor = isMarked ? appDelegate.storage.settings.themePreference.asColor : .secondaryLabelColor
             cell.accessoryView = img
@@ -198,21 +198,49 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
+        guard let itemsToAdd = itemsToAdd else {
+            dismiss()
+            return
+        }
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
         
-        let markedIndex = selectedPlaylits.firstIndex { $0 == playlist }
-        if let markedIndex = markedIndex {
-            selectedPlaylits.remove(at: markedIndex)
-        } else {
-            selectedPlaylits.append(playlist)
+        func handleSuccessfullSelection(playables: [AbstractPlayable]) {
+            let songs = playables.compactMap { $0.asSong }
+            if !songs.isEmpty {
+                self.selectedPlaylits[playlist] = songs
+            } else {
+                self.selectedPlaylits.removeValue(forKey: playlist)
+            }
+            self.tableView.reconfigureRows(at: [indexPath])
+            
+            if selectMode == .single {
+                self.addSongsToSelectedPlaylists()
+                self.dismiss()
+            } else {
+                self.refreshAddButton()
+            }
         }
-        tableView.reconfigureRows(at: [indexPath])
         
-        if selectMode == .single {
-            addSongsToSelectedPlaylists()
-            dismiss()
+        if selectedPlaylits[playlist] != nil {
+            selectedPlaylits.removeValue(forKey: playlist)
+            tableView.reconfigureRows(at: [indexPath])
         } else {
-            refreshAddButton()
+            let itemsNotContained = playlist.notContaines(playables: itemsToAdd)
+            if itemsNotContained.count != itemsToAdd.count {
+                let alert = UIAlertController(title: nil, message: "Duplicates are going to be added to this Playlist. Do you want to add the Duplicates or skip them?", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Add Duplicates", style: .default, handler: { _ in
+                    handleSuccessfullSelection(playables: itemsToAdd)
+                }))
+                alert.addAction(UIAlertAction(title: "Skip Duplicates", style: .default, handler: { _ in
+                    handleSuccessfullSelection(playables: Array(itemsNotContained))
+                }))
+                alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { _ in
+                    // do nothing
+                }))
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                handleSuccessfullSelection(playables: itemsToAdd)
+            }
         }
     }
     

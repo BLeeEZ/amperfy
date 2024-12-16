@@ -47,6 +47,8 @@
 		504B441D28D7A6330033982C /* XCallbackURLsSetttingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441C28D7A6330033982C /* XCallbackURLsSetttingsView.swift */; };
 		504B442028D8E7880033982C /* SupportSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441F28D8E7880033982C /* SupportSettingsView.swift */; };
 		504B442228D8EBB20033982C /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B442128D8EBB20033982C /* MailView.swift */; };
+		5052497B2D10CBC70005EEB0 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 5052497A2D10CBC70005EEB0 /* Collections */; };
+		5052497D2D10CBED0005EEB0 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 5052497C2D10CBED0005EEB0 /* Collections */; };
 		505362D12C23682500846C53 /* AlbumsCollectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505362D02C23682500846C53 /* AlbumsCollectionVC.swift */; };
 		505362D32C2425C200846C53 /* AlbumsCommonVCInteractions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505362D22C2425C200846C53 /* AlbumsCommonVCInteractions.swift */; };
 		5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5055AA5626835A9000096B8D /* PodcastEpisodeTableCell.swift */; };
@@ -1028,6 +1030,7 @@
 				507DFE5B2B1E58CB002BBB1D /* PMKAlamofire in Frameworks */,
 				507DFE622B1E59F2002BBB1D /* PromiseKit in Frameworks */,
 				507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */,
+				5052497D2D10CBED0005EEB0 /* Collections in Frameworks */,
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
 				507DFE8D2B1E7192002BBB1D /* LNPopupController in Frameworks */,
 				507DFE4C2B1E57BE002BBB1D /* MarqueeLabel in Frameworks */,
@@ -1050,6 +1053,7 @@
 			files = (
 				507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */,
 				50F40A3B2C9088B30097FE63 /* IfritStatic in Frameworks */,
+				5052497B2D10CBC70005EEB0 /* Collections in Frameworks */,
 				507DFE682B1E5A1A002BBB1D /* PromiseKit in Frameworks */,
 				50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */,
 				507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */,
@@ -1993,6 +1997,7 @@
 				507DFE612B1E59F2002BBB1D /* PromiseKit */,
 				507DFE8C2B1E7192002BBB1D /* LNPopupController */,
 				507DFE8F2B1E7262002BBB1D /* CallbackURLKit */,
+				5052497C2D10CBED0005EEB0 /* Collections */,
 			);
 			productName = Amperfy;
 			productReference = 508385E421C5965B00C4BB32 /* Amperfy.app */;
@@ -2037,6 +2042,7 @@
 				507DFE672B1E5A1A002BBB1D /* PromiseKit */,
 				507DFE692B1E62C9002BBB1D /* ID3TagEditor */,
 				50F40A3A2C9088B30097FE63 /* IfritStatic */,
+				5052497A2D10CBC70005EEB0 /* Collections */,
 			);
 			productName = AmpertyKit;
 			productReference = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */;
@@ -2119,6 +2125,7 @@
 				507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */,
 				507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */,
 				50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */,
+				505249792D10CBC70005EEB0 /* XCRemoteSwiftPackageReference "swift-collections" */,
 			);
 			productRefGroup = 508385E521C5965B00C4BB32 /* Products */;
 			projectDirPath = "";
@@ -3112,6 +3119,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		505249792D10CBC70005EEB0 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.4;
+			};
+		};
 		507DFE472B1E577D002BBB1D /* XCRemoteSwiftPackageReference "LNPopupController" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/LeoNatan/LNPopupController";
@@ -3195,6 +3210,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5052497A2D10CBC70005EEB0 /* Collections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 505249792D10CBC70005EEB0 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = Collections;
+		};
+		5052497C2D10CBED0005EEB0 /* Collections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 505249792D10CBC70005EEB0 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = Collections;
+		};
 		507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */;

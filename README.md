@@ -73,6 +73,7 @@ For more information, and to participate in the public beta releases, please vis
 - [PromiseKit](https://github.com/mxcl/PromiseKit) by [Max Howell](https://github.com/mxcl) is licensed under [MIT License](https://github.com/mxcl/PromiseKit/blob/master/LICENSE)
 - [PMKAlamofire](https://github.com/PromiseKit/PMKAlamofire) by [Max Howell](https://github.com/mxcl) is licensed under [MIT License](https://github.com/PromiseKit/PMKAlamofire/blob/master/LICENSE)
 - [Ifrit](https://github.com/ukushu/Ifrit) by [Andrii Vynnychenko](https://github.com/ukushu) is licensed under [MIT License](https://github.com/ukushu/Ifrit/blob/main/LICENSE.md)
+- [swift-collections](https://github.com/apple/swift-collections) by [Apple](https://github.com/apple) is licensed under [Apache License 2.0](https://github.com/apple/swift-collections/blob/main/LICENSE.txt)
 
 **Amperfy license:** [GPLv3](https://github.com/BLeeEZ/Amperfy/blob/master/LICENSE)
 
