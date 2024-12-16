@@ -164,4 +164,21 @@ public struct LibraryDisplaySettings {
                 .podcasts
             ])
     }
+    
+    public static var addToPlaylistSettings: LibraryDisplaySettings {
+        return LibraryDisplaySettings(
+            inUse: [
+                .genres,
+                .artists,
+                .favoriteArtists,
+                .albums,
+                .favoriteAlbums,
+                .newestAlbums,
+                .recentAlbums,
+                .songs,
+                .favoriteSongs,
+                .directories,
+                .playlists,
+            ])
+    }
 }

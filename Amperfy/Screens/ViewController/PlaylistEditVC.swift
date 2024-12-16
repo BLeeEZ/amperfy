@@ -41,7 +41,8 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
     private var doneButton: UIBarButtonItem!
     private var selectBarButton: UIBarButtonItem!
     private var deleteBarButton: UIBarButtonItem!
-    
+    private var addBarButton: UIBarButtonItem!
+
     var detailOperationsView: GenericDetailTableHeader?
     
     private var selectedItems = [PlaylistItem]()
@@ -88,7 +89,8 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
         let flexible = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: self, action: nil)
         selectBarButton = UIBarButtonItem(title: "Select", style: .plain, target: self, action: #selector(selectBarButtonPressed))
         deleteBarButton = UIBarButtonItem(image: .trash, style: .plain, target: self, action: #selector(deleteBarButtonPressed))
-        self.toolbarItems = [selectBarButton, flexible, deleteBarButton]
+        addBarButton    = UIBarButtonItem(image: .plus, style: .plain, target: self, action: #selector(addBarButtonPressed))
+        self.toolbarItems = [selectBarButton, flexible, addBarButton, flexible, deleteBarButton]
         
         changeEditMode(.reorder)
         refreshBarButtons()
@@ -150,6 +152,17 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
 
         selectedItems.removeAll()
         refreshDeleteButton()
+    }
+    
+    @IBAction func addBarButtonPressed(_ sender: Any) {
+        let playlistAddVC = PlaylistAddLibraryVC()
+        playlistAddVC.addToPlaylistManager.playlist = self.playlist
+        playlistAddVC.addToPlaylistManager.onDoneCB = {
+            self.detailOperationsView?.refresh()
+            self.tableView.reloadData()
+        }
+        let playlistAddNav = UINavigationController(rootViewController: playlistAddVC)
+        self.present(playlistAddNav, animated: true, completion: nil)
     }
     
     private func dismiss() {

@@ -295,20 +295,14 @@ class LibraryNavigatorConfigurator: NSObject {
                 cell.contentConfiguration = content
             } else if let libraryItem = item.library {
                 var content = cell.defaultContentConfiguration()
-                content.text = libraryItem.displayName
-                content.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
-                var imageSize = CGSize(width: 35.0, height: 25.0)
-                if !libraryItem.image.isSymbolImage {
-                    // special case for podcast icon
-                    imageSize = CGSize(width: imageSize.width, height: imageSize.height-2)
-                }
-                content.imageProperties.maximumSize = imageSize
-                content.imageProperties.reservedLayoutSize = imageSize
+                Self.configureForLibrary(contentView: &content, libraryItem: libraryItem)
+
                 #if targetEnvironment(macCatalyst)
                 cell.accessories = [.reorder()]
                 #else
                 cell.accessories = [.disclosureIndicator(displayed: .whenNotEditing), .reorder()]
                 #endif
+                
                 if item.isSelected {
                     cell.accessories.append(.customView(configuration: .createIsSelected()))
                 } else {
@@ -365,6 +359,18 @@ class LibraryNavigatorConfigurator: NSObject {
         #if targetEnvironment(macCatalyst)
         dataSource.reorderingHandlers.didReorder = { _ in }
         #endif
+    }
+    
+    static func configureForLibrary(contentView: inout UIListContentConfiguration, libraryItem: LibraryDisplayType) {
+        contentView.text = libraryItem.displayName
+        contentView.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
+        var imageSize = CGSize(width: 35.0, height: 25.0)
+        if !libraryItem.image.isSymbolImage {
+            // special case for podcast icon
+            imageSize = CGSize(width: imageSize.width, height: imageSize.height-2)
+        }
+        contentView.imageProperties.maximumSize = imageSize
+        contentView.imageProperties.reservedLayoutSize = imageSize
     }
     
     private func applyInitialSnapshots() {

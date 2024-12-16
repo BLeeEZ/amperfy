@@ -113,6 +113,7 @@ extension UIImage {
     public static let trash = UIImage.create(systemName: "trash")
     public static let cloudX = UIImage.create(systemName: "xmark.icloud")
     public static let plus = UIImage.create(systemName: "plus")
+    public static let plusCircle = UIImage.create(systemName: "plus.circle")
     public static let play = UIImage.create(systemName: "play.fill")
     public static let pause = UIImage.create(systemName: "pause.fill")
     public static let sleep = UIImage.create(systemName: "moon.zzz")

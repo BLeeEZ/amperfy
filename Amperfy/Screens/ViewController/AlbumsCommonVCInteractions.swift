@@ -92,6 +92,7 @@ class AlbumsCommonVCInteractions {
     public var updateFetchDataSourceCB: VoidFunctionCallback?
 
     private var appDelegate: AppDelegate = (UIApplication.shared.delegate as! AppDelegate)
+    private var isSetNavbarButton = true
 
     public var rootVC: UIViewController?
     public var fetchedResultsController: AlbumFetchedResultsController!
@@ -104,6 +105,10 @@ class AlbumsCommonVCInteractions {
         didSet {
             isIndexTitelsHiddenCB?()
         }
+    }
+    
+    init(isSetNavbarButton: Bool = true) {
+        self.isSetNavbarButton = isSetNavbarButton
     }
     
     func applyFilter() {
@@ -194,6 +199,7 @@ class AlbumsCommonVCInteractions {
     }
     
     func updateRightBarButtonItems() {
+        guard isSetNavbarButton else { return }
         var actions = [UIMenu]()
 
         switch sortType {

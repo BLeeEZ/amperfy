@@ -1,0 +1,112 @@
+//
+//  PlaylistAddAlbumDetailVC.swift
+//  Amperfy
+//
+//  Created by Maximilian Bauer on 15.12.24.
+//  Copyright (c) 2019 Maximilian Bauer. All rights reserved.
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+import UIKit
+import AmperfyKit
+import PromiseKit
+
+class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO>, PlaylistVCAddable {
+
+    override var sceneTitle: String? { album.name }
+
+    public var album: Album!
+    public var addToPlaylistManager = AddToPlaylistManager()
+
+    private var fetchedResultsController: AlbumSongsFetchedResultsController!
+    private var doneButton: UIBarButtonItem!
+
+    override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+        let source = AlbumDetailDiffableDataSource(tableView: tableView) { (tableView, indexPath, objectID) -> UITableViewCell? in
+            guard let object = try? self.appDelegate.storage.main.context.existingObject(with: objectID),
+                  let songMO = object as? SongMO
+            else {
+                fatalError("Managed object should be available")
+            }
+            let song = Song(managedObject: songMO)
+            return self.createCell(tableView, forRowAt: indexPath, song: song)
+        }
+        return source
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        doneButton = addToPlaylistManager.createDoneButton()
+        navigationItem.rightBarButtonItems = [doneButton]
+
+        fetchedResultsController = AlbumSongsFetchedResultsController(forAlbum: album, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
+        singleFetchedResultsController = fetchedResultsController
+        singleFetchedResultsController?.delegate = self
+        singleFetchedResultsController?.fetch()
+        
+        configureSearchController(placeholder: "Search in \"Album\"", scopeButtonTitles: ["All", "Cached"])
+        tableView.register(nibName: PlayableTableCell.typeName)
+        tableView.rowHeight = PlayableTableCell.rowHeight
+        tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+        tableView.sectionHeaderHeight = 0.0
+        tableView.estimatedSectionHeaderHeight = 0.0
+        tableView.sectionFooterHeight = 0.0
+        tableView.estimatedSectionFooterHeight = 0.0
+    }
+    
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
+        updateTitle()
+        
+        guard self.appDelegate.storage.settings.isOnlineMode else { return }
+        firstly {
+            album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+        }.catch { error in
+            self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+        }
+    }
+    
+    func updateTitle() {
+        setNavBarTitle(title: addToPlaylistManager.title)
+    }
+
+    func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, song: Song) -> UITableViewCell {
+        let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
+        cell.display(playable: song,
+                     displayMode: .add,
+                     playContextCb: { _ in return nil },
+                     rootView: self,
+                     isDislayAlbumTrackNumberStyle: true,
+                     isMarked: addToPlaylistManager.contains(playable: song))
+        return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: false)
+        
+        let item = fetchedResultsController.getWrappedEntity(at: indexPath)
+        if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell {
+            cell.isMarked = addToPlaylistManager.toggleSelection(playable: item)
+            cell.refresh()
+            updateTitle()
+        }
+    }
+    
+    override func updateSearchResults(for searchController: UISearchController) {
+        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "", onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1 )
+        tableView.reloadData()
+    }
+}

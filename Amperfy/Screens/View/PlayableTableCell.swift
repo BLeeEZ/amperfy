@@ -29,6 +29,7 @@ enum DisplayMode {
     case normal
     case selection
     case reorder
+    case add
 }
 
 class PlayableTableCell: BasicTableCell {
@@ -120,6 +121,10 @@ class PlayableTableCell: BasicTableCell {
         if displayMode == .selection {
             let img = UIImageView(image: isMarked ? .checkmark : .circle)
             img.tintColor = isMarked ? appDelegate.storage.settings.themePreference.asColor : .secondaryLabelColor
+            accessoryView = img
+        } else if displayMode == .add {
+            let img = UIImageView(image: isMarked ? .checkmark : .plusCircle)
+            img.tintColor = appDelegate.storage.settings.themePreference.asColor
             accessoryView = img
         } else if displayMode == .reorder || playerIndexCb != nil {
             let img = UIImageView(image: .bars)
