@@ -89,7 +89,8 @@ public class AmperKit {
         }
         let playerData = storage.main.library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
-        let curPlayer = AudioPlayer(coreData: playerData, queueHandler: queueHandler, backendAudioPlayer: backendAudioPlayer, settings: storage.settings, userStatistics: userStatistics)
+        let chromecastPlayer = ChromecastPlayer(backendApi: backendApi, backendAudioPlayer: backendAudioPlayer, queueHandler: queueHandler)
+        let curPlayer = AudioPlayer(coreData: playerData, queueHandler: queueHandler, backendAudioPlayer: backendAudioPlayer, settings: storage.settings, userStatistics: userStatistics, chromeCastPlayer: chromecastPlayer)
         audioSessionHandler.musicPlayer = curPlayer
         audioSessionHandler.eventLogger = eventLogger
         audioSessionHandler.configureObserverForAudioSessionInterruption()

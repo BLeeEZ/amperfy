@@ -23,9 +23,13 @@ import UIKit
 import CoreMedia
 import AmperfyKit
 import PromiseKit
+import GoogleCast
+import os.log
+
+let kCastControlBarsAnimationDuration: TimeInterval = 0.20
 
 class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
-
+    
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var largePlayerPlaceholderView: UIView!
     @IBOutlet weak var controlPlaceholderView: UIView!
@@ -34,6 +38,8 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     
     @IBOutlet weak var controlPlaceholderHeightConstraint: NSLayoutConstraint!
     private let safetyMarginOnBottom = 20.0
+    
+    private let NULL_CREDENTIALS = "N/A"
     
     lazy var tableViewKeyCommandsController = TableViewKeyCommandsController(tableView: tableView, overrideFirstLastIndexPath: IndexPath(row: 0, section: PlayerSectionCategory.currentlyPlaying.rawValue))
     
@@ -58,6 +64,8 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        
+        
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.dragDelegate = self
@@ -155,6 +163,21 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         tableView.reloadData()
         scrollToCurrentlyPlayingRow()
     }
+
+      func installViewController(_ viewController: UIViewController?, inContainerView containerView: UIView) {
+        if let viewController = viewController {
+            self.addChild(viewController)
+            viewController.view.frame = containerView.bounds
+            containerView.addSubview(viewController.view)
+            viewController.didMove(toParent: self)
+        }
+      }
+
+      func uninstallViewController(_ viewController: UIViewController) {
+          viewController.willMove(toParent: nil)
+          viewController.view.removeFromSuperview()
+          viewController.removeFromParent()
+      }
     
     func scrollToCurrentlyPlayingRow() {
         tableView.scrollToRow(at: IndexPath(row: 0, section: PlayerSectionCategory.currentlyPlaying.rawValue), at: .top, animated: false);

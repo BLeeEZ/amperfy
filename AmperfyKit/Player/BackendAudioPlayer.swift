@@ -87,6 +87,7 @@ class BackendAudioPlayer: NSObject {
     public private(set) var isPlaying: Bool = false
     public private(set) var isErrorOccured: Bool = false
     public private(set) var playType: PlayType?
+    public var onSeek: ((Double) -> Void)?
     
     var responder: BackendAudioPlayerNotifiable?
     var isPlayableLoaded: Bool {
@@ -246,6 +247,7 @@ class BackendAudioPlayer: NSObject {
     
     func seek(toSecond: Double) {
         player.seek(to: CMTime(seconds: toSecond, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
+        onSeek!(toSecond)
     }
     
     var shouldPlaybackStart: Bool {

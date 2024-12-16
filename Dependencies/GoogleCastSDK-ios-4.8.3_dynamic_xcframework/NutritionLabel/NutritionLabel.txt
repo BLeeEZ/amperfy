@@ -1,0 +1,34 @@
+App Privacy Details on the Apple App Store
+
+Google is committed to helping our customers create great iOS 14+ apps for end
+users. The Apple App Store requires iOS 14+ app developers to provide App
+Privacy Details. Starting with Cast iOS SDK version 4.6.0, privacy details
+for a specific version of the SDK can be found in
+GoogleCastSDK-ios-version_framework/NutritionLabel/NutritionLabel.txt
+inside the Cast SDK framework. As privacy details may change from version to
+version, be sure to check this file for the version you're building with.
+
+While we will aim to be as transparent as possible in supporting you, we won’t
+be able to speak for you, and you will ultimately be responsible for deciding
+how to respond to Apple’s questionnaire and whether to show end users any
+permissions or prompts described by Apple.
+
+The Cast SDK automatically collects certain data by default, which Google uses
+to monitor and improve the reliability and performance of the Cast SDK.
+
+The Cast SDK collects the following data for all Cast apps:
+
+* Diagnostic data
+
+The Cast SDK collects certain data only if certain features are enabled or used:
+
+* Device ID on every log upload. This is collected only if Analytics Logging
+  has been enabled in the SDK.
+
+* Usage data if the Cast SDK UI is used, including cast device selection
+  and controlling media.
+
+When answering Apple’s app privacy questions, the above data corresponds
+to collecting the following types of data: Coarse location, Device Id,
+Performance Data, and optionally, Product Interaction. This data is used
+for Analytics and App Functionality.

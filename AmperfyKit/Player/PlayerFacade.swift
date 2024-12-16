@@ -155,6 +155,8 @@ public protocol PlayerFacade {
     func playNext()
     func skipForward(interval: Double)
     func skipBackward(interval: Double)
+    func mute()
+    func unmute()
     
     func addNotifier(notifier: MusicPlayable)
 }
@@ -395,6 +397,14 @@ class PlayerFacadeImpl: PlayerFacade {
         }
         musicPlayer.play(context: context)
         musicPlayer.notifyPlaylistUpdated()
+    }
+    
+    func mute() {
+        backendAudioPlayer.mute()
+    }
+    
+    func unmute() {
+        backendAudioPlayer.unmute()
     }
     
     private func setPlayerModeForContextPlay(_ newValue: PlayerMode) {
