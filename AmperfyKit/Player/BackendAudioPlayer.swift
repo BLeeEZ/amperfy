@@ -70,6 +70,7 @@ class BackendAudioPlayer: NSObject {
     private var nextPreloadedPlayable: AbstractPlayable?
     private var isPreviousPlaylableFinshed = true
     private var isAutoStartPlayback = true
+    private var isMuted = false
 
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
@@ -147,6 +148,11 @@ class BackendAudioPlayer: NSObject {
                 self.responder?.didLyricsTimeChange(time: time)
             }
         }
+        if isMuted {
+            player.volume = 0
+        } else {
+            player.volume = 1
+        }
     }
     
     private func checkForPreloadNextPlayerItem() {
@@ -222,6 +228,16 @@ class BackendAudioPlayer: NSObject {
             isTriggerReinsertPlayableAllowed = false
             triggerReinsertPlayableCB?()
         }
+    }
+    
+    func mute() {
+        player.volume = 0
+        isMuted = true
+    }
+    
+    func unmute() {
+        player.volume = 1
+        isMuted = false
     }
     
     func continuePlay() {
