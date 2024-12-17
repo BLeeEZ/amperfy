@@ -23,7 +23,6 @@ import UIKit
 import CoreMedia
 import AmperfyKit
 import PromiseKit
-import GoogleCast
 import os.log
 
 let kCastControlBarsAnimationDuration: TimeInterval = 0.20

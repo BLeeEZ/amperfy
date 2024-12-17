@@ -26,7 +26,12 @@ import os.log
 import AmperfyKit
 import PromiseKit
 import Intents
+#if !targetEnvironment(macCatalyst)
 import GoogleCast
+#endif
+#if targetEnvironment(macCatalyst)
+let kGCKDefaultMediaReceiverApplicationID = ""
+#endif
 
 let windowSettingsTitle = "Settings"
 let windowMiniPlayerTitle = "MiniPlayer"
@@ -36,7 +41,7 @@ let miniPlayerWindowActivityType = "amperfy.miniplayer"
 let defaultWindowActivityType = "amperfy.main"
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, GCKLoggerDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
      
     static let name = "Amperfy"
     let kReceiverAppID = kGCKDefaultMediaReceiverApplicationID
@@ -235,20 +240,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCKLoggerDelegate {
         configureNotificationHandling()
         initEventLogger()
         self.window = UIWindow(frame: UIScreen.main.bounds)
+        #if !targetEnvironment(macCatalyst)
         let criteria = GCKDiscoveryCriteria(applicationID: kReceiverAppID)
         let options = GCKCastOptions(discoveryCriteria: criteria)
             GCKCastContext.setSharedInstanceWith(options)
-
-        // Enable logger.
-        GCKLogger.sharedInstance().delegate = self
-        func logMessage(_ message: String,
-                          at level: GCKLoggerLevel,
-                          fromFunction function: String,
-                          location: String) {
-            if (kDebugLoggingEnabled) {
-              print(function + " - " + message)
-            }
-        }
+        #endif
         
         #if targetEnvironment(macCatalyst)
         self.patchMPVolumeViewPreSonoma()

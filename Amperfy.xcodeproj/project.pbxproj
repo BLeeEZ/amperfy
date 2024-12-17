@@ -430,8 +430,8 @@
 		50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */; };
 		50F40A3B2C9088B30097FE63 /* IfritStatic in Frameworks */ = {isa = PBXBuildFile; productRef = 50F40A3A2C9088B30097FE63 /* IfritStatic */; };
 		50FF311B2BBC4D8000C2C3B9 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FF311A2BBC4D8000C2C3B9 /* NetworkMonitor.swift */; };
-		55311C9E2D0E2EF300AB05A0 /* GoogleCast.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 555CBF262CE3DADD00D1EF76 /* GoogleCast.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		555CBF272CE3DADD00D1EF76 /* GoogleCast.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 555CBF262CE3DADD00D1EF76 /* GoogleCast.xcframework */; };
+		55311C9E2D0E2EF300AB05A0 /* GoogleCast.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 555CBF262CE3DADD00D1EF76 /* GoogleCast.xcframework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		555CBF272CE3DADD00D1EF76 /* GoogleCast.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 555CBF262CE3DADD00D1EF76 /* GoogleCast.xcframework */; platformFilter = ios; };
 		55D0ED242D08E56E00193DA8 /* ChromecastPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D0ED232D08E51A00193DA8 /* ChromecastPlayer.swift */; };
 		631C16652C6BA7E60085F62E /* AppDelegateAppKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C16642C6BA7E60085F62E /* AppDelegateAppKitExtension.swift */; };
 		631C166B2C6D3D9A0085F62E /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166A2C6D3D9A0085F62E /* SettingsRow.swift */; };

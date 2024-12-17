@@ -5,9 +5,29 @@
 //  Created by Tobias Eisenschenk on 10.12.24.
 //  Copyright © 2024 Maximilian Bauer. All rights reserved.
 //
-import GoogleCast
 import os.log
 import PromiseKit
+#if targetEnvironment(macCatalyst)
+public class ChromecastPlayer: NSObject {
+    init(backendApi: BackendApi, backendAudioPlayer: BackendAudioPlayer, queueHandler: PlayQueueHandler) {}
+    func castQueue(playables: [AbstractPlayable],
+                   elapsed: Double = 0.0,
+                   autoPlay: Bool = true,
+                   startIndex: Int = 0,
+                   _ completion: @escaping () -> Void) {}
+    func playRemote() {}
+    func pauseRemote() {}
+    func playPrevious() {}
+    func playNext() {}
+    func stopRemote() {}
+    func seekRemote(to: Double) {}
+}
+#endif
+
+#if !targetEnvironment(macCatalyst)
+import GoogleCast
+
+
 
 public class ChromecastPlayer: NSObject,
                                GCKSessionManagerListener,
@@ -242,3 +262,4 @@ public class ChromecastPlayer: NSObject,
         os_log("request \(Int(request.requestID)) failed with error \(error)")
     }
 }
+#endif
