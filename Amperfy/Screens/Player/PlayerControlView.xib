@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<<<<<<< refs/remotes/origin/master
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait" appearance="light"/>
-    <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
-=======
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
->>>>>>> feat: integrate chromecast sender
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -147,7 +139,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="qv2-7E-wG4" userLabel="Cast Button" customClass="GCKUICastButton">
-                            <rect key="frame" x="54.5" y="0.0" width="28" height="28"/>
+                            <rect key="frame" x="68" y="0.0" width="28" height="28"/>
                             <accessibility key="accessibilityConfiguration">
                                 <accessibilityTraits key="traits" button="YES" startsMediaSession="YES"/>
                             </accessibility>
@@ -163,11 +155,7 @@
                             </state>
                         </button>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
-<<<<<<< refs/remotes/origin/master
-                            <rect key="frame" x="90.5" y="0.0" width="28" height="28"/>
-=======
-                            <rect key="frame" x="109" y="0.0" width="28" height="28"/>
->>>>>>> feat: integrate chromecast sender
+                            <rect key="frame" x="136" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="dHI-Uf-EN9"/>
                                 <constraint firstAttribute="height" constant="28" id="dOb-nc-wBt"/>
@@ -186,34 +174,8 @@
                                 <action selector="displayPlaylistPressed" destination="iN0-l3-epB" eventType="touchUpInside" id="h4G-hj-JDx"/>
                             </connections>
                         </button>
-<<<<<<< refs/remotes/origin/master
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change">
-                            <rect key="frame" x="181.5" y="0.0" width="28" height="28"/>
-=======
-                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="MwT-Zv-e8l" userLabel="Lyrics Button">
-                            <rect key="frame" x="163" y="0.0" width="28" height="28"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="28" id="Jaw-IB-PJv"/>
-                                <constraint firstAttribute="width" secondItem="MwT-Zv-e8l" secondAttribute="height" multiplier="1:1" id="ORF-qP-V4k"/>
-                                <constraint firstAttribute="width" secondItem="MwT-Zv-e8l" secondAttribute="height" multiplier="1:1" id="r7H-ic-qIC"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                            <color key="tintColor" systemColor="labelColor"/>
-                            <state key="normal">
-                                <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="rectangle.portrait.inset.filled" catalog="system" symbolScale="medium"/>
-                            </state>
-                            <buttonConfiguration key="configuration" style="gray" cornerStyle="medium" buttonSize="small">
-                                <imageReference key="image" image="lyrics" symbolScale="small"/>
-                                <backgroundConfiguration key="background"/>
-                            </buttonConfiguration>
-                            <connections>
-                                <action selector="displayLyricsPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="T5I-A9-fTA"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change">
-                            <rect key="frame" x="217.5" y="0.0" width="28" height="28"/>
->>>>>>> feat: integrate chromecast sender
+                            <rect key="frame" x="204" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="Iye-f4-Rd2"/>
                                 <constraint firstAttribute="width" constant="28" id="O0l-F2-ebZ"/>
@@ -268,11 +230,7 @@
             </constraints>
             <connections>
                 <outlet property="airplayButton" destination="l5j-2I-Ltc" id="ENH-UT-6ix"/>
-<<<<<<< refs/remotes/origin/master
-=======
-                <outlet property="castButton" destination="qv2-7E-wG4" id="ZQY-z3-xr1"/>
-                <outlet property="displayLyricsButton" destination="MwT-Zv-e8l" id="5fb-7U-tR6"/>
->>>>>>> feat: integrate chromecast sender
+                <outlet property="castButton" destination="qv2-7E-wG4" id="H1h-KS-1jQ"/>
                 <outlet property="displayPlaylistButton" destination="ZVN-JG-VAA" id="2Rh-6V-CMd"/>
                 <outlet property="elapsedTimeLabel" destination="okd-ac-nGY" id="MFD-Qa-B7r"/>
                 <outlet property="nextButton" destination="E3q-DK-jgm" id="MGI-Lm-8TL"/>
@@ -303,11 +261,6 @@
         <image name="gobackward.10" catalog="system" width="119" height="128"/>
         <image name="goforward.10" catalog="system" width="119" height="128"/>
         <image name="list.bullet" catalog="system" width="128" height="87"/>
-<<<<<<< refs/remotes/origin/master
-=======
-        <image name="lyrics" width="10" height="13"/>
-        <image name="moon.zzz.fill" catalog="system" width="117" height="128"/>
->>>>>>> feat: integrate chromecast sender
         <image name="play.fill" catalog="system" width="120" height="128"/>
         <image name="podcast" width="448" height="512"/>
         <image name="rectangle.portrait.inset.filled" catalog="system" width="115" height="128"/>
