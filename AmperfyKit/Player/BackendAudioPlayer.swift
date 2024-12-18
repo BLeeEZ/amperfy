@@ -70,6 +70,7 @@ class BackendAudioPlayer: NSObject {
     private var nextPreloadedPlayable: AbstractPlayable?
     private var isPreviousPlaylableFinshed = true
     private var isAutoStartPlayback = true
+    private var isMuted = false
 
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
@@ -87,6 +88,7 @@ class BackendAudioPlayer: NSObject {
     public private(set) var isPlaying: Bool = false
     public private(set) var isErrorOccured: Bool = false
     public private(set) var playType: PlayType?
+    public var onSeek: ((Double) -> Void)?
     
     var responder: BackendAudioPlayerNotifiable?
     var isPlayableLoaded: Bool {
@@ -145,6 +147,11 @@ class BackendAudioPlayer: NSObject {
             if let self = self {
                 self.responder?.didLyricsTimeChange(time: time)
             }
+        }
+        if isMuted {
+            player.volume = 0
+        } else {
+            player.volume = 1
         }
     }
     
@@ -223,6 +230,16 @@ class BackendAudioPlayer: NSObject {
         }
     }
     
+    func mute() {
+        player.volume = 0
+        isMuted = true
+    }
+    
+    func unmute() {
+        player.volume = 1
+        isMuted = false
+    }
+    
     func continuePlay() {
         isPlaying = true
         player.play()
@@ -246,6 +263,7 @@ class BackendAudioPlayer: NSObject {
     
     func seek(toSecond: Double) {
         player.seek(to: CMTime(seconds: toSecond, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
+        onSeek!(toSecond)
     }
     
     var shouldPlaybackStart: Bool {

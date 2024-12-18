@@ -24,6 +24,9 @@ import MediaPlayer
 import MarqueeLabel
 import AmperfyKit
 import PromiseKit
+#if !targetEnvironment(macCatalyst)
+import GoogleCast
+#endif
 
 class PlayerControlView: UIView {
   
@@ -53,6 +56,14 @@ class PlayerControlView: UIView {
     @IBOutlet weak var displayPlaylistButton: UIButton!
     @IBOutlet weak var optionsButton: UIButton!
     
+    @IBOutlet var castInstructionLabel: UILabel!
+    @IBOutlet var credsToggleButton: UIButton!
+    @IBOutlet var credsLabel: UILabel!
+    
+    #if !targetEnvironment(macCatalyst)
+    @IBOutlet var castButton: GCKUICastButton!
+    #endif
+    
     required init?(coder aDecoder: NSCoder) {
         #if targetEnvironment(macCatalyst)
         airplayVolume = MPVolumeView(frame: .zero)
@@ -80,6 +91,9 @@ class PlayerControlView: UIView {
         airplayButton.tintColor = .label
         playerModeChangeButton.tintColor = .label
         optionsButton.imageView?.tintColor = .label
+        #if !targetEnvironment(macCatalyst)
+        castButton.tintColor = .label
+        #endif
         refreshPlayer()
     }
     

@@ -26,6 +26,12 @@ import os.log
 import AmperfyKit
 import PromiseKit
 import Intents
+#if !targetEnvironment(macCatalyst)
+import GoogleCast
+#endif
+#if targetEnvironment(macCatalyst)
+let kGCKDefaultMediaReceiverApplicationID = ""
+#endif
 
 let windowSettingsTitle = "Settings"
 let windowMiniPlayerTitle = "MiniPlayer"
@@ -36,8 +42,10 @@ let defaultWindowActivityType = "amperfy.main"
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
+     
     static let name = "Amperfy"
+    let kReceiverAppID = kGCKDefaultMediaReceiverApplicationID
+    let kDebugLoggingEnabled = true
     static var version: String {
         return (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? ""
     }
@@ -232,6 +240,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         configureNotificationHandling()
         initEventLogger()
         self.window = UIWindow(frame: UIScreen.main.bounds)
+        #if !targetEnvironment(macCatalyst)
+        let criteria = GCKDiscoveryCriteria(applicationID: kReceiverAppID)
+        let options = GCKCastOptions(discoveryCriteria: criteria)
+            GCKCastContext.setSharedInstanceWith(options)
+        #endif
         
         #if targetEnvironment(macCatalyst)
         self.patchMPVolumeViewPreSonoma()

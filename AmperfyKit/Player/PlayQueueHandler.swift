@@ -24,6 +24,7 @@ import Foundation
 public class PlayQueueHandler  {
     
     private var playerQueues: PlayerQueuesPersistent
+    public var onQueueInsert: (([AbstractPlayable], Int?) -> Void)!
     
     init(playerData: PlayerQueuesPersistent) {
         self.playerQueues = playerData
@@ -95,11 +96,14 @@ public class PlayQueueHandler  {
     func insertContextQueue(playables: [AbstractPlayable]) {
         playerQueues.contextName = ""
         playerQueues.insertContextQueue(playables: playables)
+        let topIndex = 1
+        onQueueInsert(playables, topIndex)
     }
     
     func appendContextQueue(playables: [AbstractPlayable]) {
         playerQueues.contextName = ""
         playerQueues.appendContextQueue(playables: playables)
+        onQueueInsert(playables, nil)
     }
     
     func insertUserQueue(playables: [AbstractPlayable]) {

@@ -48,14 +48,16 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     private let settings: PersistentStorage.Settings
     private let userStatistics: UserStatistics
     private var notifierList = [MusicPlayable]()
+    private var chromeCastPlayer: ChromecastPlayer
 
-    init(coreData: PlayerStatusPersistent, queueHandler: PlayQueueHandler, backendAudioPlayer: BackendAudioPlayer, settings: PersistentStorage.Settings, userStatistics: UserStatistics) {
+    init(coreData: PlayerStatusPersistent, queueHandler: PlayQueueHandler, backendAudioPlayer: BackendAudioPlayer, settings: PersistentStorage.Settings, userStatistics: UserStatistics, chromeCastPlayer: ChromecastPlayer) {
         self.playerStatus = coreData
         self.queueHandler = queueHandler
         self.backendAudioPlayer = backendAudioPlayer
         self.backendAudioPlayer.isAutoCachePlayedItems = coreData.isAutoCachePlayedItems
         self.settings = settings
         self.userStatistics = userStatistics
+        self.chromeCastPlayer = chromeCastPlayer
         super.init()
         self.backendAudioPlayer.responder = self
         self.backendAudioPlayer.nextPlayablePreloadCB = { () in
@@ -117,14 +119,17 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
             backendAudioPlayer.continuePlay()
             notifyItemStartedPlaying()
         }
+        self.chromeCastPlayer.playRemote()
     }
 
     public func play(context: PlayContext) {
+        os_log("play context \(context.index) \(context.name)")
         guard let activePlayable = context.getActivePlayable() else { return }
         let topUserQueueItem = queueHandler.userQueue.first
         let wasUserQueuePlaying = queueHandler.isUserQueuePlaying
         queueHandler.clearActiveQueue()
         queueHandler.appendActiveQueue(playables: context.playables)
+        chromeCastPlayer.castQueue(playables: context.playables, startIndex: context.index, {})
         if context.type == .music {
             queueHandler.contextName = context.name
         }
@@ -167,6 +172,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         } else {
             replayCurrentItem()
         }
+        chromeCastPlayer.playPrevious()
     }
 
     //BackendAudioPlayerNotifiable
@@ -182,6 +188,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         if queueHandler.userQueue.count > 0 {
             return PlayerIndex(queueType: .user, index: 0)
         } else if queueHandler.nextQueue.count > 0 {
+            chromeCastPlayer.playNext()
             return PlayerIndex(queueType: .next, index: 0)
         } else if playerStatus.repeatMode == .all, !queueHandler.prevQueue.isEmpty {
             return PlayerIndex(queueType: .prev, index: 0)
@@ -192,6 +199,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     
     func pause() {
         backendAudioPlayer.pause()
+        self.chromeCastPlayer.pauseRemote()
         notifyItemPaused()
     }
     
@@ -200,11 +208,13 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
         isContinueSongProgress = false
         backendAudioPlayer.stop()
         playerStatus.stop()
+        chromeCastPlayer.stopRemote()
         notifyPlayerStopped()
     }
     
     func stopButRemainIndex() {
         backendAudioPlayer.stop()
+        chromeCastPlayer.stopRemote()
         notifyPlayerStopped()
     }
     
@@ -225,6 +235,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
            playable.playProgress > 0,
            backendAudioPlayer.isErrorOccured || playable.isPodcastEpisode || isContinueSongProgress {
             backendAudioPlayer.seek(toSecond: Double(playable.playProgress))
+            self.chromeCastPlayer.seekRemote(to: Double(playable.playProgress))
         }
         isContinueSongProgress = false
     }
