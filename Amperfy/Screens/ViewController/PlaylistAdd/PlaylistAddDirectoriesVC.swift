@@ -61,6 +61,7 @@ class PlaylistAddDirectoriesVC: MultiSourceTableViewController, PlaylistVCAddabl
         updateTitle()
         subdirectoriesFetchedResultsController?.delegate = self
         songsFetchedResultsController?.delegate = self
+        addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
         
         guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
@@ -78,8 +79,18 @@ class PlaylistAddDirectoriesVC: MultiSourceTableViewController, PlaylistVCAddabl
         super.viewWillDisappear(animated)
         subdirectoriesFetchedResultsController?.delegate = nil
         songsFetchedResultsController?.delegate = nil
+        addToPlaylistManager.hideToolbar(viewVC: self)
     }
-    
+       
+    @IBAction func selectAllButtonPressed(_ sender: UIBarButtonItem) {
+        if let songs = songsFetchedResultsController?.fetchedObjects?.compactMap({ Song(managedObject: $0) }) {
+            addToPlaylistManager.toggleSelection(playables: songs, rootVC: self, doneCB: {
+                self.tableView.reloadData()
+                self.updateTitle()
+            })
+        }
+    } 
+
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -152,9 +163,11 @@ class PlaylistAddDirectoriesVC: MultiSourceTableViewController, PlaylistVCAddabl
         case 1:
             let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell {
-                cell.isMarked = addToPlaylistManager.toggleSelection(playable: song)
-                cell.refresh()
-                updateTitle()
+                addToPlaylistManager.toggleSelection(playable: song, rootVC: self) {
+                    cell.isMarked = $0
+                    cell.refresh()
+                    self.updateTitle()
+                }
             }
         default: break
         }

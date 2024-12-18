@@ -227,7 +227,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         } else {
             let itemsNotContained = playlist.notContaines(playables: itemsToAdd)
             if itemsNotContained.count != itemsToAdd.count {
-                let alert = UIAlertController(title: nil, message: "Duplicates are going to be added to this Playlist. Do you want to add the Duplicates or skip them?", preferredStyle: .alert)
+                let alert = UIAlertController(title: nil, message: "Some Songs are already in this Playlist.", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "Add Duplicates", style: .default, handler: { _ in
                     handleSuccessfullSelection(playables: itemsToAdd)
                 }))

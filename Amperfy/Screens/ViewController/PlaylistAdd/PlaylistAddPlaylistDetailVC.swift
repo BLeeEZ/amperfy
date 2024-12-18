@@ -72,6 +72,7 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         updateTitle()
+        addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
         
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
@@ -81,6 +82,24 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
         }
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        addToPlaylistManager.hideToolbar(viewVC: self)
+    }
+    
+    @IBAction func selectAllButtonPressed(_ sender: UIBarButtonItem) {
+        let songs = singleFetchedResultsController?
+                    .fetchedObjects?
+                    .compactMap({ PlaylistItem(library: self.appDelegate.storage.main.library, managedObject: $0) })
+                    .compactMap({ $0.playable })
+        if let songs = songs {
+            addToPlaylistManager.toggleSelection(playables: songs, rootVC: self, doneCB: {
+                self.tableView.reloadData()
+                self.updateTitle()
+            })
+        }
+    }
+
     func updateTitle() {
         setNavBarTitle(title: addToPlaylistManager.title)
     }
@@ -103,9 +122,11 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
         let item = fetchedResultsController.getWrappedEntity(at: indexPath)
         if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell,
            let song = item.playable?.asSong {
-            cell.isMarked = addToPlaylistManager.toggleSelection(playable: song)
-            cell.refresh()
-            updateTitle()
+            addToPlaylistManager.toggleSelection(playable: song, rootVC: self) {
+                cell.isMarked = $0
+                cell.refresh()
+                self.updateTitle()
+            }
         }
     }
     

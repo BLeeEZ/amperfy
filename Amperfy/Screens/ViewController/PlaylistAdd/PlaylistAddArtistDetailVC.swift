@@ -60,6 +60,7 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
         albumsFetchedResultsController?.delegate = self
         songsFetchedResultsController?.delegate = self
         updateTitle()
+        addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
         
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
@@ -77,6 +78,16 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
         super.viewWillDisappear(animated)
         albumsFetchedResultsController?.delegate = nil
         songsFetchedResultsController?.delegate = nil
+        addToPlaylistManager.hideToolbar(viewVC: self)
+    }
+        
+    @IBAction func selectAllButtonPressed(_ sender: UIBarButtonItem) {
+        if let songs = songsFetchedResultsController?.fetchedObjects?.compactMap({ Song(managedObject: $0) }) {
+            addToPlaylistManager.toggleSelection(playables: songs, rootVC: self, doneCB: {
+                self.tableView.reloadData()
+                self.updateTitle()
+            })
+        }
     }
     
     // MARK: - Table view data source
@@ -174,9 +185,11 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
             tableView.deselectRow(at: indexPath, animated: false)
             let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell {
-                cell.isMarked = addToPlaylistManager.toggleSelection(playable: song)
-                cell.refresh()
-                updateTitle()
+                addToPlaylistManager.toggleSelection(playable: song, rootVC: self) {
+                    cell.isMarked = $0
+                    cell.refresh()
+                    self.updateTitle()
+                }
             }
         default: break
         }

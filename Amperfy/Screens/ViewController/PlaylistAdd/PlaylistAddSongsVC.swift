@@ -47,7 +47,6 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
         navigationItem.rightBarButtonItems = [doneButton]
 
         applyFilter()
-        configureSearchController(placeholder: "Search in \"\(self.sceneTitle ?? "Songs")\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
         tableView.register(nibName: PlayableTableCell.typeName)
         tableView.rowHeight = PlayableTableCell.rowHeight
         tableView.estimatedRowHeight = PlayableTableCell.rowHeight
@@ -55,14 +54,31 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
         tableView.estimatedSectionHeaderHeight = 0.0
         tableView.sectionFooterHeight = 0.0
         tableView.estimatedSectionFooterHeight = 0.0
+        
+        configureSearchController(placeholder: "Search in \"\(self.sceneTitle ?? "Songs")\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
     }
     
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         updateTitle()
         updateFromRemote()
+        addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
+    }
+       
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        addToPlaylistManager.hideToolbar(viewVC: self)
     }
     
+    @IBAction func selectAllButtonPressed(_ sender: UIBarButtonItem) {
+        if let songs = singleFetchedResultsController?.fetchedObjects?.compactMap({ Song(managedObject: $0) }) {
+            addToPlaylistManager.toggleSelection(playables: songs, rootVC: self, doneCB: {
+                self.tableView.reloadData()
+                self.updateTitle()
+            })
+        }
+    }
+
     func updateFromRemote() {
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
         switch displayFilter {
@@ -81,7 +97,6 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
         }
     }
     
-
     func applyFilter() {
         switch displayFilter {
         case .all:
@@ -127,11 +142,13 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         
-        let item = fetchedResultsController.getWrappedEntity(at: indexPath)
+        let song = fetchedResultsController.getWrappedEntity(at: indexPath)
         if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell {
-            cell.isMarked = addToPlaylistManager.toggleSelection(playable: item)
-            cell.refresh()
-            updateTitle()
+            addToPlaylistManager.toggleSelection(playable: song, rootVC: self) {
+                cell.isMarked = $0
+                cell.refresh()
+                self.updateTitle()
+            }
         }
     }
     

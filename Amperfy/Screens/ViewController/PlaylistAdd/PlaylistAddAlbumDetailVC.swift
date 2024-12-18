@@ -70,12 +70,27 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         updateTitle()
+        addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
         
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
             album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        addToPlaylistManager.hideToolbar(viewVC: self)
+    }
+    
+    @IBAction func selectAllButtonPressed(_ sender: UIBarButtonItem) {
+        if let songs = singleFetchedResultsController?.fetchedObjects?.compactMap({ Song(managedObject: $0) }) {
+            addToPlaylistManager.toggleSelection(playables: songs, rootVC: self, doneCB: {
+                self.tableView.reloadData()
+                self.updateTitle()
+            })
         }
     }
     
@@ -99,9 +114,11 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
         
         let item = fetchedResultsController.getWrappedEntity(at: indexPath)
         if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell {
-            cell.isMarked = addToPlaylistManager.toggleSelection(playable: item)
-            cell.refresh()
-            updateTitle()
+            addToPlaylistManager.toggleSelection(playable: item, rootVC: self) {
+                cell.isMarked = $0
+                cell.refresh()
+                self.updateTitle()
+            }
         }
     }
     

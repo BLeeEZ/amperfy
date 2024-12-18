@@ -23,6 +23,7 @@ import UIKit
 import AmperfyKit
 import PromiseKit
 import CoreData
+import Collections
 
 public protocol PlaylistVCAddable : UIViewController {
     var addToPlaylistManager: AddToPlaylistManager { get set }
@@ -78,6 +79,8 @@ extension LibraryDisplayType {
     }
 }
 
+public typealias SelectedCallback = (Bool) -> Void
+
 public class AddToPlaylistManager {
     public var playlist: Playlist!
     public var onDoneCB: VoidFunctionCallback?
@@ -85,6 +88,7 @@ public class AddToPlaylistManager {
     public var rootView: UIViewController?
     
     private var appDelegate: AppDelegate
+    private static let warningElementsToAddCount = 100
     
     init() {
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
@@ -105,18 +109,75 @@ public class AddToPlaylistManager {
         })
     }
     
-    func toggleSelection(playable: AbstractPlayable) -> Bool {
+    func toggleSelection(playables: [AbstractPlayable], rootVC: UIViewController, doneCB: @escaping VoidFunctionCallback) {
+        let elementsToAddSet = OrderedSet<AbstractPlayable>(elementsToAdd)
+        let playableToToggleSet = OrderedSet<AbstractPlayable>(playables)
+        let itemsAlreadyAboutToGetAdded = elementsToAddSet.intersection(playableToToggleSet)
+        guard itemsAlreadyAboutToGetAdded.isEmpty else {
+            // unselect all provided playables
+            elementsToAdd = Array(elementsToAddSet.subtracting(itemsAlreadyAboutToGetAdded))
+            doneCB()
+            return
+        }
+        
+        func handleSuccessfullSelection(playables: [AbstractPlayable]) {
+            elementsToAdd.append(contentsOf: playables)
+            doneCB()
+        }
+        let itemsNotContained = playlist.notContaines(playables: playables)
+        if itemsNotContained.count != playableToToggleSet.count {
+            let useSingular = (playableToToggleSet.count == 1)
+            let pluralS = useSingular ? "" : "s"
+            let alertTitle = useSingular ?
+              "This Song is already in your Playlist." :
+              "Some Songs are already in your Playlist."
+            let alert = UIAlertController(title: nil, message: alertTitle, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Add Duplicate\(pluralS)", style: .default, handler: { _ in
+                handleSuccessfullSelection(playables: playables)
+            }))
+            alert.addAction(UIAlertAction(title: "Skip\(useSingular ? "" : " Duplicates")", style: useSingular ? .cancel : .default, handler: { _ in
+                handleSuccessfullSelection(playables: Array(itemsNotContained))
+            }))
+            if !useSingular {
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+                    // do nothing
+                    doneCB()
+                }))
+            }
+            rootVC.present(alert, animated: true, completion: nil)
+        } else {
+            handleSuccessfullSelection(playables: playables)
+        }
+    }
+    
+    func toggleSelection(playable: AbstractPlayable, rootVC: UIViewController, isSelectedCB: @escaping SelectedCallback) {
         let markedIndex = elementsToAdd.firstIndex { $0 == playable }
         if let markedIndex = markedIndex {
             elementsToAdd.remove(at: markedIndex)
+            isSelectedCB(false)
         } else {
-            elementsToAdd.append(playable)
+            self.append(playable: playable, rootVC: rootVC, isSelectedCB: isSelectedCB)
         }
-        return markedIndex == nil
     }
     
-    func append(playable: AbstractPlayable) {
-        elementsToAdd.append(playable)
+    private func append(playable: AbstractPlayable, rootVC: UIViewController, isSelectedCB: @escaping SelectedCallback) {
+        func handleSuccessfullSelection(playables: [AbstractPlayable]) {
+            elementsToAdd.append(playable)
+            isSelectedCB(true)
+        }
+        let itemsNotContained = playlist.notContaines(playables: [playable])
+        if itemsNotContained.isEmpty {
+            let alert = UIAlertController(title: nil, message: "This Song is already in your Playlist.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Add Duplicate", style: .default, handler: { _ in
+                handleSuccessfullSelection(playables: [playable])
+            }))
+            alert.addAction(UIAlertAction(title: "Skip", style: .cancel, handler: { _ in
+                isSelectedCB(false)
+            }))
+            rootVC.present(alert, animated: true, completion: nil)
+        } else {
+            handleSuccessfullSelection(playables: [playable])
+        }
     }
     
     func remove(playable: AbstractPlayable) {
@@ -129,8 +190,14 @@ public class AddToPlaylistManager {
     
     @IBAction func doneBarButtonPressed(_ sender: UIBarButtonItem) {
         let songsToAdd = elementsToAdd.compactMap{ $0.asSong }
-
-        if songsToAdd.count > 0 {
+        guard songsToAdd.count > 0 else {
+            self.rootView?.dismiss(animated: true, completion: nil)
+            return
+        }
+        
+        func uploadPlaylistChanges() {
+            self.rootView?.dismiss(animated: true, completion: nil)
+            
             firstly {
                 self.appDelegate.librarySyncer.syncUpload(playlistToAddSongs: playlist, songs: songsToAdd)
             }.done {
@@ -139,13 +206,39 @@ public class AddToPlaylistManager {
             }.catch { error in
                 self.appDelegate.eventLogger.report(topic: "Add Songs to Playlist", error: error)
             }.finally {
-                self.rootView?.dismiss(animated: true, completion: nil)
+                if songsToAdd.count > Self.warningElementsToAddCount {
+                    self.appDelegate.eventLogger.info(topic: "Add Songs to Playlist", message: "The Playlist \"\(self.playlist.name)\" has been successfully synced to the server.")
+                }
             }
+        }
+
+        if songsToAdd.count > Self.warningElementsToAddCount {
+            let alert = UIAlertController(title: nil, message: "Adding \(songsToAdd.count) Songs to this Playlist may cause performance issues during server synchronization.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Add Songs Anyway", style: .default, handler: { _ in
+                uploadPlaylistChanges()
+            }))
+            alert.addAction(UIAlertAction(title: "Abort", style: .default, handler: { _ in
+                self.rootView?.dismiss(animated: true, completion: nil)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+                // do nothing
+            }))
+            self.rootView?.present(alert, animated: true, completion: nil)
         } else {
-            self.rootView?.dismiss(animated: true, completion: nil)
+            uploadPlaylistChanges()
         }
     }
     
+    public func configuteToolbar(viewVC: UIViewController, selectButtonSelector: Selector) {
+        viewVC.navigationController?.setToolbarHidden(false, animated: false)
+        let flexible = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: self, action: nil)
+        let selectAllBarButton = UIBarButtonItem(title: "All", style: .plain, target: viewVC, action: selectButtonSelector)
+        viewVC.toolbarItems = [selectAllBarButton, flexible]
+    }
+    
+    public func hideToolbar(viewVC: UIViewController) {
+        viewVC.navigationController?.setToolbarHidden(true, animated: false)
+    }
 }
 
 class PlaylistAddLibraryVC: KeyCommandTableViewController {
