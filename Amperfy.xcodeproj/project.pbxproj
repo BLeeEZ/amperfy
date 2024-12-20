@@ -430,8 +430,7 @@
 		50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */; };
 		50F40A3B2C9088B30097FE63 /* IfritStatic in Frameworks */ = {isa = PBXBuildFile; productRef = 50F40A3A2C9088B30097FE63 /* IfritStatic */; };
 		50FF311B2BBC4D8000C2C3B9 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FF311A2BBC4D8000C2C3B9 /* NetworkMonitor.swift */; };
-		55311C9E2D0E2EF300AB05A0 /* GoogleCast.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 555CBF262CE3DADD00D1EF76 /* GoogleCast.xcframework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		555CBF272CE3DADD00D1EF76 /* GoogleCast.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 555CBF262CE3DADD00D1EF76 /* GoogleCast.xcframework */; platformFilter = ios; };
+		555F37262D160F4C000ECD28 /* GoogleCast in Frameworks */ = {isa = PBXBuildFile; productRef = 555F37252D160F4C000ECD28 /* GoogleCast */; };
 		55D0ED242D08E56E00193DA8 /* ChromecastPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D0ED232D08E51A00193DA8 /* ChromecastPlayer.swift */; };
 		631C16652C6BA7E60085F62E /* AppDelegateAppKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C16642C6BA7E60085F62E /* AppDelegateAppKitExtension.swift */; };
 		631C166B2C6D3D9A0085F62E /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C166A2C6D3D9A0085F62E /* SettingsRow.swift */; };
@@ -518,7 +517,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				55311C9E2D0E2EF300AB05A0 /* GoogleCast.xcframework in CopyFiles */,
 				50C1CD9F2C93342900629993 /* AppKitIntegration.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -970,7 +968,6 @@
 		50FE808D26A55CEA00CB434D /* DownloadMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DownloadMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50FF31192BBB27AC00C2C3B9 /* Amperfy v36.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v36.xcdatamodel"; sourceTree = "<group>"; };
 		50FF311A2BBC4D8000C2C3B9 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
-		555CBF262CE3DADD00D1EF76 /* GoogleCast.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GoogleCast.xcframework; sourceTree = "<group>"; };
 		55D0ED232D08E51A00193DA8 /* ChromecastPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromecastPlayer.swift; sourceTree = "<group>"; };
 		631C16642C6BA7E60085F62E /* AppDelegateAppKitExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateAppKitExtension.swift; sourceTree = "<group>"; };
 		631C166A2C6D3D9A0085F62E /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
@@ -1006,7 +1003,6 @@
 			files = (
 				507DFE902B1E7262002BBB1D /* CallbackURLKit in Frameworks */,
 				507DFE5B2B1E58CB002BBB1D /* PMKAlamofire in Frameworks */,
-				555CBF272CE3DADD00D1EF76 /* GoogleCast.xcframework in Frameworks */,
 				507DFE622B1E59F2002BBB1D /* PromiseKit in Frameworks */,
 				507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */,
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
@@ -1031,6 +1027,7 @@
 			files = (
 				507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */,
 				50F40A3B2C9088B30097FE63 /* IfritStatic in Frameworks */,
+				555F37262D160F4C000ECD28 /* GoogleCast in Frameworks */,
 				507DFE682B1E5A1A002BBB1D /* PromiseKit in Frameworks */,
 				50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */,
 				507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */,
@@ -1394,7 +1391,6 @@
 				50CF3CEE28A4F83100263F7C /* CryptoKit.framework */,
 				50253F81284A5EEA00BCCFB2 /* Intents.framework */,
 				50253F8C284A5EEB00BCCFB2 /* IntentsUI.framework */,
-				555CBF262CE3DADD00D1EF76 /* GoogleCast.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1999,6 +1995,7 @@
 				507DFE672B1E5A1A002BBB1D /* PromiseKit */,
 				507DFE692B1E62C9002BBB1D /* ID3TagEditor */,
 				50F40A3A2C9088B30097FE63 /* IfritStatic */,
+				555F37252D160F4C000ECD28 /* GoogleCast */,
 			);
 			productName = AmpertyKit;
 			productReference = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */;
@@ -2081,6 +2078,7 @@
 				507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */,
 				507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */,
 				50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */,
+				555F37242D160F4C000ECD28 /* XCRemoteSwiftPackageReference "swift-package-google-cast-sdk" */,
 			);
 			productRefGroup = 508385E521C5965B00C4BB32 /* Products */;
 			projectDirPath = "";
@@ -3142,6 +3140,14 @@
 				version = 2.0.3;
 			};
 		};
+		555F37242D160F4C000ECD28 /* XCRemoteSwiftPackageReference "swift-package-google-cast-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tobiaseisenschenk/swift-package-google-cast-sdk.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -3224,6 +3230,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */;
 			productName = IfritStatic;
+		};
+		555F37252D160F4C000ECD28 /* GoogleCast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 555F37242D160F4C000ECD28 /* XCRemoteSwiftPackageReference "swift-package-google-cast-sdk" */;
+			productName = GoogleCast;
 		};
 /* End XCSwiftPackageProductDependency section */
 

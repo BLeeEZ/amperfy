@@ -1,5 +1,5 @@
 {
-  "originHash" : "540dfab39b5c5850aef4501328da3e2e3788f4596df4484419f102c3d45ae514",
+  "originHash" : "71b5074505f9c681351c12d242e07abe88fe260169bf44be57480e14e5cdbb80",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -89,6 +89,15 @@
       "state" : {
         "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
         "version" : "5.7.1"
+      }
+    },
+    {
+      "identity" : "swift-package-google-cast-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tobiaseisenschenk/swift-package-google-cast-sdk.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "38626cb05906840dbadbc12d3f31779cc4b580e3"
       }
     },
     {
