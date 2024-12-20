@@ -231,12 +231,19 @@ class BasicTableViewController: KeyCommandTableViewController {
                 case .download:
                     self.appDelegate.playableDownloadManager.download(objects: actionContext.playables)
                 case .removeFromCache:
-                    self.appDelegate.playableDownloadManager.removeFinishedDownload(for: actionContext.playables)
-                    self.appDelegate.storage.main.library.deleteCache(of: actionContext.playables)
-                    self.appDelegate.storage.main.saveContext()
-                    if let cell = self.tableView.cellForRow(at: indexPath) as? PlayableTableCell {
-                        cell.refresh()
-                    }
+                    let alert = UIAlertController(title: nil, message: "Are you shure to delete the cached file\(actionContext.playables.count > 1 ? "s" : "")?", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+                        self.appDelegate.playableDownloadManager.removeFinishedDownload(for: actionContext.playables)
+                        self.appDelegate.storage.main.library.deleteCache(of: actionContext.playables)
+                        self.appDelegate.storage.main.saveContext()
+                        if let cell = self.tableView.cellForRow(at: indexPath) as? PlayableTableCell {
+                            cell.refresh()
+                        }
+                    }))
+                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+                        // do nothing
+                    }))
+                    self.present(alert, animated: true, completion: nil)
                 case .addToPlaylist:
                     let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
                     selectPlaylistVC.itemsToAdd = actionContext.playables

@@ -545,24 +545,40 @@ class EntityPreviewActionBuilder {
     private func createDeleteCacheAction() -> UIAction {
         return UIAction(title: "Delete Cache", image: .trash) { action in
             guard self.entityPlayables.hasCachedItems else { return }
-            self.appDelegate.playableDownloadManager.removeFinishedDownload(for: self.entityPlayables)
-            self.appDelegate.storage.main.library.deleteCache(of: self.entityPlayables)
-            self.appDelegate.storage.main.saveContext()
-            self.reloadRootView()
+            
+            let alert = UIAlertController(title: nil, message: "Are you shure to delete the cached file\(self.entityPlayables.count > 1 ? "s" : "")?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+                self.appDelegate.playableDownloadManager.removeFinishedDownload(for: self.entityPlayables)
+                self.appDelegate.storage.main.library.deleteCache(of: self.entityPlayables)
+                self.appDelegate.storage.main.saveContext()
+                self.reloadRootView()
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+                // do nothing
+            }))
+            self.rootView.present(alert, animated: true, completion: nil)
         }
     }
     
     private func createDeleteOnServerAction() -> UIAction {
         return UIAction(title: "Delete on Server", image: .cloudX) { action in
             guard let playable = self.entityContainer as? AbstractPlayable, let podcastEpisode = playable.asPodcastEpisode else { return }
-            firstly {
-                self.appDelegate.librarySyncer.requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
-            }.then { () -> Promise<Void> in
-                guard let podcast = podcastEpisode.podcast else { return Promise.value }
-                return self.appDelegate.librarySyncer.sync(podcast: podcast)
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Podcast Episode Sync Delete", error: error)
-            }
+            
+            let alert = UIAlertController(title: nil, message: "Are you shure to delete the podcast episode on the server?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+                firstly {
+                    self.appDelegate.librarySyncer.requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
+                }.then { () -> Promise<Void> in
+                    guard let podcast = podcastEpisode.podcast else { return Promise.value }
+                    return self.appDelegate.librarySyncer.sync(podcast: podcast)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Podcast Episode Delete Sync", error: error)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+                // do nothing
+            }))
+            self.rootView.present(alert, animated: true, completion: nil)
         }
     }
     
