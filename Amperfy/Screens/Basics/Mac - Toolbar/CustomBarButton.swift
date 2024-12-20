@@ -37,6 +37,7 @@ class MacSnapshotButton: UIButton {
 class CustomBarButton: UIBarButtonItem, Refreshable {
     static let defaultPointSize: CGFloat = 18.0
     static let smallPointSize: CGFloat = 14.0
+    static let verySmallPointSize: CGFloat = 12.0
     static let defaultSize = CGSize(width: 32, height: 22)
 
     let pointSize: CGFloat

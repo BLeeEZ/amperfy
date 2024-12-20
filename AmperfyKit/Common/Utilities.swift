@@ -535,6 +535,13 @@ extension UISlider {
         self.setThumbImage(thumbImage, for: state)
     }
 
+    public func setUnicolorRoundedThumbImage(thumbSize: CGSize, color: UIColor, for state: UIControl.State) {
+        let layerFrame = CGRect(origin: .zero, size: thumbSize)
+        let path = UIBezierPath(roundedRect: layerFrame, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight], cornerRadii: CGSize(width: thumbSize.width/2, height: thumbSize.height/2)).cgPath
+        let thumbImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
+        self.setThumbImage(thumbImage, for: state)
+    }
+    
     public func setUnicolorRectangularThumbImage(thumbSize: CGSize, color: UIColor, for state: UIControl.State) {
         let layerFrame = CGRect(origin: .zero, size: thumbSize)
         let path = UIBezierPath(roundedRect: layerFrame, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: thumbSize.width/2, height: thumbSize.height/2)).cgPath

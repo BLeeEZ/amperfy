@@ -70,6 +70,7 @@ class BackendAudioPlayer: NSObject {
     private var nextPreloadedPlayable: AbstractPlayable?
     private var isPreviousPlaylableFinshed = true
     private var isAutoStartPlayback = true
+    private var volumePlayer: Float = 1.0
 
     public var isOfflineMode: Bool = false
     public var isAutoCachePlayedItems: Bool = true
@@ -89,6 +90,15 @@ class BackendAudioPlayer: NSObject {
     public private(set) var playType: PlayType?
     
     var responder: BackendAudioPlayerNotifiable?
+    var volume: Float {
+        get {
+            return volumePlayer
+        }
+        set {
+            volumePlayer = newValue
+            player.volume = newValue
+        }
+    }
     var isPlayableLoaded: Bool {
         return player.currentItem?.status == AVPlayerItem.Status.readyToPlay
     }
@@ -134,6 +144,7 @@ class BackendAudioPlayer: NSObject {
     
     private func initAVPlayer() {
         player = createAVPlayerCB()
+        player.volume = volumePlayer
         player.allowsExternalPlayback = false // Disable video transmission via AirPlay -> only audio
         player.addPeriodicTimeObserver(forInterval: updateElapsedTimeInterval, queue: DispatchQueue.main) { [weak self] time in
             if let self = self {

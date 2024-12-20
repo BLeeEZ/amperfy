@@ -276,6 +276,7 @@ public class PersistentStorage {
         case StreamingFormatPreference = "streamingFormatPreference"
         case CacheTranscodingFormatPreference = "cacheTranscodingFormatPreference"
         case CacheLimit = "cacheLimitInBytes" // limit in byte
+        case PlayerVolume = "playerVolume"
         case ShowDetailedInfo = "showDetailedInfo"
         case ShowSongDuration = "showSongDuration"
         case ShowAlbumDuration = "showAlbumDuration"
@@ -429,6 +430,17 @@ public class PersistentStorage {
                 return UserDefaults.standard.object(forKey: UserDefaultsKey.CacheLimit.rawValue) as? Int ?? 0
             }
             set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.CacheLimit.rawValue) }
+        }
+        
+        public var playerVolume: Float {
+            get {
+                let volume = UserDefaults.standard.object(forKey: UserDefaultsKey.PlayerVolume.rawValue) as? Float ?? 1.0
+                return (volume >= 0.0 && volume <= 1.0) ? volume : 1.0
+            }
+            set {
+                guard newValue >= 0.0 && newValue <= 1.0 else { return }
+                UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.PlayerVolume.rawValue)
+            }
         }
         
         public var playlistsSortSetting: PlaylistSortType {

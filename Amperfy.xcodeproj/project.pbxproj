@@ -49,6 +49,7 @@
 		504B442228D8EBB20033982C /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B442128D8EBB20033982C /* MailView.swift */; };
 		5052497B2D10CBC70005EEB0 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 5052497A2D10CBC70005EEB0 /* Collections */; };
 		5052497D2D10CBED0005EEB0 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 5052497C2D10CBED0005EEB0 /* Collections */; };
+		5052497F2D12CC860005EEB0 /* VolumeBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5052497E2D12CC7D0005EEB0 /* VolumeBarItem.swift */; };
 		505362D12C23682500846C53 /* AlbumsCollectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505362D02C23682500846C53 /* AlbumsCollectionVC.swift */; };
 		505362D32C2425C200846C53 /* AlbumsCommonVCInteractions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505362D22C2425C200846C53 /* AlbumsCommonVCInteractions.swift */; };
 		5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5055AA5626835A9000096B8D /* PodcastEpisodeTableCell.swift */; };
@@ -652,6 +653,7 @@
 		504B442128D8EBB20033982C /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		504C718E23BAC8F2001F82C7 /* PlaylistItemTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistItemTest.swift; sourceTree = "<group>"; };
 		504C719023BAD112001F82C7 /* SongTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTest.swift; sourceTree = "<group>"; };
+		5052497E2D12CC7D0005EEB0 /* VolumeBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeBarItem.swift; sourceTree = "<group>"; };
 		505362D02C23682500846C53 /* AlbumsCollectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsCollectionVC.swift; sourceTree = "<group>"; };
 		505362D22C2425C200846C53 /* AlbumsCommonVCInteractions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsCommonVCInteractions.swift; sourceTree = "<group>"; };
 		5055AA5526835A9000096B8D /* PodcastEpisodeTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastEpisodeTableCell.xib; sourceTree = "<group>"; };
@@ -1934,6 +1936,7 @@
 				637A28AC2C77BB9A0082FACC /* ControlBarButton.swift */,
 				637A28A72C75318C0082FACC /* NowPlayingBarItem.swift */,
 				637A28AE2C77C5140082FACC /* SpaceBarItem.swift */,
+				5052497E2D12CC7D0005EEB0 /* VolumeBarItem.swift */,
 				637A28B02C77C8D40082FACC /* AirplayBarButton.swift */,
 				632F511D2C7FD54A0032860D /* QueueBarButton.swift */,
 			);
@@ -2287,6 +2290,7 @@
 				63298D0F2C87BA390064CD67 /* InnerNavigationController.swift in Sources */,
 				637A28AB2C77BB8E0082FACC /* Refreshable.swift in Sources */,
 				500B97CD2B7BC680005554BF /* EntityPreviewVC.swift in Sources */,
+				5052497F2D12CC860005EEB0 /* VolumeBarItem.swift in Sources */,
 				50791E7C28D32B8A006CE6E5 /* AlternativeURLAddDialogView.swift in Sources */,
 				502E56BC27561AD900638BD2 /* UserQueueSectionHeader.swift in Sources */,
 				50791E7A28D31090006CE6E5 /* ServerURLsSettingsView.swift in Sources */,

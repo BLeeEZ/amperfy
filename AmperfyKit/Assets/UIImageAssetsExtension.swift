@@ -145,6 +145,8 @@ extension UIImage {
     public static let arrowTurnUp = UIImage.create(systemName: "arrowshape.turn.up.backward.circle.fill")
     public static let hammer = UIImage.create(systemName: "hammer.circle.fill")
     public static let circle = UIImage.create(systemName: "circle")
+    public static let volumeMin = UIImage.create(systemName: "speaker.fill")
+    public static let volumeMax = UIImage.create(systemName: "speaker.wave.3.fill")
 
     public static let miniPlayer = UIImage.create(systemName: "play.rectangle.on.rectangle")
     public static let listBullet = UIImage.create(systemName: "list.bullet")

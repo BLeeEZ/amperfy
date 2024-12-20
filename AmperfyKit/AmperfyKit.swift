@@ -94,6 +94,7 @@ public class AmperKit {
         audioSessionHandler.eventLogger = eventLogger
         audioSessionHandler.configureObserverForAudioSessionInterruption()
         backendAudioPlayer.triggerReinsertPlayableCB = curPlayer.play
+        backendAudioPlayer.volume = self.storage.settings.playerVolume
         
         let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(playerStatus: playerData, queueHandler: queueHandler, playableDownloadManager: playableDownloadManager)
         curPlayer.addNotifier(notifier:  playerDownloadPreparationHandler)

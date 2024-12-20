@@ -105,6 +105,7 @@ public protocol PlayerFacade {
     var userQueue: [AbstractPlayable] { get }
     var nextQueue: [AbstractPlayable] { get }
     
+    var volume: Float { get set }
     var isPlaying: Bool { get }
     func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable?
     var currentlyPlaying: AbstractPlayable?  { get }
@@ -208,6 +209,15 @@ class PlayerFacadeImpl: PlayerFacade {
     }
     var nextQueue: [AbstractPlayable] {
         return queueHandler.nextQueue
+    }
+    
+    var volume: Float {
+        get {
+            return backendAudioPlayer.volume
+        }
+        set {
+            backendAudioPlayer.volume = newValue
+        }
     }
     
     var isPlaying: Bool {

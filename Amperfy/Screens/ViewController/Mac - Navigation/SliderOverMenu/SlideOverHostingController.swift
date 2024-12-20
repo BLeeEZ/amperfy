@@ -165,6 +165,8 @@ class SlideOverHostingController: UIViewController {
                 SpaceBarItem(minSpace: defaultSpacing),
                 NowPlayingBarItem(player: player, splitViewController: splitViewController),
                 SpaceBarItem(),
+                VolumeBarItem(player: player),
+                SpaceBarItem(),
                 AirplayBarButton(),
                 QueueBarButton(splitViewController: splitViewController),
                 SpaceBarItem(fixedSpace: defaultSpacing)

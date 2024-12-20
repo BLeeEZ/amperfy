@@ -26,7 +26,7 @@ import AmperfyKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     #if true // default to true: set to false to adjust Main window to App Connect compatible screen size for screenshots
-    static let mainWindowSize = CGSizeMake(SplitVC.sidebarWidth + 700, 580)
+    static let mainWindowSize = CGSizeMake(SplitVC.sidebarWidth + 810, 580)
     #else
     static let mainWindowSize = CGSizeMake(1168, 688) // 2560 x 1600
     #endif
