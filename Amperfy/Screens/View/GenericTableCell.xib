@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="mac" appearance="light" renderMode="macOS"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -19,7 +19,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="sEM-ZY-PBA" userLabel="VStack View">
-                        <rect key="frame" x="16" y="10" width="637" height="48"/>
+                        <rect key="frame" x="16" y="10" width="629" height="48"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kaN-9u-M2i" userLabel="EntityImage" customClass="EntityImageView" customModule="AmperfyKit">
                                 <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
@@ -30,13 +30,13 @@
                                 </constraints>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="55a-sm-8cR" userLabel="HStack View">
-                                <rect key="frame" x="56" y="7" width="581" height="35"/>
+                                <rect key="frame" x="56" y="7" width="573" height="35"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="HDj-Db-Qbv">
-                                        <rect key="frame" x="0.0" y="0.0" width="373" height="35"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="365" height="35"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHk-4e-H8f" userLabel="Title Label">
-                                                <rect key="frame" x="0.0" y="9" width="186.5" height="18"/>
+                                                <rect key="frame" x="0.0" y="9" width="179.5" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="16" id="vsJ-7z-xj1">
                                                         <variation key="widthClass=regular" constant="18"/>
@@ -60,7 +60,7 @@
                                                 </variation>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hM0-yx-hsO" userLabel="Subtitle Label">
-                                                <rect key="frame" x="187" y="9" width="186.5" height="18"/>
+                                                <rect key="frame" x="186" y="9" width="179.5" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="15" id="dnN-rs-XET">
                                                         <variation key="widthClass=regular" constant="18"/>
@@ -93,15 +93,15 @@
                                                 <exclude reference="y2Z-f4-QBV"/>
                                             </mask>
                                         </variation>
-                                        <variation key="widthClass=regular" alignment="center" axis="horizontal" distribution="fillEqually">
+                                        <variation key="widthClass=regular" alignment="center" axis="horizontal" distribution="fillEqually" spacing="6">
                                             <mask key="constraints">
                                                 <include reference="y2Z-f4-QBV"/>
                                             </mask>
                                         </variation>
                                         <variation key="userInterfaceIdiom=mac-widthClass=regular" alignment="center" axis="horizontal" distribution="fillEqually"/>
                                     </stackView>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ah3-fC-zQQ" userLabel="Info Label">
-                                        <rect key="frame" x="381" y="9" width="200" height="18"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5 Songs" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ah3-fC-zQQ" userLabel="Info Label">
+                                        <rect key="frame" x="373" y="9" width="200" height="18"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="15" id="1Hs-Po-1o2">
                                                 <variation key="widthClass=regular" constant="18"/>
@@ -154,7 +154,9 @@
                 <constraints>
                     <constraint firstItem="sEM-ZY-PBA" firstAttribute="leading" secondItem="OYQ-xE-eM6" secondAttribute="leadingMargin" id="5zc-L3-4I9"/>
                     <constraint firstItem="JAm-cG-f5H" firstAttribute="leading" secondItem="OYQ-xE-eM6" secondAttribute="leading" id="A3m-JT-84r"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="sEM-ZY-PBA" secondAttribute="trailing" id="ACJ-ab-eiH"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="sEM-ZY-PBA" secondAttribute="trailing" id="ACJ-ab-eiH">
+                        <variation key="widthClass=regular" constant="8"/>
+                    </constraint>
                     <constraint firstItem="sEM-ZY-PBA" firstAttribute="leading" secondItem="JAm-cG-f5H" secondAttribute="trailing" id="KpN-2r-QYl"/>
                     <constraint firstItem="JAm-cG-f5H" firstAttribute="centerY" secondItem="OYQ-xE-eM6" secondAttribute="centerY" id="Y20-F4-UB5"/>
                     <constraint firstItem="sEM-ZY-PBA" firstAttribute="centerY" secondItem="OYQ-xE-eM6" secondAttribute="centerY" id="tNd-M9-X1j"/>

@@ -89,7 +89,6 @@ class PlaylistAddPlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO
         let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(playlist: playlist, rootView: self)
-        cell.accessoryType = .disclosureIndicator
         return cell
     }
     

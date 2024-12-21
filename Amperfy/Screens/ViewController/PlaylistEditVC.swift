@@ -183,7 +183,7 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
             cell.display(
                 playable: song,
                 displayMode: (editMode == .reorder) ? .reorder : .selection,
-                playContextCb: { _ in return nil },
+                playContextCb: nil,
                 rootView: self,
                 isMarked: (selectedItems.firstIndex { $0 == playlistItem } != nil))
         }

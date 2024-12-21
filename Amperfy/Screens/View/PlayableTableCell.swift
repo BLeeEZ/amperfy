@@ -46,6 +46,8 @@ class PlayableTableCell: BasicTableCell {
     @IBOutlet weak var titleContainerLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var labelTrailingCellConstraint: NSLayoutConstraint!
     @IBOutlet weak var cacheTrailingCellConstaint: NSLayoutConstraint!
+    @IBOutlet weak var durationTrailingCellConstraint: NSLayoutConstraint!
+    @IBOutlet weak var optionsButton: UIButton!
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     private static let touchAnimation = 0.4
@@ -66,7 +68,7 @@ class PlayableTableCell: BasicTableCell {
         playContextCb = nil
     }
     
-    func display(playable: AbstractPlayable, displayMode: DisplayMode = .normal, playContextCb: @escaping GetPlayContextFromTableCellCallback, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, isDislayAlbumTrackNumberStyle: Bool = false, download: Download? = nil, isMarked: Bool = false) {
+    func display(playable: AbstractPlayable, displayMode: DisplayMode = .normal, playContextCb: GetPlayContextFromTableCellCallback?, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, isDislayAlbumTrackNumberStyle: Bool = false, download: Download? = nil, isMarked: Bool = false) {
         if playIndicator == nil {
             playIndicator = PlayIndicator(rootViewTypeName: rootView.typeName)
         }
@@ -165,18 +167,34 @@ class PlayableTableCell: BasicTableCell {
         let cacheIconWidth = (traitCollection.horizontalSizeClass == .regular) ? 17.0 : 15.0
         let durationWidth = (traitCollection.horizontalSizeClass == .regular &&
                              traitCollection.userInterfaceIdiom != .mac) ? 49.0 : 40.0
+        let isDisplayOptionButton = (traitCollection.horizontalSizeClass == .regular) &&
+                                    (playContextCb != nil) && (playerIndexCb == nil)
+        let durationTrailing = isDisplayOptionButton ? 30 : 0.0
         
         // macOS & iPadOS regular
-        //|title|x|Cache|4|Duration|
-        //|title|        80        |
+        //|title|x|Cache|4|Duration| ... |
+        //|title|        80        | 30  |
         // compact
         //|title|4|Cache|4|Duration|
         //|title|4|  15 |4|   40   |
         //|title|4|  15 |-|   --   |
         //|title|8|  -- |-|   40   |
         if traitCollection.horizontalSizeClass == .regular {
-            labelTrailingCellConstraint.constant = 80
+            optionsButton.isHidden = !isDisplayOptionButton
+            if isDisplayOptionButton {
+                optionsButton.showsMenuAsPrimaryAction = true
+                optionsButton.imageView?.tintColor = .label
+                if let rootView = rootView {
+                    let playContext = playContextCb != nil ? { self.playContextCb?(self) } : nil
+                    let playIndex = playerIndexCb != nil ? { self.playerIndexCb?(self) } : nil
+                    optionsButton.menu = UIMenu.lazyMenu {
+                        EntityPreviewActionBuilder(container: playable, on: rootView, playContextCb: playContext, playerIndexCb: playIndex).createMenu()
+                    }
+                }
+            }
+            labelTrailingCellConstraint.constant = 80 + durationTrailing
         } else {
+            optionsButton.isHidden = true
             var lableTrailing = 0.0
             if playable.isCached, isDurationVisible {
                 lableTrailing = 4 + cacheIconWidth + 4 + durationWidth
@@ -188,8 +206,9 @@ class PlayableTableCell: BasicTableCell {
             labelTrailingCellConstraint.constant = lableTrailing
         }
         
+        durationTrailingCellConstraint.constant = durationTrailing
         cacheIconImage.isHidden = !playable.isCached
-        cacheTrailingCellConstaint.constant = isDurationVisible ? (4.0 + durationWidth) : 0.0
+        cacheTrailingCellConstaint.constant = durationTrailing + (isDurationVisible ? (4.0 + durationWidth) : 0.0)
         durationLabel.isHidden = !isDurationVisible
         if isDurationVisible {
             durationLabel.text = playable.duration.asColonDurationString

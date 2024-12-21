@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -72,7 +72,9 @@
                     <constraint firstItem="TkT-gC-6LF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="2vG-6C-BAk"/>
                     <constraint firstItem="TkT-gC-6LF" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="HCl-M9-BrL"/>
                     <constraint firstItem="TxE-Fh-ozu" firstAttribute="leading" secondItem="TkT-gC-6LF" secondAttribute="trailing" constant="8" id="OcW-Ql-tV0"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="TxE-Fh-ozu" secondAttribute="trailing" id="bfa-IE-DcM"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="TxE-Fh-ozu" secondAttribute="trailing" id="bfa-IE-DcM">
+                        <variation key="widthClass=regular" constant="8"/>
+                    </constraint>
                     <constraint firstItem="TxE-Fh-ozu" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="pF2-Kr-tcV"/>
                 </constraints>
             </tableViewCellContentView>

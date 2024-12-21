@@ -72,7 +72,6 @@ class PlaylistAddMusicFoldersVC: SingleFetchedResultsTableViewController<MusicFo
         let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
         let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(folder: musicFolder)
-        cell.accessoryType = .disclosureIndicator
         return cell
     }
     

@@ -109,7 +109,7 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
         if let playable = playlistItem.playable, let song = playable.asSong {
             cell.display(playable: song,
                          displayMode: .add,
-                         playContextCb: { _ in return nil},
+                         playContextCb: nil,
                          rootView: self,
                          isMarked: addToPlaylistManager.contains(playable: song))
         }

@@ -253,6 +253,13 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
             }
         }
     }
+    
+    func refreshCellsContent() {
+        for cell in tableView.visibleCells {
+            guard let playableCell = cell as? PlayableTableCell else { continue }
+            playableCell.refresh()
+        }
+    }
 
 }
 

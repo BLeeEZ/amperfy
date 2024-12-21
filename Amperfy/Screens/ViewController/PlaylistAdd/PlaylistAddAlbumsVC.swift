@@ -109,7 +109,6 @@ class PlaylistAddAlbumsVC: SingleSnapshotFetchedResultsTableViewController<Album
         let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
         if let album = (diffableDataSource as? AlbumsDiffableDataSource)?.getAlbum(at: indexPath) {
             cell.display(container: album, rootView: self)
-            cell.accessoryType = .disclosureIndicator
         }
         return cell
     }

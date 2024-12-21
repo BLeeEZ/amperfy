@@ -102,7 +102,7 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
         let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
         cell.display(playable: song,
                      displayMode: .add,
-                     playContextCb: { _ in return nil },
+                     playContextCb: nil,
                      rootView: self,
                      isDislayAlbumTrackNumberStyle: true,
                      isMarked: addToPlaylistManager.contains(playable: song))

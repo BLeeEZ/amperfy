@@ -28,6 +28,7 @@ extension PopupPlayerVC {
         refreshContextQueueSectionHeader()
         refreshUserQueueSectionHeader()
         refreshCellMasks()
+        refreshCellsContent()
         refreshCurrentlyPlayingInfoView()
     }
     

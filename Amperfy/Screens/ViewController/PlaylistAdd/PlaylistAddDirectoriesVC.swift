@@ -114,14 +114,13 @@ class PlaylistAddDirectoriesVC: MultiSourceTableViewController, PlaylistVCAddabl
             let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
             let cellDirectory = subdirectoriesFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             cell.display(directory: cellDirectory)
-            cell.accessoryType = .disclosureIndicator
             return cell
         case 1:
             let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
             let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             cell.display(playable: song,
                          displayMode: .add,
-                         playContextCb: { _ in return nil },
+                         playContextCb: nil,
                          rootView: self,
                          isMarked: addToPlaylistManager.contains(playable: song))
             return cell

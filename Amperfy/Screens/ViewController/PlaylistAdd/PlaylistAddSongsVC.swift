@@ -133,7 +133,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
         let song = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(playable: song,
                      displayMode: .add,
-                     playContextCb: { _ in return nil },
+                     playContextCb: nil,
                      rootView: self,
                      isMarked: addToPlaylistManager.contains(playable: song))
         return cell

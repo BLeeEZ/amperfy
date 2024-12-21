@@ -67,7 +67,6 @@ class PlaylistAddGenresVC: SingleFetchedResultsTableViewController<GenreMO>, Pla
         cell.display(container: genre,
                      rootView: self)
         cell.entityImage.isHidden = true
-        cell.accessoryType = .disclosureIndicator
         return cell
     }
     

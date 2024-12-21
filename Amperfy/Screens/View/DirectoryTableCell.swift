@@ -85,6 +85,7 @@ class DirectoryTableCell: BasicTableCell {
             infoLabel.text = folder.name
             iconImage.isHidden = false
         }
+        self.accessoryType = .disclosureIndicator
     }
 
 }

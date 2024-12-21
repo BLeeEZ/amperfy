@@ -134,20 +134,18 @@ class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddabl
             let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
             let artist = artistsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             cell.display(container: artist, rootView: self)
-            cell.accessoryType = .disclosureIndicator
             return cell
         case LibraryElement.Album.rawValue:
             let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
             let album = albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             cell.display(container: album, rootView: self)
-            cell.accessoryType = .disclosureIndicator
             return cell
         case LibraryElement.Song.rawValue:
             let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
             let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
             cell.display(playable: song,
                          displayMode: .add,
-                         playContextCb: { _ in return nil},
+                         playContextCb: nil,
                          rootView: self,
                          isMarked: addToPlaylistManager.contains(playable: song))
             return cell

@@ -49,11 +49,12 @@ class GenericTableCell: BasicTableCell {
         let infoText = container.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .short, settings: appDelegate.storage.settings))
         infoLabel.isHidden = infoText.isEmpty
         infoLabel.text = infoText
+        infoLabel.textAlignment = (traitCollection.horizontalSizeClass == .regular) ? .right : .left
         favoriteIconImage.isHidden = !container.isFavorite
         favoriteIconImage.tintColor = .red
         
         if container is Album {
-            infoLabelWidthConstraint.constant = 140
+            infoLabelWidthConstraint.constant = 75
         } else if container is Artist {
             infoLabelWidthConstraint.constant = 230
         } else if container is Genre {
@@ -61,6 +62,7 @@ class GenericTableCell: BasicTableCell {
         } else if container is Podcast {
             infoLabelWidthConstraint.constant = 140
         }
+        self.accessoryType = .disclosureIndicator
     }
 
 }

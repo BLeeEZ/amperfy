@@ -73,7 +73,6 @@ class PlaylistAddIndexesVC: SingleFetchedResultsTableViewController<DirectoryMO>
         let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
         let directory = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(directory: directory)
-        cell.accessoryType = .disclosureIndicator
         return cell
     }
     

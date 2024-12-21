@@ -90,7 +90,6 @@ class PlaylistAddArtistsVC: SingleFetchedResultsTableViewController<ArtistMO>, P
         let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
         let artist = fetchedResultsController.getWrappedEntity(at: indexPath)
         cell.display(container: artist, rootView: self)
-        cell.accessoryType = .disclosureIndicator
         return cell
     }
     

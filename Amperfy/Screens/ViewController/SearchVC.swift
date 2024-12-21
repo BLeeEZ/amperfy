@@ -295,7 +295,6 @@ class SearchVC: BasicTableViewController {
             if let playlist = container as? Playlist {
                 let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
                 cell.display(playlist: playlist, rootView: self)
-                cell.accessoryType = .disclosureIndicator
                 return cell
             } else if let song = container as? Song {
                 let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
@@ -304,26 +303,22 @@ class SearchVC: BasicTableViewController {
             } else {
                 let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
                 cell.display(container: container, rootView: self)
-                cell.accessoryType = .disclosureIndicator
                 return cell
             }
         case .Playlist:
             let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
             let playlist = self.playlists[indexPath.row]
             cell.display(playlist: playlist, rootView: self)
-            cell.accessoryType = .disclosureIndicator
             return cell
         case .Artist:
             let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
             let artist = self.artists[indexPath.row]
             cell.display(container: artist, rootView: self)
-            cell.accessoryType = .disclosureIndicator
             return cell
         case .Album:
             let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
             let album = self.albums[indexPath.row]
             cell.display(container: album, rootView: self)
-            cell.accessoryType = .disclosureIndicator
             return cell
         case .Song:
             let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)

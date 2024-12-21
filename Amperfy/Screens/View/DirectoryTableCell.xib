@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -41,7 +41,9 @@
                 </subviews>
                 <constraints>
                     <constraint firstItem="JCR-db-pze" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="8BO-j3-Gi5"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="ZWe-re-U6e" secondAttribute="trailing" id="9tO-1D-PDW"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="ZWe-re-U6e" secondAttribute="trailing" id="9tO-1D-PDW">
+                        <variation key="widthClass=regular" constant="8"/>
+                    </constraint>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="centerY" secondItem="4aT-Z7-2jl" secondAttribute="centerY" id="JpQ-DO-pPO"/>
                     <constraint firstItem="CTD-zX-CsU" firstAttribute="trailing" secondItem="JCR-db-pze" secondAttribute="trailing" constant="-4" id="QiU-4G-MZo"/>
                     <constraint firstItem="CTD-zX-CsU" firstAttribute="top" secondItem="JCR-db-pze" secondAttribute="top" constant="4" id="a3f-cL-aeg"/>

@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -131,6 +132,19 @@
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                         </variation>
                     </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="SRF-Yt-kwz" userLabel="Options Button">
+                        <rect key="frame" x="570" y="27.5" width="15" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="SRF-Yt-kwz" secondAttribute="height" multiplier="1:1" id="YEj-qK-ZMZ"/>
+                            <constraint firstAttribute="height" constant="15" id="fo6-W8-VpX"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" title="Button">
+                            <color key="titleColor" systemColor="labelColor"/>
+                            <imageReference key="image" image="ellipsis" catalog="system" symbolScale="medium"/>
+                            <preferredSymbolConfiguration key="preferredSymbolConfiguration"/>
+                        </state>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="HnA-Bb-1UQ" firstAttribute="left" secondItem="WOq-tb-OTF" secondAttribute="leftMargin" id="0uP-N3-DaP"/>
@@ -142,7 +156,9 @@
                     <constraint firstItem="Uwb-Vy-dE7" firstAttribute="leading" secondItem="ZTB-B7-OZR" secondAttribute="trailing" id="Coh-TC-C5u"/>
                     <constraint firstItem="2Xe-ur-neX" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="Evs-mq-aoE"/>
                     <constraint firstAttribute="bottomMargin" secondItem="4NS-Qv-02y" secondAttribute="bottom" id="Sxk-IV-5P0"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="SRF-Yt-kwz" secondAttribute="trailing" constant="4" id="X7z-Kg-90N"/>
                     <constraint firstItem="mUX-sN-oa8" firstAttribute="left" secondItem="WOq-tb-OTF" secondAttribute="leftMargin" constant="56" id="XXa-cv-hEs"/>
+                    <constraint firstItem="SRF-Yt-kwz" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="Xpp-RU-QRy"/>
                     <constraint firstItem="Uwb-Vy-dE7" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="b4X-h3-kb4"/>
                     <constraint firstItem="HnA-Bb-1UQ" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="cj6-KU-NTA"/>
                     <constraint firstItem="XQO-xE-pLx" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="evm-GL-FO9"/>
@@ -159,9 +175,11 @@
                 <outlet property="cacheTrailingCellConstaint" destination="689-Vc-7ao" id="6J7-6Z-UNH"/>
                 <outlet property="downloadProgress" destination="4NS-Qv-02y" id="vZf-uL-wef"/>
                 <outlet property="durationLabel" destination="XQO-xE-pLx" id="LV8-46-i0Q"/>
+                <outlet property="durationTrailingCellConstraint" destination="ew4-ya-VWk" id="tBt-EX-jFh"/>
                 <outlet property="entityImage" destination="Uwb-Vy-dE7" id="hLh-iq-m4X"/>
                 <outlet property="favoriteIconImage" destination="ww2-RJ-EgX" id="Mbz-hq-RMS"/>
                 <outlet property="labelTrailingCellConstraint" destination="46w-nK-8d4" id="LaG-cJ-Yxk"/>
+                <outlet property="optionsButton" destination="SRF-Yt-kwz" id="9u4-Zj-nMb"/>
                 <outlet property="titleContainerLeadingConstraint" destination="XXa-cv-hEs" id="5ID-Oc-DJw"/>
                 <outlet property="titleLabel" destination="hPr-VQ-rTt" id="Gwv-hx-ZdG"/>
                 <outlet property="trackNumberLabel" destination="HnA-Bb-1UQ" id="UGY-2E-Agh"/>
@@ -171,12 +189,16 @@
     </objects>
     <resources>
         <image name="arrow.down.circle" catalog="system" width="128" height="123"/>
+        <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="suit.heart.fill" catalog="system" width="128" height="107"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
