@@ -61,8 +61,13 @@ class PlayableTableCell: BasicTableCell {
     private var playIndicator: PlayIndicator?
     private var isDislayAlbumTrackNumberStyle: Bool = false
     private var displayMode: DisplayMode = .normal
+#if targetEnvironment(macCatalyst)
     private var hoverGestureRecognizer: UIHoverGestureRecognizer!
-    
+    private var doubleTapGestureRecognizer: UITapGestureRecognizer!
+#else
+    private var singleTapGestureRecognizer: UITapGestureRecognizer!
+#endif
+
     public var isMarked = false
     private var isDeleteButtonAllowedToBeVisible: Bool {
         return (traitCollection.userInterfaceIdiom == .mac) && (playerIndexCb != nil)
@@ -74,6 +79,15 @@ class PlayableTableCell: BasicTableCell {
 #if targetEnvironment(macCatalyst)
         hoverGestureRecognizer = UIHoverGestureRecognizer(target: self, action: #selector(hovering(_:)))
         self.addGestureRecognizer(hoverGestureRecognizer)
+        doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(doubleTap))
+        doubleTapGestureRecognizer.numberOfTapsRequired = 2
+        self.addGestureRecognizer(doubleTapGestureRecognizer)
+#else
+        singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(singleTap))
+        singleTapGestureRecognizer.numberOfTapsRequired = 1
+        // to handle double and single tap recognizer in parallel:
+        //singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
+        self.addGestureRecognizer(singleTapGestureRecognizer)
 #endif
     }
     
@@ -93,6 +107,14 @@ class PlayableTableCell: BasicTableCell {
         self.download = download
         self.selectionStyle = .default
         self.isMarked = isMarked
+        
+#if targetEnvironment(macCatalyst)
+        hoverGestureRecognizer.isEnabled = isDeleteButtonAllowedToBeVisible
+        doubleTapGestureRecognizer.isEnabled = (displayMode == .normal)
+#else
+        singleTapGestureRecognizer.isEnabled = (displayMode == .normal)
+#endif
+        
         refresh()
     }
 
@@ -243,13 +265,6 @@ class PlayableTableCell: BasicTableCell {
         playIndicator?.reset()
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        if displayMode == .normal {
-           playThisSong()
-        }
-    }
-    
     func playThisSong() {
         guard let playable = playable else { return }
         if let playerIndex = playerIndexCb?(self) {
@@ -289,6 +304,28 @@ class PlayableTableCell: BasicTableCell {
             self.deleteButton.isHidden = !isDeleteButtonAllowedToBeVisible
         case .ended:
             self.deleteButton.isHidden = true
+        default:
+            break
+        }
+    }
+
+    @objc func doubleTap(sender: UITapGestureRecognizer) {
+        switch sender.state {
+        case .ended:
+            if displayMode == .normal {
+               playThisSong()
+            }
+        default:
+            break
+        }
+    }
+#else
+    @objc func singleTap(sender: UITapGestureRecognizer) {
+        switch sender.state {
+        case .ended:
+            if displayMode == .normal {
+               playThisSong()
+            }
         default:
             break
         }
