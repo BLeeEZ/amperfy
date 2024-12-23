@@ -342,55 +342,6 @@ class PlayerControlView: UIView {
         return UIMenu(title: "Playback Rate", subtitle: playerPlaybackRate.description, children: availablePlaybackRates)
     }
     
-    func createSleepTimeMenu() -> UIMenuElement {
-        if let timer = appDelegate.sleepTimer {
-            let deactivate = UIAction(title: "Off", image: nil, handler: { _ in
-                self.appDelegate.sleepTimer?.invalidate()
-                self.appDelegate.sleepTimer = nil
-            })
-            return UIMenu(title: "Sleep Timer", subtitle: "Will pause at: \(timer.fireDate.asShortHrMinString)", children: [deactivate])
-        } else if self.appDelegate.player.isShouldPauseAfterFinishedPlaying {
-            let deactivate = UIAction(title: "Off", image: nil, handler: { _ in
-                self.appDelegate.player.isShouldPauseAfterFinishedPlaying = false
-            })
-            switch player.playerMode {
-            case .music:
-                return UIMenu(title: "Sleep Timer", subtitle: "Will pause at end of song", children: [deactivate])
-            case .podcast:
-                return UIMenu(title: "Sleep Timer", subtitle: "Will pause at end of episode", children: [deactivate])
-            }
-        } else {
-            let endOfTrack = UIAction(title: "End of song or episode", image: nil, handler: { _ in
-                self.appDelegate.player.isShouldPauseAfterFinishedPlaying = true
-            })
-            let sleep5 = UIAction(title: "5 Minutes", image: nil, handler: { _ in
-                self.activateSleepTimer(timeInterval: TimeInterval(5 * 60))
-            })
-            let sleep10 = UIAction(title: "10 Minutes", image: nil, handler: { _ in
-                self.activateSleepTimer(timeInterval: TimeInterval(10 * 60))
-            })
-            let sleep15 = UIAction(title: "15 Minutes", image: nil, handler: { _ in
-                self.activateSleepTimer(timeInterval: TimeInterval(15 * 60))
-            })
-            let sleep30 = UIAction(title: "30 Minutes", image: nil, handler: { _ in
-                self.activateSleepTimer(timeInterval: TimeInterval(30 * 60))
-            })
-            let sleep45 = UIAction(title: "45 Minutes", image: nil, handler: { _ in
-                self.activateSleepTimer(timeInterval: TimeInterval(45 * 60))
-            })
-            let sleep60 = UIAction(title: "1 Hour", image: nil, handler: { _ in
-                self.activateSleepTimer(timeInterval: TimeInterval(60 * 60))
-            })
-            let sleep120 = UIAction(title: "2 Hours", image: nil, handler: { _ in
-                self.activateSleepTimer(timeInterval: TimeInterval(2 * 60 * 60))
-            })
-            let sleep240 = UIAction(title: "4 Hours", image: nil, handler: { _ in
-                self.activateSleepTimer(timeInterval: TimeInterval(4 * 60 * 60))
-            })
-            return UIMenu(title: "Sleep Timer", children: [endOfTrack, sleep5, sleep10, sleep15, sleep30, sleep45, sleep60, sleep120, sleep240])
-        }
-    }
-    
     func createPlayerOptionsMenu() -> UIMenu {
         var menuActions = [UIMenuElement]()
         if player.currentlyPlaying != nil || player.prevQueue.count > 0 || player.userQueue.count > 0 || player.nextQueue.count > 0 {
@@ -406,7 +357,7 @@ class PlayerControlView: UIView {
             menuActions.append(clearUserQueue)
         }
         
-        menuActions.append(createSleepTimeMenu())
+        menuActions.append(appDelegate.createSleepTimerMenu(refreshCB: nil))
         menuActions.append(createPlaybackRateMenu())
         
         if self.rootView?.largeCurrentlyPlayingView?.isLyricsButtonAllowedToDisplay ?? false {
@@ -494,16 +445,6 @@ class PlayerControlView: UIView {
         optionsButton.showsMenuAsPrimaryAction = true
         optionsButton.menu = UIMenu.lazyMenu(title: menuTitle) {
             return self.createPlayerOptionsMenu()
-        }
-    }
-    
-    func activateSleepTimer(timeInterval: TimeInterval) {
-        appDelegate.sleepTimer?.invalidate()
-        appDelegate.sleepTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { (t) in
-            self.appDelegate.player.pause()
-            self.appDelegate.eventLogger.info(topic: "Sleep Timer", message: "Sleep Timer paused playback.")
-            self.appDelegate.sleepTimer?.invalidate()
-            self.appDelegate.sleepTimer = nil
         }
     }
     

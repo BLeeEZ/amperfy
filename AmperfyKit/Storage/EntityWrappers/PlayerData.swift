@@ -81,6 +81,13 @@ public enum PlayerMode: Int16 {
         case .podcast: "Podcast"
         }
     }
+    
+    public var playableName: String {
+        switch (self) {
+        case .music: "Song"
+        case .podcast: "Podcast Episode"
+        }
+    }
 }
 
 public class PlayerData: NSObject {

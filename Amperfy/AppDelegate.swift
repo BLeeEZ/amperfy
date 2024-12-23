@@ -377,6 +377,81 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         return nil
     }
+    
+    func createSleepTimerMenu(refreshCB: VoidFunctionCallback?) -> UIMenuElement {
+        if let timer = sleepTimer {
+#if targetEnvironment(macCatalyst)
+            let actionTitle = "Turn Off (Pause at: \(timer.fireDate.asShortHrMinString))"
+#else
+            let actionTitle = "Turn Off"
+#endif
+            let deactivate = UIAction(title: actionTitle, image: nil, handler: { _ in
+                self.sleepTimer?.invalidate()
+                self.sleepTimer = nil
+                refreshCB?()
+            })
+            return UIMenu(title: "Sleep Timer", subtitle: "Pause at: \(timer.fireDate.asShortHrMinString)", children: [deactivate])
+        } else if self.player.isShouldPauseAfterFinishedPlaying {
+#if targetEnvironment(macCatalyst)
+            let actionTitle = "Turn Off (Pause at end of \(player.playerMode.playableName))"
+#else
+            let actionTitle = "Turn Off"
+#endif
+            let deactivate = UIAction(title: actionTitle, image: nil, handler: { _ in
+                self.player.isShouldPauseAfterFinishedPlaying = false
+                refreshCB?()
+            })
+            return UIMenu(title: "Sleep Timer", subtitle: "Pause at end of \(player.playerMode.playableName)", children: [deactivate])
+        } else {
+            let endOfTrack = UIAction(title: "End of Song or Podcast Episode", image: nil, handler: { _ in
+                self.player.isShouldPauseAfterFinishedPlaying = true
+                refreshCB?()
+            })
+            let sleep5 = UIAction(title: "5 Minutes", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(5 * 60))
+                refreshCB?()
+            })
+            let sleep10 = UIAction(title: "10 Minutes", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(10 * 60))
+                refreshCB?()
+            })
+            let sleep15 = UIAction(title: "15 Minutes", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(15 * 60))
+                refreshCB?()
+            })
+            let sleep30 = UIAction(title: "30 Minutes", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(30 * 60))
+                refreshCB?()
+            })
+            let sleep45 = UIAction(title: "45 Minutes", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(45 * 60))
+                refreshCB?()
+            })
+            let sleep60 = UIAction(title: "1 Hour", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(60 * 60))
+                refreshCB?()
+            })
+            let sleep120 = UIAction(title: "2 Hours", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(2 * 60 * 60))
+                refreshCB?()
+            })
+            let sleep240 = UIAction(title: "4 Hours", image: nil, handler: { _ in
+                self.activateSleepTimer(timeInterval: TimeInterval(4 * 60 * 60))
+                refreshCB?()
+            })
+            return UIMenu(title: "Sleep Timer", children: [endOfTrack, sleep5, sleep10, sleep15, sleep30, sleep45, sleep60, sleep120, sleep240])
+        }
+    }
+    
+    private func activateSleepTimer(timeInterval: TimeInterval) {
+        appDelegate.sleepTimer?.invalidate()
+        appDelegate.sleepTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { (t) in
+            self.appDelegate.player.pause()
+            self.appDelegate.eventLogger.info(topic: "Sleep Timer", message: "Sleep Timer paused playback.")
+            self.appDelegate.sleepTimer?.invalidate()
+            self.appDelegate.sleepTimer = nil
+        }
+    }
 
 #if targetEnvironment(macCatalyst)
     var isMainOrMiniPlayerPlayerOpen: Bool {
@@ -555,20 +630,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ])
             section2.insert(shuffleMenu, at: 0)
         }
-
+        
         let section3 = [
+            self.createSleepTimerMenu(refreshCB: {
+                UIMenuSystem.main.setNeedsRebuild()
+            })
+        ]
+
+        let section4 = [
             UIAction(title: "Switch Music/Podcast mode") { _ in
                 self.player.setPlayerMode(self.player.playerMode.nextMode)
             }
         ]
 
-        let sections: [[UIMenuElement]] = [section1, section2, section3]
+        let sections: [[UIMenuElement]] = [section1, section2, section3, section4]
 
         return UIMenu(title: "Controls", children: sections.reduce([], { (result, section) in
             result + [UIMenu(options: .displayInline)] + section
         }))
     }
-
+    
     @objc func showSettings(sender: Any) {
         let settingsActivity = NSUserActivity(activityType: settingsWindowActivityType)
         UIApplication.shared.requestSceneSessionActivation(settingsSceneSession, userActivity: settingsActivity, options: nil, errorHandler: nil)
