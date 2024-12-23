@@ -114,7 +114,7 @@
                             </constraint>
                         </constraints>
                     </imageView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="99:59:59" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XQO-xE-pLx" userLabel="Duration">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="99:59:59" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.69999999999999996" translatesAutoresizingMaskIntoConstraints="NO" id="XQO-xE-pLx" userLabel="Duration">
                         <rect key="frame" x="549" y="26.5" width="40" height="17"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="40" id="jIq-1R-vvd">

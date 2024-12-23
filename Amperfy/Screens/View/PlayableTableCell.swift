@@ -167,41 +167,40 @@ class PlayableTableCell: BasicTableCell {
         let cacheIconWidth = (traitCollection.horizontalSizeClass == .regular) ? 17.0 : 15.0
         let durationWidth = (traitCollection.horizontalSizeClass == .regular &&
                              traitCollection.userInterfaceIdiom != .mac) ? 49.0 : 40.0
-        let isDisplayOptionButton = (traitCollection.horizontalSizeClass == .regular) &&
-                                    (playContextCb != nil) && (playerIndexCb == nil)
-        let durationTrailing = isDisplayOptionButton ? 30 : 0.0
+        let isDisplayOptionButton = (playContextCb != nil) && (playerIndexCb == nil)
+        let durationTrailing = isDisplayOptionButton ? ((traitCollection.horizontalSizeClass == .regular) ? 30 : 30.0) : 0.0
+        
+        optionsButton.isHidden = !isDisplayOptionButton
+        if isDisplayOptionButton {
+            optionsButton.showsMenuAsPrimaryAction = true
+            optionsButton.imageView?.tintColor = .label
+            if let rootView = rootView {
+                let playContext = playContextCb != nil ? { self.playContextCb?(self) } : nil
+                let playIndex = playerIndexCb != nil ? { self.playerIndexCb?(self) } : nil
+                optionsButton.menu = UIMenu.lazyMenu {
+                    EntityPreviewActionBuilder(container: playable, on: rootView, playContextCb: playContext, playerIndexCb: playIndex).createMenu()
+                }
+            }
+        }
         
         // macOS & iPadOS regular
         //|title|x|Cache|4|Duration| ... |
         //|title|        80        | 30  |
         // compact
-        //|title|4|Cache|4|Duration|
-        //|title|4|  15 |4|   40   |
-        //|title|4|  15 |-|   --   |
-        //|title|8|  -- |-|   40   |
+        //|title|4|Cache|4|Duration| ... |
+        //|title|4|  15 |4|   40   | 30  |
+        //|title|4|  15 |-|   --   | 30  |
+        //|title|8|  -- |-|   40   | 30  |
         if traitCollection.horizontalSizeClass == .regular {
-            optionsButton.isHidden = !isDisplayOptionButton
-            if isDisplayOptionButton {
-                optionsButton.showsMenuAsPrimaryAction = true
-                optionsButton.imageView?.tintColor = .label
-                if let rootView = rootView {
-                    let playContext = playContextCb != nil ? { self.playContextCb?(self) } : nil
-                    let playIndex = playerIndexCb != nil ? { self.playerIndexCb?(self) } : nil
-                    optionsButton.menu = UIMenu.lazyMenu {
-                        EntityPreviewActionBuilder(container: playable, on: rootView, playContextCb: playContext, playerIndexCb: playIndex).createMenu()
-                    }
-                }
-            }
             labelTrailingCellConstraint.constant = 80 + durationTrailing
         } else {
-            optionsButton.isHidden = true
-            var lableTrailing = 0.0
+            var lableTrailing = durationTrailing
             if playable.isCached, isDurationVisible {
-                lableTrailing = 4 + cacheIconWidth + 4 + durationWidth
+                lableTrailing += 4 + cacheIconWidth + 4 + durationWidth
             } else if playable.isCached {
-                lableTrailing = 4 + cacheIconWidth
+                lableTrailing += 4 + cacheIconWidth
             } else if isDurationVisible {
-                lableTrailing = 8 + durationWidth
+                lableTrailing += 8 + durationWidth
             }
             labelTrailingCellConstraint.constant = lableTrailing
         }
