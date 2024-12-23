@@ -207,4 +207,8 @@ public struct PlayerIndex: Equatable {
         guard let queueType = PlayerQueueType(rawValue: indexPath.section) else { return nil }
         return PlayerIndex(queueType: queueType, index: indexPath.row)
     }
+    
+    public var asIndexPath: IndexPath {
+        return IndexPath(row: index, section: queueType.rawValue)
+    }
 }

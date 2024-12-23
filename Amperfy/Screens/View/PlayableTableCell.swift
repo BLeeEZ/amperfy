@@ -48,6 +48,7 @@ class PlayableTableCell: BasicTableCell {
     @IBOutlet weak var cacheTrailingCellConstaint: NSLayoutConstraint!
     @IBOutlet weak var durationTrailingCellConstraint: NSLayoutConstraint!
     @IBOutlet weak var optionsButton: UIButton!
+    @IBOutlet weak var deleteButton: UIButton!
     
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     private static let touchAnimation = 0.4
@@ -60,18 +61,29 @@ class PlayableTableCell: BasicTableCell {
     private var playIndicator: PlayIndicator?
     private var isDislayAlbumTrackNumberStyle: Bool = false
     private var displayMode: DisplayMode = .normal
+    private var hoverGestureRecognizer: UIHoverGestureRecognizer!
     
     public var isMarked = false
+    private var isDeleteButtonAllowedToBeVisible: Bool {
+        return (traitCollection.userInterfaceIdiom == .mac) && (playerIndexCb != nil)
+    }
 
     override func awakeFromNib() {
         super.awakeFromNib()
         playContextCb = nil
+#if targetEnvironment(macCatalyst)
+        hoverGestureRecognizer = UIHoverGestureRecognizer(target: self, action: #selector(hovering(_:)))
+        self.addGestureRecognizer(hoverGestureRecognizer)
+#endif
     }
     
     func display(playable: AbstractPlayable, displayMode: DisplayMode = .normal, playContextCb: GetPlayContextFromTableCellCallback?, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, isDislayAlbumTrackNumberStyle: Bool = false, download: Download? = nil, isMarked: Bool = false) {
         if playIndicator == nil {
             playIndicator = PlayIndicator(rootViewTypeName: rootView.typeName)
         }
+        
+        self.deleteButton.isHidden = true
+        self.deleteButton.tintColor = .red
         self.playable = playable
         self.displayMode = displayMode
         self.playContextCb = playContextCb
@@ -260,5 +272,27 @@ class PlayableTableCell: BasicTableCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         playIndicator?.applyStyle()
     }
+    
+#if targetEnvironment(macCatalyst)
+    @IBAction func deleteButtonPressed(_ sender: Any) {
+        if let playerIndexCb = playerIndexCb,
+           let playerIndex = playerIndexCb(self),
+           let queueVC = rootView as? QueueVC,
+           let tableView = queueVC.tableView {
+            queueVC.tableView(tableView, commit: .delete, forRowAt: playerIndex.asIndexPath)
+        }
+    }
+    
+    @objc func hovering(_ recognizer: UIHoverGestureRecognizer) {
+        switch recognizer.state {
+        case .began:
+            self.deleteButton.isHidden = !isDeleteButtonAllowedToBeVisible
+        case .ended:
+            self.deleteButton.isHidden = true
+        default:
+            break
+        }
+    }
+#endif
 
 }

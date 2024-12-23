@@ -20,7 +20,7 @@
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Uwb-Vy-dE7" customClass="EntityImageView" customModule="AmperfyKit">
                         <rect key="frame" x="16" y="11" width="48" height="48"/>
-                        <color key="backgroundColor" systemColor="systemRedColor"/>
+                        <color key="backgroundColor" systemColor="systemMintColor"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="48" id="PdF-S9-lw7"/>
                         </constraints>
@@ -145,6 +145,22 @@
                             <preferredSymbolConfiguration key="preferredSymbolConfiguration"/>
                         </state>
                     </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="l8v-65-XtX" userLabel="Delete Button">
+                        <rect key="frame" x="12" y="7" width="24" height="24"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="l8v-65-XtX" secondAttribute="height" multiplier="1:1" id="cyp-zD-Rqp"/>
+                            <constraint firstAttribute="width" constant="24" id="gC2-kM-pC9"/>
+                        </constraints>
+                        <color key="tintColor" systemColor="systemRedColor"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal">
+                            <imageReference key="image" image="minus.circle.fill" catalog="system" renderingMode="original"/>
+                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="22"/>
+                        </state>
+                        <connections>
+                            <action selector="deleteButtonPressed:" destination="pd9-97-MJI" eventType="primaryActionTriggered" id="yrp-Lp-mqn"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="HnA-Bb-1UQ" firstAttribute="left" secondItem="WOq-tb-OTF" secondAttribute="leftMargin" id="0uP-N3-DaP"/>
@@ -153,8 +169,10 @@
                     <constraint firstItem="4NS-Qv-02y" firstAttribute="leading" secondItem="mUX-sN-oa8" secondAttribute="leading" id="4Fr-bx-vmN"/>
                     <constraint firstAttribute="trailingMargin" secondItem="2Xe-ur-neX" secondAttribute="trailing" constant="44" id="689-Vc-7ao"/>
                     <constraint firstItem="ZTB-B7-OZR" firstAttribute="leading" secondItem="WOq-tb-OTF" secondAttribute="leading" id="CSu-Tb-lqZ"/>
+                    <constraint firstItem="l8v-65-XtX" firstAttribute="top" secondItem="Uwb-Vy-dE7" secondAttribute="top" constant="-4" id="Cg9-Lz-BOL"/>
                     <constraint firstItem="Uwb-Vy-dE7" firstAttribute="leading" secondItem="ZTB-B7-OZR" secondAttribute="trailing" id="Coh-TC-C5u"/>
                     <constraint firstItem="2Xe-ur-neX" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="Evs-mq-aoE"/>
+                    <constraint firstItem="l8v-65-XtX" firstAttribute="leading" secondItem="Uwb-Vy-dE7" secondAttribute="leading" constant="-4" id="QAw-hu-VDc"/>
                     <constraint firstAttribute="bottomMargin" secondItem="4NS-Qv-02y" secondAttribute="bottom" id="Sxk-IV-5P0"/>
                     <constraint firstAttribute="trailingMargin" secondItem="SRF-Yt-kwz" secondAttribute="trailing" constant="4" id="X7z-Kg-90N"/>
                     <constraint firstItem="mUX-sN-oa8" firstAttribute="left" secondItem="WOq-tb-OTF" secondAttribute="leftMargin" constant="56" id="XXa-cv-hEs"/>
@@ -173,6 +191,7 @@
                 <outlet property="artistLabel" destination="nJe-7h-3tU" id="SlX-ew-mVM"/>
                 <outlet property="cacheIconImage" destination="2Xe-ur-neX" id="Wt7-D7-TTG"/>
                 <outlet property="cacheTrailingCellConstaint" destination="689-Vc-7ao" id="6J7-6Z-UNH"/>
+                <outlet property="deleteButton" destination="l8v-65-XtX" id="BlT-4f-Hok"/>
                 <outlet property="downloadProgress" destination="4NS-Qv-02y" id="vZf-uL-wef"/>
                 <outlet property="durationLabel" destination="XQO-xE-pLx" id="LV8-46-i0Q"/>
                 <outlet property="durationTrailingCellConstraint" destination="ew4-ya-VWk" id="tBt-EX-jFh"/>
@@ -184,18 +203,22 @@
                 <outlet property="titleLabel" destination="hPr-VQ-rTt" id="Gwv-hx-ZdG"/>
                 <outlet property="trackNumberLabel" destination="HnA-Bb-1UQ" id="UGY-2E-Agh"/>
             </connections>
-            <point key="canvasLocation" x="219" y="-213"/>
+            <point key="canvasLocation" x="218.40000000000001" y="-213.19340329835083"/>
         </tableViewCell>
     </objects>
     <resources>
         <image name="arrow.down.circle" catalog="system" width="128" height="123"/>
         <image name="ellipsis" catalog="system" width="128" height="37"/>
+        <image name="minus.circle.fill" catalog="system" width="128" height="123"/>
         <image name="suit.heart.fill" catalog="system" width="128" height="107"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemMintColor">
+            <color red="0.0" green="0.7803921568627451" blue="0.74509803921568629" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
