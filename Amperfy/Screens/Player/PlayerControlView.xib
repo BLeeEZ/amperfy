@@ -218,9 +218,9 @@
                 <outlet property="elapsedTimeLabel" destination="okd-ac-nGY" id="MFD-Qa-B7r"/>
                 <outlet property="nextButton" destination="E3q-DK-jgm" id="MGI-Lm-8TL"/>
                 <outlet property="optionsButton" destination="0xq-hb-FZa" id="5AH-yU-Tbd"/>
+                <outlet property="optionsStackView" destination="xXq-r4-gI6" id="52T-2y-bUq"/>
                 <outlet property="playButton" destination="Byk-rx-3Lv" id="03r-73-6Na"/>
                 <outlet property="playerModeButton" destination="7xb-YR-9X6" id="yNk-04-nkT"/>
-                <outlet property="playerModeChangeButton" destination="7xb-YR-9X6" id="nyN-I8-ZUJ"/>
                 <outlet property="previousButton" destination="Jhy-pc-jwZ" id="3vl-Xj-JHn"/>
                 <outlet property="remainingTimeLabel" destination="t1c-hF-UMw" id="hPl-lK-efe"/>
                 <outlet property="skipBackwardButton" destination="PZj-JS-NGq" id="q0L-Ve-YvK"/>

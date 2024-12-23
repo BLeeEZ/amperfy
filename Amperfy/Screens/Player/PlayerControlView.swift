@@ -47,9 +47,9 @@ class PlayerControlView: UIView {
     @IBOutlet weak var elapsedTimeLabel: UILabel!
     @IBOutlet weak var remainingTimeLabel: UILabel!
     
+    @IBOutlet weak var optionsStackView: UIStackView!
     @IBOutlet weak var playerModeButton: UIButton!
     @IBOutlet weak var airplayButton: UIButton!
-    @IBOutlet weak var playerModeChangeButton: UIButton!
     @IBOutlet weak var displayPlaylistButton: UIButton!
     @IBOutlet weak var optionsButton: UIButton!
     
@@ -78,7 +78,7 @@ class PlayerControlView: UIView {
         skipBackwardButton.tintColor = .label
         skipForwardButton.tintColor = .label
         airplayButton.tintColor = .label
-        playerModeChangeButton.tintColor = .label
+        playerModeButton.tintColor = .label
         optionsButton.imageView?.tintColor = .label
         refreshPlayer()
     }
@@ -180,10 +180,6 @@ class PlayerControlView: UIView {
             appDelegate.player.setPlayerMode(.music)
         }
         refreshPlayerModeChangeButton()
-    }
-    
-    func viewWillAppear(_ animated: Bool) {
-        refreshView()
     }
     
     func refreshView() {
@@ -520,12 +516,14 @@ class PlayerControlView: UIView {
     }
     
     func refreshPlayerModeChangeButton() {
+        playerModeButton.isHidden = !appDelegate.storage.settings.libraryDisplaySettings.isVisible(libraryType: .podcasts)
         switch player.playerMode {
         case .music:
             playerModeButton.setImage(UIImage.musicalNotes, for: .normal)
         case .podcast:
             playerModeButton.setImage(UIImage.podcast, for: .normal)
         }
+        optionsStackView.layoutIfNeeded()
     }
     
 }

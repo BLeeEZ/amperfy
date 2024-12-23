@@ -136,6 +136,7 @@ public enum LibraryDisplayType: Int, CaseIterable {
 }
 
 public struct LibraryDisplaySettings {
+
     public var combined: [[LibraryDisplayType]]
 
     public var inUse: [LibraryDisplayType] {
@@ -143,6 +144,10 @@ public struct LibraryDisplaySettings {
     }
     public var notUsed: [LibraryDisplayType] {
         return combined[1]
+    }
+    
+    public func isVisible(libraryType: LibraryDisplayType) -> Bool {
+        return inUse.contains(where: { $0 == libraryType })
     }
     
     public init(inUse: [LibraryDisplayType]) {
