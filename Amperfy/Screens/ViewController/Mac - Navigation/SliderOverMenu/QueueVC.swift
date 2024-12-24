@@ -248,10 +248,8 @@ extension QueueVC: UITableViewDelegate, UITableViewDataSource {
 
     // Override to allow editing only for certain rows
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        switch PlayerSectionCategory(rawValue: indexPath.section) {
-        case .contextPrev, .userQueue, .contextNext: return true
-        default: return false
-        }
+        // don't allow to delete via swipe
+        return false
     }
 
     // Override to support editing the table view.
