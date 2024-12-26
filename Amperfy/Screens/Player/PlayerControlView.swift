@@ -460,9 +460,9 @@ class PlayerControlView: UIView {
         playerModeButton.isHidden = !appDelegate.storage.settings.libraryDisplaySettings.isVisible(libraryType: .podcasts)
         switch player.playerMode {
         case .music:
-            playerModeButton.setImage(UIImage.musicalNotes, for: .normal)
-        case .podcast:
             playerModeButton.setImage(UIImage.podcast, for: .normal)
+        case .podcast:
+            playerModeButton.setImage(UIImage.musicalNotes, for: .normal)
         }
         optionsStackView.layoutIfNeeded()
     }
