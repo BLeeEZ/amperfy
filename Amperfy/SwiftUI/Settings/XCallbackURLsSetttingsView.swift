@@ -36,6 +36,7 @@ struct XCallbackURLsSetttingsView: View {
                             Text(actionDocu.name)
                                 .font(.subheadline)
                                 .fontWeight(.bold)
+                                .foregroundColor(.accentColor)
                                 .padding([.top], 8)
                             Text("\(actionDocu.description)")
                                 .font(.caption)
@@ -49,9 +50,13 @@ struct XCallbackURLsSetttingsView: View {
                                 .underline()
                                 .padding([.bottom], 4)
                             ForEach(actionDocu.exampleURLs, id: \.self) { url in
-                                Text("- " + url)
-                                    .font(.caption)
-                                    .padding([.leading], 8)
+                                HStack {
+                                    Text("- " + url)
+                                        .font(.caption)
+                                        .padding([.leading, .bottom], 8)
+                                    Spacer()
+                                    copyToPasteBoardButton(for: url)
+                                }
                             }
 
                             if !actionDocu.parameters.isEmpty {
@@ -63,6 +68,7 @@ struct XCallbackURLsSetttingsView: View {
                             ForEach(actionDocu.parameters, id: \.self) { para in
                                 Text("\(para.name) \(para.isMandatory ? "(mandatory)" : "")")
                                     .font(.caption)
+                                    .fontWeight(.bold)
                                     .padding([.top], 4)
                                 Text("Type: \(para.type)")
                                     .font(.caption)
@@ -83,6 +89,23 @@ struct XCallbackURLsSetttingsView: View {
         }
         .navigationTitle("X-Callback-URL Documentation")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+extension XCallbackURLsSetttingsView {
+    
+    /// Generates a button with an action to set the given URL to the system pasteBoard.
+    func copyToPasteBoardButton(for url: String) -> some View {
+        Button(action: {
+            copyToPasteBoard(url: url)
+        }, label: {
+            Image(systemName: "document.on.document")
+        })
+        .buttonStyle(.borderless)
+    }
+    
+    private func copyToPasteBoard(url: String) {
+        UIPasteboard.general.string = url
     }
 }
 
