@@ -2,21 +2,13 @@
   "colors" : [
     {
       "color" : {
-        "platform" : "ios",
-        "reference" : "systemGray4Color"
-      },
-      "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
+        "color-space" : "srgb",
+        "components" : {
+          "alpha" : "0.600",
+          "blue" : "0x29",
+          "green" : "0x29",
+          "red" : "0x29"
         }
-      ],
-      "color" : {
-        "platform" : "ios",
-        "reference" : "systemGray3Color"
       },
       "idiom" : "universal"
     }

@@ -40,13 +40,11 @@ class PlayIndicatorHandler {
     
     func getIndicator(for viewControllerTypeName: String) -> VYPlayIndicator {
         var indicator = indicatorDict[viewControllerTypeName]
-        let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         if indicator == nil {
             indicator = VYPlayIndicator()
             indicatorDict[viewControllerTypeName] = indicator
-            indicator!.indicatorStyle = .modern
+            indicator!.indicatorStyle = .legacy
         }
-        indicator?.color = appDelegate.storage.settings.themePreference.asColor
         return indicator!
     }
     
@@ -65,7 +63,7 @@ class PlayIndicator {
     
     static private let frameHeight = 20.0
     static private var imageOverlayColor: CGColor {
-        return UIColor.imageOverlayBackground.withAlphaComponent(0.8).cgColor
+        return UIColor.imageOverlayBackground.cgColor
     }
     
     var willDisplayIndicatorCB: VoidFunctionCallback?
@@ -173,6 +171,7 @@ class PlayIndicator {
 
         if playable == appDelegate.player.currentlyPlaying {
             let indicator = PlayIndicatorHandler.shared.getIndicator(for: rootViewTypeName)
+            indicator.color = self.isDisplayedOnImage ? .white : appDelegate.storage.settings.themePreference.asColor
             if appDelegate.player.isPlaying {
                 if indicator.state != .playing {
                     indicator.state = .playing
