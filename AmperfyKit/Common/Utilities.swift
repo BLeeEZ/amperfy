@@ -528,7 +528,7 @@ extension UIAlertAction {
 
 extension UISlider {
     public func setUnicolorThumbImage(thumbSize: CGFloat, color: UIColor, for state: UIControl.State) {
-        let layerFrame = CGRect(x: 0, y: 0, width: thumbSize, height: thumbSize)
+        let layerFrame = CGRect(x: 1, y: 1, width: thumbSize, height: thumbSize)
         let path = CGPath(ellipseIn: layerFrame.insetBy(dx: 1, dy: 1), transform: nil)
 
         let thumbImage = createImage(path: path, inFrame: layerFrame, color: color)
