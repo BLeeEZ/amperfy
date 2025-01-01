@@ -44,7 +44,26 @@ struct LibraryDuplicateInfo {
 public class LibraryStorage: PlayableFileCachable {
     public static var carPlayMaxElements = 200
     
-    static let entitiesToDelete = [Genre.typeName, Artist.typeName, Album.typeName, Song.typeName, PlayableFile.typeName, Artwork.typeName, EmbeddedArtwork.typeName, Playlist.typeName, PlaylistItem.typeName, PlayerData.entityName, LogEntry.typeName, MusicFolder.typeName, Directory.typeName, Podcast.typeName, PodcastEpisode.typeName, Download.typeName, ScrobbleEntry.typeName, SearchHistoryItem.typeName]
+    static let entitiesToDelete = [
+        Genre.typeName,
+        Artist.typeName,
+        Album.typeName,
+        Song.typeName,
+        PlayableFile.typeName,
+        Artwork.typeName,
+        EmbeddedArtwork.typeName,
+        Playlist.typeName,
+        PlaylistItem.typeName,
+        PlayerData.entityName,
+        LogEntry.typeName,
+        MusicFolder.typeName,
+        Directory.typeName,
+        Podcast.typeName,
+        PodcastEpisode.typeName,
+        Radio.typeName,
+        Download.typeName,
+        ScrobbleEntry.typeName,
+        SearchHistoryItem.typeName]
     private let log = OSLog(subsystem: "Amperfy", category: "LibraryStorage")
     private var context: NSManagedObjectContext
     private let fileManager = CacheFileManager.shared
@@ -335,9 +354,18 @@ public class LibraryStorage: PlayableFileCachable {
         return Song(managedObject: songMO)
     }
     
+    func createRadio() -> Radio {
+        let radioMO = RadioMO(context: context)
+        return Radio(managedObject: radioMO)
+    }
+    
     func createScrobbleEntry() -> ScrobbleEntry {
         let scrobbleEntryMO = ScrobbleEntryMO(context: context)
         return ScrobbleEntry(managedObject: scrobbleEntryMO)
+    }
+    
+    func deleteRadio(_ radio: Radio) {
+        context.delete(radio.managedObject)
     }
     
     func deleteScrobbleEntry(_ scrobbleEntry: ScrobbleEntry) {
@@ -517,6 +545,8 @@ public class LibraryStorage: PlayableFileCachable {
             return Podcast(managedObject: context.object(with: managedObjectID) as! PodcastMO)
         case .directory:
             return Directory(managedObject: context.object(with: managedObjectID) as! DirectoryMO)
+        case .radio:
+            return Radio(managedObject: context.object(with: managedObjectID) as! RadioMO)
         }
     }
     
@@ -888,6 +918,13 @@ public class LibraryStorage: PlayableFileCachable {
         return songs ?? [Song]()
     }
     
+    public func getRadios() -> [Radio] {
+        let fetchRequest = RadioMO.identifierSortedFetchRequest
+        let foundRadios = try? context.fetch(fetchRequest)
+        let radios = foundRadios?.compactMap{ Radio(managedObject: $0) }
+        return radios ?? [Radio]()
+    }
+    
     public func getSearchHistory() -> [SearchHistoryItem] {
         let fetchRequest = SearchHistoryItemMO.searchDateFetchRequest
         fetchRequest.predicate = SearchHistoryItemMO.excludeEmptyItemsFetchPredicate
@@ -1253,6 +1290,14 @@ public class LibraryStorage: PlayableFileCachable {
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(SongMO.id), NSString(string: id))
         let songs = try? context.fetch(fetchRequest)
         return songs?.compactMap{ Song(managedObject: $0) } ?? [Song]()
+    }
+    
+    public func getRadio(id: String) -> Radio? {
+        let fetchRequest: NSFetchRequest<RadioMO> = RadioMO.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(RadioMO.id), NSString(string: id))
+        fetchRequest.fetchLimit = 1
+        let radios = try? context.fetch(fetchRequest)
+        return radios?.lazy.compactMap{ Radio(managedObject: $0) }.first
     }
     
     func getFileURL(forPlayable playable: AbstractPlayable) -> URL? {

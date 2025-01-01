@@ -231,7 +231,8 @@ class PlayableTableCell: BasicTableCell {
         favoriteIconImage.isHidden = !playable.isFavorite
         favoriteIconImage.tintColor = .red
         
-        let isDurationVisible = appDelegate.storage.settings.isShowSongDuration || (traitCollection.horizontalSizeClass == .regular)
+        let isDurationVisible = !playable.isRadio &&
+            (appDelegate.storage.settings.isShowSongDuration || (traitCollection.horizontalSizeClass == .regular))
         let cacheIconWidth = (traitCollection.horizontalSizeClass == .regular) ? 17.0 : 15.0
         let durationWidth = (traitCollection.horizontalSizeClass == .regular &&
                              traitCollection.userInterfaceIdiom != .mac) ? 49.0 : 40.0
@@ -353,7 +354,11 @@ class PlayableTableCell: BasicTableCell {
                 var buttonImg = UIImage()
                 if appDelegate.player.currentlyPlaying == self.playable,
                    appDelegate.player.isPlaying {
-                    buttonImg = UIImage.pause
+                    if appDelegate.player.isStopInsteadOfPause {
+                        buttonImg = UIImage.stop
+                    } else {
+                        buttonImg = UIImage.pause
+                    }
                 } else {
                     buttonImg = UIImage.play
                 }

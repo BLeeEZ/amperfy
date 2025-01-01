@@ -90,6 +90,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
     func syncNewestAlbums(offset: Int, count: Int) -> Promise<Void> { return Promise.value }
     func syncRecentAlbums(offset: Int, count: Int) -> Promise<Void> { return Promise.value }
     func syncFavoriteLibraryElements() -> Promise<Void> { return Promise.value }
+    func syncRadios() -> Promise<Void> { return Promise.value }
     func syncDownPlaylistsWithoutSongs() -> Promise<Void> { return Promise.value }
     func syncDown(playlist: Playlist) -> Promise<Void> { return Promise.value }
     func syncUpload(playlistToUpdateName playlist: Playlist) -> Promise<Void> { return Promise.value }
@@ -1063,15 +1064,65 @@ class MusicPlayerTest: XCTestCase {
     func testPlayPreviousOrReplay_Replay() {
         prepareWithCachedPlaylist()
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 2))
+        XCTAssertFalse(testPlayer.isStopInsteadOfPause)
         testPlayer.seek(toSecond: 10.0)
         mockAVPlayer.useMockCurrentItem = true
         testPlayer.playPreviousOrReplay()
         mockAVPlayer.useMockCurrentItem = false
+        XCTAssertTrue(testPlayer.isSkipAvailable)
         XCTAssertEqual(playerData.currentIndex, 3)
         XCTAssertEqual(testPlayer.prevQueue.count, 3)
         XCTAssertEqual(testPlayer.userQueue.count, 0)
         XCTAssertEqual(testPlayer.nextQueue.count, 5)
         XCTAssertEqual(testPlayer.elapsedTime, 0.0)
+    }
+    
+    func testPlayPreviousOrReplay_Radio_Previous() {
+        let radios = library.getRadios()
+        XCTAssertEqual(radios.count, 4)
+        testPlayer.play(context: PlayContext(name: "Radios", playables: radios))
+        testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 2))
+        testPlayer.seek(toSecond: 10.0)
+        mockAVPlayer.useMockCurrentItem = true
+        testPlayer.playPreviousOrReplay()
+        mockAVPlayer.useMockCurrentItem = false
+        XCTAssertEqual(playerData.currentIndex, 2)
+    }
+    
+    func testPauseRadio() {
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "DidStartPlaying")
+        mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
+        
+        let radios = library.getRadios()
+        XCTAssertEqual(radios.count, 4)
+        testPlayer.play(context: PlayContext(name: "Radios", playables: radios))
+        testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 2))
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+        XCTAssertTrue(testPlayer.isStopInsteadOfPause)
+        XCTAssertTrue(testPlayer.isPlaying)
+        XCTAssertEqual(playerData.currentIndex, 3)
+        testPlayer.pause()
+        XCTAssertFalse(testPlayer.isPlaying)
+        XCTAssertFalse(testPlayer.isSkipAvailable)
+        XCTAssertEqual(playerData.currentIndex, 3)
+    }
+    
+    func testRadioInvalidUrl() {
+        let radios = library.getRadios()
+        
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "Normal Play")
+        mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1
+        testPlayer.play(context: PlayContext(name: "Radios", playables: radios))
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+
+        mockMusicPlayable.expectationDidStartPlaying = self.expectation(description: "Invalid URL")
+        mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1
+        testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
+        wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+        
+        XCTAssertTrue(testPlayer.isStopInsteadOfPause)
+        XCTAssertFalse(testPlayer.isPlaying)
+        XCTAssertEqual(playerData.currentIndex, 1)
     }
     
     func testPlayPrevious_EmptyPlaylist() {

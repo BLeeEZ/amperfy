@@ -160,7 +160,7 @@ class NowPlayingInfoView: UIView {
         label.font = .systemFont(ofSize: 12.0)
         return label
     }()
-    
+
     var remainingTimeLabelWidthOnHover: CGFloat = 0.0
     var remainingTimeLabelWidthConstraint: NSLayoutConstraint?
     var remainingTimeLabelTrailingConstraint: NSLayoutConstraint?
@@ -173,6 +173,19 @@ class NowPlayingInfoView: UIView {
         label.backgroundColor = .clear
         label.isHidden = true
         label.font = .systemFont(ofSize: 12.0)
+        return label
+    }()
+    fileprivate lazy var liveLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.textAlignment = .center
+        label.numberOfLines = 1
+        label.backgroundColor = .systemGray2
+        label.isHidden = true
+        label.font = .systemFont(ofSize: 10.0, weight: .bold)
+        label.text = "LIVE"
+        label.layer.cornerRadius = CornerRadius.verySmall.asCGFloat
+        label.layer.masksToBounds = true
         return label
     }()
     
@@ -188,6 +201,7 @@ class NowPlayingInfoView: UIView {
         self.moreButton.translatesAutoresizingMaskIntoConstraints = false
         self.elapsedTimeLabel.translatesAutoresizingMaskIntoConstraints = false
         self.remainingTimeLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.liveLabel.translatesAutoresizingMaskIntoConstraints = false
 
         let view = UIView()
         view.addSubview(self.titleLabel)
@@ -195,7 +209,8 @@ class NowPlayingInfoView: UIView {
         view.addSubview(self.subtitleLabel)
         view.addSubview(self.elapsedTimeLabel)
         view.addSubview(self.remainingTimeLabel)
-        
+        view.addSubview(self.liveLabel)
+
         self.moreButtonWidthConstraint = self.moreButton.widthAnchor.constraint(equalToConstant: 0)
         self.moreButtonTrailingConstraint = self.moreButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0)
         
@@ -203,7 +218,7 @@ class NowPlayingInfoView: UIView {
         self.elapsedTimeLabelLeadingConstraint = self.elapsedTimeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor)
         self.remainingTimeLabelWidthConstraint = self.remainingTimeLabel.widthAnchor.constraint(equalToConstant: 0)
         self.remainingTimeLabelTrailingConstraint = self.remainingTimeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        
+
         NSLayoutConstraint.activate([
             self.moreButtonWidthConstraint!,
             self.moreButtonTrailingConstraint!,
@@ -220,7 +235,10 @@ class NowPlayingInfoView: UIView {
             self.elapsedTimeLabelLeadingConstraint!,
             self.remainingTimeLabel.topAnchor.constraint(equalTo: self.titleLabel.bottomAnchor),
             self.remainingTimeLabelTrailingConstraint!,
-            self.remainingTimeLabelWidthConstraint!
+            self.remainingTimeLabelWidthConstraint!,
+            self.liveLabel.topAnchor.constraint(equalTo: self.titleLabel.bottomAnchor),
+            self.liveLabel.widthAnchor.constraint(equalToConstant: 35),
+            self.liveLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -5)
         ])
         
         return view
@@ -341,7 +359,8 @@ class NowPlayingInfoView: UIView {
 extension NowPlayingInfoView: MusicPlayable, Refreshable {
     
     private func refreshTimeLabels(hovered: Bool = false) {
-        if (hovered) {
+        let areTimeLablesVisible = hovered && !(player.currentlyPlaying?.isRadio ?? false)
+        if (areTimeLablesVisible) {
             self.elapsedTimeLabelWidthConstraint?.constant = elapsedTimeLabelWidthOnHover
             self.remainingTimeLabelWidthConstraint?.constant = remainingTimeLabelWidthOnHover
             self.elapsedTimeLabelLeadingConstraint?.constant = 10
@@ -353,8 +372,8 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
             self.remainingTimeLabelTrailingConstraint?.constant = 0
         }
         
-        self.elapsedTimeLabel.isHidden = !hovered
-        self.remainingTimeLabel.isHidden = !hovered
+        self.elapsedTimeLabel.isHidden = !areTimeLablesVisible
+        self.remainingTimeLabel.isHidden = !areTimeLablesVisible
     }
     
     private func refreshMoreButton(hovered: Bool = false) {
@@ -397,9 +416,9 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
             }
             return
         }
-
-        switch self.player.playerMode {
-        case .music:
+        
+        switch currentPlaying.derivedType {
+        case .song:
             let song = currentPlaying.asSong
             let title = song?.title ?? ""
             let artist = song?.artist?.name ?? ""
@@ -412,12 +431,19 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
             }
             self.titleLabel.text = title
             self.subtitleLabel.text = subtitle
-        case .podcast:
+            self.liveLabel.isHidden = true
+        case .podcastEpisode:
             let podcast = currentPlaying.asPodcastEpisode
             let title = podcast?.title ?? ""
             let subtitle = podcast?.subtitle ?? ""
             self.titleLabel.text = title
             self.subtitleLabel.text = subtitle
+            self.liveLabel.isHidden = true
+        case .radio:
+            let radio = currentPlaying.asRadio
+            self.titleLabel.text = radio?.title ?? ""
+            self.subtitleLabel.text = ""
+            self.liveLabel.isHidden = false
         }
     }
     
@@ -430,41 +456,49 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
     }
     
     private func refreshElapsedTimeAndRemainingTime() {
-        if self.player.currentlyPlaying != nil {
-            self.timeSlider.minimumValue = 0.0
-            self.timeSlider.maximumValue = Float(player.duration)
-            if !self.timeSlider.isTracking {
+        if let currentlyPlaying = player.currentlyPlaying {
+            let supportTimeInteraction = !currentlyPlaying.isRadio
+            timeSlider.isEnabled = supportTimeInteraction
+            timeSlider.maximumValue = Float(player.duration)
+            if !self.timeSlider.isTracking, supportTimeInteraction {
                 self.timeSlider.value = Float(player.elapsedTime)
             }
             
-            if player.elapsedTime > 60*60 {
-                self.elapsedTimeLabelWidthOnHover = 45.0
-            } else if player.elapsedTime > 10*60 {
-                self.elapsedTimeLabelWidthOnHover = 35.0
-            } else {
-                self.elapsedTimeLabelWidthOnHover = 30.0
-            }
-
-            let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
-            self.elapsedTimeLabel.text = elapsedClockTime.asShortString()
-            if let remainingTime = remainingTime {
-                remainingTimeLabel.text = ClockTime(timeInSeconds: remainingTime).asShortString()
-                if remainingTime < -60*60 {
-                    self.remainingTimeLabelWidthOnHover = 50.0
-                } else if remainingTime < -10*60 {
-                    self.remainingTimeLabelWidthOnHover = 40.0
+            if supportTimeInteraction {
+                if player.elapsedTime > 60*60 {
+                    self.elapsedTimeLabelWidthOnHover = 45.0
+                } else if player.elapsedTime > 10*60 {
+                    self.elapsedTimeLabelWidthOnHover = 35.0
                 } else {
+                    self.elapsedTimeLabelWidthOnHover = 30.0
+                }
+                
+                let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
+                self.elapsedTimeLabel.text = elapsedClockTime.asShortString()
+                if let remainingTime = remainingTime {
+                    remainingTimeLabel.text = ClockTime(timeInSeconds: remainingTime).asShortString()
+                    if remainingTime < -60*60 {
+                        self.remainingTimeLabelWidthOnHover = 50.0
+                    } else if remainingTime < -10*60 {
+                        self.remainingTimeLabelWidthOnHover = 40.0
+                    } else {
+                        self.remainingTimeLabelWidthOnHover = 35.0
+                    }
+                } else {
+                    remainingTimeLabel.text = "--:--"
                     self.remainingTimeLabelWidthOnHover = 35.0
                 }
             } else {
-                remainingTimeLabel.text = "--:--"
-                self.remainingTimeLabelWidthOnHover = 35.0
+                timeSlider.minimumValue = 0.0
+                timeSlider.maximumValue = 1.0
+                timeSlider.value = 0.0
             }
         } else {
             self.elapsedTimeLabel.text = "--:--"
             self.elapsedTimeLabelWidthOnHover = 35.0
             self.remainingTimeLabel.text = "--:--"
             self.remainingTimeLabelWidthOnHover = 35.0
+            self.timeSlider.isEnabled = false
             self.timeSlider.minimumValue = 0.0
             self.timeSlider.maximumValue = 1.0
             self.timeSlider.value = 0.0

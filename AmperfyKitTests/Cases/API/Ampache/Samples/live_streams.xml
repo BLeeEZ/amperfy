@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <total_count>3</total_count>
+  <live_stream id="3">
+    <name><![CDATA[4ZZZ Community Radio]]></name>
+    <url><![CDATA[https://stream.4zzz.org.au:9200/4zzz]]></url>
+    <codec><![CDATA[mp3]]></codec>
+    <catalog>1</catalog>
+    <site_url><![CDATA[https://4zzzfm.org.au]]></site_url>
+  </live_stream>
+  <live_stream id="1">
+    <name><![CDATA[HBR1.com - Dream Factory]]></name>
+    <url><![CDATA[http://ubuntu.hbr1.com:19800/ambient.aac]]></url>
+    <codec><![CDATA[mp4]]></codec>
+    <catalog>1</catalog>
+    <site_url><![CDATA[http://www.hbr1.com/]]></site_url>
+  </live_stream>
+  <live_stream id="2">
+    <name><![CDATA[HBR1.com - I.D.M. Tranceponder]]></name>
+    <url><![CDATA[http://ubuntu.hbr1.com:19800/trance.ogg]]></url>
+    <codec><![CDATA[ogg]]></codec>
+    <catalog>1</catalog>
+    <site_url><![CDATA[http://www.hbr1.com/]]></site_url>
+  </live_stream>
+</root>

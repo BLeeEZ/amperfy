@@ -593,6 +593,25 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
 
 }
 
+public class RadiosFetchedResultsController: CachedFetchedResultsController<RadioMO> {
+    
+    public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool, fetchLimit: Int? = nil) {
+        let fetchRequest = RadioMO.alphabeticSortedFetchRequest
+        fetchRequest.fetchLimit = fetchLimit ?? 0
+        fetchRequest.predicate = RadioMO.excludeServerDeleteRadiosFetchPredicate
+        super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: .alphabet, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
+    }
+    
+    public func search(searchText: String) {
+        if searchText.count > 0 {
+            search(predicate: RadioMO.excludeServerDeleteRadiosFetchPredicate)
+        } else {
+            showAllResults()
+        }
+    }
+
+}
+
 public class AlbumSongsFetchedResultsController: BasicFetchedResultsController<SongMO> {
     
     let album: Album

@@ -25,6 +25,12 @@ import UIKit
 import AVFoundation
 import PromiseKit
 
+public enum DerivedPlayableType {
+    case song
+    case podcastEpisode
+    case radio
+}
+
 public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     /*
     Avoid direct access to the PlayableFile.
@@ -64,10 +70,22 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         return playableManagedObject.objectID
     }
     public var displayString: String {
-        return "\(creatorName) - \(title)"
+        switch derivedType {
+        case .song, .podcastEpisode:
+            return "\(creatorName) - \(title)"
+        case .radio:
+            return "\(title)"
+        }
     }
     public var creatorName: String {
-        return asSong?.creatorName ?? asPodcastEpisode?.creatorName ?? "Unknown"
+        switch derivedType {
+        case .song:
+            return asSong?.creatorName ?? "Unknown"
+        case .podcastEpisode:
+            return asPodcastEpisode?.creatorName ?? "Unknown"
+        case .radio:
+            return ""
+        }
     }
     public var title: String {
         get { return playableManagedObject.title ?? "Unknown Title" }
@@ -204,6 +222,12 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         }
     }
 
+    public var derivedType: DerivedPlayableType {
+        return isSong ?           .song :
+               isPodcastEpisode ? .podcastEpisode :
+               isRadio ?          .radio :
+                                  .song
+    }
     
     public var isSong: Bool {
         return playableManagedObject is SongMO
@@ -219,6 +243,25 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         guard self.isPodcastEpisode, let playablePodcastEpisode = playableManagedObject as? PodcastEpisodeMO else { return nil }
         return PodcastEpisode(managedObject: playablePodcastEpisode)
     }
+    public var isRadio: Bool {
+        return playableManagedObject is RadioMO
+    }
+    public var asRadio: Radio? {
+        guard self.isRadio, let playableRadio = playableManagedObject as? RadioMO else { return nil }
+        return Radio(managedObject: playableRadio)
+    }
+    
+    public func isAvailableToUser() -> Bool {
+        switch derivedType {
+        case .song:
+            return asSong?.isAvailableToUser() ?? false
+        case .podcastEpisode:
+            return asPodcastEpisode?.isAvailableToUser() ?? false
+        case .radio:
+            return asRadio?.isAvailableToUser() ?? false
+        }
+    }
+    
     public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
         if details.type == .long {
@@ -247,9 +290,14 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         return infoContent
     }
     override public func getDefaultImage(theme: ThemePreference) -> UIImage  {
-        return isPodcastEpisode ?
-            UIImage.getGeneratedArtwork(theme: theme, artworkType: .podcastEpisode) :
-            UIImage.getGeneratedArtwork(theme: theme, artworkType: .song)
+        switch derivedType {
+        case .song:
+            return UIImage.getGeneratedArtwork(theme: theme, artworkType: .song)
+        case .podcastEpisode:
+            return UIImage.getGeneratedArtwork(theme: theme, artworkType: .podcastEpisode)
+        case .radio:
+            return UIImage.getGeneratedArtwork(theme: theme, artworkType: .radio)
+        }
     }
     
     override public func playedViaContext() {
@@ -270,13 +318,34 @@ extension AbstractPlayable: PlayableContainable  {
     public var playables: [AbstractPlayable] {
         return [self]
     }
-    public var playContextType: PlayerMode { return isSong ? .music : .podcast }
+    public var playContextType: PlayerMode {
+        switch derivedType {
+        case .song, .radio:
+            return .music
+        case .podcastEpisode:
+            return .podcast
+        }
+    }
     public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
         guard let song = asSong else { return Promise.value }
         return librarySyncer.sync(song: song)
     }
-    public var isRateable: Bool { return isSong }
-    public var isFavoritable: Bool { return isSong }
+    public var isRateable: Bool {
+        switch derivedType {
+        case .song:
+            return true
+        case .podcastEpisode, .radio:
+            return false
+        }
+    }
+    public var isFavoritable: Bool {
+        switch derivedType {
+        case .song:
+            return true
+        case .podcastEpisode, .radio:
+            return false
+        }
+    }
     public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
         guard let song = asSong else { return Promise.value}
         guard let context = song.managedObject.managedObjectContext else { return Promise<Void>(error: BackendError.persistentSaveFailed) }
@@ -285,11 +354,33 @@ extension AbstractPlayable: PlayableContainable  {
         library.saveContext()
         return syncer.setFavorite(song: song, isFavorite: isFavorite)
     }
-    public var isDownloadAvailable: Bool { return asPodcastEpisode?.isAvailableToUser ?? true }
+    public var isDownloadAvailable: Bool {
+        switch derivedType {
+        case .song:
+            return true
+        case .podcastEpisode:
+            return asPodcastEpisode?.isAvailableToUser() ?? false
+        case .radio:
+            return false
+        }
+    }
     public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
         return ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)
     }
-    public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: isSong ? .song : .podcastEpisode, objectID: playableManagedObject.objectID.uriRepresentation().absoluteString) }
+    public var containerIdentifier: PlayableContainerIdentifier {
+        let containerType = switch derivedType {
+        case .song:
+            PlayableContainerBaseType.song
+        case .podcastEpisode:
+            PlayableContainerBaseType.podcastEpisode
+        case .radio:
+            PlayableContainerBaseType.radio
+        }
+        
+        return PlayableContainerIdentifier(
+            type: containerType,
+            objectID: playableManagedObject.objectID.uriRepresentation().absoluteString)
+    }
 }
 
 extension AbstractPlayable: Hashable, Equatable {
@@ -336,8 +427,8 @@ extension Array where Element: AbstractPlayable {
         return self.sortById().sorted{ $0.track < $1.track }
     }
     
-    public func filterSongs() -> [Element] {
-        return self.filter{ $0.isSong }
+    public func filterSongs() -> [Song] {
+        return self.compactMap{ $0.asSong }
     }
 
 }

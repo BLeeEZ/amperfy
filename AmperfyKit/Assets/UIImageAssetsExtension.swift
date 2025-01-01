@@ -39,7 +39,8 @@ public enum ArtworkType: CaseIterable {
     case podcastEpisode
     case playlist
     case folder
-  
+    case radio
+
     public var description: String {
         switch self {
         case .song:
@@ -58,6 +59,8 @@ public enum ArtworkType: CaseIterable {
             return "Playlist"
         case .folder:
             return "Folder"
+        case .radio:
+            return "Radio"
         }
     }
 }
@@ -106,6 +109,7 @@ extension UIImage {
     public static let artist = UIImage.create(systemName: "music.mic")
     public static let album = UIImage.create(systemName: "square.stack")
     public static let folder = UIImage.create(systemName: "folder.fill")
+    public static let radio = UIImage.create(systemName: "dot.radiowaves.left.and.right")
     public static let playlist = UIImage.create(systemName: "music.note.list")
     public static let musicLibrary = UIImage.create(systemName: "music.note.house")
     public static let musicalNotes = UIImage.create(systemName: "music.note")
@@ -116,6 +120,7 @@ extension UIImage {
     public static let plusCircle = UIImage.create(systemName: "plus.circle")
     public static let play = UIImage.create(systemName: "play.fill")
     public static let pause = UIImage.create(systemName: "pause.fill")
+    public static let stop = UIImage.create(systemName: "stop.fill")
     public static let sleep = UIImage.create(systemName: "moon.zzz")
     public static let sleepFill = UIImage.create(systemName: "moon.zzz.fill")
     public static let cache = download
@@ -130,6 +135,7 @@ extension UIImage {
     public static let heartFill = UIImage.create(systemName: "heart.fill")
     public static let heartEmpty = UIImage.create(systemName: "heart")
     public static let heartSlash = UIImage.create(systemName: "heart.slash")
+    public static let followLink = UIImage.create(systemName: "arrowshape.turn.up.forward.fill")
     public static let clock = UIImage.create(systemName: "clock")
     public static let refresh = UIImage.create(systemName: "arrow.triangle.2.circlepath")
     public static let exclamation = UIImage.create(systemName: "exclamationmark")
@@ -190,6 +196,8 @@ extension UIImage {
                 img = UIImage(imageLiteralResourceName: "BluePlaylist")
             case .folder:
                 img = UIImage(imageLiteralResourceName: "BlueFolder")
+            case .radio:
+                img = UIImage(imageLiteralResourceName: "BlueRadio")
             }
         case .green:
             switch artworkType {
@@ -209,6 +217,8 @@ extension UIImage {
                 img = UIImage(imageLiteralResourceName: "GreenPlaylist")
             case .folder:
                 img = UIImage(imageLiteralResourceName: "GreenFolder")
+            case .radio:
+                img = UIImage(imageLiteralResourceName: "GreenRadio")
             }
         case .red:
             switch artworkType {
@@ -228,6 +238,8 @@ extension UIImage {
                 img = UIImage(imageLiteralResourceName: "RedPlaylist")
             case .folder:
                 img = UIImage(imageLiteralResourceName: "RedFolder")
+            case .radio:
+                img = UIImage(imageLiteralResourceName: "RedRadio")
             }
         case .yellow:
             switch artworkType {
@@ -247,6 +259,8 @@ extension UIImage {
                 img = UIImage(imageLiteralResourceName: "YellowPlaylist")
             case .folder:
                 img = UIImage(imageLiteralResourceName: "YellowFolder")
+            case .radio:
+                img = UIImage(imageLiteralResourceName: "YellowRadio")
             }
         case .orange:
             switch artworkType {
@@ -266,6 +280,8 @@ extension UIImage {
                 img = UIImage(imageLiteralResourceName: "OrangePlaylist")
             case .folder:
                 img = UIImage(imageLiteralResourceName: "OrangeFolder")
+            case .radio:
+                img = UIImage(imageLiteralResourceName: "OrangeRadio")
             }
         case .purple:
             switch artworkType {
@@ -285,6 +301,8 @@ extension UIImage {
                 img = UIImage(imageLiteralResourceName: "PurplePlaylist")
             case .folder:
                 img = UIImage(imageLiteralResourceName: "PurpleFolder")
+            case .radio:
+                img = UIImage(imageLiteralResourceName: "PurpleRadio")
             }
         case .pink:
             switch artworkType {
@@ -304,6 +322,8 @@ extension UIImage {
                 img = UIImage(imageLiteralResourceName: "PinkPlaylist")
             case .folder:
                 img = UIImage(imageLiteralResourceName: "PinkFolder")
+            case .radio:
+                img = UIImage(imageLiteralResourceName: "PinkRadio")
             }
         }
 
@@ -329,6 +349,8 @@ extension UIImage {
             generatedArtwork = UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, theme: theme, switchColors: true)
         case .folder:
             generatedArtwork = UIImage.createArtwork(with: UIImage.folder, iconSizeType: .big, theme: theme)
+        case .radio:
+            generatedArtwork = UIImage.createArtwork(with: UIImage.radio, iconSizeType: .big, theme: theme)
         }
         return generatedArtwork ?? UIImage()
     }

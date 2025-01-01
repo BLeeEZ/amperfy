@@ -110,6 +110,7 @@ public protocol LibrarySyncer {
     func syncRecentAlbums(offset: Int, count: Int) -> Promise<Void>
     func syncNewestPodcastEpisodes() -> Promise<Void>
     func syncFavoriteLibraryElements() -> Promise<Void>
+    func syncRadios() -> Promise<Void>
     func syncDownPlaylistsWithoutSongs() -> Promise<Void>
     func syncDown(playlist: Playlist) -> Promise<Void>
     func syncUpload(playlistToUpdateName playlist: Playlist) -> Promise<Void>

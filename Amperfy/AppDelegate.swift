@@ -597,14 +597,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func buildControlsMenu() -> UIMenu {
         let isPlaying = self.player.isPlaying
         let isShuffle = self.player.isShuffle
-
+        let isSkipAvailable = isPlaying && player.isSkipAvailable
+        
         let section1 = [
-            UIKeyCommand(title: isPlaying ? "Pause" : "Play", action: isPlaying ? #selector(self.keyCommandPause) : #selector(self.keyCommandPlay), input: " "),
-            UIKeyCommand(title: "Stop", action: #selector(self.keyCommandStop), input: ".", modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
+            UIKeyCommand(title: isPlaying ? (player.isStopInsteadOfPause ? "Stop Radio" : "Pause") : "Play", action: isPlaying ? #selector(self.keyCommandPause) : #selector(self.keyCommandPlay), input: " "),
+            UIKeyCommand(title: (isPlaying && player.isStopInsteadOfPause) ? "Stop Player" : "Stop", action: #selector(self.keyCommandStop), input: ".", modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
             UIKeyCommand(title: "Next Track", action: #selector(self.keyCommandNext), input: UIKeyCommand.inputRightArrow, modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
             UIKeyCommand(title: "Previous Track", action: #selector(self.keyCommandPrevious), input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, attributes: isPlaying ? [] : [.disabled]),
-            UIKeyCommand(title: "Skip Forward: " + Int(self.player.skipForwardInterval).description + " sec.", action: #selector(self.keyCommandSkipForward), input: UIKeyCommand.inputRightArrow, modifierFlags: [.shift, .command], attributes: isPlaying ? [] : [.disabled]),
-            UIKeyCommand(title: "Skip Backward: " + Int(self.player.skipBackwardInterval).description + " sec.", action: #selector(self.keyCommandSkipBackward), input: UIKeyCommand.inputLeftArrow, modifierFlags: [.shift, .command], attributes: isPlaying ? [] : [.disabled]),
+            UIKeyCommand(title: "Skip Forward: " + Int(self.player.skipForwardInterval).description + " sec.", action: #selector(self.keyCommandSkipForward), input: UIKeyCommand.inputRightArrow, modifierFlags: [.shift, .command], attributes: isSkipAvailable ? [] : [.disabled]),
+            UIKeyCommand(title: "Skip Backward: " + Int(self.player.skipBackwardInterval).description + " sec.", action: #selector(self.keyCommandSkipBackward), input: UIKeyCommand.inputLeftArrow, modifierFlags: [.shift, .command], attributes: isSkipAvailable ? [] : [.disabled]),
         ]
 
         var section2 = [

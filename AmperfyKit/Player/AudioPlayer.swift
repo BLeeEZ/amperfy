@@ -71,6 +71,10 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     }
     
     private func shouldCurrentItemReplayedInsteadOfPrevious() -> Bool {
+        if let currentlyPlaying = currentlyPlaying,
+           currentlyPlaying.isRadio {
+            return false
+        }
         if !backendAudioPlayer.canBeContinued {
             return false
         }
@@ -192,8 +196,13 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     }
     
     func pause() {
-        backendAudioPlayer.pause()
-        notifyItemPaused()
+        if let currentlyPlaying = currentlyPlaying,
+           currentlyPlaying.isRadio {
+            stopButRemainIndex()
+        } else {
+            backendAudioPlayer.pause()
+            notifyItemPaused()
+        }
     }
     
     //BackendAudioPlayerNotifiable

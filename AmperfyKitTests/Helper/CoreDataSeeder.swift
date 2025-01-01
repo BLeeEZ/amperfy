@@ -58,6 +58,12 @@ class CoreDataSeeder {
         (id: "9",     name: "With Three Cached", songIds: ["3", "5", "10T", "36", "19", "10T", "38", "5", "41"]),
         (id: "dRsa11",    name: "No Cached", songIds: ["3", "10T", "19"])
     ]
+    let radios = [
+        (id: "12",     title: "GoGo Radio", url: "www.blub.de/aaa", siteUrl: "www.blub.de/ddf"),
+        (id: "36",     title: "Wau", url: "www.blub.de/fjjuf", siteUrl: "www.blub.de/23452"),
+        (id: "dRsa11", title: "Invalid Url", url: "", siteUrl: "www.blub.de/daeeaa"),
+        (id: "dFrDF",  title: "Radio Channel 2", url: "www.blub.de/ffhnnnza", siteUrl: "www.blub.de/44re4t")
+    ]
     
     func seed(context: NSManagedObjectContext) {
         let library = LibraryStorage(context: context)
@@ -108,6 +114,14 @@ class CoreDataSeeder {
                     print(logMsg)
                 }
             }
+        }
+        
+        for radioSeed in radios {
+            let radio = library.createRadio()
+            radio.id = radioSeed.id
+            radio.title = radioSeed.title
+            radio.url = radioSeed.url
+            radio.siteURL = URL(string: radioSeed.siteUrl)
         }
         
         library.saveContext()

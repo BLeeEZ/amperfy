@@ -40,7 +40,7 @@ class EntityPreviewActionBuilder {
         let playables = entityContainer.playables.filterCached(dependigOn: appDelegate.storage.settings.isOfflineMode)
         switch(entityContainer.playContextType) {
         case .music:
-            return playables.compactMap{ $0.asSong }.filterServerDeleteUncachedSongs()
+            return playables.filter{ $0.asSong?.isAvailableToUser() ?? $0.asRadio?.isAvailableToUser() ?? false }
         case .podcast:
             return playables
         }
@@ -60,6 +60,7 @@ class EntityPreviewActionBuilder {
                  !entityContainer.isDownloadAvailable)
     }
     private var isDeleteOnServer = false
+    private var isGoToSiteUrl = false
     private var isShowPodcastDetails = false
     private var isShowSongDetails = false
 
@@ -137,6 +138,9 @@ class EntityPreviewActionBuilder {
         if isDeleteOnServer {
             elementHandlingActions.append(createDeleteOnServerAction())
         }
+        if isGoToSiteUrl, let url = (entityContainer as? AbstractPlayable)?.asRadio?.siteURL {
+            elementHandlingActions.append(createGoToSiteUrl(url: url))
+        }
         if !elementHandlingActions.isEmpty {
             menuActions.append(UIMenu(options: .displayInline, children: elementHandlingActions))
         }
@@ -210,6 +214,8 @@ class EntityPreviewActionBuilder {
                 configureFor(song: song)
             } else if let podcastEpisode = playable.asPodcastEpisode {
                 configureFor(podcastEpisode: podcastEpisode)
+            } else if let radio = playable.asRadio {
+               configureFor(radio: radio)
             }
         } else if let album = entityContainer as? Album {
             configureFor(album: album)
@@ -241,25 +247,41 @@ class EntityPreviewActionBuilder {
         isShowArtist = !(rootView is ArtistDetailVC)
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
         isDeleteOnServer = false
+        isGoToSiteUrl = false
         isShowPodcastDetails = false
         isShowSongDetails = true
     }
     
     private func configureFor(podcastEpisode: PodcastEpisode) {
-        isPlay = !((playContextCb == nil) ||
-                   (!podcastEpisode.isAvailableToUser && appDelegate.storage.settings.isOnlineMode) ||
+        isPlay = !((self.playContextCb == nil) ||
+                   (!podcastEpisode.isAvailableToUser() && appDelegate.storage.settings.isOnlineMode) ||
                    (!podcastEpisode.isCached && appDelegate.storage.settings.isOfflineMode))
         isShuffle = false
         isMusicQueue = false
-        isPodcastQueue = !((playContextCb == nil) ||
-                           (playerIndexCb != nil) ||
-                           (!podcastEpisode.isAvailableToUser && appDelegate.storage.settings.isOnlineMode) ||
+        isPodcastQueue = !((self.playContextCb == nil) ||
+                           (self.playerIndexCb != nil) ||
+                           (!podcastEpisode.isAvailableToUser() && appDelegate.storage.settings.isOnlineMode) ||
                            (!podcastEpisode.isCached && appDelegate.storage.settings.isOfflineMode))
         isShowAlbum = false
         isShowArtist = !(rootView is PodcastDetailVC)
         isAddToPlaylist = false
         isDeleteOnServer = podcastEpisode.podcastStatus != .deleted && appDelegate.storage.settings.isOnlineMode
+        isGoToSiteUrl = false
         isShowPodcastDetails = true
+        isShowSongDetails = false
+    }
+    
+    private func configureFor(radio: Radio) {
+        isPlay = !((playContextCb == nil) || appDelegate.storage.settings.isOfflineMode)
+        isShuffle = false
+        isMusicQueue = !((playContextCb == nil) ||
+                         playerIndexCb != nil ||
+                         (appDelegate.storage.settings.isOfflineMode))
+        isPodcastQueue = false
+        isAddToPlaylist = false
+        isDeleteOnServer = false
+        isGoToSiteUrl = radio.siteURL != nil
+        isShowPodcastDetails = false
         isShowSongDetails = false
     }
     
@@ -273,6 +295,7 @@ class EntityPreviewActionBuilder {
         isShowArtist = false
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
         isDeleteOnServer = false
+        isGoToSiteUrl = false
         isShowPodcastDetails = false
         isShowSongDetails = false
     }
@@ -287,6 +310,7 @@ class EntityPreviewActionBuilder {
         isShowArtist = false
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
         isDeleteOnServer = false
+        isGoToSiteUrl = false
         isShowPodcastDetails = false
         isShowSongDetails = false
     }
@@ -301,6 +325,7 @@ class EntityPreviewActionBuilder {
         isPodcastQueue = true
         isAddToPlaylist = false
         isDeleteOnServer = false
+        isGoToSiteUrl = false
         isShowPodcastDetails = true
         isShowSongDetails = false
     }
@@ -315,6 +340,7 @@ class EntityPreviewActionBuilder {
         isShowArtist = false
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
         isDeleteOnServer = false
+        isGoToSiteUrl = false
         isShowPodcastDetails = false
         isShowSongDetails = false
     }
@@ -329,6 +355,7 @@ class EntityPreviewActionBuilder {
         isShowArtist = !(rootView is ArtistDetailVC)
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
         isDeleteOnServer = false
+        isGoToSiteUrl = false
         isShowPodcastDetails = false
         isShowSongDetails = false
     }
@@ -343,6 +370,7 @@ class EntityPreviewActionBuilder {
         isShowArtist = false
         isAddToPlaylist = appDelegate.storage.settings.isOnlineMode && !entityContainer.playables.isEmpty
         isDeleteOnServer = false
+        isGoToSiteUrl = false
         isShowPodcastDetails = false
         isShowSongDetails = false
     }
@@ -473,7 +501,7 @@ class EntityPreviewActionBuilder {
         return UIAction(title: "Add to Playlist", image: .playlistPlus) { action in
             guard !self.entityPlayables.isEmpty else { return }
             let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-            selectPlaylistVC.itemsToAdd = self.entityPlayables
+            selectPlaylistVC.itemsToAdd = self.entityPlayables.filterSongs()
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
             self.rootView.present(selectPlaylistNav, animated: true)
         }
@@ -579,6 +607,12 @@ class EntityPreviewActionBuilder {
                 // do nothing
             }))
             self.rootView.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func createGoToSiteUrl(url: URL) -> UIAction {
+        return UIAction(title: "Go to Site", image: .followLink) { action in
+            UIApplication.shared.open(url)
         }
     }
     

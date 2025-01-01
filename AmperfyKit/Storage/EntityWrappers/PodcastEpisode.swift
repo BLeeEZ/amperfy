@@ -119,7 +119,7 @@ public class PodcastEpisode: AbstractPlayable {
             return .syncingOnServer
         }
     }
-    public var isAvailableToUser: Bool {
+    override public func isAvailableToUser() -> Bool {
         return userStatus == .cached || userStatus == .availableOnServer
     }
     public var streamId: String? {
@@ -169,7 +169,7 @@ public class PodcastEpisode: AbstractPlayable {
         var infoContent = [String]()
         if details.type == .long {
             infoContent.append("\(publishDate.asShortDayMonthString)")
-            if !isAvailableToUser && !isCached  {
+            if !isAvailableToUser() && !isCached  {
                 infoContent.append("Not Available")
             } else if let remainingTime = remainingTimeInSec {
                 infoContent.append("\(remainingTime.asDurationString) left")

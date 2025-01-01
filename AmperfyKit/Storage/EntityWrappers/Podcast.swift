@@ -90,7 +90,7 @@ extension Podcast: PlayableContainable  {
         return infoContent
     }
     public var playables: [AbstractPlayable] {
-        return episodes.filter{ $0.isAvailableToUser }
+        return episodes.filter{ $0.isAvailableToUser() }
     }
     public var playContextType: PlayerMode { return .podcast }
     public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {

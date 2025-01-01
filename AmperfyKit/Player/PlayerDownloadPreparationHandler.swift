@@ -43,7 +43,7 @@ class PlayerDownloadPreparationHandler {
         if userQueueRangeEnd > 0 {
             for i in 0...userQueueRangeEnd-1 {
                 let playable = queueHandler.userQueue[i]
-                if !playable.isCached {
+                if !playable.isCached, !playable.isRadio {
                     playableDownloadManager.download(object: playable)
                 }
             }
@@ -52,7 +52,7 @@ class PlayerDownloadPreparationHandler {
         if nextQueueRangeEnd > 0 {
             for i in 0...nextQueueRangeEnd-1 {
                 let playable = queueHandler.nextQueue[i]
-                if !playable.isCached {
+                if !playable.isCached, !playable.isRadio {
                     playableDownloadManager.download(object: playable)
                 }
             }

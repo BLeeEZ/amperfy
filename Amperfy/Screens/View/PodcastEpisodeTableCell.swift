@@ -82,7 +82,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
             playProgressBar.isHidden = true
             playProgressLabelPlayButtonDistance.constant = 8.0
         }
-        if !episode.isAvailableToUser {
+        if !episode.isAvailableToUser() {
             progressText += " \(CommonString.oneMiddleDot) \(episode.userStatus.description)"
         }
         playProgressLabel.text = progressText
@@ -105,7 +105,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
         if episode == appDelegate.player.currentlyPlaying {
             playEpisodeButton.setImage(nil, for: .normal)
             playEpisodeButton.isEnabled = false
-        } else if episode.isAvailableToUser {
+        } else if episode.isAvailableToUser() {
             playEpisodeButton.setImage(.play, for: .normal)
             playEpisodeButton.isEnabled = true
         } else {

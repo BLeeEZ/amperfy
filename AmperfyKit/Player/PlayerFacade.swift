@@ -183,6 +183,22 @@ extension PlayerFacade {
             return skipBackwardPodcastInterval
         }
     }
+    public var isSkipAvailable: Bool {
+        if let currentlyPlaying = currentlyPlaying,
+           currentlyPlaying.isRadio {
+            return false
+        } else {
+            return true
+        }
+    }
+    public var isStopInsteadOfPause: Bool {
+        if let currentlyPlaying = currentlyPlaying,
+           currentlyPlaying.isRadio {
+            return true
+        } else {
+            return false
+        }
+    }
 }
 
 class PlayerFacadeImpl: PlayerFacade {
@@ -325,7 +341,14 @@ class PlayerFacadeImpl: PlayerFacade {
     
     func seek(toSecond: Double) {
         userStatistics.usedAction(.playerSeek)
-        backendAudioPlayer.seek(toSecond: toSecond)
+        guard let currentlyPlaying = currentlyPlaying else { return }
+        switch currentlyPlaying.derivedType {
+        case .song, .podcastEpisode:
+            backendAudioPlayer.seek(toSecond: toSecond)
+        case .radio:
+            break // do nothing
+        }
+        
     }
     
     func insertContextQueue(playables: [AbstractPlayable]) {

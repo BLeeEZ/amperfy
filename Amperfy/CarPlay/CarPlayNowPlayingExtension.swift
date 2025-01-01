@@ -40,20 +40,23 @@ extension CarPlaySceneDelegate {
                     self.appDelegate.player.toggleShuffle()
                 })
             )
-            let isFavorite = appDelegate.player.currentlyPlaying?.isFavorite ?? false
-            buttons.append(
-                CPNowPlayingImageButton(image: isFavorite ? .heartFill : .heartEmpty, handler: { [weak self] button in
-                    guard let `self` = self else { return }
-                    guard let playableInfo = appDelegate.player.currentlyPlaying else { return }
-                    firstly {
-                        playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
-                    }.catch { error in
-                        self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
-                    }.finally {
-                        self.configureNowPlayingTemplate()
-                    }
-                })
-            )
+            if let currentlyPlaying = appDelegate.player.currentlyPlaying,
+               !currentlyPlaying.isRadio {
+                let isFavorite = appDelegate.player.currentlyPlaying?.isFavorite ?? false
+                buttons.append(
+                    CPNowPlayingImageButton(image: isFavorite ? .heartFill : .heartEmpty, handler: { [weak self] button in
+                        guard let `self` = self else { return }
+                        guard let playableInfo = appDelegate.player.currentlyPlaying else { return }
+                        firstly {
+                            playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+                        }.catch { error in
+                            self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+                        }.finally {
+                            self.configureNowPlayingTemplate()
+                        }
+                    })
+                )
+            }
         }
         buttons.append(
             CPNowPlayingPlaybackRateButton(handler: { [weak self] button in

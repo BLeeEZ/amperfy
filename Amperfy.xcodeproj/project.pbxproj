@@ -420,6 +420,16 @@
 		50C9D71E285088DA007F18D0 /* RoundedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F95222283FED0099CA91 /* RoundedImage.swift */; };
 		50CCD0572B6C38670073793B /* PlainDetailsVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50CCD0562B6C38670073793B /* PlainDetailsVC.xib */; };
 		50CCD0592B6C388B0073793B /* PlainDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CCD0582B6C388B0073793B /* PlainDetailsVC.swift */; };
+		50CEC6382D1EDA6B00D0E696 /* live_streams.xml in Resources */ = {isa = PBXBuildFile; fileRef = 50CEC6362D1EDA6B00D0E696 /* live_streams.xml */; };
+		50CEC63A2D1EDB0000D0E696 /* internetRadioStations_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 50CEC6392D1EDB0000D0E696 /* internetRadioStations_example_1.xml */; };
+		50CEC63E2D1EDCE500D0E696 /* RadioMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CEC63C2D1EDCE500D0E696 /* RadioMO+CoreDataClass.swift */; };
+		50CEC63F2D1EDCE500D0E696 /* RadioMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CEC63D2D1EDCE500D0E696 /* RadioMO+CoreDataProperties.swift */; };
+		50CEC6412D1EDE1100D0E696 /* Radio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CEC6402D1EDE1100D0E696 /* Radio.swift */; };
+		50CEC6432D1F38F800D0E696 /* SsRadioExampleParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CEC6422D1F38F800D0E696 /* SsRadioExampleParserTest.swift */; };
+		50CEC6452D1F399700D0E696 /* SsRadioParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CEC6442D1F399700D0E696 /* SsRadioParserDelegate.swift */; };
+		50CEC6472D1F405500D0E696 /* RadioParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CEC6462D1F405500D0E696 /* RadioParserDelegate.swift */; };
+		50CEC6492D1F41A400D0E696 /* RadiosExampleParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CEC6482D1F41A400D0E696 /* RadiosExampleParserTest.swift */; };
+		50CEC64B2D1F4C0A00D0E696 /* RadiosVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CEC64A2D1F4C0A00D0E696 /* RadiosVC.swift */; };
 		50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50CF3CEE28A4F83100263F7C /* CryptoKit.framework */; };
 		50CFB59228D483AD00A47D44 /* AddSwipeActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CFB59128D483AD00A47D44 /* AddSwipeActionView.swift */; };
 		50CFB59428D4846300A47D44 /* SwipeCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CFB59328D4846300A47D44 /* SwipeCellView.swift */; };
@@ -899,6 +909,17 @@
 		50CDF207264BC6BB00F83EF6 /* LogEntryMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogEntryMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50CDF208264BC6BB00F83EF6 /* LogEntryMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogEntryMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50CDF20B264BC72800F83EF6 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
+		50CEC6362D1EDA6B00D0E696 /* live_streams.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = live_streams.xml; sourceTree = "<group>"; };
+		50CEC6392D1EDB0000D0E696 /* internetRadioStations_example_1.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = internetRadioStations_example_1.xml; sourceTree = "<group>"; };
+		50CEC63B2D1EDB9500D0E696 /* Amperfy v40.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v40.xcdatamodel"; sourceTree = "<group>"; };
+		50CEC63C2D1EDCE500D0E696 /* RadioMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadioMO+CoreDataClass.swift"; sourceTree = "<group>"; };
+		50CEC63D2D1EDCE500D0E696 /* RadioMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadioMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		50CEC6402D1EDE1100D0E696 /* Radio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Radio.swift; sourceTree = "<group>"; };
+		50CEC6422D1F38F800D0E696 /* SsRadioExampleParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsRadioExampleParserTest.swift; sourceTree = "<group>"; };
+		50CEC6442D1F399700D0E696 /* SsRadioParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsRadioParserDelegate.swift; sourceTree = "<group>"; };
+		50CEC6462D1F405500D0E696 /* RadioParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioParserDelegate.swift; sourceTree = "<group>"; };
+		50CEC6482D1F41A400D0E696 /* RadiosExampleParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiosExampleParserTest.swift; sourceTree = "<group>"; };
+		50CEC64A2D1F4C0A00D0E696 /* RadiosVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiosVC.swift; sourceTree = "<group>"; };
 		50CF3CEE28A4F83100263F7C /* CryptoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoKit.framework; path = System/Library/Frameworks/CryptoKit.framework; sourceTree = SDKROOT; };
 		50CFB59128D483AD00A47D44 /* AddSwipeActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSwipeActionView.swift; sourceTree = "<group>"; };
 		50CFB59328D4846300A47D44 /* SwipeCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeCellView.swift; sourceTree = "<group>"; };
@@ -1148,6 +1169,8 @@
 				50A12F422739239800E7B2AA /* EmbeddedArtworkMO+CoreDataProperties.swift */,
 				50F81EDA23BF6B1E00EAAC3E /* SongMO+CoreDataClass.swift */,
 				50F81EDB23BF6B1E00EAAC3E /* SongMO+CoreDataProperties.swift */,
+				50CEC63C2D1EDCE500D0E696 /* RadioMO+CoreDataClass.swift */,
+				50CEC63D2D1EDCE500D0E696 /* RadioMO+CoreDataProperties.swift */,
 				501A7D442681C11C0055A51B /* PodcastEpisodeMO+CoreDataClass.swift */,
 				501A7D452681C11C0055A51B /* PodcastEpisodeMO+CoreDataProperties.swift */,
 				50CDF207264BC6BB00F83EF6 /* LogEntryMO+CoreDataClass.swift */,
@@ -1380,6 +1403,7 @@
 				50DEEE01265D4AB30073FF20 /* SsDirectoryParserDelegate.swift */,
 				501A7D402680B0710055A51B /* SsPodcastParserDelegate.swift */,
 				50C80F2726831DB40022F710 /* SsPodcastEpisodeParserDelegate.swift */,
+				50CEC6442D1F399700D0E696 /* SsRadioParserDelegate.swift */,
 				50E964A925E8E20E00E3210F /* SubsonicVersion.swift */,
 			);
 			path = Subsonic;
@@ -1511,6 +1535,7 @@
 				50A85EEA2689C0A500FB3E31 /* AbstractPlayable.swift */,
 				50B798A023B6CA5400551E62 /* Song.swift */,
 				501A7D482681C1700055A51B /* PodcastEpisode.swift */,
+				50CEC6402D1EDE1100D0E696 /* Radio.swift */,
 				50F81E8D23BC6FEA00EAAC3E /* Artwork.swift */,
 				50C16BF721E10E7500F086F0 /* Playlist.swift */,
 				50B798A823B6E5FF00551E62 /* PlaylistItem.swift */,
@@ -1581,6 +1606,7 @@
 				502040332203865400ED48A3 /* PlaylistSongsParserDelegate.swift */,
 				501A7D3A2680A9680055A51B /* PodcastParserDelegate.swift */,
 				501A7D4A2681E6DD0055A51B /* PodcastEpisodeParserDelegate.swift */,
+				50CEC6462D1F405500D0E696 /* RadioParserDelegate.swift */,
 			);
 			path = Ampache;
 			sourceTree = "<group>";
@@ -1636,6 +1662,7 @@
 				505362D02C23682500846C53 /* AlbumsCollectionVC.swift */,
 				50C16C1B21E7051700F086F0 /* AlbumDetailVC.swift */,
 				50BA92F921CC37F800E5901D /* SongsVC.swift */,
+				50CEC64A2D1F4C0A00D0E696 /* RadiosVC.swift */,
 				5007CE4021EF5F4300BC5CBA /* PlaylistsVC.swift */,
 				5007CE4621EF6A8E00BC5CBA /* PlaylistDetailVC.swift */,
 				502B98EC2D03A02D000FE187 /* PlaylistEditVC.swift */,
@@ -1779,6 +1806,7 @@
 				501A7D2226808AC10055A51B /* PodcastsParserTest.swift */,
 				501A7D2426808AE40055A51B /* PodcastEpisodesParserTest.swift */,
 				50048F9C275A4BA10087EDFB /* PodcastEpisodesExample2ParserTest.swift */,
+				50CEC6482D1F41A400D0E696 /* RadiosExampleParserTest.swift */,
 			);
 			path = Ampache;
 			sourceTree = "<group>";
@@ -1798,6 +1826,7 @@
 				501A7D1F26808A9D0055A51B /* podcasts.xml */,
 				501A7D1E26808A9D0055A51B /* podcast_episodes.xml */,
 				50048F9A275A4B560087EDFB /* podcast_episodes_example_2.xml */,
+				50CEC6362D1EDA6B00D0E696 /* live_streams.xml */,
 			);
 			path = Samples;
 			sourceTree = "<group>";
@@ -1825,6 +1854,7 @@
 				50AB92E3266760C100DCE45C /* SsDirectoriesExample2ParserTest.swift */,
 				501A7D422680B8BE0055A51B /* SsPodcastParserTest.swift */,
 				501A7D3E2680B04F0055A51B /* SsPodcastEpisodesParserTest.swift */,
+				50CEC6422D1F38F800D0E696 /* SsRadioExampleParserTest.swift */,
 				50AE79B52C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift */,
 				50AE79BB2C1F6ADE0085CBB3 /* SsOpenSubsonicExtensionsParserTest.swift */,
 				50AE79B72C1F68080085CBB3 /* SsLyricsBySongId2ParserTest.swift */,
@@ -1854,6 +1884,7 @@
 				50AE79B92C1F69A00085CBB3 /* OpenSubsonicExtensions_example_1.xml */,
 				50AE79B12C1F64E30085CBB3 /* getLyricsBySongId_example_1.xml */,
 				50AE79B32C1F64F50085CBB3 /* getLyricsBySongId_example_2.xml */,
+				50CEC6392D1EDB0000D0E696 /* internetRadioStations_example_1.xml */,
 			);
 			path = Samples;
 			sourceTree = "<group>";
@@ -2200,6 +2231,7 @@
 				50BE5D7C2850F50700156FC6 /* podcast_episodes.xml in Resources */,
 				50AE79B42C1F64F50085CBB3 /* getLyricsBySongId_example_2.xml in Resources */,
 				50BE5D572850F4F600156FC6 /* album_missing_artistId.xml in Resources */,
+				50CEC6382D1EDA6B00D0E696 /* live_streams.xml in Resources */,
 				50BE5D642850F4F600156FC6 /* genres_example_1.xml in Resources */,
 				50BE5D612850F4F600156FC6 /* playlists_example_1.xml in Resources */,
 				50BE5D802850F50700156FC6 /* songs.xml in Resources */,
@@ -2219,6 +2251,7 @@
 				50BE5D5F2850F4F600156FC6 /* playlist_example_1.xml in Resources */,
 				50BE5D602850F4F600156FC6 /* error_example_1.xml in Resources */,
 				50BE5D5D2850F4F600156FC6 /* ping_example_1.xml in Resources */,
+				50CEC63A2D1EDB0000D0E696 /* internetRadioStations_example_1.xml in Resources */,
 				50BE5D592850F4F600156FC6 /* album_multidisc_example_1.xml in Resources */,
 				50BE5D7F2850F50700156FC6 /* error-4700.xml in Resources */,
 				50BE5D652850F4F600156FC6 /* artists_example_1.xml in Resources */,
@@ -2348,6 +2381,7 @@
 				631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */,
 				50A30E542B7408DB00722894 /* ContextQueueNextSectionHeader.swift in Sources */,
 				632F511E2C7FD54A0032860D /* QueueBarButton.swift in Sources */,
+				50CEC64B2D1F4C0A00D0E696 /* RadiosVC.swift in Sources */,
 				50791E8528D36F1F006CE6E5 /* LibrarySettingsView.swift in Sources */,
 				50DE29ED2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift in Sources */,
 				5019441D2B7ACB0800082D2E /* PopupPlayer+Animations.swift in Sources */,
@@ -2415,6 +2449,7 @@
 				50C9D68B284FAA6C007F18D0 /* PodcastEpisodeMO+CoreDataClass.swift in Sources */,
 				50C9D6BD284FAA87007F18D0 /* Album.swift in Sources */,
 				50C9D661284FAA0B007F18D0 /* AlbumParserDelegate.swift in Sources */,
+				50CEC6452D1F399700D0E696 /* SsRadioParserDelegate.swift in Sources */,
 				50C9D649284FAA02007F18D0 /* SubsonicVersion.swift in Sources */,
 				50C9D640284FA9C7007F18D0 /* AutoDownloadLibrarySyncer.swift in Sources */,
 				50C9D6D7284FAB88007F18D0 /* PlayerNotificationAdapter.swift in Sources */,
@@ -2443,6 +2478,7 @@
 				50C9D6AA284FAA87007F18D0 /* Artwork.swift in Sources */,
 				50C9D66F284FAA4D007F18D0 /* LibrarySyncVersion.swift in Sources */,
 				50C9D6BA284FAA87007F18D0 /* MusicFolder.swift in Sources */,
+				50CEC6412D1EDE1100D0E696 /* Radio.swift in Sources */,
 				50C9D68C284FAA6C007F18D0 /* ScrobbleEntryMO+CoreDataClass.swift in Sources */,
 				50C9D6A0284FAA6C007F18D0 /* ScrobbleEntryMO+CoreDataProperties.swift in Sources */,
 				50C9D6E9284FACAF007F18D0 /* ArtworkCollection.swift in Sources */,
@@ -2549,9 +2585,11 @@
 				50C9D695284FAA6C007F18D0 /* PlayableFileMO+CoreDataClass.swift in Sources */,
 				50C9D659284FAA0B007F18D0 /* SongParserDelegate.swift in Sources */,
 				50C9D688284FAA6C007F18D0 /* SongMO+CoreDataClass.swift in Sources */,
+				50CEC6472D1F405500D0E696 /* RadioParserDelegate.swift in Sources */,
 				50C9D67D284FAA6C007F18D0 /* AbstractPlayableMO+CoreDataProperties.swift in Sources */,
 				50C9D668284FAA0B007F18D0 /* AmpacheApi.swift in Sources */,
 				50C9D6A1284FAA6C007F18D0 /* GenreMO+CoreDataProperties.swift in Sources */,
+				50CEC63F2D1EDCE500D0E696 /* RadioMO+CoreDataProperties.swift in Sources */,
 				50C9D645284FA9C7007F18D0 /* BackendApi.swift in Sources */,
 				50C9D6DE284FAB88007F18D0 /* PlayQueueHandler.swift in Sources */,
 				50C9D681284FAA6C007F18D0 /* MusicFolderMO+CoreDataProperties.swift in Sources */,
@@ -2567,6 +2605,7 @@
 				50C9D678284FAA6C007F18D0 /* SongMO+CoreDataProperties.swift in Sources */,
 				50C9D687284FAA6C007F18D0 /* AlbumMO+CoreDataProperties.swift in Sources */,
 				50C9D6BC284FAA87007F18D0 /* EmbeddedArtwork.swift in Sources */,
+				50CEC63E2D1EDCE500D0E696 /* RadioMO+CoreDataClass.swift in Sources */,
 				50C9D6D5284FAB88007F18D0 /* NowPlayingInfoCenterHandler.swift in Sources */,
 				50C9D669284FAA0B007F18D0 /* AmpacheXmlParser.swift in Sources */,
 				50C9D6A3284FAA77007F18D0 /* MigrationPolicyV4toV5.swift in Sources */,
@@ -2601,6 +2640,7 @@
 				50BE5D872850F50F00156FC6 /* AbstractAmpacheTest.swift in Sources */,
 				50BE5D4F2850F4C900156FC6 /* AlbumTest.swift in Sources */,
 				50BE5D8E2850F50F00156FC6 /* PodcastEpisodesParserTest.swift in Sources */,
+				50CEC6432D1F38F800D0E696 /* SsRadioExampleParserTest.swift in Sources */,
 				50BE5D882850F50F00156FC6 /* SongParserTest.swift in Sources */,
 				50BE5D8F2850F50F00156FC6 /* ArtistParserTest.swift in Sources */,
 				50AE79B62C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift in Sources */,
@@ -2628,6 +2668,7 @@
 				50BE5D902850F50F00156FC6 /* PodcastEpisodesExample2ParserTest.swift in Sources */,
 				50BE5D562850F4E700156FC6 /* PlayQueueHandlerTest.swift in Sources */,
 				50BE5D4A2850F4C900156FC6 /* SongTest.swift in Sources */,
+				50CEC6492D1F41A400D0E696 /* RadiosExampleParserTest.swift in Sources */,
 				50BE5D772850F4FB00156FC6 /* SsSongExample2ParserTest.swift in Sources */,
 				50BE5D762850F4FB00156FC6 /* SsArtistParserTest.swift in Sources */,
 				50BE5D682850F4FB00156FC6 /* SsPodcastEpisodesParserTest.swift in Sources */,
@@ -3310,6 +3351,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				50CEC63B2D1EDB9500D0E696 /* Amperfy v40.xcdatamodel */,
 				643A04712CD29AB20012DEA3 /* Amperfy v39.xcdatamodel */,
 				50AE79BD2C1F704B0085CBB3 /* Amperfy v38.xcdatamodel */,
 				5023D9AE2BD8408B00310144 /* Amperfy v37.xcdatamodel */,
@@ -3350,7 +3392,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 643A04712CD29AB20012DEA3 /* Amperfy v39.xcdatamodel */;
+			currentVersion = 50CEC63B2D1EDB9500D0E696 /* Amperfy v40.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

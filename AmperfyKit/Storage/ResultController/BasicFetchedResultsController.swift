@@ -318,6 +318,13 @@ extension BasicFetchedResultsController where ResultType == SongMO {
     }
 }
 
+extension BasicFetchedResultsController where ResultType == RadioMO {
+    public func getWrappedEntity(at indexPath: IndexPath) -> Radio {
+        let radioMO = fetchResultsController.object(at: indexPath) as! ResultType
+        return Radio(managedObject: radioMO)
+    }
+}
+
 extension BasicFetchedResultsController where ResultType == PlaylistMO {
     public func getWrappedEntity(at indexPath: IndexPath) -> Playlist {
         let playlistMO = fetchResultsController.object(at: indexPath) as! ResultType

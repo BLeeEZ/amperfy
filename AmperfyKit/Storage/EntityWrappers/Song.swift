@@ -149,14 +149,18 @@ public class Song: AbstractPlayable, Identifyable {
     public var identifier: String {
         return title
     }
+    
+    override public func isAvailableToUser() -> Bool {
+        // See also SongMO.excludeServerDeleteUncachedSongsFetchPredicate()
+        return ((size > 0) && (album?.remoteStatus == .available)) || (isCached)
+    }
 
 }
 
 extension Array where Element: Song {
     
     public func filterServerDeleteUncachedSongs() -> [Element] {
-        // See also SongMO.excludeServerDeleteUncachedSongsFetchPredicate()
-        return self.filter{ (($0.size > 0) && ($0.album?.remoteStatus == .available)) || ($0.isCached) }
+        return self.filter{ $0.isAvailableToUser() }
     }
     
     public func filterCached() -> [Element] {

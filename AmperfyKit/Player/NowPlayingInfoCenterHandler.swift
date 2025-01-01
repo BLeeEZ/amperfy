@@ -52,6 +52,7 @@ class NowPlayingInfoCenterHandler {
             
             MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
+            MPNowPlayingInfoPropertyIsLiveStream: playable.isRadio,
             
             MPNowPlayingInfoPropertyDefaultPlaybackRate: NSNumber(value: 1.0),
             MPNowPlayingInfoPropertyPlaybackRate: NSNumber(value: backendAudioPlayer.playbackRate.asDouble),

@@ -371,6 +371,26 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
             }
         }
     }
+    
+    func syncRadios() -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            self.subsonicServerApi.requestRadios()
+        }.then { response in
+            self.storage.async.perform { asyncCompanion in
+                let oldRadios = Set(asyncCompanion.library.getRadios())
+                
+                let parserDelegate = SsRadioParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
+                try self.parse(response: response, delegate: parserDelegate)
+                
+                let deletedRadios = oldRadios.subtracting(parserDelegate.parsedRadios)
+                deletedRadios.forEach {
+                    os_log("Radio <%s> is remote deleted", log: self.log, type: .info, $0.displayString)
+                    $0.remoteStatus = .deleted
+                }
+            }
+        }
+    }
 
     func syncMusicFolders() -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }

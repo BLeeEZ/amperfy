@@ -46,6 +46,7 @@ class PlayerControlView: UIView {
     @IBOutlet weak var timeSlider: UISlider!
     @IBOutlet weak var elapsedTimeLabel: UILabel!
     @IBOutlet weak var remainingTimeLabel: UILabel!
+    @IBOutlet weak var liveLabel: UILabel!
     
     @IBOutlet weak var optionsStackView: UIStackView!
     @IBOutlet weak var playerModeButton: UIButton!
@@ -184,24 +185,23 @@ class PlayerControlView: UIView {
     
     func refreshView() {
         refreshPlayer()
-
-        timeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
-        timeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
     }
     
     // handle dark/light mode change
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        timeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
-        timeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
-        
+        refreshTimeInfo()
         refreshPopupBarButtonItmes()
     }
     
     func refreshPlayButton() {
         var buttonImg = UIImage()
         if player.isPlaying {
-            buttonImg = UIImage.pause
+            if player.isStopInsteadOfPause {
+                buttonImg = UIImage.stop
+            } else {
+                buttonImg = UIImage.pause
+            }
         } else {
             buttonImg = UIImage.play
         }
@@ -225,7 +225,11 @@ class PlayerControlView: UIView {
             }
             
             if player.isPlaying {
-                buttonImg = .pause
+                if player.isStopInsteadOfPause {
+                    buttonImg = .stop
+                } else {
+                    buttonImg = .pause
+                }
             } else {
                 buttonImg = .play
             }
@@ -265,12 +269,16 @@ class PlayerControlView: UIView {
         switch player.playerMode {
         case .music:
             skipBackwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
-            skipForwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
+            skipBackwardButton.isEnabled = player.isSkipAvailable
             skipBackwardButton.alpha = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons ? 0.0 : 1.0
+            skipForwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
+            skipForwardButton.isEnabled = player.isSkipAvailable
             skipForwardButton.alpha = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons ? 0.0 : 1.0
         case .podcast:
             skipBackwardButton.isHidden = true
+            skipBackwardButton.isEnabled = true
             skipForwardButton.isHidden = true
+            skipForwardButton.isEnabled = true
         }
     }
     
@@ -283,10 +291,12 @@ class PlayerControlView: UIView {
     }
 
     func refreshTimeInfo() {
-        if player.currentlyPlaying != nil {
+        if let currentlyPlaying = player.currentlyPlaying {
+            let supportTimeInteraction = !currentlyPlaying.isRadio
+            timeSlider.isEnabled = supportTimeInteraction
             timeSlider.minimumValue = 0.0
             timeSlider.maximumValue = Float(player.duration)
-            if !timeSlider.isTracking {
+            if !timeSlider.isTracking, supportTimeInteraction {
                 let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
                 elapsedTimeLabel.text = elapsedClockTime.asShortString()
                 if let remainingTime = remainingTime {
@@ -296,9 +306,45 @@ class PlayerControlView: UIView {
                 }
                 timeSlider.value = Float(player.elapsedTime)
             }
-            let progress = Float(player.elapsedTime / player.duration)
-            rootView?.popupItem.progress = progress.isNormal ? progress : 0.0
+                
+            if !supportTimeInteraction {
+                liveLabel.isHidden = false
+                timeSlider.setThumbImage(UIImage(), for: .normal)
+                timeSlider.setThumbImage(UIImage(), for: .highlighted)
+                timeSlider.minimumValue = 0.0
+                timeSlider.maximumValue = 1.0
+                timeSlider.value = 0.0
+                
+                // make the middle part of the time slider transparent
+                let mask = CAGradientLayer()
+                mask.frame = timeSlider.bounds
+                mask.colors = [
+                    UIColor.white.cgColor,
+                    UIColor.white.withAlphaComponent(0).cgColor,
+                    UIColor.white.withAlphaComponent(0).cgColor,
+                    UIColor.white.cgColor]
+                mask.startPoint = CGPoint(x: 0.0, y: 0.0)
+                mask.endPoint = CGPoint(x: 1.0, y: 0.0)
+                mask.locations = [
+                    0.0, 0.4, 0.6, 1.0]
+                timeSlider.layer.mask = mask
+                
+                elapsedTimeLabel.text = ""
+                remainingTimeLabel.text = ""
+                rootView?.popupItem.progress = 0.0
+            } else {
+                liveLabel.isHidden = true
+                timeSlider.layer.mask = nil
+                timeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
+                timeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
+                let progress = Float(player.elapsedTime / player.duration)
+                rootView?.popupItem.progress = progress.isNormal ? progress : 0.0
+            }
         } else {
+            liveLabel.isHidden = true
+            timeSlider.layer.mask = nil
+            timeSlider.setUnicolorThumbImage(thumbSize: 10.0, color: .labelColor, for: UIControl.State.normal)
+            timeSlider.setUnicolorThumbImage(thumbSize: 30.0, color: .labelColor, for: UIControl.State.highlighted)
             elapsedTimeLabel.text = "--:--"
             remainingTimeLabel.text = "--:--"
             timeSlider.minimumValue = 0.0
@@ -389,8 +435,8 @@ class PlayerControlView: UIView {
                 let addContextToPlaylist = UIAction(title: "Add Context Queue to Playlist", image: .playlistPlus, handler: { _ in
                     let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
                     var itemsToAdd = self.player.prevQueue.filterSongs()
-                    if let currentlyPlaying = self.player.currentlyPlaying, currentlyPlaying.isSong {
-                        itemsToAdd.append(currentlyPlaying)
+                    if let currentlyPlaying = self.player.currentlyPlaying, let currentSong = currentlyPlaying.asSong {
+                        itemsToAdd.append(currentSong)
                     }
                     itemsToAdd.append(contentsOf: self.player.nextQueue.filterSongs())
                     selectPlaylistVC.itemsToAdd = itemsToAdd

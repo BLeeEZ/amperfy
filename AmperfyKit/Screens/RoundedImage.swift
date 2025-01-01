@@ -22,11 +22,14 @@
 import UIKit
 
 public enum CornerRadius {
+    case verySmall
     case small
     case big
     
     public var asCGFloat: CGFloat {
         switch self {
+        case .verySmall:
+            return 3.0
         case .small:
             return 5.0
         case .big:

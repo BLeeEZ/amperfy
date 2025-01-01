@@ -43,6 +43,11 @@ extension CarPlaySceneDelegate {
             podcastFetchController?.fetch()
         }
     }
+    func createRadiosFetchController() {
+        radiosFetchController = RadiosFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
+        radiosFetchController?.delegate = self
+        radiosFetchController?.fetch()
+    }
     func createArtistsFavoritesFetchController() {
         artistsFavoritesFetchController = ArtistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: appDelegate.storage.settings.artistsSortSetting, isGroupedInAlphabeticSections: false)
         artistsFavoritesFetchController?.delegate = self

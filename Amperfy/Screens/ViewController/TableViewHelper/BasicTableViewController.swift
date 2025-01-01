@@ -55,6 +55,11 @@ struct SwipeDisplaySettings {
     func isAllowedToDisplay(actionType: SwipeActionType, containable: PlayableContainable, isOfflineMode: Bool) -> Bool {
         switch playContextTypeOfElements {
         case .music:
+            if actionType == .addToPlaylist,
+               containable.playables.count == 1,
+               containable.playables[0].isRadio {
+                return false
+            }
             if actionType == .insertPodcastQueue ||
                actionType == .appendPodcastQueue {
                 return false
@@ -246,7 +251,7 @@ class BasicTableViewController: KeyCommandTableViewController {
                     self.present(alert, animated: true, completion: nil)
                 case .addToPlaylist:
                     let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-                    selectPlaylistVC.itemsToAdd = actionContext.playables
+                    selectPlaylistVC.itemsToAdd = actionContext.playables.filterSongs()
                     let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
                     self.present(selectPlaylistNav, animated: true)
                 case .play:

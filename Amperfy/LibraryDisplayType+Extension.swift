@@ -65,6 +65,9 @@ extension LibraryDisplayType {
         case .recentAlbums:
             let vc = AppStoryboard.Main.createAlbumsVC(style: settings.albumsStyleSetting, category: .recent)
             return vc
+        case .radios:
+            let vc = RadiosVC()
+            return vc
         }
     }
 }

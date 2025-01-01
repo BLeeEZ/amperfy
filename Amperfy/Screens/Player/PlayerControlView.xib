@@ -193,14 +193,25 @@
                         <constraint firstAttribute="width" constant="300" id="dMH-9W-9do"/>
                     </constraints>
                 </stackView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="LIVE" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lCe-bR-yIr" userLabel="Live Label">
+                    <rect key="frame" x="167.5" y="28" width="40" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="20" id="0Q8-Lz-6Rd"/>
+                        <constraint firstAttribute="width" constant="40" id="rQl-w5-Gbn"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <gestureRecognizers/>
             <constraints>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="3yB-kd-VKC"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="4ed-LA-PXc"/>
+                <constraint firstItem="lCe-bR-yIr" firstAttribute="centerX" secondItem="42q-l9-IXM" secondAttribute="centerX" id="5j4-wU-MHY"/>
                 <constraint firstItem="SoI-ny-Hw0" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="8yb-bt-h2J"/>
                 <constraint firstAttribute="trailingMargin" secondItem="SoI-ny-Hw0" secondAttribute="trailing" priority="999" id="9wH-XK-zJU"/>
+                <constraint firstItem="lCe-bR-yIr" firstAttribute="centerY" secondItem="42q-l9-IXM" secondAttribute="centerY" constant="-13" id="Psw-On-UDt"/>
                 <constraint firstAttribute="trailingMargin" secondItem="t1c-hF-UMw" secondAttribute="trailing" id="QUi-S2-Eme"/>
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="centerY" secondItem="okd-ac-nGY" secondAttribute="centerY" id="lCh-dw-03A"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="msH-gV-d4u"/>
@@ -216,6 +227,7 @@
                 <outlet property="airplayButton" destination="l5j-2I-Ltc" id="ENH-UT-6ix"/>
                 <outlet property="displayPlaylistButton" destination="ZVN-JG-VAA" id="2Rh-6V-CMd"/>
                 <outlet property="elapsedTimeLabel" destination="okd-ac-nGY" id="MFD-Qa-B7r"/>
+                <outlet property="liveLabel" destination="lCe-bR-yIr" id="vcG-AT-BfK"/>
                 <outlet property="nextButton" destination="E3q-DK-jgm" id="MGI-Lm-8TL"/>
                 <outlet property="optionsButton" destination="0xq-hb-FZa" id="5AH-yU-Tbd"/>
                 <outlet property="optionsStackView" destination="xXq-r4-gI6" id="52T-2y-bUq"/>

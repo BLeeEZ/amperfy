@@ -62,7 +62,8 @@ public enum ViewToVisit {
     settingsPlayerSongTab,
     settingsServer,
     settingsSupport,
-    songs
+    songs,
+    radios
 }
 
 public class UserStatistics {
@@ -168,6 +169,8 @@ public class UserStatistics {
             self.managedObject.visitedSettingsSupportCount += 1
         case .songs:
             self.managedObject.visitedSongsCount += 1
+        case .radios:
+            self.managedObject.visitedRadiosCount += 1
         }
         
         library.saveContext()
@@ -283,6 +286,7 @@ public class UserStatistics {
         viewsVisited.settingsServer = managedObject.visitedSettingsServerCount
         viewsVisited.settingsSupport = managedObject.visitedSettingsSupportCount
         viewsVisited.songs = managedObject.visitedSongsCount
+        viewsVisited.radios = managedObject.visitedRadiosCount
         overview.viewsVisitedCounts = viewsVisited
         
         return overview
@@ -353,4 +357,5 @@ public struct ViewsVisitedCounts: Encodable {
     public var settingsServer: Int32?
     public var settingsSupport: Int32?
     public var songs: Int32?
+    public var radios: Int32?
 }

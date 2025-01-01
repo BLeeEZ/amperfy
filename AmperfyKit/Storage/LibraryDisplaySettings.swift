@@ -39,6 +39,7 @@ public enum LibraryDisplayType: Int, CaseIterable {
     //case recentSongs = 11 not used anymore
     case newestAlbums = 12
     case recentAlbums = 13
+    case radios = 14
 
     public var displayName: String {
         switch self {
@@ -68,6 +69,8 @@ public enum LibraryDisplayType: Int, CaseIterable {
             return "Newest Albums"
         case .recentAlbums:
             return "Recently Played Albums"
+        case .radios:
+            return "Radios"
         }
     }
 
@@ -99,6 +102,8 @@ public enum LibraryDisplayType: Int, CaseIterable {
             return UIImage.albumNewest
         case .recentAlbums:
             return UIImage.albumRecent
+        case .radios:
+            return UIImage.radio
         }
     }
     
@@ -130,6 +135,8 @@ public enum LibraryDisplayType: Int, CaseIterable {
             return "toAlbums"
         case .recentAlbums:
             return "toAlbums"
+        case .radios:
+            return "toRadios"
         }
     }
     
@@ -166,7 +173,8 @@ public struct LibraryDisplaySettings {
                 .favoriteSongs,
                 .directories,
                 .playlists,
-                .podcasts
+                .podcasts,
+                .radios
             ])
     }
     

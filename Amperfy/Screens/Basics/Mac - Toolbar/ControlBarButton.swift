@@ -69,24 +69,34 @@ class PlayBarButton: ControlBarButton {
     }
 
     override func didStartPlaying() {
-        self.updateImage(image: (player?.isPlaying ?? false) ? .pause : .play)
+        setCorrectImage()
     }
 
     override func didPause() {
-        self.updateImage(image: .play)
+        setCorrectImage()
     }
 
     override func didStopPlaying() {
-        self.updateImage(image: .play)
+        setCorrectImage()
     }
 
     override func reload() {
         super.reload()
-        if player?.isPlaying ?? false {
-            self.updateImage(image: .pause)
-        } else {
-            self.updateImage(image: .play)
+        setCorrectImage()
+    }
+    
+    func setCorrectImage() {
+        var image = UIImage.play
+        if let player = player {
+            if !player.isPlaying {
+                image = .play
+            } else if player.isStopInsteadOfPause {
+                image = .stop
+            } else {
+                image = .pause
+            }
         }
+        self.updateImage(image: image)
     }
 }
 

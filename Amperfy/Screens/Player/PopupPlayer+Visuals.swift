@@ -77,16 +77,21 @@ extension PopupPlayerVC {
         var config = UIButton.Configuration.playerRound()
         switch player.playerMode {
         case .music:
-            if let playableInfo = player.currentlyPlaying {
+            if let playableInfo = player.currentlyPlaying,
+               playableInfo.isSong {
                 config.image = playableInfo.isFavorite ? .heartFill : .heartEmpty
                 config.baseForegroundColor = appDelegate.storage.settings.isOnlineMode ? .redHeart : .label
                 button.isEnabled = appDelegate.storage.settings.isOnlineMode
+            } else if let playableInfo = player.currentlyPlaying,
+                      let radio = playableInfo.asRadio {
+                config.image = .followLink
+                config.baseForegroundColor = .label
+                button.isEnabled = radio.siteURL != nil
             } else {
                 config.image = .heartEmpty
                 config.baseForegroundColor = .redHeart
                 button.isEnabled = false
             }
-            
         case .podcast:
             config.image = .info
             config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .large)
@@ -127,8 +132,8 @@ extension PopupPlayerVC {
         if let playableInfo = player.currentlyPlaying {
             titleLabel.text = playableInfo.title
             albumLabel?.text = playableInfo.asSong?.album?.name ?? ""
-            albumButton?.isEnabled = playableInfo.asSong != nil
-            albumContainerView?.isHidden = playableInfo.asSong == nil
+            albumButton?.isEnabled = playableInfo.isSong
+            albumContainerView?.isHidden = !playableInfo.isSong
             artistLabel.text = playableInfo.creatorName
         } else {
             switch player.playerMode {

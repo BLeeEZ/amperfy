@@ -121,6 +121,11 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     func createLibrarySections() -> [CPListSection] {
         let continuePlayingItems = createContinePlayingItems()
         var librarySections = [
+            appDelegate.storage.settings.libraryDisplaySettings.isVisible(libraryType: .radios) ?
+                CPListSection(items: [
+                    createLibraryItem(text: "Channels", icon: UIImage.radio, sectionToDisplay: radioSection)
+                ], header: "Radio", sectionIndexTitle: nil)
+                : nil,
             CPListSection(items: [
                 createPlayRandomSongsItem(onlyCached: false),
                 createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: songsFavoriteSection)
@@ -134,7 +139,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             CPListSection(items: [
                 createLibraryItem(text: "Favorites", icon: UIImage.heartFill, sectionToDisplay: artistsFavoriteSection)
             ], header: "Artists", sectionIndexTitle: nil)
-        ]
+        ].compactMap{ $0 }
         if continuePlayingItems.count > 0 {
             let continuePlayingSection = CPListSection(items: continuePlayingItems, header: "Continue Playing", sectionIndexTitle: nil)
             librarySections.insert(continuePlayingSection, at: 0)
@@ -224,6 +229,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         ])
         return template
     }()
+    lazy var radioSection = {
+        let template = CPListTemplate(title: "Radios", sections: [
+            CPListSection(items: [CPListTemplateItem]())
+        ])
+        return template
+    }()
     var playlistDetailSection: CPListTemplate?
     var podcastDetailSection: CPListTemplate?
     
@@ -299,6 +310,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     
     var playlistFetchController: PlaylistFetchedResultsController?
     var podcastFetchController: PodcastFetchedResultsController?
+    var radiosFetchController: RadiosFetchedResultsController?
     //
     var artistsFavoritesFetchController: ArtistFetchedResultsController?
     var artistsFavoritesCachedFetchController: ArtistFetchedResultsController?
@@ -526,6 +538,22 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         }
         return sections
     }
+    
+    private func createRadioItems(from fetchedController: BasicFetchedResultsController<RadioMO>?) -> [CPListTemplateItem] {
+        var items = [CPListTemplateItem]()
+        guard let fetchedController = fetchedController else { return items }
+
+        guard let fetchedRadios = fetchedController.fetchedObjects else { return items }
+        let itemCount = min(fetchedRadios.count, CPListTemplate.maximumSectionCount)
+        guard itemCount > 0 else { return items }
+        for radioIndex in 0...(itemCount-1) {
+            let radioMO = fetchedRadios[radioIndex]
+            let radio = Radio(managedObject: radioMO)
+            let listItem = createDetailTemplate(for: radio, playContext: PlayContext(containable: radio), isTrackDisplayed: false)
+            items.append(listItem)
+        }
+        return items
+    }
 
     private func createPlayShuffledListItem(playContext: PlayContext, text: String = "Shuffle") -> CPListItem {
         let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits)
@@ -650,6 +678,11 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
                                 let mo = appDelegate.storage.main.context.object(with: managedObjectID) as? PodcastEpisodeMO
                                 if let mo = mo {
                                     playable = PodcastEpisode(managedObject: mo)
+                                }
+                            case .radio:
+                                let mo = appDelegate.storage.main.context.object(with: managedObjectID) as? RadioMO
+                                if let mo = mo {
+                                    playable = Radio(managedObject: mo)
                                 }
                             default: break
                             }
@@ -789,6 +822,10 @@ extension CarPlaySceneDelegate: NSFetchedResultsControllerDelegate {
             podcastTab.updateSections([CPListSection(items: createPodcastsSections())])
         }
         
+        if templates.contains(radioSection), let radiosFetchController = radiosFetchController, controller == radiosFetchController.fetchResultsController {
+            os_log("CarPlay: FetchedResults: radiosFetchController", log: self.log, type: .info)
+            radioSection.updateSections([CPListSection(items: createRadioItems(from: radiosFetchController))])
+        }
         if templates.contains(artistsFavoriteSection), let artistsFavoritesFetchController = artistsFavoritesFetchController, controller == artistsFavoritesFetchController.fetchResultsController {
             os_log("CarPlay: FetchedResults: artistsFavoritesFetchController", log: self.log, type: .info)
             artistsFavoriteSection.updateSections([CPListSection(items: createArtistItems(from: artistsFavoritesFetchController, onlyCached: isOfflineMode))])
@@ -860,6 +897,10 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
             os_log("CarPlay: templateWillAppear podcastTab", log: self.log, type: .info)
             if podcastFetchController == nil { createPodcastFetchController() }
             podcastTab.updateSections([CPListSection(items: createPodcastsSections())])
+        } else if aTemplate == radioSection {
+            os_log("CarPlay: templateWillAppear radioSection", log: self.log, type: .info)
+            if radiosFetchController == nil { createRadiosFetchController() }
+            radioSection.updateSections([CPListSection(items: createRadioItems(from: radiosFetchController))])
         } else if aTemplate == artistsFavoriteSection {
             os_log("CarPlay: templateWillAppear artistsFavoriteSection", log: self.log, type: .info)
             if artistsFavoritesFetchController == nil { createArtistsFavoritesFetchController() }

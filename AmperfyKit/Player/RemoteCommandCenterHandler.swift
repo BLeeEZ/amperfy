@@ -55,6 +55,11 @@ class RemoteCommandCenterHandler {
             self.musicPlayer.togglePlayPause()
             return .success})
         
+        remoteCommandCenter.stopCommand.isEnabled = true
+        remoteCommandCenter.stopCommand.addTarget(handler: { (event) in
+            self.musicPlayer.pause()
+            return .success})
+        
         remoteCommandCenter.previousTrackCommand.isEnabled = true
         remoteCommandCenter.previousTrackCommand.addTarget(handler: { (event) in
             switch self.musicPlayer.playerMode {
@@ -89,12 +94,6 @@ class RemoteCommandCenterHandler {
             }
             self.musicPlayer.toggleShuffle()
             return .success })
-
-        remoteCommandCenter.changePlaybackPositionCommand.isEnabled = true
-        remoteCommandCenter.changePlaybackPositionCommand.addTarget(handler: { (event) in
-            guard let command = event as? MPChangePlaybackPositionCommandEvent else { return .noSuchContent}
-            self.backendAudioPlayer.seek(toSecond: command.positionTime)
-            return .success})
         
         remoteCommandCenter.skipBackwardCommand.isEnabled = true
         remoteCommandCenter.skipBackwardCommand.preferredIntervals = [NSNumber(value: self.musicPlayer.skipBackwardPodcastInterval)]
@@ -165,7 +164,12 @@ class RemoteCommandCenterHandler {
 
     private func changeRemoteCommandCenterControlsBasedOnCurrentPlayableType() {
         guard let currentItem = musicPlayer.currentlyPlaying else { return }
-        if currentItem.isSong {
+        switch currentItem.derivedType {
+        case .song:
+            remoteCommandCenter.playCommand.isEnabled = true
+            remoteCommandCenter.pauseCommand.isEnabled = true
+            remoteCommandCenter.togglePlayPauseCommand.isEnabled = true
+            remoteCommandCenter.stopCommand.isEnabled = false
             remoteCommandCenter.previousTrackCommand.isEnabled = true
             remoteCommandCenter.nextTrackCommand.isEnabled = true
             remoteCommandCenter.skipBackwardCommand.isEnabled = false
@@ -174,7 +178,13 @@ class RemoteCommandCenterHandler {
             remoteCommandCenter.changeRepeatModeCommand.isEnabled = true
             remoteCommandCenter.likeCommand.isEnabled = true
             remoteCommandCenter.likeCommand.isActive = currentItem.isFavorite
-        } else if currentItem.isPodcastEpisode {
+            remoteCommandCenter.changePlaybackPositionCommand.isEnabled = true
+            remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
+        case .podcastEpisode:
+            remoteCommandCenter.playCommand.isEnabled = true
+            remoteCommandCenter.pauseCommand.isEnabled = true
+            remoteCommandCenter.togglePlayPauseCommand.isEnabled = true
+            remoteCommandCenter.stopCommand.isEnabled = false
             remoteCommandCenter.previousTrackCommand.isEnabled = false
             remoteCommandCenter.nextTrackCommand.isEnabled = false
             remoteCommandCenter.skipBackwardCommand.isEnabled = true
@@ -183,6 +193,23 @@ class RemoteCommandCenterHandler {
             remoteCommandCenter.changeRepeatModeCommand.isEnabled = false
             remoteCommandCenter.likeCommand.isEnabled = false
             remoteCommandCenter.likeCommand.isActive = false
+            remoteCommandCenter.changePlaybackPositionCommand.isEnabled = true
+            remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
+        case .radio:
+            remoteCommandCenter.playCommand.isEnabled = true
+            remoteCommandCenter.pauseCommand.isEnabled = false
+            remoteCommandCenter.togglePlayPauseCommand.isEnabled = false
+            remoteCommandCenter.stopCommand.isEnabled = true
+            remoteCommandCenter.previousTrackCommand.isEnabled = true
+            remoteCommandCenter.nextTrackCommand.isEnabled = true
+            remoteCommandCenter.skipBackwardCommand.isEnabled = false
+            remoteCommandCenter.skipForwardCommand.isEnabled = false
+            remoteCommandCenter.changeShuffleModeCommand.isEnabled = true
+            remoteCommandCenter.changeRepeatModeCommand.isEnabled = true
+            remoteCommandCenter.likeCommand.isEnabled = false
+            remoteCommandCenter.likeCommand.isActive = false
+            remoteCommandCenter.changePlaybackPositionCommand.isEnabled = false
+            remoteCommandCenter.changePlaybackRateCommand.isEnabled = false
         }
         updateShuffle()
         updateRepeat()

@@ -55,6 +55,7 @@ public enum PlayableContainerBaseType: Int, Codable {
     case playlist
     case podcast
     case directory
+    case radio
 }
 
 public struct PlayableContainerIdentifier: Codable {

@@ -481,6 +481,26 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }
     }
     
+    func syncRadios() -> Promise<Void> {
+        guard isSyncAllowed else { return Promise.value }
+        return firstly {
+            ampacheXmlServerApi.requestRadios()
+        }.then { response in
+            self.storage.async.perform { asyncCompanion in
+                let oldRadios = Set(asyncCompanion.library.getRadios())
+                
+                let parserDelegate = RadioParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: nil)
+                try self.parse(response: response, delegate: parserDelegate)
+                
+                let deletedRadios = oldRadios.subtracting(parserDelegate.parsedRadios)
+                deletedRadios.forEach {
+                    os_log("Radio <%s> is remote deleted", log: self.log, type: .info, $0.displayString)
+                    $0.remoteStatus = .deleted
+                }
+            }
+        }
+    }
+    
     func requestRandomSongs(playlist: Playlist, count: Int) -> Promise<Void> {
         guard isSyncAllowed else { return Promise.value }
         return firstly {

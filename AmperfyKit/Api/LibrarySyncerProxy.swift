@@ -78,6 +78,10 @@ extension LibrarySyncerProxy: LibrarySyncer {
         return activeSyncer.syncFavoriteLibraryElements()
     }
     
+    func syncRadios() -> Promise<Void> {
+        return activeSyncer.syncRadios()
+    }
+
     func syncDownPlaylistsWithoutSongs() -> Promise<Void> {
         return activeSyncer.syncDownPlaylistsWithoutSongs()
     }

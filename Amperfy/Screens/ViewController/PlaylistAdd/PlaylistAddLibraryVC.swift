@@ -189,7 +189,7 @@ public class AddToPlaylistManager {
     }
     
     @IBAction func doneBarButtonPressed(_ sender: UIBarButtonItem) {
-        let songsToAdd = elementsToAdd.compactMap{ $0.asSong }
+        let songsToAdd = elementsToAdd.filterSongs()
         guard songsToAdd.count > 0 else {
             self.rootView?.dismiss(animated: true, completion: nil)
             return

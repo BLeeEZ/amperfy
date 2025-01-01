@@ -539,6 +539,14 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
+    func requestRadios() -> Promise<APIDataResponse> {
+        return request { auth in
+            var urlComp = try self.createAuthApiUrlComponent(auth: auth)
+            urlComp.addQueryItem(name: "action", value: "live_streams")
+            return try self.createUrl(from: urlComp)
+        }
+    }
+    
     func requestPodcasts() -> Promise<APIDataResponse> {
         return request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)

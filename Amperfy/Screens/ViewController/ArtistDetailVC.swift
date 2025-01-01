@@ -53,7 +53,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
             infoCB: { "\(self.artist.albumCount) Album\(self.artist.albumCount == 1 ? "" : "s") \(CommonString.oneMiddleDot) \(self.artist.songCount) Song\(self.artist.songCount == 1 ? "" : "s")" },
             playContextCb: {() in
                 let songs = self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
-                let sortedSongs = songs.compactMap{ $0.asSong }.sortByAlbum()
+                let sortedSongs = songs.filterSongs().sortByAlbum()
                 return PlayContext(containable: self.artist, playables: sortedSongs)
             },
             player: appDelegate.player,

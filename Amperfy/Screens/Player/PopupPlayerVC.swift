@@ -106,6 +106,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         super.viewDidLayoutSubviews()
         refreshCellMasks()
         adjustLaoutMargins()
+        controlView?.refreshView()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -164,12 +165,17 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         switch player.playerMode {
         case .music:
             guard let playableInfo = player.currentlyPlaying else { return }
-            firstly {
-                playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
-            }.finally {
-                self.refresh()
+            if playableInfo.isSong {
+                firstly {
+                    playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+                }.catch { error in
+                    self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+                }.finally {
+                    self.refresh()
+                }
+            } else if let radio = playableInfo.asRadio,
+                      let siteURL = radio.siteURL {
+                UIApplication.shared.open(siteURL)
             }
         case .podcast:
             guard let podcastEpisode = player.currentlyPlaying?.asPodcastEpisode

@@ -173,7 +173,7 @@ class BackendAudioPlayer: NSObject {
                     firstly {
                         insertStreamPlayable(playable: nextPreloadedPlayable, queueType: .queue)
                     }.done {
-                        if self.isAutoCachePlayedItems {
+                        if self.isAutoCachePlayedItems, nextPreloadedPlayable.isDownloadAvailable {
                             self.playableDownloader.download(object: nextPreloadedPlayable)
                         }
                     }.catch { error in
@@ -287,17 +287,27 @@ class BackendAudioPlayer: NSObject {
                 isPlaying = false
             }
             self.responder?.notifyItemPreparationFinished()
-        } else if !isOfflineMode{
+        } else if !isOfflineMode {
             self.nextPreloadedPlayable = nil
             guard playable.isPlayableOniOS || backendApi.isStreamingTranscodingActive else {
                 reactToIncompatibleContentType(contentType: playable.fileContentType ?? "", playableDisplayTitle: playable.displayString)
                 return
             }
+            if let radio = playable.asRadio {
+                // radios must have a valid URL
+                guard let urlString = radio.url,
+                      URL(string: urlString) != nil
+                else {
+                    reactToInvalidRadioUrl(playableDisplayTitle: playable.displayString)
+                    return
+                }
+            }
+            
             self.stop()
             firstly {
                 insertStreamPlayable(playable: playable)
             }.done {
-                if self.isAutoCachePlayedItems {
+                if self.isAutoCachePlayedItems, !playable.isRadio {
                     self.playableDownloader.download(object: playable)
                 }
                 if self.shouldPlaybackStart {
@@ -320,6 +330,12 @@ class BackendAudioPlayer: NSObject {
     private func reactToIncompatibleContentType(contentType: String, playableDisplayTitle: String) {
         clearPlayer()
         eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Content type \"\(contentType)\" of \"\(playableDisplayTitle)\" is not playable via Amperfy. Activating transcoding in Settings could resolve this issue.", displayPopup: true)
+        self.responder?.notifyItemPreparationFinished()
+    }
+    
+    private func reactToInvalidRadioUrl(playableDisplayTitle: String) {
+        clearPlayer()
+        eventLogger.info(topic: "Player Info", statusCode: .playerError, message: "Radio \"\(playableDisplayTitle)\" has an invalid stream URL.", displayPopup: true)
         self.responder?.notifyItemPreparationFinished()
     }
     
@@ -349,7 +365,16 @@ class BackendAudioPlayer: NSObject {
     private func insertStreamPlayable(playable: AbstractPlayable, queueType: BackendAudioQueueType = .play) -> Promise<Void> {
         let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: self.networkMonitor)
         return firstly {
-            return backendApi.generateUrl(forStreamingPlayable: playable, maxBitrate: streamingMaxBitrate)
+            if let radio = playable.asRadio {
+                guard let streamUrlString = radio.url,
+                      let streamUrl = URL(string: streamUrlString)
+                else {
+                    return Promise<URL>(error: BackendError.invalidUrl)
+                }
+                return Promise<URL>.value(streamUrl)
+            } else {
+                return backendApi.generateUrl(forStreamingPlayable: playable, maxBitrate: streamingMaxBitrate)
+            }
         }.get { streamUrl in
             if queueType == .play {
                 os_log(.default, "Play Stream: %s (%s)", playable.displayString, streamingMaxBitrate.description)

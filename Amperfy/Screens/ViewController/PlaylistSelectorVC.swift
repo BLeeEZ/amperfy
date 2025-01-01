@@ -33,7 +33,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
     override var sceneTitle: String? { "Playlists" }
 
-    var itemsToAdd: [AbstractPlayable]?
+    var itemsToAdd: [Song]?
     private var selectedPlaylits = [Playlist : [Song]]()
 
     private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
@@ -205,7 +205,7 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
         
         func handleSuccessfullSelection(playables: [AbstractPlayable]) {
-            let songs = playables.compactMap { $0.asSong }
+            let songs = playables.filterSongs()
             if !songs.isEmpty {
                 self.selectedPlaylits[playlist] = songs
             } else {
