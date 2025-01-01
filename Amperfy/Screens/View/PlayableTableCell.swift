@@ -331,6 +331,12 @@ class PlayableTableCell: BasicTableCell {
            let tableView = queueVC.tableView {
             queueVC.tableView(tableView, commit: .delete, forRowAt: playerIndex.asIndexPath)
         }
+        if let playerIndexCb = playerIndexCb,
+           let playerIndex = playerIndexCb(self),
+           let popupPlayerVC = rootView as? PopupPlayerVC,
+           let tableView = popupPlayerVC.tableView {
+            popupPlayerVC.tableView(tableView, commit: .delete, forRowAt: playerIndex.asIndexPath)
+        }
     }
     
     @IBAction func playButtonPressed(_ sender: Any) {
@@ -377,7 +383,9 @@ class PlayableTableCell: BasicTableCell {
             }
             self.cacheIconImage.tintColor = appDelegate.storage.settings.themePreference.asColor
             optionsButton.imageView?.tintColor = appDelegate.storage.settings.themePreference.asColor
-            backgroundColor = .secondarySystemGroupedBackground
+            backgroundColor = (rootView is PopupPlayerVC) ?
+                .secondarySystemGroupedBackground.withAlphaComponent(0.2) :
+                .secondarySystemGroupedBackground
         } else {
             playOverArtworkButton.isHidden = true
             playOverNumberButton.isHidden = true
