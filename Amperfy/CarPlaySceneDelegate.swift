@@ -99,7 +99,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             cachedTab,
             playlistTab,
             podcastTab
-        ])
+        ].prefix(upToAsArray: CPTabBarTemplate.maximumTabCount))
         return bar
     }()
     lazy var playlistTab = {
