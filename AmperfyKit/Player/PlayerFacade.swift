@@ -94,7 +94,7 @@ public struct PlayContext {
         return playables[index]
     }
     
-    func getWithShuffledIndex() -> PlayContext {
+    public func getWithShuffledIndex() -> PlayContext {
         guard !isKeepIndexDuringShuffle else { return self }
         return PlayContext(name: name, index: Int.random(in: 0...playables.count-1), playables: playables)
     }

@@ -89,10 +89,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath)
         }
-        playContextAtIndexPathCallback = { (indexPath) in
-            let entity = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            return PlayContext(containable: entity)
-        }
+        playContextAtIndexPathCallback = self.convertIndexPathToPlayContext
         swipeCallback = { (indexPath, completionHandler) in
             let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)

@@ -31,7 +31,8 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     }
 
     private var fetchedResultsController: RadiosFetchedResultsController!
-    
+    private var detailHeaderView: LibraryElementDetailTableHeaderView?
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -50,17 +51,20 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
         tableView.rowHeight = PlayableTableCell.rowHeight
         tableView.estimatedRowHeight = PlayableTableCell.rowHeight
 
-#if !targetEnvironment(macCatalyst)
+        let playShuffleConfig = PlayShuffleInfoConfiguration(
+             infoCB: { "\(self.fetchedResultsController.fetchedObjects?.count ?? 0) Radio\((self.fetchedResultsController.fetchedObjects?.count ?? 0) == 1 ? "" : "s")" },
+             playContextCb: self.handleHeaderPlay,
+             player: appDelegate.player,
+             isInfoAlwaysHidden: false,
+             isShuffleOnContextNeccessary: false,
+             shuffleContextCb: self.handleHeaderShuffle)
+        detailHeaderView = LibraryElementDetailTableHeaderView.createTableHeader(rootView: self, configuration: playShuffleConfig)
         self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
-#endif
 
         containableAtIndexPathCallback = { (indexPath) in
             return self.fetchedResultsController.getWrappedEntity(at: indexPath)
         }
-        playContextAtIndexPathCallback = { (indexPath) in
-            let entity = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            return PlayContext(containable: entity)
-        }
+        playContextAtIndexPathCallback = convertIndexPathToPlayContext
         swipeCallback = { (indexPath, completionHandler) in
             let radio = self.fetchedResultsController.getWrappedEntity(at: indexPath)
             let playContext = self.convertIndexPathToPlayContext(radioIndexPath: indexPath)
@@ -81,8 +85,21 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
         }.finally {
+            self.detailHeaderView?.refresh()
             self.updateSearchResults(for: self.searchController)
         }
+    }
+    
+    public func handleHeaderPlay() -> PlayContext {
+        guard let displayedRadiosMO = self.fetchedResultsController.fetchedObjects else { return PlayContext(name: sceneTitle ?? "", playables: []) }
+        let radios = displayedRadiosMO.prefix(appDelegate.player.maxSongsToAddOnce).compactMap{ Radio(managedObject: $0) }
+        return PlayContext(name: sceneTitle ?? "", playables: radios)
+    }
+    
+    public func handleHeaderShuffle() -> PlayContext {
+        guard let displayedRadiosMO = self.fetchedResultsController.fetchedObjects else { return PlayContext(name: sceneTitle ?? "", playables: []) }
+        let radios = displayedRadiosMO.prefix(appDelegate.player.maxSongsToAddOnce).compactMap{ Radio(managedObject: $0) }
+        return PlayContext(name: sceneTitle ?? "", index: Int.random(in: 0..<radios.count), playables: radios)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -101,8 +118,11 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     }
     
     func convertIndexPathToPlayContext(radioIndexPath: IndexPath) -> PlayContext? {
+        guard let radios = self.fetchedResultsController.getContextRadios()
+        else { return nil }
         let selectedRadio = self.fetchedResultsController.getWrappedEntity(at: radioIndexPath)
-        return PlayContext(containable: selectedRadio)
+        guard let playContextIndex = radios.firstIndex(of: selectedRadio) else { return nil }
+        return PlayContext(name: sceneTitle ?? "", index: playContextIndex, playables: radios)
     }
     
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
@@ -132,6 +152,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
         }.catch { error in
             self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
         }.finally {
+            self.detailHeaderView?.refresh()
             self.updateSearchResults(for: self.searchController)
 #if !targetEnvironment(macCatalyst)
             self.refreshControl?.endRefreshing()

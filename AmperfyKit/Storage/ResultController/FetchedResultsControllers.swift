@@ -604,7 +604,8 @@ public class RadiosFetchedResultsController: CachedFetchedResultsController<Radi
     
     public func search(searchText: String) {
         if searchText.count > 0 {
-            search(predicate: RadioMO.excludeServerDeleteRadiosFetchPredicate)
+            let predicate = coreDataCompanion.library.getSearchRadiosPredicate(searchText: searchText)
+            search(predicate: predicate)
         } else {
             showAllResults()
         }

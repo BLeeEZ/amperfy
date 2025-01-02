@@ -323,6 +323,15 @@ extension BasicFetchedResultsController where ResultType == RadioMO {
         let radioMO = fetchResultsController.object(at: indexPath) as! ResultType
         return Radio(managedObject: radioMO)
     }
+    
+    public func getContextRadios() -> [AbstractPlayable]? {
+        guard let basicPredicate = defaultPredicate else { return nil }
+        let cachedFetchRequest = fetchResultsController.fetchRequest.copy() as! NSFetchRequest<RadioMO>
+        cachedFetchRequest.predicate = basicPredicate
+        let radiosMO = try? coreDataCompanion.context.fetch(cachedFetchRequest)
+        let radios = radiosMO?.compactMap{ Radio(managedObject: $0) }
+        return radios
+    }
 }
 
 extension BasicFetchedResultsController where ResultType == PlaylistMO {

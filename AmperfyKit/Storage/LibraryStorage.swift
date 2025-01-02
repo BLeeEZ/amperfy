@@ -920,6 +920,7 @@ public class LibraryStorage: PlayableFileCachable {
     
     public func getRadios() -> [Radio] {
         let fetchRequest = RadioMO.identifierSortedFetchRequest
+        fetchRequest.predicate = RadioMO.excludeServerDeleteRadiosFetchPredicate
         let foundRadios = try? context.fetch(fetchRequest)
         let radios = foundRadios?.compactMap{ Radio(managedObject: $0) }
         return radios ?? [Radio]()
@@ -990,6 +991,14 @@ public class LibraryStorage: PlayableFileCachable {
         let found = try? context.fetch(fetchRequest)
         let wrapped = found?.compactMap{ Playlist(library: self, managedObject: $0) }
         return wrapped ?? [Playlist]()
+    }
+    
+    public func getSearchRadiosPredicate(searchText: String) -> NSPredicate {
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            RadioMO.excludeServerDeleteRadiosFetchPredicate,
+            RadioMO.getIdentifierBasedSearchPredicate(searchText: searchText)
+        ])
+        return predicate
     }
     
     public func getSearchSongsPredicate(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) -> NSPredicate {

@@ -542,17 +542,30 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     private func createRadioItems(from fetchedController: BasicFetchedResultsController<RadioMO>?) -> [CPListTemplateItem] {
         var items = [CPListTemplateItem]()
         guard let fetchedController = fetchedController else { return items }
-
         guard let fetchedRadios = fetchedController.fetchedObjects else { return items }
-        let itemCount = min(fetchedRadios.count, CPListTemplate.maximumSectionCount)
+        let itemCount = min(fetchedRadios.count, CPListTemplate.maximumSectionCount-2)
         guard itemCount > 0 else { return items }
-        for radioIndex in 0...(itemCount-1) {
-            let radioMO = fetchedRadios[radioIndex]
-            let radio = Radio(managedObject: radioMO)
-            let listItem = createDetailTemplate(for: radio, playContext: PlayContext(containable: radio), isTrackDisplayed: false)
+        let radios = fetchedRadios.prefix(itemCount).compactMap{ Radio(managedObject: $0) }
+        
+        items.append(self.createPlayRandomListItem(playContext: PlayContext(name: "Radios", playables: radios)))
+        for (index, radio) in radios.enumerated() {
+            let listItem = createDetailTemplate(for: radio, playContext: PlayContext(name: "Radios", index: index, playables: Array(radios)), isTrackDisplayed: false)
             items.append(listItem)
         }
         return items
+    }
+    
+    private func createPlayRandomListItem(playContext: PlayContext, text: String = "Random") -> CPListItem {
+        let img = UIImage.createArtwork(with: UIImage.shuffle, iconSizeType: .small, theme: appDelegate.storage.settings.themePreference, switchColors: true).carPlayImage(carTraitCollection: traits)
+        let listItem = CPListItem(text: text, detailText: nil, image: img)
+        listItem.handler = { [weak self] item, completion in
+            guard let `self` = self else { completion(); return }
+            self.appDelegate.player.play(context: playContext.getWithShuffledIndex())
+            self.displayNowPlaying() {
+                completion()
+            }
+        }
+        return listItem
     }
 
     private func createPlayShuffledListItem(playContext: PlayContext, text: String = "Shuffle") -> CPListItem {
