@@ -30,6 +30,35 @@ public enum ArtworkIconSizeType: CGFloat {
     public static let defaultSize: CGFloat = 200.0
 }
 
+public enum LightDarkModeType: CaseIterable {
+    case light
+    case dark
+    
+    public var description: String {
+        switch self {
+        case .light:
+            return "Light"
+        case .dark:
+            return "Dark"
+        }
+    }
+}
+
+extension UIUserInterfaceStyle {
+    public var asModeType: LightDarkModeType {
+        switch self {
+        case .unspecified:
+            return .light
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        @unknown default:
+            return .light
+        }
+    }
+}
+
 public enum ArtworkType: CaseIterable {
     case song
     case album
@@ -330,27 +359,27 @@ extension UIImage {
         return img
     }
     
-    public static func generateArtwork(theme: ThemePreference, artworkType: ArtworkType) -> UIImage {
+    public static func generateArtwork(theme: ThemePreference, lightDarkMode: LightDarkModeType, artworkType: ArtworkType) -> UIImage {
         var generatedArtwork: UIImage?
         switch artworkType {
         case .song:
-            generatedArtwork = UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, theme: theme)
+            generatedArtwork = UIImage.createArtwork(with: UIImage.musicalNotes, iconSizeType: .small, theme: theme, lightDarkMode: lightDarkMode)
         case .album:
-            generatedArtwork = UIImage.createArtwork(with: UIImage.album, iconSizeType: .big, theme: theme)
+            generatedArtwork = UIImage.createArtwork(with: UIImage.album, iconSizeType: .big, theme: theme, lightDarkMode: lightDarkMode)
         case .genre:
-            generatedArtwork = UIImage.createArtwork(with: UIImage.genre, iconSizeType: .big, theme: theme)
+            generatedArtwork = UIImage.createArtwork(with: UIImage.genre, iconSizeType: .big, theme: theme, lightDarkMode: lightDarkMode)
         case .artist:
-            generatedArtwork = UIImage.createArtwork(with: UIImage.artist, iconSizeType: .big, theme: theme)
+            generatedArtwork = UIImage.createArtwork(with: UIImage.artist, iconSizeType: .big, theme: theme, lightDarkMode: lightDarkMode)
         case .podcast:
-            generatedArtwork = UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .big, theme: theme)
+            generatedArtwork = UIImage.createArtwork(with: UIImage.podcast, iconSizeType: .big, theme: theme, lightDarkMode: lightDarkMode)
         case .podcastEpisode:
-            generatedArtwork = UIImage.createArtwork(with: UIImage.podcastEpisode, iconSizeType: .small, theme: theme)
+            generatedArtwork = UIImage.createArtwork(with: UIImage.podcastEpisode, iconSizeType: .small, theme: theme, lightDarkMode: lightDarkMode)
         case .playlist:
-            generatedArtwork = UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, theme: theme, switchColors: true)
+            generatedArtwork = UIImage.createArtwork(with: UIImage.playlist, iconSizeType: .small, theme: theme, lightDarkMode: lightDarkMode, switchColors: true)
         case .folder:
-            generatedArtwork = UIImage.createArtwork(with: UIImage.folder, iconSizeType: .big, theme: theme)
+            generatedArtwork = UIImage.createArtwork(with: UIImage.folder, iconSizeType: .big, theme: theme, lightDarkMode: lightDarkMode)
         case .radio:
-            generatedArtwork = UIImage.createArtwork(with: UIImage.radio, iconSizeType: .big, theme: theme)
+            generatedArtwork = UIImage.createArtwork(with: UIImage.radio, iconSizeType: .big, theme: theme, lightDarkMode: lightDarkMode)
         }
         return generatedArtwork ?? UIImage()
     }
@@ -362,10 +391,14 @@ extension UIImage {
         return UIImage(systemName: systemName) ?? UIImage()
     }
     
-    public static func createArtwork(with image: UIImage, iconSizeType: ArtworkIconSizeType, theme: ThemePreference, switchColors: Bool = false) -> UIImage {
+    public static func createArtwork(with image: UIImage,
+                                     iconSizeType: ArtworkIconSizeType,
+                                     theme: ThemePreference,
+                                     lightDarkMode: LightDarkModeType,
+                                     switchColors: Bool = false) -> UIImage {
         let frame = CGRect(x: 0, y: 0, width: ArtworkIconSizeType.defaultSize, height: ArtworkIconSizeType.defaultSize)
         let buildView = EntityImageView(frame: frame)
-        let grayScale = 0.92
+        let grayScale = lightDarkMode == .light ? 0.85 : 0.15
         let artworkBackgroundColor = UIColor(red: grayScale, green: grayScale, blue: grayScale, alpha: 1)
         let imageTintColor = !switchColors ? theme.asColor : artworkBackgroundColor
         let backgroundColor = switchColors ? theme.asColor : artworkBackgroundColor

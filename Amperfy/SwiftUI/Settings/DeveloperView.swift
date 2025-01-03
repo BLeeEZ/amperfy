@@ -28,14 +28,15 @@ struct DeveloperView: View {
     
     func generateDefaultArtworks() {
         for artworkType in ArtworkType.allCases {
-            for theme in ThemePreference.allCases {
-                let name = theme.description + artworkType.description + ".png"
-                let img = UIImage.generateArtwork(theme: theme, artworkType: artworkType)
-                let fileURL = URL(string: name)!
-                let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: fileURL)!
-                try? CacheFileManager.shared.writeDataExcludedFromBackup(data: img.pngData()!, to: absFilePath)
+            for lightDarkMode in LightDarkModeType.allCases {
+                for theme in ThemePreference.allCases {
+                    let name = theme.description + artworkType.description + lightDarkMode.description + ".png"
+                    let img = UIImage.generateArtwork(theme: theme, lightDarkMode: lightDarkMode, artworkType: artworkType)
+                    let fileURL = URL(string: name)!
+                    let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: fileURL)!
+                    try? CacheFileManager.shared.writeDataExcludedFromBackup(data: img.pngData()!, to: absFilePath)
+                }
             }
-            
         }
         
     }
