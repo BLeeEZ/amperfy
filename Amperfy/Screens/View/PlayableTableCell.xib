@@ -133,13 +133,13 @@
                         </variation>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="SRF-Yt-kwz" userLabel="Options Button">
-                        <rect key="frame" x="570" y="27.5" width="15" height="15"/>
+                        <rect key="frame" x="559" y="12.5" width="30" height="45"/>
                         <constraints>
-                            <constraint firstAttribute="width" secondItem="SRF-Yt-kwz" secondAttribute="height" multiplier="1:1" id="YEj-qK-ZMZ"/>
-                            <constraint firstAttribute="height" constant="15" id="fo6-W8-VpX"/>
+                            <constraint firstAttribute="width" constant="30" id="im2-Rb-wis"/>
+                            <constraint firstAttribute="height" constant="45" id="rZz-nd-hSg"/>
                         </constraints>
                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                        <state key="normal" title="Button">
+                        <state key="normal">
                             <color key="titleColor" systemColor="labelColor"/>
                             <imageReference key="image" image="ellipsis" catalog="system" symbolScale="medium"/>
                             <preferredSymbolConfiguration key="preferredSymbolConfiguration"/>
@@ -200,13 +200,13 @@
                     <constraint firstItem="Uwb-Vy-dE7" firstAttribute="leading" secondItem="ZTB-B7-OZR" secondAttribute="trailing" id="Coh-TC-C5u"/>
                     <constraint firstItem="2Xe-ur-neX" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="Evs-mq-aoE"/>
                     <constraint firstItem="TYw-rj-zE1" firstAttribute="leading" secondItem="HnA-Bb-1UQ" secondAttribute="leading" id="HN0-vg-ZbJ"/>
+                    <constraint firstItem="SRF-Yt-kwz" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="NfZ-bC-0c2"/>
                     <constraint firstItem="l8v-65-XtX" firstAttribute="leading" secondItem="Uwb-Vy-dE7" secondAttribute="leading" constant="-4" id="QAw-hu-VDc"/>
                     <constraint firstItem="TYw-rj-zE1" firstAttribute="top" secondItem="HnA-Bb-1UQ" secondAttribute="top" id="SJR-m7-ou7"/>
                     <constraint firstAttribute="bottomMargin" secondItem="4NS-Qv-02y" secondAttribute="bottom" id="Sxk-IV-5P0"/>
                     <constraint firstItem="euv-dS-9Rx" firstAttribute="trailing" secondItem="Uwb-Vy-dE7" secondAttribute="trailing" id="Trn-WR-LKv"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="SRF-Yt-kwz" secondAttribute="trailing" constant="4" id="X7z-Kg-90N"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="SRF-Yt-kwz" secondAttribute="trailing" id="X7z-Kg-90N"/>
                     <constraint firstItem="mUX-sN-oa8" firstAttribute="left" secondItem="WOq-tb-OTF" secondAttribute="leftMargin" constant="56" id="XXa-cv-hEs"/>
-                    <constraint firstItem="SRF-Yt-kwz" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="Xpp-RU-QRy"/>
                     <constraint firstItem="Uwb-Vy-dE7" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="b4X-h3-kb4"/>
                     <constraint firstItem="TYw-rj-zE1" firstAttribute="bottom" secondItem="HnA-Bb-1UQ" secondAttribute="bottom" id="c3a-Pp-tUE"/>
                     <constraint firstItem="euv-dS-9Rx" firstAttribute="top" secondItem="Uwb-Vy-dE7" secondAttribute="top" id="ciA-A3-97k"/>
@@ -251,13 +251,13 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemMintColor">
-            <color red="0.0" green="0.78039215689999997" blue="0.74509803919999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.7803921568627451" blue="0.74509803921568629" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
