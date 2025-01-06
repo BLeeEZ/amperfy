@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>com.apple.developer.carplay-audio</key>
- 	<true/>
- 	<key>com.apple.developer.siri</key>
- 	<true/>
+	<false/>
+	<key>com.apple.developer.siri</key>
+	<false/>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
 	<key>com.apple.security.network.client</key>
