@@ -26,175 +26,100 @@ struct PlayerSettingsView: View {
     
     @EnvironmentObject private var settings: Settings
     
-    func updateBitrate() {
+    private func updateBitrate(wifi: StreamingMaxBitratePreference? = nil, cellular: StreamingMaxBitratePreference? = nil) {
+        if let wifi = wifi {
+            settings.streamingMaxBitrateWifiPreference = wifi
+        }
+        if let cellular = cellular {
+            settings.streamingMaxBitrateCellularPreference = cellular
+        }
         appDelegate.player.streamingMaxBitrates = StreamingMaxBitrates(
-            wifi: appDelegate.storage.settings.streamingMaxBitrateWifiPreference,
-            cellular: appDelegate.storage.settings.streamingMaxBitrateCellularPreference)
+            wifi: settings.streamingMaxBitrateWifiPreference,
+            cellular: settings.streamingMaxBitrateCellularPreference
+        )
     }
     
-    func streamingMaxBitrateWifiNoLimit() {
-        settings.streamingMaxBitrateWifiPreference = .noLimit
-        updateBitrate()
-    }
-    func streamingMaxBitrateWifi32() {
-        settings.streamingMaxBitrateWifiPreference = .limit32
-        updateBitrate()
-    }
-    func streamingMaxBitrateWifi64() {
-        settings.streamingMaxBitrateWifiPreference = .limit64
-        updateBitrate()
-    }
-    func streamingMaxBitrateWifi96() {
-        settings.streamingMaxBitrateWifiPreference = .limit96
-        updateBitrate()
-    }
-    func streamingMaxBitrateWifi128() {
-        settings.streamingMaxBitrateWifiPreference = .limit128
-        updateBitrate()
-    }
-    func streamingMaxBitrateWifi192() {
-        settings.streamingMaxBitrateWifiPreference = .limit192
-        updateBitrate()
-    }
-    func streamingMaxBitrateWifi256() {
-        settings.streamingMaxBitrateWifiPreference = .limit256
-        updateBitrate()
-    }
-    func streamingMaxBitrateWifi320() {
-        settings.streamingMaxBitrateWifiPreference = .limit320
-        updateBitrate()
+    private func updateFormat(_ format: StreamingFormatPreference) {
+        settings.streamingFormatPreference = format
     }
     
-    
-    func streamingMaxBitrateCellularNoLimit() {
-        settings.streamingMaxBitrateCellularPreference = .noLimit
-        updateBitrate()
-    }
-    func streamingMaxBitrateCellular32() {
-        settings.streamingMaxBitrateCellularPreference = .limit32
-        updateBitrate()
-    }
-    func streamingMaxBitrateCellular64() {
-        settings.streamingMaxBitrateCellularPreference = .limit64
-        updateBitrate()
-    }
-    func streamingMaxBitrateCellular96() {
-        settings.streamingMaxBitrateCellularPreference = .limit96
-        updateBitrate()
-    }
-    func streamingMaxBitrateCellular128() {
-        settings.streamingMaxBitrateCellularPreference = .limit128
-        updateBitrate()
-    }
-    func streamingMaxBitrateCellular192() {
-        settings.streamingMaxBitrateCellularPreference = .limit192
-        updateBitrate()
-    }
-    func streamingMaxBitrateCellular256() {
-        settings.streamingMaxBitrateCellularPreference = .limit256
-        updateBitrate()
-    }
-    func streamingMaxBitrateCellular320() {
-        settings.streamingMaxBitrateCellularPreference = .limit320
-        updateBitrate()
-    }
-    
-    
-    func streamingFormatMp3() {
-        settings.streamingFormatPreference = .mp3
-    }
-    func streamingFormatRaw() {
-        settings.streamingFormatPreference = .raw
-    }
-    func streamingFormatServerConfig() {
-        settings.streamingFormatPreference = .serverConfig
-    }
-    
-    func cacheFormatMp3() {
-        settings.cacheTranscodingFormatPreference = .mp3
-    }
-    func cacheFormatRaw() {
-        settings.cacheTranscodingFormatPreference = .raw
-    }
-    func cacheFormatServerConfig() {
-        settings.cacheTranscodingFormatPreference = .serverConfig
+    private func updateCacheFormat(_ format: CacheTranscodingFormatPreference) {
+        settings.cacheTranscodingFormatPreference = format
     }
     
     var body: some View {
-        ZStack{
+        ZStack {
             SettingsList {
+                // General Settings
                 SettingsSection {
                     SettingsCheckBoxRow(label: "Auto cache played Songs", isOn: $settings.isPlayerAutoCachePlayedItems)
                 }
                 
                 SettingsSection(content: {
                     SettingsCheckBoxRow(label: "Scrobble streamed Songs", isOn: $settings.isScrobbleStreamedItems)
-                }, footer: "Some server count streamed Songs already as played. When enabled, all streamed Songs are consistently scrobbled."
-                )
-
+                }, footer: "Enable to scrobble all streamed songs, even if the server already marks them as played.")
+                
                 SettingsSection(content: {
-                    SettingsCheckBoxRow(label: "Start audio playback only on explicit press on Play", isOn: $settings.isPlaybackStartOnlyOnPlay)
-                }, footer:
-                    "When enabled, audio playback starts only when the Play button is actively pressed. Otherwise, audio playback starts automatically."
-                )
-
+                    SettingsCheckBoxRow(label: "Manual Playback", isOn: $settings.isPlaybackStartOnlyOnPlay)
+                }, footer: "Enable to start playback only when the Play button is pressed.")
+                
+                // Streaming Bitrate Settings
                 SettingsSection(content: {
                     SettingsRow(title: "Max Bitrate for Streaming (WiFi)") {
                         Menu(settings.streamingMaxBitrateWifiPreference.description) {
-                            Button(StreamingMaxBitratePreference.noLimit.description, action: streamingMaxBitrateWifiNoLimit)
-                            Button(StreamingMaxBitratePreference.limit32.description, action: streamingMaxBitrateWifi32)
-                            Button(StreamingMaxBitratePreference.limit64.description, action: streamingMaxBitrateWifi64)
-                            Button(StreamingMaxBitratePreference.limit96.description, action: streamingMaxBitrateWifi96)
-                            Button(StreamingMaxBitratePreference.limit128.description, action: streamingMaxBitrateWifi128)
-                            Button(StreamingMaxBitratePreference.limit192.description, action: streamingMaxBitrateWifi192)
-                            Button(StreamingMaxBitratePreference.limit256.description, action: streamingMaxBitrateWifi256)
-                            Button(StreamingMaxBitratePreference.limit320.description, action: streamingMaxBitrateWifi320)
+                            ForEach(StreamingMaxBitratePreference.allCases, id: \.self) { bitrate in
+                                Button(bitrate.description) {
+                                    updateBitrate(wifi: bitrate)
+                                }
+                            }
                         }
                     }
-                }, footer:
-                    "Lower bitrate saves bandwidth. This takes only affect when streaming and connected via WiFi."
-                )
-
+                }, footer: "Set the maximum streaming bitrate for WiFi")
+                
                 SettingsSection(content: {
                     SettingsRow(title: "Max Bitrate for Streaming (Cellular)") {
                         Menu(settings.streamingMaxBitrateCellularPreference.description) {
-                            Button(StreamingMaxBitratePreference.noLimit.description, action: streamingMaxBitrateCellularNoLimit)
-                            Button(StreamingMaxBitratePreference.limit32.description, action: streamingMaxBitrateCellular32)
-                            Button(StreamingMaxBitratePreference.limit64.description, action: streamingMaxBitrateCellular64)
-                            Button(StreamingMaxBitratePreference.limit96.description, action: streamingMaxBitrateCellular96)
-                            Button(StreamingMaxBitratePreference.limit128.description, action: streamingMaxBitrateCellular128)
-                            Button(StreamingMaxBitratePreference.limit192.description, action: streamingMaxBitrateCellular192)
-                            Button(StreamingMaxBitratePreference.limit256.description, action: streamingMaxBitrateCellular256)
-                            Button(StreamingMaxBitratePreference.limit320.description, action: streamingMaxBitrateCellular320)
+                            ForEach(StreamingMaxBitratePreference.allCases, id: \.self) { bitrate in
+                                Button(bitrate.description) {
+                                    updateBitrate(cellular: bitrate)
+                                }
+                            }
                         }
                     }
-                }, footer:
-                    "Lower bitrate saves bandwidth. This takes only affect when streaming and connected via Cellular."
-                )
+                }, footer: "Set the maximum streaming bitrate for Cellular")
                 
+                // Streaming Format Settings
                 SettingsSection(content: {
                     SettingsRow(title: "Streaming Format (Transcoding)") {
                         Menu(settings.streamingFormatPreference.description) {
-                            Button(StreamingFormatPreference.mp3.description, action: streamingFormatMp3)
-                            Button(StreamingFormatPreference.raw.description, action: streamingFormatRaw)
-                            Button(StreamingFormatPreference.serverConfig.description, action: streamingFormatServerConfig)
+                            ForEach(StreamingFormatPreference.allCases, id: \.self) { format in
+                                Button(format.description) {
+                                    updateFormat(format)
+                                }
+                            }
                         }
                     }
-                }, footer:
-                    "Transcoding is recommended due to incompatibility with some formats. This takes only affect when streaming."
-                )
-                
+                }, footer: "Select a transcoding format for streaming. Transcoding is recommended for better compatibility.")
+
+                // Cache Format Settings
                 SettingsSection(content: {
                     SettingsRow(title: "Cache Format (Transcoding)") {
                         Menu(settings.cacheTranscodingFormatPreference.description) {
-                            Button(CacheTranscodingFormatPreference.mp3.description, action: cacheFormatMp3)
-                            Button(CacheTranscodingFormatPreference.raw.description, action: cacheFormatRaw)
-                            Button(CacheTranscodingFormatPreference.serverConfig.description, action: cacheFormatServerConfig)
+                            ForEach(CacheTranscodingFormatPreference.allCases, id: \.self) { format in
+                                Button(format.description) {
+                                    updateCacheFormat(format)
+                                }
+                            }
                         }
                     }
-                }, footer:
-                    "Transcoding is recommended due to incompatibility with some formats. Changes will not effect already downloaded songs, if this is wanted: Clear cache and redownload. \(((appDelegate.storage.loginCredentials?.backendApi ?? .ampache) == .ampache) ? "" : "\nIf cache format 'raw' is selected Amperfy will use the Subsonic API action 'download' for caching. Every other option requires Amperfy to use the Subsonic API action 'stream' for caching. Only 'stream' allows server side transcoding. Please check for correct server configuration regarding the active API action.")"
-                )
+                }, footer: """
+                Select a transcoding format for cached songs. Changes will not apply to already downloaded songs; clear cache and redownload if needed.
+                \(appDelegate.storage.loginCredentials?.backendApi == .ampache ? "" :
+                """
+                For 'raw', Amperfy uses the Subsonic API's 'download' action, which skips transcoding. Other formats use the 'stream' action, which requires proper server configuration for transcoding.
+                """)
+                """)
+
             }
         }
         .navigationTitle("Player, Stream & Scrobble")
