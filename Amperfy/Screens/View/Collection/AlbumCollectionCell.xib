@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -22,10 +22,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="363" height="310"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZEz-V1-LUZ" userLabel="OuterView">
-                                <rect key="frame" x="0.0" y="0.0" width="363" height="278"/>
+                                <rect key="frame" x="0.0" y="0.0" width="363" height="274"/>
                                 <subviews>
                                     <view contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="vhw-xr-Op6" userLabel="EntityImage" customClass="EntityImageView" customModule="AmperfyKit">
-                                        <rect key="frame" x="56.666666666666657" y="14" width="249.99999999999997" height="250"/>
+                                        <rect key="frame" x="56.666666666666657" y="12" width="249.99999999999997" height="250"/>
                                         <color key="backgroundColor" systemColor="systemRedColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="vhw-xr-Op6" secondAttribute="height" multiplier="1:1" id="LgY-n9-cP3"/>
@@ -40,13 +40,13 @@
                                 </constraints>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="fZp-PJ-7R1" userLabel="HStack Text View">
-                                <rect key="frame" x="0.0" y="278" width="363" height="32"/>
+                                <rect key="frame" x="0.0" y="274" width="363" height="36"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hHv-Ol-9T7" userLabel="Title Label">
-                                        <rect key="frame" x="0.0" y="0.0" width="31.666666666666668" height="15"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="31.666666666666668" height="17"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="15" id="hQa-4Q-xIT">
-                                                <variation key="widthClass=regular" constant="16"/>
+                                            <constraint firstAttribute="height" constant="17" id="hQa-4Q-xIT">
+                                                <variation key="widthClass=regular" constant="18"/>
                                             </constraint>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
@@ -60,10 +60,10 @@
                                         </variation>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="d1W-z7-anZ" userLabel="Subtitle Label">
-                                        <rect key="frame" x="0.0" y="19" width="46.666666666666664" height="13"/>
+                                        <rect key="frame" x="0.0" y="21" width="46.666666666666664" height="15"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="13" id="F1P-zn-bmx">
-                                                <variation key="widthClass=regular" constant="15"/>
+                                            <constraint firstAttribute="height" constant="15" id="F1P-zn-bmx">
+                                                <variation key="widthClass=regular" constant="16"/>
                                             </constraint>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
@@ -78,8 +78,8 @@
                                     </label>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="32" id="RXp-z1-4PU">
-                                        <variation key="widthClass=regular" constant="35"/>
+                                    <constraint firstAttribute="height" constant="36" id="RXp-z1-4PU">
+                                        <variation key="widthClass=regular" constant="38"/>
                                     </constraint>
                                 </constraints>
                                 <variation key="widthClass=regular" spacing="4"/>
