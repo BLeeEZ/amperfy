@@ -166,11 +166,10 @@
                             </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                             <color key="tintColor" systemColor="labelColor"/>
-                            <inset key="contentEdgeInsets" minX="4" minY="4" maxX="4" maxY="4"/>
+                            <inset key="contentEdgeInsets" minX="2" minY="2" maxX="2" maxY="2"/>
                             <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="podcast" symbolScale="small" variableValue="0.60000000000000009"/>
-                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" weight="bold"/>
+                                <imageReference key="image" image="podcast" symbolScale="medium"/>
                             </state>
                             <connections>
                                 <action selector="playerModeChangePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="WMf-zb-HxJ"/>
@@ -257,7 +256,7 @@
         <image name="goforward.10" catalog="system" width="119" height="128"/>
         <image name="list.bullet" catalog="system" width="128" height="87"/>
         <image name="play.fill" catalog="system" width="120" height="128"/>
-        <image name="podcast" width="448" height="512"/>
+        <image name="podcast" width="10" height="11"/>
         <image name="rectangle.portrait.inset.filled" catalog="system" width="115" height="128"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
