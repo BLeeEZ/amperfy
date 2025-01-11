@@ -756,8 +756,8 @@ public class IntentManager {
               userActivity.activityType == NSUserActivity.searchAndPlayActivityType ||
               userActivity.activityType == NSStringFromClass(PlayIDIntent.self) ||
               userActivity.activityType == NSUserActivity.playIdActivityType ||
-              userActivity.activityType == NSStringFromClass(PlayRandomSongsIntent.self)
-                
+              userActivity.activityType == NSStringFromClass(PlayRandomSongsIntent.self) ||
+              userActivity.activityType == NSUserActivity.playRandomeSongsActivityType
             else {
                 return Guarantee<Bool>.value(false)
         }

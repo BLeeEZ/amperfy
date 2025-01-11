@@ -216,7 +216,7 @@
 				</dict>
 				<dict>
 					<key>INEnumValueDisplayName</key>
-					<string>online</string>
+					<string>Online</string>
 					<key>INEnumValueDisplayNameID</key>
 					<string>bugitj</string>
 					<key>INEnumValueIndex</key>
@@ -226,7 +226,7 @@
 				</dict>
 				<dict>
 					<key>INEnumValueDisplayName</key>
-					<string>cached only</string>
+					<string>Cached only</string>
 					<key>INEnumValueDisplayNameID</key>
 					<string>nnDYnK</string>
 					<key>INEnumValueIndex</key>

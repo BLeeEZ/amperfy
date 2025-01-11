@@ -119,7 +119,7 @@ public class PlayRandomSongsIntentHandler: NSObject, PlayRandomSongsIntentHandli
     }
     
     public func handle(intent: PlayRandomSongsIntent, completion: @escaping (PlayRandomSongsIntentResponse) -> Void) {
-        let userActivity = NSUserActivity(activityType: NSUserActivity.playIdActivityType)
+        let userActivity = NSUserActivity(activityType: NSUserActivity.playRandomeSongsActivityType)
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.libraryElementType.rawValue: PlayableContainerType.song.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: true])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.offlineMode.rawValue: intent.networkMode.rawValue])
