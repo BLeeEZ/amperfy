@@ -111,6 +111,32 @@ public class PlayIDIntentHandler: NSObject, PlayIDIntentHandling {
     }
 }
 
+public class PlayRandomSongsIntentHandler: NSObject, PlayRandomSongsIntentHandling {
+    let intentManager: IntentManager
+    
+    public init(intentManager: IntentManager) {
+        self.intentManager = intentManager
+    }
+    
+    public func handle(intent: PlayRandomSongsIntent, completion: @escaping (PlayRandomSongsIntentResponse) -> Void) {
+        let userActivity = NSUserActivity(activityType: NSUserActivity.playIdActivityType)
+        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.libraryElementType.rawValue: PlayableContainerType.song.rawValue])
+        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: true])
+        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.offlineMode.rawValue: intent.networkMode.rawValue])
+        
+        firstly {
+            self.intentManager.handleIncomingIntent(userActivity: userActivity)
+        }.done { success in
+            completion(PlayRandomSongsIntentResponse())
+        }
+    }
+    
+    public func resolveNetworkMode(for intent: PlayRandomSongsIntent, with completion: @escaping (NetworkTypeResolutionResult) -> Void) {
+        completion(.success(with: intent.networkMode))
+    }
+    
+}
+
 public class PlayMediaIntentHandler: NSObject, INPlayMediaIntentHandling {
     
     let intentManager: IntentManager
