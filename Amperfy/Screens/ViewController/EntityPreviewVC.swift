@@ -574,7 +574,7 @@ class EntityPreviewActionBuilder {
         return UIAction(title: "Delete Cache", image: .trash) { action in
             guard self.entityPlayables.hasCachedItems else { return }
             
-            let alert = UIAlertController(title: nil, message: "Are you shure to delete the cached file\(self.entityPlayables.count > 1 ? "s" : "")?", preferredStyle: .alert)
+            let alert = UIAlertController(title: nil, message: "Are you sure to delete the cached file\(self.entityPlayables.count > 1 ? "s" : "")?", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
                 self.appDelegate.playableDownloadManager.removeFinishedDownload(for: self.entityPlayables)
                 self.appDelegate.storage.main.library.deleteCache(of: self.entityPlayables)
@@ -592,7 +592,7 @@ class EntityPreviewActionBuilder {
         return UIAction(title: "Delete on Server", image: .cloudX) { action in
             guard let playable = self.entityContainer as? AbstractPlayable, let podcastEpisode = playable.asPodcastEpisode else { return }
             
-            let alert = UIAlertController(title: nil, message: "Are you shure to delete the podcast episode on the server?", preferredStyle: .alert)
+            let alert = UIAlertController(title: nil, message: "Are you sure to delete the podcast episode on the server?", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
                 firstly {
                     self.appDelegate.librarySyncer.requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)

@@ -141,7 +141,7 @@ class BasicTableViewController: KeyCommandTableViewController {
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         // return nil here allows to display the "Delete" confirmation swipe action in edit mode (nil -> show default action -> delete is the default one)
         guard !(tableView.isEditing && !isSingleCellEditingModeActive) else { return nil }
-        // this empty configuration enshures to only perform one "Delete" action at a time (no confirmation is displayed)
+        // this empty configuration ensures to only perform one "Delete" action at a time (no confirmation is displayed)
         guard !(tableView.isEditing && isSingleCellEditingModeActive) else { return UISwipeActionsConfiguration() }
         guard let swipeCB = swipeCallback,
               let containableCB = containableAtIndexPathCallback,
@@ -236,7 +236,7 @@ class BasicTableViewController: KeyCommandTableViewController {
                 case .download:
                     self.appDelegate.playableDownloadManager.download(objects: actionContext.playables)
                 case .removeFromCache:
-                    let alert = UIAlertController(title: nil, message: "Are you shure to delete the cached file\(actionContext.playables.count > 1 ? "s" : "")?", preferredStyle: .alert)
+                    let alert = UIAlertController(title: nil, message: "Are you sure to delete the cached file\(actionContext.playables.count > 1 ? "s" : "")?", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
                         self.appDelegate.playableDownloadManager.removeFinishedDownload(for: actionContext.playables)
                         self.appDelegate.storage.main.library.deleteCache(of: actionContext.playables)

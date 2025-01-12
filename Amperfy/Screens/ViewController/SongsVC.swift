@@ -296,7 +296,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
                 songs = self.appDelegate.storage.main.library.getFavoriteSongs()
             }
             if songs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {
-                let alert = UIAlertController(title: "Many Songs", message: "Are you shure to add \(songs.count) songs from \"\(self.filterTitle)\" to download queue?", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Many Songs", message: "Are you sure to add \(songs.count) songs from \"\(self.filterTitle)\" to download queue?", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
                     self.appDelegate.playableDownloadManager.download(objects: songs)
                 }))
