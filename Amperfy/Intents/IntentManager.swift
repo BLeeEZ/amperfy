@@ -755,7 +755,9 @@ public class IntentManager {
         guard userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self) ||
               userActivity.activityType == NSUserActivity.searchAndPlayActivityType ||
               userActivity.activityType == NSStringFromClass(PlayIDIntent.self) ||
-              userActivity.activityType == NSUserActivity.playIdActivityType
+              userActivity.activityType == NSUserActivity.playIdActivityType ||
+              userActivity.activityType == NSStringFromClass(PlayRandomSongsIntent.self) ||
+              userActivity.activityType == NSUserActivity.playRandomSongsActivityType
             else {
                 return Guarantee<Bool>.value(false)
         }
@@ -781,7 +783,7 @@ public class IntentManager {
         } else if userActivity.activityType == NSUserActivity.playIdActivityType || userActivity.activityType == NSStringFromClass(PlayIDIntent.self),
            let id = userActivity.userInfo?[NSUserActivity.ActivityKeys.id.rawValue] as? String,
            let libraryElementTypeRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.libraryElementType.rawValue] as? Int,
-           let libraryElementType = PlayableContainerType(rawValue: libraryElementTypeRaw) {
+                  let libraryElementType = PlayableContainerType(rawValue: libraryElementTypeRaw) {
             
             var shuffleOption = false
             var repeatOption = RepeatMode.off
@@ -794,9 +796,15 @@ public class IntentManager {
                let repeatUser = RepeatType(rawValue: repeatUserRaw) {
                 repeatOption = RepeatMode.fromIntent(type: repeatUser)
             }
-
+            
             let playableContainer = self.getPlayableContainer(id: id, libraryElementType: libraryElementType)
             return play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+        } else if let playRandomSongsIntent = userActivity.playRandomSongsIntent {
+            let cacheOnly = playRandomSongsIntent.filterOption == .cache
+            let songs = self.library.getSongs().filterCached(dependigOn: cacheOnly)[randomPick: self.player.maxSongsToAddOnce]
+            let playerContext = PlayContext(name: "Random Songs", playables: songs)
+            return play(context: playerContext, shuffleOption: true, repeatOption: .off)
+
         } else {
             return Guarantee<Bool>.value(false)
         }
@@ -975,5 +983,11 @@ extension PlayableContainerType {
         @unknown default:
             return .unknown
         }
+    }
+}
+
+extension NSUserActivity {
+    var playRandomSongsIntent: PlayRandomSongsIntent? {
+        self.interaction?.intent as? PlayRandomSongsIntent
     }
 }

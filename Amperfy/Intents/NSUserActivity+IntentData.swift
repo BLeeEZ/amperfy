@@ -38,5 +38,6 @@ extension NSUserActivity {
     
     public static let searchAndPlayActivityType = "de.familie-zimba.Amperfy.SearchAndPlay"
     public static let playIdActivityType = "de.familie-zimba.Amperfy.PlayID"
+    public static let playRandomSongsActivityType = "de.familie-zimba.Amperfy.PlayRandomSongsActivityType"
 
 }
