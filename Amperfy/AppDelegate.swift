@@ -375,6 +375,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if intent is INPlayMediaIntent {
             return PlayMediaIntentHandler(intentManager: intentManager)
         }
+        if intent is PlayRandomSongsIntent {
+            return PlayRandomSongsIntentHandler(intentManager: intentManager)
+        }
         return nil
     }
     

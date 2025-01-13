@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.music</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>de.familie-zimba.Amperfy.RefreshTask</string>
@@ -60,6 +58,8 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.music</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -68,7 +68,12 @@
 		<true/>
 	</dict>
 	<key>NSUserActivityTypes</key>
-	<array/>
+	<array>
+		<string>INPlayMediaIntent</string>
+		<string>PlayIDIntent</string>
+		<string>PlayRandomSongsIntent</string>
+		<string>SearchAndPlayIntent</string>
+	</array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Font Awesome 5 Free-Solid-900.otf</string>
