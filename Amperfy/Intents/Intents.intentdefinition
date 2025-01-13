@@ -195,13 +195,13 @@
 		</dict>
 		<dict>
 			<key>INEnumDisplayName</key>
-			<string>Network Type</string>
+			<string>Play Random Songs Filter Type</string>
 			<key>INEnumDisplayNameID</key>
 			<string>qKv0q6</string>
 			<key>INEnumGeneratesHeader</key>
 			<true/>
 			<key>INEnumName</key>
-			<string>NetworkType</string>
+			<string>PlayRandomSongsFilterType</string>
 			<key>INEnumType</key>
 			<string>Regular</string>
 			<key>INEnumValues</key>
@@ -216,13 +216,13 @@
 				</dict>
 				<dict>
 					<key>INEnumValueDisplayName</key>
-					<string>Online</string>
+					<string>All</string>
 					<key>INEnumValueDisplayNameID</key>
 					<string>bugitj</string>
 					<key>INEnumValueIndex</key>
 					<integer>1</integer>
 					<key>INEnumValueName</key>
-					<string>onlilne</string>
+					<string>all</string>
 				</dict>
 				<dict>
 					<key>INEnumValueDisplayName</key>
@@ -896,7 +896,7 @@
 			<integer>10</integer>
 			<key>INIntentManagedParameterCombinations</key>
 			<dict>
-				<key>networkMode</key>
+				<key>cacheMode</key>
 				<dict>
 					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
 					<true/>
@@ -912,7 +912,7 @@
 			<string>PlayRandomSongs</string>
 			<key>INIntentParameterCombinations</key>
 			<dict>
-				<key>networkMode</key>
+				<key>cacheMode</key>
 				<dict>
 					<key>INIntentParameterCombinationIsLinked</key>
 					<true/>
@@ -932,13 +932,13 @@
 					<key>INIntentParameterCustomDisambiguation</key>
 					<true/>
 					<key>INIntentParameterDisplayName</key>
-					<string>Network Mode</string>
+					<string>Cache Mode</string>
 					<key>INIntentParameterDisplayNameID</key>
 					<string>T2MTMt</string>
 					<key>INIntentParameterDisplayPriority</key>
 					<integer>1</integer>
 					<key>INIntentParameterEnumType</key>
-					<string>NetworkType</string>
+					<string>PlayRandomSongsFilterType</string>
 					<key>INIntentParameterEnumTypeNamespace</key>
 					<string>1o3qqV</string>
 					<key>INIntentParameterMetadata</key>
@@ -947,7 +947,7 @@
 						<string>onlilne</string>
 					</dict>
 					<key>INIntentParameterName</key>
-					<string>networkMode</string>
+					<string>cacheMode</string>
 					<key>INIntentParameterPromptDialogs</key>
 					<array>
 						<dict>
@@ -966,7 +966,7 @@
 							<key>INIntentParameterPromptDialogCustom</key>
 							<true/>
 							<key>INIntentParameterPromptDialogFormatString</key>
-							<string>There are ${count} options matching ‘${networkMode}’.</string>
+							<string>There are ${count} options matching ‘${cacheMode}’.</string>
 							<key>INIntentParameterPromptDialogFormatStringID</key>
 							<string>UWgT3D</string>
 							<key>INIntentParameterPromptDialogType</key>
@@ -976,7 +976,7 @@
 							<key>INIntentParameterPromptDialogCustom</key>
 							<true/>
 							<key>INIntentParameterPromptDialogFormatString</key>
-							<string>Just to confirm, you wanted ‘${networkMode}’?</string>
+							<string>Just to confirm, you wanted ‘${cacheMode}’?</string>
 							<key>INIntentParameterPromptDialogFormatStringID</key>
 							<string>xhj3Cb</string>
 							<key>INIntentParameterPromptDialogType</key>

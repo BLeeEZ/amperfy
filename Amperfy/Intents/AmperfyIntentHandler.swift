@@ -122,7 +122,7 @@ public class PlayRandomSongsIntentHandler: NSObject, PlayRandomSongsIntentHandli
         let userActivity = NSUserActivity(activityType: NSUserActivity.playRandomeSongsActivityType)
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.libraryElementType.rawValue: PlayableContainerType.song.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: true])
-        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.offlineMode.rawValue: intent.networkMode.rawValue])
+        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.onlyCached.rawValue: intent.cacheMode.rawValue])
         
         firstly {
             self.intentManager.handleIncomingIntent(userActivity: userActivity)
@@ -131,8 +131,8 @@ public class PlayRandomSongsIntentHandler: NSObject, PlayRandomSongsIntentHandli
         }
     }
     
-    public func resolveNetworkMode(for intent: PlayRandomSongsIntent, with completion: @escaping (NetworkTypeResolutionResult) -> Void) {
-        completion(.success(with: intent.networkMode))
+    public func resolveCacheMode(for intent: PlayRandomSongsIntent, with completion: @escaping (PlayRandomSongsFilterTypeResolutionResult) -> Void) {
+        completion(.success(with: intent.cacheMode))
     }
     
 }

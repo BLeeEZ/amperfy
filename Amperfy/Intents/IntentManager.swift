@@ -800,7 +800,7 @@ public class IntentManager {
             let playableContainer = self.getPlayableContainer(id: id, libraryElementType: libraryElementType)
             return play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else if let playRandomSongsIntent = userActivity.playRandomSongsIntent {
-            let cacheOnly = playRandomSongsIntent.networkMode == .cache
+            let cacheOnly = playRandomSongsIntent.cacheMode == .cache
             let songs = self.library.getSongs().filterCached(dependigOn: cacheOnly)[randomPick: self.player.maxSongsToAddOnce]
             let playerContext = PlayContext(name: "Random Songs", playables: songs)
             return play(context: playerContext, shuffleOption: true, repeatOption: .off)
