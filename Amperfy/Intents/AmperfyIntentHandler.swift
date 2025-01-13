@@ -119,10 +119,10 @@ public class PlayRandomSongsIntentHandler: NSObject, PlayRandomSongsIntentHandli
     }
     
     public func handle(intent: PlayRandomSongsIntent, completion: @escaping (PlayRandomSongsIntentResponse) -> Void) {
-        let userActivity = NSUserActivity(activityType: NSUserActivity.playRandomeSongsActivityType)
+        let userActivity = NSUserActivity(activityType: NSUserActivity.playRandomSongsActivityType)
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.libraryElementType.rawValue: PlayableContainerType.song.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: true])
-        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.onlyCached.rawValue: intent.cacheMode.rawValue])
+        userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.onlyCached.rawValue: intent.filterOption.rawValue])
         
         firstly {
             self.intentManager.handleIncomingIntent(userActivity: userActivity)
@@ -131,8 +131,8 @@ public class PlayRandomSongsIntentHandler: NSObject, PlayRandomSongsIntentHandli
         }
     }
     
-    public func resolveCacheMode(for intent: PlayRandomSongsIntent, with completion: @escaping (PlayRandomSongsFilterTypeResolutionResult) -> Void) {
-        completion(.success(with: intent.cacheMode))
+    public func resolveFilterOption(for intent: PlayRandomSongsIntent, with completion: @escaping (PlayRandomSongsFilterTypeResolutionResult) -> Void) {
+        completion(.success(with: intent.filterOption))
     }
     
 }

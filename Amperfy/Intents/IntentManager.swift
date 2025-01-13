@@ -757,7 +757,7 @@ public class IntentManager {
               userActivity.activityType == NSStringFromClass(PlayIDIntent.self) ||
               userActivity.activityType == NSUserActivity.playIdActivityType ||
               userActivity.activityType == NSStringFromClass(PlayRandomSongsIntent.self) ||
-              userActivity.activityType == NSUserActivity.playRandomeSongsActivityType
+              userActivity.activityType == NSUserActivity.playRandomSongsActivityType
             else {
                 return Guarantee<Bool>.value(false)
         }
@@ -800,7 +800,7 @@ public class IntentManager {
             let playableContainer = self.getPlayableContainer(id: id, libraryElementType: libraryElementType)
             return play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else if let playRandomSongsIntent = userActivity.playRandomSongsIntent {
-            let cacheOnly = playRandomSongsIntent.cacheMode == .cache
+            let cacheOnly = playRandomSongsIntent.filterOption == .cache
             let songs = self.library.getSongs().filterCached(dependigOn: cacheOnly)[randomPick: self.player.maxSongsToAddOnce]
             let playerContext = PlayContext(name: "Random Songs", playables: songs)
             return play(context: playerContext, shuffleOption: true, repeatOption: .off)

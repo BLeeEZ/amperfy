@@ -242,11 +242,11 @@
 	<key>INIntentDefinitionNamespace</key>
 	<string>1o3qqV</string>
 	<key>INIntentDefinitionSystemVersion</key>
-	<string>24A335</string>
+	<string>24B83</string>
 	<key>INIntentDefinitionToolsBuildVersion</key>
-	<string>16B40</string>
+	<string>16A242d</string>
 	<key>INIntentDefinitionToolsVersion</key>
-	<string>16.1</string>
+	<string>16.0</string>
 	<key>INIntents</key>
 	<array>
 		<dict>
@@ -896,7 +896,7 @@
 			<integer>10</integer>
 			<key>INIntentManagedParameterCombinations</key>
 			<dict>
-				<key>cacheMode</key>
+				<key>filterOption</key>
 				<dict>
 					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
 					<true/>
@@ -912,7 +912,7 @@
 			<string>PlayRandomSongs</string>
 			<key>INIntentParameterCombinations</key>
 			<dict>
-				<key>cacheMode</key>
+				<key>filterOption</key>
 				<dict>
 					<key>INIntentParameterCombinationIsLinked</key>
 					<true/>
@@ -932,7 +932,7 @@
 					<key>INIntentParameterCustomDisambiguation</key>
 					<true/>
 					<key>INIntentParameterDisplayName</key>
-					<string>Cache Mode</string>
+					<string>Filter</string>
 					<key>INIntentParameterDisplayNameID</key>
 					<string>T2MTMt</string>
 					<key>INIntentParameterDisplayPriority</key>
@@ -947,7 +947,7 @@
 						<string>onlilne</string>
 					</dict>
 					<key>INIntentParameterName</key>
-					<string>cacheMode</string>
+					<string>filterOption</string>
 					<key>INIntentParameterPromptDialogs</key>
 					<array>
 						<dict>
@@ -966,7 +966,7 @@
 							<key>INIntentParameterPromptDialogCustom</key>
 							<true/>
 							<key>INIntentParameterPromptDialogFormatString</key>
-							<string>There are ${count} options matching ‘${cacheMode}’.</string>
+							<string>There are ${count} options matching ‘${filterOption}’.</string>
 							<key>INIntentParameterPromptDialogFormatStringID</key>
 							<string>UWgT3D</string>
 							<key>INIntentParameterPromptDialogType</key>
@@ -976,7 +976,7 @@
 							<key>INIntentParameterPromptDialogCustom</key>
 							<true/>
 							<key>INIntentParameterPromptDialogFormatString</key>
-							<string>Just to confirm, you wanted ‘${cacheMode}’?</string>
+							<string>Just to confirm, you wanted ‘${filterOption}’?</string>
 							<key>INIntentParameterPromptDialogFormatStringID</key>
 							<string>xhj3Cb</string>
 							<key>INIntentParameterPromptDialogType</key>
