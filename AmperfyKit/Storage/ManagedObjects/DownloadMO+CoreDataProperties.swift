@@ -41,5 +41,10 @@ extension DownloadMO {
     @NSManaged public var urlString: String
     @NSManaged public var artwork: ArtworkMO?
     @NSManaged public var playable: AbstractPlayableMO?
+    
+    static let relationshipKeyPathsForPrefetching = [
+        #keyPath(DownloadMO.artwork),
+        #keyPath(DownloadMO.playable),
+    ]
 
 }

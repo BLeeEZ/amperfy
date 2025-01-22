@@ -859,7 +859,7 @@ public class IntentManager {
         case .playlist:
             playableContainer = library.getPlaylist(id: id)
         case .album:
-            playableContainer = library.getAlbum(id: id)
+            playableContainer = library.getAlbum(id: id, isDetailFaultResolution: false)
         case .genre:
             playableContainer = library.getGenre(id: id)
         case .podcast:

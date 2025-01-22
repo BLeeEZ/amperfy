@@ -42,4 +42,19 @@ extension PlayerMO {
     @NSManaged public var userQueuePlaylist: PlaylistMO?
     @NSManaged public var podcastPlaylist: PlaylistMO?
 
+    static let relationshipKeyPathsForPrefetching = [
+        #keyPath(PlayerMO.contextPlaylist),
+        #keyPath(PlayerMO.contextPlaylist.items),
+        #keyPath(PlayerMO.contextPlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
+        #keyPath(PlayerMO.shuffledContextPlaylist),
+        #keyPath(PlayerMO.shuffledContextPlaylist.items),
+        #keyPath(PlayerMO.shuffledContextPlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
+        #keyPath(PlayerMO.userQueuePlaylist),
+        #keyPath(PlayerMO.userQueuePlaylist.items),
+        #keyPath(PlayerMO.userQueuePlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
+        #keyPath(PlayerMO.podcastPlaylist),
+        #keyPath(PlayerMO.podcastPlaylist.items),
+        #keyPath(PlayerMO.podcastPlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
+    ]
+    
 }

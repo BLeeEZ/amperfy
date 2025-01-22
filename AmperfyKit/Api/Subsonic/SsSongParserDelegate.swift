@@ -75,7 +75,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
                 if let guessedAlbum = guessedAlbum, guessedAlbum.id == albumId {
                     songBuffer?.album = guessedAlbum
                     songBuffer?.album?.remoteStatus = .available
-                } else if let album = library.getAlbum(id: albumId) {
+                } else if let album = library.getAlbum(id: albumId, isDetailFaultResolution: true) {
                     songBuffer?.album = album
                     songBuffer?.album?.remoteStatus = .available
                 } else if let albumName = attributeDict["album"] {

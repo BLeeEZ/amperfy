@@ -58,7 +58,7 @@ class SongParserDelegate: PlayableParserDelegate {
             }
         case "album":
             guard let song = songBuffer, let albumId = attributeDict["id"] else { return }
-            if let album = library.getAlbum(id: albumId)  {
+            if let album = library.getAlbum(id: albumId, isDetailFaultResolution: true)  {
                 song.album = album
             } else {
                 albumIdToCreate = albumId

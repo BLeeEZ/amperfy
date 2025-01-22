@@ -32,6 +32,11 @@ extension PodcastMO {
     @NSManaged public var depiction: String?
     @NSManaged public var episodes: NSOrderedSet?
     @NSManaged public var title: String?
+    
+    static let relationshipKeyPathsForPrefetching = [
+        #keyPath(PodcastMO.artwork),
+        #keyPath(PodcastMO.episodes),
+    ]
 
 }
 

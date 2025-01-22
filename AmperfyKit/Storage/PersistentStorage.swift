@@ -242,6 +242,7 @@ public class AsyncCoreDataAccessWrapper {
     public func perform(body: @escaping (_ asyncCompanion: CoreDataCompanion) throws -> Void) -> Promise<Void> {
         return Promise<Void> { seal in
             self.persistentContainer.performBackgroundTask() { (context) in
+                context.retainsRegisteredObjects = true
                 let library = LibraryStorage(context: context)
                 let asyncCompanion = CoreDataCompanion(context: context)
                 do {
@@ -730,6 +731,7 @@ public class CoreDataPersistentManager: CoreDataManagable {
     
     lazy var context: NSManagedObjectContext = {
         persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
+        persistentContainer.viewContext.retainsRegisteredObjects = true
         return persistentContainer.viewContext
     }()
 

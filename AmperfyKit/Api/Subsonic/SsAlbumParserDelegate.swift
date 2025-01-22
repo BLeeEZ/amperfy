@@ -36,7 +36,7 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
         if elementName == "album" {
             guard let albumId = attributeDict["id"] else { return }
             
-            if let fetchedAlbum = library.getAlbum(id: albumId)  {
+            if let fetchedAlbum = library.getAlbum(id: albumId, isDetailFaultResolution: true)  {
                 albumBuffer = fetchedAlbum
             } else {
                 albumBuffer = library.createAlbum()

@@ -64,7 +64,7 @@ class SongTest: XCTestCase {
     }
     
     func testAlbum() {
-        guard let album = library.getAlbum(id: cdHelper.seeder.albums[0].id) else { XCTFail(); return }
+        guard let album = library.getAlbum(id: cdHelper.seeder.albums[0].id, isDetailFaultResolution: true) else { XCTFail(); return }
         testSong.album = album
         XCTAssertEqual(testSong.album!.id, album.id)
         library.saveContext()

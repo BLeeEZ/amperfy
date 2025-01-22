@@ -33,6 +33,8 @@ extension MusicFolderMO {
     @NSManaged public var name: String
     @NSManaged public var directories: NSOrderedSet?
     @NSManaged public var songs: NSOrderedSet?
+    
+    static let relationshipKeyPathsForPrefetching = [String]()
 
 }
 

@@ -35,5 +35,12 @@ extension SongMO {
     @NSManaged public var directory: DirectoryMO?
     @NSManaged public var genre: GenreMO?
     @NSManaged public var musicFolder: MusicFolderMO?
+    
+    static let relationshipKeyPathsForPrefetching = [
+        #keyPath(SongMO.album),
+        #keyPath(SongMO.artist),
+        #keyPath(SongMO.artwork),
+        #keyPath(SongMO.embeddedArtwork),
+    ]
 
 }

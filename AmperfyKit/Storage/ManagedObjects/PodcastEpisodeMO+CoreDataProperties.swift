@@ -34,5 +34,11 @@ extension PodcastEpisodeMO {
     @NSManaged public var status: Int16
     @NSManaged public var streamId: String?
     @NSManaged public var podcast: PodcastMO?
+    
+    static let relationshipKeyPathsForPrefetching = [
+        #keyPath(PodcastEpisodeMO.podcast),
+        #keyPath(PodcastEpisodeMO.artwork),
+        #keyPath(PodcastEpisodeMO.embeddedArtwork),
+    ]
 
 }

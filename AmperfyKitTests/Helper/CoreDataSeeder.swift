@@ -95,7 +95,7 @@ class CoreDataSeeder {
             song.url = songSeed.url
             let artist = library.getArtist(id: songSeed.artistId)
             song.artist = artist
-            let album = library.getAlbum(id: songSeed.albumId)
+            let album = library.getAlbum(id: songSeed.albumId, isDetailFaultResolution: true)
             song.album = album
             if songSeed.isCached {
                 song.relFilePath = relFilePath

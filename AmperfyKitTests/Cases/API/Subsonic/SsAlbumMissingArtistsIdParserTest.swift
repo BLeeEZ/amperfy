@@ -41,7 +41,7 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
     
     override func checkCorrectParsing() {
         let fetchRequest = SongMO.trackNumberSortedFetchRequest
-        let album = library.getAlbum(id: albumId)!
+        let album = library.getAlbum(id: albumId, isDetailFaultResolution: true)!
         fetchRequest.predicate = library.getFetchPredicate(forAlbum: album)
         
         let songsMO = try? context.fetch(fetchRequest)

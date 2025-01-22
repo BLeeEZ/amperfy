@@ -36,6 +36,12 @@ extension ArtistMO {
     @NSManaged public var albums: NSOrderedSet?
     @NSManaged public var genre: GenreMO?
     @NSManaged public var songs: NSOrderedSet?
+    
+    static let relationshipKeyPathsForPrefetching = [
+        #keyPath(ArtistMO.artwork),
+        #keyPath(ArtistMO.albums),
+        #keyPath(ArtistMO.songs),
+    ]
 
 }
 

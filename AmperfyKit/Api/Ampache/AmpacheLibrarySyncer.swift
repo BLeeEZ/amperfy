@@ -337,7 +337,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     }
     
     private func sync(directory: Directory, thatIsAlbumId albumId: String) -> Promise<Void> {
-        guard let album = storage.main.library.getAlbum(id: albumId) else { return Promise.value }
+        guard let album = storage.main.library.getAlbum(id: albumId, isDetailFaultResolution: true) else { return Promise.value }
         let songsBeforeFetch = Set(directory.songs)
         
         return firstly {

@@ -495,28 +495,69 @@ public class LibraryStorage: PlayableFileCachable {
     func deletePlaylistItem(item: PlaylistItem) {
         context.delete(item.managedObject)
     }
+
+    /// Download Fetch Cache
+    private var downloadFetchCacheId : [String: NSManagedObjectID] = [:]
+    private var downloadFetchCacheUrl : [String: NSManagedObjectID] = [:]
     
-    func createDownload() -> Download {
-        return Download(managedObject: DownloadMO(context: context))
+    func createDownload(id: String) -> Download {
+        let download = Download(managedObject: DownloadMO(context: context))
+        download.id = id
+        return download
+    }
+    
+    func setDownloadUrl(download: Download, url: URL) {
+        downloadFetchCacheUrl[url.absoluteString] = download.managedObject.objectID
+        download.setURL(url)
     }
     
     func getDownload(id: String) -> Download? {
-        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(DownloadMO.id), NSString(string: id))
-        fetchRequest.fetchLimit = 1
-        let downloads = try? context.fetch(fetchRequest)
-        return downloads?.lazy.compactMap{ Download(managedObject: $0) }.first
+        let downloadObjectId : NSManagedObjectID? = downloadFetchCacheId[id]
+
+        if let downloadObjectId = downloadObjectId {
+            let object = context.object(with: downloadObjectId)
+            return Download(managedObject: object as! DownloadMO)
+        } else {
+            let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(DownloadMO.id), NSString(string: id))
+            fetchRequest.fetchLimit = 1
+            let downloads = try? context.fetch(fetchRequest)
+            if let downloadMO = downloads?.lazy.first {
+                let download = Download(managedObject: downloadMO)
+                downloadFetchCacheId[download.id] = downloadMO.objectID
+                if let urlString = download.url?.absoluteString {
+                    downloadFetchCacheUrl[urlString] = downloadMO.objectID
+                }
+                return download
+            }
+        }
+        return nil
     }
     
     func getDownload(url: String) -> Download? {
-        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(DownloadMO.urlString), NSString(string: url))
-        fetchRequest.fetchLimit = 1
-        let downloads = try? context.fetch(fetchRequest)
-        return downloads?.lazy.compactMap{ Download(managedObject: $0) }.first
+        let downloadObjectId : NSManagedObjectID? = downloadFetchCacheUrl[url]
+
+        if let downloadObjectId = downloadObjectId {
+            let object = context.object(with: downloadObjectId)
+            return Download(managedObject: object as! DownloadMO)
+        } else {
+            let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(DownloadMO.urlString), NSString(string: url))
+            fetchRequest.fetchLimit = 1
+            let downloads = try? context.fetch(fetchRequest)
+            if let downloadMO = downloads?.lazy.first {
+                let download = Download(managedObject: downloadMO)
+                downloadFetchCacheId[download.id] = downloadMO.objectID
+                downloadFetchCacheUrl[url] = downloadMO.objectID
+                return download
+            }
+        }
+        return nil
     }
     
     func deleteDownload(_ download: Download) {
+        downloadFetchCacheId[download.id] = nil
+        downloadFetchCacheUrl[download.urlString] = nil
         context.delete(download.managedObject)
     }
     
@@ -1128,7 +1169,9 @@ public class LibraryStorage: PlayableFileCachable {
     }
     
     func getPlayerData() -> PlayerData {
-        let fetchRequest: NSFetchRequest<PlayerMO> = PlayerMO.fetchRequest()
+        let fetchRequest = PlayerMO.fetchRequest()
+        fetchRequest.relationshipKeyPathsForPrefetching = PlayerMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         var playerData: PlayerData
         var playerMO: PlayerMO
 
@@ -1230,10 +1273,16 @@ public class LibraryStorage: PlayableFileCachable {
         return artists?.lazy.compactMap{ Artist(managedObject: $0) }.first
     }
     
-    public func getAlbum(id: String) -> Album? {
+    public func getAlbum(id: String, isDetailFaultResolution: Bool) -> Album? {
         let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(AlbumMO.id), NSString(string: id))
         fetchRequest.fetchLimit = 1
+        if isDetailFaultResolution {
+            fetchRequest.relationshipKeyPathsForPrefetching = AlbumMO.relationshipKeyPathsForPrefetchingDetailed
+        } else {
+            fetchRequest.relationshipKeyPathsForPrefetching = AlbumMO.relationshipKeyPathsForPrefetching
+        }
+        fetchRequest.returnsObjectsAsFaults = false
         let albums = try? context.fetch(fetchRequest)
         return albums?.lazy.compactMap{ Album(managedObject: $0) }.first
     }

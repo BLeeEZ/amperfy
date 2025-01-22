@@ -173,6 +173,8 @@ public class PodcastFetchedResultsController: CachedFetchedResultsController<Pod
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(onlyCachedPodcasts: true),
         ])
+        fetchRequest.relationshipKeyPathsForPrefetching = PodcastMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
         
@@ -199,6 +201,8 @@ public class PodcastEpisodesReleaseDateFetchedResultsController: BasicFetchedRes
     public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest = PodcastEpisodeMO.publishedDateSortedFetchRequest
         fetchRequest.predicate = coreDataCompanion.library.getFetchPredicateForUserAvailableEpisodes()
+        fetchRequest.relationshipKeyPathsForPrefetching = PodcastEpisodeMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -225,6 +229,8 @@ public class PodcastEpisodesFetchedResultsController: BasicFetchedResultsControl
         self.podcast = podcast
         let fetchRequest = PodcastEpisodeMO.publishedDateSortedFetchRequest
         fetchRequest.predicate = coreDataCompanion.library.getFetchPredicateForUserAvailableEpisodes(forPodcast: podcast)
+        fetchRequest.relationshipKeyPathsForPrefetching = PodcastEpisodeMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -247,6 +253,8 @@ public class GenreFetchedResultsController: CachedFetchedResultsController<Genre
     
     public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest = GenreMO.alphabeticSortedFetchRequest
+        fetchRequest.relationshipKeyPathsForPrefetching = GenreMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
         
@@ -282,6 +290,8 @@ public class GenreArtistsFetchedResultsController: BasicFetchedResultsController
             ]),
             coreDataCompanion.library.getFetchPredicate(forGenre: genre)
         ])
+        fetchRequest.relationshipKeyPathsForPrefetching = ArtistMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -318,6 +328,8 @@ public class GenreAlbumsFetchedResultsController: BasicFetchedResultsController<
             ]),
             coreDataCompanion.library.getFetchPredicate(forGenre: genre)
         ])
+        fetchRequest.relationshipKeyPathsForPrefetching = AlbumMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -351,6 +363,8 @@ public class GenreSongsFetchedResultsController: BasicFetchedResultsController<S
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(forGenre: genre)
         ])
+        fetchRequest.relationshipKeyPathsForPrefetching = SongMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -393,6 +407,8 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: true)
         ])
+        fetchRequest.relationshipKeyPathsForPrefetching = ArtistMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -424,6 +440,8 @@ public class ArtistAlbumsItemsFetchedResultsController: BasicFetchedResultsContr
                 AlbumMO.getFetchPredicateForAlbumsWhoseSongsHave(artist: artist)
             ])
         ])
+        fetchRequest.relationshipKeyPathsForPrefetching = AlbumMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
@@ -476,6 +494,8 @@ public class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsContro
                 ])
             ])
         }
+        fetchRequest.relationshipKeyPathsForPrefetching = SongMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
 
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
@@ -543,6 +563,8 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
             AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true)
         ])
+        fetchRequest.relationshipKeyPathsForPrefetching = AlbumMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -576,6 +598,8 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
         }
         fetchRequest.fetchLimit = fetchLimit ?? 0
         fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
+        fetchRequest.relationshipKeyPathsForPrefetching = SongMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: sortType.asSectionIndexType, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
         // CPU load for song VCs is high when background sync is active
         // reduce the CPU load on song VCs by turning updates off for those VCs
@@ -599,6 +623,8 @@ public class RadiosFetchedResultsController: CachedFetchedResultsController<Radi
         let fetchRequest = RadioMO.alphabeticSortedFetchRequest
         fetchRequest.fetchLimit = fetchLimit ?? 0
         fetchRequest.predicate = RadioMO.excludeServerDeleteRadiosFetchPredicate
+        fetchRequest.relationshipKeyPathsForPrefetching = RadioMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, sectionIndexType: .alphabet, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -624,6 +650,8 @@ public class AlbumSongsFetchedResultsController: BasicFetchedResultsController<S
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(forAlbum: album)
         ])
+        fetchRequest.relationshipKeyPathsForPrefetching = SongMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -651,6 +679,8 @@ public class PlaylistItemsFetchedResultsController: BasicFetchedResultsControlle
         self.playlist = playlist
         let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
         fetchRequest.predicate = coreDataCompanion.library.getFetchPredicate(forPlaylist: playlist)
+        fetchRequest.relationshipKeyPathsForPrefetching = PlaylistItemMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -687,6 +717,8 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
         }
         fetchRequest.fetchLimit = fetchLimit ?? 0
         fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
+        fetchRequest.relationshipKeyPathsForPrefetching = PlaylistMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -722,6 +754,8 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
             PlaylistMO.excludeSystemPlaylistsFetchPredicate,
             coreDataCompanion.library.getFetchPredicate(forPlaylistSearchCategory: .userOnly)
         ])
+        fetchRequest.relationshipKeyPathsForPrefetching = PlaylistMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -753,6 +787,8 @@ public class MusicFolderFetchedResultsController: CachedFetchedResultsController
     
     public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest = MusicFolderMO.idSortedFetchRequest
+        fetchRequest.relationshipKeyPathsForPrefetching = MusicFolderMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -774,6 +810,8 @@ public class MusicFolderDirectoriesFetchedResultsController: BasicFetchedResults
         self.musicFolder = musicFolder
         let fetchRequest = DirectoryMO.alphabeticSortedFetchRequest
         fetchRequest.predicate = coreDataCompanion.library.getFetchPredicate(forMusicFolder: musicFolder)
+        fetchRequest.relationshipKeyPathsForPrefetching = DirectoryMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
@@ -799,6 +837,8 @@ public class DirectorySubdirectoriesFetchedResultsController: BasicFetchedResult
         self.directory = directory
         let fetchRequest = DirectoryMO.alphabeticSortedFetchRequest
         fetchRequest.predicate = coreDataCompanion.library.getDirectoryFetchPredicate(forDirectory: directory)
+        fetchRequest.relationshipKeyPathsForPrefetching = DirectoryMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 
@@ -829,6 +869,8 @@ public class DirectorySongsFetchedResultsController: BasicFetchedResultsControll
             SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
             coreDataCompanion.library.getSongFetchPredicate(forDirectory: directory)
         ])
+        fetchRequest.relationshipKeyPathsForPrefetching = SongMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
     
@@ -854,6 +896,8 @@ public class DownloadsFetchedResultsController: BasicFetchedResultsController<Do
     public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
         let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
         fetchRequest.predicate = DownloadMO.onlyPlayablesPredicate
+        fetchRequest.relationshipKeyPathsForPrefetching = DownloadMO.relationshipKeyPathsForPrefetching
+        fetchRequest.returnsObjectsAsFaults = false
         super.init(coreDataCompanion: coreDataCompanion, fetchRequest: fetchRequest, isGroupedInAlphabeticSections: isGroupedInAlphabeticSections)
     }
 

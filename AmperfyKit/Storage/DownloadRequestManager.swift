@@ -58,8 +58,7 @@ class DownloadRequestManager {
         let existingDownload = library.getDownload(id: object.uniqueID)
         
         if existingDownload == nil {
-            let download = library.createDownload()
-            download.id = object.uniqueID
+            let download = library.createDownload(id: object.uniqueID)
             download.element = object
         } else if let existingDownload = existingDownload, existingDownload.errorDate != nil {
             existingDownload.reset()

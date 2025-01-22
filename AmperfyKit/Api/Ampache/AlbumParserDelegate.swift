@@ -44,7 +44,7 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
                 os_log("Found album with no id", log: log, type: .error)
                 return
             }
-            if let fetchedAlbum = library.getAlbum(id: albumId)  {
+            if let fetchedAlbum = library.getAlbum(id: albumId, isDetailFaultResolution: true)  {
                 albumBuffer = fetchedAlbum
             } else {
                 albumBuffer = library.createAlbum()

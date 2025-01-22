@@ -151,7 +151,7 @@ class DownloadManager: NSObject, DownloadManageable {
         }.then {
             self.downloadDelegate.prepareDownload(download: download)
         }.get { url in
-            download.setURL(url)
+            self.storage.main.library.setDownloadUrl(download: download, url: url)
             self.storage.main.saveContext()
             self.fetch(url: url)
         }.catch { error in

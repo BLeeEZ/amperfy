@@ -30,5 +30,10 @@ extension RadioMO {
     }
     
     @NSManaged public var siteUrl: String?
+    
+    static let relationshipKeyPathsForPrefetching = [
+        #keyPath(RadioMO.artwork),
+        #keyPath(RadioMO.embeddedArtwork),
+    ]
 
 }
