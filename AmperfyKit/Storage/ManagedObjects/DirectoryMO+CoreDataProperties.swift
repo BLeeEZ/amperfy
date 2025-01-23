@@ -31,6 +31,8 @@ extension DirectoryMO {
 
     @NSManaged public var name: String?
     @NSManaged public var parent: DirectoryMO?
+    @NSManaged public var subdirectoryCount: Int16
+    @NSManaged public var songCount: Int16
     @NSManaged public var songs: NSOrderedSet?
     @NSManaged public var subdirectories: NSOrderedSet?
     @NSManaged public var musicFolder: MusicFolderMO?

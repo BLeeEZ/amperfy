@@ -48,6 +48,15 @@ public class Genre: AbstractLibraryEntity {
     public var duration: Int {
         return playables.reduce(0){ $0 + $1.duration }
     }
+    public var artistCount: Int {
+        get { return Int(managedObject.artistCount) }
+    }
+    public var albumCount: Int {
+        get { return Int(managedObject.albumCount) }
+    }
+    public var songCount: Int {
+        get { return Int(managedObject.songCount) }
+    }
     public var artists: [Artist] {
         guard let artistsSet = managedObject.artists, let artistsMO = artistsSet.array as? [ArtistMO] else { return [Artist]() }
         return artistsMO.compactMap {
@@ -78,29 +87,25 @@ extension Genre: PlayableContainable  {
     public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
         if api == .ampache {
-            if artists.count == 1 {
+            if artistCount == 1 {
                 infoContent.append("1 Artist")
-            } else if artists.count > 1 {
-                infoContent.append("\(artists.count) Artists")
+            } else if artistCount > 1 {
+                infoContent.append("\(artistCount) Artists")
             }
         }
-        if albums.count == 1 {
+        if albumCount == 1 {
             infoContent.append("1 Album")
-        } else if albums.count > 1 {
-            infoContent.append("\(albums.count) Albums")
+        } else if albumCount > 1 {
+            infoContent.append("\(albumCount) Albums")
         }
-        if songs.count == 1 {
+        if songCount == 1 {
             infoContent.append("1 Song")
-        } else if songs.count > 1 {
-            infoContent.append("\(songs.count) Songs")
+        } else if songCount > 1 {
+            infoContent.append("\(songCount) Songs")
         }
         if details.type == .long {
             if isCompletelyCached {
                 infoContent.append("Cached")
-            }
-            let completeDuration = songs.reduce(0, {$0 + $1.duration})
-            if completeDuration > 0 {
-                infoContent.append("\(completeDuration.asDurationShortString)")
             }
             if details.isShowDetailedInfo {
                 infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")

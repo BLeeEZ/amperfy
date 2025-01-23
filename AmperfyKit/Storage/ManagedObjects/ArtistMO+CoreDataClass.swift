@@ -24,6 +24,34 @@ import CoreData
 
 @objc(ArtistMO)
 public final class ArtistMO: AbstractLibraryEntityMO {
+    
+    override public func willSave() {
+        super.willSave()
+        if hasChangedSongs {
+            updateSongCount()
+        }
+        if hasChangedAlbums {
+            updateAlbumCount()
+        }
+    }
+
+    fileprivate var hasChangedSongs: Bool {
+        return changedValue(forKey: #keyPath(songs)) != nil
+    }
+
+    fileprivate func updateSongCount() {
+        guard Int16(songs?.count ?? 0) != songCount else { return }
+        songCount = Int16(songs?.count ?? 0)
+    }
+
+    fileprivate var hasChangedAlbums: Bool {
+        return changedValue(forKey: #keyPath(albums)) != nil
+    }
+
+    fileprivate func updateAlbumCount() {
+        guard Int16(albums?.count ?? 0) != albumCount else { return }
+        albumCount = Int16(albums?.count ?? 0)
+    }
 
 }
 

@@ -77,6 +77,10 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
         XCTAssertEqual(episode.artwork?.url, "www-27")
         XCTAssertEqual(episode.artwork?.type, "")
         XCTAssertEqual(episode.artwork?.id, "27")
+        
+        // denormalized value -> will be updated at save context
+        self.library.saveContext()
+        XCTAssertEqual(podcast.episodeCount, 2)
     }
 
 }

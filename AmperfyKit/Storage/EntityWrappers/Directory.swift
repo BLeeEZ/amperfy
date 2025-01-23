@@ -41,6 +41,12 @@ public class Directory: AbstractLibraryEntity {
             }
         }
     }
+    public var songCount: Int {
+        get { return Int(managedObject.songCount) }
+    }
+    public var subdirectoryCount: Int {
+        get { return Int(managedObject.subdirectoryCount) }
+    }
     public var songs: [Song] {
         return managedObject.songs?.compactMap{ Song(managedObject: $0 as! SongMO) } ?? [Song]()
     }
@@ -61,10 +67,10 @@ extension Directory: PlayableContainable  {
             infoContent.append("\(subdirectories.count) Subdirectory")
         }
         
-        if songs.count == 1 {
+        if songCount == 1 {
             infoContent.append("1 Song")
-        } else if songs.count > 1 {
-            infoContent.append("\(songs.count) Songs")
+        } else if songCount > 1 {
+            infoContent.append("\(songCount) Songs")
         }
         
         if details.type == .long {

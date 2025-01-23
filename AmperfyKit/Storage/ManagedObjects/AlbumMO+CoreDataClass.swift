@@ -25,6 +25,22 @@ import CoreData
 @objc(AlbumMO)
 public final class AlbumMO: AbstractLibraryEntityMO {
 
+    override public func willSave() {
+        super.willSave()
+        if hasChangedSongs {
+            updateSongCount()
+        }
+    }
+
+    fileprivate var hasChangedSongs: Bool {
+        return changedValue(forKey: #keyPath(songs)) != nil
+    }
+
+    fileprivate func updateSongCount() {
+        guard Int16(songs?.count ?? 0) != songCount else { return }
+        songCount = Int16(songs?.count ?? 0)
+    }
+    
     static func getFetchPredicateForAlbumsWhoseSongsHave(artist: Artist) -> NSPredicate {
         return NSPredicate(format: "SUBQUERY(songs, $song, $song.artist == %@) .@count > 0", artist.managedObject.objectID)
     }

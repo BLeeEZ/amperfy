@@ -60,6 +60,11 @@ class SsDirectoriesExample1ParserTest: AbstractSsParserTest {
         XCTAssertEqual(directories[1].artwork?.url, "www-23")
         XCTAssertEqual(directories[1].artwork?.type, "")
         XCTAssertEqual(directories[1].artwork?.id, "23")
+        
+        // denormalized value -> will be updated at save context
+        self.library.saveContext()
+        XCTAssertEqual(directory.subdirectoryCount, 2)
+        XCTAssertEqual(directory.songCount, 0)
     }
 
 }

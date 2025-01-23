@@ -103,6 +103,10 @@ class PodcastEpisodesParserTest: AbstractAmpacheTest {
         XCTAssertEqual(episode.artwork?.url, "https://music.com.au/image.php?object_id=1&object_type=podcast&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.jpg")
         XCTAssertEqual(episode.artwork?.type, "podcast")
         XCTAssertEqual(episode.artwork?.id, "1")
+        
+        // denormalized value -> will be updated at save context
+        self.library.saveContext()
+        XCTAssertEqual(podcast.episodeCount, 4)
     }
 
 }

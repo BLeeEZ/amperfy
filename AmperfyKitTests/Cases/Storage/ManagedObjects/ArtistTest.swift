@@ -45,8 +45,10 @@ class ArtistTest: XCTestCase {
         XCTAssertEqual(artist.identifier, "Unknown Artist")
         XCTAssertEqual(artist.name, "Unknown Artist")
         XCTAssertEqual(artist.songs.count, 0)
+        XCTAssertEqual(artist.songCount, 0)
         XCTAssertFalse(artist.playables.hasCachedItems)
         XCTAssertEqual(artist.albums.count, 0)
+        XCTAssertEqual(artist.albumCount, 0)
         XCTAssertNil(artist.artwork)
         XCTAssertEqual(artist.image(theme: .blue, setting: .serverArtworkOnly), UIImage.getGeneratedArtwork(theme: .blue, artworkType: .artist))
     }
@@ -65,8 +67,10 @@ class ArtistTest: XCTestCase {
     func testSongs() {
         guard let artist3Items = library.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
         XCTAssertEqual(artist3Items.songs.count, 3)
+        XCTAssertEqual(artist3Items.songCount, 3)
         guard let artist2Items = library.getArtist(id: cdHelper.seeder.artists[1].id) else { XCTFail(); return }
         XCTAssertEqual(artist2Items.songs.count, 2)
+        XCTAssertEqual(artist2Items.songCount, 2)
     }
     
     func testHasCachedSongs() {
@@ -79,8 +83,10 @@ class ArtistTest: XCTestCase {
     func testAlbums() {
         guard let artist1Items = library.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
         XCTAssertEqual(artist1Items.albums.count, 1)
+        XCTAssertEqual(artist1Items.albumCount, 1)
         guard let artist2Items = library.getArtist(id: cdHelper.seeder.artists[2].id) else { XCTFail(); return }
         XCTAssertEqual(artist2Items.albums.count, 2)
+        XCTAssertEqual(artist2Items.albumCount, 2)
     }
     
     func testArtworkAndImage() {

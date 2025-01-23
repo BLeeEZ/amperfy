@@ -663,6 +663,7 @@
 		504B442128D8EBB20033982C /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		504C718E23BAC8F2001F82C7 /* PlaylistItemTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistItemTest.swift; sourceTree = "<group>"; };
 		504C719023BAD112001F82C7 /* SongTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTest.swift; sourceTree = "<group>"; };
+		504D26262D4168DE003FDEB3 /* Amperfy v41.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v41.xcdatamodel"; sourceTree = "<group>"; };
 		5052497E2D12CC7D0005EEB0 /* VolumeBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeBarItem.swift; sourceTree = "<group>"; };
 		505362D02C23682500846C53 /* AlbumsCollectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsCollectionVC.swift; sourceTree = "<group>"; };
 		505362D22C2425C200846C53 /* AlbumsCommonVCInteractions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsCommonVCInteractions.swift; sourceTree = "<group>"; };
@@ -3351,6 +3352,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				504D26262D4168DE003FDEB3 /* Amperfy v41.xcdatamodel */,
 				50CEC63B2D1EDB9500D0E696 /* Amperfy v40.xcdatamodel */,
 				643A04712CD29AB20012DEA3 /* Amperfy v39.xcdatamodel */,
 				50AE79BD2C1F704B0085CBB3 /* Amperfy v38.xcdatamodel */,
@@ -3392,7 +3394,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 50CEC63B2D1EDB9500D0E696 /* Amperfy v40.xcdatamodel */;
+			currentVersion = 504D26262D4168DE003FDEB3 /* Amperfy v41.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

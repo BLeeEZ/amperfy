@@ -52,6 +52,9 @@ public class Podcast: AbstractLibraryEntity {
     public var duration: Int {
         return playables.reduce(0){ $0 + $1.duration }
     }
+    public var episodeCount: Int {
+        return Int(managedObject.episodeCount)
+    }
     public var episodes: [PodcastEpisode] {
         guard let episodesSet = managedObject.episodes, let episodesMO = episodesSet.array as? [PodcastEpisodeMO] else { return [PodcastEpisode]() }
         return episodesMO.compactMap{ PodcastEpisode(managedObject: $0) }.sortByPublishDate()
@@ -69,10 +72,10 @@ extension Podcast: PlayableContainable  {
     public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
         if details.type != .noCountInfo {
-            if episodes.count == 1 {
+            if episodeCount == 1 {
                 infoContent.append("1 Episode")
-            } else if episodes.count > 1 {
-                infoContent.append("\(episodes.count) Episodes")
+            } else if episodeCount > 1 {
+                infoContent.append("\(episodeCount) Episodes")
             }
         }
         if details.type == .long || details.type == .noCountInfo {

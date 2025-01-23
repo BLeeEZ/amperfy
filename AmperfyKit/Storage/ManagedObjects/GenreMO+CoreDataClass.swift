@@ -24,7 +24,47 @@ import CoreData
 
 @objc(GenreMO)
 public final class GenreMO: AbstractLibraryEntityMO {
+    
+    override public func willSave() {
+        super.willSave()
+        if hasChangedSongs {
+            updateSongCount()
+        }
+        if hasChangedAlbums {
+            updateAlbumCount()
+        }
+        if hasChangedArtists {
+            updateArtistCount()
+        }
+    }
 
+    fileprivate var hasChangedSongs: Bool {
+        return changedValue(forKey: #keyPath(songs)) != nil
+    }
+
+    fileprivate func updateSongCount() {
+        guard Int16(songs?.count ?? 0) != songCount else { return }
+        songCount = Int16(songs?.count ?? 0)
+    }
+
+    fileprivate var hasChangedAlbums: Bool {
+        return changedValue(forKey: #keyPath(albums)) != nil
+    }
+
+    fileprivate func updateAlbumCount() {
+        guard Int16(albums?.count ?? 0) != albumCount else { return }
+        albumCount = Int16(albums?.count ?? 0)
+    }
+    
+    fileprivate var hasChangedArtists: Bool {
+        return changedValue(forKey: #keyPath(artists)) != nil
+    }
+
+    fileprivate func updateArtistCount() {
+        guard Int16(artists?.count ?? 0) != artistCount else { return }
+        artistCount = Int16(artists?.count ?? 0)
+    }
+    
 }
 
 extension GenreMO: CoreDataIdentifyable {

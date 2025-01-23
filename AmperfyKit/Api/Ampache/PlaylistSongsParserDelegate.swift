@@ -61,7 +61,6 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
                 }
             }
             playlist.updateDuration()
-            playlist.updateSongCount()
         default:
             break
         }

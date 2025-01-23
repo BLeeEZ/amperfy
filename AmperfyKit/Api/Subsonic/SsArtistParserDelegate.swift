@@ -42,7 +42,7 @@ class SsArtistParserDelegate: SsXmlLibWithArtworkParser {
             }
             artistBuffer?.remoteStatus = .available
             if let attributeAlbumCount = attributeDict["albumCount"], let albumCount = Int(attributeAlbumCount) {
-                artistBuffer?.albumCount = albumCount
+                artistBuffer?.remoteAlbumCount = albumCount
             }
 
             if let attributeArtistName = attributeDict["name"] {

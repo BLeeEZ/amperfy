@@ -24,7 +24,35 @@ import CoreData
 
 @objc(DirectoryMO)
 public final class DirectoryMO: AbstractLibraryEntityMO {
+    
+    override public func willSave() {
+        super.willSave()
+        if hasChangedSongs {
+            updateSongCount()
+        }
+        if hasChangedSubdirectories {
+            updateSubdirectoryCount()
+        }
+    }
 
+    fileprivate var hasChangedSongs: Bool {
+        return changedValue(forKey: #keyPath(songs)) != nil
+    }
+
+    fileprivate func updateSongCount() {
+        guard Int16(songs?.count ?? 0) != songCount else { return }
+        songCount = Int16(songs?.count ?? 0)
+    }
+
+    fileprivate var hasChangedSubdirectories: Bool {
+        return changedValue(forKey: #keyPath(subdirectories)) != nil
+    }
+
+    fileprivate func updateSubdirectoryCount() {
+        guard Int16(subdirectories?.count ?? 0) != subdirectoryCount else { return }
+        subdirectoryCount = Int16(subdirectories?.count ?? 0)
+    }
+    
     static var alphabeticSortedFetchRequest: NSFetchRequest<DirectoryMO> {
         let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
         fetchRequest.sortDescriptors = [

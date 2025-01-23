@@ -31,10 +31,14 @@ extension MusicFolderMO {
 
     @NSManaged public var id: String
     @NSManaged public var name: String
+    @NSManaged public var directoryCount: Int16
+    @NSManaged public var songCount: Int16
     @NSManaged public var directories: NSOrderedSet?
     @NSManaged public var songs: NSOrderedSet?
     
-    static let relationshipKeyPathsForPrefetching = [String]()
+    static let relationshipKeyPathsForPrefetching = [
+        #keyPath(MusicFolderMO.directories),
+    ]
 
 }
 

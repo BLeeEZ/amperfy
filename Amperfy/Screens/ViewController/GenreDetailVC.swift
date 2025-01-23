@@ -56,7 +56,7 @@ class GenreDetailVC: MultiSourceTableViewController {
         setNavBarTitle(title: genre.name)
 
         let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
-            infoCB: { "\(self.genre.artists.count) Artist\(self.genre.artists.count == 1 ? "" : "s") \(CommonString.oneMiddleDot) \(self.genre.albums.count) Album\(self.genre.albums.count == 1 ? "" : "s") \(CommonString.oneMiddleDot) \(self.genre.songs.count) Song\(self.genre.songs.count == 1 ? "" : "s")" },
+            infoCB: { "\(self.genre.artistCount) Artist\(self.genre.artistCount == 1 ? "" : "s") \(CommonString.oneMiddleDot) \(self.genre.albumCount) Album\(self.genre.albumCount == 1 ? "" : "s") \(CommonString.oneMiddleDot) \(self.genre.songCount) Song\(self.genre.songCount == 1 ? "" : "s")" },
             playContextCb: {() in PlayContext(containable: self.genre, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
             player: appDelegate.player,
             isInfoAlwaysHidden: true)

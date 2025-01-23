@@ -104,7 +104,7 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
         case "time":
             albumBuffer?.remoteDuration = Int(buffer) ?? 0
         case "songcount":
-            albumBuffer?.songCount = Int(buffer) ?? 0
+            albumBuffer?.remoteSongCount = Int(buffer) ?? 0
         case "art":
             albumBuffer?.artwork = parseArtwork(urlString: buffer)
         case "genre":

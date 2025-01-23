@@ -24,6 +24,22 @@ import CoreData
 
 @objc(PodcastMO)
 public final class PodcastMO: AbstractLibraryEntityMO {
+    
+    override public func willSave() {
+        super.willSave()
+        if hasChangedEpisodes {
+            updateEpisodeCount()
+        }
+    }
+
+    fileprivate var hasChangedEpisodes: Bool {
+        return changedValue(forKey: #keyPath(episodes)) != nil
+    }
+
+    fileprivate func updateEpisodeCount() {
+        guard Int16(episodes?.count ?? 0) != episodeCount else { return }
+        episodeCount = Int16(episodes?.count ?? 0)
+    }
 
 }
 

@@ -25,10 +25,12 @@ import os.log
 
 public protocol LibraryUpdaterCallbacks {
     func startOperation(name: String, totalCount: Int)
-    func tickOpersation()
+    func tickOperation()
 }
 
 public class LibraryUpdater {
+    
+    private static let sleepTimeInMicroSecToReduceCpuLoad : UInt32 = 500
     
     private let log = OSLog(subsystem: "Amperfy", category: "BackgroundSyncer")
     private let storage : PersistentStorage
@@ -93,6 +95,12 @@ public class LibraryUpdater {
                 os_log("Perform blocking library update (START): Extract Binary Data", log: self.log, type: .info)
                 try self.extractBinaryDataToFileManager(notifier: notifier, asyncCompanion: asyncCompanion)
                 os_log("Perform blocking library update (DONE): Extract  Binary Data", log: self.log, type: .info)
+            }
+            if self.storage.librarySyncVersion < .v18 {
+                self.storage.librarySyncVersion = .v18 // if App crashes don't do this step again -> This step is only for convenience
+                os_log("Perform blocking library update (START): Denormalization Count", log: self.log, type: .info)
+                try self.denormalizeCount(notifier: notifier, asyncCompanion: asyncCompanion)
+                os_log("Perform blocking library update (DONE): Denormalization Count", log: self.log, type: .info)
             }
         }
     }
@@ -201,7 +209,7 @@ public class LibraryUpdater {
         for artworkRemoteInfo in artworkRemoteInfos {
             moveArtworkToFileManager(artworkRemoteInfo: artworkRemoteInfo, asyncCompanion: asyncCompanion)
             asyncCompanion.library.saveContext()
-            notifier.tickOpersation()
+            notifier.tickOperation()
             if !isRunning {
                 throw PMKError.cancelled
             }
@@ -217,7 +225,7 @@ public class LibraryUpdater {
         for embeddedArtworkOwner in embeddedArtworkOwners {
             moveEmbeddedArtworkToFileManager(embeddedArtworkOwner: embeddedArtworkOwner, asyncCompanion: asyncCompanion)
             asyncCompanion.library.saveContext()
-            notifier.tickOpersation()
+            notifier.tickOperation()
             if !isRunning {
                 throw PMKError.cancelled
             }
@@ -230,7 +238,7 @@ public class LibraryUpdater {
         for cachedSong in cachedSongs {
             movePlayableToFileManager(playable: cachedSong, asyncCompanion: asyncCompanion)
             asyncCompanion.library.saveContext()
-            notifier.tickOpersation()
+            notifier.tickOperation()
             if !isRunning {
                 throw PMKError.cancelled
             }
@@ -238,12 +246,89 @@ public class LibraryUpdater {
         for cachedEpisode in cachedEpisodes {
             movePlayableToFileManager(playable: cachedEpisode, asyncCompanion: asyncCompanion)
             asyncCompanion.library.saveContext()
-            notifier.tickOpersation()
+            notifier.tickOperation()
             if !isRunning {
                 throw PMKError.cancelled
             }
         }
         asyncCompanion.library.deleteBinaryPlayableFileSavedInCoreData()
+        asyncCompanion.library.saveContext()
+    }
+    
+    private func denormalizeCount(notifier: LibraryUpdaterCallbacks, asyncCompanion: CoreDataCompanion) throws {
+        try autoreleasepool {
+            os_log("Music Folder Denormalize", log: log, type: .info)
+            let musicFolders = asyncCompanion.library.getMusicFolders(isFaultsOptimized: true)
+            notifier.startOperation(name: "Music Folder Update", totalCount: musicFolders.count)
+            for musicFolder in musicFolders {
+                usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+                musicFolder.managedObject.songCount = Int16(musicFolder.songs.count)
+                musicFolder.managedObject.directoryCount = Int16(musicFolder.directories.count)
+                notifier.tickOperation()
+                guard isRunning else { throw PMKError.cancelled }
+            }
+        }
+        try autoreleasepool {
+            os_log("Directory Denormalize", log: log, type: .info)
+            let directories = asyncCompanion.library.getDirectories(isFaultsOptimized: true)
+            notifier.startOperation(name: "Directory Update", totalCount: directories.count)
+            for directory in directories {
+                usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+                directory.managedObject.songCount = Int16(directory.songs.count)
+                directory.managedObject.subdirectoryCount = Int16(directory.subdirectories.count)
+                notifier.tickOperation()
+                guard isRunning else { throw PMKError.cancelled }
+            }
+        }
+        try autoreleasepool {
+            os_log("Genre Denormalize", log: log, type: .info)
+            let genres = asyncCompanion.library.getGenres(isFaultsOptimized: true)
+            notifier.startOperation(name: "Genre Update", totalCount: genres.count)
+            for genre in genres {
+                usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+                genre.managedObject.songCount = Int16(genre.songs.count)
+                genre.managedObject.albumCount = Int16(genre.albums.count)
+                genre.managedObject.artistCount = Int16(genre.artists.count)
+                notifier.tickOperation()
+                guard isRunning else { throw PMKError.cancelled }
+            }
+        }
+        try autoreleasepool {
+            os_log("Artist Denormalize", log: log, type: .info)
+            let artists = asyncCompanion.library.getArtists(isFaultsOptimized: true)
+            notifier.startOperation(name: "Artist Update", totalCount: artists.count)
+            for artist in artists {
+                usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+                artist.managedObject.remoteAlbumCount = artist.managedObject.albumCount
+                artist.managedObject.albumCount = Int16(artist.albums.count)
+                artist.managedObject.songCount = Int16(artist.songs.count)
+                notifier.tickOperation()
+                guard isRunning else { throw PMKError.cancelled }
+            }
+        }
+        try autoreleasepool {
+            os_log("Album Denormalize", log: log, type: .info)
+            let albums = asyncCompanion.library.getAlbums(isFaultsOptimized: true)
+            notifier.startOperation(name: "Album Update", totalCount: albums.count)
+            for album in albums {
+                usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+                album.managedObject.remoteSongCount = album.managedObject.songCount
+                album.managedObject.songCount = Int16(album.songs.count)
+                notifier.tickOperation()
+                guard isRunning else { throw PMKError.cancelled }
+            }
+        }
+        try autoreleasepool {
+            os_log("Podcast Denormalize", log: log, type: .info)
+            let podcasts = asyncCompanion.library.getPodcasts(isFaultsOptimized: true)
+            notifier.startOperation(name: "Podcast Update", totalCount: podcasts.count)
+            for podcast in podcasts {
+                usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+                podcast.managedObject.episodeCount = Int16(podcast.episodes.count)
+                notifier.tickOperation()
+                guard isRunning else { throw PMKError.cancelled }
+            }
+        }
         asyncCompanion.library.saveContext()
     }
     

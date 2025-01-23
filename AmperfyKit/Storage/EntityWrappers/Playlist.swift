@@ -168,29 +168,17 @@ public class Playlist: Identifyable {
     }
     
     public var songCount: Int {
-        get { return Int(managedObject.songCount) }
-        set {
-            guard Int16.isValid(value: newValue), managedObject.songCount != Int16(newValue) else { return }
-            managedObject.songCount = Int16(newValue)
+        get {
+            let moSongCount = Int(managedObject.songCount)
+            return moSongCount != 0 ? moSongCount : remoteSongCount
         }
     }
     public var remoteSongCount: Int {
         get { return Int(managedObject.remoteSongCount) }
         set {
-            if Int16.isValid(value: newValue) {
-                if managedObject.remoteSongCount != Int16(newValue) {
-                    managedObject.remoteSongCount = Int16(newValue)
-                }
-                updateSongCount()
+            if Int16.isValid(value: newValue), managedObject.remoteSongCount != Int16(newValue) {
+                managedObject.remoteSongCount = Int16(newValue)
             }
-        }
-    }
-    public func updateSongCount() {
-        if let items = managedObject.items, items.count > 0, Int16.isValid(value: items.count) {
-            managedObject.songCount = Int16(items.count)
-        } else {
-            // set songCount to remoteSongCount only if no songs are locally available
-            managedObject.songCount = managedObject.remoteSongCount
         }
     }
 
@@ -281,7 +269,7 @@ public class Playlist: Identifyable {
 
     public var info: String {
         var infoText = "Name: " + name + "\n"
-        infoText += "Count: " + String(sortedPlaylistItems.count) + "\n"
+        infoText += "Count: " + String(songCount) + "\n"
         infoText += "Playables:\n"
         for playlistItem in sortedPlaylistItems {
             infoText += String(playlistItem.order) + ": "
@@ -345,7 +333,6 @@ public class Playlist: Identifyable {
         for (index, playable) in playablesToInsert.enumerated() {
             createPlaylistItem(for: playable, customOrder: index + insertIndex)
         }
-        songCount += playablesToInsert.count
         updateChangeDate()
         updateDuration(byIncreasingDuration: playablesToInsert.reduce(0){ $0 + $1.duration })
         updateArtworkItems(isInitialUpdate: false)
@@ -355,7 +342,6 @@ public class Playlist: Identifyable {
 
     public func append(playable: AbstractPlayable) {
         createPlaylistItem(for: playable)
-        songCount += 1
         updateChangeDate()
         updateDuration(byIncreasingDuration: playable.duration)
         updateArtworkItems(isInitialUpdate: false)
@@ -367,7 +353,6 @@ public class Playlist: Identifyable {
         for playable in playablesToAppend {
             createPlaylistItem(for: playable)
         }
-        songCount += playablesToAppend.count
         updateChangeDate()
         updateDuration(byIncreasingDuration: playablesToAppend.reduce(0){ $0 + $1.duration })
         updateArtworkItems(isInitialUpdate: false)
@@ -383,7 +368,6 @@ public class Playlist: Identifyable {
     }
 
     public func add(item: PlaylistItem) {
-        songCount += 1
         updateChangeDate()
         updateDuration(byIncreasingDuration: item.playable?.duration ?? 0)
         managedObject.addToItems(item.managedObject)
@@ -421,7 +405,6 @@ public class Playlist: Identifyable {
                 }
             }
             library.deletePlaylistItem(item: itemToBeRemoved)
-            songCount -= 1
             updateChangeDate()
             updateDuration(byReducingDuration: itemToBeRemoved.playable?.duration ?? 0)
             updateArtworkItems(isInitialUpdate: false)
@@ -434,7 +417,6 @@ public class Playlist: Identifyable {
         for item in items {
             if item.playable?.id == playable.id {
                 remove(at: Int(item.order))
-                songCount -= 1
                 break
             }
         }
@@ -454,7 +436,6 @@ public class Playlist: Identifyable {
         for item in sortedPlaylistItems {
             library.deletePlaylistItem(item: item)
         }
-        songCount = 0
         updateChangeDate()
         updateArtworkItems(isInitialUpdate: false)
         managedObject.duration = 0
@@ -524,9 +505,8 @@ extension Playlist: PlayableContainable  {
             if isCompletelyCached {
                 infoContent.append("Cached")
             }
-            let completeDuration = playables.reduce(0, {$0 + $1.duration})
-            if completeDuration > 0 {
-                infoContent.append("\(completeDuration.asDurationShortString)")
+            if duration > 0 {
+                infoContent.append("\(duration.asDurationShortString)")
             }
             if details.isShowDetailedInfo {
                 infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")

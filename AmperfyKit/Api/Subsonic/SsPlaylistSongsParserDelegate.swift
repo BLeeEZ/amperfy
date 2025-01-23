@@ -49,7 +49,7 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
                 playlist.name = attributePlaylistName
             }
             if let attributeSongCount = attributeDict["songCount"], let songCount = Int(attributeSongCount) {
-                playlist.songCount = songCount
+                playlist.remoteSongCount = songCount
             }
         }
         
@@ -80,7 +80,6 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
                 }
             }
             playlist.updateDuration()
-            playlist.updateSongCount()
         default:
             break
         }

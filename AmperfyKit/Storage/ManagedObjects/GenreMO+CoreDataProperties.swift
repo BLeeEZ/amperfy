@@ -30,15 +30,15 @@ extension GenreMO {
     }
 
     @NSManaged public var name: String?
+    @NSManaged public var artistCount: Int16
+    @NSManaged public var albumCount: Int16
+    @NSManaged public var songCount: Int16
     @NSManaged public var albums: NSOrderedSet?
     @NSManaged public var artists: NSOrderedSet?
     @NSManaged public var songs: NSOrderedSet?
     
     static let relationshipKeyPathsForPrefetching = [
         #keyPath(GenreMO.artwork),
-        #keyPath(GenreMO.albums),
-        #keyPath(GenreMO.artists),
-        #keyPath(GenreMO.songs),
     ]
 
 }

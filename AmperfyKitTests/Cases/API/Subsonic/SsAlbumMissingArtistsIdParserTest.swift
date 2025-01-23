@@ -80,6 +80,10 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
         XCTAssertEqual(albumId, song.album?.id)
         
         let localArtist = library.getArtistLocal(name: "Logistics")
+        XCTAssertEqual(songs[3].artist, localArtist)
+        XCTAssertEqual(2, localArtist?.songs.count)
+        // songCount is denormalized -> will be updated at save context
+        self.library.saveContext()
         XCTAssertEqual(2, localArtist?.songCount)
     }
 

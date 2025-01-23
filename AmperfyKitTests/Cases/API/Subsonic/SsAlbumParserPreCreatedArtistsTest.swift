@@ -40,7 +40,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
     override func checkCorrectParsing() {
         let albums = library.getAlbums().sorted(by: {Int($0.id)! < Int($1.id)!} )
         XCTAssertEqual(albums.count, 15)
-        
+
         var album = albums[1]
         XCTAssertEqual(album.id, "11047")
         XCTAssertEqual(album.name, "Back In Black")
@@ -49,7 +49,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.duration, 2534)
         XCTAssertEqual(album.remoteDuration, 2534)
-        XCTAssertEqual(album.songCount, 10)
+        XCTAssertEqual(album.remoteSongCount, 10)
         XCTAssertNil(album.genre)
         XCTAssertEqual(album.artwork?.url, "www-al-11047")
         XCTAssertEqual(album.artwork?.type, "")
@@ -64,7 +64,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.duration, 2403)
         XCTAssertEqual(album.remoteDuration, 2403)
-        XCTAssertEqual(album.songCount, 10)
+        XCTAssertEqual(album.remoteSongCount, 10)
         XCTAssertNil(album.genre)
         XCTAssertEqual(album.artwork?.url, "www-al-11052")
         XCTAssertEqual(album.artwork?.type, "")
@@ -78,7 +78,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.duration, 2414)
         XCTAssertEqual(album.remoteDuration, 2414)
-        XCTAssertEqual(album.songCount, 8)
+        XCTAssertEqual(album.remoteSongCount, 8)
         XCTAssertNil(album.genre)
         XCTAssertEqual(album.artwork?.url, "www-al-11053")
         XCTAssertEqual(album.artwork?.type, "")
@@ -92,7 +92,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.duration, 2291)
         XCTAssertEqual(album.remoteDuration, 2291)
-        XCTAssertEqual(album.songCount, 9)
+        XCTAssertEqual(album.remoteSongCount, 9)
         XCTAssertNil(album.genre)
         XCTAssertEqual(album.artwork?.url, "www-al-11061")
         XCTAssertEqual(album.artwork?.type, "")

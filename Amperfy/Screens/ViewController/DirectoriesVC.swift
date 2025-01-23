@@ -48,7 +48,7 @@ class DirectoriesVC: MultiSourceTableViewController {
         tableView.register(nibName: PlayableTableCell.typeName)
         
         let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
-            infoCB: { "\(self.directory.songs.count) Song\(self.directory.songs.count == 1 ? "" : "s")" },
+            infoCB: { "\(self.directory.songCount) Song\(self.directory.songCount == 1 ? "" : "s")" },
             playContextCb: {() in PlayContext(containable: self.directory, playables: self.songsFetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
             player: appDelegate.player,
             isInfoAlwaysHidden: false)

@@ -38,7 +38,7 @@ public class Artist: AbstractLibraryEntity {
     }
     
     public var songCount: Int {
-        return managedObject.songs?.count ?? 0
+        return Int(managedObject.songCount)
     }
     public var songs: [AbstractPlayable] {
         guard let songsSet = managedObject.songs, let songsMO = songsSet.array as? [SongMO] else { return [Song]() }
@@ -75,14 +75,20 @@ public class Artist: AbstractLibraryEntity {
         guard Int16.isValid(value: playablesDuration), managedObject.duration != Int16(playablesDuration) else { return }
         managedObject.duration = Int16(playablesDuration)
     }
-    public var albumCount: Int {
+    public var remoteAlbumCount: Int {
         get {
-            let moAlbumCount = Int(managedObject.albumCount)
-            return moAlbumCount != 0 ? moAlbumCount : (managedObject.albums?.count ?? 0)
+            return Int(managedObject.remoteAlbumCount)
         }
         set {
-            guard Int16.isValid(value: newValue), managedObject.albumCount != Int16(newValue) else { return }
-            managedObject.albumCount = Int16(newValue)
+            guard Int16.isValid(value: newValue), managedObject.remoteAlbumCount != Int16(newValue) else { return }
+            managedObject.remoteAlbumCount = Int16(newValue)
+        }
+    }
+    public var albumCount: Int {
+        get {
+            let moRemoteAlbumCount = Int(managedObject.remoteAlbumCount)
+            let moAlbumCount = Int(managedObject.albumCount)
+            return moRemoteAlbumCount != 0 ? moRemoteAlbumCount : moAlbumCount
         }
     }
     public var albums: [Album] {
@@ -120,10 +126,6 @@ extension Artist: PlayableContainable  {
             } else if relatedAlbumCount > 1 {
                 infoContent.append("\(relatedAlbumCount) Albums")
             }
-        } else if albums.count == 1 {
-            infoContent.append("1 Album")
-        } else if albums.count > 1 {
-            infoContent.append("\(albums.count) Albums")
         } else if albumCount == 1 {
             infoContent.append("1 Album")
         } else if albumCount > 1 {
@@ -139,9 +141,9 @@ extension Artist: PlayableContainable  {
             } else if relatedSongsCount > 1 {
                 infoContent.append("\(relatedSongsCount) Songs")
             }
-        } else if songs.count == 1 {
+        } else if songCount == 1 {
             infoContent.append("1 Song")
-        } else if songs.count > 1 {
+        } else if songCount > 1 {
             infoContent.append("\(songCount) Songs")
         }
         if details.type == .short, details.isShowArtistDuration, duration > 0 {

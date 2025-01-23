@@ -47,6 +47,7 @@ class AlbumTest: XCTestCase {
         XCTAssertEqual(album.year, 0)
         XCTAssertEqual(album.artist, nil)
         XCTAssertEqual(album.songs.count, 0)
+        XCTAssertEqual(album.songCount, 0)
         XCTAssertNil(album.artwork)
         XCTAssertEqual(album.image(theme: .blue, setting: .serverArtworkOnly), UIImage.getGeneratedArtwork(theme: .blue, artworkType: .album))
         XCTAssertFalse(album.playables.hasCachedItems)
@@ -103,8 +104,10 @@ class AlbumTest: XCTestCase {
     func testSongs() {
         guard let album3Items = library.getAlbum(id: cdHelper.seeder.albums[0].id, isDetailFaultResolution: true) else { XCTFail(); return }
         XCTAssertEqual(album3Items.songs.count, 3)
+        XCTAssertEqual(album3Items.songCount, 3)
         guard let album2Items = library.getAlbum(id: cdHelper.seeder.albums[2].id, isDetailFaultResolution: true) else { XCTFail(); return }
         XCTAssertEqual(album2Items.songs.count, 2)
+        XCTAssertEqual(album2Items.songCount, 2)
     }
     
     func testHasCachedSongs() {

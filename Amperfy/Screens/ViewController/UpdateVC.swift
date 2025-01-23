@@ -101,7 +101,7 @@ extension UpdateVC: LibraryUpdaterCallbacks {
         self.updateSyncInfo(infoText: name, percentParsed: 0.0)
     }
     
-    func tickOpersation() {
+    func tickOperation() {
         tickCount += 1
         var parsePercent: Float = 0.0
         if self.totalTickCount > 0 {

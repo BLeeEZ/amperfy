@@ -36,6 +36,7 @@ extension AlbumMO {
     @NSManaged public var newestIndex: Int16
     @NSManaged public var remoteDuration: Int16
     @NSManaged public var songCount: Int16
+    @NSManaged public var remoteSongCount: Int16
     @NSManaged public var year: Int16
     @NSManaged public var artist: ArtistMO?
     @NSManaged public var genre: GenreMO?
@@ -44,7 +45,6 @@ extension AlbumMO {
     static let relationshipKeyPathsForPrefetching = [
         #keyPath(AlbumMO.artwork),
         #keyPath(AlbumMO.artist),
-        #keyPath(AlbumMO.songs),
     ]
     
     static let relationshipKeyPathsForPrefetchingDetailed = [

@@ -33,16 +33,7 @@ public class Album: AbstractLibraryEntity {
         super.init(managedObject: managedObject)
     }
     override public func image(theme: ThemePreference, setting: ArtworkDisplayPreference) -> UIImage {
-        switch setting {
-        case .id3TagOnly:
-            return embeddedArtworkImage ?? getDefaultImage(theme: theme)
-        case .serverArtworkOnly:
-            return super.image(theme: theme, setting: setting)
-        case .preferServerArtwork:
-            return artwork?.image ?? embeddedArtworkImage ?? getDefaultImage(theme: theme)
-        case .preferId3Tag:
-            return embeddedArtworkImage ?? artwork?.image ?? getDefaultImage(theme: theme)
-        }
+        return super.image(theme: theme, setting: setting)
     }
     private var embeddedArtworkImage: UIImage? {
         return songs.lazy.compactMap{ $0.embeddedArtwork }.first?.image
@@ -128,14 +119,20 @@ public class Album: AbstractLibraryEntity {
     public func markAsNotRecentAnymore() {
         managedObject.recentIndex = 0
     }
+    public var remoteSongCount: Int {
+        get {
+            return Int(managedObject.remoteSongCount)
+        }
+        set {
+            guard Int16.isValid(value: newValue), managedObject.remoteSongCount != Int16(newValue) else { return }
+            managedObject.remoteSongCount = Int16(newValue)
+        }
+    }
     public var songCount: Int {
         get {
             let moSongCount = Int(managedObject.songCount)
-            return moSongCount != 0 ? moSongCount : (managedObject.songs?.count ?? 0)
-        }
-        set {
-            guard Int16.isValid(value: newValue), managedObject.songCount != Int16(newValue) else { return }
-            managedObject.songCount = Int16(newValue)
+            let moRemoteSongCount = Int(managedObject.remoteSongCount)
+            return moRemoteSongCount != 0 ? moRemoteSongCount : moSongCount
         }
     }
     public var songs: [AbstractPlayable] {
@@ -169,11 +166,7 @@ extension Album: PlayableContainable  {
     public var subsubtitle: String? { return nil }
     public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
         var infoContent = [String]()
-        if songs.count == 1 {
-            infoContent.append("1 Song")
-        } else if songs.count > 1 {
-            infoContent.append("\(songs.count) Songs")
-        } else if songCount == 1 {
+        if songCount == 1 {
             infoContent.append("1 Song")
         } else if songCount > 1 {
             infoContent.append("\(songCount) Songs")

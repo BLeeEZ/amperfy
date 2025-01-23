@@ -52,7 +52,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
         tableView.estimatedRowHeight = PodcastEpisodeTableCell.rowHeight
 
         let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
-            infoCB: { "\(self.podcast.episodes.count) Episode\(self.podcast.episodes.count == 1 ? "" : "s")" },
+            infoCB: { "\(self.podcast.episodeCount) Episode\(self.podcast.episodeCount == 1 ? "" : "s")" },
             playContextCb: {() in
                 let context =  self.fetchedResultsController.getContextPodcastEpisodes(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
                 let newestEpisode = context?.first

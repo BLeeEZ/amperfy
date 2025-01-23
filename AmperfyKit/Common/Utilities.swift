@@ -23,6 +23,7 @@ import Foundation
 import UIKit
 import os.log
 import PromiseKit
+import CoreData
 
 public typealias VoidFunctionCallback = () -> Void
 
@@ -642,3 +643,12 @@ extension UIDevice {
     }
 }
 
+extension NSManagedObject {
+    public func changedValue(forKey: String) -> Any? {
+        return changedValues()[forKey]
+    }
+    
+    public func committedValue(forKey: String) -> Any? {
+        return committedValues(forKeys: nil)[forKey]
+    }
+}

@@ -56,7 +56,7 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
                 albumBuffer?.year = year
             }
             if let attributeSongCount = attributeDict["songCount"], let songCount = Int(attributeSongCount) {
-                albumBuffer?.songCount = songCount
+                albumBuffer?.remoteSongCount = songCount
             }
             if let attributeDuration = attributeDict["duration"], let duration = Int(attributeDuration) {
                 albumBuffer?.remoteDuration = duration

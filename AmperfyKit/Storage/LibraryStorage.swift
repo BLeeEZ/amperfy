@@ -798,15 +798,23 @@ public class LibraryStorage: PlayableFileCachable {
         }
     }
     
-    public func getGenres() -> [Genre] {
+    public func getGenres(isFaultsOptimized: Bool = false) -> [Genre] {
         let fetchRequest = GenreMO.identifierSortedFetchRequest
+        if isFaultsOptimized {
+            fetchRequest.relationshipKeyPathsForPrefetching = GenreMO.relationshipKeyPathsForPrefetching
+            fetchRequest.returnsObjectsAsFaults = false
+        }
         let foundGenres = try? context.fetch(fetchRequest)
         let genres = foundGenres?.compactMap{ Genre(managedObject: $0) }
         return genres ?? [Genre]()
     }
     
-    public func getArtists() -> [Artist] {
+    public func getArtists(isFaultsOptimized: Bool = false) -> [Artist] {
         let fetchRequest = ArtistMO.identifierSortedFetchRequest
+        if isFaultsOptimized {
+            fetchRequest.relationshipKeyPathsForPrefetching = ArtistMO.relationshipKeyPathsForPrefetching
+            fetchRequest.returnsObjectsAsFaults = false
+        }
         let foundArtists = try? context.fetch(fetchRequest)
         let artists = foundArtists?.compactMap{ Artist(managedObject: $0) }
         return artists ?? [Artist]()
@@ -832,8 +840,12 @@ public class LibraryStorage: PlayableFileCachable {
         return artists ?? [Artist]()
     }
     
-    public func getAlbums() -> [Album] {
+    public func getAlbums(isFaultsOptimized: Bool = false) -> [Album] {
         let fetchRequest = AlbumMO.identifierSortedFetchRequest
+        if isFaultsOptimized {
+            fetchRequest.relationshipKeyPathsForPrefetching = AlbumMO.relationshipKeyPathsForPrefetching
+            fetchRequest.returnsObjectsAsFaults = false
+        }
         let foundAlbums = try? context.fetch(fetchRequest)
         let albums = foundAlbums?.compactMap{ Album(managedObject: $0) }
         return albums ?? [Album]()
@@ -901,8 +913,12 @@ public class LibraryStorage: PlayableFileCachable {
         return albums ?? [Album]()
     }
     
-    public func getPodcasts() -> [Podcast] {
+    public func getPodcasts(isFaultsOptimized: Bool = false) -> [Podcast] {
         let fetchRequest = PodcastMO.identifierSortedFetchRequest
+        if isFaultsOptimized {
+            fetchRequest.relationshipKeyPathsForPrefetching = PodcastMO.relationshipKeyPathsForPrefetching
+            fetchRequest.returnsObjectsAsFaults = false
+        }
         let foundPodcasts = try? context.fetch(fetchRequest)
         let podcasts = foundPodcasts?.compactMap{ Podcast(managedObject: $0) }
         return podcasts ?? [Podcast]()
@@ -1520,8 +1536,12 @@ public class LibraryStorage: PlayableFileCachable {
         return userStatistics ?? [UserStatistics]()
     }
     
-    func getMusicFolders() -> [MusicFolder] {
+    func getMusicFolders(isFaultsOptimized: Bool = false) -> [MusicFolder] {
         let fetchRequest: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
+        if isFaultsOptimized {
+            fetchRequest.relationshipKeyPathsForPrefetching = MusicFolderMO.relationshipKeyPathsForPrefetching
+            fetchRequest.returnsObjectsAsFaults = false
+        }
         let foundMusicFolders = try? context.fetch(fetchRequest)
         let musicFolders = foundMusicFolders?.compactMap{ MusicFolder(managedObject: $0) }
         return musicFolders ?? [MusicFolder]()
@@ -1535,8 +1555,12 @@ public class LibraryStorage: PlayableFileCachable {
         return musicFolders?.lazy.compactMap{ MusicFolder(managedObject: $0) }.first
     }
     
-    func getDirectories() -> [Directory] {
+    func getDirectories(isFaultsOptimized: Bool = false) -> [Directory] {
         let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
+        if isFaultsOptimized {
+            fetchRequest.relationshipKeyPathsForPrefetching = DirectoryMO.relationshipKeyPathsForPrefetching
+            fetchRequest.returnsObjectsAsFaults = false
+        }
         let directories = try? context.fetch(fetchRequest)
         return directories?.lazy.compactMap{ Directory(managedObject: $0) } ?? [Directory]()
     }

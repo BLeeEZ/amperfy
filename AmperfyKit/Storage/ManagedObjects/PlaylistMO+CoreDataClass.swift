@@ -25,6 +25,22 @@ import CoreData
 @objc(PlaylistMO)
 public final class PlaylistMO: NSManagedObject {
 
+    override public func willSave() {
+        super.willSave()
+        if hasChangedSongs {
+            updateSongCount()
+        }
+    }
+
+    fileprivate var hasChangedSongs: Bool {
+        return changedValue(forKey: #keyPath(items)) != nil
+    }
+
+    fileprivate func updateSongCount() {
+        guard Int16(items?.count ?? 0) != songCount else { return }
+        songCount = Int16(items?.count ?? 0)
+    }
+
     static var excludeSystemPlaylistsFetchPredicate: NSPredicate {
         return NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersContextPlaylist)),

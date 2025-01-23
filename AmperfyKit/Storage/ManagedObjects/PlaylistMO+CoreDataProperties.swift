@@ -48,7 +48,6 @@ extension PlaylistMO {
     @NSManaged public var searchHistory: SearchHistoryItemMO?
     
     static let relationshipKeyPathsForPrefetching = [
-        #keyPath(PlaylistMO.items),
         #keyPath(PlaylistMO.artworkItems),
     ]
 
