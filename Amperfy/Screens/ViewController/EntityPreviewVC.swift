@@ -732,7 +732,7 @@ class EntityPreviewVC: UIViewController {
 
     func refresh() {
         guard let entityContainer = entityContainer else { return }
-        entityImageView.display(theme: appDelegate.storage.settings.themePreference, container: entityContainer)
+        entityImageView.display(theme: appDelegate.storage.settings.themePreference, container: entityContainer, priority: .low)
         titleLabel.text = entityContainer.name
         artistLabel.text = entityContainer.subtitle
         artistLabel.isHidden = entityContainer.subtitle == nil

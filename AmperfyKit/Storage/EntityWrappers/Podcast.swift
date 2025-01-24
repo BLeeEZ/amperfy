@@ -107,13 +107,3 @@ extension Podcast: PlayableContainable  {
     }
     public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .podcast, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
 }
-
-extension Podcast: Hashable, Equatable {
-    public static func == (lhs: Podcast, rhs: Podcast) -> Bool {
-        return lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(managedObject)
-    }
-}

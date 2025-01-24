@@ -115,3 +115,13 @@ public class AbstractLibraryEntity {
     }
 
 }
+
+extension AbstractLibraryEntity: Hashable, Equatable {
+    public static func == (lhs: AbstractLibraryEntity, rhs: AbstractLibraryEntity) -> Bool {
+        return lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(managedObject)
+    }
+}

@@ -383,16 +383,6 @@ extension AbstractPlayable: PlayableContainable  {
     }
 }
 
-extension AbstractPlayable: Hashable, Equatable {
-    public static func == (lhs: AbstractPlayable, rhs: AbstractPlayable) -> Bool {
-        return lhs.playableManagedObject == rhs.playableManagedObject && lhs.playableManagedObject == rhs.playableManagedObject
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(playableManagedObject)
-    }
-}
-
 extension Array where Element: AbstractPlayable {
     
     public func filterCached() -> [Element] {

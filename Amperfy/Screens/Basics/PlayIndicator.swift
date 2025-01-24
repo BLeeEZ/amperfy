@@ -23,6 +23,9 @@ import Foundation
 import VYPlayIndicator
 import AmperfyKit
 
+class OverlayLayer : CALayer {
+}
+
 class PlayIndicatorHandler {
     
     static var shared: PlayIndicatorHandler {
@@ -34,8 +37,12 @@ class PlayIndicatorHandler {
     private static var inst: PlayIndicatorHandler?
     
     private var indicatorDict = Dictionary<String, VYPlayIndicator>()
-    private var imageOverlayDict = Dictionary<String, CALayer>()
+    private var imageOverlayDict = Dictionary<String, OverlayLayer>()
 
+    static private var imageOverlayColor: CGColor {
+        return UIColor.imageOverlayBackground.cgColor
+    }
+    
     private init() { }
     
     func getIndicator(for viewControllerTypeName: String) -> VYPlayIndicator {
@@ -48,10 +55,11 @@ class PlayIndicatorHandler {
         return indicator!
     }
     
-    func getImageOverlay(for viewControllerTypeName: String) -> CALayer {
+    func getImageOverlay(for viewControllerTypeName: String) -> OverlayLayer {
         var imageOverlay = imageOverlayDict[viewControllerTypeName]
         if imageOverlay == nil {
-            imageOverlay = CALayer()
+            imageOverlay = OverlayLayer()
+            imageOverlay?.backgroundColor = Self.imageOverlayColor
             imageOverlayDict[viewControllerTypeName] = imageOverlay
         }
         return imageOverlay!
@@ -62,14 +70,11 @@ class PlayIndicatorHandler {
 class PlayIndicator {
     
     static private let frameHeight = 20.0
-    static private var imageOverlayColor: CGColor {
-        return UIColor.imageOverlayBackground.cgColor
-    }
     
     var willDisplayIndicatorCB: VoidFunctionCallback?
     var willHideIndicatorCB: VoidFunctionCallback?
     private var appDelegate: AppDelegate
-    private var rootViewTypeName: String
+    private(set) var rootViewTypeName: String
     private var rootView: UIView?
     private var playable: AbstractPlayable?
     private var isDisplayedOnImage = false
@@ -133,34 +138,34 @@ class PlayIndicator {
     
     private func addIndicatorIfNeeded() {
         guard let rootView = rootView else { return }
-        let indicator = PlayIndicatorHandler.shared.getIndicator(for: rootViewTypeName)
-        indicator.frame = calcIndicatorFrame(rootFrame: rootView.bounds)
-        let imageOverlay = PlayIndicatorHandler.shared.getImageOverlay(for: rootViewTypeName)
-        imageOverlay.frame = rootView.bounds
-        imageOverlay.backgroundColor = Self.imageOverlayColor
-        
-        var isAlreadyInSublayers = false
-        if let rootSublayers = rootView.layer.sublayers, rootSublayers.contains(where: {$0 == indicator}) {
-            isAlreadyInSublayers = true
-        }
-        if playable == appDelegate.player.currentlyPlaying, !isAlreadyInSublayers {
-            willDisplayIndicatorCB?()
-            if isDisplayedOnImage {
-                rootView.layer.addSublayer(imageOverlay)
+
+        if playable == appDelegate.player.currentlyPlaying {
+            var isAlreadyInSublayers = false
+            if let rootSublayers = rootView.layer.sublayers, rootSublayers.contains(where: { $0 is VYPlayIndicator }) {
+                isAlreadyInSublayers = true
             }
-            rootView.layer.addSublayer(indicator)
+            if !isAlreadyInSublayers {
+                let indicator = PlayIndicatorHandler.shared.getIndicator(for: rootViewTypeName)
+                indicator.frame = calcIndicatorFrame(rootFrame: rootView.bounds)
+                let imageOverlay = PlayIndicatorHandler.shared.getImageOverlay(for: rootViewTypeName)
+                imageOverlay.frame = rootView.bounds
+                
+                willDisplayIndicatorCB?()
+                if isDisplayedOnImage {
+                    rootView.layer.addSublayer(imageOverlay)
+                }
+                rootView.layer.addSublayer(indicator)
+            }
         }
     }
     
     private func removeIndicatorIfNeeded(force: Bool = false) {
         guard let rootView = rootView else { return }
-        let indicator = PlayIndicatorHandler.shared.getIndicator(for: rootViewTypeName)
-        let imageOverlay = PlayIndicatorHandler.shared.getImageOverlay(for: rootViewTypeName)
         if playable != appDelegate.player.currentlyPlaying || force {
             willHideIndicatorCB?()
-            rootView.layer.sublayers = rootView.layer.sublayers?.filter{ $0 != indicator }
+            rootView.layer.sublayers = rootView.layer.sublayers?.filter{ !($0 is VYPlayIndicator) }
             if isDisplayedOnImage {
-                rootView.layer.sublayers = rootView.layer.sublayers?.filter{ $0 != imageOverlay }
+                rootView.layer.sublayers = rootView.layer.sublayers?.filter{ !($0 is OverlayLayer) }
             }
         }
     }

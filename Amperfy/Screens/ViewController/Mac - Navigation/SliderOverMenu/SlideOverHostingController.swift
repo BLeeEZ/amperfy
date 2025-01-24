@@ -244,9 +244,11 @@ class SlideOverHostingController: UIViewController {
     }
 
     @objc func settingsDidChange() {
-        self.navigationItem.leftBarButtonItems?.forEach { ($0 as? Refreshable)?.reload() }
-        self.updateButtonVisibility()
-        self.slideOverViewController.settingsDidChange()
+        DispatchQueue.main.async {
+            self.navigationItem.leftBarButtonItems?.forEach { ($0 as? Refreshable)?.reload() }
+            self.updateButtonVisibility()
+            self.slideOverViewController.settingsDidChange()
+        }
     }
 
     func showSlideOverView() {

@@ -34,7 +34,7 @@ public class EmbeddedArtwork: NSObject {
     public var image: UIImage? {
         if let relFilePath = relFilePath,
            let absolutePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath){
-            return UIImage(contentsOfFile: absolutePath.path)
+            return UIImage(named: absolutePath.path)
         } else {
             return nil
         }

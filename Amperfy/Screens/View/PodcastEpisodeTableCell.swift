@@ -66,7 +66,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
             self.configurePlayEpisodeButton()
         }
         podcastEpisodeLabel.text = episode.title
-        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: episode)
+        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: episode, priority: .low)
         
         infoLabel.text = "\(episode.publishDate.asShortDayMonthString)"
         descriptionLabel.text = episode.depiction ?? ""

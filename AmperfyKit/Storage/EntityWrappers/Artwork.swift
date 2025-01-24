@@ -87,7 +87,7 @@ public class Artwork: NSObject {
         case .CustomImage:
             if let relFilePath = relFilePath,
                let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath){
-                img = UIImage(contentsOfFile: absFilePath.path)
+                img = UIImage(named: absFilePath.path)
             }
         default:
             break

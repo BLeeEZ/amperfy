@@ -168,7 +168,7 @@ extension PopupPlayerVC {
     
     func refreshArtwork(artworkImage: LibraryEntityImage) {
         if let playableInfo = player.currentlyPlaying {
-            artworkImage.display(entity: playableInfo)
+            artworkImage.display(entity: playableInfo, priority: .high)
         } else {
             switch player.playerMode {
             case .music:

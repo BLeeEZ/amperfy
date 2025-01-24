@@ -32,6 +32,12 @@ enum DisplayMode {
     case add
 }
 
+enum PlayableTableCellStyle {
+    case none
+    case trackNumber
+    case artwork
+}
+
 class PlayableTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
@@ -55,6 +61,7 @@ class PlayableTableCell: BasicTableCell {
     static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
     private static let touchAnimation = 0.4
     
+    private var style = PlayableTableCellStyle.none
     private var playerIndexCb: GetPlayerIndexFromTableCellCallback?
     private var playContextCb: GetPlayContextFromTableCellCallback?
     private var playable: AbstractPlayable?
@@ -94,6 +101,26 @@ class PlayableTableCell: BasicTableCell {
         //singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
         self.addGestureRecognizer(singleTapGestureRecognizer)
 #endif
+
+        style = PlayableTableCellStyle.none
+        deleteButton.tintColor = .red
+        playOverArtworkButton.layer.backgroundColor = UIColor.imageOverlayBackground.cgColor
+        playOverArtworkButton.layer.cornerRadius = CornerRadius.small.asCGFloat
+        selectionStyle = .none
+        downloadProgress.isHidden = true
+        resetForReuse()
+    }
+    
+    func resetForReuse() {
+        playIndicator?.reset()
+        deleteButton.isHidden = true
+        playOverArtworkButton.isHidden = true
+        playOverNumberButton.isHidden = true
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        resetForReuse()
     }
 
 #if targetEnvironment(macCatalyst)
@@ -119,16 +146,9 @@ class PlayableTableCell: BasicTableCell {
 #endif
     
     func display(playable: AbstractPlayable, displayMode: DisplayMode = .normal, playContextCb: GetPlayContextFromTableCellCallback?, rootView: UIViewController, playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil, isDislayAlbumTrackNumberStyle: Bool = false, download: Download? = nil, isMarked: Bool = false) {
-        if playIndicator == nil {
+        if playIndicator?.rootViewTypeName != rootView.typeName {
             playIndicator = PlayIndicator(rootViewTypeName: rootView.typeName)
         }
-        
-        self.deleteButton.isHidden = true
-        self.deleteButton.tintColor = .red
-        self.playOverArtworkButton.isHidden = true
-        self.playOverArtworkButton.layer.backgroundColor = UIColor.imageOverlayBackground.cgColor
-        self.playOverArtworkButton.layer.cornerRadius = CornerRadius.small.asCGFloat
-        self.playOverNumberButton.isHidden = true
 
         self.playable = playable
         self.displayMode = displayMode
@@ -137,7 +157,6 @@ class PlayableTableCell: BasicTableCell {
         self.rootView = rootView
         self.isDislayAlbumTrackNumberStyle = isDislayAlbumTrackNumberStyle
         self.download = download
-        self.selectionStyle = .none
         self.isMarked = isMarked
         
 #if targetEnvironment(macCatalyst)
@@ -148,18 +167,15 @@ class PlayableTableCell: BasicTableCell {
 #else
         singleTapGestureRecognizer.isEnabled = (displayMode == .normal)
 #endif
-        
         refresh()
     }
-
-    func refresh() {
-        downloadProgress.isHidden = true
-        guard let playable = playable else { return }
-        titleLabel.text = playable.title
-        artistLabel.text = playable.creatorName
-        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playable)
+    
+    private func configureStyle(playable: AbstractPlayable, newStyle: PlayableTableCellStyle) {
+        // adjust style only if it has changed
+        guard newStyle != style else { return }
         
-        if self.isDislayAlbumTrackNumberStyle {
+        switch newStyle {
+        case .trackNumber:
             configureTrackNumberLabel()
             playIndicator?.willDisplayIndicatorCB = { [weak self] () in
                 guard let self = self else { return }
@@ -169,23 +185,37 @@ class PlayableTableCell: BasicTableCell {
                 guard let self = self else { return }
                 self.configureTrackNumberLabel()
             }
-            
-            playIndicator?.display(playable: playable, rootView: self.trackNumberLabel)
             trackNumberLabel.isHidden = false
             entityImage.isHidden = true
             titleContainerLeadingConstraint.constant = 21 + 16 // track lable width + offset
-        } else {
+        case .artwork:
             playIndicator?.willDisplayIndicatorCB = nil
             playIndicator?.willHideIndicatorCB = nil
+            trackNumberLabel.isHidden = true
+            entityImage.isHidden = false
+            titleContainerLeadingConstraint.constant = 48 + 8 // artwork width + offset
+        case .none:
+            break // do nothing
+        }
+    }
+
+    func refresh() {
+        guard let playable = playable else { return }
+        titleLabel.text = playable.title
+        artistLabel.text = playable.creatorName
+        
+        configureStyle(playable: playable, newStyle: isDislayAlbumTrackNumberStyle ? .trackNumber : .artwork)
+        
+        if isDislayAlbumTrackNumberStyle {
+            playIndicator?.display(playable: playable, rootView: self.trackNumberLabel)
+        } else {
+            entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playable, priority: .low)
             if self.playerIndexCb == nil {
                 playIndicator?.display(playable: playable, rootView: self.entityImage, isOnImage: true)
             } else {
                 // don't show play indicator on PopupPlayer
                 playIndicator?.reset()
             }
-            trackNumberLabel.isHidden = true
-            entityImage.isHidden = false
-            titleContainerLeadingConstraint.constant = 48 + 8 // artwork width + offset
         }
         
         if displayMode == .selection {
@@ -200,19 +230,23 @@ class PlayableTableCell: BasicTableCell {
             let img = UIImageView(image: .bars)
             img.tintColor = .labelColor
             accessoryView = img
-        } else if download?.error != nil {
-            let img = UIImageView(image: .exclamation)
-            img.tintColor = .labelColor
-            accessoryView = img
-        } else if download?.isFinishedSuccessfully ?? false {
-            let img = UIImageView(image: .check)
-            img.tintColor = .labelColor
-            accessoryView = img
-        } else if download?.isDownloading ?? false {
-            let spinner = UIActivityIndicatorView(style: .medium)
-            spinner.startAnimating()
-            spinner.tintColor = .labelColor
-            accessoryView = spinner
+        } else if let download = download {
+            if download.error != nil {
+                let img = UIImageView(image: .exclamation)
+                img.tintColor = .labelColor
+                accessoryView = img
+            } else if download.isFinishedSuccessfully {
+                let img = UIImageView(image: .check)
+                img.tintColor = .labelColor
+                accessoryView = img
+            } else if download.isDownloading {
+                let spinner = UIActivityIndicatorView(style: .medium)
+                spinner.startAnimating()
+                spinner.tintColor = .labelColor
+                accessoryView = spinner
+            } else {
+                accessoryView = nil
+            }
         } else {
             accessoryView = nil
         }
@@ -293,11 +327,6 @@ class PlayableTableCell: BasicTableCell {
             artistLabel.textColor = UIColor.secondaryLabelColor
             durationLabel.textColor = UIColor.secondaryLabelColor
         }
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        playIndicator?.reset()
     }
     
     func playThisSong() {

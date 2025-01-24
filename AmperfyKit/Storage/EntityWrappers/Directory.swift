@@ -106,13 +106,3 @@ extension Directory: PlayableContainable  {
         playables.reduce(0){ $0 + $1.duration }
     }
 }
-
-extension Directory: Hashable, Equatable {
-    public static func == (lhs: Directory, rhs: Directory) -> Bool {
-        return lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(managedObject)
-    }
-}

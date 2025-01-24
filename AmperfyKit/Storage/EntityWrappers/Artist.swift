@@ -183,13 +183,3 @@ extension Artist: PlayableContainable  {
     }
     public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .artist, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
 }
-
-extension Artist: Hashable, Equatable {
-    public static func == (lhs: Artist, rhs: Artist) -> Bool {
-        return lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(managedObject)
-    }
-}

@@ -62,10 +62,26 @@ open class EntityImageView: UIView {
         ]
         addSubview(view)
         self.view = view
+        
+        backgroundColor = .clear
+        
+        layer.masksToBounds = true
+        self.view.backgroundColor = .clear
+        self.view.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        quadImages[0].layer.maskedCorners = [
+            .layerMinXMinYCorner,
+            .layerMaxXMinYCorner,
+            .layerMinXMaxYCorner,
+            .layerMaxXMaxYCorner
+        ]
+        quadImages[0].layer.maskedCorners = [.layerMinXMinYCorner]
+        quadImages[1].layer.maskedCorners = [.layerMaxXMinYCorner]
+        quadImages[2].layer.maskedCorners = [.layerMinXMaxYCorner]
+        quadImages[3].layer.maskedCorners = [.layerMaxXMaxYCorner]
     }
     
-    public func display(theme: ThemePreference, container: PlayableContainable, cornerRadius: CornerRadius = .small) {
-        display(theme: theme, collection: container.getArtworkCollection(theme: theme), cornerRadius: cornerRadius)
+    public func display(theme: ThemePreference, container: PlayableContainable, priority: ImageDisplayPriority, cornerRadius: CornerRadius = .small) {
+        display(theme: theme, collection: container.getArtworkCollection(theme: theme), priority: priority, cornerRadius: cornerRadius)
     }
 
     public func configureStyling(image: UIImage, imageSizeType: ArtworkIconSizeType, imageTintColor: UIColor, backgroundColor: UIColor) {
@@ -76,25 +92,16 @@ open class EntityImageView: UIView {
         singleImage.display(image: modImage)
     }
     
-    public func display(theme: ThemePreference, collection: ArtworkCollection, cornerRadius: CornerRadius = .small) {
-        backgroundColor = .clear
+    private func display(theme: ThemePreference, collection: ArtworkCollection, priority: ImageDisplayPriority, cornerRadius: CornerRadius = .small) {
         layer.cornerRadius = cornerRadius.asCGFloat
-        layer.masksToBounds = true
-        self.view.backgroundColor = .clear
-        self.view.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         quadImages.forEach{ $0.isHidden = true }
         singleImage.isHidden = false
-        quadImages[0].layer.maskedCorners = [
-            .layerMinXMinYCorner,
-            .layerMaxXMinYCorner,
-            .layerMinXMaxYCorner,
-            .layerMaxXMaxYCorner
-        ]
+
         if let quadEntities = collection.quadImageEntity {
             if quadEntities.count > 1 {
                 // check if all images are the same
                 if Set(quadEntities.compactMap{$0.artwork?.id}).count == 1 {
-                    singleImage.displayAndUpdate(entity: quadEntities.first!)
+                    singleImage.displayAndUpdate(entity: quadEntities.first!, priority: priority)
                 } else {
                     singleImage.isHidden = true
                     quadImages.forEach{
@@ -103,20 +110,16 @@ open class EntityImageView: UIView {
                     }
                     for (index, entity) in quadEntities.enumerated() {
                         guard index < quadImages.count else { break }
-                        quadImages[index].display(entity: entity)
+                        quadImages[index].display(entity: entity, priority: priority)
                     }
-                    quadImages[0].layer.maskedCorners = [.layerMinXMinYCorner]
-                    quadImages[1].layer.maskedCorners = [.layerMaxXMinYCorner]
-                    quadImages[2].layer.maskedCorners = [.layerMinXMaxYCorner]
-                    quadImages[3].layer.maskedCorners = [.layerMaxXMaxYCorner]
                 }
             } else if let firstEntity = quadEntities.first  {
-                singleImage.displayAndUpdate(entity: firstEntity)
+                singleImage.displayAndUpdate(entity: firstEntity, priority: priority)
             } else {
                 singleImage.display(image: collection.defaultImage)
             }
         } else if let singleEntity = collection.singleImageEntity {
-            singleImage.displayAndUpdate(entity: singleEntity)
+            singleImage.displayAndUpdate(entity: singleEntity, priority: priority)
         } else {
             singleImage.display(image: collection.defaultImage)
         }

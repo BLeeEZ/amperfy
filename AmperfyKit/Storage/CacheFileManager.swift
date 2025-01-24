@@ -84,6 +84,8 @@ public class CacheFileManager {
     }
     
     private let fileManager = FileManager.default
+    // Get the URL to the app container's 'Library' directory.
+    private var amperfyLibraryDirectory: URL?
 
     public func moveItemToTempDirectoryWithUniqueName(at: URL) throws -> URL {
         // Get the URL to the app container's 'tmp' directory.
@@ -117,8 +119,10 @@ public class CacheFileManager {
     }
     
     private func getOrCreateAmperfyDirectory() -> URL?  {
-        var amperfyDir: URL? = nil
-        if let bundleIdentifier = Bundle.main.bundleIdentifier,
+        var amperfyDir: URL? = amperfyLibraryDirectory
+        if amperfyDir == nil,
+           // the action to get Amperfy's library directory takes long -> save it in cache
+           let bundleIdentifier = Bundle.main.bundleIdentifier,
            // Get the URL to the app container's 'Library' directory.
            var url = try? fileManager.url(for: .libraryDirectory,
                                    in: .userDomainMask,
@@ -131,6 +135,7 @@ public class CacheFileManager {
                 try? markItemAsExcludedFromBackup(at: url)
             }
             amperfyDir = url
+            amperfyLibraryDirectory = url
         }
         return amperfyDir
     }

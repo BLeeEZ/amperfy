@@ -211,13 +211,3 @@ extension Album: PlayableContainable  {
     }
     public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .album, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
 }
-
-extension Album: Hashable, Equatable {
-    public static func == (lhs: Album, rhs: Album) -> Bool {
-        return lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(managedObject)
-    }
-}
