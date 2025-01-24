@@ -716,12 +716,16 @@ class EntityPreviewVC: UIViewController {
         // for displaying a preview with the dimension of an image, for example.
         // Unlike peek and pop, it doesn't seem to automatically scale down for you.
 
-        let width = view.bounds.width
-        let height = entityImageView.frame.height + Self.margin.top + Self.margin.bottom
-        preferredContentSize = CGSize(width: width, height: height)
+        if traitCollection.userInterfaceIdiom == .phone {
+            preferredContentSize = CGSize(width: view.bounds.width, height: 150 + Self.margin.top + Self.margin.bottom)
+        } else if traitCollection.userInterfaceIdiom == .pad {
+            preferredContentSize = CGSize(width: view.bounds.width, height: 190 + Self.margin.top + Self.margin.bottom)
+        } else {
+            preferredContentSize = CGSize(width: view.bounds.width, height: 190 + Self.margin.top + Self.margin.bottom)
+        }
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
+
+    override func viewIsAppearing(_ animated: Bool) {
         refresh()
     }
 
