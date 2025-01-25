@@ -80,7 +80,6 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         self.sortType = sortType
         appDelegate.storage.settings.playlistsSortSetting = sortType
         singleFetchedResultsController?.clearResults()
-        tableView.reloadData()
         fetchedResultsController = PlaylistFetchedResultsController(coreDataCompanion: appDelegate.storage.main, sortType: sortType, isGroupedInAlphabeticSections: sortType.asSectionIndexType != .none)
         fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
         singleFetchedResultsController = fetchedResultsController

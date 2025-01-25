@@ -102,7 +102,7 @@ class GenericDetailTableHeader: UIView {
     func refresh() {
         guard let config = config else { return }
         let entityContainer = config.entityContainer
-        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: entityContainer, priority: .low)
+        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: entityContainer)
         titleLabel.text = entityContainer.name
         subtitleView.isHidden = entityContainer.subtitle == nil
         subtitleLabel.text = entityContainer.subtitle

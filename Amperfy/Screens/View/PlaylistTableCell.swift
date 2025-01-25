@@ -37,7 +37,7 @@ class PlaylistTableCell: BasicTableCell {
         self.playlist = playlist
         self.rootView = rootView
         nameLabel.text = playlist.name
-        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playlist, priority: .low)
+        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playlist)
         infoLabel.text = playlist.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .short, settings: appDelegate.storage.settings))
         infoLabel.textAlignment = (traitCollection.horizontalSizeClass == .regular) ? .right : .left
         self.accessoryType = .disclosureIndicator

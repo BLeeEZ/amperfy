@@ -78,12 +78,12 @@ class PlayableTableCell: BasicTableCell {
 #else
     private var singleTapGestureRecognizer: UITapGestureRecognizer!
 #endif
-
+    
     public var isMarked = false
     private var isDeleteButtonAllowedToBeVisible: Bool {
         return (traitCollection.userInterfaceIdiom == .mac) && (playerIndexCb != nil)
     }
-
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         playContextCb = nil
@@ -101,7 +101,7 @@ class PlayableTableCell: BasicTableCell {
         //singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
         self.addGestureRecognizer(singleTapGestureRecognizer)
 #endif
-
+        
         style = PlayableTableCellStyle.none
         deleteButton.tintColor = .red
         playOverArtworkButton.layer.backgroundColor = UIColor.imageOverlayBackground.cgColor
@@ -122,7 +122,7 @@ class PlayableTableCell: BasicTableCell {
         super.prepareForReuse()
         resetForReuse()
     }
-
+    
 #if targetEnvironment(macCatalyst)
     deinit {
         unregister()
@@ -149,7 +149,7 @@ class PlayableTableCell: BasicTableCell {
         if playIndicator?.rootViewTypeName != rootView.typeName {
             playIndicator = PlayIndicator(rootViewTypeName: rootView.typeName)
         }
-
+        
         self.playable = playable
         self.displayMode = displayMode
         self.playContextCb = playContextCb
@@ -198,18 +198,16 @@ class PlayableTableCell: BasicTableCell {
             break // do nothing
         }
     }
-
-    func refresh() {
-        guard let playable = playable else { return }
-        titleLabel.text = playable.title
-        artistLabel.text = playable.creatorName
-        
-        configureStyle(playable: playable, newStyle: isDislayAlbumTrackNumberStyle ? .trackNumber : .artwork)
+    
+    private func configurePlayIndicator(playable: AbstractPlayable?) {
+        guard let playable = playable else {
+            playIndicator?.reset()
+            return
+        }
         
         if isDislayAlbumTrackNumberStyle {
             playIndicator?.display(playable: playable, rootView: self.trackNumberLabel)
         } else {
-            entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playable, priority: .low)
             if self.playerIndexCb == nil {
                 playIndicator?.display(playable: playable, rootView: self.entityImage, isOnImage: true)
             } else {
@@ -217,7 +215,17 @@ class PlayableTableCell: BasicTableCell {
                 playIndicator?.reset()
             }
         }
+    }
+
+    func refresh() {
+        guard let playable = playable else { return }
+        titleLabel.text = playable.title
+        artistLabel.text = playable.creatorName
         
+        configureStyle(playable: playable, newStyle: isDislayAlbumTrackNumberStyle ? .trackNumber : .artwork)
+        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playable)
+        configurePlayIndicator(playable: playable)
+
         if displayMode == .selection {
             let img = UIImageView(image: isMarked ? .checkmark : .circle)
             img.tintColor = isMarked ? appDelegate.storage.settings.themePreference.asColor : .secondaryLabelColor
@@ -418,7 +426,7 @@ class PlayableTableCell: BasicTableCell {
         } else {
             playOverArtworkButton.isHidden = true
             playOverNumberButton.isHidden = true
-            refresh()
+            configurePlayIndicator(playable: playable)
             deleteButton.isHidden = true
             refreshSubtitleColor()
             optionsButton.imageView?.tintColor = .label

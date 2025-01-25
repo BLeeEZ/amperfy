@@ -80,8 +80,8 @@ open class EntityImageView: UIView {
         quadImages[3].layer.maskedCorners = [.layerMaxXMaxYCorner]
     }
     
-    public func display(theme: ThemePreference, container: PlayableContainable, priority: ImageDisplayPriority, cornerRadius: CornerRadius = .small) {
-        display(theme: theme, collection: container.getArtworkCollection(theme: theme), priority: priority, cornerRadius: cornerRadius)
+    public func display(theme: ThemePreference, container: PlayableContainable, cornerRadius: CornerRadius = .small) {
+        display(theme: theme, collection: container.getArtworkCollection(theme: theme), cornerRadius: cornerRadius)
     }
 
     public func configureStyling(image: UIImage, imageSizeType: ArtworkIconSizeType, imageTintColor: UIColor, backgroundColor: UIColor) {
@@ -92,7 +92,7 @@ open class EntityImageView: UIView {
         singleImage.display(image: modImage)
     }
     
-    private func display(theme: ThemePreference, collection: ArtworkCollection, priority: ImageDisplayPriority, cornerRadius: CornerRadius = .small) {
+    private func display(theme: ThemePreference, collection: ArtworkCollection, cornerRadius: CornerRadius = .small) {
         layer.cornerRadius = cornerRadius.asCGFloat
         quadImages.forEach{ $0.isHidden = true }
         singleImage.isHidden = false
@@ -101,25 +101,25 @@ open class EntityImageView: UIView {
             if quadEntities.count > 1 {
                 // check if all images are the same
                 if Set(quadEntities.compactMap{$0.artwork?.id}).count == 1 {
-                    singleImage.displayAndUpdate(entity: quadEntities.first!, priority: priority)
+                    singleImage.displayAndUpdate(entity: quadEntities.first!)
                 } else {
                     singleImage.isHidden = true
-                    quadImages.forEach{
+                    quadImages.forEach {
                         $0.display(image: UIImage.getGeneratedArtwork(theme: theme, artworkType: .song))
                         $0.isHidden = false
                     }
                     for (index, entity) in quadEntities.enumerated() {
                         guard index < quadImages.count else { break }
-                        quadImages[index].display(entity: entity, priority: priority)
+                        quadImages[index].display(entity: entity)
                     }
                 }
             } else if let firstEntity = quadEntities.first  {
-                singleImage.displayAndUpdate(entity: firstEntity, priority: priority)
+                singleImage.displayAndUpdate(entity: firstEntity)
             } else {
                 singleImage.display(image: collection.defaultImage)
             }
         } else if let singleEntity = collection.singleImageEntity {
-            singleImage.displayAndUpdate(entity: singleEntity, priority: priority)
+            singleImage.displayAndUpdate(entity: singleEntity)
         } else {
             singleImage.display(image: collection.defaultImage)
         }

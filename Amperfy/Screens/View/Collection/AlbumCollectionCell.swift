@@ -41,7 +41,7 @@ class AlbumCollectionCell: BasicCollectionCell {
         self.rootFlowLayout = rootFlowLayout
         titleLabel.text = container.name
         subtitleLabel.text = container.subtitle
-        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: container, priority: .low, cornerRadius: .big)
+        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: container, cornerRadius: .big)
         updateArtworkImageConstraint(indexPath: initialIndexPath)
         layoutIfNeeded()
     }
