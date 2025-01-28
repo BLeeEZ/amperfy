@@ -25,6 +25,8 @@ import CoreData
 @objc(PlaylistItemMO)
 public class PlaylistItemMO: NSManagedObject {
 
+    public static let orderDistance : Int32 = 32
+    
     static var playlistOrderSortedFetchRequest: NSFetchRequest<PlaylistItemMO> {
         let fetchRequest: NSFetchRequest<PlaylistItemMO> = PlaylistItemMO.fetchRequest()
         fetchRequest.sortDescriptors = [

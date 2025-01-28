@@ -27,6 +27,7 @@ import os.log
 class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
     
     private let playlist: Playlist
+    private var playlistChanged = false
     var items: [PlaylistItem]
     public private(set) var playlistHasBeenDetected = false
     
@@ -54,20 +55,21 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
         }
         
         if elementName == "entry" {
-            let order = Int(parsedCount)
+            let index = Int(parsedCount)
             var item: PlaylistItem?
             
-            if order < items.count {
-                item = items[order]
-            } else {
-                item = library.createPlaylistItem()
-                item?.order = order
-                playlist.add(item: item!)
+            if let song = songBuffer {
+                if index < items.count {
+                    item = items[index]
+                    if item?.playable.id != song.id {
+                        playlistChanged = true
+                        item?.playable = song
+                    }
+                } else {
+                    playlist.createAndAppendPlaylistItem(for: song)
+                    playlistChanged = true
+                }
             }
-            if item?.playable?.id != songBuffer?.id {
-                playlist.updateChangeDate()
-            }
-            item?.playable = songBuffer
         }
     }
     
@@ -78,8 +80,13 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
                 for i in Array(parsedCount...items.count-1) {
                     library.deletePlaylistItem(item: items[i])
                 }
+                playlistChanged = true
             }
-            playlist.updateDuration()
+            if playlistChanged {
+                playlist.updateChangeDate()
+                playlist.updateDuration()
+                playlist.updateArtworkItems()
+            }
         default:
             break
         }

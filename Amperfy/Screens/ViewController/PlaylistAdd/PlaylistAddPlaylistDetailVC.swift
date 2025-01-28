@@ -106,7 +106,7 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
 
     func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, playlistItem: PlaylistItem) -> UITableViewCell {
         let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
-        if let playable = playlistItem.playable, let song = playable.asSong {
+        if let song = playlistItem.playable.asSong {
             cell.display(playable: song,
                          displayMode: .add,
                          playContextCb: nil,
@@ -121,7 +121,7 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
         
         let item = fetchedResultsController.getWrappedEntity(at: indexPath)
         if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell,
-           let song = item.playable?.asSong {
+           let song = item.playable.asSong {
             addToPlaylistManager.toggleSelection(playable: song, rootVC: self) {
                 cell.isMarked = $0
                 cell.refresh()

@@ -133,12 +133,15 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
         var syncPromises = [() -> Promise<Void>]()
 
         syncPromises = selectedItemsSorted.compactMap { item in
-            return { return firstly {
-                self.appDelegate.librarySyncer.syncUpload(playlistToDeleteSong: self.playlist, index: item.order)
-            }.then {
-                self.playlist?.remove(at: item.order)
-                return Promise.value
-            }}
+            return {
+                guard let index = self.playlist.getFirstIndex(item: item) else { return Promise.value }
+                return firstly {
+                    self.appDelegate.librarySyncer.syncUpload(playlistToDeleteSong: self.playlist, index: index)
+                }.then {
+                    self.playlist?.remove(at: index)
+                    return Promise.value
+                }
+            }
         }
         firstly {
             syncPromises.resolveSequentially()
@@ -179,7 +182,7 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
 
     func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, playlistItem: PlaylistItem) -> UITableViewCell {
         let cell: PlayableTableCell = tableView.dequeueCell(for: tableView, at: indexPath)
-        if let playable = playlistItem.playable, let song = playable.asSong {
+        if let song = playlistItem.playable.asSong {
             cell.display(
                 playable: song,
                 displayMode: (editMode == .reorder) ? .reorder : .selection,

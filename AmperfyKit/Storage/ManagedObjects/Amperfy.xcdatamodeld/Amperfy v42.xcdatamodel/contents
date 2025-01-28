@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23231" systemVersion="24B83" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="AbstractLibraryEntity" representedClassName="AbstractLibraryEntityMO" isAbstract="YES" elementID="AbstractLibraryElementMO" syncable="YES">
+        <attribute name="alphabeticSectionInitial" attributeType="String" defaultValueString="?"/>
+        <attribute name="id" attributeType="String" defaultValueString=""/>
+        <attribute name="isFavorite" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="lastPlayedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="playCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="rating" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="remoteStatus" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="starredDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="artwork" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Artwork" inverseName="owners" inverseEntity="Artwork"/>
+        <relationship name="searchHistory" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="SearchHistoryItem" inverseName="searchedLibraryEntity" inverseEntity="SearchHistoryItem"/>
+    </entity>
+    <entity name="AbstractPlayable" representedClassName="AbstractPlayableMO" isAbstract="YES" parentEntity="AbstractLibraryEntity" syncable="YES">
+        <attribute name="bitrate" optional="YES" attributeType="Integer 32" usesScalarValueType="YES"/>
+        <attribute name="combinedDuration" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="contentType" optional="YES" attributeType="String"/>
+        <attribute name="contentTypeTranscoded" optional="YES" attributeType="String"/>
+        <attribute name="disk" optional="YES" attributeType="String"/>
+        <attribute name="playDuration" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="playProgress" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="relFilePath" optional="YES" attributeType="String"/>
+        <attribute name="remoteDuration" optional="YES" attributeType="Integer 16" usesScalarValueType="YES" elementID="duration"/>
+        <attribute name="size" optional="YES" attributeType="Integer 32" usesScalarValueType="YES"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="track" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="url" optional="YES" attributeType="String"/>
+        <attribute name="year" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="download" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Download" inverseName="playable" inverseEntity="Download"/>
+        <relationship name="embeddedArtwork" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="EmbeddedArtwork" inverseName="owner" inverseEntity="EmbeddedArtwork"/>
+        <relationship name="file" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="PlayableFile" inverseName="info" inverseEntity="PlayableFile" elementID="dataMO"/>
+        <relationship name="playlistItems" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="PlaylistItem" inverseName="playable" inverseEntity="PlaylistItem" elementID="playlistElements"/>
+        <relationship name="scrobbleEntries" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="ScrobbleEntry" inverseName="playable" inverseEntity="ScrobbleEntry"/>
+    </entity>
+    <entity name="Album" representedClassName="AlbumMO" parentEntity="AbstractLibraryEntity" syncable="YES">
+        <attribute name="duration" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isSongsMetaDataSynced" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="newestIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="recentIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="remoteDuration" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="remoteSongCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="songCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="year" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="albums" inverseEntity="Artist"/>
+        <relationship name="genre" optional="YES" maxCount="1" deletionRule="Nullify" ordered="YES" destinationEntity="Genre" inverseName="albums" inverseEntity="Genre"/>
+        <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="album" inverseEntity="Song" elementID="songsMO"/>
+    </entity>
+    <entity name="Artist" representedClassName="ArtistMO" parentEntity="AbstractLibraryEntity" syncable="YES">
+        <attribute name="albumCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="duration" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="remoteAlbumCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="remoteDuration" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="songCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="albums" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Album" inverseName="artist" inverseEntity="Album"/>
+        <relationship name="genre" optional="YES" maxCount="1" deletionRule="Nullify" ordered="YES" destinationEntity="Genre" inverseName="artists" inverseEntity="Genre"/>
+        <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="artist" inverseEntity="Song" elementID="songsMO"/>
+    </entity>
+    <entity name="Artwork" representedClassName="ArtworkMO" syncable="YES">
+        <attribute name="id" attributeType="String" defaultValueString=""/>
+        <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="relFilePath" optional="YES" attributeType="String"/>
+        <attribute name="status" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" elementID="statusMO"/>
+        <attribute name="type" attributeType="String" defaultValueString=""/>
+        <attribute name="url" optional="YES" attributeType="String" elementID="urlMO"/>
+        <relationship name="download" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Download" inverseName="artwork" inverseEntity="Download"/>
+        <relationship name="owners" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AbstractLibraryEntity" inverseName="artwork" inverseEntity="AbstractLibraryEntity"/>
+    </entity>
+    <entity name="Directory" representedClassName="DirectoryMO" parentEntity="AbstractLibraryEntity" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="songCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="subdirectoryCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="musicFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MusicFolder" inverseName="directories" inverseEntity="MusicFolder"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Directory" inverseName="subdirectories" inverseEntity="Directory"/>
+        <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="directory" inverseEntity="Song"/>
+        <relationship name="subdirectories" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Directory" inverseName="parent" inverseEntity="Directory"/>
+    </entity>
+    <entity name="Download" representedClassName="DownloadMO" syncable="YES">
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="errorDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="errorType" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="finishDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="progressPercent" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="totalSize" optional="YES" attributeType="String"/>
+        <attribute name="urlString" attributeType="String" defaultValueString=""/>
+        <relationship name="artwork" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artwork" inverseName="download" inverseEntity="Artwork"/>
+        <relationship name="playable" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AbstractPlayable" inverseName="download" inverseEntity="AbstractPlayable"/>
+    </entity>
+    <entity name="EmbeddedArtwork" representedClassName="EmbeddedArtworkMO" syncable="YES">
+        <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="relFilePath" optional="YES" attributeType="String"/>
+        <relationship name="owner" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AbstractPlayable" inverseName="embeddedArtwork" inverseEntity="AbstractPlayable"/>
+    </entity>
+    <entity name="Genre" representedClassName="GenreMO" parentEntity="AbstractLibraryEntity" syncable="YES">
+        <attribute name="albumCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="artistCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String" defaultValueString=""/>
+        <attribute name="songCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="albums" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Album" inverseName="genre" inverseEntity="Album"/>
+        <relationship name="artists" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Artist" inverseName="genre" inverseEntity="Artist"/>
+        <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="genre" inverseEntity="Song"/>
+    </entity>
+    <entity name="LogEntry" representedClassName="LogEntryMO" syncable="YES">
+        <attribute name="creationDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="message" attributeType="String"/>
+        <attribute name="statusCode" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="suppressionTimeInterval" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="type" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="MusicFolder" representedClassName="MusicFolderMO" syncable="YES">
+        <attribute name="directoryCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="String" defaultValueString=""/>
+        <attribute name="name" attributeType="String" defaultValueString=""/>
+        <attribute name="songCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="directories" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Directory" inverseName="musicFolder" inverseEntity="Directory"/>
+        <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Song" inverseName="musicFolder" inverseEntity="Song"/>
+    </entity>
+    <entity name="PlayableFile" representedClassName="PlayableFileMO" elementID="SongFile" syncable="YES">
+        <attribute name="data" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <relationship name="info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AbstractPlayable" inverseName="file" inverseEntity="AbstractPlayable"/>
+    </entity>
+    <entity name="Player" representedClassName="PlayerMO" syncable="YES">
+        <attribute name="autoCachePlayedItemSetting" optional="YES" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES" elementID="autoCachePlayedSongSetting"/>
+        <attribute name="isUserQueuePlaying" attributeType="Boolean" defaultValueString="0" usesScalarValueType="YES" elementID="isWaitingQueuePlaying"/>
+        <attribute name="musicIndex" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" elementID="currentSongIndex"/>
+        <attribute name="musicPlaybackRate" optional="YES" attributeType="Double" defaultValueString="1" usesScalarValueType="YES"/>
+        <attribute name="playerMode" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="podcastIndex" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="podcastPlaybackRate" optional="YES" attributeType="Double" defaultValueString="1" usesScalarValueType="YES"/>
+        <attribute name="repeatSetting" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="shuffleSetting" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" elementID="shuffelSetting"/>
+        <relationship name="contextPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="playersContextPlaylist" inverseEntity="Playlist" elementID="playlist"/>
+        <relationship name="podcastPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="playersPodcastPlaylist" inverseEntity="Playlist"/>
+        <relationship name="shuffledContextPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="playersShuffledContextPlaylist" inverseEntity="Playlist" elementID="shuffledPlaylist"/>
+        <relationship name="userQueuePlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="playersUserQueuePlaylist" inverseEntity="Playlist" elementID="waitingQueuePlaylist"/>
+    </entity>
+    <entity name="Playlist" representedClassName="PlaylistMO" syncable="YES">
+        <attribute name="alphabeticSectionInitial" attributeType="String" defaultValueString="?"/>
+        <attribute name="changeDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="duration" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="String" defaultValueString=""/>
+        <attribute name="lastPlayedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="playCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="remoteDuration" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="remoteSongCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="songCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="artworkItems" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="PlaylistItem" inverseName="playlistArtworkItem" inverseEntity="PlaylistItem"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="PlaylistItem" inverseName="playlist" inverseEntity="PlaylistItem" elementID="entries"/>
+        <relationship name="playersContextPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="contextPlaylist" inverseEntity="Player" elementID="currentlyPlaying"/>
+        <relationship name="playersPodcastPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="podcastPlaylist" inverseEntity="Player"/>
+        <relationship name="playersShuffledContextPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="shuffledContextPlaylist" inverseEntity="Player" elementID="playersShuffledPlaylist"/>
+        <relationship name="playersUserQueuePlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="userQueuePlaylist" inverseEntity="Player" elementID="playersWaitingQueuePlaylist"/>
+        <relationship name="searchHistory" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="SearchHistoryItem" inverseName="searchedPlaylist" inverseEntity="SearchHistoryItem"/>
+    </entity>
+    <entity name="PlaylistItem" representedClassName="PlaylistItemMO" syncable="YES">
+        <attribute name="order" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="playable" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AbstractPlayable" inverseName="playlistItems" inverseEntity="AbstractPlayable" elementID="song"/>
+        <relationship name="playlist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="items" inverseEntity="Playlist"/>
+        <relationship name="playlistArtworkItem" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="artworkItems" inverseEntity="Playlist"/>
+    </entity>
+    <entity name="Podcast" representedClassName="PodcastMO" parentEntity="AbstractLibraryEntity" syncable="YES">
+        <attribute name="depiction" attributeType="String" defaultValueString=""/>
+        <attribute name="episodeCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="title" attributeType="String" defaultValueString=""/>
+        <relationship name="episodes" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="PodcastEpisode" inverseName="podcast" inverseEntity="PodcastEpisode"/>
+    </entity>
+    <entity name="PodcastEpisode" representedClassName="PodcastEpisodeMO" parentEntity="AbstractPlayable" syncable="YES">
+        <attribute name="depiction" optional="YES" attributeType="String"/>
+        <attribute name="publishDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="status" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="streamId" optional="YES" attributeType="String"/>
+        <relationship name="podcast" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast" inverseName="episodes" inverseEntity="Podcast"/>
+    </entity>
+    <entity name="Radio" representedClassName="RadioMO" parentEntity="AbstractPlayable" syncable="YES">
+        <attribute name="siteUrl" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="ScrobbleEntry" representedClassName="ScrobbleEntryMO" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="isUploaded" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <relationship name="playable" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AbstractPlayable" inverseName="scrobbleEntries" inverseEntity="AbstractPlayable"/>
+    </entity>
+    <entity name="SearchHistoryItem" representedClassName="SearchHistoryItemMO" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="searchedLibraryEntity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AbstractLibraryEntity" inverseName="searchHistory" inverseEntity="AbstractLibraryEntity"/>
+        <relationship name="searchedPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist" inverseName="searchHistory" inverseEntity="Playlist"/>
+    </entity>
+    <entity name="Song" representedClassName="SongMO" parentEntity="AbstractPlayable" syncable="YES">
+        <attribute name="lyricsRelFilePath" optional="YES" attributeType="String"/>
+        <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songs" inverseEntity="Album"/>
+        <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist" inverseName="songs" inverseEntity="Artist"/>
+        <relationship name="directory" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Directory" inverseName="songs" inverseEntity="Directory"/>
+        <relationship name="genre" optional="YES" maxCount="1" deletionRule="Nullify" ordered="YES" destinationEntity="Genre" inverseName="songs" inverseEntity="Genre"/>
+        <relationship name="musicFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MusicFolder" inverseName="songs" inverseEntity="MusicFolder"/>
+    </entity>
+    <entity name="UserStatistics" representedClassName="UserStatisticsMO" syncable="YES">
+        <attribute name="activeRepeatAllSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="activeRepeatOffSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="activeRepeatSingleSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="activeShuffleOffSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="activeShuffleOnSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="appSessionsStartedCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="appStartedViaNotificationCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="appVersion" attributeType="String" defaultValueString=""/>
+        <attribute name="backgroundFetchFailedCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="backgroundFetchNewDataCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="backgroundFetchNoDataCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="creationDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="localNotificationCreationCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="playedSongFromCacheCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="playedSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="playedSongViaStreamCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="usedAirplayCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="usedAlertGoToAlbumCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="usedAlertGoToArtistCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="usedAlertGoToPodcastCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="usedChangePlayerDisplayStyleCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="usedPlayerOptionsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="usedPlayerSeekCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedAlbumDetailCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedAlbumsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedArtistDetailCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedArtistsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedDirectoriesCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedDownloadsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedEventLogCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedGenreDetailCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedGenresCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedIndexesCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedLibraryCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedLicenseCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedMusicFoldersCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedPlaylistDetailCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedPlaylistsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedPlaylistSelectorCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedPodcastDetailCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedPodcastsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedPopupPlayerCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedRadiosCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedSearchCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedSettingsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedSettingsLibraryCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedSettingsPlayerCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedSettingsPlayerSongTabCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedSettingsServerCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedSettingsSupportCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="visitedSongsCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+</model>

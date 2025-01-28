@@ -139,10 +139,8 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         }
         swipeCallback = { (indexPath, completionHandler) in
             let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            if let song = playlistItem.playable {
-                let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
-                completionHandler(SwipeActionContext(containable: song, playContext: playContext))
-            }
+            let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
+            completionHandler(SwipeActionContext(containable: playlistItem.playable, playContext: playContext))
         }
 
         #if targetEnvironment(macCatalyst)
@@ -213,7 +211,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
     func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, playlistItem: PlaylistItem) -> UITableViewCell {
         let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
-        if let playable = playlistItem.playable, let song = playable.asSong {
+        if let song = playlistItem.playable.asSong {
             cell.display(playable: song, playContextCb: convertCellViewToPlayContext, rootView: self)
         }
         return cell

@@ -37,8 +37,19 @@ public final class PlaylistMO: NSManagedObject {
     }
 
     fileprivate func updateSongCount() {
-        guard Int16(items?.count ?? 0) != songCount else { return }
-        songCount = Int16(items?.count ?? 0)
+        guard Int16(items.count) != songCount else { return }
+        songCount = Int16(items.count)
+    }
+    
+    public func removeAllItems() {
+        let mutableItems = self.mutableOrderedSetValue(forKeyPath: #keyPath(items))
+        mutableItems.removeAllObjects()
+    }
+    
+    public func moveInsideItems(fromIndex: Int, to: Int) {
+        let fromItem = items[fromIndex]
+        removeFromItems(at: fromIndex)
+        insertIntoItems(fromItem, at: to)
     }
 
     static var excludeSystemPlaylistsFetchPredicate: NSPredicate {

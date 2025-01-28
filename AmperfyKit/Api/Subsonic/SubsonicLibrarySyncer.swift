@@ -474,8 +474,6 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
                 let parserDelegate = SsPlaylistSongsParserDelegate(performanceMonitor: self.performanceMonitor, playlist: playlistAsync, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                 try self.parse(response: response, delegate: parserDelegate)
-                playlistAsync.ensureConsistentItemOrder()
-                playlistAsync.updateArtworkItems(isInitialUpdate: false)
             }
         }
     }

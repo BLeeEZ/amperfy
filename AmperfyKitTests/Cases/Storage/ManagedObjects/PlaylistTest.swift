@@ -107,8 +107,7 @@ class PlaylistTest: XCTestCase {
         XCTAssertEqual(playlist.items.count, 3)
         
         for (index,entry) in playlist.items.enumerated() {
-            XCTAssertEqual(entry.order, index)
-            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+            XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
         }
     }
     
@@ -150,8 +149,10 @@ class PlaylistTest: XCTestCase {
         XCTAssertEqual(playlist.items.count, 5)
         
         for (index,entry) in playlist.items.enumerated() {
-            XCTAssertEqual(entry.order, index)
-            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+            if index > 0 {
+                XCTAssert(playlist.items[index-1].order < entry.order)
+            }
+            XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
         }
     }
     
@@ -170,8 +171,10 @@ class PlaylistTest: XCTestCase {
         XCTAssertEqual(playlist.items.count, 5)
         
         for (index,entry) in playlist.items.enumerated() {
-            XCTAssertEqual(entry.order, index)
-            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+            if index > 0 {
+                XCTAssert(playlist.items[index-1].order < entry.order)
+            }
+            XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
         }
     }
     
@@ -189,8 +192,10 @@ class PlaylistTest: XCTestCase {
         playlist.insert(playables: [song3], index: 2)
 
         for (index,entry) in playlist.items.enumerated() {
-            XCTAssertEqual(index, entry.order)
-            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+            if index > 0 {
+                XCTAssert(playlist.items[index-1].order < entry.order)
+            }
+            XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
         }
     }
     
@@ -208,8 +213,10 @@ class PlaylistTest: XCTestCase {
         playlist.insert(playables: [song5], index: 4)
 
         for (index,entry) in playlist.items.enumerated() {
-            XCTAssertEqual(index, entry.order)
-            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+            if index > 0 {
+                XCTAssert(playlist.items[index-1].order < entry.order)
+            }
+            XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
         }
     }
     
@@ -221,8 +228,10 @@ class PlaylistTest: XCTestCase {
         playlist.insert(playables: [song2], index: 1)
 
         for (index,entry) in playlist.items.enumerated() {
-            XCTAssertEqual(index, entry.order)
-            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+            if index > 0 {
+                XCTAssert(playlist.items[index-1].order < entry.order)
+            }
+            XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
         }
     }
     
@@ -239,8 +248,10 @@ class PlaylistTest: XCTestCase {
         playlist.insert(playables: [song2, song3, song4], index: 1)
 
         for (index,entry) in playlist.items.enumerated() {
-            XCTAssertEqual(index, entry.order)
-            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+            if index > 0 {
+                XCTAssert(playlist.items[index-1].order < entry.order)
+            }
+            XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
         }
     }
 
@@ -258,8 +269,10 @@ class PlaylistTest: XCTestCase {
         XCTAssertEqual(playlist.items.count, 3)
         
         for (index,entry) in playlist.items.enumerated() {
-            XCTAssertEqual(entry.order, index)
-            XCTAssertEqual(entry.playable?.id, cdHelper.seeder.songs[index].id)
+            if index > 0 {
+                XCTAssert(playlist.items[index-1].order < entry.order)
+            }
+            XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
         }
     }
     
@@ -269,50 +282,50 @@ class PlaylistTest: XCTestCase {
         XCTAssertEqual(defaultPlaylist.items.count, 5)
         XCTAssertEqual(defaultPlaylist.lastPlayableIndex, 4)
         XCTAssertEqual(defaultPlaylist.playables[0].id, cdHelper.seeder.songs[0].id)
-        XCTAssertEqual(defaultPlaylist.items[0].playable!.id, cdHelper.seeder.songs[0].id)
-        XCTAssertEqual(defaultPlaylist.items[0].order, 0)
+        XCTAssertEqual(defaultPlaylist.items[0].playable.id, cdHelper.seeder.songs[0].id)
+        XCTAssertEqual(defaultPlaylist.items[0].order, Int(PlaylistItemMO.orderDistance) * 1)
         XCTAssertEqual(defaultPlaylist.playables[1].id, cdHelper.seeder.songs[1].id)
-        XCTAssertEqual(defaultPlaylist.items[1].playable!.id, cdHelper.seeder.songs[1].id)
-        XCTAssertEqual(defaultPlaylist.items[1].order, 1)
+        XCTAssertEqual(defaultPlaylist.items[1].playable.id, cdHelper.seeder.songs[1].id)
+        XCTAssertEqual(defaultPlaylist.items[1].order, Int(PlaylistItemMO.orderDistance) * 2)
         XCTAssertEqual(defaultPlaylist.playables[2].id, cdHelper.seeder.songs[2].id)
-        XCTAssertEqual(defaultPlaylist.items[2].playable!.id, cdHelper.seeder.songs[2].id)
-        XCTAssertEqual(defaultPlaylist.items[2].order, 2)
+        XCTAssertEqual(defaultPlaylist.items[2].playable.id, cdHelper.seeder.songs[2].id)
+        XCTAssertEqual(defaultPlaylist.items[2].order, Int(PlaylistItemMO.orderDistance) * 3)
         XCTAssertEqual(defaultPlaylist.playables[3].id, cdHelper.seeder.songs[4].id)
-        XCTAssertEqual(defaultPlaylist.items[3].playable!.id, cdHelper.seeder.songs[4].id)
-        XCTAssertEqual(defaultPlaylist.items[3].order, 3)
+        XCTAssertEqual(defaultPlaylist.items[3].playable.id, cdHelper.seeder.songs[4].id)
+        XCTAssertEqual(defaultPlaylist.items[3].order, Int(PlaylistItemMO.orderDistance) * 4)
         XCTAssertEqual(defaultPlaylist.playables[4].id, cdHelper.seeder.songs[3].id)
-        XCTAssertEqual(defaultPlaylist.items[4].playable!.id, cdHelper.seeder.songs[3].id)
-        XCTAssertEqual(defaultPlaylist.items[4].order, 4)
+        XCTAssertEqual(defaultPlaylist.items[4].playable.id, cdHelper.seeder.songs[3].id)
+        XCTAssertEqual(defaultPlaylist.items[4].order, Int(PlaylistItemMO.orderDistance) * 5)
     }
     
     func testReorderLastToFirst() {
         defaultPlaylist.movePlaylistItem(fromIndex: 2, to: 0)
-        XCTAssertEqual(defaultPlaylist.items[0].playable!.id, cdHelper.seeder.songs[2].id)
-        XCTAssertEqual(defaultPlaylist.items[1].playable!.id, cdHelper.seeder.songs[0].id)
-        XCTAssertEqual(defaultPlaylist.items[2].playable!.id, cdHelper.seeder.songs[1].id)
+        XCTAssertEqual(defaultPlaylist.items[0].playable.id, cdHelper.seeder.songs[2].id)
+        XCTAssertEqual(defaultPlaylist.items[1].playable.id, cdHelper.seeder.songs[0].id)
+        XCTAssertEqual(defaultPlaylist.items[2].playable.id, cdHelper.seeder.songs[1].id)
     }
     
     func testReorderSecondToLast() {
         defaultPlaylist.movePlaylistItem(fromIndex: 1, to: 2)
-        XCTAssertEqual(defaultPlaylist.items[0].playable!.id, cdHelper.seeder.songs[0].id)
-        XCTAssertEqual(defaultPlaylist.items[1].playable!.id, cdHelper.seeder.songs[2].id)
-        XCTAssertEqual(defaultPlaylist.items[2].playable!.id, cdHelper.seeder.songs[1].id)
+        XCTAssertEqual(defaultPlaylist.items[0].playable.id, cdHelper.seeder.songs[0].id)
+        XCTAssertEqual(defaultPlaylist.items[1].playable.id, cdHelper.seeder.songs[2].id)
+        XCTAssertEqual(defaultPlaylist.items[2].playable.id, cdHelper.seeder.songs[1].id)
     }
     
     func testReorderNoChange() {
         defaultPlaylist.movePlaylistItem(fromIndex: 1, to: 1)
-        XCTAssertEqual(defaultPlaylist.items[0].playable!.id, cdHelper.seeder.songs[0].id)
-        XCTAssertEqual(defaultPlaylist.items[1].playable!.id, cdHelper.seeder.songs[1].id)
-        XCTAssertEqual(defaultPlaylist.items[2].playable!.id, cdHelper.seeder.songs[2].id)
+        XCTAssertEqual(defaultPlaylist.items[0].playable.id, cdHelper.seeder.songs[0].id)
+        XCTAssertEqual(defaultPlaylist.items[1].playable.id, cdHelper.seeder.songs[1].id)
+        XCTAssertEqual(defaultPlaylist.items[2].playable.id, cdHelper.seeder.songs[2].id)
     }
     
     func testEntryRemoval() {
         defaultPlaylist.remove(at: 1)
         XCTAssertEqual(defaultPlaylist.items.count, cdHelper.seeder.playlists[0].songIds.count - 1)
-        XCTAssertEqual(defaultPlaylist.items[0].playable!.id, cdHelper.seeder.songs[0].id)
-        XCTAssertEqual(defaultPlaylist.items[0].order, 0)
-        XCTAssertEqual(defaultPlaylist.items[1].playable!.id, cdHelper.seeder.songs[2].id)
-        XCTAssertEqual(defaultPlaylist.items[1].order, 1)
+        XCTAssertEqual(defaultPlaylist.items[0].playable.id, cdHelper.seeder.songs[0].id)
+        XCTAssertEqual(defaultPlaylist.items[0].order, Int(PlaylistItemMO.orderDistance) * 1)
+        XCTAssertEqual(defaultPlaylist.items[1].playable.id, cdHelper.seeder.songs[2].id)
+        XCTAssertEqual(defaultPlaylist.items[1].order, Int(PlaylistItemMO.orderDistance) * 3)
     }
     
     func testRemoveFirstOccurrenceOfSong_Success() {
@@ -320,20 +333,20 @@ class PlaylistTest: XCTestCase {
         defaultPlaylist.append(playable: song1)
         defaultPlaylist.remove(firstOccurrenceOfPlayable: song1)
         XCTAssertEqual(defaultPlaylist.items.count, cdHelper.seeder.playlists[0].songIds.count)
-        XCTAssertEqual(defaultPlaylist.items[0].playable!.id, cdHelper.seeder.songs[0].id)
-        XCTAssertEqual(defaultPlaylist.items[0].order, 0)
-        XCTAssertEqual(defaultPlaylist.items[1].playable!.id, cdHelper.seeder.songs[2].id)
-        XCTAssertEqual(defaultPlaylist.items[1].order, 1)
-        XCTAssertEqual(defaultPlaylist.items[4].playable!.id,song1.id)
+        XCTAssertEqual(defaultPlaylist.items[0].playable.id, cdHelper.seeder.songs[0].id)
+        XCTAssertEqual(defaultPlaylist.items[0].order, Int(PlaylistItemMO.orderDistance) * 1)
+        XCTAssertEqual(defaultPlaylist.items[1].playable.id, cdHelper.seeder.songs[2].id)
+        XCTAssertEqual(defaultPlaylist.items[1].order, Int(PlaylistItemMO.orderDistance) * 3)
+        XCTAssertEqual(defaultPlaylist.items[4].playable.id,song1.id)
         
         defaultPlaylist.remove(firstOccurrenceOfPlayable: song1)
         XCTAssertEqual(defaultPlaylist.items.count, cdHelper.seeder.playlists[0].songIds.count - 1)
-        XCTAssertEqual(defaultPlaylist.items[0].playable!.id, cdHelper.seeder.songs[0].id)
-        XCTAssertEqual(defaultPlaylist.items[0].order, 0)
-        XCTAssertEqual(defaultPlaylist.items[1].playable!.id, cdHelper.seeder.songs[2].id)
-        XCTAssertEqual(defaultPlaylist.items[1].order, 1)
-        XCTAssertEqual(defaultPlaylist.items[3].playable!.id, cdHelper.seeder.songs[3].id)
-        XCTAssertEqual(defaultPlaylist.items[3].order, 3)
+        XCTAssertEqual(defaultPlaylist.items[0].playable.id, cdHelper.seeder.songs[0].id)
+        XCTAssertEqual(defaultPlaylist.items[0].order, Int(PlaylistItemMO.orderDistance) * 1)
+        XCTAssertEqual(defaultPlaylist.items[1].playable.id, cdHelper.seeder.songs[2].id)
+        XCTAssertEqual(defaultPlaylist.items[1].order, Int(PlaylistItemMO.orderDistance) * 3)
+        XCTAssertEqual(defaultPlaylist.items[3].playable.id, cdHelper.seeder.songs[3].id)
+        XCTAssertEqual(defaultPlaylist.items[3].order, Int(PlaylistItemMO.orderDistance) * 5)
     }
     
     func testRemoveFirstOccurrenceOfSong_NoChange() {
@@ -351,15 +364,15 @@ class PlaylistTest: XCTestCase {
         guard let song0 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         guard let foundSongIndex0 = defaultPlaylist.getFirstIndex(playable: song0) else { XCTFail(); return }
         XCTAssertEqual(foundSongIndex0, 1)
-        XCTAssertEqual(defaultPlaylist.items[foundSongIndex0].playable!.id, song0.id)
+        XCTAssertEqual(defaultPlaylist.items[foundSongIndex0].playable.id, song0.id)
         defaultPlaylist.append(playable: song0)
         guard let foundSongIndex1 = defaultPlaylist.getFirstIndex(playable: song0) else { XCTFail(); return }
         XCTAssertEqual(foundSongIndex1, 1)
-        XCTAssertEqual(defaultPlaylist.items[foundSongIndex1].playable!.id, song0.id)
+        XCTAssertEqual(defaultPlaylist.items[foundSongIndex1].playable.id, song0.id)
         defaultPlaylist.remove(firstOccurrenceOfPlayable: song0)
         guard let foundSongIndex2 = defaultPlaylist.getFirstIndex(playable: song0) else { XCTFail(); return }
         XCTAssertEqual(foundSongIndex2, 4)
-        XCTAssertEqual(defaultPlaylist.items[foundSongIndex2].playable!.id, song0.id)
+        XCTAssertEqual(defaultPlaylist.items[foundSongIndex2].playable.id, song0.id)
         defaultPlaylist.remove(firstOccurrenceOfPlayable: song0)
         XCTAssertEqual(defaultPlaylist.getFirstIndex(playable: song0), nil)
     }
@@ -368,64 +381,6 @@ class PlaylistTest: XCTestCase {
         XCTAssertFalse(playlistNoCached.playables.hasCachedItems)
         XCTAssertTrue(defaultPlaylist.playables.hasCachedItems)
         XCTAssertTrue(playlistThreeCached.playables.hasCachedItems)
-    }
-    
-    func testPreviousCachedSongIndex() {
-        guard let prev1 = defaultPlaylist.previousCachedItemIndex(downwardsFrom: 4) else { XCTFail(); return }
-        XCTAssertEqual(prev1, 3)
-        guard let prev2 = defaultPlaylist.previousCachedItemIndex(beginningAt: 3) else { XCTFail(); return }
-        XCTAssertEqual(prev2, 3)
-        guard let prev3 = defaultPlaylist.previousCachedItemIndex(beginningAt: 4) else { XCTFail(); return }
-        XCTAssertEqual(prev3, 3)
-        
-        XCTAssertEqual(defaultPlaylist.previousCachedItemIndex(downwardsFrom: 3), nil)
-        XCTAssertEqual(defaultPlaylist.previousCachedItemIndex(beginningAt: 2), nil)
-        
-        XCTAssertEqual(playlistNoCached.previousCachedItemIndex(downwardsFrom: 3), nil)
-        XCTAssertEqual(playlistNoCached.previousCachedItemIndex(beginningAt: 3), nil)
-        
-        guard let prev4 = playlistThreeCached.previousCachedItemIndex(beginningAt: 8) else { XCTFail(); return }
-        XCTAssertEqual(prev4, 8)
-        guard let prev5 = playlistThreeCached.previousCachedItemIndex(beginningAt: 7) else { XCTFail(); return }
-        XCTAssertEqual(prev5, 6)
-        guard let prev6 = playlistThreeCached.previousCachedItemIndex(beginningAt: 6) else { XCTFail(); return }
-        XCTAssertEqual(prev6, 6)
-        guard let prev7 = playlistThreeCached.previousCachedItemIndex(beginningAt: 5) else { XCTFail(); return }
-        XCTAssertEqual(prev7, 3)
-        XCTAssertEqual(playlistThreeCached.previousCachedItemIndex(beginningAt: 2), nil)
-    }
-    
-    func testNextCachedSongIndex() {
-        guard let next1 = defaultPlaylist.nextCachedItemIndex(upwardsFrom: 2) else { XCTFail(); return }
-        XCTAssertEqual(next1, 3)
-        guard let next2 = defaultPlaylist.nextCachedItemIndex(beginningAt: 3) else { XCTFail(); return }
-        XCTAssertEqual(next2, 3)
-        guard let next3 = defaultPlaylist.nextCachedItemIndex(beginningAt: 0) else { XCTFail(); return }
-        XCTAssertEqual(next3, 3)
-        guard let next4 = defaultPlaylist.nextCachedItemIndex(upwardsFrom: 0) else { XCTFail(); return }
-        XCTAssertEqual(next4, 3)
-        guard let next5 = defaultPlaylist.nextCachedItemIndex(beginningAt: 1) else { XCTFail(); return }
-        XCTAssertEqual(next5, 3)
-        guard let next6 = defaultPlaylist.nextCachedItemIndex(upwardsFrom: 1) else { XCTFail(); return }
-        XCTAssertEqual(next6, 3)
-        
-        XCTAssertEqual(defaultPlaylist.nextCachedItemIndex(upwardsFrom: 3), nil)
-        XCTAssertEqual(defaultPlaylist.nextCachedItemIndex(beginningAt: 4), nil)
-        
-        XCTAssertEqual(playlistNoCached.nextCachedItemIndex(upwardsFrom: 0), nil)
-        XCTAssertEqual(playlistNoCached.nextCachedItemIndex(beginningAt: 0), nil)
-        
-        guard let next7 = playlistThreeCached.nextCachedItemIndex(upwardsFrom: 1) else { XCTFail(); return }
-        XCTAssertEqual(next7, 3)
-        guard let next8 = playlistThreeCached.nextCachedItemIndex(upwardsFrom: 3) else { XCTFail(); return }
-        XCTAssertEqual(next8, 6)
-        guard let next9 = playlistThreeCached.nextCachedItemIndex(upwardsFrom: 7) else { XCTFail(); return }
-        XCTAssertEqual(next9, 8)
-        guard let next10 = playlistThreeCached.nextCachedItemIndex(beginningAt: 8) else { XCTFail(); return }
-        XCTAssertEqual(next10, 8)
-        
-        XCTAssertEqual(playlistThreeCached.nextCachedItemIndex(upwardsFrom: 8), nil)
-        XCTAssertEqual(playlistThreeCached.nextCachedItemIndex(beginningAt: 9), nil)
     }
     
     func testMovePlaylistSong_InvalidValues() {
@@ -521,6 +476,51 @@ class PlaylistTest: XCTestCase {
         checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 4)
         checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 2)
         checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 3)
-     }
+    }
+    
+    func testMovePlaylistSongToStart() {
+        resetTestPlaylist()
+        testPlaylist.movePlaylistItem(fromIndex: 1, to: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 4)
+        
+        resetTestPlaylist()
+        testPlaylist.movePlaylistItem(fromIndex: 2, to: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 4)
+        
+        resetTestPlaylist()
+        testPlaylist.movePlaylistItem(fromIndex: 4, to: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 3)
+        
+    }
+    
+    func testMovePlaylistSongToEnd() {
+        resetTestPlaylist()
+        testPlaylist.movePlaylistItem(fromIndex: 0, to: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 2)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 0)
+
+        resetTestPlaylist()
+        testPlaylist.movePlaylistItem(fromIndex: 2, to: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 0, seedIndex: 0)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 1)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 3)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 4)
+        checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 2)
+    }
 
 }

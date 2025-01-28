@@ -32,22 +32,14 @@ public class Playlist: Identifyable {
     static var typeName: String {
         return String(describing: Self.self)
     }
-    
+    static let artworkItemMaxLookCount = 20
+
     public let managedObject: PlaylistMO
     private let library: LibraryStorage
-    private var kvoToken: NSKeyValueObservation?
-    private var isInternalArrayUpdateNeeded = false
     
     public init(library: LibraryStorage, managedObject: PlaylistMO) {
         self.library = library
         self.managedObject = managedObject
-        kvoToken = self.managedObject.observe(\.items, options: .new) { (playlist, change) in
-            self.isInternalArrayUpdateNeeded = true
-        }
-    }
-    
-    deinit {
-        kvoToken?.invalidate()
     }
     
     public var identifier: String {
@@ -58,99 +50,35 @@ public class Playlist: Identifyable {
         let playlistMO = context.object(with: managedObject.objectID) as! PlaylistMO
         return Playlist(library: library, managedObject: playlistMO)
     }
-    
-    private var internalSortedPlaylistItems: [PlaylistItem]?
-    private var internalSortedCachedPlaylistItems: [PlaylistItem]?
-    private var internalPlayables: [AbstractPlayable]?
-    
-    private func checkIfUpdateIsNeeded() -> Bool {
-        let managedObjectItemCount = managedObject.items?.count ?? 0
-        
-        guard let internalSortedPI = internalSortedPlaylistItems,
-              let internalPlayables = internalPlayables,
-              let internalSortedCachedPlaylistItems = internalSortedCachedPlaylistItems
-        else { return true }
-        
-        let cachedPI = internalSortedPI.reduce(0){ $0 + (($1.playable?.isCached ?? false) ? 1 : 0) }
-        
-        return isInternalArrayUpdateNeeded ||
-            (managedObjectItemCount != internalSortedPI.count) ||
-            (managedObjectItemCount != internalPlayables.count) ||
-            (cachedPI != internalSortedCachedPlaylistItems.count)
-    }
-    private func updateInternalArrays() {
-        isInternalArrayUpdateNeeded = false
-        updateSortedPlaylistItems()
-        updateSortedCachedPlaylistItems()
-        updateInternalPlayables()
-    }
-    private func updateSortedPlaylistItems() {
-        guard let itemsMO = managedObject.items?.allObjects as? [PlaylistItemMO] else { return }
-        internalSortedPlaylistItems = itemsMO
-            .sorted(by: { $0.order < $1.order })
-            .compactMap{ PlaylistItem(library: library, managedObject: $0) }
-    } 
-    private func updateSortedCachedPlaylistItems() {
-        internalSortedCachedPlaylistItems = internalSortedPlaylistItems?.filter{ return $0.playable?.isCached ?? false }
-    }
-    private func updateInternalPlayables() {
-        internalPlayables = internalSortedPlaylistItems?.compactMap{ $0.playable }
-    }
 
-    private var sortedPlaylistItems: [PlaylistItem] {
-        if internalSortedPlaylistItems == nil || checkIfUpdateIsNeeded() { updateInternalArrays() }
-        return internalSortedPlaylistItems ?? [PlaylistItem]()
-    }
-    
-    private var sortedCachedPlaylistItems: [PlaylistItem] {
-        if internalSortedCachedPlaylistItems == nil || checkIfUpdateIsNeeded() { updateInternalArrays() }
-        return internalSortedCachedPlaylistItems ?? [PlaylistItem]()
-    }
     public var items: [PlaylistItem] {
-        return sortedPlaylistItems
+        return managedObject.items.compactMap{ PlaylistItem(library: library, managedObject: $0) }
     }
     public var artworkItems: [PlaylistItem] {
-        guard let artworkItemsMO = managedObject.artworkItems?.allObjects as? [PlaylistItemMO] else { return [PlaylistItem]() }
-        return artworkItemsMO
-            .sorted(by: { $0.order < $1.order })
-            .compactMap{ PlaylistItem(library: library, managedObject: $0) }
+        return managedObject.artworkItems.compactMap{ PlaylistItem(library: library, managedObject: $0) }
     }
-    public func updateArtworkItems(isInitialUpdate: Bool) {
-        guard !isInitialUpdate || songCount < 100 else { return }
-        
-        if isInitialUpdate {
-            updateSortedPlaylistItems()
-        } else if internalSortedPlaylistItems == nil || (internalSortedPlaylistItems?.count ?? 0) == 0, songCount < 100 {
-            updateSortedPlaylistItems()
-        }
-        
-        if let internalSortedPlaylistItems = internalSortedPlaylistItems {
-            var updatedArtworkItems = [PlaylistItem]()
-            for (index, playlistItem) in internalSortedPlaylistItems.enumerated() {
-                if playlistItem.playable?.artwork != nil {
-                    updatedArtworkItems.append(playlistItem)
-                    if updatedArtworkItems.count >= 4 || index > 20 {
-                        break
-                    }
+    public func updateArtworkItems() {
+        var updatedArtworkItems = [PlaylistItemMO]()
+        for (index, playlistItem) in managedObject.items.enumerated() {
+            if playlistItem.playable.artwork != nil {
+                updatedArtworkItems.append(playlistItem)
+                if updatedArtworkItems.count >= 4 || index > Self.artworkItemMaxLookCount {
+                    break
                 }
             }
-            let artworkItems = artworkItems
-            if artworkItems != updatedArtworkItems {
-                managedObject.artworkItems = nil
-                for item in updatedArtworkItems {
-                    managedObject.addToArtworkItems(item.managedObject)
-                }
+        }
+        if managedObject.artworkItems != updatedArtworkItems {
+            for artworkItem in artworkItems {
+                managedObject.removeFromArtworkItems(artworkItem.managedObject)
+            }
+            for artworkItem in updatedArtworkItems {
+                managedObject.addToArtworkItems(artworkItem)
             }
         }
     }
     
     public var playables: [AbstractPlayable] {
-        if internalPlayables == nil || checkIfUpdateIsNeeded() {
-            updateInternalArrays()
-        } else {
-            updateInternalPlayables()
-        }
-        return internalPlayables ?? [AbstractPlayable]()
+        return managedObject.items.compactMap{ AbstractPlayable(managedObject: $0.playable) }
     }
     
     /// returns number of playables that are already contained in playlist
@@ -245,8 +173,8 @@ public class Playlist: Identifyable {
         }
     }
     public func updateDuration() {
-        if (managedObject.items?.count ?? 0) > 0 {
-            let playablesDuration = playables.reduce(0){ $0 + $1.duration }
+        if managedObject.items.count > 0 {
+            let playablesDuration = Int(managedObject.items.reduce(0){ $0 + $1.playable.combinedDuration })
             if Int16.isValid(value: playablesDuration), managedObject.duration != Int16(playablesDuration) {
                 managedObject.duration = Int16(playablesDuration)
             }
@@ -271,214 +199,228 @@ public class Playlist: Identifyable {
         var infoText = "Name: " + name + "\n"
         infoText += "Count: " + String(songCount) + "\n"
         infoText += "Playables:\n"
-        for playlistItem in sortedPlaylistItems {
+        for playlistItem in managedObject.items {
             infoText += String(playlistItem.order) + ": "
-            if let playable = playlistItem.playable {
-                infoText += playable.creatorName
-                infoText += " - "
-                infoText += playable.title
-            } else {
-                infoText += "NOT AVAILABLE"
-            }
+            let playable = playlistItem.playable
+            infoText += playable.title ?? ""
             infoText += "\n"
         }
         return infoText
     }
-    
-    public func previousCachedItemIndex(downwardsFrom: Int) -> Int? {
-        let cachedPlaylistItems = sortedCachedPlaylistItems
-        guard downwardsFrom <= playables.count, !cachedPlaylistItems.isEmpty else {
-            return nil
-        }
-        var previousIndex: Int? = nil
-        for item in cachedPlaylistItems.reversed() {
-            if item.order < downwardsFrom {
-                previousIndex = Int(item.order)
-                break
-            }
-        }
-        return previousIndex
-    }
-    
-    public func previousCachedItemIndex(beginningAt: Int) -> Int? {
-        return previousCachedItemIndex(downwardsFrom: beginningAt+1)
-    }
-    
-    public func nextCachedItemIndex(upwardsFrom: Int) -> Int? {
-        let cachedPlaylistItems = sortedCachedPlaylistItems
-        guard upwardsFrom < playables.count, !cachedPlaylistItems.isEmpty else {
-            return nil
-        }
-        var nextIndex: Int? = nil
-        for item in cachedPlaylistItems {
-            if item.order > upwardsFrom {
-                nextIndex = Int(item.order)
-                break
-            }
-        }
-        return nextIndex
-    }
-    
-    public func nextCachedItemIndex(beginningAt: Int) -> Int? {
-        return nextCachedItemIndex(upwardsFrom: beginningAt-1)
-    }
-    
-    public func insert(playables playablesToInsert: [AbstractPlayable], index insertIndex: Int = 0) {
-        let localSortedPlaylistItems = sortedPlaylistItems
-        guard insertIndex <= localSortedPlaylistItems.count && insertIndex >= 0, playablesToInsert.count > 0 else { return }
-        let oldItemsAfterIndex = sortedPlaylistItems[insertIndex...]
-        for localItem in oldItemsAfterIndex {
-            localItem.order += playablesToInsert.count
-        }
-        for (index, playable) in playablesToInsert.enumerated() {
-            createPlaylistItem(for: playable, customOrder: index + insertIndex)
-        }
-        updateChangeDate()
-        updateDuration(byIncreasingDuration: playablesToInsert.reduce(0){ $0 + $1.duration })
-        updateArtworkItems(isInitialUpdate: false)
-        library.saveContext()
-        isInternalArrayUpdateNeeded = true
-    }
 
     public func append(playable: AbstractPlayable) {
-        createPlaylistItem(for: playable)
+        createAndAppendPlaylistItem(for: playable)
         updateChangeDate()
         updateDuration(byIncreasingDuration: playable.duration)
-        updateArtworkItems(isInitialUpdate: false)
+        updateArtworkItems()
         library.saveContext()
-        isInternalArrayUpdateNeeded = true
     }
 
     public func append(playables playablesToAppend: [AbstractPlayable]) {
         for playable in playablesToAppend {
-            createPlaylistItem(for: playable)
+            createAndAppendPlaylistItem(for: playable)
         }
         updateChangeDate()
         updateDuration(byIncreasingDuration: playablesToAppend.reduce(0){ $0 + $1.duration })
-        updateArtworkItems(isInitialUpdate: false)
+        updateArtworkItems()
         library.saveContext()
-        isInternalArrayUpdateNeeded = true
     }
 
-    private func createPlaylistItem(for playable: AbstractPlayable, customOrder: Int? = nil) {
-        let playlistItem = library.createPlaylistItem()
-        playlistItem.order = customOrder ?? managedObject.items!.count
-        playlistItem.playlist = self
+    public func createAndAppendPlaylistItem(for playable: AbstractPlayable) {
+        let playlistItem = library.createPlaylistItem(playable: playable)
+        let lastPlaylistItemOrder = managedObject.items.last?.order ?? Int32(managedObject.items.count)
+        playlistItem.managedObject.order = lastPlaylistItemOrder + PlaylistItemMO.orderDistance
+        managedObject.addToItems(playlistItem.managedObject)
+    }
+    
+    private func createAndInsertPlaylistItem(for playable: AbstractPlayable, atIndex: Int, withOrder: Int32) {
+        let playlistItem = library.createPlaylistItem(playable: playable)
         playlistItem.playable = playable
+        playlistItem.managedObject.order = withOrder
+        managedObject.insertIntoItems(playlistItem.managedObject, at: atIndex)
     }
 
     public func add(item: PlaylistItem) {
         updateChangeDate()
-        updateDuration(byIncreasingDuration: item.playable?.duration ?? 0)
+        updateDuration(byIncreasingDuration: item.playable.duration)
         managedObject.addToItems(item.managedObject)
-        isInternalArrayUpdateNeeded = true
+    }
+    
+    public func reassignOrder() {
+        for (index, item) in managedObject.items.enumerated() {
+            item.order = Int32(index + 1) * PlaylistItemMO.orderDistance
+        }
+    }
+    
+    private func createEvenlySpreadIndicesInRangeOffset(indexCount: Int, range: Int) -> [Int32] {
+        var spreadIndices = [Int32]()
+        let rangeArray = Array(1...Int32(indexCount))
+        if indexCount == range {
+            spreadIndices = rangeArray
+        } else {
+            let availableSplitSpace = range - indexCount
+            let minDiffBetweenIndex = availableSplitSpace / (indexCount+1)
+            if minDiffBetweenIndex > 0 {
+                // it is possible to have at least one empty slot between the items
+                for index in rangeArray {
+                    spreadIndices.append((index * Int32(minDiffBetweenIndex + 1)))
+                }
+
+            } else {
+                let spaceBeforeAndAfterItems = (range - indexCount) / 2
+                for index in rangeArray {
+                    spreadIndices.append(index + Int32(spaceBeforeAndAfterItems))
+                }
+            }
+            
+        }
+        assert(spreadIndices.count == indexCount)
+        assert(spreadIndices.first! >= 0)
+        assert(spreadIndices.last! <= range)
+        return spreadIndices
+    }
+    
+    /// nil as return value -> no free space left
+    private func getOrdersToInsert(at: Int, itemToInsertCount: Int, isMove: Bool) -> [Int32]? {
+        assert(at <= (isMove ? managedObject.items.count-1 : managedObject.items.count))
+        var orders = [Int32]()
+        if at == 0 {
+            if managedObject.items.count == 0 {
+                return Array(1...Int32(itemToInsertCount)).compactMap{ $0 * PlaylistItemMO.orderDistance}
+            } else if managedObject.items[0].order < itemToInsertCount {
+                // there is no space left to insert
+                return nil
+            } else {
+                let spreadOrders = createEvenlySpreadIndicesInRangeOffset(indexCount: itemToInsertCount, range: Int(managedObject.items[0].order))
+                orders = spreadOrders.compactMap{ $0 - 1 }
+                assert(orders.count == itemToInsertCount)
+            }
+        } else if at == (isMove ? managedObject.items.count-1 : managedObject.items.count) {
+            // last playlist item
+            let lastOrder = managedObject.items.last!.order
+            for index in 0...Int32(itemToInsertCount-1) {
+                orders.append(lastOrder + ((index + 1) * PlaylistItemMO.orderDistance))
+            }
+            assert(orders.count == itemToInsertCount)
+        } else {
+            // somewhere in the array
+            let oneBeforeToIndex = at - 1
+            let oneBeforeToItemMO = managedObject.items[oneBeforeToIndex]
+            let targetItemMO = managedObject.items[at]
+            let spaceToInsert = targetItemMO.order - oneBeforeToItemMO.order - 1
+            if spaceToInsert < itemToInsertCount {
+                // there is no space left to insert
+                return nil
+            } else {
+                let spreadOrders = createEvenlySpreadIndicesInRangeOffset(indexCount: itemToInsertCount, range: Int(spaceToInsert))
+                orders = spreadOrders.compactMap{ oneBeforeToItemMO.order + $0 }
+                assert(orders.count == itemToInsertCount)
+            }
+        }
+        return orders
+    }
+    
+    public func insert(playables playablesToInsert: [AbstractPlayable], index insertIndex: Int = 0) {
+        guard insertIndex <= managedObject.items.count && insertIndex >= 0, playablesToInsert.count > 0 else { return }
+
+        let insertationCount = playablesToInsert.count
+        let spreadOrders = getOrdersToInsert(at: insertIndex, itemToInsertCount: insertationCount, isMove: false)
+        
+        for (index, playable) in playablesToInsert.enumerated() {
+            createAndInsertPlaylistItem(for: playable, atIndex: index + insertIndex, withOrder: spreadOrders?[index] ?? Int32(0))
+        }
+        if spreadOrders == nil {
+            reassignOrder()
+        }
+        
+        updateChangeDate()
+        updateDuration(byIncreasingDuration: playablesToInsert.reduce(0){ $0 + $1.duration })
+        if insertIndex < Self.artworkItemMaxLookCount {
+            updateArtworkItems()
+        }
+        library.saveContext()
     }
     
     public func movePlaylistItem(fromIndex: Int, to: Int) {
-        guard fromIndex >= 0, fromIndex < playables.count, to >= 0, to < playables.count, fromIndex != to else { return }
+        guard fromIndex >= 0, fromIndex < managedObject.items.count, to >= 0, to < managedObject.items.count, fromIndex != to else { return }
         
-        let localSortedPlaylistItems = sortedPlaylistItems
-        let targetOrder = localSortedPlaylistItems[to].order
-        if fromIndex < to {
-            for i in fromIndex+1...to {
-                localSortedPlaylistItems[i].order = localSortedPlaylistItems[i].order - 1
-            }
+        let fromItemMO = managedObject.items[fromIndex]
+        let newOrders = getOrdersToInsert(at: to, itemToInsertCount: 1, isMove: true)
+        assert(newOrders == nil || newOrders?.count == 1)
+        managedObject.moveInsideItems(fromIndex: fromIndex, to: to)
+        if let newOrder = newOrders?.first {
+            fromItemMO.order = newOrder
         } else {
-            for i in to...fromIndex-1 {
-                localSortedPlaylistItems[i].order = localSortedPlaylistItems[i].order + 1
-            }
+            reassignOrder()
         }
-        localSortedPlaylistItems[fromIndex].order = targetOrder
-        
+
         updateChangeDate()
-        updateArtworkItems(isInitialUpdate: false)
+        if fromIndex < Self.artworkItemMaxLookCount || to < Self.artworkItemMaxLookCount {
+            updateArtworkItems()
+        }
+        updateArtworkItems()
         library.saveContext()
-        isInternalArrayUpdateNeeded = true
     }
     
     public func remove(at index: Int) {
-        if index < sortedPlaylistItems.count {
-            let itemToBeRemoved = sortedPlaylistItems[index]
-            for item in sortedPlaylistItems {
-                if item.order > index {
-                    item.order = item.order - 1
-                }
-            }
-            library.deletePlaylistItem(item: itemToBeRemoved)
-            updateChangeDate()
-            updateDuration(byReducingDuration: itemToBeRemoved.playable?.duration ?? 0)
-            updateArtworkItems(isInitialUpdate: false)
-            library.saveContext()
-            isInternalArrayUpdateNeeded = true
+        guard index < managedObject.items.count else { return }
+        let itemToBeRemovedMO = managedObject.items[index]
+        managedObject.removeFromItems(at: index)
+        library.deletePlaylistItemMO(item: itemToBeRemovedMO)
+        
+        updateChangeDate()
+        updateDuration(byReducingDuration: Int(itemToBeRemovedMO.playable.combinedDuration))
+        if index < Self.artworkItemMaxLookCount {
+            updateArtworkItems()
         }
+        library.saveContext()
     }
     
     public func remove(firstOccurrenceOfPlayable playable: AbstractPlayable) {
-        for item in items {
-            if item.playable?.id == playable.id {
-                remove(at: Int(item.order))
-                break
-            }
+        let targetPlayableMO = playable.playableManagedObject
+        if let targetIndex = managedObject.items.firstIndex(where: { $0.playable == targetPlayableMO }) {
+            remove(at: targetIndex)
         }
-        isInternalArrayUpdateNeeded = true
+    }
+    
+    public func getFirstIndex(item: PlaylistItem) -> Int? {
+        let itemMO = item.managedObject
+        return managedObject.items.firstIndex(where: { $0 == itemMO })
     }
     
     public func getFirstIndex(playable: AbstractPlayable) -> Int? {
-        for item in items {
-            if item.playable?.id == playable.id {
-                return Int(item.order)
-            }
-        }
-        return nil
+        let targetPlayableMO = playable.playableManagedObject
+        return managedObject.items.firstIndex(where: { $0.playable == targetPlayableMO })
     }
     
     public func removeAllItems() {
-        for item in sortedPlaylistItems {
-            library.deletePlaylistItem(item: item)
-        }
+        managedObject.removeAllItems()
         updateChangeDate()
-        updateArtworkItems(isInitialUpdate: false)
+        updateArtworkItems()
         managedObject.duration = 0
         managedObject.remoteDuration = 0
         library.saveContext()
-        isInternalArrayUpdateNeeded = true
     }
     
     public func shuffle() {
-        let localSortedPlaylistItems = sortedPlaylistItems
-        let songCount = localSortedPlaylistItems.count
-        guard songCount > 0 else { return }
+        guard managedObject.items.count > 0 else { return }
         
         var shuffeldIndexes = [Int]()
-        shuffeldIndexes += 0...songCount-1
+        shuffeldIndexes += 0...Int(managedObject.items.count-1)
         shuffeldIndexes = shuffeldIndexes.shuffled()
+        assert(shuffeldIndexes.count == managedObject.items.count)
         
-        for i in 0..<songCount {
-            localSortedPlaylistItems[i].order = shuffeldIndexes[i]
+        for i in 0..<managedObject.items.count {
+            managedObject.moveInsideItems(fromIndex: i, to: shuffeldIndexes[i])
         }
+        reassignOrder()
         library.saveContext()
-        isInternalArrayUpdateNeeded = true
     }
     
     public func updateChangeDate() {
         changeDate = Date()
     }
 
-    public func ensureConsistentItemOrder() {
-        var hasInconsistencyDetected = false
-        for (index, item) in sortedPlaylistItems.enumerated() {
-            if item.order != index {
-                item.order = index
-                hasInconsistencyDetected = true
-            }
-        }
-        if hasInconsistencyDetected {
-            os_log(.debug, "Playlist inconsistency detected and fixed!")
-            library.saveContext()
-            isInternalArrayUpdateNeeded = true
-        }
-    }
-    
     public func getDefaultImage(theme: ThemePreference) -> UIImage  {
         return UIImage.getGeneratedArtwork(theme: theme, artworkType: .playlist)
     }

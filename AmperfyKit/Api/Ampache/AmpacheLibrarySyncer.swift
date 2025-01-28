@@ -549,8 +549,6 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
                 let parserDelegate = PlaylistSongsParserDelegate(performanceMonitor: self.performanceMonitor, playlist: playlistAsync, library: asyncCompanion.library)
                 try self.parse(response: response, delegate: parserDelegate)
-                playlistAsync.ensureConsistentItemOrder()
-                playlistAsync.updateArtworkItems(isInitialUpdate: false)
             }
         }
     }

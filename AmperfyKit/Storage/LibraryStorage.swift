@@ -480,20 +480,21 @@ public class LibraryStorage: PlayableFileCachable {
     }
     
     public func deletePlaylist(_ playlist: Playlist) {
-        let playlistEntries = playlist.managedObject.items
-        playlistEntries?.compactMap{ $0 as? PlaylistItemMO }.forEach{
-            context.delete($0)
-        }
+        playlist.removeAllItems()
         context.delete(playlist.managedObject)
     }
     
-    func createPlaylistItem() -> PlaylistItem {
+    func createPlaylistItem(playable: AbstractPlayable) -> PlaylistItem {
         let itemMO = PlaylistItemMO(context: context)
+        itemMO.playable = playable.playableManagedObject
         return PlaylistItem(library: self, managedObject: itemMO)
     }
     
     func deletePlaylistItem(item: PlaylistItem) {
         context.delete(item.managedObject)
+    }
+    func deletePlaylistItemMO(item: PlaylistItemMO) {
+        context.delete(item)
     }
 
     /// Download Fetch Cache
@@ -644,6 +645,13 @@ public class LibraryStorage: PlayableFileCachable {
     
     func getFetchPredicate(forPlaylist playlist: Playlist) -> NSPredicate {
         return NSPredicate(format: "%K == %@", #keyPath(PlaylistItemMO.playlist), playlist.managedObject.objectID)
+    }
+    
+    func getFetchPredicateForOrphanedPlaylistItems() -> NSPredicate {
+        return NSCompoundPredicate(orPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == nil", #keyPath(PlaylistItemMO.playlist)),
+            NSPredicate(format: "%K == nil", #keyPath(PlaylistItemMO.playable))
+        ])
     }
     
     func getFetchPredicateForUserAvailableEpisodes() -> NSPredicate {
@@ -1169,12 +1177,33 @@ public class LibraryStorage: PlayableFileCachable {
         return entries?.lazy.compactMap{ ScrobbleEntry(managedObject: $0) }.first
     }
     
-    public func getPlaylists() -> [Playlist] {
+    public func getPlaylists(isFaultsOptimized: Bool = false, areSystemPlaylistsIncluded: Bool = false) -> [Playlist] {
         let fetchRequest = PlaylistMO.identifierSortedFetchRequest
-        fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
+        if !areSystemPlaylistsIncluded {
+            fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
+        }
+        if isFaultsOptimized {
+            fetchRequest.relationshipKeyPathsForPrefetching = PlaylistMO.relationshipKeyPathsForPrefetching
+            fetchRequest.returnsObjectsAsFaults = false
+        }
         let foundPlaylists = try? context.fetch(fetchRequest)
         let playlists = foundPlaylists?.compactMap{ Playlist(library: self, managedObject: $0) }
         return playlists ?? [Playlist]()
+    }
+    
+    public func getPlaylistItems(playlist: Playlist) -> [PlaylistItemMO] {
+        let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
+        fetchRequest.predicate = getFetchPredicate(forPlaylist: playlist)
+        let foundPlaylistItems = try? context.fetch(fetchRequest)
+        return foundPlaylistItems ?? [PlaylistItemMO]()
+    }
+    
+    public func getPlaylistItemOrphans() -> [PlaylistItem] {
+        let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
+        fetchRequest.predicate = getFetchPredicateForOrphanedPlaylistItems()
+        let foundPlaylistItems = try? context.fetch(fetchRequest)
+        let items = foundPlaylistItems?.compactMap{ PlaylistItem(library: self, managedObject: $0) }
+        return items ?? [PlaylistItem]()
     }
     
     public func getLogEntries() -> [LogEntry] {
@@ -1229,7 +1258,7 @@ public class LibraryStorage: PlayableFileCachable {
         let shuffledContextPlaylist = Playlist(library: self, managedObject: playerMO.shuffledContextPlaylist!)
         let podcastPlaylist = Playlist(library: self, managedObject: playerMO.podcastPlaylist!)
         
-        if shuffledContextPlaylist.items.count != contextPlaylist.items.count {
+        if shuffledContextPlaylist.managedObject.items.count != contextPlaylist.managedObject.items.count {
             shuffledContextPlaylist.removeAllItems()
             shuffledContextPlaylist.append(playables: contextPlaylist.playables)
             shuffledContextPlaylist.shuffle()

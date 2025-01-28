@@ -102,6 +102,12 @@ public class LibraryUpdater {
                 try self.denormalizeCount(notifier: notifier, asyncCompanion: asyncCompanion)
                 os_log("Perform blocking library update (DONE): Denormalization Count", log: self.log, type: .info)
             }
+            if self.storage.librarySyncVersion < .v19 {
+                self.storage.librarySyncVersion = .v19 // if App crashes don't do this step again -> This step is only for convenience
+                os_log("Perform blocking library update (START): Sort playlist items", log: self.log, type: .info)
+                try self.sortPlaylistItems(notifier: notifier, asyncCompanion: asyncCompanion)
+                os_log("Perform blocking library update (DONE): Sort playlist items", log: self.log, type: .info)
+            }
         }
     }
     
@@ -189,7 +195,7 @@ public class LibraryUpdater {
     private func updatePlaylistArtworkItems() {
         let playlists = storage.main.library.getPlaylists()
         playlists.forEach{
-            $0.updateArtworkItems(isInitialUpdate: true)
+            $0.updateArtworkItems()
         }
         storage.main.saveContext()
     }
@@ -253,6 +259,34 @@ public class LibraryUpdater {
         }
         asyncCompanion.library.deleteBinaryPlayableFileSavedInCoreData()
         asyncCompanion.library.saveContext()
+    }
+
+    private func sortPlaylistItems(notifier: LibraryUpdaterCallbacks, asyncCompanion: CoreDataCompanion) throws {
+        autoreleasepool {
+            os_log("Playlist items delete orphans", log: log, type: .info)
+            let orphanPlaylistItems = asyncCompanion.library.getPlaylistItemOrphans()
+            os_log("Playlist items delete orphans: %i found", log: log, type: .info, orphanPlaylistItems.count)
+            for orphanPlaylistItem in orphanPlaylistItems {
+                asyncCompanion.library.deletePlaylistItem(item: orphanPlaylistItem)
+            }
+        }
+        try autoreleasepool {
+            os_log("Playlist items sort", log: log, type: .info)
+            let playlists = asyncCompanion.library.getPlaylists(isFaultsOptimized: true, areSystemPlaylistsIncluded: true)
+            notifier.startOperation(name: "Playlist Update", totalCount: playlists.count)
+            for playlist in playlists {
+                usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+                let playables = asyncCompanion.library.getPlaylistItems(playlist: playlist).compactMap{ AbstractPlayable(managedObject: $0.playable) }
+                playlist.removeAllItems()
+                for playable in playables {
+                    playlist.createAndAppendPlaylistItem(for: playable)
+                }
+                playlist.reassignOrder()
+                playlist.updateArtworkItems()
+                notifier.tickOperation()
+                guard isRunning else { throw PMKError.cancelled }
+            }
+        }
     }
     
     private func denormalizeCount(notifier: LibraryUpdaterCallbacks, asyncCompanion: CoreDataCompanion) throws {

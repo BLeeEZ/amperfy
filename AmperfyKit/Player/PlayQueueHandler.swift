@@ -68,7 +68,7 @@ public class PlayQueueHandler  {
     }
     
     var nextQueue: [AbstractPlayable] {
-        if activeQueue.playables.count > 0, currentIndex < activeQueue.playables.count-1 {
+        if activeQueue.songCount > 0, currentIndex < activeQueue.songCount-1 {
             return Array(activeQueue.playables[(currentIndex+1)...])
         } else {
             return [AbstractPlayable]()
@@ -305,12 +305,12 @@ public class PlayQueueHandler  {
     }
 
     private func removeItemFromUserQueue(at index: Int) {
-        guard index < userQueuePlaylist.playables.count else { return }
+        guard index < userQueuePlaylist.songCount else { return }
         userQueuePlaylist.remove(at: index)
     }
     
     private func removeItemFromActiveQueue(at index: Int) {
-        guard index < activeQueue.playables.count else { return }
+        guard index < activeQueue.songCount else { return }
         let playableToRemove = activeQueue.playables[index]
         if index < currentIndex {
             currentIndex -= 1
@@ -322,7 +322,7 @@ public class PlayQueueHandler  {
     }
     
     private func moveContextItem(fromIndex: Int, to: Int) {
-        guard fromIndex < activeQueue.playables.count, to < activeQueue.playables.count, fromIndex != to else { return }
+        guard fromIndex < activeQueue.songCount, to < activeQueue.songCount, fromIndex != to else { return }
         activeQueue.movePlaylistItem(fromIndex: fromIndex, to: to)
         guard !isUserQueuePlaying else { return }
         if currentIndex == fromIndex {
@@ -335,7 +335,7 @@ public class PlayQueueHandler  {
     }
 
     private func moveUserQueueItem(fromIndex: Int, to: Int) {
-        guard fromIndex < userQueuePlaylist.playables.count, to < userQueuePlaylist.playables.count, fromIndex != to else { return }
+        guard fromIndex < userQueuePlaylist.songCount, to < userQueuePlaylist.songCount, fromIndex != to else { return }
         userQueuePlaylist.movePlaylistItem(fromIndex: fromIndex, to: to)
     }
 

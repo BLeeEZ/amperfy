@@ -36,34 +36,48 @@ class PlaylistItemTest: XCTestCase {
     }
     
     func testCreation() {
-        let item = library.createPlaylistItem()
-        XCTAssertEqual(item.index, 0)
-        XCTAssertEqual(item.order, 0)
-        XCTAssertEqual(item.playable, nil)
-        XCTAssertEqual(item.playlist, nil)
-        
         guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
-        item.playable = song1
-        XCTAssertEqual(item.playable!.id, song1.id)
+        let item = library.createPlaylistItem(playable: song1)
+        XCTAssertEqual(item.order, 0)
+        
+        XCTAssertEqual(item.playable.id, song1.id)
         guard let playlist = library.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }
         let itemOrder = playlist.playables.count
         item.playlist = playlist
-        XCTAssertEqual(item.playlist!.id, playlist.id)
+        XCTAssertEqual(item.playlist.id, playlist.id)
         item.order = itemOrder
         XCTAssertEqual(item.order, itemOrder)
         
         guard let playlistFetched = library.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }
-        XCTAssertEqual(playlistFetched.items[itemOrder].playable!.id, song1.id)
-        XCTAssertEqual(playlistFetched.items[itemOrder].playlist!.id, playlistFetched.id)
+        XCTAssertEqual(playlistFetched.items[itemOrder].playable.id, song1.id)
+        XCTAssertEqual(playlistFetched.items[itemOrder].playlist.id, playlistFetched.id)
         XCTAssertEqual(playlistFetched.items[itemOrder].order, itemOrder)
     }
     
-    func testIndexAfterDeletion() {
-        let item = library.createPlaylistItem()
-        XCTAssertEqual(item.index, 0)
-        library.deletePlaylistItem(item: item)
-        library.saveContext()
-        XCTAssertEqual(item.index, nil)
+    func testOrphanDetectionDeletedPlaylist() {
+        guard let playlist = library.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }
+        let playlistItemCount = playlist.songCount
+        XCTAssertGreaterThan(playlistItemCount, 0)
+        var orphans = library.getPlaylistItemOrphans()
+        XCTAssertEqual(orphans.count, 0)
+        
+        playlist.managedObject.managedObjectContext?.delete(playlist.managedObject)
+        orphans = library.getPlaylistItemOrphans()
+        // Delete Rule should delete the orphans
+        XCTAssertEqual(orphans.count, 0)
+    }
+    
+    func testOrphanDetectionDeletedSong() {
+        guard let playlist = library.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }
+        let playlistItemCount = playlist.songCount
+        XCTAssertGreaterThan(playlistItemCount, 0)
+        var orphans = library.getPlaylistItemOrphans()
+        XCTAssertEqual(orphans.count, 0)
+        
+        playlist.managedObject.managedObjectContext?.delete(playlist.playables[0].playableManagedObject)
+        orphans = library.getPlaylistItemOrphans()
+        // Delete Rule should delete the orphans
+        XCTAssertEqual(orphans.count, 0)
     }
 
 }
