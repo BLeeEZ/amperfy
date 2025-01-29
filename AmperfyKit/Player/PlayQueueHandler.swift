@@ -39,37 +39,137 @@ public class PlayQueueHandler  {
         return playerQueues.currentPodcastItem
     }
     
-    var prevQueue: [AbstractPlayable] {
-        var played = [AbstractPlayable]()
-        if isUserQueuePlaying, currentIndex == -1 {
-            // prev is empty
-        } else if isUserQueuePlaying, currentIndex == 0, activeQueue.songCount > 0 {
-            played = [activeQueue.playables[0]]
-        } else if currentIndex > 0 {
-            if isUserQueuePlaying {
-                played = Array(activeQueue.playables[0...currentIndex])
-            } else {
-                played = Array(activeQueue.playables[0...currentIndex-1])
-            }
-        }
-        return played
+    var totalPlayDuration: Int {
+        return activeQueue.duration + userQueuePlaylist.duration
+    }
+    var remainingPlayDuration: Int {
+        return getNextQueueItems(from: 0, to: nil).reduce(0, { $0 + $1.duration}) + userQueuePlaylist.duration
     }
     
-    var userQueue: [AbstractPlayable] {
-        var userQueue = [AbstractPlayable]()
+    var prevQueueCount: Int {
+        var count = 0
+        if isUserQueuePlaying, currentIndex == -1 {
+            count = 0 // prev is empty
+        } else if isUserQueuePlaying, currentIndex == 0, activeQueue.songCount > 0 {
+            count = 1
+        } else if currentIndex > 0 {
+            if isUserQueuePlaying {
+                count = currentIndex + 1
+            } else {
+                count = currentIndex
+            }
+        }
+        return count
+    }
+    
+    func getPrevQueueItem(at: Int) -> AbstractPlayable? {
+        let count = prevQueueCount
+        guard count > 0, at < count else { return nil }
+        return activeQueue.getPlayable(at: at)
+    }
+    
+    func getPrevQueueItems(from: Int, to: Int?) -> [AbstractPlayable] {
+        let count = prevQueueCount
+        guard count > 0 else { return [AbstractPlayable]() }
+        let end = to ?? count-1
+        guard from >= 0, end >= 0, from <= end, end < count else { return [AbstractPlayable]() }
+        
+        return activeQueue.getPlayables(from: from, to: end)
+    }
+    
+    func getAllPrevQueueItems() -> [AbstractPlayable] {
+        let count = prevQueueCount
+        guard count > 0 else { return [AbstractPlayable]() }
+        return activeQueue.getPlayables(from: 0, to: count-1)
+    }
+    
+    var userQueueCount: Int {
+        var userQueue = 0
         if isUserQueueVisible {
             if isUserQueuePlaying {
-                userQueue = Array(userQueuePlaylist.playables[1...])
+                userQueue = userQueuePlaylist.songCount - 1
             } else {
-                userQueue = userQueuePlaylist.playables
+                userQueue = userQueuePlaylist.songCount
             }
         }
         return userQueue
     }
     
-    var nextQueue: [AbstractPlayable] {
+    func getUserQueueItem(at: Int) -> AbstractPlayable? {
+        if isUserQueueVisible {
+            if isUserQueuePlaying {
+                return userQueuePlaylist.getPlayable(at: at + 1)
+            } else {
+                return userQueuePlaylist.getPlayable(at: at)
+            }
+        }
+        return nil
+    }
+    
+    func getUserQueueItems(from: Int, to: Int?) -> [AbstractPlayable] {
+        let count = userQueueCount
+        guard count > 0 else { return [AbstractPlayable]() }
+        let end = to ?? count-1
+        guard from >= 0, end >= 0, from <= end, end < count else { return [AbstractPlayable]() }
+        
+        var userQueue = [AbstractPlayable]()
+        if isUserQueueVisible {
+            if isUserQueuePlaying {
+                userQueue = userQueuePlaylist.getPlayables(from: from + 1, to: end + 1)
+            } else {
+                userQueue = userQueuePlaylist.getPlayables(from: from, to: end)
+            }
+        }
+        return userQueue
+    }
+    
+    func getAllUserQueueItems() -> [AbstractPlayable] {
+        var userQueue = [AbstractPlayable]()
+        if isUserQueueVisible {
+            if isUserQueuePlaying {
+                userQueue = userQueuePlaylist.getPlayables(from: 1)
+            } else {
+                userQueue = userQueuePlaylist.getPlayables(from: 0)
+            }
+        }
+        return userQueue
+    }
+    
+    var nextQueueCount: Int {
         if activeQueue.songCount > 0, currentIndex < activeQueue.songCount-1 {
-            return Array(activeQueue.playables[(currentIndex+1)...])
+            return activeQueue.songCount - currentIndex - 1
+        } else {
+            return 0
+        }
+    }
+    
+    func getNextQueueItem(at: Int) -> AbstractPlayable? {
+        let count = nextQueueCount
+        if count > 0, at < count {
+            return activeQueue.getPlayable(at: at + currentIndex + 1)
+        } else {
+            return nil
+        }
+    }
+    
+    func getNextQueueItems(from: Int, to: Int?) -> [AbstractPlayable] {
+        let count = nextQueueCount
+        guard count > 0 else { return [AbstractPlayable]() }
+        let end = to ?? count-1
+        guard from >= 0, end >= 0, from <= end, end < count else { return [AbstractPlayable]() }
+        
+        if count > 0 {
+            let offset = currentIndex + 1
+            return activeQueue.getPlayables(from: from + offset, to: end + offset)
+        } else {
+            return [AbstractPlayable]()
+        }
+    }
+    
+    func getAllNextQueueItems() -> [AbstractPlayable] {
+        let count = nextQueueCount
+        if count > 0 {
+            return activeQueue.getPlayables(from: currentIndex + 1)
         } else {
             return [AbstractPlayable]()
         }
@@ -149,8 +249,8 @@ public class PlayQueueHandler  {
 
     func markAndGetPlayableAsPlaying(at playerIndex: PlayerIndex) -> AbstractPlayable? {
         var playable: AbstractPlayable?
-        if playerIndex.queueType == .user, playerIndex.index >= 0, playerIndex.index < userQueue.count {
-            playable = userQueue[playerIndex.index]
+        if playerIndex.queueType == .user, playerIndex.index >= 0, playerIndex.index < userQueueCount {
+            playable = getUserQueueItem(at: playerIndex.index)
             if isUserQueuePlaying {
                 removeItemFromUserQueue(at: 0)
             }
@@ -160,22 +260,22 @@ public class PlayQueueHandler  {
                 }
             }
             playerQueues.isUserQueuePlaying = true
-        } else if playerIndex.queueType == .prev, playerIndex.index >= 0, playerIndex.index < prevQueue.count {
+        } else if playerIndex.queueType == .prev, playerIndex.index >= 0, playerIndex.index < prevQueueCount {
             if isUserQueuePlaying {
                 removeItemFromUserQueue(at: 0)
             }
-            playable = prevQueue[playerIndex.index]
+            playable = getPrevQueueItem(at: playerIndex.index)
             currentIndex = playerIndex.index
             playerQueues.isUserQueuePlaying = false
-        } else if playerIndex.queueType == .next, playerIndex.index >= 0, playerIndex.index < nextQueue.count {
+        } else if playerIndex.queueType == .next, playerIndex.index >= 0, playerIndex.index < nextQueueCount {
             if isUserQueuePlaying {
                 removeItemFromUserQueue(at: 0)
             }
-            playable = nextQueue[playerIndex.index]
+            playable = getNextQueueItem(at: playerIndex.index)
             if isUserQueuePlaying {
-                currentIndex = prevQueue.count + playerIndex.index
+                currentIndex = prevQueueCount + playerIndex.index
             } else {
-                currentIndex = prevQueue.count + 1 + playerIndex.index
+                currentIndex = prevQueueCount + 1 + playerIndex.index
             }
             playerQueues.isUserQueuePlaying = false
         }
@@ -193,7 +293,7 @@ public class PlayQueueHandler  {
         case .prev:
             removeItemFromActiveQueue(at: at.index)
         case .next:
-            var playlistIndex = prevQueue.count + at.index
+            var playlistIndex = prevQueueCount + at.index
             if !isUserQueuePlaying {
                 playlistIndex += 1
             }
@@ -204,17 +304,17 @@ public class PlayQueueHandler  {
     func movePlayable(from: PlayerIndex, to: PlayerIndex) {
         let userQueueOffsetIsUserQueuePlaying = isUserQueuePlaying ? 1 : 0
         let nextQueueOffsetIsUserQueuePlaying = isUserQueuePlaying ? 0 : 1
-        let offsetToNext = prevQueue.count + nextQueueOffsetIsUserQueuePlaying
+        let offsetToNext = prevQueueCount + nextQueueOffsetIsUserQueuePlaying
         
         guard from.index >= 0, to.index >= 0 else { return }
         
-        if from.queueType == .prev { guard from.index < prevQueue.count else { return } }
-        if from.queueType == .user { guard from.index < userQueue.count else { return } }
-        if from.queueType == .next { guard from.index < nextQueue.count else { return } }
+        if from.queueType == .prev { guard from.index < prevQueueCount else { return } }
+        if from.queueType == .user { guard from.index < userQueueCount else { return } }
+        if from.queueType == .next { guard from.index < nextQueueCount else { return } }
         
-        if to.queueType == .prev { guard to.index <= prevQueue.count else { return } }
-        if to.queueType == .user { guard to.index <= userQueue.count else { return } }
-        if to.queueType == .next { guard to.index <= nextQueue.count else { return } }
+        if to.queueType == .prev { guard to.index <= prevQueueCount else { return } }
+        if to.queueType == .user { guard to.index <= userQueueCount else { return } }
+        if to.queueType == .next { guard to.index <= nextQueueCount else { return } }
 
         // Prev <=> Prev
         if from.queueType == .prev, to.queueType == .prev {
@@ -249,13 +349,13 @@ public class PlayQueueHandler  {
 
         // User ==> Next
         } else if from.queueType == .user, to.queueType == .next {
-            playerQueues.appendContextQueue(playables: [userQueue[from.index]])
+            playerQueues.appendContextQueue(playables: [getUserQueueItem(at: from.index)!])
             let fromIndex = activeQueue.songCount-1
             moveContextItem(fromIndex: fromIndex, to: offsetToNext+to.index)
             removeItemFromUserQueue(at: from.index + userQueueOffsetIsUserQueuePlaying)
         // User ==> Prev
         } else if from.queueType == .user, to.queueType == .prev {
-            playerQueues.appendContextQueue(playables: [userQueue[from.index]])
+            playerQueues.appendContextQueue(playables: [getUserQueueItem(at: from.index)!])
             let fromIndex = activeQueue.songCount-1
             moveContextItem(fromIndex: fromIndex, to: to.index)
             if isUserQueuePlaying {
@@ -265,12 +365,12 @@ public class PlayQueueHandler  {
 
         // Prev ==> User
         } else if from.queueType == .prev, to.queueType == .user {
-            playerQueues.appendUserQueue(playables: [prevQueue[from.index]])
+            playerQueues.appendUserQueue(playables: [getPrevQueueItem(at: from.index)!])
             moveUserQueueItem(fromIndex: userQueuePlaylist.songCount-1, to: to.index + userQueueOffsetIsUserQueuePlaying)
             removeItemFromActiveQueue(at: from.index)
         // Next ==> User
         } else if from.queueType == .next, to.queueType == .user {
-            playerQueues.appendUserQueue(playables: [nextQueue[from.index]])
+            playerQueues.appendUserQueue(playables: [getNextQueueItem(at: from.index)!])
             moveUserQueueItem(fromIndex: userQueuePlaylist.songCount-1, to: to.index + userQueueOffsetIsUserQueuePlaying)
             removeItemFromActiveQueue(at: offsetToNext+from.index)
         }
@@ -279,11 +379,11 @@ public class PlayQueueHandler  {
     func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable? {
         switch(playerIndex.queueType) {
         case .prev:
-            return prevQueue.element(at: playerIndex.index)
+            return getPrevQueueItem(at: playerIndex.index)
         case .user:
-            return userQueue.element(at: playerIndex.index)
+            return getUserQueueItem(at: playerIndex.index)
         case .next:
-            return nextQueue.element(at: playerIndex.index)
+            return getNextQueueItem(at: playerIndex.index)
         }
     }
     
@@ -311,7 +411,7 @@ public class PlayQueueHandler  {
     
     private func removeItemFromActiveQueue(at index: Int) {
         guard index < activeQueue.songCount else { return }
-        let playableToRemove = activeQueue.playables[index]
+        let playableToRemove = activeQueue.getPlayable(at: index)!
         if index < currentIndex {
             currentIndex -= 1
         } else if isUserQueuePlaying, index == currentIndex {

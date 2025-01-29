@@ -312,15 +312,117 @@ class MusicPlayerTest: XCTestCase {
         }
     }
     
+    func checkQueueInfoConsistency() {
+        /// -------------------
+        /// Prev Queue
+        /// -------------------
+        let prevQueueCount = testQueueHandler.prevQueueCount
+        let prevQueueItemsAll = testQueueHandler.getAllPrevQueueItems()
+        XCTAssertEqual(prevQueueCount, prevQueueItemsAll.count)
+        for (index, item) in prevQueueItemsAll.enumerated() {
+            let atItem = testQueueHandler.getPrevQueueItem(at: index)
+            XCTAssertEqual(atItem, item)
+        }
+        var prevRangItemsAll = testQueueHandler.getPrevQueueItems(from: 0, to: nil)
+        XCTAssertEqual(prevRangItemsAll, prevQueueItemsAll)
+
+        if prevQueueCount > 0 {
+            prevRangItemsAll = testQueueHandler.getPrevQueueItems(from: 0, to: prevQueueCount-1)
+            XCTAssertEqual(prevRangItemsAll, prevQueueItemsAll)
+        }
+        if prevQueueCount > 1 {
+            let prevRangeItemsBeforeEnd1 = testQueueHandler.getPrevQueueItems(from: 0, to: prevQueueCount-2)
+            XCTAssertEqual(prevRangeItemsBeforeEnd1.count, prevQueueCount-1)
+            XCTAssertEqual(prevRangeItemsBeforeEnd1, Array(prevQueueItemsAll[0...prevQueueCount-2]))
+            let prevRangeItemsOff1 = testQueueHandler.getPrevQueueItems(from: 1, to: prevQueueCount-1)
+            XCTAssertEqual(prevRangeItemsOff1.count, prevQueueCount-1)
+            XCTAssertEqual(prevRangeItemsOff1, Array(prevQueueItemsAll[1...prevQueueCount-1]))
+            XCTAssertEqual(prevRangeItemsOff1[0], prevQueueItemsAll[1])
+        }
+        if prevQueueCount > 2 {
+            let prevRangeItemsMissingStartAndEnd = testQueueHandler.getPrevQueueItems(from: 1, to: prevQueueCount-2)
+            XCTAssertEqual(prevRangeItemsMissingStartAndEnd.count, prevQueueCount-2)
+            XCTAssertEqual(prevRangeItemsMissingStartAndEnd, Array(prevQueueItemsAll[1...prevQueueCount-2]))
+            XCTAssertEqual(prevRangeItemsMissingStartAndEnd[0], prevQueueItemsAll[1])
+            XCTAssertEqual(prevRangeItemsMissingStartAndEnd.last!, prevQueueItemsAll[prevQueueCount-2])
+        }
+        /// -------------------
+        /// User Queue
+        /// -------------------
+        let userQueueCount = testQueueHandler.userQueueCount
+        let userQueueItemsAll = testQueueHandler.getAllUserQueueItems()
+        XCTAssertEqual(userQueueCount, userQueueItemsAll.count)
+        for (index, item) in userQueueItemsAll.enumerated() {
+            let atItem = testQueueHandler.getUserQueueItem(at: index)
+            XCTAssertEqual(atItem, item)
+        }
+        var userRangItemsAll = testQueueHandler.getUserQueueItems(from: 0, to: nil)
+        XCTAssertEqual(userRangItemsAll, userQueueItemsAll)
+
+        if userQueueCount > 0 {
+            userRangItemsAll = testQueueHandler.getUserQueueItems(from: 0, to: userQueueCount-1)
+            XCTAssertEqual(userRangItemsAll, userQueueItemsAll)
+        }
+        if userQueueCount > 1 {
+            let userRangeItemsBeforeEnd1 = testQueueHandler.getUserQueueItems(from: 0, to: userQueueCount-2)
+            XCTAssertEqual(userRangeItemsBeforeEnd1.count, userQueueCount-1)
+            XCTAssertEqual(userRangeItemsBeforeEnd1, Array(userQueueItemsAll[0...userQueueCount-2]))
+            let userRangeItemsOff1 = testQueueHandler.getUserQueueItems(from: 1, to: userQueueCount-1)
+            XCTAssertEqual(userRangeItemsOff1.count, userQueueCount-1)
+            XCTAssertEqual(userRangeItemsOff1, Array(userQueueItemsAll[1...userQueueCount-1]))
+            XCTAssertEqual(userRangeItemsOff1[0], userQueueItemsAll[1])
+        }
+        if userQueueCount > 2 {
+            let userRangeItemsMissingStartAndEnd = testQueueHandler.getUserQueueItems(from: 1, to: userQueueCount-2)
+            XCTAssertEqual(userRangeItemsMissingStartAndEnd.count, userQueueCount-2)
+            XCTAssertEqual(userRangeItemsMissingStartAndEnd, Array(userQueueItemsAll[1...userQueueCount-2]))
+            XCTAssertEqual(userRangeItemsMissingStartAndEnd[0], userQueueItemsAll[1])
+            XCTAssertEqual(userRangeItemsMissingStartAndEnd.last!, userQueueItemsAll[userQueueCount-2])
+        }
+        /// -------------------
+        /// Next Queue
+        /// -------------------
+        let nextQueueCount = testQueueHandler.nextQueueCount
+        let nextQueueItemsAll = testQueueHandler.getAllNextQueueItems()
+        XCTAssertEqual(nextQueueCount, nextQueueItemsAll.count)
+        for (index, item) in nextQueueItemsAll.enumerated() {
+            let atItem = testQueueHandler.getNextQueueItem(at: index)
+            XCTAssertEqual(atItem, item)
+        }
+        var nextRangItemsAll = testQueueHandler.getNextQueueItems(from: 0, to: nil)
+        XCTAssertEqual(nextRangItemsAll, nextQueueItemsAll)
+
+        if nextQueueCount > 0 {
+            nextRangItemsAll = testQueueHandler.getNextQueueItems(from: 0, to: nextQueueCount-1)
+            XCTAssertEqual(nextRangItemsAll, nextQueueItemsAll)
+        }
+        if nextQueueCount > 1 {
+            let nextRangeItemsBeforeEnd1 = testQueueHandler.getNextQueueItems(from: 0, to: nextQueueCount-2)
+            XCTAssertEqual(nextRangeItemsBeforeEnd1.count, nextQueueCount-1)
+            XCTAssertEqual(nextRangeItemsBeforeEnd1, Array(nextQueueItemsAll[0...nextQueueCount-2]))
+            let nextRangeItemsOff1 = testQueueHandler.getNextQueueItems(from: 1, to: nextQueueCount-1)
+            XCTAssertEqual(nextRangeItemsOff1.count, nextQueueCount-1)
+            XCTAssertEqual(nextRangeItemsOff1, Array(nextQueueItemsAll[1...nextQueueCount-1]))
+            XCTAssertEqual(nextRangeItemsOff1[0], nextQueueItemsAll[1])
+        }
+        if nextQueueCount > 2 {
+            let nextRangeItemsMissingStartAndEnd = testQueueHandler.getNextQueueItems(from: 1, to: nextQueueCount-2)
+            XCTAssertEqual(nextRangeItemsMissingStartAndEnd.count, nextQueueCount-2)
+            XCTAssertEqual(nextRangeItemsMissingStartAndEnd, Array(nextQueueItemsAll[1...nextQueueCount-2]))
+            XCTAssertEqual(nextRangeItemsMissingStartAndEnd[0], nextQueueItemsAll[1])
+            XCTAssertEqual(nextRangeItemsMissingStartAndEnd.last!, nextQueueItemsAll[nextQueueCount-2])
+        }
+    }
+    
     // -------------------------------------------------------------
     
     func testCreation() {
         XCTAssertFalse(testPlayer.isPlaying)
         XCTAssertFalse(testPlayer.isShuffle)
         XCTAssertEqual(testPlayer.currentlyPlaying, nil)
-        XCTAssertEqual(testPlayer.prevQueue, [AbstractPlayable]())
-        XCTAssertEqual(testPlayer.userQueue, [AbstractPlayable]())
-        XCTAssertEqual(testPlayer.nextQueue, [AbstractPlayable]())
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems(), [AbstractPlayable]())
+        XCTAssertEqual(testPlayer.getAllNextQueueItems(), [AbstractPlayable]())
+        XCTAssertEqual(testPlayer.getAllUserQueueItems(), [AbstractPlayable]())
         XCTAssertEqual(testPlayer.elapsedTime, 0.0)
         XCTAssertEqual(testPlayer.duration, 0.0)
         XCTAssertEqual(testPlayer.repeatMode, RepeatMode.off)
@@ -410,9 +512,9 @@ class MusicPlayerTest: XCTestCase {
     func testPlaySong_CheckPlaylistClear() {
         prepareWithCachedPlaylist()
         testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
-        XCTAssertEqual(testPlayer.prevQueue, [AbstractPlayable]())
-        XCTAssertEqual(testPlayer.userQueue, [AbstractPlayable]())
-        XCTAssertEqual(testPlayer.nextQueue, [AbstractPlayable]())
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems(), [AbstractPlayable]())
+        XCTAssertEqual(testPlayer.getAllUserQueueItems(), [AbstractPlayable]())
+        XCTAssertEqual(testPlayer.getAllNextQueueItems(), [AbstractPlayable]())
         XCTAssertEqual(testPlayer.currentlyPlaying, songCached)
     }
     
@@ -477,23 +579,24 @@ class MusicPlayerTest: XCTestCase {
     }
     
     func testAddToPlaylist() {
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
         testPlayer.appendContextQueue(playables: [songCached])
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
         testPlayer.appendContextQueue(playables: [songToDownload])
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 1)
         testPlayer.appendContextQueue(playables: [songCached])
-        XCTAssertEqual(testPlayer.nextQueue.count, 2)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 2)
         testPlayer.appendContextQueue(playables: [songToDownload])
-        XCTAssertEqual(testPlayer.nextQueue.count, 3)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 3)
     }
   
     func testPlaylistClear_EmptyPlaylist() {
         testPlayer.clearContextQueue()
         XCTAssertFalse(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, nil)
     }
     
@@ -503,9 +606,10 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertFalse(testPlayer.isPlaying)
         testPlayer.clearContextQueue()
         XCTAssertFalse(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
     
@@ -517,9 +621,10 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertFalse(testPlayer.isPlaying)
         testPlayer.clearContextQueue()
         XCTAssertFalse(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 1)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
     
@@ -529,9 +634,10 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertFalse(testPlayer.isPlaying)
         testPlayer.clearContextQueue()
         XCTAssertFalse(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
     
@@ -543,11 +649,12 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertFalse(testPlayer.isPlaying)
         testPlayer.clearContextQueue()
         XCTAssertFalse(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 1)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
-        XCTAssertEqual(testPlayer.userQueue[0], songId1)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems()[0], songId1)
     }
     
     func testPlaylistClear_EmptyPlaylist_WaitingQueueHasEntries5() {
@@ -561,9 +668,10 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertTrue(testPlayer.isPlaying)
         testPlayer.clearContextQueue()
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 1)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
     
@@ -571,9 +679,10 @@ class MusicPlayerTest: XCTestCase {
         prepareWithCachedPlaylist()
         testPlayer.clearContextQueue()
         XCTAssertFalse(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, nil)
     }
     
@@ -587,9 +696,10 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.clearContextQueue()
         wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 1)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
 
@@ -604,9 +714,10 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.clearContextQueue()
         wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 1)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId0)
     }
     
@@ -627,9 +738,10 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 2)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 2)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
@@ -648,9 +760,10 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(context: PlayContext(name: "", playables: [songId1, songId2, songId3]))
         wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 2)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 2)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
@@ -667,9 +780,10 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(context: PlayContext(name: "", playables: [songId1, songId2, songId3]))
         wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 1)
-        XCTAssertEqual(testPlayer.nextQueue.count, 2)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 2)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
@@ -681,9 +795,10 @@ class MusicPlayerTest: XCTestCase {
 
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 1)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
@@ -704,9 +819,10 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(context: PlayContext(name: "", playables: [songId3]))
         wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 3.0)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 2)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 2)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId3)
     }
 
@@ -723,9 +839,10 @@ class MusicPlayerTest: XCTestCase {
         
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId3]))
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 2)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 2)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId3)
     }
 
@@ -738,9 +855,10 @@ class MusicPlayerTest: XCTestCase {
         
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
@@ -758,9 +876,10 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertFalse(testPlayer.isPlaying)
         wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying, songId1)
     }
 
@@ -771,9 +890,10 @@ class MusicPlayerTest: XCTestCase {
 
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId1.id)
     }
     
@@ -785,9 +905,10 @@ class MusicPlayerTest: XCTestCase {
 
         guard let songId1 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1]))
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId1.id)
     }
 
@@ -801,9 +922,10 @@ class MusicPlayerTest: XCTestCase {
         guard let songId2 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", playables: [songId1, songId2, songId3]))
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 2)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 2)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId1.id)
     }
     
@@ -817,9 +939,10 @@ class MusicPlayerTest: XCTestCase {
         guard let songId2 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
         guard let songId3 = library.getSong(id: cdHelper.seeder.songs[3].id) else { XCTFail(); return }
         testPlayer.play(context: PlayContext(name: "", index: 1, playables: [songId1, songId2, songId3]))
-        XCTAssertEqual(testPlayer.prevQueue.count, 1)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 1)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId2.id)
     }
     
@@ -839,12 +962,13 @@ class MusicPlayerTest: XCTestCase {
         XCTAssertFalse(testPlayer.isPlaying)
         wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 2)
-        XCTAssertEqual(testPlayer.userQueue.count, 2)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 2)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 2)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId3.id)
-        XCTAssertEqual(testPlayer.userQueue[0].id, songId4.id)
-        XCTAssertEqual(testPlayer.userQueue[1].id, songId5.id)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems()[0].id, songId4.id)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems()[1].id, songId5.id)
     }
     
     func testPlayMulitpleSongs_switchPlayerMode_toMusic() {
@@ -867,20 +991,22 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(context: PlayContext(name: "", index: 1, playables: [songId7, songId8, songId9]))
         XCTAssertEqual(testPlayer.playerMode, PlayerMode.music)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 1)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 1)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId8.id)
-        XCTAssertEqual(testPlayer.prevQueue[0].id, songId7.id)
-        XCTAssertEqual(testPlayer.nextQueue[0].id, songId9.id)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems()[0].id, songId7.id)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems()[0].id, songId9.id)
         
         testPlayer.setPlayerMode(.podcast)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 2)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 2)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId1.id)
-        XCTAssertEqual(testPlayer.nextQueue[0].id, songId2.id)
-        XCTAssertEqual(testPlayer.nextQueue[1].id, songId3.id)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems()[0].id, songId2.id)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems()[1].id, songId3.id)
     }
     
     
@@ -906,20 +1032,22 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(context: PlayContext(name: "", type: .music, index: 2, playables: [songId7, songId8, songId9]))
         XCTAssertEqual(testPlayer.playerMode, PlayerMode.music)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 2)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 2)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId9.id)
-        XCTAssertEqual(testPlayer.prevQueue[0].id, songId7.id)
-        XCTAssertEqual(testPlayer.prevQueue[1].id, songId8.id)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems()[0].id, songId7.id)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems()[1].id, songId8.id)
         
         testPlayer.setPlayerMode(.podcast)
-        XCTAssertEqual(testPlayer.prevQueue.count, 1)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 1)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId2.id)
-        XCTAssertEqual(testPlayer.prevQueue[0].id, songId1.id)
-        XCTAssertEqual(testPlayer.nextQueue[0].id, songId3.id)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems()[0].id, songId1.id)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems()[0].id, songId3.id)
     }
     
     func testPlayMulitpleSongs_switchPlayerMode_toPodcast() {
@@ -941,20 +1069,22 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(context: PlayContext(name: "", type: .podcast, index: 1, playables: [songId7, songId8, songId9]))
         XCTAssertEqual(testPlayer.playerMode, PlayerMode.podcast)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 1)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 1)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId8.id)
-        XCTAssertEqual(testPlayer.prevQueue[0].id, songId7.id)
-        XCTAssertEqual(testPlayer.nextQueue[0].id, songId9.id)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems()[0].id, songId7.id)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems()[0].id, songId9.id)
         
         testPlayer.setPlayerMode(.music)
-        XCTAssertEqual(testPlayer.prevQueue.count, 0)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 2)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 2)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId0.id)
-        XCTAssertEqual(testPlayer.nextQueue[0].id, songId4.id)
-        XCTAssertEqual(testPlayer.nextQueue[1].id, songId5.id)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems()[0].id, songId4.id)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems()[1].id, songId5.id)
     }
     
     func testPlayMulitpleSongs_switchPlayerMode_toPodcast2() {
@@ -979,20 +1109,22 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(context: PlayContext(name: "", type: .podcast, index: 2, playables: [songId7, songId8, songId9]))
         XCTAssertEqual(testPlayer.playerMode, PlayerMode.podcast)
         XCTAssertTrue(testPlayer.isPlaying)
-        XCTAssertEqual(testPlayer.prevQueue.count, 2)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 0)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 2)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 0)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId9.id)
-        XCTAssertEqual(testPlayer.prevQueue[0].id, songId7.id)
-        XCTAssertEqual(testPlayer.prevQueue[1].id, songId8.id)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems()[0].id, songId7.id)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems()[1].id, songId8.id)
         
         testPlayer.setPlayerMode(.music)
-        XCTAssertEqual(testPlayer.prevQueue.count, 1)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 1)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 1)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 1)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.currentlyPlaying?.id, songId4.id)
-        XCTAssertEqual(testPlayer.prevQueue[0].id, songId0.id)
-        XCTAssertEqual(testPlayer.nextQueue[0].id, songId5.id)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems()[0].id, songId0.id)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems()[0].id, songId5.id)
     }
     
     func testPlay_ContextNameChanges() {
@@ -1055,9 +1187,10 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 2))
         testPlayer.playPreviousOrReplay()
         XCTAssertEqual(playerData.currentIndex, 2)
-        XCTAssertEqual(testPlayer.prevQueue.count, 2)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 6)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 2)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 6)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.elapsedTime, 0.0)
     }
     
@@ -1071,9 +1204,10 @@ class MusicPlayerTest: XCTestCase {
         mockAVPlayer.useMockCurrentItem = false
         XCTAssertTrue(testPlayer.isSkipAvailable)
         XCTAssertEqual(playerData.currentIndex, 3)
-        XCTAssertEqual(testPlayer.prevQueue.count, 3)
-        XCTAssertEqual(testPlayer.userQueue.count, 0)
-        XCTAssertEqual(testPlayer.nextQueue.count, 5)
+        XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 3)
+        XCTAssertEqual(testPlayer.getAllUserQueueItems().count, 0)
+        XCTAssertEqual(testPlayer.getAllNextQueueItems().count, 5)
+        checkQueueInfoConsistency()
         XCTAssertEqual(testPlayer.elapsedTime, 0.0)
     }
     
@@ -1314,27 +1448,29 @@ class MusicPlayerTest: XCTestCase {
     func testPlayer_InsertNextInMainQueue_emptyMainQueue() {
         testPlayer.clearContextQueue()
         playerData.currentIndex = 0
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [])
         testPlayer.insertContextQueue(playables: [songCached])
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [])
     }
     
     func testPlayer_InsertNextInMainQueue_emptyMainQueue_userQueuePlaing() {
         playerData.currentIndex = 0
         testPlayer.insertUserQueue(playables: [songCached])
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [])
+        checkQueueInfoConsistency()
         testPlayer.insertContextQueue(playables: [songToDownload])
         checkCurrentlyPlaying(idToBe: 4)
         XCTAssertEqual(playerData.currentIndex, -1)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [])
+        checkQueueInfoConsistency()
     }
     
     func testPlayer_InsertNextInMainQueue_WithWaitingQueuePlaying_nextEmpty() {
@@ -1343,14 +1479,16 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
         testPlayer.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
         testPlayer.insertContextQueue(playables: [songCached])
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
     }
     
     func testPlayer_InsertNextInMainQueue_noWaitingQueuePlaying_nextEmpty() {
@@ -1359,42 +1497,48 @@ class MusicPlayerTest: XCTestCase {
         testPlayer.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
         testPlayer.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
         checkCurrentlyPlaying(idToBe: 2)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
         testPlayer.insertContextQueue(playables: [songCached])
         checkCurrentlyPlaying(idToBe: 2)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
     }
 
     func testPlayer_InsertNextInMainQueue_WithWaitingQueuePlaying() {
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 2
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
         testPlayer.insertContextQueue(playables: [songCached])
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
     }
     
     func testPlayer_InsertNextInMainQueue_noWaitingQueuePlaying() {
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 2
         checkCurrentlyPlaying(idToBe: 2)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
         testPlayer.insertContextQueue(playables: [songCached])
         checkCurrentlyPlaying(idToBe: 2)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
     }
     
 
@@ -1402,28 +1546,32 @@ class MusicPlayerTest: XCTestCase {
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 2
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
         testPlayer.appendContextQueue(playables: [songToDownload])
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4, 0])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4, 0])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
     }
     
     func testPlayer_AppendNextInMainQueue_noWaitingQueuePlaying() {
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 2
         checkCurrentlyPlaying(idToBe: 2)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
         testPlayer.appendContextQueue(playables: [songToDownload])
         checkCurrentlyPlaying(idToBe: 2)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4, 0])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4, 0])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
     }
     
     func testPlayer_PlayPrev_WithWaitingQueue_noWaitingQueuePlaying() {
@@ -1431,28 +1579,32 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 3
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 2)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 1)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 0
         testPlayer.setRepeatMode(.all)
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
     }
     
     func testPlayer_PlayPrev_WithWaitingQueue_withWaitingQueuePlaying() {
@@ -1460,28 +1612,32 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 2
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 2)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 1)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = -1
         checkCurrentlyPlaying(idToBe: 5)
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [0, 1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [0, 1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = -1
@@ -1489,9 +1645,10 @@ class MusicPlayerTest: XCTestCase {
         checkCurrentlyPlaying(idToBe: 5)
         testMusicPlayer.playPrevious()
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
     }
     
     func testPlayer_PlayNext_WithWaitingQueue_noWaitingQueuePlaying() {
@@ -1499,25 +1656,28 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 2
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
         
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 0
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 4
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
     }
     
     func testPlayer_PlayNext_WithWaitingQueue_withWaitingQueuePlaying() {
@@ -1525,48 +1685,55 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 2
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 6)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [7, 8])
+        checkQueueInfoConsistency()
         
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = -1
         checkCurrentlyPlaying(idToBe: 5)
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 6)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [0, 1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [0, 1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [7, 8])
+        checkQueueInfoConsistency()
         testPlayer.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
         testPlayer.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
         
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 0
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 6)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [7, 8])
+        checkQueueInfoConsistency()
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 7)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [8])
+        checkQueueInfoConsistency()
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 8)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 1)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
         
         prepareWithWaitingQueuePlaying()
         testPlayer.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -1574,15 +1741,17 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 4
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 8)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
         testPlayer.setRepeatMode(.all)
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
         
         prepareWithWaitingQueuePlaying()
         testPlayer.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -1590,31 +1759,35 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 4
         testPlayer.playNext()
         checkCurrentlyPlaying(idToBe: 8)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
         testPlayer.setRepeatMode(.single)
         testPlayer.playNext()
         XCTAssertFalse(testPlayer.isPlaying)
         XCTAssertFalse(playerData.isUserQueuePlaying)
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
     }
     
     func testPlayer_Play_indexValidation() {
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = -1
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
         testPlayer.play()
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
     }
 
     func testPlayer_PlayPlayIndex_prev_noWaitingQueuePlaying() {
@@ -1622,41 +1795,46 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 1
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 0))
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
         
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 0))
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 1))
         checkCurrentlyPlaying(idToBe: 1)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 4
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 3))
         checkCurrentlyPlaying(idToBe: 3)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 4
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 0))
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
     }
 
     func testPlayer_PlayPlayIndex_prev_withWaitingQueuePlaying() {
@@ -1664,49 +1842,55 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 0
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 0))
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
         
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 0))
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 1))
         checkCurrentlyPlaying(idToBe: 1)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 4
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 4))
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 4
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 3))
         checkCurrentlyPlaying(idToBe: 3)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 4
         testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 0))
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
     }
     
     func testPlayer_PlayPlayIndex_next_noWaitingQueuePlaying() {
@@ -1714,41 +1898,46 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 3
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
         
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         checkCurrentlyPlaying(idToBe: 3)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 1))
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 0
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 3))
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 0
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         checkCurrentlyPlaying(idToBe: 1)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [5, 6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
+        checkQueueInfoConsistency()
     }
 
     func testPlayer_PlayPlayIndex_next_withWaitingQueuePlaying() {
@@ -1756,57 +1945,64 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 3
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
         
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         checkCurrentlyPlaying(idToBe: 3)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 1))
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = -1
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         checkCurrentlyPlaying(idToBe: 0)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = -1
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 4))
         checkCurrentlyPlaying(idToBe: 4)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = -1
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 2))
         checkCurrentlyPlaying(idToBe: 2)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 0
         testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         checkCurrentlyPlaying(idToBe: 1)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
     }
 
     func testPlayer_PlayPlayIndex_wait_noWaitingQueuePlaying() {
@@ -1814,49 +2010,55 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 3
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 0))
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
         
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 0))
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 1))
         checkCurrentlyPlaying(idToBe: 6)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [7, 8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 0
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 3))
         checkCurrentlyPlaying(idToBe: 8)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 0
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 2))
         checkCurrentlyPlaying(idToBe: 7)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [8])
+        checkQueueInfoConsistency()
 
         prepareNoWaitingQueuePlaying()
         playerData.currentIndex = 4
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 0))
         checkCurrentlyPlaying(idToBe: 5)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [6, 7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
+        checkQueueInfoConsistency()
         
         prepareNoWaitingQueuePlaying()
         testPlayer.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -1865,9 +2067,10 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 4
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 0))
         checkCurrentlyPlaying(idToBe: 8)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
     }
 
     func testPlayer_PlayPlayIndex_wait_withWaitingQueuePlaying() {
@@ -1875,41 +2078,46 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 3
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 0))
         checkCurrentlyPlaying(idToBe: 6)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [7, 8])
+        checkQueueInfoConsistency()
         
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 0))
         checkCurrentlyPlaying(idToBe: 6)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [7, 8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 2
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 1))
         checkCurrentlyPlaying(idToBe: 7)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [8])
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 4
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 2))
         checkCurrentlyPlaying(idToBe: 8)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0, 1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = 0
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 2))
         checkCurrentlyPlaying(idToBe: 8)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         testPlayer.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -1917,25 +2125,28 @@ class MusicPlayerTest: XCTestCase {
         playerData.currentIndex = 0
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 0))
         checkCurrentlyPlaying(idToBe: 8)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [0])
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
+        checkQueueInfoConsistency()
 
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = -1
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 0))
         checkCurrentlyPlaying(idToBe: 6)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [0, 1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [7, 8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [0, 1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [7, 8])
+        checkQueueInfoConsistency()
         
         prepareWithWaitingQueuePlaying()
         playerData.currentIndex = -1
         testPlayer.play(playerIndex: PlayerIndex(queueType: .user, index: 1))
         checkCurrentlyPlaying(idToBe: 7)
-        checkQueueItems(queue: testQueueHandler.prevQueue, seedIds: [Int]())
-        checkQueueItems(queue: testQueueHandler.nextQueue, seedIds: [0, 1, 2, 3, 4])
-        checkQueueItems(queue: testQueueHandler.userQueue, seedIds: [8])
+        checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
+        checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [0, 1, 2, 3, 4])
+        checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [8])
+        checkQueueInfoConsistency()
     }
 
 }

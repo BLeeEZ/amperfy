@@ -35,6 +35,7 @@ class PlainDetailsVC: UIViewController {
     private var rootView: UIViewController?
     private var podcast: Podcast?
     private var podcastEpisode: PodcastEpisode?
+    private var player: PlayerFacade?
     private var lyricsRelFilePath: URL?
 
     override func viewDidLoad() {
@@ -60,18 +61,28 @@ class PlainDetailsVC: UIViewController {
         self.rootView = rootView
         self.podcast = podcast
         self.podcastEpisode = nil
+        self.player = nil
         self.lyricsRelFilePath = nil
     }
     func display(podcastEpisode: PodcastEpisode, on rootView: UIViewController) {
         self.rootView = rootView
         self.podcast = nil
         self.podcastEpisode = podcastEpisode
+        self.player = nil
+        self.lyricsRelFilePath = nil
+    }
+    func display(player: PlayerFacade, on rootView: UIViewController) {
+        self.rootView = rootView
+        self.podcast = nil
+        self.podcastEpisode = nil
+        self.player = player
         self.lyricsRelFilePath = nil
     }
     func display(lyricsRelFilePath: URL, on rootView: UIViewController) {
         self.rootView = rootView
         self.podcast = nil
         self.podcastEpisode = nil
+        self.player = nil
         self.lyricsRelFilePath = lyricsRelFilePath
     }
 
@@ -92,6 +103,19 @@ class PlainDetailsVC: UIViewController {
             }.catch { error in
                 self.detailsTextView.text = "Lyrics are not available anymore."
             }
+        } else if let player = player {
+            headerLabel.text = "Player Info"
+            var details = ""
+            details += "Play Time\n"
+            details += "Remaining: \(player.remainingPlayDuration.asDurationString)\n"
+            details += "Total: \(player.totalPlayDuration.asDurationString)\n"
+            details += "\n"
+            details += "\n"
+            details += "Queue Items\n"
+            details += "Previous: \(player.prevQueueCount)\n"
+            details += "User: \(player.userQueueCount)\n"
+            details += "Next: \(player.nextQueueCount)\n"
+            detailsTextView.text = details
         }
     }
     

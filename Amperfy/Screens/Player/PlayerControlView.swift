@@ -82,6 +82,7 @@ class PlayerControlView: UIView {
         playerModeButton.tintColor = .label
         optionsButton.imageView?.tintColor = .label
         refreshPlayer()
+        refreshPlayerOptions()
     }
     
     @IBAction func swipeHandler(_ gestureRecognizer : UISwipeGestureRecognizer) {
@@ -362,7 +363,6 @@ class PlayerControlView: UIView {
         refreshPrevNextButtons()
         refreshDisplayPlaylistButton()
         refreshPlayerModeChangeButton()
-        refreshPlayerOptions()
     }
     
     func refreshPrevNextButtons() {
@@ -390,13 +390,13 @@ class PlayerControlView: UIView {
     
     func createPlayerOptionsMenu() -> UIMenu {
         var menuActions = [UIMenuElement]()
-        if player.currentlyPlaying != nil || player.prevQueue.count > 0 || player.userQueue.count > 0 || player.nextQueue.count > 0 {
+        if player.currentlyPlaying != nil || player.prevQueueCount > 0 || player.userQueueCount > 0 || player.nextQueueCount > 0 {
             let clearPlayer = UIAction(title: "Clear Player", image: .clear, handler: { _ in
                 self.player.clearQueues()
             })
             menuActions.append(clearPlayer)
         }
-        if player.userQueue.count > 0 {
+        if player.userQueueCount > 0 {
             let clearUserQueue = UIAction(title: "Clear User Queue", image: .playlistX, handler: { _ in
                 self.rootView?.clearUserQueue()
             })
@@ -430,15 +430,15 @@ class PlayerControlView: UIView {
         
         switch player.playerMode {
         case .music:
-            if player.currentlyPlaying != nil || player.prevQueue.count > 0 || player.nextQueue.count > 0,
+            if player.currentlyPlaying != nil || player.prevQueueCount > 0 || player.nextQueueCount > 0,
                self.appDelegate.storage.settings.isOnlineMode {
                 let addContextToPlaylist = UIAction(title: "Add Context Queue to Playlist", image: .playlistPlus, handler: { _ in
                     let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-                    var itemsToAdd = self.player.prevQueue.filterSongs()
+                    var itemsToAdd = self.player.getAllPrevQueueItems().filterSongs()
                     if let currentlyPlaying = self.player.currentlyPlaying, let currentSong = currentlyPlaying.asSong {
                         itemsToAdd.append(currentSong)
                     }
-                    itemsToAdd.append(contentsOf: self.player.nextQueue.filterSongs())
+                    itemsToAdd.append(contentsOf: self.player.getAllNextQueueItems().filterSongs())
                     selectPlaylistVC.itemsToAdd = itemsToAdd
                     let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
                     self.rootView?.present(selectPlaylistNav, animated: true, completion: nil)
@@ -456,40 +456,20 @@ class PlayerControlView: UIView {
             menuActions.append(scrollToCurrentlyPlaying)
         case .large: break
         }
+        
+        let playerInfo = UIAction(title: "Player Info", image: .info, handler: { _ in
+            guard let rootView = self.rootView else { return }
+            let detailVC = PlainDetailsVC()
+            detailVC.display(player: self.player, on: rootView)
+            rootView.present(detailVC, animated: true)
+        })
+        menuActions.append(playerInfo)
         return UIMenu(options: .displayInline, children: menuActions)
     }
     
     func refreshPlayerOptions() {
-        var menuTitle = ""
-        var remainingTotalPlaytime = 0
-        var totalPlaytime = 0
-        remainingTotalPlaytime += player.userQueue.reduce(0, { $0 + $1.duration})
-        remainingTotalPlaytime += player.nextQueue.reduce(0, { $0 + $1.duration})
-        
-        totalPlaytime += remainingTotalPlaytime
-        totalPlaytime += player.prevQueue.reduce(0, { $0 + $1.duration})
-        totalPlaytime += player.currentlyPlaying?.duration ?? 0
-        if let remainingTime = self.remainingTime {
-            remainingTotalPlaytime -= remainingTime
-        } else if let currentlyPlaying = player.currentlyPlaying {
-            remainingTotalPlaytime += currentlyPlaying.duration
-        }
-        
-        if remainingTotalPlaytime > 0 {
-            menuTitle += "\nRemaining Play Time: \(remainingTotalPlaytime.asDurationString)"
-        }
-        if totalPlaytime > 0 {
-            menuTitle += "\nTotal Play Time: \(totalPlaytime.asDurationString)"
-        }
-        
-        if menuTitle.isEmpty {
-            menuTitle = "Player Options"
-        } else {
-            menuTitle = "Player Info:" + menuTitle
-        }
-        
         optionsButton.showsMenuAsPrimaryAction = true
-        optionsButton.menu = UIMenu.lazyMenu(title: menuTitle) {
+        optionsButton.menu = UIMenu.lazyMenu(title: "Player Options") {
             return self.createPlayerOptionsMenu()
         }
     }

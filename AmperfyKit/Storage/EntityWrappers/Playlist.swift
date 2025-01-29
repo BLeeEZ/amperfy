@@ -80,6 +80,16 @@ public class Playlist: Identifyable {
     public var playables: [AbstractPlayable] {
         return managedObject.items.compactMap{ AbstractPlayable(managedObject: $0.playable) }
     }
+    public func getPlayable(at: Int) -> AbstractPlayable? {
+        guard at < songCount else { return nil }
+        return AbstractPlayable(managedObject: managedObject.items[at].playable)
+    }
+    public func getPlayables(from: Int, to: Int? = nil) -> [AbstractPlayable] {
+        guard managedObject.items.count > 0 else { return [AbstractPlayable]() }
+        let end = to ?? managedObject.items.count-1
+        guard from >= 0, end >= 0, from <= end, end < managedObject.items.count else { return [AbstractPlayable]() }
+        return managedObject.items[from...end].compactMap{ AbstractPlayable(managedObject: $0.playable) }
+    }
     
     /// returns number of playables that are already contained in playlist
     public func contains(playables playablesToCheck: [AbstractPlayable]) -> OrderedSet<AbstractPlayable> {

@@ -226,7 +226,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     
     func refreshUserQueueSectionHeader() {
         guard let userQueueSectionView = userQueueSectionHeader else { return }
-        if player.userQueue.isEmpty {
+        if player.userQueueCount == 0 {
             userQueueSectionView.hide()
         } else {
             userQueueSectionView.display(name: PlayerQueueType.user.description, buttonPressAction: self.clearUserQueue)

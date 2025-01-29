@@ -99,10 +99,12 @@ extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
     func createPlayerQueueSections() -> [CPListSection] {
         var queueSection = [CPListSection]()
         
-        let userQueue = appDelegate.player.userQueue
-        if userQueue.count > 0 {
+        let userQueueCount = appDelegate.player.userQueueCount
+        let userQueueMax = min(userQueueCount-1, CPListTemplate.maximumItemCount-1)
+        let userQueue = appDelegate.player.getUserQueueItems(from: 0, to: userQueueMax)
+        if userQueueCount > 0 {
             var userQueueItems = [CPListItem]()
-            for (index, userQueueItem) in appDelegate.player.userQueue.enumerated() {
+            for (index, userQueueItem) in userQueue.enumerated() {
                 let playerIndex = PlayerIndex(queueType: .user, index: index)
                 let listItem = self.createQueueItem(for: userQueueItem, playerIndex: playerIndex)
                 userQueueItems.append(listItem)
@@ -114,11 +116,13 @@ extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
             queueSection.append(userQueueSection)
         }
 
-        if userQueue.count < CPListTemplate.maximumItemCount {
-            let nextQueue = appDelegate.player.nextQueue
+        if userQueueCount < CPListTemplate.maximumItemCount {
+            let nextQueueCount = appDelegate.player.nextQueueCount
+            let nextQueueMax = min(nextQueueCount-1, CPListTemplate.maximumItemCount-1)
+            let nextQueue = appDelegate.player.getNextQueueItems(from: 0, to: nextQueueMax)
             if nextQueue.count > 0 {
                 var nextQueueItems = [CPListItem]()
-                for (index, nextQueueItem) in appDelegate.player.nextQueue.enumerated() {
+                for (index, nextQueueItem) in nextQueue.enumerated() {
                     let playerIndex = PlayerIndex(queueType: .next, index: index)
                     let listItem = self.createQueueItem(for: nextQueueItem, playerIndex: playerIndex)
                     nextQueueItems.append(listItem)

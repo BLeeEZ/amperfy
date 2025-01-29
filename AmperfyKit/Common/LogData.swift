@@ -65,7 +65,7 @@ public struct LogData: Encodable {
         playerInfo.repeatType = amperfyData.player.repeatMode.description
         playerInfo.isShuffle = amperfyData.player.isShuffle
         playerInfo.songIndex = amperfyData.player.currentlyPlaying != nil ? 0 : -99
-        playerInfo.playlistItemCount = amperfyData.player.prevQueue.count + amperfyData.player.nextQueue.count + 1
+        playerInfo.playlistItemCount = amperfyData.player.prevQueueCount + amperfyData.player.nextQueueCount + 1
         logData.playerInfo = playerInfo
         
         var userSettings = UserSettings()

@@ -126,7 +126,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
 
     public func play(context: PlayContext) {
         guard let activePlayable = context.getActivePlayable() else { return }
-        let topUserQueueItem = queueHandler.userQueue.first
+        let topUserQueueItem = queueHandler.getUserQueueItem(at: 0)
         let wasUserQueuePlaying = queueHandler.isUserQueuePlaying
         queueHandler.clearActiveQueue()
         queueHandler.appendActiveQueue(playables: context.playables)
@@ -165,10 +165,10 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
 
     //BackendAudioPlayerNotifiable
     func playPrevious() {
-        if !queueHandler.prevQueue.isEmpty {
-            play(playerIndex: PlayerIndex(queueType: .prev, index: queueHandler.prevQueue.count-1))
-        } else if playerStatus.repeatMode == .all, !queueHandler.nextQueue.isEmpty {
-            play(playerIndex: PlayerIndex(queueType: .next, index: queueHandler.nextQueue.count-1))
+        if queueHandler.prevQueueCount > 0 {
+            play(playerIndex: PlayerIndex(queueType: .prev, index: queueHandler.prevQueueCount-1))
+        } else if playerStatus.repeatMode == .all, queueHandler.nextQueueCount > 0 {
+            play(playerIndex: PlayerIndex(queueType: .next, index: queueHandler.nextQueueCount-1))
         } else {
             replayCurrentItem()
         }
@@ -184,11 +184,11 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable  {
     }
         
     private var nextPlayerIndex: PlayerIndex? {
-        if queueHandler.userQueue.count > 0 {
+        if queueHandler.userQueueCount > 0 {
             return PlayerIndex(queueType: .user, index: 0)
-        } else if queueHandler.nextQueue.count > 0 {
+        } else if queueHandler.nextQueueCount > 0 {
             return PlayerIndex(queueType: .next, index: 0)
-        } else if playerStatus.repeatMode == .all, !queueHandler.prevQueue.isEmpty {
+        } else if playerStatus.repeatMode == .all, queueHandler.prevQueueCount > 0 {
             return PlayerIndex(queueType: .prev, index: 0)
         } else {
             return nil

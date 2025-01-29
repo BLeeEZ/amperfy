@@ -41,10 +41,10 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
     }
     
     func clearUserQueue() {
-        guard self.player.userQueue.count > 0 else { return }
+        guard self.player.userQueueCount > 0 else { return }
         tableView.beginUpdates()
         var indexPaths = [IndexPath]()
-        for i in 0...self.player.userQueue.count-1 {
+        for i in 0...self.player.userQueueCount-1 {
             indexPaths.append(IndexPath(row: i, section: PlayerSectionCategory.userQueue.rawValue))
         }
         tableView.deleteRows(at: indexPaths, with: .fade)
@@ -101,7 +101,7 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
         case .currentlyPlaying:
             return 0.0
         case .userQueue:
-            if player.userQueue.isEmpty {
+            if player.userQueueCount == 0 {
                 return CGFloat.leastNormalMagnitude
             } else {
                 return UserQueueSectionHeader.frameHeight
@@ -128,7 +128,7 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
         case .currentlyPlaying, .userQueue, .none: return 0.0
         case .contextNext: // calculate footer height to keep currently playing row on top of table view
             let heightOfContextNextRows = tableView.frame.height - CurrentlyPlayingTableCell.rowHeight - ContextQueueNextSectionHeader.frameHeight
-            let contextNextRowOccupiedHeight = CGFloat(player.nextQueue.count) * PlayableTableCell.rowHeight
+            let contextNextRowOccupiedHeight = CGFloat(player.nextQueueCount) * PlayableTableCell.rowHeight
             let offset = heightOfContextNextRows - contextNextRowOccupiedHeight
             return offset > 0.0 ? offset : 0.0
         }
@@ -136,10 +136,10 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch PlayerSectionCategory(rawValue: section) {
-        case .contextPrev: return player.prevQueue.count
+        case .contextPrev: return player.prevQueueCount
         case .currentlyPlaying: return 1
-        case .userQueue: return player.userQueue.count
-        case .contextNext: return player.nextQueue.count
+        case .userQueue: return player.userQueueCount
+        case .contextNext: return player.nextQueueCount
         case .none: return 0
         }
     }

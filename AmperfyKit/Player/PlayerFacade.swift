@@ -101,10 +101,18 @@ public struct PlayContext {
 }
 
 public protocol PlayerFacade {
-    var prevQueue: [AbstractPlayable] { get }
-    var userQueue: [AbstractPlayable] { get }
-    var nextQueue: [AbstractPlayable] { get }
+    var prevQueueCount: Int { get }
+    func getPrevQueueItems(from: Int, to: Int?) -> [AbstractPlayable]
+    func getAllPrevQueueItems() -> [AbstractPlayable]
+    var userQueueCount: Int { get }
+    func getUserQueueItems(from: Int, to: Int?) -> [AbstractPlayable]
+    func getAllUserQueueItems() -> [AbstractPlayable]
+    var nextQueueCount: Int { get }
+    func getNextQueueItems(from: Int, to: Int?) -> [AbstractPlayable]
+    func getAllNextQueueItems() -> [AbstractPlayable]
     
+    var totalPlayDuration: Int { get }
+    var remainingPlayDuration: Int { get }
     var volume: Float { get set }
     var isPlaying: Bool { get }
     func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable?
@@ -216,17 +224,41 @@ class PlayerFacadeImpl: PlayerFacade {
         self.musicPlayer = musicPlayer
         self.userStatistics = userStatistics
     }
-    
-    var prevQueue: [AbstractPlayable] {
-        return queueHandler.prevQueue
+
+    var prevQueueCount: Int {
+        return queueHandler.prevQueueCount
     }
-    var userQueue: [AbstractPlayable] {
-        return queueHandler.userQueue
+    func getPrevQueueItems(from: Int, to: Int?) -> [AbstractPlayable] {
+        return queueHandler.getPrevQueueItems(from: from, to: to)
     }
-    var nextQueue: [AbstractPlayable] {
-        return queueHandler.nextQueue
+    func getAllPrevQueueItems() -> [AbstractPlayable] {
+        return queueHandler.getAllPrevQueueItems()
     }
-    
+    var userQueueCount: Int {
+        return queueHandler.userQueueCount
+    }
+    func getUserQueueItems(from: Int, to: Int?) -> [AbstractPlayable] {
+        return queueHandler.getUserQueueItems(from: from, to: to)
+    }
+    func getAllUserQueueItems() -> [AbstractPlayable] {
+        return queueHandler.getAllUserQueueItems()
+    }
+    var nextQueueCount: Int {
+        return queueHandler.nextQueueCount
+    }
+    func getNextQueueItems(from: Int, to: Int?) -> [AbstractPlayable] {
+        return queueHandler.getNextQueueItems(from: from, to: to)
+    }
+    func getAllNextQueueItems() -> [AbstractPlayable] {
+        return queueHandler.getAllNextQueueItems()
+    }
+      
+    var totalPlayDuration: Int {
+        return queueHandler.totalPlayDuration
+    }
+    var remainingPlayDuration: Int {
+        return queueHandler.remainingPlayDuration
+    }
     var volume: Float {
         get {
             return backendAudioPlayer.volume
@@ -254,7 +286,7 @@ class PlayerFacadeImpl: PlayerFacade {
     var contextName: String {
         get {
             guard queueHandler.contextName.isEmpty else { return queueHandler.contextName }
-            if queueHandler.prevQueue.isEmpty, queueHandler.nextQueue.isEmpty, queueHandler.currentlyPlaying == nil || queueHandler.isUserQueuePlaying {
+            if queueHandler.prevQueueCount == 0, queueHandler.nextQueueCount == 0, queueHandler.currentlyPlaying == nil || queueHandler.isUserQueuePlaying {
                 return ""
             } else {
                 return "Mixed Context"
@@ -395,7 +427,7 @@ class PlayerFacadeImpl: PlayerFacade {
     
     func clearContextQueue() {
         if !queueHandler.isUserQueuePlaying {
-            if queueHandler.userQueue.isEmpty {
+            if queueHandler.userQueueCount == 0 {
                 musicPlayer.stop()
             } else {
                 play(playerIndex: PlayerIndex(queueType: .user, index: 0))

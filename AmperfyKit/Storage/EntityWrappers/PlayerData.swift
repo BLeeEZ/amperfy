@@ -350,13 +350,13 @@ extension PlayerData: PlayerQueuesPersistent {
             if managedObject.musicIndex < 0, !isUserQueuPlayingInternal {
                 return 0
             }
-            if managedObject.musicIndex >= contextQueue.playables.count || managedObject.musicIndex < -1 {
+            if managedObject.musicIndex >= contextQueue.songCount || managedObject.musicIndex < -1 {
                 return 0
             }
             return Int(managedObject.musicIndex)
         }
         set {
-            if newValue >= -1, newValue < contextQueue.playables.count {
+            if newValue >= -1, newValue < contextQueue.songCount {
                 managedObject.musicIndex = Int32(newValue)
             } else {
                 managedObject.musicIndex = isUserQueuPlayingInternal ? -1 : 0
@@ -367,13 +367,13 @@ extension PlayerData: PlayerQueuesPersistent {
     
     private var currentPodcastIndex: Int {
         get {
-            if managedObject.podcastIndex < 0 || (managedObject.podcastIndex >= podcastPlaylist.playables.count && podcastPlaylist.playables.count > 0)  {
+            if managedObject.podcastIndex < 0 || (managedObject.podcastIndex >= podcastPlaylist.songCount && podcastPlaylist.songCount > 0)  {
                 return 0
             }
             return Int(managedObject.podcastIndex)
         }
         set {
-            if newValue >= 0, newValue < podcastPlaylist.playables.count {
+            if newValue >= 0, newValue < podcastPlaylist.songCount {
                 managedObject.podcastIndex = Int32(newValue)
             } else {
                 managedObject.podcastIndex = 0
@@ -388,7 +388,7 @@ extension PlayerData: PlayerQueuesPersistent {
             case .music:
                 return getCurrentMusicPlayable(in: activeQueue)
             case .podcast:
-                return podcastPlaylist.playables.element(at: currentPodcastIndex)
+                return podcastPlaylist.getPlayable(at: currentPodcastIndex)
             }
         }
     }
@@ -398,18 +398,18 @@ extension PlayerData: PlayerQueuesPersistent {
     }
 
     var currentPodcastItem: AbstractPlayable? {
-        return podcastPlaylist.playables.element(at: currentPodcastIndex)
+        return podcastPlaylist.getPlayable(at: currentPodcastIndex)
     }
     
     private func getCurrentMusicPlayable(in queue: Playlist) -> AbstractPlayable? {
         if isUserQueuPlayingInternal, userQueuePlaylistInternal.songCount > 0 {
-            return userQueuePlaylistInternal.playables.first
+            return userQueuePlaylistInternal.getPlayable(at: 0)
         }
-        guard queue.playables.count > 0 else { return nil }
-        guard currentMusicIndex >= 0, currentMusicIndex < queue.playables.count else {
-            return queue.playables[0]
+        guard queue.songCount > 0 else { return nil }
+        guard currentMusicIndex >= 0, currentMusicIndex < queue.songCount else {
+            return queue.getPlayable(at: 0)
         }
-        return queue.playables[currentMusicIndex]
+        return queue.getPlayable(at: currentMusicIndex)
     }
 
     var userQueuePlaylist: Playlist {
