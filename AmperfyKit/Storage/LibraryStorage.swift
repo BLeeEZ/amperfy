@@ -449,9 +449,16 @@ public class LibraryStorage: PlayableFileCachable {
     public func deleteRemoteArtworkCachePaths() {
         let fetchRequest = ArtworkMO.fetchRequest()
         guard let artworksMO = try? context.fetch(fetchRequest) else { return }
+        var artworksToDelete = [ArtworkMO]()
         for artworkMO in artworksMO {
             artworkMO.status = ImageStatus.NotChecked.rawValue
             artworkMO.relFilePath = nil
+            if artworkMO.url == nil {
+                artworksToDelete.append(artworkMO)
+            }
+        }
+        for artwork in artworksToDelete {
+            deleteArtwork(artwork: Artwork(managedObject: artwork))
         }
     }
     
