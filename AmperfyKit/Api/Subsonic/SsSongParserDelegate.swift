@@ -107,8 +107,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "song" || elementName == "entry" || elementName == "child" || elementName == "episode", songBuffer != nil {
             parsedCount += 1
-            _ = songBuffer?.updateDuration()
-            playableBuffer = nil
+            resetPlayableBuffer()
             if let song = songBuffer {
                 parsedSongs.append(song)
             }

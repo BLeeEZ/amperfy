@@ -57,6 +57,7 @@ class AlbumParserTest: AbstractAmpacheTest {
         XCTAssertEqual(album.artist?.id, "19")
         XCTAssertEqual(album.artist?.name, "Various Artists")
         XCTAssertEqual(album.year, 2012)
+        XCTAssertFalse(album.isCached)
         XCTAssertEqual(album.duration, 1879)
         XCTAssertEqual(album.remoteDuration, 1879)
         XCTAssertEqual(album.remoteSongCount, 9)
@@ -71,6 +72,7 @@ class AlbumParserTest: AbstractAmpacheTest {
         XCTAssertEqual(album.artist?.id, "12") // Artist not pre created
         XCTAssertEqual(album.artist?.name, "9958A")
         XCTAssertEqual(album.year, 1974)
+        XCTAssertFalse(album.isCached)
         XCTAssertEqual(album.duration, 4621)
         XCTAssertEqual(album.remoteDuration, 4621)
         XCTAssertEqual(album.remoteSongCount, 1)
@@ -84,6 +86,7 @@ class AlbumParserTest: AbstractAmpacheTest {
         XCTAssertEqual(album.artist?.id, "91")
         XCTAssertEqual(album.artist?.name, "ZZZasdf")
         XCTAssertEqual(album.year, 2002)
+        XCTAssertFalse(album.isCached)
         XCTAssertEqual(album.duration, 2)
         XCTAssertEqual(album.remoteDuration, 2)
         XCTAssertEqual(album.remoteSongCount, 105)

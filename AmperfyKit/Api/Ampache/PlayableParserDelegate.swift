@@ -28,6 +28,14 @@ class PlayableParserDelegate: AmpacheXmlLibParser {
 
     var playableBuffer: AbstractPlayable?
     var rating: Int = 0
+    private var isCached = true
+    private var duration: Int = 0
+    var isCollectionCached: Bool {
+        return parsedCount > 0 ? isCached : false
+    }
+    var collectionDuration: Int {
+        return parsedCount > 0 ? duration : 0
+    }
     
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
@@ -36,7 +44,11 @@ class PlayableParserDelegate: AmpacheXmlLibParser {
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "title":
-            playableBuffer?.title = buffer
+            if let episode = playableBuffer as? PodcastEpisode {
+                episode.titleRawParsed = buffer
+            } else {
+                playableBuffer?.title = buffer
+            }
         case "rating":
             rating = Int(buffer) ?? 0
         case "flag":
@@ -63,8 +75,16 @@ class PlayableParserDelegate: AmpacheXmlLibParser {
         default:
             break
         }
-        
+
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
+    }
+    
+    func resetPlayableBuffer() {
+        if let playable = playableBuffer {
+            isCached = isCached && playable.isCached
+            duration += playable.duration
+        }
+        playableBuffer = nil
     }
 
 }

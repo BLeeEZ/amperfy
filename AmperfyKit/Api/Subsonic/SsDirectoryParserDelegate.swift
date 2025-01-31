@@ -112,9 +112,11 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
             if let directory = self.directory {
                 let removedSongs = songsBeforeFetch.subtracting(songsParsed)
                 removedSongs.forEach{ directory.managedObject.removeFromSongs($0.managedObject) }
+                directory.isCached = isCollectionCached
             } else if let musicFolder = musicFolder {
                 let removedSongs = songsBeforeFetch.subtracting(songsParsed)
                 removedSongs.forEach{ musicFolder.managedObject.removeFromSongs($0.managedObject) }
+                musicFolder.isCached = isCollectionCached
             }
         }
         

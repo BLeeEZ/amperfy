@@ -104,9 +104,6 @@ extension Genre: PlayableContainable  {
             infoContent.append("\(songCount) Songs")
         }
         if details.type == .long {
-            if isCompletelyCached {
-                infoContent.append("Cached")
-            }
             if details.isShowDetailedInfo {
                 infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
             }

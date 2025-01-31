@@ -36,7 +36,8 @@ extension DirectoryMO {
     @NSManaged public var songs: NSOrderedSet?
     @NSManaged public var subdirectories: NSOrderedSet?
     @NSManaged public var musicFolder: MusicFolderMO?
-    
+    @NSManaged public var isCached: Bool
+
     static let relationshipKeyPathsForPrefetching = [String]()
 
 }

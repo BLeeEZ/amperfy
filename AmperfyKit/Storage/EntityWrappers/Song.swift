@@ -72,15 +72,20 @@ public class Song: AbstractPlayable, Identifyable {
         guard let album = album else { return true }
         return album.isOrphaned
     }
-    public override func updateDuration() -> Bool {
-        return updateDuration(updateArtistAndAlbumToo: true)
-    }
-    public func updateDuration(updateArtistAndAlbumToo: Bool) -> Bool {
-        let isUpdateNeeded = super.updateDuration()
-        if updateArtistAndAlbumToo, isUpdateNeeded {
-            album?.updateDuration(updateArtistToo: true)
+    
+    public override func deleteCache() {
+        album?.isCached = false
+        for playlistItemMO in managedObject.playlistItems {
+            if playlistItemMO.playlist.isCached {
+                playlistItemMO.playlist.isCached = false
+            }
         }
-        return isUpdateNeeded
+        if managedObject.directory?.isCached ?? false {
+            managedObject.directory?.isCached = false
+        }
+        if managedObject.musicFolder?.isCached ?? false {
+            managedObject.musicFolder?.isCached = false
+        }
     }
 
     override public var creatorName: String {

@@ -41,6 +41,14 @@ public class Directory: AbstractLibraryEntity {
             }
         }
     }
+    public var isCached: Bool {
+        get { return managedObject.isCached }
+        set {
+            if managedObject.isCached != newValue {
+                managedObject.isCached = newValue
+            }
+        }
+    }
     public var songCount: Int {
         get { return Int(managedObject.songCount) }
     }
@@ -74,7 +82,7 @@ extension Directory: PlayableContainable  {
         }
         
         if details.type == .long {
-            if isCompletelyCached {
+            if isCached {
                 infoContent.append("Cached")
             }
             if duration > 0 {

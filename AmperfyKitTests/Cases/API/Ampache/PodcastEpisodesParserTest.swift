@@ -37,15 +37,39 @@ class PodcastEpisodesParserTest: AbstractAmpacheTest {
         parserDelegate = PodcastEpisodeParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), podcast: testPodcast!, library: library)
     }
     
+    func testCacheParsing() {
+        guard let podcast = testPodcast else { XCTFail(); return }
+        testParsing()
+        XCTAssertFalse((parserDelegate as! PlayableParserDelegate).isCollectionCached)
+        
+        // mark all songs cached
+        for song in podcast.episodes {
+            song.relFilePath = URL(string: "jop")
+        }
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertTrue((parserDelegate as! PlayableParserDelegate).isCollectionCached)
+        
+        // mark all songs cached exect the last one
+        for song in podcast.episodes {
+            song.relFilePath = URL(string: "jop")
+        }
+        podcast.episodes.last?.relFilePath = nil
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertFalse((parserDelegate as! PlayableParserDelegate).isCollectionCached)
+    }
+    
     override func checkCorrectParsing() {
+        parserDelegate?.performPostParseOperations()
         guard let podcast = testPodcast else { XCTFail(); return }
         XCTAssertEqual(podcast.episodes.count, 4)
 
         var episode = podcast.episodes[0]
         XCTAssertEqual(episode.id, "44")
-        XCTAssertEqual(episode.title, "COVID, Quickly, Episode 3: Vaccine Inequality--plus Your Body the Variant Fighter")
+        XCTAssertEqual(episode.title, "COVID, Quickly, Episode < 3: Vaccine Inequality--plus Your Body the Variant Fighter")
         XCTAssertEqual(episode.rating, 5)
-        XCTAssertEqual(episode.depiction, "Today we bring you the third episode in a new podcast series: COVID, Quickly. Every two weeks, Scientific American’s senior health editors Tanya...\n")
+        XCTAssertEqual(episode.depiction, "Today we bring you < the third episode in a new podcast series: COVID, Quickly. Every two weeks, Scientific American’s senior health editors Tanya...\n")
         XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1616815800)//"3/27/21, 3:30 AM"
         XCTAssertNil(episode.streamId)
         XCTAssertEqual(episode.podcastStatus, .completed)

@@ -138,5 +138,43 @@ class SongTest: XCTestCase {
         testSong.rating = 500
         XCTAssertEqual(testSong.rating, 2)
     }
+    
+    func testSongDeleteCache() {
+        guard let artist = library.getArtist(id: cdHelper.seeder.artists[0].id) else { XCTFail(); return }
+        testSong.artist = artist
+        guard let album = library.getAlbum(id: cdHelper.seeder.albums[0].id, isDetailFaultResolution: true) else { XCTFail(); return }
+        testSong.album = album
+        let directory = library.createDirectory()
+        testSong.managedObject.directory = directory.managedObject
+        let musicFolder = library.createMusicFolder()
+        testSong.managedObject.musicFolder = musicFolder.managedObject
+        
+        guard let playlist1 = library.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }
+        playlist1.append(playable: testSong)
+        guard let playlist2 = library.getPlaylist(id: cdHelper.seeder.playlists[1].id) else { XCTFail(); return }
+        playlist2.append(playable: testSong)
+
+        testSong.relFilePath = URL(string: "blub")
+        album.isCached = true
+        directory.isCached = true
+        musicFolder.isCached = true
+        playlist1.isCached = true
+        playlist2.isCached = true
+        library.saveContext()
+        
+        XCTAssertTrue(testSong.isCached)
+        XCTAssertTrue(album.isCached)
+        XCTAssertTrue(directory.isCached)
+        XCTAssertTrue(musicFolder.isCached)
+        XCTAssertTrue(playlist1.isCached)
+        XCTAssertTrue(playlist2.isCached)
+        library.deleteCache(ofPlayable: testSong)
+        XCTAssertFalse(testSong.isCached)
+        XCTAssertFalse(album.isCached)
+        XCTAssertFalse(directory.isCached)
+        XCTAssertFalse(musicFolder.isCached)
+        XCTAssertFalse(playlist1.isCached)
+        XCTAssertFalse(playlist2.isCached)
+    }
 
 }

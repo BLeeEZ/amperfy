@@ -100,6 +100,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 self.storage.async.perform { asyncCompanion in
                     let parserDelegate = PodcastParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
                     try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
+                    parserDelegate.performPostParseOperations()
                 }
             }
         }
@@ -208,6 +209,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                         albumAsync.managedObject.removeFromSongs($0.managedObject)
                     }
                     albumAsync.isSongsMetaDataSynced = true
+                    albumAsync.isCached = parserDelegate.isCollectionCached
                 }
             }
         }
@@ -240,12 +242,14 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                     
                     let parserDelegate = PodcastEpisodeParserDelegate(performanceMonitor: self.performanceMonitor, podcast: podcastAsync, library: asyncCompanion.library)
                     try self.parse(response: response, delegate: parserDelegate)
+                    parserDelegate.performPostParseOperations()
                     
                     let deletedEpisodes = oldEpisodes.subtracting(parserDelegate.parsedEpisodes)
                     deletedEpisodes.forEach {
                         os_log("Podcast Episode <%s> is remote deleted", log: self.log, type: .info, $0.displayString)
                         $0.podcastStatus = .deleted
                     }
+                    podcastAsync.isCached = parserDelegate.isCollectionCached
                 }
             }
         }
@@ -271,6 +275,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                             let podcastAsync = Podcast(managedObject: asyncCompanion.context.object(with: podcast.managedObject.objectID) as! PodcastMO)
                             let parserDelegate = PodcastEpisodeParserDelegate(performanceMonitor: self.performanceMonitor, podcast: podcastAsync, library: asyncCompanion.library)
                             try self.parse(response: response, delegate: parserDelegate)
+                            parserDelegate.performPostParseOperations()
                         }
                     }
                     }}
@@ -358,6 +363,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 albumAsync.songs.compactMap{$0.asSong}.forEach{
                     directoryAsync.managedObject.addToSongs($0.managedObject)
                 }
+                directoryAsync.isCached = albumAsync.isCached
             }
         }
     }
@@ -549,6 +555,8 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
                 let parserDelegate = PlaylistSongsParserDelegate(performanceMonitor: self.performanceMonitor, playlist: playlistAsync, library: asyncCompanion.library)
                 try self.parse(response: response, delegate: parserDelegate)
+                playlistAsync.isCached = parserDelegate.isCollectionCached
+                playlistAsync.remoteDuration = parserDelegate.collectionDuration
             }
         }
     }
@@ -659,6 +667,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                     
                     let parserDelegate = PodcastParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
                     try self.parse(response: response, delegate: parserDelegate)
+                    parserDelegate.performPostParseOperations()
                     
                     let deletedPodcasts = oldPodcasts.subtracting(parserDelegate.parsedPodcasts)
                     deletedPodcasts.forEach {

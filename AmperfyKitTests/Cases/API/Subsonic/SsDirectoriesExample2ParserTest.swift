@@ -30,8 +30,12 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
         super.setUp()
         xmlData = getTestFileData(name: "directory_example_2")
         directory = library.createDirectory()
-        ssParserDelegate = SsDirectoryParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), directory: directory, library: library, subsonicUrlCreator: subsonicUrlCreator)
+        recreateParserDelegate()
         createTestPartner()
+    }
+    
+    override func recreateParserDelegate() {
+        ssParserDelegate = SsDirectoryParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), directory: directory, library: library, subsonicUrlCreator: subsonicUrlCreator)
     }
     
     func createTestPartner() {
@@ -43,6 +47,29 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
         album.id = "11053"
         album.name = "Arrival"
         album.artwork?.url = "al-11053"
+    }
+    
+    func testCacheParsing() {
+        testParsing()
+        XCTAssertFalse((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
+        
+        // mark all songs cached
+        let songs = directory.songs
+        for song in songs {
+            song.relFilePath = URL(string: "jop")
+        }
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertTrue((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
+        
+        // mark all songs cached exect the last one
+        for song in directory.songs {
+            song.relFilePath = URL(string: "jop")
+        }
+        directory.songs.last?.relFilePath = nil
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertFalse((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
     }
     
     override func checkCorrectParsing() {

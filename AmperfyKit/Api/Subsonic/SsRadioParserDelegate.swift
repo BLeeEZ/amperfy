@@ -61,6 +61,7 @@ class SsRadioParserDelegate: SsXmlLibParser {
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
         
         if elementName == "internetRadioStation", let radio = radioBuffer {
+            parsedCount += 1
             parsedRadios.append(radio)
             radioBuffer = nil
         }

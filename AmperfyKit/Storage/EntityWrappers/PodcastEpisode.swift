@@ -93,6 +93,9 @@ public class PodcastEpisode: AbstractPlayable {
     override public var creatorName: String {
         return podcast?.title ?? "Unknown Podcast"
     }
+    
+    public var titleRawParsed: String = "" // used by parser a temporary buffer
+    public var depictionRawParsed: String? // used by parser a temporary buffer
 
     public var depiction: String? {
         get { return managedObject.depiction }
@@ -141,6 +144,16 @@ public class PodcastEpisode: AbstractPlayable {
         }
         set { if managedObject.podcast != newValue?.managedObject { managedObject.podcast = newValue?.managedObject } }
     }
+    
+    public override func deleteCache() {
+        podcast?.isCached = false
+        for playlistItemMO in managedObject.playlistItems {
+            if playlistItemMO.playlist.isCached {
+                playlistItemMO.playlist.isCached = false
+            }
+        }
+    }
+    
     public var detailInfo: String {
         var info = title
         info += " ("

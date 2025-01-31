@@ -59,9 +59,9 @@ class PodcastParserDelegate: AmpacheXmlLibParser {
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "name":
-            podcastBuffer?.title = buffer.html2String
+            podcastBuffer?.titleRawParsed = buffer
         case "description":
-            podcastBuffer?.depiction = buffer.html2String
+            podcastBuffer?.depictionRawParsed = buffer
         case "rating":
             rating = Int(buffer) ?? 0
         case "art":
@@ -79,6 +79,13 @@ class PodcastParserDelegate: AmpacheXmlLibParser {
         }
         
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
+    }
+    
+    override public func performPostParseOperations() {
+        for podcast in parsedPodcasts {
+            podcast.title = podcast.titleRawParsed.html2String
+            podcast.depiction = podcast.depictionRawParsed.html2String
+        }
     }
     
 }

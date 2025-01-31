@@ -65,15 +65,13 @@ public class Artist: AbstractLibraryEntity {
     public var remoteDuration: Int {
         get { return Int(managedObject.remoteDuration) }
         set {
-            if Int16.isValid(value: newValue), managedObject.remoteDuration != Int16(newValue) {
-                managedObject.remoteDuration = Int16(newValue)
+            if managedObject.remoteDuration != Int64(newValue) {
+                managedObject.remoteDuration = Int64(newValue)
+            }
+            if managedObject.duration != Int64(newValue) {
+                managedObject.duration = Int64(newValue)
             }
         }
-    }
-    public func updateDuration() {
-        let playablesDuration = playables.reduce(0){ $0 + $1.duration }
-        guard Int16.isValid(value: playablesDuration), managedObject.duration != Int16(playablesDuration) else { return }
-        managedObject.duration = Int16(playablesDuration)
     }
     public var remoteAlbumCount: Int {
         get {
@@ -85,11 +83,7 @@ public class Artist: AbstractLibraryEntity {
         }
     }
     public var albumCount: Int {
-        get {
-            let moRemoteAlbumCount = Int(managedObject.remoteAlbumCount)
-            let moAlbumCount = Int(managedObject.albumCount)
-            return moRemoteAlbumCount != 0 ? moRemoteAlbumCount : moAlbumCount
-        }
+        get { return Int(managedObject.albumCount) }
     }
     public var albums: [Album] {
         guard let albumsSet = managedObject.albums, let albumsMO = albumsSet.array as? [AlbumMO] else { return [Album]() }
@@ -150,9 +144,6 @@ extension Artist: PlayableContainable  {
             infoContent.append("\(duration.asDurationShortString)")
         }
         if details.type == .long {
-            if isCompletelyCached {
-                infoContent.append("Cached")
-            }
             if let genre = genre {
                 infoContent.append("Genre: \(genre.name)")
             }

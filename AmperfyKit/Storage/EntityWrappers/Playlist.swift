@@ -170,38 +170,36 @@ public class Playlist: Identifyable {
         guard playables.count > 0 else { return 0 }
         return playables.count-1
     }
+    public var isCached: Bool {
+        get { return managedObject.isCached }
+        set {
+            if managedObject.isCached != newValue {
+                managedObject.isCached = newValue
+            }
+        }
+    }
     public var duration: Int {
         get { return Int(managedObject.duration) }
     }
     public var remoteDuration: Int {
         get { return Int(managedObject.remoteDuration) }
         set {
-            if Int16.isValid(value: newValue), managedObject.remoteDuration != Int16(newValue) {
-                managedObject.remoteDuration = Int16(newValue)
+            if managedObject.remoteDuration != Int64(newValue) {
+                managedObject.remoteDuration = Int64(newValue)
             }
-            updateDuration()
-        }
-    }
-    public func updateDuration() {
-        if managedObject.items.count > 0 {
-            let playablesDuration = Int(managedObject.items.reduce(0){ $0 + $1.playable.combinedDuration })
-            if Int16.isValid(value: playablesDuration), managedObject.duration != Int16(playablesDuration) {
-                managedObject.duration = Int16(playablesDuration)
-            }
-        } else {
-            if managedObject.duration != managedObject.remoteDuration {
-                managedObject.duration = managedObject.remoteDuration
+            if managedObject.duration != Int64(newValue) {
+                managedObject.duration = Int64(newValue)
             }
         }
     }
     private func updateDuration(byReducingDuration: Int) {
-        if byReducingDuration > 0, duration >= byReducingDuration, Int16.isValid(value: byReducingDuration) {
-            managedObject.duration -= Int16(byReducingDuration)
+        if byReducingDuration > 0, duration >= byReducingDuration {
+            managedObject.duration -= Int64(byReducingDuration)
         }
     }
     private func updateDuration(byIncreasingDuration: Int) {
-        if byIncreasingDuration > 0, Int16.isValid(value: byIncreasingDuration), Int16.isValid(value: duration + byIncreasingDuration) {
-            managedObject.duration += Int16(byIncreasingDuration)
+        if byIncreasingDuration > 0 {
+            managedObject.duration += Int64(byIncreasingDuration)
         }
     }
 
@@ -454,7 +452,7 @@ extension Playlist: PlayableContainable  {
             infoContent.append("\(duration.asDurationShortString)")
         }
         if details.type == .long {
-            if isCompletelyCached {
+            if isCached {
                 infoContent.append("Cached")
             }
             if duration > 0 {

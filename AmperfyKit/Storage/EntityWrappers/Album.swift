@@ -63,25 +63,20 @@ public class Album: AbstractLibraryEntity {
     public var remoteDuration: Int {
         get { return Int(managedObject.remoteDuration) }
         set {
-            if Int16.isValid(value: newValue), managedObject.remoteDuration != Int16(newValue) {
-                managedObject.remoteDuration = Int16(newValue)
+            if managedObject.remoteDuration != Int64(newValue) {
+                managedObject.remoteDuration = Int64(newValue)
             }
-            updateDuration(updateArtistToo: true)
+            if managedObject.duration != Int64(newValue) {
+                managedObject.duration = Int64(newValue)
+            }
         }
     }
-    public func updateDuration(updateArtistToo: Bool) {
-        if isSongsMetaDataSynced {
-            let playablesDuration = playables.reduce(0){ $0 + $1.duration }
-            if Int16.isValid(value: playablesDuration), managedObject.duration != Int16(playablesDuration) {
-                managedObject.duration = Int16(playablesDuration)
+    public var isCached: Bool {
+        get { return managedObject.isCached }
+        set {
+            if managedObject.isCached != newValue {
+                managedObject.isCached = newValue
             }
-        } else {
-            if managedObject.duration != managedObject.remoteDuration {
-                managedObject.duration = managedObject.remoteDuration
-            }
-        }
-        if updateArtistToo {
-            artist?.updateDuration()
         }
     }
     public var artist: Artist? {
@@ -132,7 +127,7 @@ public class Album: AbstractLibraryEntity {
         get {
             let moSongCount = Int(managedObject.songCount)
             let moRemoteSongCount = Int(managedObject.remoteSongCount)
-            return moRemoteSongCount != 0 ? moRemoteSongCount : moSongCount
+            return moSongCount != 0 ? moSongCount : moRemoteSongCount
         }
     }
     public var songs: [AbstractPlayable] {
@@ -175,7 +170,7 @@ extension Album: PlayableContainable  {
             infoContent.append("\(duration.asDurationShortString)")
         }
         if details.type == .long {
-            if isCompletelyCached {
+            if isCached {
                 infoContent.append("Cached")
             }
             if year > 0 {

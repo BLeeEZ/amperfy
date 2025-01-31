@@ -118,6 +118,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 self.storage.async.perform { asyncCompanion in
                     let parserDelegate = SsPodcastParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
                     try self.parse(response: response, delegate: parserDelegate, isThrowingErrorsAllowed: false)
+                    parserDelegate.performPostParseOperations()
                 }
             }
         }
@@ -196,6 +197,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                         $0.remoteStatus = .deleted
                         albumAsync.managedObject.removeFromSongs($0.managedObject)
                     }
+                    albumAsync.isCached = parserDelegate.isCollectionCached
                     albumAsync.isSongsMetaDataSynced = true
                 }
             }
@@ -272,12 +274,14 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                     
                     let parserDelegate = SsPodcastEpisodeParserDelegate(performanceMonitor: self.performanceMonitor, podcast: podcastAsync, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                     try self.parse(response: response, delegate: parserDelegate)
+                    parserDelegate.performPostParseOperations()
                     
                     let deletedEpisodes = oldEpisodes.subtracting(parserDelegate.parsedEpisodes)
                     deletedEpisodes.forEach {
                         os_log("Podcast Episode <%s> is remote deleted", log: self.log, type: .info, $0.displayString)
                         $0.podcastStatus = .deleted
                     }
+                    podcastAsync.isCached = parserDelegate.isCollectionCached
                 }
             }
         }
@@ -299,6 +303,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 self.storage.async.perform { asyncCompanion in
                     let parserDelegate = SsPodcastEpisodeParserDelegate(performanceMonitor: self.performanceMonitor, podcast: nil, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                     try self.parse(response: response, delegate: parserDelegate)
+                    parserDelegate.performPostParseOperations()
                 }
             }
         }
@@ -413,6 +418,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 let musicFolderAsync = MusicFolder(managedObject: asyncCompanion.context.object(with: musicFolder.managedObject.objectID) as! MusicFolderMO)
                 let parserDelegate = SsDirectoryParserDelegate(performanceMonitor: self.performanceMonitor, musicFolder: musicFolderAsync, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                 try self.parse(response: response, delegate: parserDelegate)
+                musicFolderAsync.isCached = parserDelegate.isCollectionCached
             }
         }
     }
@@ -426,6 +432,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 let directoryAsync = Directory(managedObject: asyncCompanion.context.object(with: directory.managedObject.objectID) as! DirectoryMO)
                 let parserDelegate = SsDirectoryParserDelegate(performanceMonitor: self.performanceMonitor, directory: directoryAsync, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                 try self.parse(response: response, delegate: parserDelegate)
+                directoryAsync.isCached = parserDelegate.isCollectionCached
             }
         }
     }
@@ -474,6 +481,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                 let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
                 let parserDelegate = SsPlaylistSongsParserDelegate(performanceMonitor: self.performanceMonitor, playlist: playlistAsync, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                 try self.parse(response: response, delegate: parserDelegate)
+                playlistAsync.isCached = parserDelegate.isCollectionCached
             }
         }
     }
@@ -569,6 +577,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
                     
                     let parserDelegate = SsPodcastParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
                     try self.parse(response: response, delegate: parserDelegate)
+                    parserDelegate.performPostParseOperations()
                     
                     let deletedPodcasts = oldPodcasts.subtracting(parserDelegate.parsedPodcasts)
                     deletedPodcasts.forEach {

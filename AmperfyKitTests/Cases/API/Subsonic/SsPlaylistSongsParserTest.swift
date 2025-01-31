@@ -96,6 +96,28 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         testParsing()
     }
     
+    func testCacheParsing() {
+        testParsing()
+        XCTAssertFalse(playlist.isCached)
+        
+        // mark all songs cached
+        for song in playlist.playables {
+            song.relFilePath = URL(string: "jop")
+        }
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertTrue(playlist.isCached)
+        
+        // mark all songs cached exect the last one
+        for song in playlist.playables {
+            song.relFilePath = URL(string: "jop")
+        }
+        playlist.playables.last?.relFilePath = nil
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertFalse(playlist.isCached)
+    }
+    
     override func checkCorrectParsing() {
         library.saveContext()
         XCTAssertEqual(playlist.playables.count, 6)
@@ -106,7 +128,8 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(playlist.playables[4].id, "884")
         XCTAssertEqual(playlist.playables[5].id, "805")
         XCTAssertEqual(playlist.duration, 1391)
-        
+        XCTAssertEqual(playlist.remoteDuration, 1391)
+
         XCTAssertEqual(library.songCount, 6+createdSongCount)
         
         var song = playlist.playables[0].asSong!

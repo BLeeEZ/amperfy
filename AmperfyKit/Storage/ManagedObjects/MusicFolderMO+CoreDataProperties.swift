@@ -35,7 +35,8 @@ extension MusicFolderMO {
     @NSManaged public var songCount: Int16
     @NSManaged public var directories: NSOrderedSet?
     @NSManaged public var songs: NSOrderedSet?
-    
+    @NSManaged public var isCached: Bool
+
     static let relationshipKeyPathsForPrefetching = [
         #keyPath(MusicFolderMO.directories),
     ]

@@ -62,9 +62,10 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
             }
             if playlistChanged {
                 playlist.updateChangeDate()
-                playlist.updateDuration()
                 playlist.updateArtworkItems()
+                playlist.remoteDuration = collectionDuration
             }
+            playlist.isCached = isCollectionCached
         default:
             break
         }

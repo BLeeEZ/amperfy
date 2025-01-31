@@ -31,12 +31,13 @@ extension PlaylistMO {
 
     @NSManaged public var alphabeticSectionInitial: String
     @NSManaged public var changeDate: Date?
-    @NSManaged public var duration: Int16
+    @NSManaged public var duration: Int64
     @NSManaged public var id: String
+    @NSManaged public var isCached: Bool
     @NSManaged public var lastPlayedDate: Date?
     @NSManaged public var name: String?
     @NSManaged public var playCount: Int32
-    @NSManaged public var remoteDuration: Int16
+    @NSManaged public var remoteDuration: Int64
     @NSManaged public var remoteSongCount: Int16
     @NSManaged public var songCount: Int16
     @NSManaged public var items: Array<PlaylistItemMO>

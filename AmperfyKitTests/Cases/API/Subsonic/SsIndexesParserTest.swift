@@ -30,7 +30,33 @@ class SsIndexesParserTest: AbstractSsParserTest {
         super.setUp()
         xmlData = getTestFileData(name: "indexes_example_1")
         musicFolder = library.createMusicFolder()
+        recreateParserDelegate()
+    }
+    
+    override func recreateParserDelegate() {
         ssParserDelegate = SsDirectoryParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), musicFolder: musicFolder, library: library, subsonicUrlCreator: subsonicUrlCreator)
+    }
+    
+    func testCacheParsing() {
+        testParsing()
+        XCTAssertFalse((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
+        
+        // mark all songs cached
+        for song in musicFolder.songs {
+            song.relFilePath = URL(string: "jop")
+        }
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertTrue((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
+        
+        // mark all songs cached exect the last one
+        for song in musicFolder.songs {
+            song.relFilePath = URL(string: "jop")
+        }
+        musicFolder.songs.last?.relFilePath = nil
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertFalse((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
     }
     
     override func checkCorrectParsing() {

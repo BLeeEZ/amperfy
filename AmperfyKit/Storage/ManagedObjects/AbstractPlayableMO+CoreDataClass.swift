@@ -26,8 +26,8 @@ import CoreData
 public class AbstractPlayableMO: AbstractLibraryEntityMO {
 
     func passOwnership(to targetPlayable: AbstractPlayableMO) {
-        let playlistItemsCopy = playlistItems?.compactMap{ $0 as? PlaylistItemMO }
-        playlistItemsCopy?.forEach{
+        let playlistItemsCopy = playlistItems
+        playlistItemsCopy.forEach {
             $0.playable = targetPlayable
         }
         

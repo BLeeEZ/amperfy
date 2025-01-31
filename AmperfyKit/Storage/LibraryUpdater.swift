@@ -63,13 +63,13 @@ public class LibraryUpdater {
         if storage.librarySyncVersion < .v13 {
             storage.librarySyncVersion = .v13 // if App crashes don't do this step again -> This step is only for convenience
             os_log("Perform blocking library update (START): AbstractPlayable.duration", log: log, type: .info)
-            updateAbstractPlayableDuration()
+            // no updated needed anymore
             os_log("Perform blocking library update (DONE): AbstractPlayable.duration", log: log, type: .info)
         }
         if storage.librarySyncVersion < .v15 {
             storage.librarySyncVersion = .v15 // if App crashes don't do this step again -> This step is only for convenience
             os_log("Perform blocking library update (START): Artist,Album,Playlist duration,remoteSongCount", log: log, type: .info)
-            updateArtistAlbumPlaylistDurationAndSongCount()
+            // no updated needed anymore
             os_log("Perform blocking library update (DONE): Artist,Album,Playlist duration,remoteSongCount", log: log, type: .info)
         }
         if storage.librarySyncVersion < .v16 {
@@ -163,32 +163,6 @@ public class LibraryUpdater {
         os_log("Library update: Playlists", log: log, type: .info)
         let playlists = storage.main.library.getPlaylists()
         playlists.forEach{ $0.updateAlphabeticSectionInitial(section: $0.name) }
-        storage.main.saveContext()
-    }
-    
-    private func updateAbstractPlayableDuration() {
-        os_log("Library update: Songs", log: log, type: .info)
-        let songs = storage.main.library.getSongs()
-        songs.forEach{ _ = $0.updateDuration(updateArtistAndAlbumToo: false) }
-        os_log("Library update: PodcastEpisodes", log: log, type: .info)
-        let podcastEpisodes = storage.main.library.getPodcastEpisodes()
-        podcastEpisodes.forEach{ _ = $0.updateDuration() }
-        storage.main.saveContext()
-    }
-    
-    private func updateArtistAlbumPlaylistDurationAndSongCount() {
-        os_log("Library update: Albums Duration", log: log, type: .info)
-        let albums = storage.main.library.getAlbums()
-        albums.forEach{ $0.updateDuration(updateArtistToo: false) }
-        os_log("Library update: Artists Duration", log: log, type: .info)
-        let artists = storage.main.library.getArtists()
-        artists.forEach{ $0.updateDuration() }
-        os_log("Library update: Playlists Duration and SongCount", log: log, type: .info)
-        let playlists = storage.main.library.getPlaylists()
-        playlists.forEach{
-            $0.updateDuration()
-            $0.remoteSongCount = $0.songCount
-        }
         storage.main.saveContext()
     }
     

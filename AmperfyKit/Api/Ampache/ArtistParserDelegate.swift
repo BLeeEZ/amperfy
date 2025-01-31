@@ -84,7 +84,6 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
             parsedCount += 1
             parseNotifier?.notifyParsedObject(ofType: .artist)
             artistBuffer?.rating = rating
-            artistBuffer?.updateDuration()
             rating = 0
             if let parsedArtist = artistBuffer {
                 artistsParsed.insert(parsedArtist)

@@ -141,11 +141,6 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
             guard Int16.isValid(value: newValue), playableManagedObject.playDuration != Int16(newValue) else { return }
             playableManagedObject.playDuration = Int16(newValue)
             playableManagedObject.combinedDuration = Int16(newValue)
-            _ = updateDuration()
-            // songs need to update more members
-            if let song = asSong {
-                _ = song.updateDuration()
-            }
         }
     }
     public var playProgress: Int {
@@ -219,6 +214,16 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
         }
         set {
             playableManagedObject.relFilePath = newValue?.path
+        }
+    }
+    public func deleteCache() {
+        switch derivedType {
+        case .song:
+            asSong?.deleteCache()
+        case .podcastEpisode:
+            asPodcastEpisode?.deleteCache()
+        case .radio:
+            break // do nothing
         }
     }
 

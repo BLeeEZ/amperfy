@@ -27,7 +27,11 @@ import os.log
 class SsPlayableParserDelegate: SsXmlLibWithArtworkParser {
     
     var playableBuffer: AbstractPlayable?
-    
+    private var isCached = true
+    var isCollectionCached: Bool {
+        return parsedCount > 0 ? isCached : false
+    }
+
     override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
         
@@ -35,7 +39,11 @@ class SsPlayableParserDelegate: SsXmlLibWithArtworkParser {
             guard let isDir = attributeDict["isDir"], let isDirBool = Bool(isDir), isDirBool == false else { return }
             
             if let attributeTitle = attributeDict["title"] {
-                playableBuffer?.title = attributeTitle
+                if elementName == "episode" {
+                    (playableBuffer as? PodcastEpisode)?.titleRawParsed = attributeTitle
+                } else {
+                    playableBuffer?.title = attributeTitle
+                }
             }
             if let attributeTrack = attributeDict["track"], let track = Int(attributeTrack) {
                 playableBuffer?.track = track
@@ -80,10 +88,17 @@ class SsPlayableParserDelegate: SsXmlLibWithArtworkParser {
     
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "song" || elementName == "entry" || elementName == "child" || elementName == "episode", playableBuffer != nil {
-            playableBuffer = nil
+            resetPlayableBuffer()
         }
         
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
+    }
+    
+    func resetPlayableBuffer() {
+        if let playable = playableBuffer {
+            isCached = isCached && playable.isCached
+        }
+        playableBuffer = nil
     }
     
 }

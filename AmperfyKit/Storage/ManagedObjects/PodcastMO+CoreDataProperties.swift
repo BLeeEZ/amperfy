@@ -33,7 +33,8 @@ extension PodcastMO {
     @NSManaged public var episodeCount: Int16
     @NSManaged public var episodes: NSOrderedSet?
     @NSManaged public var title: String?
-    
+    @NSManaged public var isCached: Bool
+
     static let relationshipKeyPathsForPrefetching = [
         #keyPath(PodcastMO.artwork),
     ]

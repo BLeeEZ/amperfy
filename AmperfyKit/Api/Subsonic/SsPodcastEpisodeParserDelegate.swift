@@ -56,7 +56,7 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
             }
 
             if let description = attributeDict["description"] {
-                episodeBuffer?.depiction = description.html2String
+                episodeBuffer?.depictionRawParsed = description
             }
             if let publishDate = attributeDict["publishDate"], publishDate.count >= 19 {
                 //"2011-02-03T14:46:43"
@@ -84,10 +84,17 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
         
         if elementName == "episode", let episode = episodeBuffer {
-            episode.title = episode.title.html2String
-            playableBuffer = nil
+            parsedCount += 1
+            resetPlayableBuffer()
             parsedEpisodes.append(episode)
             episodeBuffer = nil
+        }
+    }
+    
+    override public func performPostParseOperations() {
+        for episode in parsedEpisodes {
+            episode.title = episode.titleRawParsed.html2String
+            episode.depiction = episode.depictionRawParsed?.html2String
         }
     }
     

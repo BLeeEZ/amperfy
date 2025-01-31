@@ -60,7 +60,7 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
     override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch(elementName) {
         case "description":
-            episodeBuffer?.depiction = buffer.html2String
+            episodeBuffer?.depictionRawParsed = buffer
         case "pubdate":
             if buffer.contains("/") { //"3/27/21, 3:30 AM"
                 let dateFormatter = DateFormatter()
@@ -86,11 +86,10 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
             episodeBuffer?.artwork = parseArtwork(urlString: buffer)
         case "podcast_episode":
             parsedCount += 1
-            playableBuffer = nil
+            resetPlayableBuffer()
             episodeBuffer?.rating = rating
             rating = 0
             if let episode = episodeBuffer {
-                episode.title = episode.title.html2String
                 parsedEpisodes.append(episode)
             }
             episodeBuffer = nil
@@ -99,6 +98,13 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
         }
         
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
+    }
+    
+    override public func performPostParseOperations() {
+        for episode in parsedEpisodes {
+            episode.title = episode.titleRawParsed.html2String
+            episode.depiction = episode.depictionRawParsed?.html2String
+        }
     }
 
 }

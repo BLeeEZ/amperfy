@@ -33,6 +33,9 @@ public class Podcast: AbstractLibraryEntity {
         super.init(managedObject: managedObject)
     }
     
+    public var titleRawParsed: String = "" // used by parser a temporary buffer
+    public var depictionRawParsed: String = "" // used by parser a temporary buffer
+    
     public var identifier: String {
         return title
     }
@@ -49,8 +52,13 @@ public class Podcast: AbstractLibraryEntity {
         get { return managedObject.depiction ?? "" }
         set { if managedObject.depiction != newValue { managedObject.depiction = newValue } }
     }
-    public var duration: Int {
-        return playables.reduce(0){ $0 + $1.duration }
+    public var isCached: Bool {
+        get { return managedObject.isCached }
+        set {
+            if managedObject.isCached != newValue {
+                managedObject.isCached = newValue
+            }
+        }
     }
     public var episodeCount: Int {
         return Int(managedObject.episodeCount)
@@ -79,12 +87,8 @@ extension Podcast: PlayableContainable  {
             }
         }
         if details.type == .long || details.type == .noCountInfo {
-            if isCompletelyCached {
+            if isCached {
                 infoContent.append("Cached")
-            }
-            let completeDuration = episodes.reduce(0, {$0 + $1.duration})
-            if completeDuration > 0 {
-                infoContent.append("\(completeDuration.asDurationString)")
             }
             if details.isShowDetailedInfo {
                 infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")

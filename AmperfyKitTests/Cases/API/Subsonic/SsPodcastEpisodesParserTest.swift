@@ -28,20 +28,49 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     
     override func setUp() {
         super.setUp()
-        xmlData = getTestFileData(name: "podcasts_example_1")
+        xmlData = getTestFileData(name: "podcast_example_1")
         testPodcast = library.createPodcast()
+        recreateParserDelegate()
+    }
+    
+    override func recreateParserDelegate() {
         ssParserDelegate = SsPodcastEpisodeParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), podcast: testPodcast!, library: library, subsonicUrlCreator: subsonicUrlCreator)
     }
     
+    func testCacheParsing() {
+        guard let podcast = testPodcast else { XCTFail(); return }
+        
+        testParsing()
+        XCTAssertFalse((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
+        
+        // mark all songs cached
+        for episode in podcast.episodes {
+            episode.relFilePath = URL(string: "jop")
+        }
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertTrue((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
+        
+        // mark all songs cached exect the last one
+        for episode in podcast.episodes {
+            episode.relFilePath = URL(string: "jop")
+        }
+        podcast.episodes.last?.relFilePath = nil
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertFalse((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
+    }
+    
     override func checkCorrectParsing() {
+        ssParserDelegate?.performPostParseOperations()
         guard let podcast = testPodcast else { XCTFail(); return }
         XCTAssertEqual(podcast.episodes.count, 2)
 
         // episodes are sorted by publish date
         var episode = podcast.episodes[1]
         XCTAssertEqual(episode.id, "34")
-        XCTAssertEqual(episode.title, "Scorpions have re-evolved eyes")
-        XCTAssertEqual(episode.depiction, "This week Dr Chris fills us in on the UK's largest free science festival, plus all this week's big scientific discoveries.")
+        XCTAssertEqual(episode.title, "Scorpions have re-evolved < eyes")
+        XCTAssertEqual(episode.depiction, "This week < Dr Chris fills us in on the UK's largest free science festival, plus all this week's big scientific discoveries.")
         XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1296744403) //"2011-02-03T14:46:43"
         XCTAssertEqual(episode.streamId, "523")
         XCTAssertEqual(episode.podcastStatus, .completed)

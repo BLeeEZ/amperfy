@@ -36,10 +36,13 @@ class SsMusicFolderParserTest: AbstractSsParserTest {
         let musicFolders = library.getMusicFolders().sorted(by: {Int($0.id)! < Int($1.id)!} )
         XCTAssertEqual(musicFolders[0].id, "1")
         XCTAssertEqual(musicFolders[0].name, "Music")
+        XCTAssertFalse(musicFolders[0].isCached)
         XCTAssertEqual(musicFolders[1].id, "2")
         XCTAssertEqual(musicFolders[1].name, "Movies")
+        XCTAssertFalse(musicFolders[1].isCached)
         XCTAssertEqual(musicFolders[2].id, "3")
         XCTAssertEqual(musicFolders[2].name, "Incoming")
+        XCTAssertFalse(musicFolders[2].isCached)
     }
 
 }

@@ -72,7 +72,6 @@ public protocol PlayableContainable {
     func info(for api: BackenApiType, details: DetailInfoType) -> String
     var playables: [AbstractPlayable] { get }
     var playContextType: PlayerMode { get }
-    var duration: Int { get }
     var isRateable: Bool { get }
     var isDownloadAvailable: Bool { get }
     func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection
@@ -103,7 +102,6 @@ extension PlayableContainable {
         guard storage.settings.isOnlineMode else { return Promise.value }
         return fetchFromServer(storage: storage, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager)
     }
-    public var isCompletelyCached: Bool { return !playables.isEmpty && playables.isCachedCompletely }
     public var isRateable: Bool { return false }
     public var isFavoritable: Bool { return false }
     public var isFavorite: Bool { return false }

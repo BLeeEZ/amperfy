@@ -55,7 +55,8 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
         XCTAssertEqual(playlist.remoteSongCount, 6)
         XCTAssertEqual(playlist.duration, 1391)
         XCTAssertEqual(playlist.remoteDuration, 1391)
-        
+        XCTAssertFalse(playlist.isCached)
+
         playlist = playlists[0]
         XCTAssertEqual(playlist.id, "16")
         XCTAssertEqual(playlist.name, "More random songs")
@@ -63,6 +64,7 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
         XCTAssertEqual(playlist.remoteSongCount, 5)
         XCTAssertEqual(playlist.duration, 1018)
         XCTAssertEqual(playlist.remoteDuration, 1018)
+        XCTAssertFalse(playlist.isCached)
     }
 
 }

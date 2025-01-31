@@ -417,8 +417,13 @@ public class LibraryStorage: PlayableFileCachable {
                 os_log("File for <%s> could not be removed at <%s>", log: log, type: .info, playable.displayString, absFilePath.path)
             }
         }
+        deleteCacheFinalStep(playable: playable)
+    }
+    
+    private func deleteCacheFinalStep(playable: AbstractPlayable) {
         playable.contentTypeTranscoded = nil
         playable.relFilePath = nil
+        playable.deleteCache()
     }
     
     public func deleteCache(of playables: [AbstractPlayable]) {
@@ -441,9 +446,13 @@ public class LibraryStorage: PlayableFileCachable {
     public func deletePlayableCachePaths() {
         deleteBinaryPlayableFileSavedInCoreData()
         let songs = getCachedSongs()
-        songs.forEach{ $0.relFilePath = nil }
+        songs.forEach {
+            deleteCacheFinalStep(playable: $0)
+        }
         let episodes = getCachedPodcastEpisodes()
-        episodes.forEach{ $0.relFilePath = nil }
+        episodes.forEach{
+            deleteCacheFinalStep(playable: $0)
+        }
     }
     
     public func deleteRemoteArtworkCachePaths() {

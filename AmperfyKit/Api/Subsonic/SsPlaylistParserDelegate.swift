@@ -56,9 +56,6 @@ class SsPlaylistParserDelegate: SsXmlParser {
                     playlist = library.createPlaylist()
                     playlist?.id = playlistId
                 }
-                if let attributeDuration = attributeDict["duration"], let duration = Int(attributeDuration) {
-                    playlist?.remoteDuration = duration
-                }
             } else {
                 os_log("Error: Playlist could not be parsed -> id is not given", log: log, type: .error)
                 return
@@ -66,6 +63,9 @@ class SsPlaylistParserDelegate: SsXmlParser {
             
             playlist?.name = attributePlaylistName
             
+            if let attributeDuration = attributeDict["duration"], let duration = Int(attributeDuration) {
+                playlist?.remoteDuration = duration
+            }
             if let attributeSongCount = attributeDict["songCount"], let songCount = Int(attributeSongCount) {
                 playlist?.remoteSongCount = songCount
             }

@@ -103,6 +103,28 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         recreateParserDelegate()
         testParsing()
     }
+
+    func testCacheParsing() {
+        testParsing()
+        XCTAssertFalse(playlist.isCached)
+        
+        // mark all songs cached
+        for song in playlist.playables {
+            song.relFilePath = URL(string: "jop")
+        }
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertTrue(playlist.isCached)
+        
+        // mark all songs cached exect the last one
+        for song in playlist.playables {
+            song.relFilePath = URL(string: "jop")
+        }
+        playlist.playables.last?.relFilePath = nil
+        recreateParserDelegate()
+        testParsing()
+        XCTAssertFalse(playlist.isCached)
+    }
     
     override func checkCorrectParsing() {
         library.saveContext()
@@ -110,7 +132,8 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         
         XCTAssertEqual(playlist.playables.count, 4)
         XCTAssertEqual(playlist.duration, 1442)
-               
+        XCTAssertEqual(playlist.remoteDuration, 1442)
+
         var song = playlist.playables[0].asSong!
         XCTAssertEqual(song.id, "56")
         XCTAssertEqual(song.title, "Black&BlueSmoke")

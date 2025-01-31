@@ -29,12 +29,13 @@ extension AlbumMO {
         return NSFetchRequest<AlbumMO>(entityName: "Album")
     }
 
-    @NSManaged public var duration: Int16
+    @NSManaged public var duration: Int64
     @NSManaged public var isSongsMetaDataSynced: Bool
+    @NSManaged public var isCached: Bool
     @NSManaged public var name: String?
     @NSManaged public var recentIndex: Int16
     @NSManaged public var newestIndex: Int16
-    @NSManaged public var remoteDuration: Int16
+    @NSManaged public var remoteDuration: Int64
     @NSManaged public var songCount: Int16
     @NSManaged public var remoteSongCount: Int16
     @NSManaged public var year: Int16

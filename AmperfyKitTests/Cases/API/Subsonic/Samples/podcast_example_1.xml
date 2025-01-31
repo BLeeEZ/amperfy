@@ -6,16 +6,16 @@
     <podcasts>
         <channel id="1"
                  url="http://downloads.bbc.co.uk/podcasts/fivelive/drkarl/rss.xml"
-                 title="Dr Karl and the &lt; Naked Scientist"
-                 description="Dr Chris Smith aka The &lt; Naked Scientist with the latest news from the world of science and Dr Karl answers listeners' science questions."
+                 title="Dr Karl and the Naked Scientist"
+                 description="Dr Chris Smith aka The Naked Scientist with the latest news from the world of science and Dr Karl answers listeners' science questions."
                  coverArt="pod-1"
                  originalImageUrl="http://downloads.bbc.co.uk/podcasts/fivelive/drkarl/drkarl.jpg"
                  status="completed">
             <episode id="34"
                      streamId="523"
                      channelId="1"
-                     title="Scorpions have re-evolved eyes"
-                     description="This week Dr Chris fills us in on the UK's largest free science festival, plus all this week's big scientific discoveries."
+                     title="Scorpions have re-evolved &lt; eyes"
+                     description="This week &lt; Dr Chris fills us in on the UK's largest free science festival, plus all this week's big scientific discoveries."
                      publishDate="2011-02-03T14:46:43"
                      status="completed"
                      parent="11" isDir="false" year="2011" genre="Podcast" coverArt="24"
@@ -32,18 +32,6 @@
                      size="45624671" contentType="audio/mpeg" suffix="mp3" duration="3099" bitRate="128"
                      path="Podcast/drkarl/20110903.mp3"/>
         </channel>
-        <channel id="2"
-                 url="http://podkast.nrk.no/program/herreavdelingen.rss"
-                 title="NRK P1 - Herreavdelingen"
-                 description="Et program der herrene Yan Friis og Finn Bjelke møtes og musikk nytes."
-                 coverArt="pod-2"
-                 originalImageUrl="http://gfx.nrk.no/oP_mZkqyrOkZiAOilZPvFA1nlzIxOYVV9yq7P_J-ngjw.jpg"
-                 status="completed">
-        </channel>
-        <channel id="3"
-                 url="http://foo.bar.com/xyz.rss"
-                 status="error"
-                 errorMessage="Not found."/>
     </podcasts>
 
 </subsonic-response>

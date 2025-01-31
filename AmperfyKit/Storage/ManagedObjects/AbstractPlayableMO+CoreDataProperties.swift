@@ -45,8 +45,9 @@ extension AbstractPlayableMO {
     @NSManaged public var year: Int16
     @NSManaged public var download: DownloadMO?
     @NSManaged public var embeddedArtwork: EmbeddedArtworkMO?
-    @NSManaged public var file: PlayableFileMO? /// deprecated! use relFilePath instead
-    @NSManaged public var playlistItems: NSOrderedSet?
+    /// deprecated! use relFilePath instead 
+    @NSManaged public var file: PlayableFileMO?
+    @NSManaged public var playlistItems: Array<PlaylistItemMO>
     @NSManaged public var scrobbleEntries: NSOrderedSet?
 
 }

@@ -89,4 +89,11 @@ class GenericXmlParser: NSObject, XMLParserDelegate {
         }
     }
     
+    /// Some operations are not allowed to be performed during parsing
+    /// This function needs to be called after parser.parse()
+    /// override if required
+    public func performPostParseOperations() {
+        
+    }
+    
 }

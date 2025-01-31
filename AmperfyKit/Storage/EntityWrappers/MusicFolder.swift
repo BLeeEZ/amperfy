@@ -45,6 +45,14 @@ public class MusicFolder {
             if managedObject.name != newValue { managedObject.name = newValue }
         }
     }
+    public var isCached: Bool {
+        get { return managedObject.isCached }
+        set {
+            if managedObject.isCached != newValue {
+                managedObject.isCached = newValue
+            }
+        }
+    }
     public var directories: [Directory] {
         return managedObject.directories?.compactMap{ Directory(managedObject: $0 as! DirectoryMO) } ?? [Directory]()
     }

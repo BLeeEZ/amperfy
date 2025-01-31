@@ -50,10 +50,10 @@ class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
             podcastBuffer?.remoteStatus = .available
             
             if let attributePodcastTitle = attributeDict["title"] {
-                podcastBuffer?.title = attributePodcastTitle.html2String
+                podcastBuffer?.titleRawParsed = attributePodcastTitle
             }
             if let attributeDescription = attributeDict["description"] {
-                podcastBuffer?.depiction = attributeDescription.html2String
+                podcastBuffer?.depictionRawParsed = attributeDescription
             }
             if let attributeCoverArt = attributeDict["coverArt"] {
                 podcastBuffer?.artwork = parseArtwork(id: attributeCoverArt)
@@ -74,6 +74,13 @@ class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
         }
         
         super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
+    }
+    
+    override public func performPostParseOperations() {
+        for podcast in parsedPodcasts {
+            podcast.title = podcast.titleRawParsed.html2String
+            podcast.depiction = podcast.depictionRawParsed.html2String
+        }
     }
     
 }

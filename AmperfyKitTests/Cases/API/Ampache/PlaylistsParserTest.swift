@@ -53,6 +53,7 @@ class PlaylistsParserTest: AbstractAmpacheTest {
         XCTAssertEqual(playlist.name, "admin - 02/23/2021 14:36:44")
         XCTAssertEqual(playlist.songCount, 5000)
         XCTAssertEqual(playlist.remoteSongCount, 5000)
+        XCTAssertFalse(playlist.isCached)
         XCTAssertEqual(playlist.duration, 0)
         XCTAssertEqual(playlist.remoteDuration, 0)
         
@@ -61,6 +62,7 @@ class PlaylistsParserTest: AbstractAmpacheTest {
         XCTAssertEqual(playlist.name, "Album 1*")
         XCTAssertEqual(playlist.songCount, 2)
         XCTAssertEqual(playlist.remoteSongCount, 2)
+        XCTAssertFalse(playlist.isCached)
         XCTAssertEqual(playlist.duration, 0)
         XCTAssertEqual(playlist.remoteDuration, 0)
         
@@ -69,6 +71,7 @@ class PlaylistsParserTest: AbstractAmpacheTest {
         XCTAssertEqual(playlist.name, "random - admin - private")
         XCTAssertEqual(playlist.songCount, 43)
         XCTAssertEqual(playlist.remoteSongCount, 43)
+        XCTAssertFalse(playlist.isCached)
         XCTAssertEqual(playlist.duration, 0)
         XCTAssertEqual(playlist.remoteDuration, 0)
         
@@ -77,6 +80,7 @@ class PlaylistsParserTest: AbstractAmpacheTest {
         XCTAssertEqual(playlist.name, "random - admin - public")
         XCTAssertEqual(playlist.songCount, 43)
         XCTAssertEqual(playlist.remoteSongCount, 43)
+        XCTAssertFalse(playlist.isCached)
         XCTAssertEqual(playlist.duration, 0)
         XCTAssertEqual(playlist.remoteDuration, 0)
     }

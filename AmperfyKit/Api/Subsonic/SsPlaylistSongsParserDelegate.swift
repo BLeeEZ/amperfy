@@ -52,6 +52,9 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
             if let attributeSongCount = attributeDict["songCount"], let songCount = Int(attributeSongCount) {
                 playlist.remoteSongCount = songCount
             }
+            if let attributeDuration = attributeDict["duration"], let duration = Int(attributeDuration) {
+                playlist.remoteDuration = duration
+            }
         }
         
         if elementName == "entry" {
@@ -84,9 +87,9 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
             }
             if playlistChanged {
                 playlist.updateChangeDate()
-                playlist.updateDuration()
                 playlist.updateArtworkItems()
             }
+            playlist.isCached = isCollectionCached
         default:
             break
         }
