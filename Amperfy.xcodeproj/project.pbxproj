@@ -909,6 +909,7 @@
 		50CA61222D4B658200EEF515 /* Amperfy v43.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v43.xcdatamodel"; sourceTree = "<group>"; };
 		50CA61232D4CE9E500EEF515 /* podcast_example_1.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = podcast_example_1.xml; sourceTree = "<group>"; };
 		50CA61252D4D191100EEF515 /* PodcastEpisodeTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastEpisodeTest.swift; sourceTree = "<group>"; };
+		50CA61272D4D72F600EEF515 /* Amperfy v44.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v44.xcdatamodel"; sourceTree = "<group>"; };
 		50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentTaskGroup.swift; sourceTree = "<group>"; };
 		50CCD0562B6C38670073793B /* PlainDetailsVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlainDetailsVC.xib; sourceTree = "<group>"; };
 		50CCD0582B6C388B0073793B /* PlainDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainDetailsVC.swift; sourceTree = "<group>"; };
@@ -3362,6 +3363,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				50CA61272D4D72F600EEF515 /* Amperfy v44.xcdatamodel */,
 				50CA61222D4B658200EEF515 /* Amperfy v43.xcdatamodel */,
 				5070ED2C2D46979A00EB2972 /* Amperfy v42.xcdatamodel */,
 				504D26262D4168DE003FDEB3 /* Amperfy v41.xcdatamodel */,
@@ -3406,7 +3408,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 50CA61222D4B658200EEF515 /* Amperfy v43.xcdatamodel */;
+			currentVersion = 50CA61272D4D72F600EEF515 /* Amperfy v44.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
