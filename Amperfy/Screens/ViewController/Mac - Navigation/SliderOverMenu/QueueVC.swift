@@ -120,7 +120,7 @@ extension QueueVC: UITableViewDelegate, UITableViewDataSource {
     }
 
     func refreshUserQueueSectionHeader() {
-        if self.player.userQueue.isEmpty {
+        if self.player.userQueueCount == 0 {
             self.userQueueSectionHeader?.hide()
         } else {
             self.userQueueSectionHeader?.display(name: PlayerQueueType.user.description, buttonPressAction: self.clearUserQueue)
@@ -132,10 +132,10 @@ extension QueueVC: UITableViewDelegate, UITableViewDataSource {
     }
 
     func clearUserQueue() {
-        guard self.player.userQueue.count > 0 else { return }
+        guard self.player.userQueueCount > 0 else { return }
         self.tableView?.beginUpdates()
         var indexPaths = [IndexPath]()
-        for i in 0...self.player.userQueue.count-1 {
+        for i in 0...self.player.userQueueCount-1 {
             indexPaths.append(IndexPath(row: i, section: PlayerSectionCategory.userQueue.rawValue))
         }
         self.tableView?.deleteRows(at: indexPaths, with: .fade)
@@ -178,7 +178,7 @@ extension QueueVC: UITableViewDelegate, UITableViewDataSource {
         case .contextPrev:
             return ContextQueuePrevSectionHeader.frameHeight
         case .userQueue:
-            if player.userQueue.isEmpty {
+            if player.userQueueCount == 0 {
                 return CGFloat.leastNormalMagnitude
             } else {
                 return UserQueueSectionHeader.frameHeight
@@ -205,9 +205,9 @@ extension QueueVC: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch PlayerSectionCategory(rawValue: section) {
-        case .contextPrev: return self.player.prevQueue.count
-        case .userQueue: return self.player.userQueue.count
-        case .contextNext: return self.player.nextQueue.count
+        case .contextPrev: return self.player.prevQueueCount
+        case .userQueue: return self.player.userQueueCount
+        case .contextNext: return self.player.nextQueueCount
         default: return 0
         }
     }
