@@ -426,6 +426,9 @@ class PlayableTableCell: BasicTableCell {
         } else {
             playOverArtworkButton.isHidden = true
             playOverNumberButton.isHidden = true
+            if isDislayAlbumTrackNumberStyle {
+                trackNumberLabel.isHidden = false
+            }
             configurePlayIndicator(playable: playable)
             deleteButton.isHidden = true
             refreshSubtitleColor()
