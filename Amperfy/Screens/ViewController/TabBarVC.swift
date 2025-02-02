@@ -28,8 +28,8 @@ class TabBarVC: UITabBarController {
         super.viewDidLoad()
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
     }
 
 }

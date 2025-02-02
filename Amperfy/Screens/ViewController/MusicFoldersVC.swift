@@ -44,8 +44,8 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
         tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
         guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {
             self.appDelegate.librarySyncer.syncMusicFolders()

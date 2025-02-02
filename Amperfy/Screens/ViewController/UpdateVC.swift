@@ -60,11 +60,11 @@ class UpdateVC: UIViewController {
             self.appDelegate.eventLogger.supressAlerts = false
             self.appDelegate.startManagerForNormalOperation()
 
-            #if targetEnvironment(macCatalyst)
+    #if targetEnvironment(macCatalyst)
             AppDelegate.rootViewController()?.dismiss(animated: true)
-            #else
+    #else
             self.performSegue(withIdentifier: "toLibrary", sender: self)
-            #endif
+    #endif
         }
     }
     

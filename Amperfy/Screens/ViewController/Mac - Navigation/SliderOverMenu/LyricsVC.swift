@@ -59,8 +59,8 @@ class LyricsVC: SlideOverItemVC {
         self.player.addNotifier(notifier: self)
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
         self.refreshLyrics()
     }
 

@@ -24,7 +24,7 @@ import AmperfyKit
 
 struct SwipeCellView: View {
     
-    @Environment (\.colorScheme) var colorScheme:ColorScheme
+    @Environment(\.colorScheme) var colorScheme:ColorScheme
     
     var swipe: SwipeActionType
     

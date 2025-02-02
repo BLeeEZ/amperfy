@@ -182,15 +182,10 @@ extension PopupPlayerVC {
     // handle dark/light mode change
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        layoutMarginsChangeRequestCount = 0
-        adjustLaoutMargins()
         refresh()
     }
     
-    func adjustLaoutMargins() {
-        layoutMarginsChangeRequestCount = layoutMarginsChangeRequestCount + 1
-        // limit the amount of layout margins adjustments
-        guard layoutMarginsChangeRequestCount < 5 else { return }
+    func adjustLayoutMargins() {
         if self.traitCollection.userInterfaceIdiom == .phone {
             self.view.layoutMargins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
         } else if self.traitCollection.horizontalSizeClass == .compact {

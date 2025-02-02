@@ -53,21 +53,16 @@ class SplitVC: UISplitViewController {
         super.viewWillLayoutSubviews()
     }
 
-    #if targetEnvironment(macCatalyst)
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
+        setCorrectPlayerBarView(collapseMode: isCompact)
+        
+#if targetEnvironment(macCatalyst)
         // set min and max sidebar width
         self.minimumPrimaryColumnWidth = Self.sidebarWidth
         self.maximumPrimaryColumnWidth = Self.sidebarWidth
-    }
-    #endif
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        setCorrectPlayerBarView(collapseMode: isCompact)
-        
-        #if !targetEnvironment(macCatalyst)
         displayInfoPopups()
-        #endif
+#endif
     }
     
     func displayInfoPopups() {
@@ -78,7 +73,7 @@ class SplitVC: UISplitViewController {
         }
     }
 
-    #if targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
     lazy var macToolbarNavigationController: UINavigationController = {
         let toolbarHostingVC = self.slideOverHostingController
         // This navigation controller hosts the toolbar with the player controls
@@ -99,19 +94,19 @@ class SplitVC: UISplitViewController {
     var slideOverMenuViewController: SlideOverVC = {
         return SlideOverVC()
     }()
-    #endif
+#endif
 
     func embeddInNavigation(vc: UIViewController) -> UINavigationController {
-        #if targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
         let navController = InnerNavigationController(rootViewController: vc)
         // This is a little bit hacky. We reuse the existing slideOverHostingController. This has two advantages:
         // 1. We do not need to reload the mac toolbar, which is slow.
         // 2. We keep the slide over menu open even when switching tabs.
         self.slideOverHostingController.primaryViewController = navController
         return self.macToolbarNavigationController
-        #else
+#else
         return UINavigationController(rootViewController: vc)
-        #endif
+#endif
     }
     
     var defaultSecondaryVC: UINavigationController {

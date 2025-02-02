@@ -86,8 +86,8 @@ class PodcastsVC: MultiSourceTableViewController {
         showType = appDelegate.storage.settings.podcastsShowSetting
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
         switch self.showType {
         case .podcasts:
             podcastsFetchedResultsController?.delegate = self

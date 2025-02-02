@@ -83,8 +83,8 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         updateRightBarButtonItems()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
         updateRightBarButtonItems()
         guard appDelegate.storage.settings.isOnlineMode else { return }
         firstly {

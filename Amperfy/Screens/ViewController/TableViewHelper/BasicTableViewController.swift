@@ -102,8 +102,8 @@ class BasicTableViewController: KeyCommandTableViewController {
         self.tableView.keyboardDismissMode = .onDrag
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
 
         if searchController.searchBar.scopeButtonTitles?.count ?? 0 > 1, appDelegate.storage.settings.isOfflineMode {
             searchController.searchBar.selectedScopeButtonIndex = 1

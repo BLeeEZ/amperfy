@@ -126,7 +126,8 @@ class LoginVC: UIViewController {
         ])
     }
     
-    override func viewDidAppear(_ animated: Bool) {
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
         if let credentials = appDelegate.storage.loginCredentials {
             serverUrlTF.text = credentials.serverUrl
             usernameTF.text = credentials.username

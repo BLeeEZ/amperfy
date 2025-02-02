@@ -72,9 +72,10 @@ class LibrarySyncPopupVC: UIViewController {
         self.iconImage.tintColor = .white
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
+
         showAsAnimatedPopup()
-        
         switch iconAnimation {
         case .rotate:
             animateIconRotation()

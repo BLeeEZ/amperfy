@@ -161,20 +161,13 @@ class SearchVC: BasicTableViewController {
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        appDelegate.userStatistics.visited(.search)
-    }
-
-    #if targetEnvironment(macCatalyst)
     override func viewIsAppearing(_ animated: Bool) {
+#if targetEnvironment(macCatalyst)
         // Request a search update (in case we navigated back to the search)
         NotificationCenter.default.post(name: .RequestSearchUpdate, object: self.view.window)
+#endif
         super.viewIsAppearing(animated)
-    }
-    #endif
-    
-    override func viewDidAppear(_ animated: Bool) {
+        appDelegate.userStatistics.visited(.search)
         configureSearchController(placeholder: "Playlists, Songs and more", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
     }
 

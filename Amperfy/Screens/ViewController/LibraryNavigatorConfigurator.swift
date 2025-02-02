@@ -196,7 +196,7 @@ class LibraryNavigatorConfigurator: NSObject {
         applyInitialSnapshots() // 3 Apply the snapshots.
     }
 
-    func viewDidAppear(navigationItem: UINavigationItem, collectionView: UICollectionView) {
+    func viewIsAppearing(navigationItem: UINavigationItem, collectionView: UICollectionView) {
         #if targetEnvironment(macCatalyst)
         if self.collectionView.indexPathsForSelectedItems?.first == nil {
             self.collectionView.selectItem(at: .zero, animated: false, scrollPosition: .top)

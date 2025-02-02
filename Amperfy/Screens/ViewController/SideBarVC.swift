@@ -49,12 +49,14 @@ class SideBarVC: KeyCommandCollectionViewController {
         libraryItemConfigurator.viewDidLoad(navigationItem: navigationItem, collectionView: collectionView)
     }
 
-    override func viewDidAppear(_ animated: Bool) {
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
         self.becomeFirstResponder()
-        libraryItemConfigurator.viewDidAppear(navigationItem: navigationItem, collectionView: collectionView)
+        libraryItemConfigurator.viewIsAppearing(navigationItem: navigationItem, collectionView: collectionView)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         self.resignFirstResponder()
     }
     

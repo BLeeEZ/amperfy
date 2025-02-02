@@ -115,8 +115,8 @@ class ArtistDetailVC: MultiSourceTableViewController {
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
         albumsFetchedResultsController?.delegate = self
         songsFetchedResultsController?.delegate = self
         

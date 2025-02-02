@@ -225,8 +225,8 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
         }
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
         common.updateRightBarButtonItems()
         common.updateFromRemote()
     }
