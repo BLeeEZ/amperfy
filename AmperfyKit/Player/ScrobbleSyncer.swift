@@ -22,7 +22,7 @@
 import Foundation
 import os.log
 
-public class ScrobbleSyncer {
+@MainActor public class ScrobbleSyncer {
     
     private static let maximumWaitDurationInSec = 20
 
@@ -129,7 +129,7 @@ public class ScrobbleSyncer {
         }
     }
     
-    @MainActor private func getNextScrobbleEntry() async throws -> ScrobbleEntry? {
+     private func getNextScrobbleEntry() async throws -> ScrobbleEntry? {
         var scobbleEntryMain: ScrobbleEntry?
         try await self.storage.async.perform { asyncCompanion in
             guard let scobbleEntry = asyncCompanion.library.getFirstUploadableScrobbleEntry() else {
@@ -166,11 +166,13 @@ public class ScrobbleSyncer {
         }
         
         scrobbleTimer?.invalidate()
-        scrobbleTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(waitDuration), repeats: false) { (t) in
-            guard curPlaying == self.musicPlayer.currentlyPlaying,
-                  self.backendAudioPlayer.playType == .cache || self.storage.settings.isScrobbleStreamedItems
-            else { return }
-            self.songHasBeenListendEnough = true
+        scrobbleTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(waitDuration), repeats: false) { _ in
+            Task { @MainActor in
+                guard curPlaying == self.musicPlayer.currentlyPlaying,
+                      self.backendAudioPlayer.playType == .cache || self.storage.settings.isScrobbleStreamedItems
+                else { return }
+                self.songHasBeenListendEnough = true
+            }
         }
     }
     

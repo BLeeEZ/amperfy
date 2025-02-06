@@ -23,7 +23,7 @@ import Foundation
 import MediaPlayer
 import Intents
 
-public protocol MusicPlayable {
+@MainActor public protocol MusicPlayable {
     func didStartPlayingFromBeginning()
     func didStartPlaying()
     func didPause()

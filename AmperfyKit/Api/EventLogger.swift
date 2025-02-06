@@ -40,7 +40,7 @@ public protocol AlertDisplayable {
     func createPopupVC(topic: String, shortMessage: String, detailMessage: String, logType: LogEntryType) -> UIViewController
 }
 
-public class EventLogger {
+@MainActor public class EventLogger {
     public var supressAlerts = false
     
     private let log = OSLog(subsystem: "Amperfy", category: "EventLogger")
@@ -144,7 +144,7 @@ public class EventLogger {
     
     private func displayAlert(topic: String, shortMessage: String, detailMessage: String, logType: LogEntryType) {
         guard let displayer = self.alertDisplayer else { return }
-        DispatchQueue.main.async {
+        Task { @MainActor in
             guard !self.supressAlerts else { return }
             let popupVC = displayer.createPopupVC(topic: topic, shortMessage: shortMessage, detailMessage: detailMessage, logType: logType)
             displayer.display(title: topic, subtitle: shortMessage, style: logType, notificationBanner: popupVC)

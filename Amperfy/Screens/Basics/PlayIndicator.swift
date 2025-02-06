@@ -67,7 +67,7 @@ class PlayIndicatorHandler {
     
 }
 
-class PlayIndicator {
+@MainActor class PlayIndicator {
     
     static private let frameHeight = 20.0
     
@@ -83,10 +83,6 @@ class PlayIndicator {
     init(rootViewTypeName: String) {
         self.rootViewTypeName = rootViewTypeName
         appDelegate = (UIApplication.shared.delegate as! AppDelegate)
-    }
-    
-    deinit {
-        unregister()
     }
     
     private func register() {

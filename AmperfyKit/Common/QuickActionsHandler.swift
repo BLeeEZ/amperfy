@@ -21,7 +21,7 @@
 
 import UIKit
 
-public class QuickActionsHandler {
+@MainActor public class QuickActionsHandler {
     
     private let storage: PersistentStorage
     private let player: PlayerFacade

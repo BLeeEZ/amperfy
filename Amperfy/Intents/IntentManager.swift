@@ -86,7 +86,7 @@ public struct XCallbackActionDocu: Hashable {
     public var parameters: [XCallbackActionParameterDocu]
 }
 
-public class IntentManager {
+@MainActor public class IntentManager {
     
     public private(set) var documentation: [XCallbackActionDocu]
     private let storage: PersistentStorage

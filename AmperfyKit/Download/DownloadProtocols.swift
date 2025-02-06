@@ -43,9 +43,9 @@ public protocol DownloadManagerDelegate {
     var requestPredicate: NSPredicate { get }
     var parallelDownloadsCount: Int { get }
     @MainActor func prepareDownload(download: Download) async throws -> URL
-    func validateDownloadedData(download: Download) -> ResponseError?
-    func completedDownload(download: Download, storage: PersistentStorage) async
-    func failedDownload(download: Download, storage: PersistentStorage)
+    @MainActor func validateDownloadedData(download: Download) -> ResponseError?
+    @MainActor func completedDownload(download: Download, storage: PersistentStorage) async
+    @MainActor func failedDownload(download: Download, storage: PersistentStorage)
 }
 
 public protocol Downloadable: CustomEquatable {

@@ -23,7 +23,7 @@ import AmperfyKit
 import UIKit
 import LNPopupController
 
-class BarPlayerHandler {
+@MainActor class BarPlayerHandler {
 
     let player: PlayerFacade
     var isPopupBarDisplayed = false

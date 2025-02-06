@@ -22,7 +22,7 @@
 import Foundation
 import MediaPlayer
 
-class RemoteCommandCenterHandler {
+@MainActor class RemoteCommandCenterHandler {
     
     private var musicPlayer: PlayerFacade
     private let backendAudioPlayer: BackendAudioPlayer

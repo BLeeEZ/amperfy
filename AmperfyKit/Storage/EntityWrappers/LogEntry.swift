@@ -22,7 +22,7 @@
 import Foundation
 import CoreData
 
-public enum LogEntryType: Int16 {
+public enum LogEntryType: Int16, Sendable {
     case apiError = 0
     case error = 1
     case info = 2

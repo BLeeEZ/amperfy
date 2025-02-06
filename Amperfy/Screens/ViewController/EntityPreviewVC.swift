@@ -27,7 +27,7 @@ import MarqueeLabel
 typealias GetPlayContextCallback = () -> PlayContext?
 typealias GetPlayerIndexCallback = () -> PlayerIndex?
 
-class EntityPreviewActionBuilder {
+@MainActor class EntityPreviewActionBuilder {
     
     private var entityContainer: PlayableContainable
     private var rootView: UIViewController

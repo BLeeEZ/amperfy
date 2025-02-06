@@ -24,7 +24,7 @@ import AVFoundation
 import UIKit
 import os.log
 
-protocol BackendAudioPlayerNotifiable {
+@MainActor protocol BackendAudioPlayerNotifiable {
     func didElapsedTimeChange()
     func didLyricsTimeChange(time: CMTime) // high refresh count
     func stop()
@@ -49,7 +49,7 @@ enum BackendAudioQueueType {
     case queue
 }
 
-class BackendAudioPlayer: NSObject {
+@MainActor class BackendAudioPlayer: NSObject {
     
     private let playableDownloader: DownloadManageable
     private let cacheProxy: PlayableFileCachable
@@ -146,13 +146,15 @@ class BackendAudioPlayer: NSObject {
         player.volume = volumePlayer
         player.allowsExternalPlayback = false // Disable video transmission via AirPlay -> only audio
         player.addPeriodicTimeObserver(forInterval: updateElapsedTimeInterval, queue: DispatchQueue.main) { [weak self] time in
-            if let self = self {
-                checkForPreloadNextPlayerItem()
+            Task { @MainActor in
+                guard let self = self else { return }
+                self.checkForPreloadNextPlayerItem()
                 self.responder?.didElapsedTimeChange()
             }
         }
         player.addPeriodicTimeObserver(forInterval: updateLyricsTimeInterval, queue: DispatchQueue.main) { [weak self] time in
-            if let self = self {
+            Task { @MainActor in
+                guard let self = self else { return }
                 self.responder?.didLyricsTimeChange(time: time)
             }
         }
@@ -196,9 +198,10 @@ class BackendAudioPlayer: NSObject {
     }
     
     @objc private func itemPlaybackStalled(_ notification: Notification) {
-        eventLogger.debug(topic: "Playback stalled", message: "Playback stalled")
-        player.pause()
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+        Task { @MainActor in
+            eventLogger.debug(topic: "Playback stalled", message: "Playback stalled")
+            player.pause()
+            try await Task.sleep(nanoseconds: 1_000_000_000)
             if self.isPlaying {
                 self.player.play()
             }

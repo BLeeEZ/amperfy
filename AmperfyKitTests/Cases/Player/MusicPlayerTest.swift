@@ -121,9 +121,9 @@ class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
     var requestPredicate: NSPredicate { return NSPredicate.alwaysTrue }
     var parallelDownloadsCount = 2
     func prepareDownload(download: Download) async throws -> URL { throw BackendError.notSupported }
-    func validateDownloadedData(download: Download) -> ResponseError? { return nil }
-    func completedDownload(download: Download, storage: PersistentStorage) async { }
-    func failedDownload(download: Download, storage: PersistentStorage) {}
+    @MainActor func validateDownloadedData(download: Download) -> ResponseError? { return nil }
+    @MainActor func completedDownload(download: Download, storage: PersistentStorage) async { }
+    @MainActor func failedDownload(download: Download, storage: PersistentStorage) {}
 }
 
 class MOCK_BackendApi: BackendApi {

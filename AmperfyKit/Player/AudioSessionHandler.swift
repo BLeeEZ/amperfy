@@ -23,7 +23,7 @@ import Foundation
 import MediaPlayer
 import os.log
 
-class AudioSessionHandler {
+@MainActor class AudioSessionHandler {
     
     var musicPlayer: AudioPlayer?
     var eventLogger: EventLogger?
@@ -35,9 +35,9 @@ class AudioSessionHandler {
     
     @objc private func handleAudioSessionInterruption(notification: NSNotification) {
         guard let interruptionTypeRaw: NSNumber = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? NSNumber,
-            let interruptionType = AVAudioSession.InterruptionType(rawValue: interruptionTypeRaw.uintValue) else {
-                os_log(.error, "Audio Session: Audio interruption type invalid")
-                return
+              let interruptionType = AVAudioSession.InterruptionType(rawValue: interruptionTypeRaw.uintValue) else {
+            os_log(.error, "Audio Session: Audio interruption type invalid")
+            return
         }
         
         switch (interruptionType) {
@@ -68,35 +68,35 @@ class AudioSessionHandler {
         guard let userInfo = notification.userInfo,
               let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
-                return
+            return
         }
-
+        
         switch reason {
-            case .newDeviceAvailable:
-                let session = AVAudioSession.sharedInstance()
-                for output in session.currentRoute.outputs where
-                    (output.portType == AVAudioSession.Port.headphones ||
-                     output.portType == AVAudioSession.Port.bluetoothA2DP) {
-                    os_log(.info, "Audio Session: headphones connected")
+        case .newDeviceAvailable:
+            let session = AVAudioSession.sharedInstance()
+            for output in session.currentRoute.outputs where
+            (output.portType == AVAudioSession.Port.headphones ||
+             output.portType == AVAudioSession.Port.bluetoothA2DP) {
+                os_log(.info, "Audio Session: headphones connected")
+                DispatchQueue.main.async {
+                    self.musicPlayer?.play()
+                }
+                break
+            }
+        case .oldDeviceUnavailable:
+            if let previousRoute =
+                userInfo[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription {
+                for output in previousRoute.outputs where
+                (output.portType == AVAudioSession.Port.headphones ||
+                 output.portType == AVAudioSession.Port.bluetoothA2DP) {
+                    os_log(.info, "Audio Session: headphones disconnected")
                     DispatchQueue.main.async {
-                        self.musicPlayer?.play()
+                        self.musicPlayer?.pause()
                     }
                     break
                 }
-            case .oldDeviceUnavailable:
-                if let previousRoute =
-                    userInfo[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription {
-                    for output in previousRoute.outputs where
-                        (output.portType == AVAudioSession.Port.headphones ||
-                         output.portType == AVAudioSession.Port.bluetoothA2DP) {
-                        os_log(.info, "Audio Session: headphones disconnected")
-                        DispatchQueue.main.async {
-                            self.musicPlayer?.pause()
-                        }
-                        break
-                    }
-                }
-            default: break
+            }
+        default: break
         }
     }
 

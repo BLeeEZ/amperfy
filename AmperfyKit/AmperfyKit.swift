@@ -55,23 +55,23 @@ public class AmperKit {
     public lazy var storage = {
         return PersistentStorage(coreDataManager: coreDataManager)
     }()
-    public lazy var librarySyncer: LibrarySyncer = {
+    @MainActor public lazy var librarySyncer: LibrarySyncer = {
         return LibrarySyncerProxy(backendApi: backendApi, storage: storage)
     }()
     public lazy var duplicateEntitiesResolver = {
         return DuplicateEntitiesResolver(storage: storage)
     }()
-    public lazy var eventLogger = {
+    @MainActor public lazy var eventLogger = {
         return EventLogger(storage: storage)
     }()
-    public lazy var backendApi: BackendProxy = {
+    @MainActor public lazy var backendApi: BackendProxy = {
         return BackendProxy(networkMonitor: networkMonitor, performanceMonitor: self, eventLogger: eventLogger, persistentStorage: storage)
     }()
     public lazy var notificationHandler: EventNotificationHandler = {
         return EventNotificationHandler()
     }()
     public private(set) var scrobbleSyncer: ScrobbleSyncer?
-    public lazy var player: PlayerFacade = {
+    @MainActor public lazy var player: PlayerFacade = {
         let audioSessionHandler = AudioSessionHandler()
         let backendAudioPlayer = BackendAudioPlayer(
             createAVPlayerCB: { return AVQueuePlayer() },
@@ -114,7 +114,7 @@ public class AmperKit {
 
         return facadeImpl
     }()
-    public lazy var playableDownloadManager: DownloadManageable = {
+    @MainActor public lazy var playableDownloadManager: DownloadManageable = {
         let artworkExtractor = EmbeddedArtworkExtractor()
         let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi, artworkExtractor: artworkExtractor, networkMonitor: networkMonitor)
         let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
@@ -126,7 +126,7 @@ public class AmperKit {
         
         return dlManager
     }()
-    public lazy var artworkDownloadManager: DownloadManageable = {
+    @MainActor public lazy var artworkDownloadManager: DownloadManageable = {
         let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
         let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
         requestManager.clearAllDownloadsIfAllHaveFinished()
@@ -156,10 +156,10 @@ public class AmperKit {
         
         return dlManager
     }()
-    public lazy var backgroundLibrarySyncer = {
+    @MainActor public lazy var backgroundLibrarySyncer = {
         return BackgroundLibrarySyncer(storage: storage, networkMonitor: networkMonitor, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager, eventLogger: eventLogger)
     }()
-    public lazy var libraryUpdater = {
+    @MainActor public lazy var libraryUpdater = {
         return LibraryUpdater(storage: storage, backendApi: backendApi)
     }()
     public lazy var userStatistics = {
@@ -168,11 +168,11 @@ public class AmperKit {
     public lazy var localNotificationManager = {
         return LocalNotificationManager(userStatistics: userStatistics, storage: storage)
     }()
-    public lazy var backgroundFetchTriggeredSyncer = {
+    @MainActor public lazy var backgroundFetchTriggeredSyncer = {
         return BackgroundFetchTriggeredSyncer(storage: storage, librarySyncer: librarySyncer, notificationManager: localNotificationManager, playableDownloadManager: playableDownloadManager)
     }()
 
-    public func reinit() {
+    @MainActor public func reinit() {
         let playerData = storage.main.library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
         player.reinit(playerStatus: playerData, queueHandler: queueHandler)

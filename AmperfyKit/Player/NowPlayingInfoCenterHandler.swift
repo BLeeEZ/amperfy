@@ -22,7 +22,7 @@
 import Foundation
 import MediaPlayer
 
-class NowPlayingInfoCenterHandler {
+@MainActor class NowPlayingInfoCenterHandler {
     
     private let musicPlayer: AudioPlayer
     private let backendAudioPlayer: BackendAudioPlayer

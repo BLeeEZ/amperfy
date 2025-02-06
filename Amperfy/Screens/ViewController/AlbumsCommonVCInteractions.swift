@@ -73,7 +73,7 @@ class SliderMenuView: UIView {
     }
 }
 
-class AlbumsCommonVCInteractions {
+@MainActor class AlbumsCommonVCInteractions {
     
     var sceneTitle: String? {
         return switch (self.displayFilter) {

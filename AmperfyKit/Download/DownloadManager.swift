@@ -163,7 +163,7 @@ class DownloadManager: NSObject, DownloadManageable {
     }
       
     
-    func finishDownload(download: Download, error: DownloadError) {
+    @MainActor func finishDownload(download: Download, error: DownloadError) {
         self.activeTasks.signal()
         self.triggerBackgroundDownload()
         

@@ -54,7 +54,7 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
         return try await self.ampacheXmlServerApi.generateUrl(forArtwork: artwork)
     }
     
-    public func validateDownloadedData(download: Download) -> ResponseError? {
+    @MainActor public func validateDownloadedData(download: Download) -> ResponseError? {
         guard let fileURL = download.fileURL else {
             return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: ampacheXmlServerApi), data: nil)
         }
@@ -100,7 +100,7 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
         }
     }
     
-    public func failedDownload(download: Download, storage: PersistentStorage) {
+    @MainActor public func failedDownload(download: Download, storage: PersistentStorage) {
         guard let artwork = download.element as? Artwork else {
             return
         }

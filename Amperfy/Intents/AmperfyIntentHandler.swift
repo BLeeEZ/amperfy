@@ -143,11 +143,13 @@ public class PlayMediaIntentHandler: NSObject, INPlayMediaIntentHandling {
     
     @available(iOS 13.0, *)
     public func resolveMediaItems(for intent: INPlayMediaIntent, with completion: @escaping ([INPlayMediaMediaItemResolutionResult]) -> Void) {
-        let mediaItemsToPlay = intentManager.handleIncomingPlayMediaIntent(playMediaIntent: intent)
-        if let mediaItem = mediaItemsToPlay?.item {
-            completion(INPlayMediaMediaItemResolutionResult.successes(with: [mediaItem]))
-        } else {
-            completion(INPlayMediaMediaItemResolutionResult.successes(with: []))
+        Task { @MainActor in
+            let mediaItemsToPlay = intentManager.handleIncomingPlayMediaIntent(playMediaIntent: intent)
+            if let mediaItem = mediaItemsToPlay?.item {
+                completion(INPlayMediaMediaItemResolutionResult.successes(with: [mediaItem]))
+            } else {
+                completion(INPlayMediaMediaItemResolutionResult.successes(with: []))
+            }
         }
     }
 

@@ -35,7 +35,7 @@ public struct LogData: Encodable {
     
     static let latestEventsCount = 30
     
-    public static func collectInformation(amperfyData: AmperKit) -> LogData {
+    @MainActor public static func collectInformation(amperfyData: AmperKit) -> LogData {
         var logData = LogData()
         
         var basicInfo = BasicInfo()

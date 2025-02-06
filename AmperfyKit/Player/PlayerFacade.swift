@@ -100,7 +100,7 @@ public struct PlayContext {
     }
 }
 
-public protocol PlayerFacade {
+@MainActor public protocol PlayerFacade {
     var prevQueueCount: Int { get }
     func getPrevQueueItems(from: Int, to: Int?) -> [AbstractPlayable]
     func getAllPrevQueueItems() -> [AbstractPlayable]
@@ -209,7 +209,7 @@ extension PlayerFacade {
     }
 }
 
-class PlayerFacadeImpl: PlayerFacade {
+@MainActor class PlayerFacadeImpl: PlayerFacade {
     
     private var playerStatus: PlayerStatusPersistent
     private var queueHandler: PlayQueueHandler
