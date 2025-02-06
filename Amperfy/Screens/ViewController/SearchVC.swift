@@ -22,7 +22,6 @@
 import UIKit
 import CoreData
 import AmperfyKit
-import PromiseKit
 
 public enum SearchSection: Int, CaseIterable {
     case History

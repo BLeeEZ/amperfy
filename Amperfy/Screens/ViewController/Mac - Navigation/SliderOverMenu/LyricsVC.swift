@@ -23,7 +23,6 @@ import Foundation
 import UIKit
 import MediaPlayer
 import AmperfyKit
-import PromiseKit
 
 #if targetEnvironment(macCatalyst)
 

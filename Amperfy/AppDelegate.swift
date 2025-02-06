@@ -24,7 +24,6 @@ import MediaPlayer
 import BackgroundTasks
 import os.log
 import AmperfyKit
-import PromiseKit
 import Intents
 
 let windowSettingsTitle = "Settings"

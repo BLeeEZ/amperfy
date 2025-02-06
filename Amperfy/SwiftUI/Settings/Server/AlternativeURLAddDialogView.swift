@@ -21,7 +21,6 @@
 
 import SwiftUI
 import AmperfyKit
-import PromiseKit
 
 struct AlternativeURLAddDialogView: View {
 

@@ -20,7 +20,6 @@
 //
 
 import Foundation
-import PromiseKit
 import AmperfyKit
 import Intents
 import CallbackURLKit

@@ -24,7 +24,6 @@ import UIKit
 import CarPlay
 import CoreData
 import OSLog
-import PromiseKit
 import AmperfyKit
 
 class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {

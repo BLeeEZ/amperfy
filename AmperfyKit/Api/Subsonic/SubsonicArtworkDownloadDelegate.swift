@@ -23,7 +23,6 @@ import Foundation
 import CoreData
 import UIKit
 import os.log
-import PromiseKit
 
 class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         

@@ -22,7 +22,6 @@
 import Foundation
 import UIKit
 import os.log
-import PromiseKit
 import CoreData
 
 public typealias VoidFunctionCallback = () -> Void
@@ -343,31 +342,6 @@ extension UIActivityIndicatorView {
         } else {
             return .gray
         }
-    }
-}
-
-extension Promise {
-    static func resolveSequentially(promiseFns: [()->Promise<Void>]) -> Promise<Void> {
-        return promiseFns.reduce(Promise<Void>.value) { (fn1: Promise<Void>?, fn2: (()->Promise<Void>)?) -> Promise<Void>? in
-            return fn1?.then{ (_) -> Promise<Void> in
-                return fn2!()
-            } ?? fn2!()
-        } ?? Promise<Void>.value
-    }
-}
-
-// PromiseKit related
-public func firstlyOnMain<T>(execute body: @escaping () -> Promise<T>) -> Promise<T> {
-    return firstly {
-        Guarantee.value
-    }.then {
-        body()
-    }
-}
-
-extension Array where Element == (() -> Promise<Void>) {
-    public func resolveSequentially() -> Promise<Void> {
-        Promise<Void>.resolveSequentially(promiseFns: self)
     }
 }
 

@@ -22,7 +22,6 @@
 import UIKit
 import CoreMedia
 import AmperfyKit
-import PromiseKit
 
 class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 

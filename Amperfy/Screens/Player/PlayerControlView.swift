@@ -23,7 +23,6 @@ import UIKit
 import MediaPlayer
 import MarqueeLabel
 import AmperfyKit
-import PromiseKit
 
 class PlayerControlView: UIView {
   

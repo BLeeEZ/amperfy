@@ -22,7 +22,6 @@
 import Foundation
 import CarPlay
 import AmperfyKit
-import PromiseKit
 
 extension CarPlaySceneDelegate {
     func configureNowPlayingTemplate() {

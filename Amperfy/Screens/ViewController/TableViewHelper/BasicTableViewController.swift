@@ -23,7 +23,6 @@ import UIKit
 import Foundation
 import CoreData
 import AmperfyKit
-import PromiseKit
 
 extension UIViewController {
     

@@ -22,7 +22,6 @@
 import UIKit
 import Foundation
 import AmperfyKit
-import PromiseKit
 
 class SyncVC: UIViewController {
 

@@ -90,12 +90,9 @@
 		507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE512B1E5848002BBB1D /* ID3TagEditor */; };
 		507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE542B1E587B002BBB1D /* Alamofire */; };
 		507DFE5B2B1E58CB002BBB1D /* PMKAlamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE5A2B1E58CB002BBB1D /* PMKAlamofire */; };
-		507DFE622B1E59F2002BBB1D /* PromiseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE612B1E59F2002BBB1D /* PromiseKit */; };
 		507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE632B1E5A03002BBB1D /* Alamofire */; };
 		507DFE662B1E5A0E002BBB1D /* PMKAlamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE652B1E5A0E002BBB1D /* PMKAlamofire */; };
-		507DFE682B1E5A1A002BBB1D /* PromiseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE672B1E5A1A002BBB1D /* PromiseKit */; };
 		507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE692B1E62C9002BBB1D /* ID3TagEditor */; };
-		507DFE6E2B1E6DFE002BBB1D /* PromiseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE6D2B1E6DFE002BBB1D /* PromiseKit */; };
 		507DFE8D2B1E7192002BBB1D /* LNPopupController in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8C2B1E7192002BBB1D /* LNPopupController */; };
 		507DFE8E2B1E7192002BBB1D /* LNPopupController in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8C2B1E7192002BBB1D /* LNPopupController */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		507DFE902B1E7262002BBB1D /* CallbackURLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8F2B1E7262002BBB1D /* CallbackURLKit */; };
@@ -1059,7 +1056,6 @@
 			files = (
 				507DFE902B1E7262002BBB1D /* CallbackURLKit in Frameworks */,
 				507DFE5B2B1E58CB002BBB1D /* PMKAlamofire in Frameworks */,
-				507DFE622B1E59F2002BBB1D /* PromiseKit in Frameworks */,
 				507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */,
 				5052497D2D10CBED0005EEB0 /* Collections in Frameworks */,
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
@@ -1085,7 +1081,6 @@
 				507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */,
 				50F40A3B2C9088B30097FE63 /* IfritStatic in Frameworks */,
 				5052497B2D10CBC70005EEB0 /* Collections in Frameworks */,
-				507DFE682B1E5A1A002BBB1D /* PromiseKit in Frameworks */,
 				50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */,
 				507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */,
 				507DFE662B1E5A0E002BBB1D /* PMKAlamofire in Frameworks */,
@@ -1098,7 +1093,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				50C9D60F284FA847007F18D0 /* AmperfyKit.framework in Frameworks */,
-				507DFE6E2B1E6DFE002BBB1D /* PromiseKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2038,7 +2032,6 @@
 				507DFE512B1E5848002BBB1D /* ID3TagEditor */,
 				507DFE542B1E587B002BBB1D /* Alamofire */,
 				507DFE5A2B1E58CB002BBB1D /* PMKAlamofire */,
-				507DFE612B1E59F2002BBB1D /* PromiseKit */,
 				507DFE8C2B1E7192002BBB1D /* LNPopupController */,
 				507DFE8F2B1E7262002BBB1D /* CallbackURLKit */,
 				5052497C2D10CBED0005EEB0 /* Collections */,
@@ -2083,7 +2076,6 @@
 				50BE5DA6285714A200156FC6 /* CallbackURLKit */,
 				507DFE632B1E5A03002BBB1D /* Alamofire */,
 				507DFE652B1E5A0E002BBB1D /* PMKAlamofire */,
-				507DFE672B1E5A1A002BBB1D /* PromiseKit */,
 				507DFE692B1E62C9002BBB1D /* ID3TagEditor */,
 				50F40A3A2C9088B30097FE63 /* IfritStatic */,
 				5052497A2D10CBC70005EEB0 /* Collections */,
@@ -2108,7 +2100,6 @@
 			);
 			name = AmperfyKitTests;
 			packageProductDependencies = (
-				507DFE6D2B1E6DFE002BBB1D /* PromiseKit */,
 			);
 			productName = AmpertyKitTests;
 			productReference = 50C9D60E284FA847007F18D0 /* AmperfyKitTests.xctest */;
@@ -2166,7 +2157,6 @@
 				507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */,
 				507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */,
 				507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */,
-				507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */,
 				507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */,
 				50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */,
 				505249792D10CBC70005EEB0 /* XCRemoteSwiftPackageReference "swift-collections" */,
@@ -3224,14 +3214,6 @@
 				version = 5.6.2;
 			};
 		};
-		507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mxcl/PromiseKit";
-			requirement = {
-				kind = exactVersion;
-				version = 6.18.1;
-			};
-		};
 		507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/PromiseKit/PMKAlamofire";
@@ -3302,11 +3284,6 @@
 			package = 507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */;
 			productName = PMKAlamofire;
 		};
-		507DFE612B1E59F2002BBB1D /* PromiseKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */;
-			productName = PromiseKit;
-		};
 		507DFE632B1E5A03002BBB1D /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */;
@@ -3317,20 +3294,10 @@
 			package = 507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */;
 			productName = PMKAlamofire;
 		};
-		507DFE672B1E5A1A002BBB1D /* PromiseKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */;
-			productName = PromiseKit;
-		};
 		507DFE692B1E62C9002BBB1D /* ID3TagEditor */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */;
 			productName = ID3TagEditor;
-		};
-		507DFE6D2B1E6DFE002BBB1D /* PromiseKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 507DFE562B1E58B6002BBB1D /* XCRemoteSwiftPackageReference "PromiseKit" */;
-			productName = PromiseKit;
 		};
 		507DFE8C2B1E7192002BBB1D /* LNPopupController */ = {
 			isa = XCSwiftPackageProductDependency;

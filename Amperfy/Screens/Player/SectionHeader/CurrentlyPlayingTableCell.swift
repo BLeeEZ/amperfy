@@ -21,7 +21,6 @@
 
 import UIKit
 import AmperfyKit
-import PromiseKit
 import MarqueeLabel
 
 class CurrentlyPlayingTableCell: BasicTableCell {

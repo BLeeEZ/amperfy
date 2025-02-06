@@ -22,7 +22,6 @@
 import XCTest
 import AVFoundation
 import CoreData
-import PromiseKit
 @testable import AmperfyKit
 
 class MOCK_AVPlayerItem: AVPlayerItem {

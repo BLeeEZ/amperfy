@@ -21,7 +21,6 @@
 
 import Foundation
 import CoreData
-import PromiseKit
 import OSLog
 
 public class AutoDownloadLibrarySyncer {

@@ -22,7 +22,6 @@
 import Foundation
 import UIKit
 import os.log
-import PromiseKit
 
 public class BackgroundFetchTriggeredSyncer {
     

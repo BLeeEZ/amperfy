@@ -21,7 +21,6 @@
 
 import UIKit
 import AmperfyKit
-import PromiseKit
 
 class AlbumDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {

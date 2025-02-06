@@ -23,7 +23,6 @@ import Foundation
 import AVFoundation
 import UIKit
 import os.log
-import PromiseKit
 
 protocol BackendAudioPlayerNotifiable {
     func didElapsedTimeChange()

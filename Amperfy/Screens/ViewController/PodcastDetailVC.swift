@@ -21,7 +21,6 @@
 
 import UIKit
 import AmperfyKit
-import PromiseKit
 
 class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO> {
 

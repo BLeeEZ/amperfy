@@ -21,7 +21,6 @@
 
 import Foundation
 import CoreData
-import PromiseKit
 
 class DownloadRequestManager {
 

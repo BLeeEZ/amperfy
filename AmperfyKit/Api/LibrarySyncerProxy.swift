@@ -20,7 +20,6 @@
 //
 
 import Foundation
-import PromiseKit
 
 class LibrarySyncerProxy {
     

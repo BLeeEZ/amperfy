@@ -22,7 +22,6 @@
 import Foundation
 import UIKit
 import CoreData
-import PromiseKit
 
 public enum DetailType {
     case short

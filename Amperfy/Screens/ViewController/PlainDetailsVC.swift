@@ -21,7 +21,6 @@
 
 import Foundation
 import UIKit
-import PromiseKit
 import AmperfyKit
 import MarqueeLabel
 

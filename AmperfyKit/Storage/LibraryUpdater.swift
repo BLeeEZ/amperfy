@@ -20,7 +20,6 @@
 //
 
 import Foundation
-import PromiseKit
 import os.log
 
 public protocol LibraryUpdaterCallbacks {
@@ -191,7 +190,7 @@ public class LibraryUpdater {
             asyncCompanion.library.saveContext()
             notifier.tickOperation()
             if !isRunning {
-                throw PMKError.cancelled
+                throw CancellationError()
             }
         }
         
@@ -207,7 +206,7 @@ public class LibraryUpdater {
             asyncCompanion.library.saveContext()
             notifier.tickOperation()
             if !isRunning {
-                throw PMKError.cancelled
+                throw CancellationError()
             }
         }
     
@@ -220,7 +219,7 @@ public class LibraryUpdater {
             asyncCompanion.library.saveContext()
             notifier.tickOperation()
             if !isRunning {
-                throw PMKError.cancelled
+                throw CancellationError()
             }
         }
         for cachedEpisode in cachedEpisodes {
@@ -228,7 +227,7 @@ public class LibraryUpdater {
             asyncCompanion.library.saveContext()
             notifier.tickOperation()
             if !isRunning {
-                throw PMKError.cancelled
+                throw CancellationError()
             }
         }
         asyncCompanion.library.deleteBinaryPlayableFileSavedInCoreData()
@@ -258,7 +257,7 @@ public class LibraryUpdater {
                 playlist.reassignOrder()
                 playlist.updateArtworkItems()
                 notifier.tickOperation()
-                guard isRunning else { throw PMKError.cancelled }
+                guard isRunning else { throw CancellationError() }
             }
         }
     }
@@ -273,7 +272,7 @@ public class LibraryUpdater {
                 musicFolder.managedObject.songCount = Int16(musicFolder.songs.count)
                 musicFolder.managedObject.directoryCount = Int16(musicFolder.directories.count)
                 notifier.tickOperation()
-                guard isRunning else { throw PMKError.cancelled }
+                guard isRunning else { throw CancellationError() }
             }
         }
         try autoreleasepool {
@@ -285,7 +284,7 @@ public class LibraryUpdater {
                 directory.managedObject.songCount = Int16(directory.songs.count)
                 directory.managedObject.subdirectoryCount = Int16(directory.subdirectories.count)
                 notifier.tickOperation()
-                guard isRunning else { throw PMKError.cancelled }
+                guard isRunning else { throw CancellationError() }
             }
         }
         try autoreleasepool {
@@ -298,7 +297,7 @@ public class LibraryUpdater {
                 genre.managedObject.albumCount = Int16(genre.albums.count)
                 genre.managedObject.artistCount = Int16(genre.artists.count)
                 notifier.tickOperation()
-                guard isRunning else { throw PMKError.cancelled }
+                guard isRunning else { throw CancellationError() }
             }
         }
         try autoreleasepool {
@@ -311,7 +310,7 @@ public class LibraryUpdater {
                 artist.managedObject.albumCount = Int16(artist.albums.count)
                 artist.managedObject.songCount = Int16(artist.songs.count)
                 notifier.tickOperation()
-                guard isRunning else { throw PMKError.cancelled }
+                guard isRunning else { throw CancellationError() }
             }
         }
         try autoreleasepool {
@@ -323,7 +322,7 @@ public class LibraryUpdater {
                 album.managedObject.remoteSongCount = album.managedObject.songCount
                 album.managedObject.songCount = Int16(album.songs.count)
                 notifier.tickOperation()
-                guard isRunning else { throw PMKError.cancelled }
+                guard isRunning else { throw CancellationError() }
             }
         }
         try autoreleasepool {
@@ -334,7 +333,7 @@ public class LibraryUpdater {
                 usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
                 podcast.managedObject.episodeCount = Int16(podcast.episodes.count)
                 notifier.tickOperation()
-                guard isRunning else { throw PMKError.cancelled }
+                guard isRunning else { throw CancellationError() }
             }
         }
         asyncCompanion.library.saveContext()

@@ -22,7 +22,6 @@
 import Foundation
 import CoreData
 import UIKit
-import PromiseKit
 
 public class Genre: AbstractLibraryEntity {
     

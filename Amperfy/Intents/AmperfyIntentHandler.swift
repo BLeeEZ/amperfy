@@ -21,7 +21,6 @@
 
 import Foundation
 import Intents
-import PromiseKit
 import AmperfyKit
 import OSLog
 

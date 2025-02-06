@@ -22,7 +22,6 @@
 import Foundation
 import CoreData
 import os.log
-import PromiseKit
 
 class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 

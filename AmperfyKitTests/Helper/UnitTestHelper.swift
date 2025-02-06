@@ -22,7 +22,6 @@
 import Foundation
 import XCTest
 import AmperfyKit
-import PromiseKit
 
 public class MOCK_PerformanceMonitor: ThreadPerformanceMonitor {
     public var shouldSlowDownExecution = false

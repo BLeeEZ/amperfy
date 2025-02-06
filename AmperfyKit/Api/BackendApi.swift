@@ -22,7 +22,6 @@
 import Foundation
 import CoreData
 import CoreMedia
-import PromiseKit
 import PMKAlamofire
 
 public enum ParsedObjectType {

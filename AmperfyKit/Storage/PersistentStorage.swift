@@ -22,7 +22,6 @@
 import Foundation
 import UIKit
 import CoreData
-import PromiseKit
 
 public enum ArtworkDownloadSetting: Int, CaseIterable {
     case updateOncePerSession = 0

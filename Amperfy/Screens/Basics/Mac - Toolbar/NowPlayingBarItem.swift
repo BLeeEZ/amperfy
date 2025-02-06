@@ -23,7 +23,6 @@ import Foundation
 import UIKit
 import AmperfyKit
 import MarqueeLabel
-import PromiseKit
 
 #if targetEnvironment(macCatalyst)
 

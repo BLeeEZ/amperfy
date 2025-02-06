@@ -23,7 +23,6 @@ import Foundation
 import CoreData
 import UIKit
 import AVFoundation
-import PromiseKit
 
 public enum DerivedPlayableType {
     case song

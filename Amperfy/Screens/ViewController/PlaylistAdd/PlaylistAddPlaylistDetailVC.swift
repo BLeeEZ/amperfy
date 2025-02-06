@@ -21,7 +21,6 @@
 
 import UIKit
 import AmperfyKit
-import PromiseKit
 import CoreData
 
 class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<PlaylistItemMO>, PlaylistVCAddable {

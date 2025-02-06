@@ -21,7 +21,6 @@
 
 import UIKit
 import AmperfyKit
-import PromiseKit
 
 extension String {
     var isHyperTextProtocolProvided: Bool {

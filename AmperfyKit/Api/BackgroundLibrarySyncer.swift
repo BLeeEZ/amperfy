@@ -21,7 +21,6 @@
 
 import Foundation
 import os.log
-import PromiseKit
 
 public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     

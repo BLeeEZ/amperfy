@@ -20,7 +20,6 @@
 //
 
 import UIKit
-import PromiseKit
 import AmperfyKit
 
 struct DetailHeaderConfiguration {

@@ -21,7 +21,6 @@
 
 import Foundation
 import CoreData
-import PromiseKit
 
 class PlayableDownloadDelegate: DownloadManagerDelegate {
     /// max file size of an error response from an API

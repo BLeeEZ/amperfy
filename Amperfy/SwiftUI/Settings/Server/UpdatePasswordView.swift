@@ -20,7 +20,6 @@
 //
 
 import SwiftUI
-import PromiseKit
 
 struct UpdatePasswordView: View {
     

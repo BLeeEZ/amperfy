@@ -20,7 +20,6 @@
 //
 
 import UIKit
-import PromiseKit
 import ID3TagEditor
 
 class EmbeddedArtworkExtractor  {

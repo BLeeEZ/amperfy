@@ -22,7 +22,6 @@
 import UIKit
 import CoreData
 import AmperfyKit
-import PromiseKit
 
 class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, PlaylistVCAddable {
     

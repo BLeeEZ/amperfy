@@ -23,7 +23,6 @@ import Foundation
 import CoreData
 import os.log
 import UIKit
-import PromiseKit
 
 class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     

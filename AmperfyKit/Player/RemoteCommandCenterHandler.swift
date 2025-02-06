@@ -21,7 +21,6 @@
 
 import Foundation
 import MediaPlayer
-import PromiseKit
 
 class RemoteCommandCenterHandler {
     
