@@ -48,7 +48,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         let pollCountArtist = max(1, Int(ceil(Double(auth.artistCount) / Double(AmpacheXmlServerApi.maxItemCountToPollAtOnce))))
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             for index in Array(0...pollCountArtist) {
-                taskGroup.addTask { @MainActor in
+                taskGroup.addTask { @MainActor @Sendable in
                     let artistsResponse = try await self.ampacheXmlServerApi.requestArtists(startIndex: index*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                     try await self.storage.async.perform { asyncCompanion in
                         let parserDelegate = ArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
@@ -63,7 +63,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         let pollCountAlbum = max(1, Int(ceil(Double(auth.albumCount) / Double(AmpacheXmlServerApi.maxItemCountToPollAtOnce))))
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             for index in Array(0...pollCountAlbum) {
-                taskGroup.addTask { @MainActor in
+                taskGroup.addTask { @MainActor @Sendable in
                     let albumsResponse = try await self.ampacheXmlServerApi.requestAlbums(startIndex: index*AmpacheXmlServerApi.maxItemCountToPollAtOnce)
                     try await self.storage.async.perform { asyncCompanion in
                         let parserDelegate = AlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
@@ -95,8 +95,8 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     @MainActor func sync(genre: Genre) async throws {
         guard isSyncAllowed else { return }
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
-            genre.albums.forEach { album in
-                taskGroup.addTask { @MainActor in
+            for album in genre.albums {
+                taskGroup.addTask { @MainActor @Sendable in
                     try await self.sync(album: album)
                 }
             }
@@ -233,7 +233,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         let podcasts = self.storage.main.library.getPodcasts().filter{ $0.remoteStatus == .available }
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             podcasts.forEach { podcast in
-                taskGroup.addTask { @MainActor in
+                taskGroup.addTask { @MainActor @Sendable in
                     let response = try await self.ampacheXmlServerApi.requestPodcastEpisodes(id: podcast.id, limit: 5)
                     try await self.storage.async.perform { asyncCompanion in
                         let podcastAsync = Podcast(managedObject: asyncCompanion.context.object(with: podcast.managedObject.objectID) as! PodcastMO)

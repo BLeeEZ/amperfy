@@ -24,7 +24,7 @@ import os.log
 
 class GenericXmlParser: NSObject, XMLParserDelegate {
     
-    static var debugPrint = false
+    static let debugPrint = false
     /// Background tasks that produce to much CPU load will be terminated by iOS:
     /// Event:               cpu usage
     /// Action taken:    Process killed

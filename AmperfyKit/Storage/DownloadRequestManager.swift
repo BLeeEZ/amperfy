@@ -32,14 +32,14 @@ class DownloadRequestManager {
         self.downloadDelegate = downloadDelegate
     }
     
-    func add(object: Downloadable) {
-        storage.main.context.perform {
+    @MainActor func add(object: Downloadable) {
+        Task { @MainActor in
             self.addLowPrio(object: object, library: self.storage.main.library)
             self.storage.main.saveContext()
         }
     }
     
-    func add(objects: [Downloadable]) {
+    @MainActor func add(objects: [Downloadable]) {
         Task { @MainActor in
             try? await self.storage.async.perform { asyncCompanion in
                 for (n,object) in objects.enumerated() {

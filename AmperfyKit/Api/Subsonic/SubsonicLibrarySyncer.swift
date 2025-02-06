@@ -23,7 +23,7 @@ import Foundation
 import CoreData
 import os.log
 
-class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
+@MainActor class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     private let subsonicServerApi: SubsonicServerApi
    
@@ -60,7 +60,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         statusNotifyier?.notifySyncStarted(ofType: .album, totalCount: pollCountArtist)
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             for index in Array(0...pollCountArtist) {
-                taskGroup.addTask { @MainActor in
+                taskGroup.addTask { @MainActor @Sendable in
                     let albumsResponse = try await self.subsonicServerApi.requestAlbums(offset: index*Self.maxItemCountToPollAtOnce, count: Self.maxItemCountToPollAtOnce)
                     try await self.storage.async.perform { asyncCompanion in
                         let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
@@ -120,7 +120,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         guard isSyncAllowed else { return }
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             genre.albums.forEach { album in
-                taskGroup.addTask { @MainActor in
+                taskGroup.addTask { @MainActor @Sendable in
                     try await self.sync(album: album)
                 }
             }
@@ -149,7 +149,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         guard artist.remoteStatus == .available else { return }
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             artist.albums.forEach { album in
-                taskGroup.addTask { @MainActor in
+                taskGroup.addTask { @MainActor @Sendable in
                     try await self.sync(album: album)
                 }
             }

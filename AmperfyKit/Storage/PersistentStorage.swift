@@ -691,7 +691,7 @@ protocol CoreDataManagable {
 
 public class CoreDataPersistentManager: CoreDataManagable {
 
-    static var managedObjectModel: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
+    static let managedObjectModel: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
 
     lazy var persistentContainer: NSPersistentContainer = {
         /*

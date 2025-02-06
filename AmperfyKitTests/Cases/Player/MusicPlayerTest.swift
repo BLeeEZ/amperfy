@@ -118,7 +118,7 @@ class MOCK_LibrarySyncer: LibrarySyncer {
 }
 
 class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
-    var requestPredicate: NSPredicate { return NSPredicate.alwaysTrue }
+    var requestPredicate: NSPredicate { return NSPredicate.init(value: true) }
     var parallelDownloadsCount = 2
     func prepareDownload(download: Download) async throws -> URL { throw BackendError.notSupported }
     @MainActor func validateDownloadedData(download: Download) -> ResponseError? { return nil }
@@ -190,7 +190,7 @@ class MOCK_CoreDataManager: CoreDataManagable {
     }
 }
 
-class MusicPlayerTest: XCTestCase {
+@MainActor class MusicPlayerTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
     var library: LibraryStorage!

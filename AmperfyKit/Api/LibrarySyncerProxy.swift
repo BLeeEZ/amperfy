@@ -21,7 +21,7 @@
 
 import Foundation
 
-class LibrarySyncerProxy {
+@MainActor class LibrarySyncerProxy {
     
     let backendApi: BackendApi
     let storage: PersistentStorage

@@ -22,12 +22,12 @@
 import Foundation
 
 extension Notification.Name {
-    public static var downloadFinishedSuccess = Notification.Name(rawValue: "de.amperfy.download.finished.success")
-    public static var playerPlay = Notification.Name(rawValue: "de.amperfy.player.play")
-    public static var playerPause = Notification.Name(rawValue: "de.amperfy.player.pause")
-    public static var playerStop = Notification.Name(rawValue: "de.amperfy.player.stop")
-    public static var fetchControllerSortChanged = Notification.Name(rawValue: "de.amperfy.fetchController.sort.change")
-    public static var offlineModeChanged = Notification.Name(rawValue: "de.amperfy.settings.offline-mode")
+    public static let downloadFinishedSuccess = Notification.Name(rawValue: "de.amperfy.download.finished.success")
+    public static let playerPlay = Notification.Name(rawValue: "de.amperfy.player.play")
+    public static let playerPause = Notification.Name(rawValue: "de.amperfy.player.pause")
+    public static let playerStop = Notification.Name(rawValue: "de.amperfy.player.stop")
+    public static let fetchControllerSortChanged = Notification.Name(rawValue: "de.amperfy.fetchController.sort.change")
+    public static let offlineModeChanged = Notification.Name(rawValue: "de.amperfy.settings.offline-mode")
 }
 
 public struct DownloadNotification {

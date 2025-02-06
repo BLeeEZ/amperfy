@@ -81,7 +81,7 @@ extension SubsonicApi: BackendApi {
         return subsonicServerApi.checkForErrorResponse(response: response)
     }
     
-    func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
+    @MainActor func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
         return SubsonicLibrarySyncer(subsonicServerApi: subsonicServerApi, networkMonitor: networkMonitor, performanceMonitor: performanceMonitor, storage: storage, eventLogger: eventLogger)
     }
     

@@ -22,7 +22,7 @@
 import Foundation
 import os.log
 
-public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
+@MainActor public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     
     private let storage: PersistentStorage
     private let networkMonitor: NetworkMonitorFacade

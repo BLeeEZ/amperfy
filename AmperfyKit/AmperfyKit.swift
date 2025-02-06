@@ -34,12 +34,7 @@ public class AmperKit {
     }
     
     public static let newestElementsFetchCount = 50
-        
-    private static var inst: AmperKit?
-    public static var shared: AmperKit {
-        if inst == nil { inst = AmperKit() }
-        return inst!
-    }
+    public static let shared = AmperKit()
     
     public var isInForeground = true
     
@@ -58,7 +53,7 @@ public class AmperKit {
     @MainActor public lazy var librarySyncer: LibrarySyncer = {
         return LibrarySyncerProxy(backendApi: backendApi, storage: storage)
     }()
-    public lazy var duplicateEntitiesResolver = {
+    @MainActor public lazy var duplicateEntitiesResolver = {
         return DuplicateEntitiesResolver(storage: storage)
     }()
     @MainActor public lazy var eventLogger = {

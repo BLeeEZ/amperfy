@@ -42,7 +42,7 @@ extension CoreDataIdentifyable {
     }
     
     static func getIdentifierBasedSearchPredicate(searchText: String) -> NSPredicate {
-        var predicate: NSPredicate = NSPredicate.alwaysTrue
+        var predicate: NSPredicate = NSPredicate.init(value: true)
         if searchText.count > 0 {
             predicate = NSPredicate(format: "%K contains[cd] %@", Self.identifierKeyString, searchText)
         }

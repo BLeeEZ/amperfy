@@ -29,8 +29,8 @@ public enum NotificationContentType: NSString {
 }
 
 public struct NotificationUserInfo {
-    public static let type: NSString = "type"
-    public static let id: NSString = "id"
+    public static let type: String = "type"
+    public static let id: String = "id"
 }
 
 public class LocalNotificationManager {

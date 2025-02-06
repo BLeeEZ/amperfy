@@ -58,14 +58,14 @@ class DownloadManager: NSObject, DownloadManageable {
         activeTasks = DispatchSemaphore(value: self.downloadSlotCount)
     }
     
-    func download(object: Downloadable) {
+    @MainActor func download(object: Downloadable) {
         guard !object.isCached, storage.settings.isOnlineMode, (object is Artwork) || !storageExceedsCacheLimit() else { return }
         if let isValidCheck = preDownloadIsValidCheck, !isValidCheck(object) { return }
         self.requestManager.add(object: object)
         triggerBackgroundDownload()
     }
     
-    func download(objects: [Downloadable]) {
+    @MainActor func download(objects: [Downloadable]) {
         guard storage.settings.isOnlineMode, !storageExceedsCacheLimit() else { return }
         let downloadObjects = objects.filter{ !$0.isCached }.filter{ preDownloadIsValidCheck?($0) ?? true }
         if !downloadObjects.isEmpty {
@@ -74,11 +74,11 @@ class DownloadManager: NSObject, DownloadManageable {
         triggerBackgroundDownload()
     }
     
-    func removeFinishedDownload(for object: Downloadable) {
+    @MainActor func removeFinishedDownload(for object: Downloadable) {
         requestManager.removeFinishedDownload(for: object)
     }
     
-    func removeFinishedDownload(for objects: [Downloadable]) {
+    @MainActor func removeFinishedDownload(for objects: [Downloadable]) {
         requestManager.removeFinishedDownload(for: objects)
     }
 

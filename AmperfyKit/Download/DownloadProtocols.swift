@@ -26,10 +26,10 @@ public typealias CompleteHandlerBlock = () -> ()
 
 public protocol DownloadManageable {
     var backgroundFetchCompletionHandler: CompleteHandlerBlock? { get set }
-    func download(object: Downloadable)
-    func download(objects: [Downloadable])
-    func removeFinishedDownload(for object: Downloadable)
-    func removeFinishedDownload(for objects: [Downloadable])
+    @MainActor func download(object: Downloadable)
+    @MainActor func download(objects: [Downloadable])
+    @MainActor func removeFinishedDownload(for object: Downloadable)
+    @MainActor func removeFinishedDownload(for objects: [Downloadable])
     func clearFinishedDownloads()
     func resetFailedDownloads()
     func cancelDownloads()

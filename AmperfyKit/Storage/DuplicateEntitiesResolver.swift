@@ -22,7 +22,7 @@
 import Foundation
 import os.log
 
-public class DuplicateEntitiesResolver {
+@MainActor public class DuplicateEntitiesResolver {
     
     private let log = OSLog(subsystem: "Amperfy", category: "DuplicateEntitiesResolver")
     private let storage: PersistentStorage

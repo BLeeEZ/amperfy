@@ -134,7 +134,7 @@ public protocol LibrarySyncer {
     @MainActor func parseLyrics(relFilePath: URL) async throws -> LyricsList
 }
 
-protocol AbstractBackgroundLibrarySyncer {
+@MainActor protocol AbstractBackgroundLibrarySyncer {
     var isActive: Bool { get }
     func stop()
     func stopAndWait()
@@ -182,7 +182,7 @@ public protocol BackendApi: URLCleanser {
     @MainActor func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL
     @MainActor func generateUrl(forArtwork artwork: Artwork) async throws -> URL
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
-    func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
+    @MainActor func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo?
 }

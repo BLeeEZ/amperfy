@@ -85,7 +85,7 @@ public protocol PlayableContainable {
 
 extension PlayableContainable {
     
-    public func cachePlayables(downloadManager: DownloadManageable) {
+    @MainActor public func cachePlayables(downloadManager: DownloadManageable) {
         for playable in playables {
             if !playable.isCached {
                 downloadManager.download(object: playable)

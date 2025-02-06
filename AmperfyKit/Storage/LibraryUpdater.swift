@@ -27,7 +27,7 @@ public protocol LibraryUpdaterCallbacks {
     func tickOperation()
 }
 
-public class LibraryUpdater {
+@MainActor public class LibraryUpdater {
     
     private static let sleepTimeInMicroSecToReduceCpuLoad : UInt32 = 500
     

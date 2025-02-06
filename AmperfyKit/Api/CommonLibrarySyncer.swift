@@ -22,7 +22,7 @@
 import Foundation
 import os.log
 
-class CommonLibrarySyncer {
+@MainActor class CommonLibrarySyncer {
     
     let networkMonitor: NetworkMonitorFacade
     let performanceMonitor: ThreadPerformanceMonitor

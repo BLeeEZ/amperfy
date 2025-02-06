@@ -69,7 +69,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard error != nil, let requestUrl = task.originalRequest?.url?.absoluteString else { return }
-        self.storage.main.context.performAndWait {
+        Task { @MainActor in
             let library = self.storage.main.library
             guard let download = library.getDownload(url: requestUrl) else { return }
             self.finishDownload(download: download, error: .fetchFailed)

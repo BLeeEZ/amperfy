@@ -42,7 +42,7 @@ struct LibraryDuplicateInfo {
 }
 
 public class LibraryStorage: PlayableFileCachable {
-    public static var carPlayMaxElements = 200
+    public static let carPlayMaxElements = 200
     
     static let entitiesToDelete = [
         Genre.typeName,
@@ -700,7 +700,7 @@ public class LibraryStorage: PlayableFileCachable {
         if onlyCachedArtists {
             return NSPredicate(format: "SUBQUERY(songs, $song, $song.relFilePath != nil) .@count > 0")
         } else {
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         }
     }
     
@@ -708,7 +708,7 @@ public class LibraryStorage: PlayableFileCachable {
         if onlyCachedAlbums {
             return NSPredicate(format: "SUBQUERY(songs, $song, $song.relFilePath != nil) .@count > 0")
         } else {
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         }
     }
     
@@ -720,7 +720,7 @@ public class LibraryStorage: PlayableFileCachable {
         if onlyCachedPlaylistItems {
             return NSPredicate(format: "%K != nil", #keyPath(PlaylistItemMO.playable.relFilePath))
         } else {
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         }
     }
     
@@ -730,7 +730,7 @@ public class LibraryStorage: PlayableFileCachable {
                 NSPredicate(format: "%K != nil", #keyPath(SongMO.relFilePath))
             ])
         } else {
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         }
     }
     
@@ -738,7 +738,7 @@ public class LibraryStorage: PlayableFileCachable {
         if onlyCachedPodcasts {
             return NSPredicate(format: "SUBQUERY(episodes, $episode, $episode.relFilePath != nil) .@count > 0")
         } else {
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         }
     }
     
@@ -748,7 +748,7 @@ public class LibraryStorage: PlayableFileCachable {
                 NSPredicate(format: "%K != nil", #keyPath(PodcastEpisodeMO.relFilePath))
             ])
         } else {
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         }
     }
     
@@ -756,7 +756,7 @@ public class LibraryStorage: PlayableFileCachable {
         if onlyCachedGenreArtists {
             return NSPredicate(format: "SUBQUERY(artists, $artist, ANY $artist.songs.relFilePath != nil) .@count > 0")
         } else {
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         }
     }
     
@@ -764,7 +764,7 @@ public class LibraryStorage: PlayableFileCachable {
         if onlyCachedGenreAlbums {
             return NSPredicate(format: "SUBQUERY(albums, $album, ANY $album.songs.relFilePath != nil) .@count > 0")
         } else {
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         }
     }
     
@@ -772,14 +772,14 @@ public class LibraryStorage: PlayableFileCachable {
         if onlyCachedGenreSongs {
             return NSPredicate(format: "SUBQUERY(songs, $song, $song.relFilePath != nil) .@count > 0")
         } else {
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         }
     }
     
     func getFetchPredicate(songsDisplayFilter: DisplayCategoryFilter) -> NSPredicate {
         switch songsDisplayFilter {
         case .all, .newest, .recent:
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         case .favorites:
             return NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isFavorite))
         }
@@ -788,7 +788,7 @@ public class LibraryStorage: PlayableFileCachable {
     func getFetchPredicate(albumsDisplayFilter: DisplayCategoryFilter) -> NSPredicate {
         switch albumsDisplayFilter {
         case .all:
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         case .newest:
             return NSPredicate(format: "%K > 0", #keyPath(AlbumMO.newestIndex))
         case .recent:
@@ -801,7 +801,7 @@ public class LibraryStorage: PlayableFileCachable {
     func getFetchPredicate(artistsDisplayFilter: ArtistCategoryFilter) -> NSPredicate {
         switch artistsDisplayFilter {
         case .all:
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         case .albumArtists:
             return NSPredicate(format: "%K.@count > 0", #keyPath(ArtistMO.albums))
         case .favorites:
@@ -812,7 +812,7 @@ public class LibraryStorage: PlayableFileCachable {
     func getFetchPredicate(forPlaylistSearchCategory playlistSearchCategory: PlaylistSearchCategory) -> NSPredicate {
         switch playlistSearchCategory {
         case .all:
-            return NSPredicate.alwaysTrue
+            return NSPredicate.init(value: true)
         case .cached:
             return NSPredicate(format: "SUBQUERY(items, $item, $item.playable.relFilePath != nil) .@count > 0")
         case .userOnly:

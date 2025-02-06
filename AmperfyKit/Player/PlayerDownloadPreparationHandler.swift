@@ -21,7 +21,7 @@
 
 import Foundation
 
-class PlayerDownloadPreparationHandler {
+@MainActor class PlayerDownloadPreparationHandler {
     
     static let preDownloadCount = 3
     

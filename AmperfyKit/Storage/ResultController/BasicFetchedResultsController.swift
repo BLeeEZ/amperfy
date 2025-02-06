@@ -33,7 +33,7 @@ extension NSFetchedResultsController {
     
     @objc func clearResults() {
         let oldPredicate = fetchRequest.predicate
-        fetchRequest.predicate = NSPredicate.alwaysFalse
+        fetchRequest.predicate = NSPredicate.init(value: false)
         fetch()
         fetchRequest.predicate = oldPredicate
     }

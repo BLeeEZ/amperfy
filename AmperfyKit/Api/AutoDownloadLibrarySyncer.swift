@@ -23,7 +23,7 @@ import Foundation
 import CoreData
 import OSLog
 
-public class AutoDownloadLibrarySyncer {
+@MainActor public class AutoDownloadLibrarySyncer {
     
     private let log = OSLog(subsystem: "Amperfy", category: "AutoDownloadLibrarySyncer")
     private let storage: PersistentStorage
@@ -55,8 +55,9 @@ public class AutoDownloadLibrarySyncer {
         fetchNeededNewestAlbums = newNewestAlbums.filter { !$0.isSongsMetaDataSynced }
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             for album in fetchNeededNewestAlbums {
-                taskGroup.addTask { @MainActor in
+                taskGroup.addTask { @MainActor @Sendable in
                     try await self.librarySyncer.sync(album: album)
+
                 }
             }
             try await taskGroup.waitForAll()

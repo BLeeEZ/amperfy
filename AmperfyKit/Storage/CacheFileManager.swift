@@ -77,11 +77,7 @@ public class MimeFileConverter {
 
 public class CacheFileManager {
     
-    private static var inst: CacheFileManager?
-    public static var shared: CacheFileManager {
-        if inst == nil { inst = CacheFileManager() }
-        return inst!
-    }
+    public static let shared = CacheFileManager()
     
     private let fileManager = FileManager.default
     // Get the URL to the app container's 'Library' directory.

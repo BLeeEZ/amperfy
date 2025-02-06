@@ -64,7 +64,7 @@ public final class DirectoryMO: AbstractLibraryEntityMO {
     }
 
     static func getSearchPredicate(searchText: String) -> NSPredicate {
-        var predicate: NSPredicate = NSPredicate.alwaysTrue
+        var predicate: NSPredicate = NSPredicate.init(value: true)
         if searchText.count > 0 {
             predicate = NSPredicate(format: "%K contains[cd] %@", #keyPath(DirectoryMO.name), searchText)
         }
