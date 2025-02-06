@@ -23,7 +23,6 @@ import Foundation
 import CoreData
 import os.log
 import Alamofire
-import PMKAlamofire
 
 struct AmpacheResponseError: LocalizedError {
     public var statusCode: Int = 0

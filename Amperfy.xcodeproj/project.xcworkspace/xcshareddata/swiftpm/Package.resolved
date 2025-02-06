@@ -1,5 +1,5 @@
 {
-  "originHash" : "c26d746934755275fa14d2f3083a6909b427daa22cad55ffd69d4dc8e0e094b3",
+  "originHash" : "2f0805849e6d853c13e1f5c7613d9731a96de93db42ee6dcf96631489e948421",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -62,24 +62,6 @@
       "state" : {
         "revision" : "a9ec5cd29b4669f5fdf3dcd494a08cea4776913c",
         "version" : "3.2.0"
-      }
-    },
-    {
-      "identity" : "pmkalamofire",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/PromiseKit/PMKAlamofire",
-      "state" : {
-        "revision" : "e1791b81d309d4b4853127d72473978f86e96ebe",
-        "version" : "4.0.0"
-      }
-    },
-    {
-      "identity" : "promisekit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mxcl/PromiseKit",
-      "state" : {
-        "revision" : "43772616c46a44a9977e41924ae01d0e55f2f9ca",
-        "version" : "6.18.1"
       }
     },
     {

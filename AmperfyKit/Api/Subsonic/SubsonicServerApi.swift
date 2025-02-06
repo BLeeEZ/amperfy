@@ -22,7 +22,6 @@
 import Foundation
 import os.log
 import Alamofire
-import PMKAlamofire
 
 protocol SubsonicUrlCreator {
     func getArtUrlString(forCoverArtId: String) -> String

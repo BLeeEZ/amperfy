@@ -89,9 +89,7 @@
 		507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */; };
 		507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE512B1E5848002BBB1D /* ID3TagEditor */; };
 		507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE542B1E587B002BBB1D /* Alamofire */; };
-		507DFE5B2B1E58CB002BBB1D /* PMKAlamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE5A2B1E58CB002BBB1D /* PMKAlamofire */; };
 		507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE632B1E5A03002BBB1D /* Alamofire */; };
-		507DFE662B1E5A0E002BBB1D /* PMKAlamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE652B1E5A0E002BBB1D /* PMKAlamofire */; };
 		507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE692B1E62C9002BBB1D /* ID3TagEditor */; };
 		507DFE8D2B1E7192002BBB1D /* LNPopupController in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8C2B1E7192002BBB1D /* LNPopupController */; };
 		507DFE8E2B1E7192002BBB1D /* LNPopupController in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8C2B1E7192002BBB1D /* LNPopupController */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -1055,7 +1053,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				507DFE902B1E7262002BBB1D /* CallbackURLKit in Frameworks */,
-				507DFE5B2B1E58CB002BBB1D /* PMKAlamofire in Frameworks */,
 				507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */,
 				5052497D2D10CBED0005EEB0 /* Collections in Frameworks */,
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
@@ -1083,7 +1080,6 @@
 				5052497B2D10CBC70005EEB0 /* Collections in Frameworks */,
 				50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */,
 				507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */,
-				507DFE662B1E5A0E002BBB1D /* PMKAlamofire in Frameworks */,
 				50BE5DA7285714A200156FC6 /* CallbackURLKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2031,7 +2027,6 @@
 				507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */,
 				507DFE512B1E5848002BBB1D /* ID3TagEditor */,
 				507DFE542B1E587B002BBB1D /* Alamofire */,
-				507DFE5A2B1E58CB002BBB1D /* PMKAlamofire */,
 				507DFE8C2B1E7192002BBB1D /* LNPopupController */,
 				507DFE8F2B1E7262002BBB1D /* CallbackURLKit */,
 				5052497C2D10CBED0005EEB0 /* Collections */,
@@ -2075,7 +2070,6 @@
 			packageProductDependencies = (
 				50BE5DA6285714A200156FC6 /* CallbackURLKit */,
 				507DFE632B1E5A03002BBB1D /* Alamofire */,
-				507DFE652B1E5A0E002BBB1D /* PMKAlamofire */,
 				507DFE692B1E62C9002BBB1D /* ID3TagEditor */,
 				50F40A3A2C9088B30097FE63 /* IfritStatic */,
 				5052497A2D10CBC70005EEB0 /* Collections */,
@@ -2157,7 +2151,6 @@
 				507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */,
 				507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */,
 				507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */,
-				507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */,
 				50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */,
 				505249792D10CBC70005EEB0 /* XCRemoteSwiftPackageReference "swift-collections" */,
 			);
@@ -3214,14 +3207,6 @@
 				version = 5.6.2;
 			};
 		};
-		507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/PromiseKit/PMKAlamofire";
-			requirement = {
-				kind = exactVersion;
-				version = 4.0.0;
-			};
-		};
 		509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/obrhoff/VYPlayIndicator";
@@ -3279,20 +3264,10 @@
 			package = 507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
-		507DFE5A2B1E58CB002BBB1D /* PMKAlamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */;
-			productName = PMKAlamofire;
-		};
 		507DFE632B1E5A03002BBB1D /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
-		};
-		507DFE652B1E5A0E002BBB1D /* PMKAlamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 507DFE592B1E58CB002BBB1D /* XCRemoteSwiftPackageReference "PMKAlamofire" */;
-			productName = PMKAlamofire;
 		};
 		507DFE692B1E62C9002BBB1D /* ID3TagEditor */ = {
 			isa = XCSwiftPackageProductDependency;
