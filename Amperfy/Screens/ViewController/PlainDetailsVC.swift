@@ -97,13 +97,12 @@ class PlainDetailsVC: UIViewController {
         } else if let lyricsRelFilePath = lyricsRelFilePath {
             detailsTextView.text = ""
             headerLabel.text = "Lyrics"
-            firstly {
-                appDelegate.librarySyncer.parseLyrics(relFilePath: lyricsRelFilePath)
-            }.done { lyricsList in
+            Task { @MainActor in do {
+                let lyricsList = try await appDelegate.librarySyncer.parseLyrics(relFilePath: lyricsRelFilePath)
                 self.displayLyrics(lyricsList: lyricsList)
-            }.catch { error in
+            } catch {
                 self.detailsTextView.text = "Lyrics are not available anymore."
-            }
+            }}
         } else if let player = player {
             headerLabel.text = "Player Info"
             var details = ""

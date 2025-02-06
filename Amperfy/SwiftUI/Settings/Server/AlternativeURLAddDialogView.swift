@@ -70,22 +70,22 @@ struct AlternativeURLAddDialogView: View {
         let credentials = LoginCredentials(serverUrl: newAltUrl, username: username, password: password, backendApi: activeApi)
 
         isValidating = true
-        firstly {
-            self.appDelegate.backendApi.isAuthenticationValid(credentials: credentials)
-        }.done {
-            if let activeUrl = self.appDelegate.storage.loginCredentials?.serverUrl {
-                var currentAltUrls = self.appDelegate.storage.alternativeServerURLs
-                currentAltUrls.append(activeUrl)
-                self.appDelegate.storage.alternativeServerURLs = currentAltUrls
+        Task { @MainActor in
+            do {
+                try await self.appDelegate.backendApi.isAuthenticationValid(credentials: credentials)
+                if let activeUrl = self.appDelegate.storage.loginCredentials?.serverUrl {
+                    var currentAltUrls = self.appDelegate.storage.alternativeServerURLs
+                    currentAltUrls.append(activeUrl)
+                    self.appDelegate.storage.alternativeServerURLs = currentAltUrls
+                }
+                self.appDelegate.storage.loginCredentials = credentials
+                self.appDelegate.backendApi.provideCredentials(credentials: credentials)
+                activeServerURL = newAltUrl
+                serverURLs.append(newAltUrl)
+                successMsg = "Alternative URL added."
+            } catch {
+                errorMsg = "Alternative URL could not be verified! Authentication failed! Alternative URL has not been added."
             }
-            self.appDelegate.storage.loginCredentials = credentials
-            self.appDelegate.backendApi.provideCredentials(credentials: credentials)
-            activeServerURL = newAltUrl
-            serverURLs.append(newAltUrl)
-            successMsg = "Alternative URL added."
-        }.catch { error in
-            errorMsg = "Alternative URL could not be verified! Authentication failed! Alternative URL has not been added."
-        }.finally {
             isValidating = false
         }
     }

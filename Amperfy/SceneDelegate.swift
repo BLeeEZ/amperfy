@@ -49,7 +49,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If Amperfy is terminated and a Siri Shortcut is triggered, ConnectionOptions will contain the activity
         for activity in connectionOptions.userActivities {
             os_log("willConnectTo activity: %s", log: self.log, type: .info, activity.activityType)
-            _ = appDelegate.intentManager.handleIncomingIntent(userActivity: activity)
+            Task { @MainActor in
+                _ = await appDelegate.intentManager.handleIncomingIntent(userActivity: activity)
+            }
         }
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
@@ -205,7 +207,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         os_log("scene launch via userActivity: %s", log: self.log, type: .info, userActivity.activityType)
-        _ = appDelegate.intentManager.handleIncomingIntent(userActivity: userActivity)
+        
+        Task { @MainActor in
+            _ = await appDelegate.intentManager.handleIncomingIntent(userActivity: userActivity)
+        }
     }
 
     func scene(_ scene: UIScene, didFailToContinueUserActivityWithType userActivityType: String, error: Error) {

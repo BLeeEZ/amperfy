@@ -66,11 +66,12 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
         swipeCallback = { (indexPath, completionHandler) in
             let playlist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            firstly {
-                playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
+                }
                 completionHandler(SwipeActionContext(containable: playlist))
             }
         }
@@ -94,11 +95,11 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         }
         updateRightBarButtonItems()
         guard appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
-        }.catch { error in
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
-        }
+        }}
     }
 
     func updateRightBarButtonItems() {
@@ -141,11 +142,12 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         let playlistId = playlist.id
         self.appDelegate.storage.main.library.deletePlaylist(playlist)
         self.appDelegate.storage.main.saveContext()
-        firstly {
-            self.appDelegate.librarySyncer.syncUpload(playlistIdToDelete: playlistId)
-        }.catch { error in
+        
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.syncUpload(playlistIdToDelete: playlistId)
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Playlist Upload Deletion", error: error)
-        }
+        }}
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -182,31 +184,32 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     
     private func createOptionsButtonMenu() -> UIMenu {
         let fetchAllPlaylists = UIAction(title: "Sync All Playlists", image: .refresh, handler: { _ in
-            self.appDelegate.storage.async.perform { asyncCompanion in
-                let playlists = asyncCompanion.library.getPlaylists()
-                firstly {
-                    let playlistPromises: [() -> Promise<Void>] = playlists.compactMap { playlist in return {
-                        firstly {
-                            playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                        }
-                    }}
-                    return playlistPromises.resolveSequentially()
-                }.done {
-                    self.appDelegate.eventLogger.info(topic: "Sync All Playlists", message: "All playlists have been synced.")
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Sync All Playlists", error: error)
+            Task { @MainActor in do {
+                var playlistsIds = [NSManagedObjectID]()
+                try await self.appDelegate.storage.async.perform { asyncCompanion in
+                    let playlists = asyncCompanion.library.getPlaylists()
+                    playlistsIds = playlists.compactMap{ $0.managedObject.objectID }
                 }
-            }.catch { error in }
+                for moId in playlistsIds {
+                    let playlistMainMO = self.appDelegate.storage.main.context.object(with: moId) as! PlaylistMO
+                    let playlistMain = Playlist(library: self.appDelegate.storage.main.library, managedObject: playlistMainMO)
+                    try await playlistMain.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                }
+                self.appDelegate.eventLogger.info(topic: "Sync All Playlists", message: "All playlists have been synced.")
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Sync All Playlists", error: error)
+            }}
         })
         return UIMenu(title: "Options", image: .sort, options: [.displayInline], children: [fetchAllPlaylists])
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        firstly {
-            self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
+            }
             self.refreshControl?.endRefreshing()
         }
     }

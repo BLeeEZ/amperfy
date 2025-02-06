@@ -52,20 +52,20 @@ class AmpacheApi: BackendApi {
         ampacheXmlServerApi.provideCredentials(credentials: credentials)
     }
 
-    func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
-        return ampacheXmlServerApi.isAuthenticationValid(credentials: credentials)
+    @MainActor func isAuthenticationValid(credentials: LoginCredentials) async throws {
+        return try await ampacheXmlServerApi.isAuthenticationValid(credentials: credentials)
     }
 
-    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> {
-        return ampacheXmlServerApi.generateUrl(forDownloadingPlayable: playable)
+    @MainActor func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL {
+        return try await ampacheXmlServerApi.generateUrl(forDownloadingPlayable: playable)
     }
 
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> {
-        return ampacheXmlServerApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
+    @MainActor func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL {
+        return try await ampacheXmlServerApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
     }
     
-    func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
-        return ampacheXmlServerApi.generateUrl(forArtwork: artwork)
+    @MainActor func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
+        return try await ampacheXmlServerApi.generateUrl(forArtwork: artwork)
     }
     
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {

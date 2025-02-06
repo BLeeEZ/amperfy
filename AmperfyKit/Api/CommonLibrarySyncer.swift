@@ -43,7 +43,7 @@ class CommonLibrarySyncer {
         self.eventLogger = eventLogger
     }
     
-    func createCachedItemRepresentationsInCoreData(statusNotifyier: SyncCallbacks?) -> Promise<Void> {
+    @MainActor func createCachedItemRepresentationsInCoreData(statusNotifyier: SyncCallbacks?) async throws {
         let cachedArtworks = fileManager.getCachedArtworks()
         let cachedEmbeddedArtworks = fileManager.getCachedEmbeddedArtworks()
         let cachedLyrics = fileManager.getCachedLyrics()
@@ -53,11 +53,11 @@ class CommonLibrarySyncer {
         let totalCount = cachedArtworks.count + cachedEmbeddedArtworks.count + cachedLyrics.count + cachedSongs.count + cachedEpisodes.count
         guard totalCount > 0 else {
             // nothing to do
-            return Promise.value
+            return
         }
         statusNotifyier?.notifySyncStarted(ofType: .cache, totalCount: totalCount)
         
-        return self.storage.async.perform { asyncCompanion in
+        return try await self.storage.async.perform { asyncCompanion in
             for cachedArtwork in cachedArtworks {
                 let artwork = asyncCompanion.library.getArtwork(remoteInfo: ArtworkRemoteInfo(id: cachedArtwork.id, type: cachedArtwork.type)) ?? asyncCompanion.library.createArtwork()
                 artwork.id = cachedArtwork.id

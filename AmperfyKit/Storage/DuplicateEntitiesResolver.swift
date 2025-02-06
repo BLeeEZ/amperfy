@@ -27,7 +27,6 @@ public class DuplicateEntitiesResolver {
     private let log = OSLog(subsystem: "Amperfy", category: "DuplicateEntitiesResolver")
     private let storage: PersistentStorage
     private let activeDispatchGroup = DispatchGroup()
-    private let mainFlowSemaphore = DispatchSemaphore(value: 1)
     private var isRunning = false
     private var isActive = false
     
@@ -49,79 +48,58 @@ public class DuplicateEntitiesResolver {
     }
     
     private func resolveDuplicatesInBackground() {
-        DispatchQueue.global().async {
+        Task { @MainActor in
             self.activeDispatchGroup.enter()
             os_log("start", log: self.log, type: .info)
             
             // only check for duplicates on Ampache API, Subsonic does not have genre ids
             if self.isRunning, self.storage.loginCredentials?.backendApi == .ampache {
-                self.mainFlowSemaphore.wait()
-                self.storage.async.perform { asyncCompanion in
-                    defer { self.mainFlowSemaphore.signal() }
+                try? await self.storage.async.perform { asyncCompanion in
                     let duplicates = asyncCompanion.library.findDuplicates(for: Genre.typeName).filter{ $0.id != "" }
                     asyncCompanion.library.resolveGenresDuplicates(duplicates: duplicates)
-                    asyncCompanion.saveContext()
-                }.catch { error in }
+                }
             }
             
             if self.isRunning {
-                self.mainFlowSemaphore.wait()
-                self.storage.async.perform { asyncCompanion in
-                    defer { self.mainFlowSemaphore.signal() }
+                try? await self.storage.async.perform { asyncCompanion in
                     let duplicates = asyncCompanion.library.findDuplicates(for: Artist.typeName).filter{ $0.id != "" }
                     asyncCompanion.library.resolveArtistsDuplicates(duplicates: duplicates)
-                    asyncCompanion.saveContext()
-                }.catch { error in }
+                }
             }
             
             if self.isRunning {
-                self.mainFlowSemaphore.wait()
-                self.storage.async.perform { asyncCompanion in
-                    defer { self.mainFlowSemaphore.signal() }
+                try? await self.storage.async.perform { asyncCompanion in
                     let duplicates = asyncCompanion.library.findDuplicates(for: Album.typeName).filter{ $0.id != "" }
                     asyncCompanion.library.resolveAlbumsDuplicates(duplicates: duplicates)
-                    asyncCompanion.saveContext()
-                }.catch { error in }
+                }
             }
             
             if self.isRunning {
-                self.mainFlowSemaphore.wait()
-                self.storage.async.perform { asyncCompanion in
-                    defer { self.mainFlowSemaphore.signal() }
+                try? await self.storage.async.perform { asyncCompanion in
                     let duplicates = asyncCompanion.library.findDuplicates(for: Song.typeName).filter{ $0.id != "" }
                     asyncCompanion.library.resolveSongsDuplicates(duplicates: duplicates)
-                    asyncCompanion.saveContext()
-                }.catch { error in }
+                }
             }
             
             if self.isRunning {
-                self.mainFlowSemaphore.wait()
-                self.storage.async.perform { asyncCompanion in
-                    defer { self.mainFlowSemaphore.signal() }
+                try? await self.storage.async.perform { asyncCompanion in
                     let duplicates = asyncCompanion.library.findDuplicates(for: PodcastEpisode.typeName).filter{ $0.id != "" }
                     asyncCompanion.library.resolvePodcastEpisodesDuplicates(duplicates: duplicates)
-                    asyncCompanion.saveContext()
-                }.catch { error in }
+                }
             }
             
             if self.isRunning {
-                self.mainFlowSemaphore.wait()
-                self.storage.async.perform { asyncCompanion in
-                    defer { self.mainFlowSemaphore.signal() }
+                try? await self.storage.async.perform { asyncCompanion in
                     let duplicates = asyncCompanion.library.findDuplicates(for: Podcast.typeName).filter{ $0.id != "" }
                     asyncCompanion.library.resolvePodcastsDuplicates(duplicates: duplicates)
-                    asyncCompanion.saveContext()
-                }.catch { error in }
+                }
             }
             
             if self.isRunning {
-                self.mainFlowSemaphore.wait()
-                self.storage.async.perform { asyncCompanion in
-                    defer { self.mainFlowSemaphore.signal() }
+                try? await self.storage.async.perform { asyncCompanion in
                     let duplicates = asyncCompanion.library.findDuplicates(for: Playlist.typeName).filter{ $0.id != "" }
                     asyncCompanion.library.resolvePlaylistsDuplicates(duplicates: duplicates)
-                    asyncCompanion.saveContext()
-                }.catch { error in }
+                }
             }
             
             os_log("stopped", log: self.log, type: .info)

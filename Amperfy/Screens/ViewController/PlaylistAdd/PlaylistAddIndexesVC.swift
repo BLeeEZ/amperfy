@@ -58,11 +58,11 @@ class PlaylistAddIndexesVC: SingleFetchedResultsTableViewController<DirectoryMO>
         updateTitle()
         
         guard appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.syncIndexes(musicFolder: musicFolder)
-        }.catch { error in
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.syncIndexes(musicFolder: musicFolder)
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Indexes Sync", error: error)
-        }
+        }}
     }
     
     func updateTitle() {

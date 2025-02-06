@@ -80,50 +80,50 @@ class MOCK_AlertDisplayable: AlertDisplayable {
 }
 
 class MOCK_LibrarySyncer: LibrarySyncer {
-    func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void> { return Promise.value }
-    func sync(genre: Genre) -> Promise<Void> { return Promise.value }
-    func sync(artist: Artist) -> Promise<Void> { return Promise.value }
-    func sync(album: Album) -> Promise<Void> { return Promise.value }
-    func sync(song: Song) -> Promise<Void> { return Promise.value }
-    func sync(podcast: Podcast) -> Promise<Void> { return Promise.value }
-    func syncNewestPodcastEpisodes() -> Promise<Void> { return Promise.value }
-    func syncNewestAlbums(offset: Int, count: Int) -> Promise<Void> { return Promise.value }
-    func syncRecentAlbums(offset: Int, count: Int) -> Promise<Void> { return Promise.value }
-    func syncFavoriteLibraryElements() -> Promise<Void> { return Promise.value }
-    func syncRadios() -> Promise<Void> { return Promise.value }
-    func syncDownPlaylistsWithoutSongs() -> Promise<Void> { return Promise.value }
-    func syncDown(playlist: Playlist) -> Promise<Void> { return Promise.value }
-    func syncUpload(playlistToUpdateName playlist: Playlist) -> Promise<Void> { return Promise.value }
-    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song]) -> Promise<Void> { return Promise.value }
-    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int) -> Promise<Void> { return Promise.value }
-    func syncUpload(playlistToUpdateOrder playlist: Playlist) -> Promise<Void> { return Promise.value }
-    func syncUpload(playlistIdToDelete id: String) -> Promise<Void> { return Promise.value }
-    func syncDownPodcastsWithoutEpisodes() -> Promise<Void> { return Promise.value }
-    func searchArtists(searchText: String) -> Promise<Void> { return Promise.value }
-    func searchAlbums(searchText: String) -> Promise<Void> { return Promise.value }
-    func searchSongs(searchText: String) -> Promise<Void> { return Promise.value }
-    func syncMusicFolders() -> Promise<Void> { return Promise.value }
-    func syncIndexes(musicFolder: MusicFolder) -> Promise<Void> { return Promise.value }
-    func sync(directory: Directory) -> Promise<Void> { return Promise.value }
-    func requestRandomSongs(playlist: Playlist, count: Int) -> Promise<Void> { return Promise.value }
-    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) -> Promise<Void> { return Promise.value }
-    func syncNowPlaying(song: Song, songPosition: NowPlayingSongPosition) -> Promise<Void> { return Promise.value }
-    func scrobble(song: Song, date: Date?) -> Promise<Void> { return Promise.value }
-    func setRating(song: Song, rating: Int) -> Promise<Void> { return Promise.value }
-    func setRating(album: Album, rating: Int) -> Promise<Void> { return Promise.value }
-    func setRating(artist: Artist, rating: Int) -> Promise<Void> { return Promise.value }
-    func setFavorite(song: Song, isFavorite: Bool) -> Promise<Void> { return Promise.value }
-    func setFavorite(album: Album, isFavorite: Bool) -> Promise<Void> { return Promise.value }
-    func setFavorite(artist: Artist, isFavorite: Bool) -> Promise<Void> { return Promise.value }
-    func parseLyrics(relFilePath: URL) -> Promise<LyricsList> { return Promise<LyricsList>.value(LyricsList()) }
+    func syncInitial(statusNotifyier: SyncCallbacks?) async throws { }
+    func sync(genre: Genre) async throws { }
+    func sync(artist: Artist) async throws { }
+    func sync(album: Album) async throws { }
+    func sync(song: Song) async throws { }
+    func sync(podcast: Podcast) async throws { }
+    func syncNewestPodcastEpisodes() async throws { }
+    func syncNewestAlbums(offset: Int, count: Int) async throws { }
+    func syncRecentAlbums(offset: Int, count: Int) async throws { }
+    func syncFavoriteLibraryElements() async throws { }
+    func syncRadios() async throws { }
+    func syncDownPlaylistsWithoutSongs() async throws { }
+    func syncDown(playlist: Playlist) async throws { }
+    func syncUpload(playlistToUpdateName playlist: Playlist) async throws { }
+    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song]) async throws { }
+    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int) async throws { }
+    func syncUpload(playlistToUpdateOrder playlist: Playlist) async throws { }
+    func syncUpload(playlistIdToDelete id: String) async throws { }
+    func syncDownPodcastsWithoutEpisodes() async throws { }
+    func searchArtists(searchText: String) async throws { }
+    func searchAlbums(searchText: String) async throws { }
+    func searchSongs(searchText: String) async throws { }
+    func syncMusicFolders() async throws { }
+    func syncIndexes(musicFolder: MusicFolder) async throws { }
+    func sync(directory: Directory) async throws { }
+    func requestRandomSongs(playlist: Playlist, count: Int) async throws { }
+    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) async throws { }
+    func syncNowPlaying(song: Song, songPosition: NowPlayingSongPosition) async throws { }
+    func scrobble(song: Song, date: Date?) async throws { }
+    func setRating(song: Song, rating: Int) async throws { }
+    func setRating(album: Album, rating: Int) async throws { }
+    func setRating(artist: Artist, rating: Int) async throws { }
+    func setFavorite(song: Song, isFavorite: Bool) async throws { }
+    func setFavorite(album: Album, isFavorite: Bool) async throws { }
+    func setFavorite(artist: Artist, isFavorite: Bool) async throws { }
+    func parseLyrics(relFilePath: URL) async throws -> LyricsList { return LyricsList() }
 }
 
 class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
     var requestPredicate: NSPredicate { return NSPredicate.alwaysTrue }
     var parallelDownloadsCount = 2
-    func prepareDownload(download: Download) -> Promise<URL> { return Promise(error: BackendError.notSupported) }
+    func prepareDownload(download: Download) async throws -> URL { throw BackendError.notSupported }
     func validateDownloadedData(download: Download) -> ResponseError? { return nil }
-    func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> { return Guarantee.value }
+    func completedDownload(download: Download, storage: PersistentStorage) async { }
     func failedDownload(download: Download, storage: PersistentStorage) {}
 }
 
@@ -132,10 +132,10 @@ class MOCK_BackendApi: BackendApi {
     var serverApiVersion: String = ""
     var isStreamingTranscodingActive: Bool = true
     func provideCredentials(credentials: LoginCredentials) {}
-    func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> { return Promise(error: BackendError.notSupported) }
-    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> { return Helper.urlPromise }
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> { return Helper.urlPromise }
-    func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> { return Helper.urlPromise }
+    func isAuthenticationValid(credentials: LoginCredentials) async throws { throw BackendError.notSupported }
+    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL { return Helper.testURL }
+    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL { return Helper.testURL }
+    func generateUrl(forArtwork artwork: Artwork) async throws -> URL { return Helper.testURL }
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError? { return nil }
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer { return MOCK_LibrarySyncer() }
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }

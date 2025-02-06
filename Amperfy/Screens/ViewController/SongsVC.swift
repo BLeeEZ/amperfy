@@ -135,11 +135,12 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         case .newest, .recent:
             break
         case .favorites:
-            firstly {
-                self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Favorite Songs Sync", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Favorite Songs Sync", error: error)
+                }
                 self.updateSearchResults(for: self.searchController)
             }
         }
@@ -205,11 +206,11 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     override func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            firstly {
-                self.appDelegate.librarySyncer.searchSongs(searchText: searchText)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.searchSongs(searchText: searchText)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
-            }
+            }}
             fetchedResultsController.search(searchText: searchText, onlyCachedSongs: false, displayFilter: displayFilter)
         } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
             fetchedResultsController.search(searchText: searchText, onlyCachedSongs: true, displayFilter: displayFilter)
@@ -316,15 +317,16 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             #endif
             return
         }
-        firstly {
-            AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                .syncNewestLibraryElements()
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Songs Newest Elements Sync", error: error)
-        }.finally {
-            #if !targetEnvironment(macCatalyst)
+        Task { @MainActor in
+            do {
+                try await AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    .syncNewestLibraryElements()
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Songs Newest Elements Sync", error: error)
+            }
+#if !targetEnvironment(macCatalyst)
             self.refreshControl?.endRefreshing()
-            #endif
+#endif
         }
     }
     

@@ -48,11 +48,11 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         guard appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.syncIndexes(musicFolder: musicFolder)
-        }.catch { error in
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.syncIndexes(musicFolder: musicFolder)
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Indexes Sync", error: error)
-        }
+        }}
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

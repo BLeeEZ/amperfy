@@ -153,14 +153,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func configureBackgroundFetch() {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: Self.refreshTaskId, using: nil) { task in
             os_log("Perform task: %s", log: self.log, type: .info, Self.refreshTaskId)
-            firstly {
-                self.backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
-            }.done {
-                task.setTaskCompleted(success: true)
-            }.catch { error in
-                task.setTaskCompleted(success: false)
-                self.eventLogger.error(topic: "Background Task", statusCode: .connectionError, message: error.localizedDescription, displayPopup: false)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await self.backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
+                    task.setTaskCompleted(success: true)
+                } catch {
+                    task.setTaskCompleted(success: false)
+                    self.eventLogger.error(topic: "Background Task", statusCode: .connectionError, message: error.localizedDescription, displayPopup: false)
+                }
                 self.userStatistics.backgroundFetchPerformed(result: UIBackgroundFetchResult.newData)
                 self.scheduleAppRefresh()
             }

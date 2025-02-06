@@ -331,9 +331,9 @@ extension AbstractPlayable: PlayableContainable  {
             return .podcast
         }
     }
-    public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
-        guard let song = asSong else { return Promise.value }
-        return librarySyncer.sync(song: song)
+    @MainActor public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) async throws {
+        guard let song = asSong else { return }
+        try await librarySyncer.sync(song: song)
     }
     public var isRateable: Bool {
         switch derivedType {
@@ -351,13 +351,15 @@ extension AbstractPlayable: PlayableContainable  {
             return false
         }
     }
-    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
-        guard let song = asSong else { return Promise.value}
-        guard let context = song.managedObject.managedObjectContext else { return Promise<Void>(error: BackendError.persistentSaveFailed) }
+    @MainActor public func remoteToggleFavorite(syncer: LibrarySyncer) async throws {
+        guard let song = asSong else { return }
+        guard let context = song.managedObject.managedObjectContext else {
+            throw BackendError.persistentSaveFailed
+        }
         isFavorite.toggle()
         let library = LibraryStorage(context: context)
         library.saveContext()
-        return syncer.setFavorite(song: song, isFavorite: isFavorite)
+        try await syncer.setFavorite(song: song, isFavorite: isFavorite)
     }
     public var isDownloadAvailable: Bool {
         switch derivedType {

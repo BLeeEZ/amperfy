@@ -129,13 +129,12 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
               let song = player.currentlyPlaying?.asSong
         else { return }
 
-        firstly {
-            self.appDelegate.librarySyncer.sync(song: song)
-        }.done {
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.sync(song: song)
             self.refreshCurrentlyPlayingInfoView()
-        }.catch { error in
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
-        }
+        }}
     }
 
     #if targetEnvironment(macCatalyst)
@@ -164,11 +163,12 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
         case .music:
             guard let playableInfo = player.currentlyPlaying else { return }
             if playableInfo.isSong {
-                firstly {
-                    playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
-                }.finally {
+                Task { @MainActor in
+                    do {
+                        try await playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+                    } catch {
+                        self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+                    }
                     self.refresh()
                 }
             } else if let radio = playableInfo.asRadio,

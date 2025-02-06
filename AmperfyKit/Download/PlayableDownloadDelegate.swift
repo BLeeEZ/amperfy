@@ -46,15 +46,11 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
         return 4
     }
     
-    func prepareDownload(download: Download) -> Promise<URL> {
-        return Promise<AbstractPlayable> { seal in
-            guard let playable = download.element as? AbstractPlayable else { throw DownloadError.fetchFailed }
-            guard !playable.isCached else { throw DownloadError.alreadyDownloaded }
-            guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
-            seal.fulfill(playable)
-        }.then { playable in
-            self.backendApi.generateUrl(forDownloadingPlayable: playable)
-        }
+    @MainActor func prepareDownload(download: Download) async throws -> URL {
+        guard let playable = download.element as? AbstractPlayable else { throw DownloadError.fetchFailed }
+        guard !playable.isCached else { throw DownloadError.alreadyDownloaded }
+        guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
+        return try await self.backendApi.generateUrl(forDownloadingPlayable: playable)
     }
     
     func validateDownloadedData(download: Download) -> ResponseError? {
@@ -62,31 +58,26 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
             return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: backendApi), data: nil)
         }
         guard let data = fileManager.getFileDataIfNotToBig(url: fileURL, maxFileSize: Self.maxFileSizeOfErrorResponse) else { return nil }
-        return backendApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url, meta: nil))
+        return backendApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url))
     }
 
-    func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
-        return Guarantee<Void> { seal in
-            guard let fileURL = download.fileURL,
-                  let playable = download.element as? AbstractPlayable,
-                  let url = download.url else {
-                return seal(Void())
-            }
-            firstly {
-                self.savePlayableDataAsync(playable: playable, downloadUrl: url, fileURL: fileURL, fileMimeType: download.mimeType, storage: storage)
-            }.then {
-                self.artworkExtractor.extractEmbeddedArtwork(storage: storage, playable: playable)
-            }.catch { error in
-                // no error possible
-            }.finally {
-                seal(Void())
-            }
+    @MainActor func completedDownload(download: Download, storage: PersistentStorage) async {
+        guard let fileURL = download.fileURL,
+              let playable = download.element as? AbstractPlayable,
+              let url = download.url else {
+            return
+        }
+        do {
+            try await self.savePlayableDataAsync(playable: playable, downloadUrl: url, fileURL: fileURL, fileMimeType: download.mimeType, storage: storage)
+            try await self.artworkExtractor.extractEmbeddedArtwork(storage: storage, playable: playable)
+        } catch {
+            // ignore errors
         }
     }
     
     /// save downloaded playable async to avoid memory overflow issues due to kept references
-    func savePlayableDataAsync(playable: AbstractPlayable, downloadUrl: URL, fileURL: URL, fileMimeType: String?, storage: PersistentStorage) -> Promise<Void> {
-        return storage.async.perform { companion in
+    @MainActor func savePlayableDataAsync(playable: AbstractPlayable, downloadUrl: URL, fileURL: URL, fileMimeType: String?, storage: PersistentStorage) async throws {
+        try await storage.async.perform { companion in
             guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else { return }
             let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
             playableAsync.contentTypeTranscoded = fileMimeType

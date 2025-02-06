@@ -88,11 +88,12 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
-        firstly {
-            podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
+            }
             self.detailOperationsView?.refresh()
         }
     }
@@ -119,11 +120,12 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        firstly {
-            self.appDelegate.librarySyncer.sync(podcast: self.podcast)
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await self.appDelegate.librarySyncer.sync(podcast: self.podcast)
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
+            }
             self.detailOperationsView?.refresh()
             self.tableView.visibleCells.forEach{ ($0 as! PodcastEpisodeTableCell).refresh() }
             self.refreshControl?.endRefreshing()

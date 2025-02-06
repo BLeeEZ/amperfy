@@ -30,7 +30,6 @@ public class MOCK_PerformanceMonitor: ThreadPerformanceMonitor {
 
 class Helper {
     static let testURL = URL(string: "https://github.com/BLeeEZ/amperfy")!
-    static let urlPromise = Promise<URL>.value(testURL)
 }
 
 extension XCTestCase {

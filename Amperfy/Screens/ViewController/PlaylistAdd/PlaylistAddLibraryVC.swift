@@ -198,14 +198,14 @@ public class AddToPlaylistManager {
         func uploadPlaylistChanges() {
             self.rootView?.dismiss(animated: true, completion: nil)
             
-            firstly {
-                self.appDelegate.librarySyncer.syncUpload(playlistToAddSongs: playlist, songs: songsToAdd)
-            }.done {
-                self.playlist.append(playables: songsToAdd)
-                self.onDoneCB?()
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Add Songs to Playlist", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await self.appDelegate.librarySyncer.syncUpload(playlistToAddSongs: playlist, songs: songsToAdd)
+                    self.playlist.append(playables: songsToAdd)
+                    self.onDoneCB?()
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Add Songs to Playlist", error: error)
+                }
                 if songsToAdd.count > Self.warningElementsToAddCount {
                     self.appDelegate.eventLogger.info(topic: "Add Songs to Playlist", message: "The Playlist \"\(self.playlist.name)\" has been successfully synced to the server.")
                 }

@@ -85,16 +85,13 @@ class AmpacheXmlServerApi: URLCleanser {
     private var authHandshake: AuthentificationHandshake?
     private let persistentStorage: PersistentStorage
     
-    func requestServerPodcastSupport() -> Promise<Bool> {
-        return firstly {
-            reauthenticate()
-        }.then { auth -> Promise<Bool> in
-            var isPodcastSupported = false
-            if let serverApi = self.serverApiVersion, let serverApiInt = Int(serverApi) {
-                isPodcastSupported = serverApiInt >= 420000
-            }
-            return Promise<Bool>.value(isPodcastSupported)
+    @MainActor public func requestServerPodcastSupport() async throws -> Bool {
+        let _ = try await reauthenticate()
+        var isPodcastSupported = false
+        if let serverApi = self.serverApiVersion, let serverApiInt = Int(serverApi) {
+            isPodcastSupported = serverApiInt >= 420000
         }
+        return isPodcastSupported
     }
     
     init(performanceMonitor: ThreadPerformanceMonitor,eventLogger: EventLogger, persistentStorage: PersistentStorage) {
@@ -145,51 +142,43 @@ class AmpacheXmlServerApi: URLCleanser {
         self.credentials = credentials
     }
     
-    private func authenticate(credentials: LoginCredentials) -> Promise<AuthentificationHandshake> {
-        return Promise<AuthentificationHandshake> { seal in
-            firstly {
-                requestAuth(credentials: credentials)
-            }.done { auth in
-                self.authHandshake = auth
-                seal.fulfill(auth)
-            }.catch { error in
-                self.authHandshake = nil
-                seal.reject(error)
-            }
+    @MainActor private func authenticate(credentials: LoginCredentials) async throws -> AuthentificationHandshake {
+        do {
+            let auth = try await requestAuth(credentials: credentials)
+            self.authHandshake = auth
+            return auth
+        } catch {
+            self.authHandshake = nil
+            throw error
         }
     }
     
-    func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
-        return requestAuth(credentials: credentials).asVoid()
+    @MainActor func isAuthenticationValid(credentials: LoginCredentials) async throws {
+        try await requestAuth(credentials: credentials)
     }
     
-    private func requestAuth(credentials: LoginCredentials) -> Promise<AuthentificationHandshake> {
-        return firstly {
-            createAuthURL(credentials: credentials)
-        }.then { url in
-            self.request(url: url)
-        }.then { response in
-            self.parseAuthResult(response: response)
-        }
+    @discardableResult
+    @MainActor private func requestAuth(credentials: LoginCredentials) async throws -> AuthentificationHandshake {
+        let url = try await createAuthURL(credentials: credentials)
+        let response = try await request(url: url)
+        return try await self.parseAuthResult(response: response)
     }
     
-    private func createAuthURL(credentials: LoginCredentials) -> Promise<URL> {
-        return Promise<URL> { seal in
-            let timestamp = Int(NSDate().timeIntervalSince1970)
-            let passphrase = generatePassphrase(passwordHash: credentials.passwordHash, timestamp: timestamp)
+    @MainActor private func createAuthURL(credentials: LoginCredentials) async throws -> URL {
+        let timestamp = Int(NSDate().timeIntervalSince1970)
+        let passphrase = generatePassphrase(passwordHash: credentials.passwordHash, timestamp: timestamp)
 
-            guard let apiUrl = createApiUrl(providedCredentials: credentials), var urlComp = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false) else { throw BackendError.invalidUrl }
-            urlComp.addQueryItem(name: "action", value: "handshake")
-            urlComp.addQueryItem(name: "auth", value: passphrase)
-            urlComp.addQueryItem(name: "timestamp", value: timestamp)
-            urlComp.addQueryItem(name: "version", value: clientApiVersion)
-            urlComp.addQueryItem(name: "user", value: credentials.username)
-            guard let url = urlComp.url else {
-                os_log("Ampache authentication url is invalid: %s", log: log, type: .error, urlComp.description)
-                throw BackendError.invalidUrl
-            }
-            seal.fulfill(url)
+        guard let apiUrl = createApiUrl(providedCredentials: credentials), var urlComp = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false) else { throw BackendError.invalidUrl }
+        urlComp.addQueryItem(name: "action", value: "handshake")
+        urlComp.addQueryItem(name: "auth", value: passphrase)
+        urlComp.addQueryItem(name: "timestamp", value: timestamp)
+        urlComp.addQueryItem(name: "version", value: clientApiVersion)
+        urlComp.addQueryItem(name: "user", value: credentials.username)
+        guard let url = urlComp.url else {
+            os_log("Ampache authentication url is invalid: %s", log: log, type: .error, urlComp.description)
+            throw BackendError.invalidUrl
         }
+        return url
     }
     
     func cleanse(url: URL) -> CleansedURL {
@@ -218,43 +207,41 @@ class AmpacheXmlServerApi: URLCleanser {
         return CleansedURL(urlString: urlComp.string ?? "")
     }
     
-    private func parseAuthResult(response: APIDataResponse) -> Promise<AuthentificationHandshake> {
-        return Promise<AuthentificationHandshake> { seal in
-            let parser = XMLParser(data: response.data)
-            let curDelegate = AuthParserDelegate(performanceMonitor: self.performanceMonitor)
-            parser.delegate = curDelegate
-            let success = parser.parse()
-            if let serverApiVersion = curDelegate.serverApiVersion {
-                self.serverApiVersion = serverApiVersion
-            }
-            if let error = parser.parserError {
-                os_log("Error during AuthPars: %s", log: self.log, type: .error, error.localizedDescription)
-                throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
-            }
-            if success, let auth = curDelegate.authHandshake {
-                return seal.fulfill(auth)
-            } else {
-                self.authHandshake = nil
-                os_log("Couldn't get a login token.", log: self.log, type: .error)
-                if let apiError = curDelegate.error {
-                    throw apiError
-                }
-                throw AuthenticationError.notAbleToLogin
-            }
+    @MainActor private func parseAuthResult(response: APIDataResponse) async throws -> AuthentificationHandshake {
+        let parser = XMLParser(data: response.data)
+        let curDelegate = AuthParserDelegate(performanceMonitor: self.performanceMonitor)
+        parser.delegate = curDelegate
+        let success = parser.parse()
+        if let serverApiVersion = curDelegate.serverApiVersion {
+            self.serverApiVersion = serverApiVersion
         }
-    }
-    
-    private func reauthenticate() -> Promise<AuthentificationHandshake> {
-        if let auth = authHandshake, isAuthenticated(auth: auth) {
-            return Promise<AuthentificationHandshake>.value(auth)
+        if let error = parser.parserError {
+            os_log("Error during AuthPars: %s", log: self.log, type: .error, error.localizedDescription)
+            throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
+        }
+        if success, let auth = curDelegate.authHandshake {
+            return auth
         } else {
-            guard let cred = credentials else { return Promise(error: BackendError.noCredentials) }
-            return authenticate(credentials: cred)
+            self.authHandshake = nil
+            os_log("Couldn't get a login token.", log: self.log, type: .error)
+            if let apiError = curDelegate.error {
+                throw apiError
+            }
+            throw AuthenticationError.notAbleToLogin
         }
     }
     
-    func requestDefaultArtwork() -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor private func reauthenticate() async throws -> AuthentificationHandshake {
+        if let auth = authHandshake, isAuthenticated(auth: auth) {
+            return auth
+        } else {
+            guard let cred = credentials else { throw BackendError.noCredentials }
+            return try await authenticate(credentials: cred)
+        }
+    }
+    
+    @MainActor public func requestDefaultArtwork() async throws -> APIDataResponse {
+        return try await request { auth in
             guard let hostname = self.credentials?.serverUrl,
                   var url = URL(string: hostname)
             else { throw BackendError.invalidUrl }
@@ -269,24 +256,24 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestCatalogs() -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestCatalogs() async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "catalogs")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestGenres() -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestGenres() async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "genres")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestArtists(startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestArtists(startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) async throws -> APIDataResponse {
+        return try await request { auth in
             let offset = startIndex < auth.artistCount ? startIndex : auth.artistCount-1
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "artists")
@@ -296,8 +283,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestArtistWithinCatalog(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestArtistWithinCatalog(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "advanced_search")
             urlComp.addQueryItem(name: "rule_1", value: "catalog")
@@ -308,8 +295,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestArtistInfo(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestArtistInfo(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "artist")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -317,8 +304,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestArtistAlbums(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestArtistAlbums(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "artist_albums")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -326,8 +313,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestArtistSongs(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestArtistSongs(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "artist_songs")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -335,8 +322,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestAlbumInfo(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestAlbumInfo(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "album")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -344,8 +331,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestAlbumSongs(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestAlbumSongs(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "album_songs")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -353,8 +340,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestSongInfo(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestSongInfo(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "song")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -362,8 +349,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
 
-    func requestAlbums(startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestAlbums(startIndex: Int, pollCount: Int = maxItemCountToPollAtOnce) async throws -> APIDataResponse {
+        return try await request { auth in
             let offset = startIndex < auth.albumCount ? startIndex : auth.albumCount-1
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "albums")
@@ -373,8 +360,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestRandomSongs(count: Int) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestRandomSongs(count: Int) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_generate")
             urlComp.addQueryItem(name: "mode", value: "random")
@@ -384,8 +371,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
 
-    func requestPodcastEpisodeDelete(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPodcastEpisodeDelete(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "podcast_episode_delete")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -393,8 +380,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestFavoriteArtists() -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestFavoriteArtists() async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "advanced_search")
             urlComp.addQueryItem(name: "rule_1", value: "favorite")
@@ -405,8 +392,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestFavoriteAlbums() -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestFavoriteAlbums() async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "advanced_search")
             urlComp.addQueryItem(name: "rule_1", value: "favorite")
@@ -417,8 +404,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestFavoriteSongs() -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestFavoriteSongs() async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "advanced_search")
             urlComp.addQueryItem(name: "rule_1", value: "favorite")
@@ -429,8 +416,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestNewestAlbums(offset: Int, count: Int) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestNewestAlbums(offset: Int, count: Int) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "stats")
             urlComp.addQueryItem(name: "type", value: "album")
@@ -441,8 +428,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestRecentAlbums(offset: Int, count: Int) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestRecentAlbums(offset: Int, count: Int) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "stats")
             urlComp.addQueryItem(name: "type", value: "album")
@@ -453,16 +440,16 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestPlaylists() -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPlaylists() async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlists")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestPlaylist(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPlaylist(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -470,8 +457,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestPlaylistSongs(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPlaylistSongs(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_songs")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -479,8 +466,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestPlaylistCreate(name: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPlaylistCreate(name: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_create")
             urlComp.addQueryItem(name: "name", value: name)
@@ -489,8 +476,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestPlaylistDelete(id: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPlaylistDelete(id: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_delete")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -498,8 +485,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestPlaylistAddSong(playlistId: String, songId: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPlaylistAddSong(playlistId: String, songId: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_add_song")
             urlComp.addQueryItem(name: "filter", value: playlistId)
@@ -508,8 +495,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestPlaylistDeleteItem(id: String, index: Int) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPlaylistDeleteItem(id: String, index: Int) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_remove_song")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -518,8 +505,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestPlaylistEditOnlyName(id: String, name: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPlaylistEditOnlyName(id: String, name: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_edit")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -528,8 +515,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestPlaylistEdit(id: String, songsIds: [String]) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPlaylistEdit(id: String, songsIds: [String]) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "playlist_edit")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -539,24 +526,24 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestRadios() -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestRadios() async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "live_streams")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestPodcasts() -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPodcasts() async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "podcasts")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    func requestPodcastEpisodes(id: String, limit: Int? = nil) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestPodcastEpisodes(id: String, limit: Int? = nil) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "podcast_episodes")
             urlComp.addQueryItem(name: "filter", value: id)
@@ -567,8 +554,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestRecordPlay(songId: String, date: Date?) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestRecordPlay(songId: String, date: Date?) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "record_play")
             if let username = self.credentials?.username {
@@ -582,8 +569,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestRate(songId: String, rating: Int) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestRate(songId: String, rating: Int) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "rate")
             urlComp.addQueryItem(name: "type", value: "song")
@@ -593,8 +580,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestRate(albumId: String, rating: Int) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestRate(albumId: String, rating: Int) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "rate")
             urlComp.addQueryItem(name: "type", value: "album")
@@ -604,8 +591,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestRate(artistId: String, rating: Int) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestRate(artistId: String, rating: Int) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "rate")
             urlComp.addQueryItem(name: "type", value: "artist")
@@ -615,8 +602,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
 
-    func requestSetFavorite(songId: String, isFavorite: Bool) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestSetFavorite(songId: String, isFavorite: Bool) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "flag")
             urlComp.addQueryItem(name: "type", value: "song")
@@ -626,8 +613,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestSetFavorite(albumId: String, isFavorite: Bool) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestSetFavorite(albumId: String, isFavorite: Bool) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "flag")
             urlComp.addQueryItem(name: "type", value: "album")
@@ -637,8 +624,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestSetFavorite(artistId: String, isFavorite: Bool) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestSetFavorite(artistId: String, isFavorite: Bool) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "flag")
             urlComp.addQueryItem(name: "type", value: "artist")
@@ -648,8 +635,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestSearchArtists(searchText: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestSearchArtists(searchText: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "artists")
             urlComp.addQueryItem(name: "filter", value: searchText)
@@ -658,8 +645,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestSearchAlbums(searchText: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestSearchAlbums(searchText: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "albums")
             urlComp.addQueryItem(name: "filter", value: searchText)
@@ -668,8 +655,8 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    func requestSearchSongs(searchText: String) -> Promise<APIDataResponse> {
-        return request { auth in
+    @MainActor public func requestSearchSongs(searchText: String) async throws -> APIDataResponse {
+        return try await request { auth in
             var urlComp = try self.createAuthApiUrlComponent(auth: auth)
             urlComp.addQueryItem(name: "action", value: "search_songs")
             urlComp.addQueryItem(name: "filter", value: searchText)
@@ -686,74 +673,74 @@ class AmpacheXmlServerApi: URLCleanser {
         }
     }
     
-    private func request(url: URL) -> Promise<APIDataResponse> {
-        return firstly {
-            AF.request(url, method: .get).validate().responseData()
-        }.then { data, response in
-            Promise<APIDataResponse>.value(APIDataResponse(data: data, url: url, meta: response))
+    @MainActor private func request(url: URL) async throws -> APIDataResponse {
+        try await withUnsafeThrowingContinuation { continuation in
+            AF.request(url, method: .get).validate().responseData { response in
+                
+                if let data = response.data {
+                    continuation.resume(returning: APIDataResponse(data: data, url: url))
+                    return
+                }
+                if let err = response.error {
+                    continuation.resume(throwing: err)
+                    return
+                }
+                fatalError("should not get here")
+            }
         }
     }
 
-    func requesetLibraryMetaData() -> Promise<AuthentificationHandshake> {
-        return reauthenticate()
+    @MainActor func requesetLibraryMetaData() async throws -> AuthentificationHandshake {
+        return try await reauthenticate()
     }
     
-    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> {
-        return firstly {
-            reauthenticate()
-        }.then { auth in
-            return Promise<URL> { seal in
-                var urlComp = try self.createAuthApiUrlComponent(auth: auth)
-                urlComp.addQueryItem(name: "action", value: "download")
-                urlComp.addQueryItem(name: "type", value: playable.isSong ? "song" : "podcast_episode")
-                urlComp.addQueryItem(name: "id", value: playable.id)
-                switch self.persistentStorage.settings.cacheTranscodingFormatPreference {
-                case .mp3:
-                    urlComp.addQueryItem(name: "format", value: "mp3")
-                default:
-                    urlComp.addQueryItem(name: "format", value: "raw")
-                }
-                let url = try self.createUrl(from: urlComp)
-                seal.fulfill(url)
-            }
+    @MainActor public func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL {
+        let auth = try await reauthenticate()
+        
+        var urlComp = try self.createAuthApiUrlComponent(auth: auth)
+        urlComp.addQueryItem(name: "action", value: "download")
+        urlComp.addQueryItem(name: "type", value: playable.isSong ? "song" : "podcast_episode")
+        urlComp.addQueryItem(name: "id", value: playable.id)
+        switch self.persistentStorage.settings.cacheTranscodingFormatPreference {
+        case .mp3:
+            urlComp.addQueryItem(name: "format", value: "mp3")
+        default:
+            urlComp.addQueryItem(name: "format", value: "raw")
         }
+        return try self.createUrl(from: urlComp)
     }
     
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> {
-        return firstly {
-            reauthenticate()
-        }.then { auth in
-            return Promise<URL> { seal in
-                var urlComp = try self.createAuthApiUrlComponent(auth: auth)
-                urlComp.addQueryItem(name: "action", value: "stream")
-                urlComp.addQueryItem(name: "type", value: playable.isSong ? "song" : "podcast_episode")
-                urlComp.addQueryItem(name: "id", value: playable.id)
-                switch self.persistentStorage.settings.streamingFormatPreference {
-                case .mp3:
-                    urlComp.addQueryItem(name: "format", value: "mp3")
-                case .raw:
-                    urlComp.addQueryItem(name: "format", value: "raw")
-                case .serverConfig:
-                    break // do nothing
-                }
-                switch maxBitrate {
-                case .noLimit:
-                    break
-                default:
-                    urlComp.addQueryItem(name: "bitrate", value: maxBitrate.rawValue)
-                }
-                urlComp.addQueryItem(name: "length", value: 1)
-                let url = try self.createUrl(from: urlComp)
-                seal.fulfill(url)
-            }
+    @MainActor public func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL {
+        let auth = try await reauthenticate()
+        
+        var urlComp = try createAuthApiUrlComponent(auth: auth)
+        urlComp.addQueryItem(name: "action", value: "stream")
+        urlComp.addQueryItem(name: "type", value: playable.isSong ? "song" : "podcast_episode")
+        urlComp.addQueryItem(name: "id", value: playable.id)
+        switch persistentStorage.settings.streamingFormatPreference {
+        case .mp3:
+            urlComp.addQueryItem(name: "format", value: "mp3")
+        case .raw:
+            urlComp.addQueryItem(name: "format", value: "raw")
+        case .serverConfig:
+            break // do nothing
         }
+        switch maxBitrate {
+        case .noLimit:
+            break
+        default:
+            urlComp.addQueryItem(name: "bitrate", value: maxBitrate.rawValue)
+        }
+        urlComp.addQueryItem(name: "length", value: 1)
+        let url = try createUrl(from: urlComp)
+        return url
     }
     
-    func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
-        return self.updateUrlToken(urlString: artwork.url)
+    @MainActor public func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
+        return try await self.updateUrlToken(urlString: artwork.url)
     }
     
-    func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+    public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
         let errorParser = AmpacheXmlParser(performanceMonitor: self.performanceMonitor)
         let parser = XMLParser(data: response.data)
         parser.delegate = errorParser
@@ -762,40 +749,33 @@ class AmpacheXmlServerApi: URLCleanser {
         return ResponseError.createFromAmpacheError(cleansedURL: response.url?.asCleansedURL(cleanser: self), error: ampacheError, data: response.data)
     }
     
-    func updateUrlToken(urlString: String) -> Promise<URL> {
-        return firstly {
-            reauthenticate()
-        }.then { auth -> Promise<URL> in
-            guard
-                let inputUrlComp = URLComponents(string: urlString),
-                let inputUrl = URL(string: urlString),
-                var outputUrlComp = try? self.createAuthApiUrlComponent(auth: auth),
-                let queryItems = inputUrlComp.queryItems
-            else { throw BackendError.invalidUrl }
-            
-            var outputItems = [URLQueryItem]()
-            for queryItem in queryItems {
-                if queryItem.name.isContainedIn(["ssid", "auth"]) {
-                    outputItems.append(URLQueryItem(name: queryItem.name, value: auth.token))
-                } else {
-                    outputItems.append(queryItem)
-                }
+    @MainActor private func updateUrlToken(urlString: String) async throws -> URL {
+        let auth = try await reauthenticate()
+        guard
+            let inputUrlComp = URLComponents(string: urlString),
+            let inputUrl = URL(string: urlString),
+            var outputUrlComp = try? self.createAuthApiUrlComponent(auth: auth),
+            let queryItems = inputUrlComp.queryItems
+        else { throw BackendError.invalidUrl }
+        
+        var outputItems = [URLQueryItem]()
+        for queryItem in queryItems {
+            if queryItem.name.isContainedIn(["ssid", "auth"]) {
+                outputItems.append(URLQueryItem(name: queryItem.name, value: auth.token))
+            } else {
+                outputItems.append(queryItem)
             }
-            
-            outputUrlComp.queryItems = outputItems
-            outputUrlComp.path = inputUrl.path
-            return Promise<URL>.value(try self.createUrl(from: outputUrlComp))
         }
+        
+        outputUrlComp.queryItems = outputItems
+        outputUrlComp.path = inputUrl.path
+        return try self.createUrl(from: outputUrlComp)
     }
     
-    private func request(urlCreation: @escaping (_: AuthentificationHandshake) throws -> URL) -> Promise<APIDataResponse> {
-        return firstly {
-            reauthenticate()
-        }.then { auth in
-            Promise<URL> { seal in seal.fulfill(try urlCreation(auth)) }
-        }.then { url in
-            self.request(url: url)
-        }
+    @MainActor private func request(urlCreation: @escaping (_: AuthentificationHandshake) throws -> URL) async throws -> APIDataResponse {
+        let auth = try await reauthenticate()
+        let url = try urlCreation(auth)
+        return try await self.request(url: url)
     }
     
 }

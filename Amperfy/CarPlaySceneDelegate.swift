@@ -940,11 +940,11 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
             albumsNewestCachedSection.updateSections([CPListSection(items: createAlbumItems(from: albumsNewestCachedFetchController, onlyCached: true))])
         } else if aTemplate == albumsRecentSection {
             os_log("CarPlay: templateWillAppear albumsRecentSection", log: self.log, type: .info)
-            firstly {
-                self.appDelegate.librarySyncer.syncRecentAlbums(offset: 0, count: AmperKit.newestElementsFetchCount)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.syncRecentAlbums(offset: 0, count: AmperKit.newestElementsFetchCount)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
-            }
+            }}
             if albumsRecentFetchController == nil { createAlbumsRecentFetchController() }
             albumsRecentSection.updateSections([CPListSection(items: createAlbumItems(from: albumsRecentFetchController, onlyCached: isOfflineMode))])
         } else if aTemplate == albumsRecentCachedSection {
@@ -961,19 +961,19 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
             songsFavoriteCachedSection.updateSections([CPListSection(items: createSongItems(from: songsFavoritesCachedFetchController))])
         } else if aTemplate == playlistDetailSection, let playlistDetailFetchController = playlistDetailFetchController {
             os_log("CarPlay: templateWillAppear playlistDetailSection", log: self.log, type: .info)
-            firstly {
-                playlistDetailFetchController.playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await playlistDetailFetchController.playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
-            }
+            }}
             playlistDetailSection?.updateSections([CPListSection(items: createPlaylistDetailItems(from: playlistDetailFetchController))])
         } else if aTemplate == podcastDetailSection, let podcastDetailFetchController = podcastDetailFetchController {
             os_log("CarPlay: templateWillAppear podcastDetailSection", log: self.log, type: .info)
-            firstly {
-                podcastDetailFetchController.podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await podcastDetailFetchController.podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
-            }
+            }}
             podcastDetailSection?.updateSections([CPListSection(items: createPodcastDetailItems(from: podcastDetailFetchController))])
         }
     }

@@ -63,11 +63,11 @@ class PlaylistAddPlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO
         updateTitle()
         
         guard appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
-        }.catch { error in
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
-        }
+        }}
     }
     
     func updateTitle() {

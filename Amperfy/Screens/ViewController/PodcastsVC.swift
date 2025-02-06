@@ -70,11 +70,12 @@ class PodcastsVC: MultiSourceTableViewController {
             switch self.showType {
             case .podcasts:
                 let podcast = self.podcastsFetchedResultsController.getWrappedEntity(at: indexPath)
-                firstly {
-                    podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
-                }.finally {
+                Task { @MainActor in
+                    do {
+                        try await podcast.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    } catch {
+                        self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
+                    }
                     completionHandler(SwipeActionContext(containable: podcast))
                 }
             case .episodesSortedByReleaseDate:
@@ -112,14 +113,14 @@ class PodcastsVC: MultiSourceTableViewController {
     
     func syncFromServer() {
         if appDelegate.storage.settings.isOnlineMode {
-            firstly {
-                AutoDownloadLibrarySyncer(storage: self.appDelegate.storage,
-                                          librarySyncer: self.appDelegate.librarySyncer,
-                                          playableDownloadManager: self.appDelegate.playableDownloadManager)
-                .syncNewestPodcastEpisodes().asVoid()
-            }.catch { error in
+            Task { @MainActor in do {
+                let _ = try await AutoDownloadLibrarySyncer(storage: self.appDelegate.storage,
+                                                    librarySyncer: self.appDelegate.librarySyncer,
+                                                    playableDownloadManager: self.appDelegate.playableDownloadManager)
+                          .syncNewestPodcastEpisodes()
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
-            }
+            }}
         }
     }
 

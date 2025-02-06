@@ -123,17 +123,23 @@ public class EventLogger {
     
     private func saveAndDisplay(topic: String, logType: LogEntryType, errorType: AmperfyLogStatusCode, statusCode: Int, logMessage: String, displayPopup: Bool, popupMessage: String, detailMessage: String) {
         os_log("%s", log: self.log, type: .error, logMessage)
-        storage.async.perform { asynCompanion in
-            let logEntry = asynCompanion.library.createLogEntry()
-            logEntry.type = logType
-            logEntry.statusCode = statusCode
-            logEntry.message = logMessage
-            asynCompanion.saveContext()
-            
-            if displayPopup {
-                self.displayAlert(topic: topic, shortMessage: popupMessage, detailMessage: detailMessage, logType: logType)
+        Task { @MainActor in
+            do {
+                try await storage.async.perform { asynCompanion in
+                    let logEntry = asynCompanion.library.createLogEntry()
+                    logEntry.type = logType
+                    logEntry.statusCode = statusCode
+                    logEntry.message = logMessage
+                    asynCompanion.saveContext()
+                    
+                    if displayPopup {
+                        self.displayAlert(topic: topic, shortMessage: popupMessage, detailMessage: detailMessage, logType: logType)
+                    }
+                }
+            } catch {
+                // do nothing
             }
-        }.catch { error in }
+        }
     }
     
     private func displayAlert(topic: String, shortMessage: String, detailMessage: String, logType: LogEntryType) {

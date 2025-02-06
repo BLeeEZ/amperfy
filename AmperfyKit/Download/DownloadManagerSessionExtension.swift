@@ -39,7 +39,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
         // A file URL for the temporary file. Because the file is temporary, you must either open the file for
         // reading or move it to a permanent location in your app’s sandbox container directory before returning from this delegate method.
         // If you choose to open the file for reading, you should do the actual reading in another thread to avoid blocking the delegate queue.
-        DispatchQueue.global().async {
+        Task {
             var downloadError: DownloadError?
             if let filePath = filePath,
                let fileSize = self.fileManager.getFileSize(url: filePath) {
@@ -53,13 +53,13 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
                 os_log("Could not move download to tmp directory", log: self.log, type: .error)
             }
             
-            self.storage.main.context.performAndWait {
+            Task { @MainActor in
                 let library = self.storage.main.library
                 guard let download = library.getDownload(url: requestUrl) else { return }
                 if let activeError = downloadError {
                     self.finishDownload(download: download, error: activeError)
                 } else if let filePath = filePath {
-                    self.finishDownload(download: download, fileURL: filePath, fileMimeType: fileMimeType)
+                    await self.finishDownload(download: download, fileURL: filePath, fileMimeType: fileMimeType)
                 } else {
                     self.finishDownload(download: download, error: .emptyFile)
                 }

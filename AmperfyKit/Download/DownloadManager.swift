@@ -124,12 +124,12 @@ class DownloadManager: NSObject, DownloadManageable {
     }
     
     private func triggerBackgroundDownload() {
-        DispatchQueue.global().async {
-            self.startAvailableDownload()
+        Task { @MainActor in
+            await self.startAvailableDownload()
         }
     }
     
-    private func startAvailableDownload() {
+    @MainActor private func startAvailableDownload() async {
         // A free download task is available
         if storage.settings.isOnlineMode &&
             networkMonitor.isConnectedToNetwork &&
@@ -137,28 +137,28 @@ class DownloadManager: NSObject, DownloadManageable {
             if let nextDownload = self.requestManager.getNextRequestToDownload() {
                 // There is a download to be started
                 self.triggerBackgroundDownload() // trigger an additional download
-                self.manageDownload(download: nextDownload).finally { }
+                await self.manageDownload(download: nextDownload)
             } else {
                 self.activeTasks.signal()
             }
         }
     }
     
-    private func manageDownload(download: Download) -> PMKFinalizer {
-        return firstlyOnMain{ () -> Promise<Void> in
-            os_log("Fetching %s ...", log: self.log, type: .info, download.title)
-            return Promise.value
-        }.then {
-            self.downloadDelegate.prepareDownload(download: download)
-        }.get { url in
-            self.storage.main.library.setDownloadUrl(download: download, url: url)
-            self.storage.main.saveContext()
+    @MainActor private func manageDownload(download: Download) async {
+        os_log("Fetching %s ...", log: self.log, type: .info, download.title)
+        do {
+            let url = try await self.downloadDelegate.prepareDownload(download: download)
+            self.storage.main.perform { mainCompanion in
+                mainCompanion.library.setDownloadUrl(download: download, url: url)
+            }
             self.fetch(url: url)
-        }.catch { error in
-            if let fetchError = error as? DownloadError {
-                self.finishDownload(download: download, error: fetchError)
-            } else {
-                self.finishDownload(download: download, error: .fetchFailed)
+        } catch {
+            self.storage.main.perform { mainCompanion in
+                if let fetchError = error as? DownloadError {
+                    self.finishDownload(download: download, error: fetchError)
+                } else {
+                    self.finishDownload(download: download, error: .fetchFailed)
+                }
             }
         }
     }
@@ -182,7 +182,7 @@ class DownloadManager: NSObject, DownloadManageable {
         storage.main.library.saveContext()
     }
     
-    func finishDownload(download: Download, fileURL: URL, fileMimeType: String?) {
+    @MainActor func finishDownload(download: Download, fileURL: URL, fileMimeType: String?) async {
         self.activeTasks.signal()
         self.triggerBackgroundDownload()
         
@@ -195,17 +195,14 @@ class DownloadManager: NSObject, DownloadManageable {
             return
         }
         os_log("Fetching %s SUCCESS (%{iec-bytes}d) (%s)", log: self.log, type: .info, download.title, fileManager.getFileSize(url: fileURL) ?? 0, fileMimeType ?? "no MIME type")
-        firstly {
-            downloadDelegate.completedDownload(download: download, storage: self.storage)
-        }.done {
-            download.fileURL = nil
-            download.isDownloading = false
-            self.storage.main.saveContext()
-            if let downloadElement = download.element {
-                self.notificationHandler.post(name: .downloadFinishedSuccess, object: self, userInfo: DownloadNotification(id: downloadElement.uniqueID).asNotificationUserInfo)
-                if self.storageExceedsCacheLimit() {
-                    self.cancelPlayableDownloads()
-                }
+        await downloadDelegate.completedDownload(download: download, storage: self.storage)
+        download.fileURL = nil
+        download.isDownloading = false
+        self.storage.main.saveContext()
+        if let downloadElement = download.element {
+            self.notificationHandler.post(name: .downloadFinishedSuccess, object: self, userInfo: DownloadNotification(id: downloadElement.uniqueID).asNotificationUserInfo)
+            if self.storageExceedsCacheLimit() {
+                self.cancelPlayableDownloads()
             }
         }
     }

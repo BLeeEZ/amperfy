@@ -33,7 +33,6 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     
     private let log = OSLog(subsystem: "Amperfy", category: "BackgroundLibrarySyncer")
     private let activeDispatchGroup = DispatchGroup()
-    private let syncSemaphore = DispatchSemaphore(value: 0)
     private var isRunning = false
     private var isCurrentlyActive = false
     
@@ -65,36 +64,32 @@ public class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer {
     }
     
     private func syncAlbumSongsInBackground() {
-        DispatchQueue.global().async {
+        Task { @MainActor in
             self.activeDispatchGroup.enter()
             os_log("start", log: self.log, type: .info)
             
             if self.isRunning, self.storage.settings.isOnlineMode, self.networkMonitor.isConnectedToNetwork {
-                firstlyOnMain {
-                    AutoDownloadLibrarySyncer(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
+                do {
+                    try await AutoDownloadLibrarySyncer(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
                         .syncNewestLibraryElements(offset: 0, count: AmperKit.newestElementsFetchCount)
-                }.catch { error in
+                } catch {
                     self.eventLogger.report(topic: "Latest Library Elements Background Sync", error: error, displayPopup: false)
-                }.finally {
-                    self.syncSemaphore.signal()
                 }
-                self.syncSemaphore.wait()
             }
-
+            
             while self.isRunning, self.storage.settings.isOnlineMode, self.networkMonitor.isConnectedToNetwork {
-                firstlyOnMain { () -> Promise<Void> in
+                do {
                     let albumToSync = self.storage.main.library.getAlbumWithoutSyncedSongs()
                     guard let albumToSync = albumToSync else {
                         self.isRunning = false
-                        return Promise.value
+                        break
                     }
-                    return albumToSync.fetchFromServer(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
-                }.catch { error in
+                    try await albumToSync.fetchFromServer(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
+                } catch {
                     self.eventLogger.report(topic: "Album Background Sync", error: error, displayPopup: false)
-                }.finally {
-                    self.syncSemaphore.signal()
+                    self.isRunning = false
+                    break
                 }
-                self.syncSemaphore.wait()
             }
             
             os_log("stopped", log: self.log, type: .info)

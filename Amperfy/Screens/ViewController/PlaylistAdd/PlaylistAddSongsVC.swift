@@ -87,11 +87,12 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
         case .newest, .recent:
             break
         case .favorites:
-            firstly {
-                self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Favorite Songs Sync", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Favorite Songs Sync", error: error)
+                }
                 self.updateSearchResults(for: self.searchController)
             }
         }
@@ -185,11 +186,11 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     override func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            firstly {
-                self.appDelegate.librarySyncer.searchSongs(searchText: searchText)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.searchSongs(searchText: searchText)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
-            }
+            }}
             fetchedResultsController.search(searchText: searchText, onlyCachedSongs: false, displayFilter: displayFilter)
         } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
             fetchedResultsController.search(searchText: searchText, onlyCachedSongs: true, displayFilter: displayFilter)

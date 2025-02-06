@@ -114,11 +114,11 @@ extension Genre: PlayableContainable  {
         return songs
     }
     public var playContextType: PlayerMode { return .music }
-    public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
-        return librarySyncer.sync(genre: self)
+    @MainActor public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) async throws {
+        try await librarySyncer.sync(genre: self)
     }
-    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
-        return Promise<Void>(error: BackendError.notSupported)
+    @MainActor public func remoteToggleFavorite(syncer: LibrarySyncer) async throws {
+        throw BackendError.notSupported
     }
     public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
         return ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)

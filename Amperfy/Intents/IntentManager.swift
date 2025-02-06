@@ -187,9 +187,8 @@ public class IntentManager {
                 repeatOption = repeatInput
             }
             let playableContainer = self.getPlayableContainer(searchTerm: searchTerm, searchCategory: searchCategory)
-            firstly {
-                self.play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
-            }.done { playSuccess in
+            Task { @MainActor in
+                let playSuccess = await self.play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
                 if playSuccess {
                     success(nil)
                 } else {
@@ -262,9 +261,8 @@ public class IntentManager {
                 repeatOption = repeatInput
             }
             let playableContainer = self.getPlayableContainer(id: id, libraryElementType: libraryElementType)
-            firstly {
-                self.play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
-            }.done { playSuccess in
+            Task { @MainActor in
+                let playSuccess = await self.play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
                 if playSuccess {
                     success(nil)
                 } else {
@@ -519,11 +517,12 @@ public class IntentManager {
             
             song.rating = rating
             self.storage.main.saveContext()
-            firstly {
-                self.librarySyncer.setRating(song: song, rating: rating)
-            }.catch { error in
-                // ignore error here
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await self.librarySyncer.setRating(song: song, rating: rating)
+                } catch {
+                    // ignore error here
+                }
                 success(nil)
             }
         }
@@ -575,11 +574,12 @@ public class IntentManager {
                 return
             }
             
-            firstly {
-                currentlyPlaying.remoteToggleFavorite(syncer: self.librarySyncer)
-            }.catch { error in
-                // ignore error here
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await currentlyPlaying.remoteToggleFavorite(syncer: self.librarySyncer)
+                } catch {
+                    // ignore error here
+                }
                 success(nil)
             }
         }
@@ -751,7 +751,7 @@ public class IntentManager {
         return result
     }
     
-    public func handleIncomingIntent(userActivity: NSUserActivity) -> Guarantee<Bool> {
+    @MainActor public func handleIncomingIntent(userActivity: NSUserActivity) async -> Bool {
         guard userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self) ||
               userActivity.activityType == NSUserActivity.searchAndPlayActivityType ||
               userActivity.activityType == NSStringFromClass(PlayIDIntent.self) ||
@@ -759,7 +759,7 @@ public class IntentManager {
               userActivity.activityType == NSStringFromClass(PlayRandomSongsIntent.self) ||
               userActivity.activityType == NSUserActivity.playRandomSongsActivityType
             else {
-                return Guarantee<Bool>.value(false)
+                return false
         }
         if userActivity.activityType == NSUserActivity.searchAndPlayActivityType || userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self),
            let searchTerm = userActivity.userInfo?[NSUserActivity.ActivityKeys.searchTerm.rawValue] as? String,
@@ -779,7 +779,7 @@ public class IntentManager {
             }
 
             let playableContainer = self.getPlayableContainer(searchTerm: searchTerm, searchCategory: searchCategory)
-            return play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            return await play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else if userActivity.activityType == NSUserActivity.playIdActivityType || userActivity.activityType == NSStringFromClass(PlayIDIntent.self),
            let id = userActivity.userInfo?[NSUserActivity.ActivityKeys.id.rawValue] as? String,
            let libraryElementTypeRaw = userActivity.userInfo?[NSUserActivity.ActivityKeys.libraryElementType.rawValue] as? Int,
@@ -798,7 +798,7 @@ public class IntentManager {
             }
             
             let playableContainer = self.getPlayableContainer(id: id, libraryElementType: libraryElementType)
-            return play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            return await play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else if let playRandomSongsIntent = userActivity.playRandomSongsIntent {
             let cacheOnly = playRandomSongsIntent.filterOption == .cache
             let songs = self.library.getSongs().filterCached(dependigOn: cacheOnly)[randomPick: self.player.maxSongsToAddOnce]
@@ -806,7 +806,7 @@ public class IntentManager {
             return play(context: playerContext, shuffleOption: true, repeatOption: .off)
 
         } else {
-            return Guarantee<Bool>.value(false)
+            return false
         }
     }
     
@@ -868,46 +868,39 @@ public class IntentManager {
         return playableContainer
     }
     
-    public func playLastResult(shuffleOption: Bool, repeatOption: RepeatMode) -> Guarantee<Bool> {
-        guard let lastResult = lastResult else { return Guarantee<Bool>.value(false) }
+    @MainActor public func playLastResult(shuffleOption: Bool, repeatOption: RepeatMode) async -> Bool {
+        guard let lastResult = lastResult else { return false }
         self.lastResult = nil
         
         if let playableContainer = lastResult.playableContainer {
             os_log("Play container <%s> (shuffle: %s, repeat: %s)", log: self.log, type: .info, playableContainer.name, shuffleOption.description, repeatOption.description)
-            return play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
+            return await play(container: playableContainer, shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else if let playableElements = lastResult.playableElements{
             os_log("Play Music (shuffle: %s, repeat: %s)", log: self.log, type: .info, shuffleOption.description, repeatOption.description)
             return play(context: PlayContext(name: "Siri Intent", playables: playableElements), shuffleOption: shuffleOption, repeatOption: repeatOption)
         } else {
-            return Guarantee<Bool>.value(false)
+            return false
         }
     }
 
-    private func play(container: PlayableContainable?, shuffleOption: Bool, repeatOption: RepeatMode) -> Guarantee<Bool> {
-        guard let container = container else { return Guarantee<Bool>.value(false) }
-        return Guarantee<Bool> { seal in
-            firstly {
-                container.fetch(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
-            }.catch { error in
-                // ignore error
-            }.finally {
-                firstly {
-                    self.play(context: PlayContext(containable: container), shuffleOption: shuffleOption, repeatOption: repeatOption)
-                }.done { success in
-                    seal(success)
-                }
-            }
+    @MainActor private func play(container: PlayableContainable?, shuffleOption: Bool, repeatOption: RepeatMode) async -> Bool {
+        guard let container = container else { return false }
+        do {
+            try await container.fetch(storage: self.storage, librarySyncer: self.librarySyncer, playableDownloadManager: self.playableDownloadManager)
+        } catch {
+            // do nothing
         }
+        return self.play(context: PlayContext(containable: container), shuffleOption: shuffleOption, repeatOption: repeatOption)
     }
     
-    private func play(context: PlayContext, shuffleOption: Bool, repeatOption: RepeatMode) -> Guarantee<Bool>  {
+    private func play(context: PlayContext, shuffleOption: Bool, repeatOption: RepeatMode) -> Bool  {
         if shuffleOption {
             player.playShuffled(context: context)
         } else {
             player.play(context: context)
         }
         player.setRepeatMode(repeatOption)
-        return Guarantee<Bool>.value(true)
+        return true
     }
     
 }

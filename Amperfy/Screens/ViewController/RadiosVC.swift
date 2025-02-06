@@ -80,11 +80,12 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     
     func updateFromRemote() {
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.syncRadios()
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await self.appDelegate.librarySyncer.syncRadios()
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
+            }
             self.detailHeaderView?.refresh()
             self.updateSearchResults(for: self.searchController)
         }
@@ -147,11 +148,12 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
 #endif
             return
         }
-        firstly {
-            self.appDelegate.librarySyncer.syncRadios()
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await self.appDelegate.librarySyncer.syncRadios()
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
+            }
             self.detailHeaderView?.refresh()
             self.updateSearchResults(for: self.searchController)
 #if !targetEnvironment(macCatalyst)

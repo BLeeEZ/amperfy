@@ -55,12 +55,10 @@ public enum NowPlayingSongPosition {
 public class APIDataResponse {
     public var data: Data
     public var url: URL?
-    public var meta: PMKAlamofireDataResponse?
     
-    init(data: Data, url: URL?, meta: PMKAlamofireDataResponse?) {
+    init(data: Data, url: URL?) {
         self.data = data
         self.url = url
-        self.meta = meta
     }
 }
 
@@ -100,42 +98,42 @@ public struct LyricsLine {
 }
 
 public protocol LibrarySyncer {
-    func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void>
-    func sync(genre: Genre) -> Promise<Void>
-    func sync(artist: Artist) -> Promise<Void>
-    func sync(album: Album) -> Promise<Void>
-    func sync(song: Song) -> Promise<Void>
-    func sync(podcast: Podcast) -> Promise<Void>
-    func syncNewestAlbums(offset: Int, count: Int) -> Promise<Void>
-    func syncRecentAlbums(offset: Int, count: Int) -> Promise<Void>
-    func syncNewestPodcastEpisodes() -> Promise<Void>
-    func syncFavoriteLibraryElements() -> Promise<Void>
-    func syncRadios() -> Promise<Void>
-    func syncDownPlaylistsWithoutSongs() -> Promise<Void>
-    func syncDown(playlist: Playlist) -> Promise<Void>
-    func syncUpload(playlistToUpdateName playlist: Playlist) -> Promise<Void>
-    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song]) -> Promise<Void>
-    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int) -> Promise<Void>
-    func syncUpload(playlistToUpdateOrder playlist: Playlist) -> Promise<Void>
-    func syncUpload(playlistIdToDelete id: String) -> Promise<Void>
-    func syncDownPodcastsWithoutEpisodes() -> Promise<Void>
-    func searchArtists(searchText: String) -> Promise<Void>
-    func searchAlbums(searchText: String) -> Promise<Void>
-    func searchSongs(searchText: String) -> Promise<Void>
-    func syncMusicFolders() -> Promise<Void>
-    func syncIndexes(musicFolder: MusicFolder) -> Promise<Void>
-    func sync(directory: Directory) -> Promise<Void>
-    func requestRandomSongs(playlist: Playlist, count: Int) -> Promise<Void>
-    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) -> Promise<Void>
-    func syncNowPlaying(song: Song, songPosition: NowPlayingSongPosition) -> Promise<Void>
-    func scrobble(song: Song, date: Date?) -> Promise<Void>
-    func setRating(song: Song, rating: Int) -> Promise<Void>
-    func setRating(album: Album, rating: Int) -> Promise<Void>
-    func setRating(artist: Artist, rating: Int) -> Promise<Void>
-    func setFavorite(song: Song, isFavorite: Bool) -> Promise<Void>
-    func setFavorite(album: Album, isFavorite: Bool) -> Promise<Void>
-    func setFavorite(artist: Artist, isFavorite: Bool) -> Promise<Void>
-    func parseLyrics(relFilePath: URL) -> Promise<LyricsList>
+    @MainActor func syncInitial(statusNotifyier: SyncCallbacks?) async throws
+    @MainActor func sync(genre: Genre) async throws
+    @MainActor func sync(artist: Artist) async throws
+    @MainActor func sync(album: Album) async throws
+    @MainActor func sync(song: Song) async throws
+    @MainActor func sync(podcast: Podcast) async throws
+    @MainActor func syncNewestAlbums(offset: Int, count: Int) async throws
+    @MainActor func syncRecentAlbums(offset: Int, count: Int) async throws
+    @MainActor func syncNewestPodcastEpisodes() async throws
+    @MainActor func syncFavoriteLibraryElements() async throws
+    @MainActor func syncRadios() async throws
+    @MainActor func syncDownPlaylistsWithoutSongs() async throws
+    @MainActor func syncDown(playlist: Playlist) async throws
+    @MainActor func syncUpload(playlistToUpdateName playlist: Playlist) async throws
+    @MainActor func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song]) async throws
+    @MainActor func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int) async throws
+    @MainActor func syncUpload(playlistToUpdateOrder playlist: Playlist) async throws
+    @MainActor func syncUpload(playlistIdToDelete id: String) async throws
+    @MainActor func syncDownPodcastsWithoutEpisodes() async throws
+    @MainActor func searchArtists(searchText: String) async throws
+    @MainActor func searchAlbums(searchText: String) async throws
+    @MainActor func searchSongs(searchText: String) async throws
+    @MainActor func syncMusicFolders() async throws
+    @MainActor func syncIndexes(musicFolder: MusicFolder) async throws
+    @MainActor func sync(directory: Directory) async throws
+    @MainActor func requestRandomSongs(playlist: Playlist, count: Int) async throws
+    @MainActor func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) async throws
+    @MainActor func syncNowPlaying(song: Song, songPosition: NowPlayingSongPosition) async throws
+    @MainActor func scrobble(song: Song, date: Date?) async throws
+    @MainActor func setRating(song: Song, rating: Int) async throws
+    @MainActor func setRating(album: Album, rating: Int) async throws
+    @MainActor func setRating(artist: Artist, rating: Int) async throws
+    @MainActor func setFavorite(song: Song, isFavorite: Bool) async throws
+    @MainActor func setFavorite(album: Album, isFavorite: Bool) async throws
+    @MainActor func setFavorite(artist: Artist, isFavorite: Bool) async throws
+    @MainActor func parseLyrics(relFilePath: URL) async throws -> LyricsList
 }
 
 protocol AbstractBackgroundLibrarySyncer {
@@ -181,10 +179,10 @@ public protocol BackendApi: URLCleanser {
     var serverApiVersion: String { get }
     var isStreamingTranscodingActive: Bool { get }
     func provideCredentials(credentials: LoginCredentials)
-    func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void>
-    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL>
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL>
-    func generateUrl(forArtwork artwork: Artwork) -> Promise<URL>
+    @MainActor func isAuthenticationValid(credentials: LoginCredentials) async throws
+    @MainActor func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL
+    @MainActor func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL
+    @MainActor func generateUrl(forArtwork artwork: Artwork) async throws -> URL
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate

@@ -68,11 +68,11 @@ class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddabl
         addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
         
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            genre.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-        }.catch { error in
+        Task { @MainActor in do {
+            try await genre.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
-        }
+        }}
     }
     
     func updateTitle() {

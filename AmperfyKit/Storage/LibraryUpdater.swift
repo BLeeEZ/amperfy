@@ -87,9 +87,9 @@ public class LibraryUpdater {
         isRunning = false
     }
     
-    public func performLibraryUpdateWithStatus(notifier: LibraryUpdaterCallbacks) -> Promise<Void> {
+    @MainActor public func performLibraryUpdateWithStatus(notifier: LibraryUpdaterCallbacks) async throws {
         isRunning = true
-        return storage.async.perform { asyncCompanion in
+        try await storage.async.perform { asyncCompanion in
             if self.storage.librarySyncVersion < .v17 {
                 self.storage.librarySyncVersion = .v17 // if App crashes don't do this step again -> This step is only for convenience
                 os_log("Perform blocking library update (START): Extract Binary Data", log: self.log, type: .info)

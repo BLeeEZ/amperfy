@@ -47,53 +47,44 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
         return 2
     }
 
-    func prepareDownload(download: Download) -> Promise<URL> {
-        return Promise<Artwork> { seal in
-            guard let artwork = download.element as? Artwork else {
-                throw DownloadError.fetchFailed
-            }
-            guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
-            seal.fulfill(artwork)
-        }.then { artwork in
-            self.ampacheXmlServerApi.generateUrl(forArtwork: artwork)
+    @MainActor public func prepareDownload(download: Download) async throws -> URL {
+        guard let artwork = download.element as? Artwork else {
+            throw DownloadError.fetchFailed
         }
+        guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
+        return try await self.ampacheXmlServerApi.generateUrl(forArtwork: artwork)
     }
     
-    func validateDownloadedData(download: Download) -> ResponseError? {
+    public func validateDownloadedData(download: Download) -> ResponseError? {
         guard let fileURL = download.fileURL else {
             return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: ampacheXmlServerApi), data: nil)
         }
         guard let data = fileManager.getFileDataIfNotToBig(url: fileURL, maxFileSize: Self.maxFileSizeOfErrorResponse) else { return nil }
-        return ampacheXmlServerApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url, meta: nil))
+        return ampacheXmlServerApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url))
     }
 
-    func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
-        return Guarantee<Void> { seal in
-            guard let fileURL = download.fileURL,
-                  let artwork = download.element as? Artwork else {
-                return seal(Void())
-            }
-            firstly {
-                self.requestDefaultImageData()
-            }.done { defaultImageData in
-                if let artworkFileSize = self.fileManager.getFileSize(url: fileURL),
-                   artworkFileSize == defaultImageData.sizeInByte,
-                   let artworkData = self.fileManager.getFileDataIfNotToBig(url: fileURL),
-                   artworkData == defaultImageData {
-                    artwork.status = .IsDefaultImage
-                    artwork.relFilePath = nil
-                } else {
-                    artwork.status = .CustomImage
-                    artwork.relFilePath = self.handleCustomImage(download: download, artwork: artwork)
-                }
-                storage.main.saveContext()
-            }.catch { error in
+    @MainActor public func completedDownload(download: Download, storage: PersistentStorage) async {
+        guard let fileURL = download.fileURL,
+              let artwork = download.element as? Artwork else {
+            return
+        }
+        do {
+            let defaultImageData = try await self.requestDefaultImageData()
+            if let artworkFileSize = self.fileManager.getFileSize(url: fileURL),
+               artworkFileSize == defaultImageData.sizeInByte,
+               let artworkData = self.fileManager.getFileDataIfNotToBig(url: fileURL),
+               artworkData == defaultImageData {
+                artwork.status = .IsDefaultImage
+                artwork.relFilePath = nil
+            } else {
                 artwork.status = .CustomImage
                 artwork.relFilePath = self.handleCustomImage(download: download, artwork: artwork)
-                storage.main.saveContext()
-            }.finally {
-                seal(Void())
             }
+            storage.main.saveContext()
+        } catch {
+            artwork.status = .CustomImage
+            artwork.relFilePath = self.handleCustomImage(download: download, artwork: artwork)
+            storage.main.saveContext()
         }
     }
     
@@ -110,7 +101,7 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
         }
     }
     
-    func failedDownload(download: Download, storage: PersistentStorage) {
+    public func failedDownload(download: Download, storage: PersistentStorage) {
         guard let artwork = download.element as? Artwork else {
             return
         }
@@ -118,16 +109,13 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
         storage.main.saveContext()
     }
     
-    private func requestDefaultImageData() -> Promise<Data> {
+    @MainActor private func requestDefaultImageData() async throws -> Data {
         if let defaultImageData = defaultImageData {
-            return Promise<Data>.value(defaultImageData)
+            return defaultImageData
         } else {
-            return firstly {
-                self.ampacheXmlServerApi.requestDefaultArtwork()
-            }.then { response in
-                self.defaultImageData = response.data
-                return Promise<Data>.value(response.data)
-            }
+            let response = try await self.ampacheXmlServerApi.requestDefaultArtwork()
+            self.defaultImageData = response.data
+            return response.data
         }
     }
     

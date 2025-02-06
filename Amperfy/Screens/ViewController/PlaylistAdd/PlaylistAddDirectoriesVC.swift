@@ -64,11 +64,11 @@ class PlaylistAddDirectoriesVC: MultiSourceTableViewController, PlaylistVCAddabl
         addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
         
         guard appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.sync(directory: directory)
-        }.catch { error in
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.sync(directory: directory)
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Directories Sync", error: error)
-        }
+        }}
     }
     
     func updateTitle() {

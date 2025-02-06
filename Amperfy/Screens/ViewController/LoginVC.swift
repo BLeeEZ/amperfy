@@ -77,19 +77,20 @@ class LoginVC: UIViewController {
         }
 
         let credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
-        firstly {
-            self.appDelegate.backendApi.login(apiType: selectedApiType, credentials: credentials)
-        }.done { authenticatedApi in
-            self.appDelegate.backendApi.selectedApi = authenticatedApi
-            credentials.backendApi = authenticatedApi
-            self.appDelegate.storage.loginCredentials = credentials
-            self.appDelegate.backendApi.provideCredentials(credentials: credentials)
-            self.performSegue(withIdentifier: "toSync", sender: self)
-        }.catch { error in
-            if error is AuthenticationError {
-                self.showErrorMsg(message: error.localizedDescription)
-            } else {
-                self.showErrorMsg(message: "Not able to login!")
+        Task { @MainActor in
+            do {
+                let authenticatedApi = try await self.appDelegate.backendApi.login(apiType: selectedApiType, credentials: credentials)
+                self.appDelegate.backendApi.selectedApi = authenticatedApi
+                credentials.backendApi = authenticatedApi
+                self.appDelegate.storage.loginCredentials = credentials
+                self.appDelegate.backendApi.provideCredentials(credentials: credentials)
+                self.performSegue(withIdentifier: "toSync", sender: self)
+            } catch {
+                if error is AuthenticationError {
+                    self.showErrorMsg(message: error.localizedDescription)
+                } else {
+                    self.showErrorMsg(message: "Not able to login!")
+                }
             }
         }
     }

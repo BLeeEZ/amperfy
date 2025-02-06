@@ -186,11 +186,12 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
                 completionHandler(nil)
                 return
             }
-            firstly {
-                album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+                }
                 completionHandler(SwipeActionContext(containable: album))
             }
         }

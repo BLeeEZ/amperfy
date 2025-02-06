@@ -71,11 +71,12 @@ class DirectoriesVC: MultiSourceTableViewController {
             switch indexPath.section {
             case 0:
                 let subdirectory = self.subdirectoriesFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                firstly {
-                    subdirectory.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Directory Sync", error: error)
-                }.finally {
+                Task { @MainActor in
+                    do {
+                        try await subdirectory.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    } catch {
+                        self.appDelegate.eventLogger.report(topic: "Directory Sync", error: error)
+                    }
                     self.refreshHeaderView()
                 }
                 return PlayContext(containable: subdirectory)
@@ -90,11 +91,12 @@ class DirectoriesVC: MultiSourceTableViewController {
             switch indexPath.section {
             case 0:
                 let subdirectory = self.subdirectoriesFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                firstly {
-                    subdirectory.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Directory Sync", error: error)
-                }.finally {
+                Task { @MainActor in
+                    do {
+                        try await subdirectory.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    } catch {
+                        self.appDelegate.eventLogger.report(topic: "Directory Sync", error: error)
+                    }
                     completionHandler(SwipeActionContext(containable: subdirectory))
                     self.refreshHeaderView()
                 }
@@ -124,11 +126,12 @@ class DirectoriesVC: MultiSourceTableViewController {
         songsFetchedResultsController?.delegate = self
         
         guard appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.sync(directory: directory)
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Directories Sync", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await self.appDelegate.librarySyncer.sync(directory: directory)
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Directories Sync", error: error)
+            }
             self.refreshHeaderView()
         }
     }

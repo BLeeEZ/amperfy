@@ -89,9 +89,8 @@ class LargeCurrentlyPlayingPlayerView: UIView {
             return
         }
         
-        firstly {
-            appDelegate.librarySyncer.parseLyrics(relFilePath: lyricsRelFilePath)
-        }.done { lyricsList in
+        Task { @MainActor in do {
+            let lyricsList = try await appDelegate.librarySyncer.parseLyrics(relFilePath: lyricsRelFilePath)
             guard self.isLyricsViewAllowedToDisplay else {
                 self.hideLyrics()
                 return
@@ -103,13 +102,13 @@ class LargeCurrentlyPlayingPlayerView: UIView {
             } else {
                 self.showLyricsAreNotAvailable()
             }
-        }.catch { error in
+        } catch {
             guard self.isLyricsViewAllowedToDisplay else {
                 self.hideLyrics()
                 return
             }
             self.showLyricsAreNotAvailable()
-        }
+        }}
     }
     
     var isLyricsViewAllowedToDisplay: Bool {

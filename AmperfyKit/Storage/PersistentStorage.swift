@@ -230,6 +230,13 @@ public class CoreDataCompanion {
     public func saveContext() {
         library.saveContext()
     }
+    
+    public func perform(body: @escaping (_ asyncCompanion: CoreDataCompanion) -> Void) {
+        self.context.performAndWait {
+            body(self)
+            library.saveContext()
+        }
+    }
 }
 
 public class AsyncCoreDataAccessWrapper {
@@ -239,20 +246,20 @@ public class AsyncCoreDataAccessWrapper {
         self.persistentContainer = persistentContainer
     }
     
-    public func perform(body: @escaping (_ asyncCompanion: CoreDataCompanion) throws -> Void) -> Promise<Void> {
-        return Promise<Void> { seal in
+    @MainActor public func perform(body: @escaping (_ asyncCompanion: CoreDataCompanion) throws -> Void) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
             self.persistentContainer.performBackgroundTask() { (context) in
                 context.retainsRegisteredObjects = true
                 let library = LibraryStorage(context: context)
                 let asyncCompanion = CoreDataCompanion(context: context)
                 do {
                     try body(asyncCompanion)
+                    library.saveContext()
+                    continuation.resume()
                 } catch {
                     library.saveContext()
-                    return seal.reject(error)
+                    continuation.resume(throwing: error)
                 }
-                library.saveContext()
-                seal.fulfill(Void())
             }
         }
     }

@@ -170,15 +170,16 @@ class BackendAudioPlayer: NSObject {
                 if nextPreloadedPlayable.isCached {
                     insertCachedPlayable(playable: nextPreloadedPlayable, queueType: .queue)
                 } else if !isOfflineMode {
-                    firstly {
-                        insertStreamPlayable(playable: nextPreloadedPlayable, queueType: .queue)
-                    }.done {
-                        if self.isAutoCachePlayedItems, nextPreloadedPlayable.isDownloadAvailable {
-                            self.playableDownloader.download(object: nextPreloadedPlayable)
+                    Task { @MainActor in
+                        do {
+                            try await insertStreamPlayable(playable: nextPreloadedPlayable, queueType: .queue)
+                            if self.isAutoCachePlayedItems, nextPreloadedPlayable.isDownloadAvailable {
+                                self.playableDownloader.download(object: nextPreloadedPlayable)
+                            }
+                        } catch {
+                            self.nextPreloadedPlayable = nil
+                            self.eventLogger.report(topic: "Player", error: error)
                         }
-                    }.catch { error in
-                        self.nextPreloadedPlayable = nil
-                        self.eventLogger.report(topic: "Player", error: error)
                     }
                 }
             }
@@ -304,22 +305,23 @@ class BackendAudioPlayer: NSObject {
             }
             
             self.stop()
-            firstly {
-                insertStreamPlayable(playable: playable)
-            }.done {
-                if self.isAutoCachePlayedItems, !playable.isRadio {
-                    self.playableDownloader.download(object: playable)
+            Task { @MainActor in
+                do {
+                    try await insertStreamPlayable(playable: playable)
+                    if self.isAutoCachePlayedItems, !playable.isRadio {
+                        self.playableDownloader.download(object: playable)
+                    }
+                    if self.shouldPlaybackStart {
+                        self.continuePlay()
+                    } else {
+                        self.isPlaying = false
+                    }
+                    self.responder?.notifyItemPreparationFinished()
+                } catch {
+                    self.responder?.notifyErrorOccured(error: error)
+                    self.responder?.notifyItemPreparationFinished()
+                    self.eventLogger.report(topic: "Player", error: error)
                 }
-                if self.shouldPlaybackStart {
-                    self.continuePlay()
-                } else {
-                    self.isPlaying = false
-                }
-                self.responder?.notifyItemPreparationFinished()
-            }.catch { error in
-                self.responder?.notifyErrorOccured(error: error)
-                self.responder?.notifyItemPreparationFinished()
-                self.eventLogger.report(topic: "Player", error: error)
             }
         } else {
             clearPlayer()
@@ -362,30 +364,31 @@ class BackendAudioPlayer: NSObject {
         insert(playable: playable, withUrl: fileURL, queueType: queueType)
     }
     
-    private func insertStreamPlayable(playable: AbstractPlayable, queueType: BackendAudioQueueType = .play) -> Promise<Void> {
+    @MainActor private func insertStreamPlayable(playable: AbstractPlayable, queueType: BackendAudioQueueType = .play) async throws {
         let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: self.networkMonitor)
-        return firstly {
+        
+        @MainActor func provideUrl() async throws -> URL {
             if let radio = playable.asRadio {
                 guard let streamUrlString = radio.url,
                       let streamUrl = URL(string: streamUrlString)
                 else {
-                    return Promise<URL>(error: BackendError.invalidUrl)
+                    throw BackendError.invalidUrl
                 }
-                return Promise<URL>.value(streamUrl)
+                return streamUrl
             } else {
-                return backendApi.generateUrl(forStreamingPlayable: playable, maxBitrate: streamingMaxBitrate)
+                return try await backendApi.generateUrl(forStreamingPlayable: playable, maxBitrate: streamingMaxBitrate)
             }
-        }.get { streamUrl in
-            if queueType == .play {
-                os_log(.default, "Play Stream: %s (%s)", playable.displayString, streamingMaxBitrate.description)
-            } else {
-                os_log(.default, "Insert Stream: %s (%s)", playable.displayString, streamingMaxBitrate.description)
-            }
-            
-            self.playType = .stream
-            if playable.isSong { self.userStatistics.playedSong(isPlayedFromCache: false) }
-            self.insert(playable: playable, withUrl: streamUrl, streamingMaxBitrate: streamingMaxBitrate, queueType: queueType)
-        }.asVoid()
+        }
+        let streamUrl = try await provideUrl()
+        
+        if queueType == .play {
+            os_log(.default, "Play Stream: %s (%s)", playable.displayString, streamingMaxBitrate.description)
+        } else {
+            os_log(.default, "Insert Stream: %s (%s)", playable.displayString, streamingMaxBitrate.description)
+        }
+        self.playType = .stream
+        if playable.isSong { self.userStatistics.playedSong(isPlayedFromCache: false) }
+        self.insert(playable: playable, withUrl: streamUrl, streamingMaxBitrate: streamingMaxBitrate, queueType: queueType)
     }
 
     private func insert(playable: AbstractPlayable,

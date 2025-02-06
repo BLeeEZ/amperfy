@@ -87,11 +87,11 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
         super.viewIsAppearing(animated)
         updateRightBarButtonItems()
         guard appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
-        }.catch { error in
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
-        }
+        }}
     }
     
     func updateRightBarButtonItems() {
@@ -112,26 +112,18 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     }
     
     func addSongsToSelectedPlaylists() {
-        var syncPromises = [() -> Promise<Void>]()
-        
         defer { selectedPlaylits.removeAll() }
         guard !selectedPlaylits.isEmpty else { return }
-
-        syncPromises = selectedPlaylits.compactMap { playlist, songs in
-            { return firstly {
-                self.appDelegate.librarySyncer.syncUpload(playlistToAddSongs: playlist, songs: songs)
-            }.then {
-                playlist.append(playables: songs)
-                return Promise.value
-            }}
-        }
         
-        firstly {
-            syncPromises.resolveSequentially()
-        }
-        .catch { error in
+        let localCopySelectedPlaylits = selectedPlaylits
+        Task { @MainActor in do {
+            for (playlist, songs) in localCopySelectedPlaylits {
+                try await self.appDelegate.librarySyncer.syncUpload(playlistToAddSongs: playlist, songs: songs)
+                playlist.append(playables: songs)
+            }
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Playlist Add Songs", error: error)
-        }
+        }}
     }
     
     @IBAction func selectBarButtonPressed(_ sender: Any) {

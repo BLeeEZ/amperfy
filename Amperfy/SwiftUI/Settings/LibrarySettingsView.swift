@@ -53,30 +53,34 @@ struct LibrarySettingsView: View {
                       stride(from: 110, through: 975, by: 25).map({$0.description}))
     
     private func updateValues() {
-        appDelegate.storage.async.perform { asyncCompanion in
-            self.playlistCount = asyncCompanion.library.playlistCount
-            self.artistCount = asyncCompanion.library.artistCount
-            self.albumCount = asyncCompanion.library.albumCount
-            self.podcastCount = asyncCompanion.library.podcastCount
-            self.podcastEpisodeCount = asyncCompanion.library.podcastEpisodeCount
-            self.songCount = asyncCompanion.library.songCount
-            self.albumWithSyncedSongsCount = asyncCompanion.library.albumWithSyncedSongsCount
-            if albumCount < 1 {
-                self.autoSyncProgressText = String(format: "%.1f", 0.0) + "%"
-            } else {
-                let progress = Float(albumWithSyncedSongsCount) * 100.0 / Float(albumCount)
-                self.autoSyncProgressText = String(format: "%.1f", progress) + "%"
+        Task { @MainActor in do {
+            try await appDelegate.storage.async.perform { asyncCompanion in
+                self.playlistCount = asyncCompanion.library.playlistCount
+                self.artistCount = asyncCompanion.library.artistCount
+                self.albumCount = asyncCompanion.library.albumCount
+                self.podcastCount = asyncCompanion.library.podcastCount
+                self.podcastEpisodeCount = asyncCompanion.library.podcastEpisodeCount
+                self.songCount = asyncCompanion.library.songCount
+                self.albumWithSyncedSongsCount = asyncCompanion.library.albumWithSyncedSongsCount
+                if albumCount < 1 {
+                    self.autoSyncProgressText = String(format: "%.1f", 0.0) + "%"
+                } else {
+                    let progress = Float(albumWithSyncedSongsCount) * 100.0 / Float(albumCount)
+                    self.autoSyncProgressText = String(format: "%.1f", progress) + "%"
+                }
+                self.cachedSongCount = asyncCompanion.library.cachedSongCount
+                self.cachedPodcastEpisodesCount = asyncCompanion.library.cachedPodcastEpisodeCount
+                
+                let playableByteSize = fileManager.playableCacheSize
+                self.completeCacheSize = (playableByteSize > 1_000_000) ? playableByteSize.asByteString : Int64(0).asByteString
+                
+                let curCacheSizeLimit = Int64(settings.cacheSizeLimit)
+                self.cacheSizeLimit = curCacheSizeLimit > 0 ? curCacheSizeLimit.asByteString : "No Limit"
+                self.cacheSelection = curCacheSizeLimit > 0 ? [curCacheSizeLimit.asByteString.components(separatedBy: " ")[0], " " + curCacheSizeLimit.asByteString.components(separatedBy: " ")[1]] : ["0"," MB"]
             }
-            self.cachedSongCount = asyncCompanion.library.cachedSongCount
-            self.cachedPodcastEpisodesCount = asyncCompanion.library.cachedPodcastEpisodeCount
-            
-            let playableByteSize = fileManager.playableCacheSize
-            self.completeCacheSize = (playableByteSize > 1_000_000) ? playableByteSize.asByteString : Int64(0).asByteString
-            
-            let curCacheSizeLimit = Int64(settings.cacheSizeLimit)
-            self.cacheSizeLimit = curCacheSizeLimit > 0 ? curCacheSizeLimit.asByteString : "No Limit"
-            self.cacheSelection = curCacheSizeLimit > 0 ? [curCacheSizeLimit.asByteString.components(separatedBy: " ")[0], " " + curCacheSizeLimit.asByteString.components(separatedBy: " ")[1]] : ["0"," MB"]
-        }.catch { error in }
+        } catch {
+            // do nothing
+        }}
     }
     
     private func resyncLibrary() {

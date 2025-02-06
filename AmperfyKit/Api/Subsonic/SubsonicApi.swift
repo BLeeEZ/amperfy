@@ -62,20 +62,20 @@ extension SubsonicApi: BackendApi {
         subsonicServerApi.provideCredentials(credentials: credentials)
     }
     
-    func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
-        return subsonicServerApi.isAuthenticationValid(credentials: credentials)
+    @MainActor func isAuthenticationValid(credentials: LoginCredentials) async throws {
+        return try await subsonicServerApi.isAuthenticationValid(credentials: credentials)
     }
 
-    func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> {
-        return subsonicServerApi.generateUrl(forDownloadingPlayable: playable)
+    @MainActor func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL {
+        return try await subsonicServerApi.generateUrl(forDownloadingPlayable: playable)
     }
 
-    func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> {
-        return subsonicServerApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
+    @MainActor func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL {
+        return try await subsonicServerApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
     }
     
-    func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
-        return subsonicServerApi.generateUrl(forArtwork: artwork)
+    @MainActor func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
+        return try await subsonicServerApi.generateUrl(forArtwork: artwork)
     }
 
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {

@@ -28,8 +28,8 @@ class EmbeddedArtworkExtractor  {
     private let id3TagEditor = ID3TagEditor()
     private let fileManager = CacheFileManager.shared
     
-    func extractEmbeddedArtwork(storage: PersistentStorage, playable: AbstractPlayable) -> Promise<Void> {
-        return storage.async.perform { companion in
+    @MainActor func extractEmbeddedArtwork(storage: PersistentStorage, playable: AbstractPlayable) async throws {
+        try await storage.async.perform { companion in
             guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else { return }
             let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
             

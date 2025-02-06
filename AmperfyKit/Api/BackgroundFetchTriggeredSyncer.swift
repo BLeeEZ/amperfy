@@ -39,19 +39,15 @@ public class BackgroundFetchTriggeredSyncer {
         self.playableDownloadManager = playableDownloadManager
     }
     
-    public func syncAndNotifyPodcastEpisodes() -> Promise<Void> {
+    @MainActor public func syncAndNotifyPodcastEpisodes() async throws {
         os_log("Perform podcast episode sync", log: self.log, type: .info)
-        return firstly {
-            AutoDownloadLibrarySyncer(storage: self.storage,
-                                      librarySyncer: self.librarySyncer,
-                                      playableDownloadManager: self.playableDownloadManager)
-            .syncNewestPodcastEpisodes()
-        }.then { addedPodcastEpisodes -> Guarantee<Void> in
-            for episodeToNotify in addedPodcastEpisodes {
-                os_log("Podcast: %s, New Episode: %s", log: self.log, type: .info, episodeToNotify.podcast?.name ?? "", episodeToNotify.title)
-                self.notificationManager.notify(podcastEpisode: episodeToNotify)
-            }
-            return Guarantee<Void>.value
+        let autoDlLibSyncer = AutoDownloadLibrarySyncer(storage: self.storage,
+                                                        librarySyncer: self.librarySyncer,
+                                                        playableDownloadManager: self.playableDownloadManager)
+        let addedPodcastEpisodes = try await autoDlLibSyncer.syncNewestPodcastEpisodes()
+        for episodeToNotify in addedPodcastEpisodes {
+            os_log("Podcast: %s, New Episode: %s", log: self.log, type: .info, episodeToNotify.podcast?.name ?? "", episodeToNotify.title)
+            self.notificationManager.notify(podcastEpisode: episodeToNotify)
         }
     }
 

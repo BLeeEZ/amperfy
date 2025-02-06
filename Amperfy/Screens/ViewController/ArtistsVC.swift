@@ -67,11 +67,12 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         }
         swipeCallback = { (indexPath, completionHandler) in
             let artist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            firstly {
-                artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
+                }
                 completionHandler(SwipeActionContext(containable: artist))
             }
         }
@@ -135,11 +136,12 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         case .all, .albumArtists:
             break
         case .favorites:
-            firstly {
-                self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Favorite Artists Sync", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Favorite Artists Sync", error: error)
+                }
                 self.updateSearchResults(for: self.searchController)
             }
         }
@@ -200,11 +202,11 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
         fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1, displayFilter: displayFilter)
         tableView.reloadData()
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            firstly {
-                self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
-            }
+            }}
         }
     }
     
@@ -268,12 +270,14 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
             self.refreshControl?.endRefreshing()
             return
         }
-        firstly {
-            AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+
+        Task { @MainActor in 
+            do {
+                try await AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
                 .syncNewestLibraryElements()
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Artists Newest Elements Sync", error: error)
-        }.finally {
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Artists Newest Elements Sync", error: error)
+            }
             self.refreshControl?.endRefreshing()
         }
     }

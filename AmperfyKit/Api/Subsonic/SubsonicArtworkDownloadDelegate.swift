@@ -47,14 +47,10 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         return 2
     }
 
-    func prepareDownload(download: Download) -> Promise<URL> {
-        return Promise<Artwork> { seal in
-            guard let artwork = download.element as? Artwork else { throw DownloadError.fetchFailed }
-            guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
-            seal.fulfill(artwork)
-        }.then { artwork in
-            self.subsonicServerApi.generateUrl(forArtwork: artwork)
-        }
+    @MainActor func prepareDownload(download: Download) async throws -> URL {
+        guard let artwork = download.element as? Artwork else { throw DownloadError.fetchFailed }
+        guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
+        return try await self.subsonicServerApi.generateUrl(forArtwork: artwork)
     }
     
     func validateDownloadedData(download: Download) -> ResponseError? {
@@ -62,19 +58,17 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
             return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: subsonicServerApi), data: nil)
         }
         guard let data = fileManager.getFileDataIfNotToBig(url: fileURL, maxFileSize: Self.maxFileSizeOfErrorResponse) else { return nil }
-        return subsonicServerApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url, meta: nil))
+        return subsonicServerApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url))
     }
     
-    func completedDownload(download: Download, storage: PersistentStorage) -> Guarantee<Void> {
-        return Guarantee<Void> { seal in
-            guard download.fileURL != nil,
-                  let artwork = download.element as? Artwork else {
-                return seal(Void())
-            }
+    @MainActor func completedDownload(download: Download, storage: PersistentStorage) async {
+        guard download.fileURL != nil,
+              let artwork = download.element as? Artwork else {
+            return
+        }
+        storage.main.perform { companion in
             artwork.status = .CustomImage
             artwork.relFilePath = self.handleCustomImage(download: download, artwork: artwork)
-            storage.main.saveContext()
-            seal(Void())
         }
     }
     

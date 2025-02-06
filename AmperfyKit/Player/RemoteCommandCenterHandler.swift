@@ -154,10 +154,12 @@ class RemoteCommandCenterHandler {
                 return .success
             }
             self.remoteCommandCenter.likeCommand.isActive = !command.isNegative
-            firstly {
-                currentItem.remoteToggleFavorite(syncer: self.librarySyncer)
-            }.catch { error in
-                self.eventLogger.report(topic: "Toggle Favorite", error: error)
+            Task { @MainActor in
+                do {
+                    try await currentItem.remoteToggleFavorite(syncer: self.librarySyncer)
+                } catch {
+                    self.eventLogger.report(topic: "Toggle Favorite", error: error)
+                }
             }
             return .success})
     }

@@ -47,11 +47,12 @@ extension CarPlaySceneDelegate {
                     CPNowPlayingImageButton(image: isFavorite ? .heartFill : .heartEmpty, handler: { [weak self] button in
                         guard let `self` = self else { return }
                         guard let playableInfo = appDelegate.player.currentlyPlaying else { return }
-                        firstly {
-                            playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
-                        }.catch { error in
-                            self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
-                        }.finally {
+                        Task { @MainActor in
+                            do {
+                                try await playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+                            } catch {
+                                self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+                            }
                             self.configureNowPlayingTemplate()
                         }
                     })

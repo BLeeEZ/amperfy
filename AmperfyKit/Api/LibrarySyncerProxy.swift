@@ -38,148 +38,148 @@ class LibrarySyncerProxy {
 }
 
 extension LibrarySyncerProxy: LibrarySyncer {
-    func syncInitial(statusNotifyier: SyncCallbacks?) -> Promise<Void> {
-        return activeSyncer.syncInitial(statusNotifyier: statusNotifyier)
+    @MainActor func syncInitial(statusNotifyier: SyncCallbacks?) async throws {
+        return try await activeSyncer.syncInitial(statusNotifyier: statusNotifyier)
     }
     
-    func sync(genre: Genre) -> Promise<Void> {
-        return activeSyncer.sync(genre: genre)
+    @MainActor func sync(genre: Genre) async throws {
+        return try await activeSyncer.sync(genre: genre)
     }
     
-    func sync(artist: Artist) -> Promise<Void> {
-        return activeSyncer.sync(artist: artist)
+    @MainActor func sync(artist: Artist) async throws {
+        return try await activeSyncer.sync(artist: artist)
     }
     
-    func sync(album: Album) -> Promise<Void> {
-        return activeSyncer.sync(album: album)
+    @MainActor func sync(album: Album) async throws {
+        return try await activeSyncer.sync(album: album)
     }
     
-    func sync(song: Song) -> Promise<Void> {
-        return activeSyncer.sync(song: song)
+    @MainActor func sync(song: Song) async throws {
+        return try await activeSyncer.sync(song: song)
     }
     
-    func sync(podcast: Podcast) -> Promise<Void> {
-        return activeSyncer.sync(podcast: podcast)
+    @MainActor func sync(podcast: Podcast) async throws {
+        return try await activeSyncer.sync(podcast: podcast)
     }
     
-    func syncNewestAlbums(offset: Int, count: Int) -> Promise<Void> {
-        return activeSyncer.syncNewestAlbums(offset: offset, count: count)
+    @MainActor func syncNewestAlbums(offset: Int, count: Int) async throws {
+        return try await activeSyncer.syncNewestAlbums(offset: offset, count: count)
     }
     
-    func syncRecentAlbums(offset: Int, count: Int) -> Promise<Void> {
-        return activeSyncer.syncRecentAlbums(offset: offset, count: count)
+    @MainActor func syncRecentAlbums(offset: Int, count: Int) async throws {
+        return try await activeSyncer.syncRecentAlbums(offset: offset, count: count)
     }
     
-    func syncNewestPodcastEpisodes() -> Promise<Void> {
-        return activeSyncer.syncNewestPodcastEpisodes()
+    @MainActor func syncNewestPodcastEpisodes() async throws {
+        return try await activeSyncer.syncNewestPodcastEpisodes()
     }
     
-    func syncFavoriteLibraryElements() -> Promise<Void> {
-        return activeSyncer.syncFavoriteLibraryElements()
+    @MainActor func syncFavoriteLibraryElements() async throws {
+        return try await activeSyncer.syncFavoriteLibraryElements()
     }
     
-    func syncRadios() -> Promise<Void> {
-        return activeSyncer.syncRadios()
+    @MainActor func syncRadios() async throws {
+        return try await activeSyncer.syncRadios()
     }
 
-    func syncDownPlaylistsWithoutSongs() -> Promise<Void> {
-        return activeSyncer.syncDownPlaylistsWithoutSongs()
+    @MainActor func syncDownPlaylistsWithoutSongs() async throws {
+        return try await activeSyncer.syncDownPlaylistsWithoutSongs()
     }
     
-    func syncDown(playlist: Playlist) -> Promise<Void> {
-        return activeSyncer.syncDown(playlist: playlist)
+    @MainActor func syncDown(playlist: Playlist) async throws {
+        return try await activeSyncer.syncDown(playlist: playlist)
     }
     
-    func syncUpload(playlistToUpdateName playlist: Playlist) -> Promise<Void> {
-        return activeSyncer.syncUpload(playlistToUpdateName: playlist)
+    @MainActor func syncUpload(playlistToUpdateName playlist: Playlist) async throws {
+        return try await activeSyncer.syncUpload(playlistToUpdateName: playlist)
     }
     
-    func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song]) -> Promise<Void> {
-        return activeSyncer.syncUpload(playlistToAddSongs: playlist, songs: songs)
+    @MainActor func syncUpload(playlistToAddSongs playlist: Playlist, songs: [Song]) async throws {
+        return try await activeSyncer.syncUpload(playlistToAddSongs: playlist, songs: songs)
     }
     
-    func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int) -> Promise<Void> {
-        return activeSyncer.syncUpload(playlistToDeleteSong: playlist, index: index)
+    @MainActor func syncUpload(playlistToDeleteSong playlist: Playlist, index: Int) async throws {
+        return try await activeSyncer.syncUpload(playlistToDeleteSong: playlist, index: index)
     }
     
-    func syncUpload(playlistToUpdateOrder playlist: Playlist) -> Promise<Void> {
-        return activeSyncer.syncUpload(playlistToUpdateOrder: playlist)
+    @MainActor func syncUpload(playlistToUpdateOrder playlist: Playlist) async throws {
+        return try await activeSyncer.syncUpload(playlistToUpdateOrder: playlist)
     }
     
-    func syncUpload(playlistIdToDelete id: String) -> Promise<Void> {
-        return activeSyncer.syncUpload(playlistIdToDelete: id)
+    @MainActor func syncUpload(playlistIdToDelete id: String) async throws {
+        return try await activeSyncer.syncUpload(playlistIdToDelete: id)
     }
     
-    func syncDownPodcastsWithoutEpisodes() -> Promise<Void> {
-        return activeSyncer.syncDownPodcastsWithoutEpisodes()
+    @MainActor func syncDownPodcastsWithoutEpisodes() async throws {
+        return try await activeSyncer.syncDownPodcastsWithoutEpisodes()
     }
     
-    func searchArtists(searchText: String) -> Promise<Void> {
-        return activeSyncer.searchArtists(searchText: searchText)
+    @MainActor func searchArtists(searchText: String) async throws {
+        return try await activeSyncer.searchArtists(searchText: searchText)
     }
     
-    func searchAlbums(searchText: String) -> Promise<Void> {
-        return activeSyncer.searchAlbums(searchText: searchText)
+    @MainActor func searchAlbums(searchText: String) async throws {
+        return try await activeSyncer.searchAlbums(searchText: searchText)
     }
     
-    func searchSongs(searchText: String) -> Promise<Void> {
-        return activeSyncer.searchSongs(searchText: searchText)
+    @MainActor func searchSongs(searchText: String) async throws {
+        return try await activeSyncer.searchSongs(searchText: searchText)
     }
     
-    func syncMusicFolders() -> Promise<Void> {
-        return activeSyncer.syncMusicFolders()
+    @MainActor func syncMusicFolders() async throws {
+        return try await activeSyncer.syncMusicFolders()
     }
     
-    func syncIndexes(musicFolder: MusicFolder) -> Promise<Void> {
-        return activeSyncer.syncIndexes(musicFolder: musicFolder)
+    @MainActor func syncIndexes(musicFolder: MusicFolder) async throws {
+        return try await activeSyncer.syncIndexes(musicFolder: musicFolder)
     }
     
-    func sync(directory: Directory) -> Promise<Void> {
-        return activeSyncer.sync(directory: directory)
+    @MainActor func sync(directory: Directory) async throws {
+        return try await activeSyncer.sync(directory: directory)
     }
     
-    func requestRandomSongs(playlist: Playlist, count: Int) -> Promise<Void> {
-        return activeSyncer.requestRandomSongs(playlist: playlist, count: count)
+    @MainActor func requestRandomSongs(playlist: Playlist, count: Int) async throws {
+        return try await activeSyncer.requestRandomSongs(playlist: playlist, count: count)
     }
     
-    func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) -> Promise<Void> {
-        return activeSyncer.requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
+    @MainActor func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) async throws {
+        return try await activeSyncer.requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
     }
     
-    func syncNowPlaying(song: Song, songPosition: NowPlayingSongPosition) -> Promise<Void> {
-        return activeSyncer.syncNowPlaying(song: song, songPosition: songPosition)
+    @MainActor func syncNowPlaying(song: Song, songPosition: NowPlayingSongPosition) async throws {
+        return try await activeSyncer.syncNowPlaying(song: song, songPosition: songPosition)
     }
     
-    func scrobble(song: Song, date: Date?) -> Promise<Void> {
-        return activeSyncer.scrobble(song: song, date: date)
+    @MainActor func scrobble(song: Song, date: Date?) async throws {
+        return try await activeSyncer.scrobble(song: song, date: date)
     }
     
-    func setRating(song: Song, rating: Int) -> Promise<Void> {
-        return activeSyncer.setRating(song: song, rating: rating)
+    @MainActor func setRating(song: Song, rating: Int) async throws {
+        return try await activeSyncer.setRating(song: song, rating: rating)
     }
     
-    func setRating(album: Album, rating: Int) -> Promise<Void> {
-        return activeSyncer.setRating(album: album, rating: rating)
+    @MainActor func setRating(album: Album, rating: Int) async throws {
+        return try await activeSyncer.setRating(album: album, rating: rating)
     }
     
-    func setRating(artist: Artist, rating: Int) -> Promise<Void> {
-        return activeSyncer.setRating(artist: artist, rating: rating)
+    @MainActor func setRating(artist: Artist, rating: Int) async throws {
+        return try await activeSyncer.setRating(artist: artist, rating: rating)
     }
     
-    func setFavorite(song: Song, isFavorite: Bool) -> Promise<Void> {
-        return activeSyncer.setFavorite(song: song, isFavorite: isFavorite)
+    @MainActor func setFavorite(song: Song, isFavorite: Bool) async throws {
+        return try await activeSyncer.setFavorite(song: song, isFavorite: isFavorite)
     }
     
-    func setFavorite(album: Album, isFavorite: Bool) -> Promise<Void> {
-        return activeSyncer.setFavorite(album: album, isFavorite: isFavorite)
+    @MainActor func setFavorite(album: Album, isFavorite: Bool) async throws {
+        return try await activeSyncer.setFavorite(album: album, isFavorite: isFavorite)
     }
     
-    func setFavorite(artist: Artist, isFavorite: Bool) -> Promise<Void> {
-        return activeSyncer.setFavorite(artist: artist, isFavorite: isFavorite)
+    @MainActor func setFavorite(artist: Artist, isFavorite: Bool) async throws {
+        return try await activeSyncer.setFavorite(artist: artist, isFavorite: isFavorite)
     }
     
-    func parseLyrics(relFilePath: URL) -> Promise<LyricsList> {
-        return activeSyncer.parseLyrics(relFilePath: relFilePath)
+    @MainActor func parseLyrics(relFilePath: URL) async throws -> LyricsList {
+        return try await activeSyncer.parseLyrics(relFilePath: relFilePath)
     }
     
 }

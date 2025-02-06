@@ -57,15 +57,15 @@ class SyncVC: UIViewController {
         self.appDelegate.storage.main.library.cleanStorage()
         self.appDelegate.reinit()
         
-        firstly {
-            self.appDelegate.librarySyncer.syncInitial(statusNotifyier: self)
-        }.done {
-            self.appDelegate.storage.initialSyncCompletionStatus = .completed
-        }.catch { error in
-            guard !self.syncFinished else { return }
-            self.appDelegate.eventLogger.report(topic: "Initial Sync", error: error, displayPopup: false)
-            self.appDelegate.storage.initialSyncCompletionStatus = .aborded
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await self.appDelegate.librarySyncer.syncInitial(statusNotifyier: self)
+                self.appDelegate.storage.initialSyncCompletionStatus = .completed
+            } catch {
+                guard !self.syncFinished else { return }
+                self.appDelegate.eventLogger.report(topic: "Initial Sync", error: error, displayPopup: false)
+                self.appDelegate.storage.initialSyncCompletionStatus = .aborded
+            }
             self.finishSync()
         }
     }

@@ -35,7 +35,6 @@ public class ScrobbleSyncer {
     private let librarySyncer: LibrarySyncer
     private let eventLogger: EventLogger
     private let activeDispatchGroup = DispatchGroup()
-    private let uploadSemaphore = DispatchSemaphore(value: 1)
     private var isRunning = false
     private var isActive = false
     private var scrobbleTimer: Timer?
@@ -69,14 +68,14 @@ public class ScrobbleSyncer {
     func scrobble(playedSong: Song, songPosition: NowPlayingSongPosition) {
         func nowPlayingToServerAsync(playedSong: Song, songPosition: NowPlayingSongPosition, finallyCB: ((_: Song, _: Bool) -> Void)? = nil) {
             var success = false
-            firstly {
-                self.librarySyncer.syncNowPlaying(song: playedSong, songPosition: songPosition)
-            }.done {
-                success = true
-            }.catch { error in
-                os_log("Now Playing Sync Failed: %s", log: self.log, type: .info, playedSong.displayString)
-                self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await self.librarySyncer.syncNowPlaying(song: playedSong, songPosition: songPosition)
+                    success = true
+                } catch {
+                    os_log("Now Playing Sync Failed: %s", log: self.log, type: .info, playedSong.displayString)
+                    self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
+                }
                 finallyCB?(playedSong, success)
             }
         }
@@ -100,40 +99,28 @@ public class ScrobbleSyncer {
     }
     
     private func uploadInBackground() {
-        DispatchQueue.global().async {
+        Task { @MainActor in
             self.activeDispatchGroup.enter()
             os_log("start", log: self.log, type: .info)
             
             while self.isRunning, self.storage.settings.isOnlineMode, self.networkMonitor.isConnectedToNetwork {
-                self.uploadSemaphore.wait()
-                firstlyOnMain {
-                    self.getNextScrobbleEntry()
-                }.then { scobbleEntry -> Promise<Void> in
+                do {
+                    let scobbleEntry = try await self.getNextScrobbleEntry()
                     guard let entry = scobbleEntry else {
                         self.isRunning = false
-                        return Promise.value
+                        continue
                     }
                     guard let song = entry.playable?.asSong, let date = entry.date else {
-                        return Promise.value
+                        entry.isUploaded = true;
+                        self.storage.main.saveContext()
+                        continue
                     }
-                    return Promise<Void> { seal in
-                        return firstly {
-                            self.librarySyncer.scrobble(song: song, date: date)
-                        }.done {
-                            entry.isUploaded = true;
-                            self.storage.main.saveContext()
-                        }.catch { error in
-                            self.isRunning = false
-                            self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
-                        }.finally {
-                            seal.fulfill(Void())
-                        }
-                    }
-                }.catch { error in
+                    try await self.librarySyncer.scrobble(song: song, date: date)
+                    entry.isUploaded = true;
+                    self.storage.main.saveContext()
+                } catch {
                     self.isRunning = false
                     self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
-                }.finally {
-                    self.uploadSemaphore.signal()
                 }
             }
             
@@ -143,16 +130,15 @@ public class ScrobbleSyncer {
         }
     }
     
-    private func getNextScrobbleEntry() -> Promise<ScrobbleEntry?> {
-        return Promise<ScrobbleEntry?> { seal in
-            _ = self.storage.async.perform { asyncCompanion in
-                guard let scobbleEntry = asyncCompanion.library.getFirstUploadableScrobbleEntry() else {
-                    return seal.fulfill(nil)
-                }
-                let scobbleEntryMain = ScrobbleEntry(managedObject: try! self.storage.main.context.existingObject(with: scobbleEntry.managedObject.objectID) as! ScrobbleEntryMO)
-                return seal.fulfill(scobbleEntryMain)
+    @MainActor private func getNextScrobbleEntry() async throws -> ScrobbleEntry? {
+        var scobbleEntryMain: ScrobbleEntry?
+        try await self.storage.async.perform { asyncCompanion in
+            guard let scobbleEntry = asyncCompanion.library.getFirstUploadableScrobbleEntry() else {
+                return
             }
+            scobbleEntryMain = ScrobbleEntry(managedObject: try! self.storage.main.context.existingObject(with: scobbleEntry.managedObject.objectID) as! ScrobbleEntryMO)
         }
+        return scobbleEntryMain
     }
     
     private func cacheScrobbleRequest(playedSong: Song, isUploaded: Bool) {

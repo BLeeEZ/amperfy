@@ -526,13 +526,12 @@ extension NowPlayingInfoView: MusicPlayable, Refreshable {
               let song = self.player.currentlyPlaying?.asSong
         else { return }
 
-        firstly {
-            self.appDelegate.librarySyncer.sync(song: song)
-        }.done {
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.sync(song: song)
             self.reload()
-        }.catch { error in
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
-        }
+        }}
     }
 
     func reload() {

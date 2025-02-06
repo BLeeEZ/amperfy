@@ -46,11 +46,12 @@ class UpdateVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         self.appDelegate.eventLogger.supressAlerts = true
         
-        firstly {
-            self.appDelegate.libraryUpdater.performLibraryUpdateWithStatus(notifier: self)
-        }.catch { error in
-            // cancle and do nothing
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await self.appDelegate.libraryUpdater.performLibraryUpdateWithStatus(notifier: self)
+            } catch {
+                // cancle and do nothing
+            }
             self.progressInfo.text = "Done"
             self.activitySpinner.stopAnimating()
             self.activitySpinner.isHidden = true
@@ -60,11 +61,11 @@ class UpdateVC: UIViewController {
             self.appDelegate.eventLogger.supressAlerts = false
             self.appDelegate.startManagerForNormalOperation()
 
-    #if targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
             AppDelegate.rootViewController()?.dismiss(animated: true)
-    #else
+#else
             self.performSegue(withIdentifier: "toLibrary", sender: self)
-    #endif
+#endif
         }
     }
     

@@ -69,13 +69,12 @@ class LyricsVC: SlideOverItemVC {
               let song = player.currentlyPlaying?.asSong
         else { return }
 
-        firstly {
-            self.appDelegate.librarySyncer.sync(song: song)
-        }.done {
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.sync(song: song)
             self.refreshLyrics()
-        }.catch { error in
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
-        }
+        }}
     }
 
     private func showLyrics(structuredLyrics: StructuredLyrics) {
@@ -100,18 +99,17 @@ class LyricsVC: SlideOverItemVC {
             return
         }
 
-        firstly {
-            appDelegate.librarySyncer.parseLyrics(relFilePath: lyricsRelFilePath)
-        }.done { lyricsList in
+        Task { @MainActor in do {
+            let lyricsList = try await appDelegate.librarySyncer.parseLyrics(relFilePath: lyricsRelFilePath)
             if song == self.player.currentlyPlaying?.asSong,
                let structuredLyrics = lyricsList.getFirstSyncedLyricsOrUnsyncedAsDefault() {
                 self.showLyrics(structuredLyrics: structuredLyrics)
             } else {
                 self.showLyricsAreNotAvailable()
             }
-        }.catch { error in
+        } catch {
             self.showLyricsAreNotAvailable()
-        }
+        }}
     }
 
     func refreshLyricsTime(time: CMTime) {

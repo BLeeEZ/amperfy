@@ -75,11 +75,11 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
         addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
         
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-        }.catch { error in
+        Task { @MainActor in do {
+            try await playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
-        }
+        }}
     }
     
     override func viewWillDisappear(_ animated: Bool) {

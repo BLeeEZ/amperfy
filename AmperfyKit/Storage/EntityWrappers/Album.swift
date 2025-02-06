@@ -191,15 +191,17 @@ extension Album: PlayableContainable  {
     public var playContextType: PlayerMode { return .music }
     public var isRateable: Bool { return true }
     public var isFavoritable: Bool { return true }
-    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
-        guard let context = managedObject.managedObjectContext else { return Promise<Void>(error: BackendError.persistentSaveFailed) }
+    @MainActor public func remoteToggleFavorite(syncer: LibrarySyncer) async throws {
+        guard let context = managedObject.managedObjectContext else {
+            throw BackendError.persistentSaveFailed
+        }
         isFavorite.toggle()
         let library = LibraryStorage(context: context)
         library.saveContext()
-        return syncer.setFavorite(album: self, isFavorite: isFavorite)
+        try await syncer.setFavorite(album: self, isFavorite: isFavorite)
     }
-    public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
-        return librarySyncer.sync(album: self)
+    @MainActor public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) async throws {
+        try await librarySyncer.sync(album: self)
     }
     public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
         return ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)

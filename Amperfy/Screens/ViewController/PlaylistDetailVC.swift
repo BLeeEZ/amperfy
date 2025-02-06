@@ -45,11 +45,11 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
             self.playlist?.movePlaylistItem(fromIndex: sourceIndexPath.row, to: destinationIndexPath.row)
             
             guard self.appDelegate.storage.settings.isOnlineMode else { return }
-            firstly {
-                self.appDelegate.librarySyncer.syncUpload(playlistToUpdateOrder: self.playlist)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.syncUpload(playlistToUpdateOrder: self.playlist)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Playlist Upload Order Update", error: error)
-            }
+            }}
         }
         super.tableView(tableView, moveRowAt: sourceIndexPath, to: destinationIndexPath)
     }
@@ -59,11 +59,11 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
         exectueAfterAnimation {
             self.playlist?.remove(at: indexPath.row)
             guard self.appDelegate.storage.settings.isOnlineMode else { return }
-            firstly {
-                self.appDelegate.librarySyncer.syncUpload(playlistToDeleteSong: self.playlist, index: indexPath.row)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.syncUpload(playlistToDeleteSong: self.playlist, index: indexPath.row)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
-            }
+            }}
         }
         super.tableView(tableView, commit: editingStyle, forRowAt: indexPath)
     }
@@ -156,11 +156,12 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
             tableView.isEditing = false
         }
         refreshBarButtons()
-        firstly {
-            playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
+            }
             self.detailOperationsView?.refresh()
         }
     }
@@ -223,11 +224,12 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     }
     
     @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        firstly {
-            self.appDelegate.librarySyncer.syncDown(playlist: playlist)
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await self.appDelegate.librarySyncer.syncDown(playlist: playlist)
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
+            }
             self.detailOperationsView?.refresh()
             self.refreshControl?.endRefreshing()
         }

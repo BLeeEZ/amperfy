@@ -63,11 +63,11 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
         addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
         
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-        }.catch { error in
+        Task { @MainActor in do {
+            try await artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
-        }
+        }}
     }
     
     func updateTitle() {

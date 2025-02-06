@@ -465,11 +465,11 @@ extension Playlist: PlayableContainable  {
         return infoContent
     }
     public var playContextType: PlayerMode { return .music }
-    public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
-        return librarySyncer.syncDown(playlist: self)
+    @MainActor public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) async throws {
+        try await librarySyncer.syncDown(playlist: self)
     }
-    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
-        return Promise<Void>(error: BackendError.notSupported)
+    @MainActor public func remoteToggleFavorite(syncer: LibrarySyncer) async throws {
+        throw BackendError.notSupported
     }
     public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
         let artworkItems = artworkItems

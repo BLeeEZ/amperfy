@@ -58,11 +58,12 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         }
         swipeCallback = { (indexPath, completionHandler) in
             let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            firstly {
-                genre.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await genre.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
+                }
                 completionHandler(SwipeActionContext(containable: genre))
             }
         }
@@ -100,12 +101,13 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
             self.refreshControl?.endRefreshing()
             return
         }
-        firstly {
-            AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                .syncNewestLibraryElements()
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Genres Newest Elements Sync", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    .syncNewestLibraryElements()
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Genres Newest Elements Sync", error: error)
+            }
             self.refreshControl?.endRefreshing()
         }
     }

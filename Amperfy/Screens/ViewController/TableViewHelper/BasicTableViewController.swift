@@ -192,10 +192,13 @@ class BasicTableViewController: KeyCommandTableViewController {
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
             let vc = EntityPreviewVC()
             vc.display(container: containable, on: self)
-            containable.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-            .catch { error in
-                self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
-            }.finally {
+            
+            Task { @MainActor in
+                do {
+                    try await containable.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
+                }
                 vc.refresh()
             }
             return vc
@@ -267,11 +270,12 @@ class BasicTableViewController: KeyCommandTableViewController {
                 case .appendPodcastQueue:
                     self.appDelegate.player.appendPodcastQueue(playables: actionContext.playables.filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode))
                 case .favorite:
-                    firstly {
-                        actionContext.containable.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
-                    }.catch { error in
-                        self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
-                    }.finally {
+                    Task { @MainActor in
+                        do {
+                            try await actionContext.containable.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+                        } catch {
+                            self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+                        }
                         if let cell = self.tableView.cellForRow(at: indexPath) as? PlayableTableCell {
                             cell.refresh()
                         }

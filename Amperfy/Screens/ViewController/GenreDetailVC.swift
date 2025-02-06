@@ -99,20 +99,22 @@ class GenreDetailVC: MultiSourceTableViewController {
             switch indexPath.section+1 {
             case LibraryElement.Artist.rawValue:
                 let artist = self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                firstly {
-                    artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
-                }.finally {
+                Task { @MainActor in
+                    do {
+                        try await artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    } catch {
+                        self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
+                    }
                     completionHandler(SwipeActionContext(containable: artist))
                 }
             case LibraryElement.Album.rawValue:
                 let album = self.albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-                firstly {
-                    album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                }.catch { error in
-                    self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
-                }.finally {
+                Task { @MainActor in
+                    do {
+                        try await album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                    } catch {
+                        self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+                    }
                     completionHandler(SwipeActionContext(containable: album))
                 }
             case LibraryElement.Song.rawValue:
@@ -132,11 +134,12 @@ class GenreDetailVC: MultiSourceTableViewController {
         albumsFetchedResultsController?.delegate = self
         songsFetchedResultsController?.delegate = self
         
-        firstly {
-            genre.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await genre.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
+            }
             self.detailOperationsView?.refresh()
         }
     }

@@ -36,13 +36,17 @@ struct ArtworkSettingsView: View {
     @State var isShowDeleteArtworksAlert = false
 
     func updateValues() {
-        appDelegate.storage.async.perform { asyncCompanion in
-            let artworkNotCheckedCount = asyncCompanion.library.artworkNotCheckedCount
-            let artworkNotCheckedDisplayCount = artworkNotCheckedCount > Self.artworkNotCheckedThreshold ? artworkNotCheckedCount : 0
-            self.artworkNotCheckedCountText = String(artworkNotCheckedDisplayCount)
-            let cachedArtworkCount = asyncCompanion.library.cachedArtworkCount
-                self.cachedArtworksCountText = String(cachedArtworkCount)
-        }.catch { error in }
+        Task { @MainActor in do {
+            try await appDelegate.storage.async.perform { asyncCompanion in
+                let artworkNotCheckedCount = asyncCompanion.library.artworkNotCheckedCount
+                let artworkNotCheckedDisplayCount = artworkNotCheckedCount > Self.artworkNotCheckedThreshold ? artworkNotCheckedCount : 0
+                self.artworkNotCheckedCountText = String(artworkNotCheckedDisplayCount)
+                let cachedArtworkCount = asyncCompanion.library.cachedArtworkCount
+                    self.cachedArtworksCountText = String(cachedArtworkCount)
+            }
+        } catch {
+            // do nothing
+        }}
     }
 
     var body: some View {

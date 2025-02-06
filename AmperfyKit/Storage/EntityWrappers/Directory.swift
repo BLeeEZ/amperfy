@@ -100,11 +100,11 @@ extension Directory: PlayableContainable  {
     public var playContextType: PlayerMode { return .music }
     public var isRateable: Bool { return false }
     public var isFavoritable: Bool { return false }
-    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
-        return Promise<Void>(error: BackendError.notSupported)
+    @MainActor public func remoteToggleFavorite(syncer: LibrarySyncer) async throws {
+        throw BackendError.notSupported
     }
-    public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
-        return librarySyncer.sync(directory: self)
+    @MainActor public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) async throws {
+        try await librarySyncer.sync(directory: self)
     }
     public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
         return ArtworkCollection(defaultImage: .getGeneratedArtwork(theme: theme, artworkType: .folder), singleImageEntity: self)

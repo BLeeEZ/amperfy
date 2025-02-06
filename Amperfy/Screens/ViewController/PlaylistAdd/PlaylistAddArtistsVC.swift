@@ -137,11 +137,11 @@ class PlaylistAddArtistsVC: SingleFetchedResultsTableViewController<ArtistMO>, P
         fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1, displayFilter: displayFilter)
         tableView.reloadData()
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            firstly {
-                self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
-            }
+            }}
         }
     }
 

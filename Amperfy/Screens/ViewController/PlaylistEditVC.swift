@@ -130,26 +130,17 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
     
     @IBAction func deleteBarButtonPressed(_ sender: Any) {
         let selectedItemsSorted = selectedItems.sorted(by: { $0.order > $1.order })
-        var syncPromises = [() -> Promise<Void>]()
 
-        syncPromises = selectedItemsSorted.compactMap { item in
-            return {
-                guard let index = self.playlist.getFirstIndex(item: item) else { return Promise.value }
-                return firstly {
-                    self.appDelegate.librarySyncer.syncUpload(playlistToDeleteSong: self.playlist, index: index)
-                }.then {
+        Task { @MainActor in
+            do {
+                for item in selectedItemsSorted {
+                    guard let index = self.playlist.getFirstIndex(item: item) else { continue }
+                    try await self.appDelegate.librarySyncer.syncUpload(playlistToDeleteSong: self.playlist, index: index)
                     self.playlist?.remove(at: index)
-                    return Promise.value
                 }
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
             }
-        }
-        firstly {
-            syncPromises.resolveSequentially()
-        }
-        .catch { error in
-            self.appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
-        }
-        .finally {
             self.detailOperationsView?.refresh()
         }
 

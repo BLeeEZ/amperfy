@@ -57,11 +57,11 @@ class PlaylistAddMusicFoldersVC: SingleFetchedResultsTableViewController<MusicFo
         updateTitle()
         
         guard appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            self.appDelegate.librarySyncer.syncMusicFolders()
-        }.catch { error in
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.syncMusicFolders()
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Music Folders Sync", error: error)
-        }
+        }}
     }
     
     func updateTitle() {

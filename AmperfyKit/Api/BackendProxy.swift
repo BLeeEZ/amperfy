@@ -195,94 +195,56 @@ public class BackendProxy {
         self.persistentStorage = persistentStorage
     }
 
-    public func login(apiType: BackenApiType, credentials: LoginCredentials) -> Promise<BackenApiType> {
-        return firstly {
-            checkServerReachablity(credentials: credentials)
-        }.then {
-            return Promise<BackenApiType> { seal in
-                var apiFound = BackenApiType.notDetected
-                firstly { () -> Guarantee<Void> in
-                    if apiFound == .notDetected && (apiType == .notDetected || apiType == .ampache) {
-                        return Guarantee<Void> { apiSeal in
-                            firstly {
-                                self.ampacheApi.isAuthenticationValid(credentials: credentials)
-                            }.done {
-                                apiFound = .ampache
-                            }.catch { error in
-                                // error -> ignore this api and check the others
-                            }.finally {
-                                apiSeal(Void())
-                            }
-                        }
-                    } else {
-                        return Guarantee.value
-                    }
-                }.then { () -> Guarantee<Void> in
-                    if apiFound == .notDetected && (apiType == .notDetected || apiType == .subsonic) {
-                        return Guarantee<Void> { apiSeal in
-                            firstly {
-                                self.subsonicApi.isAuthenticationValid(credentials: credentials)
-                            }.done {
-                                apiFound = .subsonic
-                            }.catch { error in
-                                // error -> ignore this api and check the others
-                            }.finally {
-                                apiSeal(Void())
-                            }
-                        }
-                    } else {
-                        return Guarantee.value
-                    }
-                }.then { () -> Guarantee<Void> in
-                    if apiFound == .notDetected && (apiType == .notDetected || apiType == .subsonic_legacy) {
-                        return Guarantee<Void> { apiSeal in
-                            firstly {
-                                self.subsonicLegacyApi.isAuthenticationValid(credentials: credentials)
-                            }.done {
-                                apiFound = .subsonic_legacy
-                            }.catch { error in
-                                // error -> ignore this api and check the others
-                            }.finally {
-                                apiSeal(Void())
-                            }
-                        }
-                    } else {
-                        return Guarantee.value
-                    }
-                }.done {
-                    if apiFound == .notDetected {
-                        seal.reject(AuthenticationError.notAbleToLogin)
-                    } else {
-                        seal.fulfill(apiFound)
-                    }
-                }
-            }
+    @MainActor public func login(apiType: BackenApiType, credentials: LoginCredentials) async throws -> BackenApiType {
+        try await checkServerReachablity(credentials: credentials)
+        
+        if (apiType == .notDetected || apiType == .ampache) {
+            do {
+                try await self.ampacheApi.isAuthenticationValid(credentials: credentials)
+                return .ampache
+            } catch { } // error -> ignore this api and check the others
         }
+        
+        if  (apiType == .notDetected || apiType == .subsonic) {
+            do {
+                try await self.subsonicApi.isAuthenticationValid(credentials: credentials)
+                return .subsonic
+            } catch { } // error -> ignore this api and check the others
+        }
+        
+        if (apiType == .notDetected || apiType == .subsonic_legacy) {
+            do {
+                try await self.subsonicLegacyApi.isAuthenticationValid(credentials: credentials)
+                return .subsonic_legacy
+            } catch { } // error -> ignore this api and check the others
+        }
+        
+        throw AuthenticationError.notAbleToLogin
     }
     
-    private func checkServerReachablity(credentials: LoginCredentials) -> Promise<Void> {
-        return Promise<Void> { seal in
-            guard let serverUrl = URL(string: credentials.serverUrl) else {
-                throw AuthenticationError.invalidUrl
-            }
-            
+    @MainActor private func checkServerReachablity(credentials: LoginCredentials) async throws {
+        guard let serverUrl = URL(string: credentials.serverUrl) else {
+            throw AuthenticationError.invalidUrl
+        }
+        
+        return try await withCheckedThrowingContinuation { continuation in
             let sessionConfig = URLSessionConfiguration.default
             let session = URLSession(configuration: sessionConfig)
             let request = URLRequest(url: serverUrl)
             let task = session.downloadTask(with: request) { (tempLocalUrl, response, error) in
                 if let error = error {
-                    seal.reject(AuthenticationError.downloadError(message: error.localizedDescription))
+                    continuation.resume(throwing: AuthenticationError.downloadError(message: error.localizedDescription))
                 } else {
                     if let statusCode = (response as? HTTPURLResponse)?.statusCode {
                         if statusCode >= 400,
-                        // ignore 401 Unauthorized (RFC 7235) status code
-                        // -> Can occure if root website requires http basic authentication,
-                        //    but the REST API endpoints are reachable without http basic authentication
-                        statusCode != 401 {
-                            seal.reject(AuthenticationError.requestStatusError(message: "\(statusCode)"))
+                           // ignore 401 Unauthorized (RFC 7235) status code
+                           // -> Can occure if root website requires http basic authentication,
+                            //    but the REST API endpoints are reachable without http basic authentication
+                            statusCode != 401 {
+                            continuation.resume(throwing: AuthenticationError.requestStatusError(message: "\(statusCode)"))
                         } else {
                             os_log("Server url is reachable. Status code: %d", log: self.log, type: .info, statusCode)
-                            seal.fulfill(Void())
+                            continuation.resume()
                         }
                     }
                 }
@@ -311,20 +273,20 @@ extension BackendProxy: BackendApi {
         activeApi.provideCredentials(credentials: credentials)
     }
 
-    public func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
-        return activeApi.isAuthenticationValid(credentials: credentials)
+    @MainActor public func isAuthenticationValid(credentials: LoginCredentials) async throws {
+        return try await activeApi.isAuthenticationValid(credentials: credentials)
     }
     
-    public func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> {
-        return activeApi.generateUrl(forDownloadingPlayable: playable)
+    @MainActor public func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL {
+        return try await activeApi.generateUrl(forDownloadingPlayable: playable)
     }
     
-    public func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> {
-        return activeApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
+    @MainActor public func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL {
+        return try await activeApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
     }
     
-    public func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
-        return activeApi.generateUrl(forArtwork: artwork)
+    @MainActor public func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
+        return try await activeApi.generateUrl(forArtwork: artwork)
     }
     
     public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {

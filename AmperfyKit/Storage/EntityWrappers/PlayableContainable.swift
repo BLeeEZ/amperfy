@@ -76,10 +76,10 @@ public protocol PlayableContainable {
     var isDownloadAvailable: Bool { get }
     func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection
     func cachePlayables(downloadManager: DownloadManageable)
-    func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void>
+    @MainActor func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) async throws
     var isFavoritable: Bool { get }
     var isFavorite: Bool { get }
-    func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void>
+    @MainActor func remoteToggleFavorite(syncer: LibrarySyncer) async throws
     func playedViaContext()
     var containerIdentifier: PlayableContainerIdentifier { get }
 }
@@ -98,9 +98,9 @@ extension PlayableContainable {
         return infoDetails(for: api, details: details).joined(separator: " \(CommonString.oneMiddleDot) ")
     }
     
-    public func fetch(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
-        guard storage.settings.isOnlineMode else { return Promise.value }
-        return fetchFromServer(storage: storage, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager)
+    @MainActor public func fetch(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) async throws {
+        guard storage.settings.isOnlineMode else { return }
+        try await fetchFromServer(storage: storage, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager)
     }
     public var isRateable: Bool { return false }
     public var isFavoritable: Bool { return false }

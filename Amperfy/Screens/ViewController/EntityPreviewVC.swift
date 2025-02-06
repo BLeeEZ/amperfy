@@ -441,11 +441,12 @@ class EntityPreviewActionBuilder {
     
     private func toggleFavorite() {
         guard self.appDelegate.storage.settings.isOnlineMode else { return }
-        firstly {
-            entityContainer.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await entityContainer.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
+            }
             self.reloadRootView()
         }
     }
@@ -473,27 +474,27 @@ class EntityPreviewActionBuilder {
         if let song = (entityContainer as? AbstractPlayable)?.asSong {
             song.rating = rating
             self.appDelegate.storage.main.saveContext()
-            firstly {
-                self.appDelegate.librarySyncer.setRating(song: song, rating: rating)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.setRating(song: song, rating: rating)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Song Rating Sync", error: error)
-            }
+            }}
         } else if let album = entityContainer as? Album  {
             album.rating = rating
             self.appDelegate.storage.main.saveContext()
-            firstly {
-                self.appDelegate.librarySyncer.setRating(album: album, rating: rating)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.setRating(album: album, rating: rating)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Album Rating Sync", error: error)
-            }
+            }}
         } else if let artist = entityContainer as? Artist {
             artist.rating = rating
             self.appDelegate.storage.main.saveContext()
-            firstly {
-                self.appDelegate.librarySyncer.setRating(artist: artist, rating: rating)
-            }.catch { error in
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.setRating(artist: artist, rating: rating)
+            } catch {
                 self.appDelegate.eventLogger.report(topic: "Artist Rating Sync", error: error)
-            }
+            }}
         }
     }
     
@@ -594,14 +595,13 @@ class EntityPreviewActionBuilder {
             
             let alert = UIAlertController(title: nil, message: "Are you sure to delete the podcast episode on the server?", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-                firstly {
-                    self.appDelegate.librarySyncer.requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
-                }.then { () -> Promise<Void> in
-                    guard let podcast = podcastEpisode.podcast else { return Promise.value }
-                    return self.appDelegate.librarySyncer.sync(podcast: podcast)
-                }.catch { error in
+                Task { @MainActor in do {
+                    try await self.appDelegate.librarySyncer.requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
+                    guard let podcast = podcastEpisode.podcast else { return }
+                    try await self.appDelegate.librarySyncer.sync(podcast: podcast)
+                } catch {
                     self.appDelegate.eventLogger.report(topic: "Podcast Episode Delete Sync", error: error)
-                }
+                }}
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
                 // do nothing

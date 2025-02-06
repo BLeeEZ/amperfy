@@ -41,8 +41,8 @@ class DownloadRequestManager {
     }
     
     func add(objects: [Downloadable]) {
-        firstly {
-            storage.async.perform { asyncCompanion in
+        Task { @MainActor in
+            try? await self.storage.async.perform { asyncCompanion in
                 for (n,object) in objects.enumerated() {
                     self.addLowPrio(object: object, library: asyncCompanion.library)
                     if (n % 500) == 0 {
@@ -51,7 +51,7 @@ class DownloadRequestManager {
                 }
                 asyncCompanion.saveContext()
             }
-        }.catch { error in }
+        }
     }
 
     private func addLowPrio(object: Downloadable, library: LibraryStorage) {
@@ -85,7 +85,7 @@ class DownloadRequestManager {
 
     func getNextRequestToDownload() -> Download? {
         var nextDownload: Download?
-        self.storage.main.context.performAndWait {
+        self.storage.main.perform { mainCompanion in
             let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
             fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
@@ -94,10 +94,9 @@ class DownloadRequestManager {
                 self.downloadDelegate.requestPredicate
             ])
             fetchRequest.fetchLimit = 1
-            let downloads = try? self.storage.main.context.fetch(fetchRequest)
+            let downloads = try? mainCompanion.context.fetch(fetchRequest)
             nextDownload = downloads?.lazy.compactMap{ Download(managedObject: $0) }.first
             nextDownload?.isDownloading = true
-            self.storage.main.saveContext()
         }
         return nextDownload
     }

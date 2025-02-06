@@ -171,28 +171,31 @@ class AlbumsCommonVCInteractions {
         case .all:
             break
         case .newest:
-            firstly {
-                AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                    .syncNewestLibraryElements(offset: offset, count: count)
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Newest Albums Sync", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                        .syncNewestLibraryElements(offset: offset, count: count)
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Newest Albums Sync", error: error)
+                }
                 self.updateSearchResultsCB?()
             }
         case .recent:
-            firstly {
-                self.appDelegate.librarySyncer.syncRecentAlbums(offset: offset, count: count)
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await self.appDelegate.librarySyncer.syncRecentAlbums(offset: offset, count: count)
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
+                }
                 self.updateSearchResultsCB?()
             }
         case .favorites:
-            firstly {
-                self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
-            }.catch { error in
-                self.appDelegate.eventLogger.report(topic: "Favorite Albums Sync", error: error)
-            }.finally {
+            Task { @MainActor in
+                do {
+                    try await self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
+                } catch {
+                    self.appDelegate.eventLogger.report(topic: "Favorite Albums Sync", error: error)
+                }
                 self.updateSearchResultsCB?()
             }
         }
@@ -371,11 +374,11 @@ class AlbumsCommonVCInteractions {
     func updateSearchResults(for searchController: UISearchController) {
         let searchText = searchController.searchBar.text ?? ""
         if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-           firstly {
-               self.appDelegate.librarySyncer.searchAlbums(searchText: searchText)
-           }.catch { error in
-               self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
-            }
+            Task { @MainActor in do {
+                try await self.appDelegate.librarySyncer.searchAlbums(searchText: searchText)
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
+            }}
         }
         fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1, displayFilter: displayFilter)
     }
@@ -395,16 +398,17 @@ class AlbumsCommonVCInteractions {
             endRefreshCB?()
             return
         }
-        firstly {
-            if self.displayFilter == .recent {
-                return self.appDelegate.librarySyncer.syncRecentAlbums(offset: 0, count: AmperKit.newestElementsFetchCount)
-            } else {
-                return AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                    .syncNewestLibraryElements()
+        Task { @MainActor in
+            do {
+                if self.displayFilter == .recent {
+                    try await self.appDelegate.librarySyncer.syncRecentAlbums(offset: 0, count: AmperKit.newestElementsFetchCount)
+                } else {
+                    try await AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
+                        .syncNewestLibraryElements()
+                }
+            } catch {
+                self.appDelegate.eventLogger.report(topic: "Albums Newest Elements Sync", error: error)
             }
-        }.catch { error in
-            self.appDelegate.eventLogger.report(topic: "Albums Newest Elements Sync", error: error)
-        }.finally {
             self.endRefreshCB?()
         }
     }

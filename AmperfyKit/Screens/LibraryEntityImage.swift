@@ -89,11 +89,15 @@ public class LibraryEntityImage: RoundedImage {
         guard let downloadNotification = DownloadNotification.fromNotification(notification) else { return }
         if let playable = entity as? AbstractPlayable,
            playable.uniqueID == downloadNotification.id {
-            refresh()
+            Task { @MainActor in
+                refresh()
+            }
         }
         if let artwork = entity?.artwork,
            artwork.uniqueID == downloadNotification.id {
-            refresh()
+            Task { @MainActor in
+                refresh()
+            }
         }
     }
     

@@ -170,12 +170,11 @@ class GenericDetailTableHeader: UIView {
         titleLabel.text = nameText
         guard appDelegate.storage.settings.isOnlineMode else { return }
      
-        firstly {
-            self.appDelegate.librarySyncer.syncUpload(playlistToUpdateName: playlist)
-        }.catch { error in
+        Task { @MainActor in do {
+            try await self.appDelegate.librarySyncer.syncUpload(playlistToUpdateName: playlist)
+        } catch {
             self.appDelegate.eventLogger.report(topic: "Playlist Update Name", error: error)
-        }
-
+        }}
     }
     
     @IBAction func subtitleButtonPressed(_ sender: Any) {

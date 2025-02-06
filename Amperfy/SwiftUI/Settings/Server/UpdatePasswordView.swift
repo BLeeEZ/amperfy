@@ -47,15 +47,15 @@ struct UpdatePasswordView: View {
         }
         isValidating = true
         loginCredentials.changePasswordAndHash(password: newPassword)
-        firstly {
-            self.appDelegate.backendApi.isAuthenticationValid(credentials: loginCredentials)
-        }.done {
-            self.appDelegate.storage.loginCredentials = loginCredentials
-            self.appDelegate.backendApi.provideCredentials(credentials: loginCredentials)
-            successMsg = "Password updated!"
-        }.catch { error in
-            errorMsg = "Authentication failed! Password has not been updated."
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await self.appDelegate.backendApi.isAuthenticationValid(credentials: loginCredentials)
+                self.appDelegate.storage.loginCredentials = loginCredentials
+                self.appDelegate.backendApi.provideCredentials(credentials: loginCredentials)
+                successMsg = "Password updated!"
+            } catch {
+                errorMsg = "Authentication failed! Password has not been updated."
+            }
             isValidating = false
         }
     }

@@ -54,7 +54,7 @@ class PodcastsParserTest: AbstractAmpacheTest {
         XCTAssertEqual(podcast.title, "Plays Well with Others")
         XCTAssertEqual(podcast.rating, 0)
         XCTAssertFalse(podcast.isCached)
-        XCTAssertEqual(podcast.depiction, "From Creative Commons, a podcast about the art and science of collaboration. With a focus on the tools, techniques, and mechanics of collaboration, we explore how today's most interesting collaborators are making new things, solving old problems, and getting things done — together. Hosted by Creative Commons CEO Ryan Merkley. ")
+        XCTAssertEqual(podcast.depiction, "From Creative Commons, a podcast about the art and science of collaboration. With a focus on the tools, techniques, and mechanics of collaboration, we explore how today's most interesting collaborators are making new things, solving old problems, and getting things done — together. Hosted by Creative Commons CEO Ryan Merkley.")
         XCTAssertEqual(podcast.artwork?.url, "https://music.com.au/image.php?object_id=2&object_type=podcast&auth=eeb9f1b6056246a7d563f479f518bb34&name=art.jpg")
         XCTAssertEqual(podcast.artwork?.type, "podcast")
         XCTAssertEqual(podcast.artwork?.id, "2")

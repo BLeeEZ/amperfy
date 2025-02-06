@@ -100,11 +100,11 @@ extension Podcast: PlayableContainable  {
         return episodes.filter{ $0.isAvailableToUser() }
     }
     public var playContextType: PlayerMode { return .podcast }
-    public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) -> Promise<Void> {
-        return librarySyncer.sync(podcast: self)
+    @MainActor public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) async throws {
+        try await librarySyncer.sync(podcast: self)
     }
-    public func remoteToggleFavorite(syncer: LibrarySyncer) -> Promise<Void> {
-        return Promise<Void>(error: BackendError.notSupported)
+    @MainActor public func remoteToggleFavorite(syncer: LibrarySyncer) async throws {
+        throw BackendError.notSupported
     }
     public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
         return ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)

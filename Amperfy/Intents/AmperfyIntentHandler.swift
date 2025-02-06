@@ -60,9 +60,8 @@ public class SearchAndPlayIntentHandler: NSObject, SearchAndPlayIntentHandling {
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: intent.shuffleOption.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.repeatOption.rawValue: intent.repeatOption.rawValue])
         
-        firstly {
-            self.intentManager.handleIncomingIntent(userActivity: userActivity)
-        }.done { success in
+        Task { @MainActor in
+            let success = await self.intentManager.handleIncomingIntent(userActivity: userActivity)
             completion(SearchAndPlayIntentResponse(code: success ? .success : .failure, userActivity: nil))
         }
     }
@@ -103,9 +102,8 @@ public class PlayIDIntentHandler: NSObject, PlayIDIntentHandling {
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: intent.shuffleOption.rawValue])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.repeatOption.rawValue: intent.repeatOption.rawValue])
         
-        firstly {
-            self.intentManager.handleIncomingIntent(userActivity: userActivity)
-        }.done { success in
+        Task { @MainActor in
+            let success = await self.intentManager.handleIncomingIntent(userActivity: userActivity)
             completion(PlayIDIntentResponse(code: success ? .success : .failure, userActivity: nil))
         }
     }
@@ -124,9 +122,8 @@ public class PlayRandomSongsIntentHandler: NSObject, PlayRandomSongsIntentHandli
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: true])
         userActivity.addUserInfoEntries(from: [NSUserActivity.ActivityKeys.onlyCached.rawValue: intent.filterOption.rawValue])
         
-        firstly {
-            self.intentManager.handleIncomingIntent(userActivity: userActivity)
-        }.done { success in
+        Task { @MainActor in
+            let _ = await self.intentManager.handleIncomingIntent(userActivity: userActivity)
             completion(PlayRandomSongsIntentResponse())
         }
     }
@@ -184,9 +181,8 @@ public class PlayMediaIntentHandler: NSObject, INPlayMediaIntentHandling {
         let shuffleOption = intent.playShuffled ?? false
         let repeatOption = RepeatMode.fromINPlaybackRepeatMode(mode: intent.playbackRepeatMode)
         
-        firstly {
-            self.intentManager.playLastResult(shuffleOption: shuffleOption, repeatOption: repeatOption)
-        }.done { success in
+        Task { @MainActor in
+            let success = await self.intentManager.playLastResult(shuffleOption: shuffleOption, repeatOption: repeatOption)
             completion(INPlayMediaIntentResponse(code: success ? .success : .failure, userActivity: nil))
         }
     }
