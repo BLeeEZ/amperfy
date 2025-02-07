@@ -41,7 +41,7 @@ enum PlayType {
 }
 
 public typealias CreateAVPlayerCallback = () -> AVQueuePlayer
-public typealias TriggerReinsertPlayableCallback = () -> Void
+public typealias TriggerReinsertPlayableCallback = @MainActor () -> Void
 typealias NextPlayablePreloadCallback = () -> AbstractPlayable?
 
 enum BackendAudioQueueType {
