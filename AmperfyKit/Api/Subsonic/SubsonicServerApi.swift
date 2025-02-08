@@ -92,6 +92,7 @@ class SubsonicServerApi: URLCleanser {
     var isStreamingTranscodingActive: Bool {
         return persistentStorage.settings.streamingFormatPreference != .raw
     }
+    var customHeaders: [String] = []
     var authType: SubsonicApiAuthType = .autoDetect
     private var authTypeBasedClientApiVersion: SubsonicVersion {
         return self.authType == .legacy ? Self.defaultClientApiVersionPreToken : Self.defaultClientApiVersionWithToken
@@ -750,13 +751,22 @@ class SubsonicServerApi: URLCleanser {
     }
     
     private func request(url: URL) -> Promise<APIDataResponse> {
+        let httpHeaders: HTTPHeaders = customHeaders.reduce(into: [:]) { result, header in
+            let parts = header.split(separator: "=")
+            if parts.count == 2 {
+                result[String(parts[0])] = String(parts[1])
+            }
+        }
         return firstly {
-            AF.request(url, method: .get).validate().responseData()
+            AF.request(url, method: .get, headers: httpHeaders).validate().responseData()
         }.then { data, response in
             Promise<APIDataResponse>.value(APIDataResponse(data: data, url: url, meta: response))
         }
     }
-    
+
+    func setCustomHeaders(headers: [String]) {
+        customHeaders = headers
+    }
 }
 
 extension SubsonicServerApi: SubsonicUrlCreator {

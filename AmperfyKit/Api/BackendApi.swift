@@ -180,6 +180,7 @@ public protocol BackendApi: URLCleanser {
     var clientApiVersion: String { get }
     var serverApiVersion: String { get }
     var isStreamingTranscodingActive: Bool { get }
+    var customHeaders: [String] { get }
     func provideCredentials(credentials: LoginCredentials)
     func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void>
     func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL>
@@ -189,4 +190,5 @@ public protocol BackendApi: URLCleanser {
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo?
+    func setCustomHeaders(headers: [String])
 }

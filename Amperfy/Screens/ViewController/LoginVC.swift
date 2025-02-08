@@ -22,6 +22,7 @@
 import UIKit
 import AmperfyKit
 import PromiseKit
+import SwiftUI
 
 extension String {
     var isHyperTextProtocolProvided: Bool {
@@ -38,7 +39,8 @@ class LoginVC: UIViewController {
     @IBOutlet weak var usernameTF: UITextField!
     @IBOutlet weak var passwordTF: UITextField!
     @IBOutlet weak var apiSelectorButton: BasicButton!
-    
+    @IBOutlet weak var advancedButton: BasicButton!
+
     @IBAction func serverUrlActionPressed() {
         serverUrlTF.resignFirstResponder()
         login()
@@ -124,6 +126,94 @@ class LoginVC: UIViewController {
                 self.updateApiSelectorText()
             })
         ])
+
+        struct ContentView: View {
+             @Binding var listEntries: [String]
+             @Environment(
+                 \.dismiss
+             ) var dismiss
+
+             var body: some View {
+                 NavigationView {
+                     List {
+                         ForEach(
+                             listEntries.indices,
+                             id: \.self
+                         ) {
+                             index in TextField(
+                                 "Enter Header: HEADER_NAME=HEADER_VALUE",
+                                 text: $listEntries[index]
+                             )
+                         }
+                         .onDelete(
+                             perform: {
+                                 (
+                                     offset: IndexSet
+                                 ) in listEntries.remove(
+                                     atOffsets: offset
+                                 )
+                             })
+                         .moveDisabled(
+                             true
+                         )
+                     }
+                     .navigationBarItems(
+                         leading: Button(
+                             action: {
+                                 listEntries
+                                     .append(
+                                         "New Header"
+                                     )
+                             },
+                             label: {
+                                 Image(
+                                     systemName: "plus"
+                                 )
+                             }
+                         ),
+                         trailing: HStack {
+                             EditButton()
+                             Button("Back") {
+                                 dismiss()
+                             }
+                         }
+                     )
+                 }
+             }
+         }
+         let customHeadersBinding = Binding<[String]>(
+             get: {
+                 self.backendApi.customHeaders
+             },
+             set: {
+                 self.backendApi.setCustomHeaders(
+                     headers: $0
+                 )
+             }
+         )
+         let contentView = ContentView(
+             listEntries: customHeadersBinding
+         )
+         let hostingVC = UIHostingController(
+             rootView: contentView
+         )
+
+         advancedButton.showsMenuAsPrimaryAction = true
+         advancedButton.menu = UIMenu(
+             children: [
+                 UIAction(
+                     title: "Custom HTTP Headers",
+                     handler: { _ in
+                         self.present(
+                             hostingVC,
+                             animated: true,
+                             completion: nil
+                         )
+                         hostingVC.modalPresentationStyle = .formSheet
+                     }
+                 )
+             ]
+         )
     }
     
     override func viewIsAppearing(_ animated: Bool) {

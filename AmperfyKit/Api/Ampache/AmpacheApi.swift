@@ -48,6 +48,10 @@ class AmpacheApi: BackendApi {
         return ampacheXmlServerApi.isStreamingTranscodingActive
     }
 
+    public var customHeaders: [String] {
+        return ampacheXmlServerApi.customHeaders
+    }
+
     func provideCredentials(credentials: LoginCredentials) {
         ampacheXmlServerApi.provideCredentials(credentials: credentials)
     }
@@ -88,4 +92,7 @@ class AmpacheApi: BackendApi {
         return ampacheXmlServerApi.cleanse(url: url)
     }
 
+    func setCustomHeaders(headers: [String]) {
+        ampacheXmlServerApi.setCustomHeaders(headers: headers)
+    }
 }
