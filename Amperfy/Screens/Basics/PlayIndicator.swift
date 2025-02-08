@@ -28,13 +28,7 @@ class OverlayLayer : CALayer {
 
 class PlayIndicatorHandler {
     
-    static var shared: PlayIndicatorHandler {
-        if inst == nil {
-            inst = PlayIndicatorHandler()
-        }
-        return inst!
-    }
-    private static var inst: PlayIndicatorHandler?
+    public static let shared = PlayIndicatorHandler()
     
     private var indicatorDict = Dictionary<String, VYPlayIndicator>()
     private var imageOverlayDict = Dictionary<String, OverlayLayer>()

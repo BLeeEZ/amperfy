@@ -33,7 +33,7 @@ let settingsWindowActivityType = "amperfy.settings"
 let miniPlayerWindowActivityType = "amperfy.miniplayer"
 let defaultWindowActivityType = "amperfy.main"
 
-@UIApplicationMain
+@main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     static let name = "Amperfy"
