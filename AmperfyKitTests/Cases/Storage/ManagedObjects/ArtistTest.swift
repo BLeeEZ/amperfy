@@ -22,7 +22,7 @@
 import XCTest
 @testable import AmperfyKit
 
-class ArtistTest: XCTestCase {
+@MainActor class ArtistTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
     var library: LibraryStorage!

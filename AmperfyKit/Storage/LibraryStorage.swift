@@ -27,7 +27,7 @@ protocol PlayableFileCachable {
     func getFileURL(forPlayable playable: AbstractPlayable) -> URL?
 }
 
-public enum PlaylistSearchCategory: Int {
+public enum PlaylistSearchCategory: Int, Sendable {
     case all = 0
     case cached = 1
     case userOnly = 2

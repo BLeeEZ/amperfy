@@ -23,7 +23,7 @@ import Foundation
 import UIKit
 import CoreData
 
-public enum ArtworkDownloadSetting: Int, CaseIterable {
+public enum ArtworkDownloadSetting: Int, CaseIterable, Sendable {
     case updateOncePerSession = 0
     case onlyOnce = 1
     case never = 2
@@ -42,7 +42,7 @@ public enum ArtworkDownloadSetting: Int, CaseIterable {
     }
 }
 
-public enum ArtworkDisplayPreference: Int, CaseIterable {
+public enum ArtworkDisplayPreference: Int, CaseIterable, Sendable {
     case id3TagOnly = 0
     case serverArtworkOnly = 1
     case preferServerArtwork = 2
@@ -64,7 +64,7 @@ public enum ArtworkDisplayPreference: Int, CaseIterable {
     }
 }
 
-public enum ScreenLockPreventionPreference: Int, CaseIterable {
+public enum ScreenLockPreventionPreference: Int, CaseIterable, Sendable {
     case always = 0
     case never = 1
     case onlyIfCharging = 2
@@ -83,7 +83,7 @@ public enum ScreenLockPreventionPreference: Int, CaseIterable {
     }
 }
 
-public enum StreamingMaxBitratePreference: Int, CaseIterable {
+public enum StreamingMaxBitratePreference: Int, CaseIterable, Sendable {
     case noLimit = 0
     case limit32 = 32
     case limit64 = 64
@@ -109,7 +109,7 @@ public enum StreamingMaxBitratePreference: Int, CaseIterable {
     }
 }
 
-public enum StreamingFormatPreference: Int, CaseIterable {
+public enum StreamingFormatPreference: Int, CaseIterable, Sendable {
     case mp3 = 0
     case raw = 1
     case serverConfig = 2 // omit the format to let the server decide which codec should be used
@@ -128,7 +128,7 @@ public enum StreamingFormatPreference: Int, CaseIterable {
     }
 }
 
-public enum SyncCompletionStatus: Int, CaseIterable {
+public enum SyncCompletionStatus: Int, CaseIterable, Sendable {
     case completed = 0
     case skipped = 1
     case aborded = 2
@@ -148,7 +148,7 @@ public enum SyncCompletionStatus: Int, CaseIterable {
 }
 
 
-public enum ThemePreference: Int, CaseIterable {
+public enum ThemePreference: Int, CaseIterable, Sendable {
     case blue = 0
     case green = 1
     case red = 2
@@ -198,7 +198,7 @@ public enum ThemePreference: Int, CaseIterable {
     }
 }
 
-public enum CacheTranscodingFormatPreference: Int, CaseIterable {
+public enum CacheTranscodingFormatPreference: Int, CaseIterable, Sendable {
     case raw = 0
     case mp3 = 1
     case serverConfig = 2 // omit the format to let the server decide which codec should be used
@@ -511,7 +511,7 @@ public class PersistentStorage {
             set { UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.AlbumsDisplayStyleSetting.rawValue) }
         }
         
-        public var albumsGridSizeSetting: Int {
+        @MainActor public var albumsGridSizeSetting: Int {
             get { return UserDefaults.standard.object(forKey: UserDefaultsKey.AlbumsGridSizeSetting.rawValue) as? Int ?? 
                 ((UIDevice.current.userInterfaceIdiom == .pad) ? 4 : 3) }
             set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.AlbumsGridSizeSetting.rawValue) }
@@ -672,11 +672,11 @@ public class PersistentStorage {
         }
     }
     
-    public lazy var main: CoreDataCompanion = {
+    @MainActor public lazy var main: CoreDataCompanion = {
         return CoreDataCompanion(context: coreDataManager.context)
     }()
     
-    public lazy var async: AsyncCoreDataAccessWrapper = {
+    @MainActor public lazy var async: AsyncCoreDataAccessWrapper = {
         return AsyncCoreDataAccessWrapper(persistentContainer: coreDataManager.persistentContainer)
     }()
 
@@ -684,14 +684,14 @@ public class PersistentStorage {
 
 // MARK: - Core Data stack
 
-protocol CoreDataManagable {
+@MainActor protocol CoreDataManagable {
     var persistentContainer: NSPersistentContainer { get }
     var context: NSManagedObjectContext { get }
 }
 
-public class CoreDataPersistentManager: CoreDataManagable {
+@MainActor public class CoreDataPersistentManager: CoreDataManagable {
 
-    static let managedObjectModel: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
+    public static let managedObjectModel: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
 
     lazy var persistentContainer: NSPersistentContainer = {
         /*
@@ -700,7 +700,7 @@ public class CoreDataPersistentManager: CoreDataManagable {
          application to it. This property is optional since there are legitimate
          error conditions that could cause the creation of the store to fail.
          */
-        let container = NSPersistentContainer(name: "Amperfy", managedObjectModel: CoreDataPersistentManager.managedObjectModel)
+        let container = NSPersistentContainer(name: "Amperfy", managedObjectModel: Self.managedObjectModel)
         let description = container.persistentStoreDescriptions.first
         description?.shouldInferMappingModelAutomatically = false
         description?.shouldMigrateStoreAutomatically = false
@@ -735,7 +735,7 @@ public class CoreDataPersistentManager: CoreDataManagable {
         return container
     }()
     
-    lazy var context: NSManagedObjectContext = {
+    @MainActor lazy var context: NSManagedObjectContext = {
         persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
         persistentContainer.viewContext.retainsRegisteredObjects = true
         return persistentContainer.viewContext

@@ -23,7 +23,7 @@ import Foundation
 import MediaPlayer
 import os.log
 
-public class AmperKit {
+@MainActor public class AmperKit {
     
     static let name = "Amperfy"
     static var version: String {
@@ -33,11 +33,20 @@ public class AmperKit {
         return (Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String) ?? ""
     }
     
-    public static let newestElementsFetchCount = 50
+    nonisolated public static let newestElementsFetchCount = 50
     public static let shared = AmperKit()
     
-    public var isInForeground = true
-    
+    nonisolated(unsafe) private var _isInForeground: Bool = true
+    private let _isInForegroundLock = NSLock()
+    nonisolated public var isInForeground: Bool {
+        get {
+            _isInForegroundLock.withLock { _isInForeground }
+        }
+        set {
+            _isInForegroundLock.withLock { _isInForeground = newValue }
+        }
+    }
+
     public lazy var log = {
         return OSLog(subsystem: "Amperfy", category: "AppDelegate")
     }()
@@ -160,7 +169,7 @@ public class AmperKit {
     public lazy var userStatistics = {
         return storage.main.library.getUserStatistics(appVersion: Self.version)
     }()
-    public lazy var localNotificationManager = {
+    @MainActor public lazy var localNotificationManager = {
         return LocalNotificationManager(userStatistics: userStatistics, storage: storage)
     }()
     @MainActor public lazy var backgroundFetchTriggeredSyncer = {
@@ -176,7 +185,7 @@ public class AmperKit {
 }
 
 extension AmperKit: ThreadPerformanceMonitor {
-    public var shouldSlowDownExecution: Bool {
+    nonisolated public var shouldSlowDownExecution: Bool {
         return !isInForeground
     }
 }

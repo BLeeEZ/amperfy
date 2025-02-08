@@ -29,7 +29,7 @@ class MOCK_SubsonicUrlCreator: SubsonicUrlCreator {
     }
 }
 
-class AbstractSsParserTest: XCTestCase {
+@MainActor class AbstractSsParserTest: XCTestCase {
     
     var context: NSManagedObjectContext!
     var cdHelper: CoreDataHelper!

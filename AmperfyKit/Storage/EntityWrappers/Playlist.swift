@@ -428,7 +428,7 @@ public class Playlist: Identifyable {
         changeDate = Date()
     }
 
-    public func getDefaultImage(theme: ThemePreference) -> UIImage  {
+    @MainActor public func getDefaultImage(theme: ThemePreference) -> UIImage  {
         return UIImage.getGeneratedArtwork(theme: theme, artworkType: .playlist)
     }
 

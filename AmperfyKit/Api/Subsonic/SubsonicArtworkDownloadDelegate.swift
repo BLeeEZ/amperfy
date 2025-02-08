@@ -54,7 +54,7 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     
     @MainActor func validateDownloadedData(download: Download) -> ResponseError? {
         guard let fileURL = download.fileURL else {
-            return ResponseError(message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: subsonicServerApi), data: nil)
+            return ResponseError(type: .api, message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: subsonicServerApi), data: nil)
         }
         guard let data = fileManager.getFileDataIfNotToBig(url: fileURL, maxFileSize: Self.maxFileSizeOfErrorResponse) else { return nil }
         return subsonicServerApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url))

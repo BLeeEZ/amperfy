@@ -107,7 +107,7 @@ public protocol AlertDisplayable {
             detailMessage += "\n\nURL:\n\(cleansedURL.description)"
         }
         
-        let isInfoError = error is ResourceNotAvailableResponseError
+        let isInfoError = error.type == .resource
         detailMessage += "\n\nError Content:\n" + error.asInfo(topic: topic).asJSONString()
         
 

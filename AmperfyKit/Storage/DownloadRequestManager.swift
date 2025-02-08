@@ -22,7 +22,7 @@
 import Foundation
 import CoreData
 
-class DownloadRequestManager {
+@MainActor class DownloadRequestManager {
 
     private let storage: PersistentStorage
     private let downloadDelegate: DownloadManagerDelegate
@@ -32,14 +32,14 @@ class DownloadRequestManager {
         self.downloadDelegate = downloadDelegate
     }
     
-    @MainActor func add(object: Downloadable) {
+    func add(object: Downloadable) {
         Task { @MainActor in
             self.addLowPrio(object: object, library: self.storage.main.library)
             self.storage.main.saveContext()
         }
     }
     
-    @MainActor func add(objects: [Downloadable]) {
+    func add(objects: [Downloadable]) {
         Task { @MainActor in
             try? await self.storage.async.perform { asyncCompanion in
                 for (n,object) in objects.enumerated() {
@@ -65,21 +65,17 @@ class DownloadRequestManager {
     }
     
     func removeFinishedDownload(for object: Downloadable) {
-        storage.main.context.performAndWait {
-            guard let existingDownload = storage.main.library.getDownload(id: object.uniqueID), existingDownload.finishDate != nil else { return }
-            storage.main.library.deleteDownload(existingDownload)
-            storage.main.saveContext()
-        }
+        guard let existingDownload = storage.main.library.getDownload(id: object.uniqueID), existingDownload.finishDate != nil else { return }
+        storage.main.library.deleteDownload(existingDownload)
+        storage.main.saveContext()
     }
     
     func removeFinishedDownload(for objects: [Downloadable]) {
-        storage.main.context.performAndWait {
-            for object in objects {
-                guard let existingDownload = storage.main.library.getDownload(id: object.uniqueID), existingDownload.finishDate != nil else { continue }
-                storage.main.library.deleteDownload(existingDownload)
-            }
-            storage.main.saveContext()
+        for object in objects {
+            guard let existingDownload = storage.main.library.getDownload(id: object.uniqueID), existingDownload.finishDate != nil else { continue }
+            storage.main.library.deleteDownload(existingDownload)
         }
+        storage.main.saveContext()
     }
 
     func getNextRequestToDownload() -> Download? {

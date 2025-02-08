@@ -33,7 +33,7 @@ public struct NotificationUserInfo {
     public static let id: String = "id"
 }
 
-public class LocalNotificationManager {
+@MainActor public class LocalNotificationManager {
     
     private static let notificationTimeInterval = 0.1 // time interval in seconds
     private static let log = OSLog(subsystem: "Amperfy", category: "LocalNotificationManager")

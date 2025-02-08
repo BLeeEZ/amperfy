@@ -94,7 +94,7 @@ public enum ArtworkType: CaseIterable {
     }
 }
 
-extension UIImage {
+@MainActor extension UIImage {
     public static func symbolImageSize(scale: UIImage.SymbolScale) -> CGSize {
         let config = UIImage.SymbolConfiguration(scale: scale)
         let image = UIImage(systemName: "plus", withConfiguration: config)!

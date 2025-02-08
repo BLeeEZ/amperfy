@@ -59,7 +59,7 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
         }
     }
     
-    var icon: UIImage {
+    @MainActor var icon: UIImage {
         switch self {
         case .search: return .search
         case .settings: return .settings
@@ -182,7 +182,7 @@ class LibraryNavigatorConfigurator: NSObject {
         self.pressedOnLibraryItemCB = pressedOnLibraryItemCB
     }
     
-    func viewDidLoad(navigationItem: UINavigationItem, collectionView: UICollectionView) {
+    @MainActor func viewDidLoad(navigationItem: UINavigationItem, collectionView: UICollectionView) {
         self.collectionView = collectionView
         #if !targetEnvironment(macCatalyst)
         editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editingPressed))
@@ -275,7 +275,7 @@ class LibraryNavigatorConfigurator: NSObject {
         return UICollectionViewCompositionalLayout(sectionProvider: sectionProvider)
     }
 
-    private func configureDataSource() {
+    @MainActor private func configureDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, LibraryNavigatorItem> { (cell, indexPath, item) in
             if !item.isInteractable {
                 var content = cell.defaultContentConfiguration()
@@ -361,7 +361,7 @@ class LibraryNavigatorConfigurator: NSObject {
         #endif
     }
     
-    static func configureForLibrary(contentView: inout UIListContentConfiguration, libraryItem: LibraryDisplayType) {
+    @MainActor static func configureForLibrary(contentView: inout UIListContentConfiguration, libraryItem: LibraryDisplayType) {
         contentView.text = libraryItem.displayName
         contentView.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
         var imageSize = CGSize(width: 35.0, height: 25.0)

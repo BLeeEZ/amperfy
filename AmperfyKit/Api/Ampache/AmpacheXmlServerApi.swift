@@ -39,7 +39,7 @@ extension ResponseError {
     }
     
     static func createFromAmpacheError(cleansedURL: CleansedURL?, error: AmpacheResponseError, data: Data?) -> ResponseError {
-        return ResponseError(statusCode: error.statusCode, message: error.message, cleansedURL: cleansedURL, data: data)
+        return ResponseError(type: .api, statusCode: error.statusCode, message: error.message, cleansedURL: cleansedURL, data: data)
     }
 }
 
@@ -215,7 +215,7 @@ class AmpacheXmlServerApi: URLCleanser {
         }
         if let error = parser.parserError {
             os_log("Error during AuthPars: %s", log: self.log, type: .error, error.localizedDescription)
-            throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
+            throw ResponseError(type: .xml, cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
         }
         if success, let auth = curDelegate.authHandshake {
             return auth

@@ -23,7 +23,7 @@ import Foundation
 import CoreData
 import os.log
 
-class DownloadManager: NSObject, DownloadManageable {
+@MainActor class DownloadManager: NSObject, DownloadManageable {
     
     let networkMonitor: NetworkMonitorFacade
     let storage: PersistentStorage
@@ -60,18 +60,22 @@ class DownloadManager: NSObject, DownloadManageable {
     
     @MainActor func download(object: Downloadable) {
         guard !object.isCached, storage.settings.isOnlineMode, (object is Artwork) || !storageExceedsCacheLimit() else { return }
-        if let isValidCheck = preDownloadIsValidCheck, !isValidCheck(object) { return }
-        self.requestManager.add(object: object)
-        triggerBackgroundDownload()
+        Task { @MainActor in
+            if let isValidCheck = preDownloadIsValidCheck, !isValidCheck(object) { return }
+            self.requestManager.add(object: object)
+            triggerBackgroundDownload()
+        }
     }
     
     @MainActor func download(objects: [Downloadable]) {
-        guard storage.settings.isOnlineMode, !storageExceedsCacheLimit() else { return }
-        let downloadObjects = objects.filter{ !$0.isCached }.filter{ preDownloadIsValidCheck?($0) ?? true }
-        if !downloadObjects.isEmpty {
-            self.requestManager.add(objects: downloadObjects)
+        Task { @MainActor in
+            guard storage.settings.isOnlineMode, !storageExceedsCacheLimit() else { return }
+            let downloadObjects = objects.filter{ !$0.isCached }.filter{ preDownloadIsValidCheck?($0) ?? true }
+            if !downloadObjects.isEmpty {
+                self.requestManager.add(objects: downloadObjects)
+            }
+            triggerBackgroundDownload()
         }
-        triggerBackgroundDownload()
     }
     
     @MainActor func removeFinishedDownload(for object: Downloadable) {
@@ -85,8 +89,10 @@ class DownloadManager: NSObject, DownloadManageable {
     func start() {
         isRunning = true
         sleepTimer?.invalidate()
-        sleepTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { (t) in
-            self.triggerBackgroundDownload()
+        sleepTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
+            Task { @MainActor in
+                self.triggerBackgroundDownload()
+            }
         }
         triggerBackgroundDownload()
     }
@@ -172,7 +178,7 @@ class DownloadManager: NSObject, DownloadManageable {
             if error != .apiErrorResponse {
                 os_log("Fetching %s FAILED: %s", log: self.log, type: .info, download.title, error.description)
                 let shortMessage = "Error \"\(error.description)\" occured while downloading object \"\(download.title)\"."
-                let responseError = ResponseError(message: shortMessage, cleansedURL: download.url?.asCleansedURL(cleanser: urlCleanser), data: nil)
+                let responseError = ResponseError(type: .api, message: shortMessage, cleansedURL: download.url?.asCleansedURL(cleanser: urlCleanser))
                 eventLogger.report(topic: "Download Error", error: responseError, displayPopup: isFailWithPopupError)
             }
             downloadDelegate.failedDownload(download: download, storage: self.storage)

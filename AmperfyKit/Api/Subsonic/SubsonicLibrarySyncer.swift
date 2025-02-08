@@ -138,7 +138,7 @@ import os.log
             } catch {
                 if let responseError = error as? ResponseError, let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
                     let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
-                    let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Artist \"\(artistAsync.name)\" is no longer available on the server.", cleansedURL: response.url?.asCleansedURL(cleanser: self.subsonicServerApi), data: response.data)
+                    let reportError = ResponseError(type: .resource, statusCode: responseError.statusCode, message: "Artist \"\(artistAsync.name)\" is no longer available on the server.", cleansedURL: response.url?.asCleansedURL(cleanser: self.subsonicServerApi), data: response.data)
                     artistAsync.remoteStatus = .deleted
                     throw reportError
                 } else {
@@ -167,7 +167,7 @@ import os.log
             } catch {
                 if let responseError = error as? ResponseError, let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
                     let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
-                    let reportError = ResourceNotAvailableResponseError(statusCode: responseError.statusCode, message: "Album \"\(albumAsync.name)\" is no longer available on the server.", cleansedURL: albumsResponse.url?.asCleansedURL(cleanser: self.subsonicServerApi), data: albumsResponse.data)
+                    let reportError = ResponseError(type: .resource, statusCode: responseError.statusCode, message: "Album \"\(albumAsync.name)\" is no longer available on the server.", cleansedURL: albumsResponse.url?.asCleansedURL(cleanser: self.subsonicServerApi), data: albumsResponse.data)
                     albumAsync.markAsRemoteDeleted()
                     throw reportError
                 } else {
@@ -589,15 +589,15 @@ import os.log
     @MainActor func parseLyrics(relFilePath: URL) async throws -> LyricsList {
         let parserDelegate = SsLyricsParserDelegate(performanceMonitor: self.performanceMonitor)
         guard let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) else {
-            throw XMLParserResponseError(cleansedURL: nil, data: nil)
+            throw ResponseError(type: .xml)
         }
         do {
             try self.parse(absFilePath: absFilePath, delegate: parserDelegate, isThrowingErrorsAllowed: false)
         } catch {
-            throw XMLParserResponseError(cleansedURL: nil, data: nil)
+            throw ResponseError(type: .xml)
         }
         guard let lyricsList = parserDelegate.lyricsList else {
-            throw XMLParserResponseError(cleansedURL: nil, data: nil)
+            throw ResponseError(type: .xml)
         }
         return lyricsList
     }
@@ -642,7 +642,7 @@ import os.log
         parser.parse()
         if let error = parser.parserError, isThrowingErrorsAllowed {
             os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
-            throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: subsonicServerApi), data: response.data)
+            throw ResponseError(type: .xml, cleansedURL: response.url?.asCleansedURL(cleanser: subsonicServerApi), data: response.data)
         }
         if let error = delegate.error, let _ = error.subsonicError, isThrowingErrorsAllowed {
             throw ResponseError.createFromSubsonicError(cleansedURL: response.url?.asCleansedURL(cleanser: subsonicServerApi), error: error, data: response.data)
@@ -651,16 +651,16 @@ import os.log
     
     private func parse(absFilePath: URL, delegate: SsXmlParser, isThrowingErrorsAllowed: Bool = true) throws {
         guard let parser = XMLParser(contentsOf: absFilePath) else {
-            throw XMLParserResponseError(cleansedURL: nil, data: nil)
+            throw ResponseError(type: .xml)
         }
         parser.delegate = delegate
         parser.parse()
         if let error = parser.parserError, isThrowingErrorsAllowed {
             os_log("Error during response parsing: %s", log: self.log, type: .error, error.localizedDescription)
-            throw XMLParserResponseError(cleansedURL: nil, data: nil)
+            throw ResponseError(type: .xml)
         }
         if let error = delegate.error, let _ = error.subsonicError, isThrowingErrorsAllowed {
-            throw XMLParserResponseError(cleansedURL: nil, data: nil)
+            throw ResponseError(type: .xml)
         }
     }
     

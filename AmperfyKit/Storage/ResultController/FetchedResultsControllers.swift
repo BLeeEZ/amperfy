@@ -22,7 +22,7 @@
 import Foundation
 import CoreData
 
-public enum ArtistElementSortType: Int {
+public enum ArtistElementSortType: Int, Sendable {
     case name = 0
     case rating = 1
     case newest = 2
@@ -44,7 +44,7 @@ public enum ArtistElementSortType: Int {
     }
 }
 
-public enum AlbumElementSortType: Int {
+public enum AlbumElementSortType: Int, Sendable {
     case name = 0
     case rating = 1
     case newest = 2
@@ -75,7 +75,7 @@ public enum AlbumElementSortType: Int {
     }
 }
 
-public enum PlaylistSortType: Int {
+public enum PlaylistSortType: Int, Sendable {
     case name = 0
     case lastPlayed = 1
     case lastChanged = 2
@@ -97,7 +97,7 @@ public enum PlaylistSortType: Int {
     }
 }
 
-public enum SongElementSortType: Int {
+public enum SongElementSortType: Int, Sendable {
     case name = 0
     case rating = 1
     case duration = 3
@@ -140,7 +140,7 @@ public enum DisplayCategoryFilter {
     case favorites
 }
 
-public enum ArtistCategoryFilter: Int {
+public enum ArtistCategoryFilter: Int, Sendable {
     case all = 0
     case favorites = 1
     case albumArtists = 2
@@ -148,7 +148,7 @@ public enum ArtistCategoryFilter: Int {
     public static let defaultValue: ArtistCategoryFilter = .albumArtists
 }
 
-public enum AlbumsDisplayStyle: Int {
+public enum AlbumsDisplayStyle: Int, Sendable {
     case table = 0
     case grid = 1
     

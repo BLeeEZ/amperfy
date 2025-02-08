@@ -94,21 +94,45 @@ public enum BackendError: LocalizedError {
     }
 }
 
-public class ResponseError: LocalizedError {
-    public var statusCode: Int = 0
-    public var message: String
-    public var cleansedURL: CleansedURL?
-    public var data: Data?
+public enum ResponseErrorType: Sendable {
+    case api
+    case xml
+    case resource
+}
+
+final public class ResponseError: LocalizedError, Sendable {
+    public let type: ResponseErrorType
+    public let statusCode: Int
+    public let message: String
+    public let cleansedURL: CleansedURL?
+    public let data: Data?
     
-    init(statusCode: Int = 0, message: String, cleansedURL: CleansedURL?, data: Data?) {
+    init(type: ResponseErrorType, statusCode: Int = 0, message: String = "", cleansedURL: CleansedURL? = nil, data: Data? = nil) {
+        self.type = type
         self.statusCode = statusCode
-        self.message = message
         self.cleansedURL = cleansedURL
         self.data = data
+        
+        switch type {
+        case .api:
+            self.message = message
+        case .xml:
+            self.message = "XML response could not be parsed."
+        case .resource:
+            self.message = message
+        }
     }
     
     public var errorDescription: String? {
-        return "API error \(statusCode): \(message)"
+        switch type {
+        case .api:
+            return "API error \(statusCode): \(message)"
+        case .xml:
+            return "\(message)"
+        case .resource:
+            return "API error \(statusCode): \(message)"
+        }
+        
     }
     
     public func asInfo(topic: String) -> ResponseErrorInfo {
@@ -127,20 +151,6 @@ public struct ResponseErrorInfo: Encodable {
     public var cleansedURL: String
     public var data: String?
 }
-
-public class XMLParserResponseError: ResponseError {
-    init(cleansedURL: CleansedURL?, data: Data?) {
-        super.init(message: "XML response could not be parsed.", cleansedURL: cleansedURL, data: data)
-    }
-    
-    public override var errorDescription: String? {
-        return "\(message)"
-    }
-}
-
-public class ResourceNotAvailableResponseError: ResponseError {
-}
-
 
 public class BackendProxy {
     
@@ -226,7 +236,7 @@ public class BackendProxy {
             throw AuthenticationError.invalidUrl
         }
         
-        return try await withCheckedThrowingContinuation { continuation in
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) -> Void in
             let sessionConfig = URLSessionConfiguration.default
             let session = URLSession(configuration: sessionConfig)
             let request = URLRequest(url: serverUrl)
@@ -236,13 +246,12 @@ public class BackendProxy {
                 } else {
                     if let statusCode = (response as? HTTPURLResponse)?.statusCode {
                         if statusCode >= 400,
-                           // ignore 401 Unauthorized (RFC 7235) status code
-                           // -> Can occure if root website requires http basic authentication,
+                            // ignore 401 Unauthorized (RFC 7235) status code
+                            // -> Can occure if root website requires http basic authentication,
                             //    but the REST API endpoints are reachable without http basic authentication
                             statusCode != 401 {
                             continuation.resume(throwing: AuthenticationError.requestStatusError(message: "\(statusCode)"))
                         } else {
-                            os_log("Server url is reachable. Status code: %d", log: self.log, type: .info, statusCode)
                             continuation.resume()
                         }
                     }
@@ -250,6 +259,7 @@ public class BackendProxy {
             }
             task.resume()
         }
+        os_log("Server url is reachable.", log: self.log, type: .info)
     }
 
 }

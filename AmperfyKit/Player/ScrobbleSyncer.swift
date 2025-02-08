@@ -164,11 +164,14 @@ import os.log
         if waitDuration > Self.maximumWaitDurationInSec {
             waitDuration = Self.maximumWaitDurationInSec
         }
+        let curPlayingId = curPlayingSong.managedObject.objectID
         
         scrobbleTimer?.invalidate()
         scrobbleTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(waitDuration), repeats: false) { _ in
             Task { @MainActor in
-                guard curPlaying == self.musicPlayer.currentlyPlaying,
+                let curPlayingClosureMO = self.storage.main.context.object(with: curPlayingId) as! SongMO
+                let curPlayingClosure = Song(managedObject: curPlayingClosureMO)
+                guard curPlayingClosure == self.musicPlayer.currentlyPlaying,
                       self.backendAudioPlayer.playType == .cache || self.storage.settings.isScrobbleStreamedItems
                 else { return }
                 self.songHasBeenListendEnough = true

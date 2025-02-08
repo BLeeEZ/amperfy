@@ -39,7 +39,7 @@ extension NSFetchedResultsController {
     }
 }
 
-public enum SectionIndexType: Int {
+public enum SectionIndexType: Int, Sendable {
     case alphabet = 0
     case rating = 1
     case newestOrRecent = 2

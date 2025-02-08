@@ -30,7 +30,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
         task.resume()
     }
     
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         guard let requestUrl = downloadTask.originalRequest?.url?.absoluteString else { return }
         let filePath = try? fileManager.moveItemToTempDirectoryWithUniqueName(at: location)
         let fileMimeType = downloadTask.response?.mimeType
@@ -67,7 +67,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
         }
     }
     
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    nonisolated func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard error != nil, let requestUrl = task.originalRequest?.url?.absoluteString else { return }
         Task { @MainActor in
             let library = self.storage.main.library
@@ -76,7 +76,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
         }
     }
     
-    func urlSession(_ session: URLSession,
+    nonisolated func urlSession(_ session: URLSession,
                     downloadTask: URLSessionDownloadTask,
                     didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
                     totalBytesExpectedToWrite: Int64) {
@@ -84,9 +84,10 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
         return
     }
     
-    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+    nonisolated func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
         os_log("URLSession urlSessionDidFinishEvents", log: self.log, type: .info)
-        if let completionHandler = backgroundFetchCompletionHandler {
+        Task { @MainActor in
+            guard let completionHandler = backgroundFetchCompletionHandler else { return }
             os_log("Calling application backgroundFetchCompletionHandler", log: self.log, type: .info)
             completionHandler()
             backgroundFetchCompletionHandler = nil

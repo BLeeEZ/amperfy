@@ -66,7 +66,7 @@ public class Podcast: AbstractLibraryEntity {
         guard let episodesSet = managedObject.episodes, let episodesMO = episodesSet.array as? [PodcastEpisodeMO] else { return [PodcastEpisode]() }
         return episodesMO.compactMap{ PodcastEpisode(managedObject: $0) }.sortByPublishDate()
     }
-    override public func getDefaultImage(theme: ThemePreference) -> UIImage  {
+    @MainActor override public func getDefaultImage(theme: ThemePreference) -> UIImage  {
         return UIImage.getGeneratedArtwork(theme: theme, artworkType: .podcast)
     }
 
@@ -105,7 +105,7 @@ extension Podcast: PlayableContainable  {
     @MainActor public func remoteToggleFavorite(syncer: LibrarySyncer) async throws {
         throw BackendError.notSupported
     }
-    public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
+    @MainActor public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
         return ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)
     }
     public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .podcast, objectID: managedObject.objectID.uriRepresentation().absoluteString) }

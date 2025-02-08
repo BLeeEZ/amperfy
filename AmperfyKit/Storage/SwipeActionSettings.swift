@@ -94,7 +94,7 @@ public enum SwipeActionType: Int, CaseIterable {
         }
     }
 
-    public var image: UIImage {
+    @MainActor public var image: UIImage {
         switch self {
         case .insertUserQueue:
             return UIImage.userQueueInsert.withTintColor(.white)

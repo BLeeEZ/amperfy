@@ -21,7 +21,7 @@
 
 import Foundation
 
-public enum PodcastsShowType: Int {
+public enum PodcastsShowType: Int, Sendable {
     case podcasts = 0
     case episodesSortedByReleaseDate = 1
     

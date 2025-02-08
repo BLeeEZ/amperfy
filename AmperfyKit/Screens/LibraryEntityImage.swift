@@ -21,12 +21,12 @@
 
 import UIKit
 
-public class LibraryEntityImage: RoundedImage {
+@MainActor public class LibraryEntityImage: RoundedImage {
 
 #if targetEnvironment(macCatalyst)
-    private static let downloadTimeIntervalInMicroSec : UInt32 = 2_000
+    nonisolated private static let downloadTimeIntervalInMicroSec : UInt32 = 2_000
 #else
-    private static let downloadTimeIntervalInMicroSec : UInt32 = 20_000
+    nonisolated private static let downloadTimeIntervalInMicroSec : UInt32 = 20_000
 #endif
     
     let appDelegate: AmperKit
@@ -62,10 +62,13 @@ public class LibraryEntityImage: RoundedImage {
         
         display(entity: entity)
         if let artwork = entity.artwork {
+            let artworkId = artwork.managedObject.objectID
             Self.artworkDownloadQueue.addOperation { [weak self] in
                 guard let self = self else { return }
-                DispatchQueue.main.async {
-                    self.appDelegate.artworkDownloadManager.download(object: artwork)
+                Task { @MainActor in
+                    let artworkClosureMO = self.appDelegate.storage.main.context.object(with: artworkId) as! ArtworkMO
+                    let artworkClosure = Artwork(managedObject: artworkClosureMO)
+                    self.appDelegate.artworkDownloadManager.download(object: artworkClosure)
                 }
                 usleep(Self.downloadTimeIntervalInMicroSec)
             }

@@ -291,7 +291,7 @@ extension UIColor {
     // 007AFF
     // r:0 g:122 b:255
     public static var defaultBlue: UIColor {
-        return UIView().tintColor
+        return UIColor(displayP3Red: 0/255, green: 122/255, blue: 1.0, alpha: 1.0)
     }
     
     public static var gold: UIColor {

@@ -21,7 +21,7 @@
 
 import Foundation
 
-class SubsonicVersion {
+final class SubsonicVersion: Sendable {
     
     static let authenticationTokenRequiredServerApi = SubsonicVersion(major: 1, minor: 13, patch: 0)
     

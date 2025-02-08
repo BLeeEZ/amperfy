@@ -22,7 +22,7 @@
 import XCTest
 @testable import AmperfyKit
 
-class PlayQueueHandlerTest: XCTestCase {
+@MainActor class PlayQueueHandlerTest: XCTestCase {
     
     var cdHelper: CoreDataHelper!
     var library: LibraryStorage!

@@ -47,7 +47,7 @@ extension ResponseError {
     }
     
     static func createFromSubsonicError(cleansedURL: CleansedURL?, error: SubsonicResponseError, data: Data?) -> ResponseError {
-        return ResponseError(statusCode: error.statusCode, message: error.message, cleansedURL: cleansedURL, data: data)
+        return ResponseError(type: .api, statusCode: error.statusCode, message: error.message, cleansedURL: cleansedURL, data: data)
     }
 }
 
@@ -314,11 +314,11 @@ class SubsonicServerApi: URLCleanser {
         parser.delegate = delegate
         parser.parse()
         guard let serverApiVersionString = delegate.serverApiVersion else {
-            throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
+            throw ResponseError(type: .xml, cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
         }
         guard let serverApiVersion = SubsonicVersion(serverApiVersionString) else {
             os_log("The server API version '%s' could not be parsed to 'SubsonicVersion'", log: self.log, type: .info, serverApiVersionString)
-            throw XMLParserResponseError(cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
+            throw ResponseError(type: .xml, cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
         }
         self.serverApiVersion = serverApiVersion
         return serverApiVersion

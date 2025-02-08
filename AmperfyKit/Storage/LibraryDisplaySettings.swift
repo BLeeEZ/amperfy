@@ -74,7 +74,7 @@ public enum LibraryDisplayType: Int, CaseIterable {
         }
     }
 
-    public var image: UIImage {
+    @MainActor public var image: UIImage {
         switch self {
         case .artists:
             return UIImage.artist

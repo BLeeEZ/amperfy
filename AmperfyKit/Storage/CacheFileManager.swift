@@ -75,19 +75,43 @@ public class MimeFileConverter {
     }
 }
 
-public class CacheFileManager {
+final public class CacheFileManager: Sendable {
     
-    public static let shared = CacheFileManager()
+    public static let shared = CacheFileManager().checkAmperfyDirector()
     
-    private let fileManager = FileManager.default
     // Get the URL to the app container's 'Library' directory.
-    private var amperfyLibraryDirectory: URL?
+    private let amperfyLibraryDirectory: URL?
+    
+    init() {
+        // the action to get Amperfy's library directory takes long -> save it in cache
+        if let bundleIdentifier = Bundle.main.bundleIdentifier,
+        // Get the URL to the app container's 'Library' directory.
+            var url = try? FileManager.default.url(
+              for: .libraryDirectory,
+              in: .userDomainMask,
+              appropriateFor: nil,
+              create: true) {
+            // Append the bundle identifier to the retrieved URL.
+            url.appendPathComponent(bundleIdentifier, isDirectory: true)
+            amperfyLibraryDirectory = url
+        } else {
+            amperfyLibraryDirectory = nil
+        }
+    }
+    
+    func checkAmperfyDirector() -> CacheFileManager {
+        guard let amperfyLibraryDirectory else { return self }
+        if self.createDirectoryIfNeeded(at: amperfyLibraryDirectory) {
+            try? markItemAsExcludedFromBackup(at: amperfyLibraryDirectory)
+        }
+        return self
+    }
 
-    public func moveItemToTempDirectoryWithUniqueName(at: URL) throws -> URL {
+    nonisolated public func moveItemToTempDirectoryWithUniqueName(at: URL) throws -> URL {
         // Get the URL to the app container's 'tmp' directory.
-        var tmpFileURL = fileManager.temporaryDirectory
+        var tmpFileURL = FileManager.default.temporaryDirectory
         tmpFileURL.appendPathComponent(UUID().uuidString, isDirectory: false)
-        try fileManager.moveItem(at: at, to: tmpFileURL)
+        try FileManager.default.moveItem(at: at, to: tmpFileURL)
         return tmpFileURL
     }
     
@@ -96,48 +120,26 @@ public class CacheFileManager {
         if createDirectoryIfNeeded(at: subDir) {
             try? markItemAsExcludedFromBackup(at: subDir)
         }
-        if fileManager.fileExists(atPath: to.path) {
+        if FileManager.default.fileExists(atPath: to.path) {
             try? self.removeItem(at: to)
         }
-        try fileManager.moveItem(at: at, to: to)
+        try FileManager.default.moveItem(at: at, to: to)
         try markItemAsExcludedFromBackup(at: to)
     }
     
     @discardableResult
     public func createDirectoryIfNeeded(at url: URL) -> Bool {
-        guard !fileManager.fileExists(atPath: url.path) else { return false }
-        try? fileManager.createDirectory(at: url, withIntermediateDirectories: true, attributes: [:])
+        guard !FileManager.default.fileExists(atPath: url.path) else { return false }
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: [:])
         return true
     }
     
     public func removeItem(at: URL) throws {
-        try fileManager.removeItem(at: at)
+        try FileManager.default.removeItem(at: at)
     }
-    
-    private func getOrCreateAmperfyDirectory() -> URL?  {
-        var amperfyDir: URL? = amperfyLibraryDirectory
-        if amperfyDir == nil,
-           // the action to get Amperfy's library directory takes long -> save it in cache
-           let bundleIdentifier = Bundle.main.bundleIdentifier,
-           // Get the URL to the app container's 'Library' directory.
-           var url = try? fileManager.url(for: .libraryDirectory,
-                                   in: .userDomainMask,
-                                   appropriateFor: nil,
-                                   create: false)
-        {
-            // Append the bundle identifier to the retrieved URL.
-            url.appendPathComponent(bundleIdentifier, isDirectory: true)
-            if createDirectoryIfNeeded(at: url) {
-                try? markItemAsExcludedFromBackup(at: url)
-            }
-            amperfyDir = url
-            amperfyLibraryDirectory = url
-        }
-        return amperfyDir
-    }
-        
+
     private func getOrCreateSubDirectory(subDirectoryName: String) -> URL?  {
-        guard let url = getOrCreateAmperfyDirectory()?.appendingPathComponent(subDirectoryName, isDirectory: true) else { return nil }
+        guard let url = amperfyLibraryDirectory?.appendingPathComponent(subDirectoryName, isDirectory: true) else { return nil }
         if createDirectoryIfNeeded(at: url) {
             try? markItemAsExcludedFromBackup(at: url)
         }
@@ -146,19 +148,19 @@ public class CacheFileManager {
     
     public func deletePlayableCache() {
         if let absSongsDir = getAbsoluteAmperfyPath(relFilePath: Self.songsDir) {
-            try? fileManager.removeItem(at: absSongsDir)
+            try? FileManager.default.removeItem(at: absSongsDir)
         }
         if let absEpisodesDir = getAbsoluteAmperfyPath(relFilePath: Self.episodesDir) {
-            try? fileManager.removeItem(at: absEpisodesDir)
+            try? FileManager.default.removeItem(at: absEpisodesDir)
         }
         if let absEmbeddedArtworksDir = getAbsoluteAmperfyPath(relFilePath: Self.embeddedArtworksDir) {
-            try? fileManager.removeItem(at: absEmbeddedArtworksDir)
+            try? FileManager.default.removeItem(at: absEmbeddedArtworksDir)
         }
     }
     
     public func deleteRemoteArtworkCache() {
         if let absArtworksDir = getAbsoluteAmperfyPath(relFilePath: Self.artworksDir) {
-            try? fileManager.removeItem(at: absArtworksDir)
+            try? FileManager.default.removeItem(at: absArtworksDir)
         }
     }
     
@@ -201,7 +203,7 @@ public class CacheFileManager {
         return getOrCreateSubDirectory(subDirectoryName: Self.lyricsDir.path)
     }
     
-    public struct PlayableCacheInfo {
+    public struct PlayableCacheInfo: Sendable  {
         let url: URL
         let id: String
         let fileType: String
@@ -269,7 +271,7 @@ public class CacheFileManager {
         return cacheInfo
     }
 
-    public struct EmbeddedArtworkCacheInfo {
+    public struct EmbeddedArtworkCacheInfo: Sendable  {
         let url: URL
         let id: String
         let isSong: Bool
@@ -315,7 +317,7 @@ public class CacheFileManager {
         return cacheInfo
     }
     
-    public struct ArtworkCacheInfo {
+    public struct ArtworkCacheInfo: Sendable  {
         let url: URL
         let id: String
         let type: String
@@ -360,7 +362,7 @@ public class CacheFileManager {
         return cacheInfo
     }
 
-    public struct LyricsCacheInfo {
+    public struct LyricsCacheInfo: Sendable {
         let url: URL
         let id: String
         let isSong: Bool
@@ -452,17 +454,17 @@ public class CacheFileManager {
     }
     
     public func getAmperfyPath() -> String? {
-        return getOrCreateAmperfyDirectory()?.path
+        return amperfyLibraryDirectory?.path
     }
     
     public func getAbsoluteAmperfyPath(relFilePath: URL) -> URL? {
-        guard let amperfyDir = getOrCreateAmperfyDirectory() else { return nil }
+        guard let amperfyDir = amperfyLibraryDirectory else { return nil }
         return amperfyDir.appendingPathComponent(relFilePath.path)
     }
     
     public func fileExits(relFilePath: URL) -> Bool {
-        guard let absFilePath = getOrCreateAmperfyDirectory()?.appendingPathComponent(relFilePath.path) else { return false }
-        return fileManager.fileExists(atPath: absFilePath.path)
+        guard let absFilePath = amperfyLibraryDirectory?.appendingPathComponent(relFilePath.path) else { return false }
+        return FileManager.default.fileExists(atPath: absFilePath.path)
     }
     
     public func writeDataExcludedFromBackup(data: Data, to: URL) throws {
@@ -483,14 +485,14 @@ public class CacheFileManager {
     }
     
     public func contentsOfDirectory(url: URL) -> [URL] {
-        let contents = try? fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: [.isDirectoryKey])
+        let contents = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [.isDirectoryKey])
         return contents ?? [URL]()
     }
     
     public func directorySize(url: URL) -> Int64 {
         let contents: [URL]
         do {
-            contents = try fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey])
+            contents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey])
         } catch {
             return 0
         }
@@ -516,7 +518,7 @@ public class CacheFileManager {
         return size
     }
     
-    public func getFileSize(url: URL) -> Int64? {
+    nonisolated public func getFileSize(url: URL) -> Int64? {
         guard let fileSizeResourceValue = try? url.resourceValues(forKeys: [.fileSizeKey]),
               let intSize = fileSizeResourceValue.fileSize
         else { return nil }

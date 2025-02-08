@@ -95,14 +95,14 @@ public class AbstractLibraryEntity {
         }
     }
     
-    public func image(theme: ThemePreference, setting: ArtworkDisplayPreference) -> UIImage {
+    @MainActor public func image(theme: ThemePreference, setting: ArtworkDisplayPreference) -> UIImage {
         guard let img = artwork?.image else {
             return getDefaultImage(theme: theme)
         }
         return img
     }
     
-    public func getDefaultImage(theme: ThemePreference) -> UIImage  {
+    @MainActor public func getDefaultImage(theme: ThemePreference) -> UIImage  {
         return UIImage.getGeneratedArtwork(theme: theme, artworkType: .song)
     }
     public func isEqual(_ other: AbstractLibraryEntity) -> Bool {

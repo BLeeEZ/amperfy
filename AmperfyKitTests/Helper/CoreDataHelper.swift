@@ -23,7 +23,7 @@ import Foundation
 import CoreData
 @testable import AmperfyKit
 
-class CoreDataHelper {
+@MainActor class CoreDataHelper {
     
     let seeder: CoreDataSeeder
     lazy var persistentContainer = {

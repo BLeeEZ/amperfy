@@ -375,7 +375,6 @@
 		50C9D6C3284FAACE007F18D0 /* DownloadProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5088A8A426A955AD00B4C8C6 /* DownloadProtocols.swift */; };
 		50C9D6C4284FAB0C007F18D0 /* LocalNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5040B2C3269CD19600911451 /* LocalNotificationManager.swift */; };
 		50C9D6C5284FAB0C007F18D0 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92FD21CED4AF00E5901D /* Utilities.swift */; };
-		50C9D6C6284FAB0C007F18D0 /* SynchronizedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F939221F40130099CA91 /* SynchronizedArray.swift */; };
 		50C9D6C7284FAB0C007F18D0 /* LogData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288626564C6800DA3A8F /* LogData.swift */; };
 		50C9D6C9284FAB0C007F18D0 /* EventNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED2B9027B7AE8500331BF7 /* EventNotificationHandler.swift */; };
 		50C9D6D0284FAB0C007F18D0 /* ConcurrentTaskGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */; };
@@ -706,7 +705,6 @@
 		5077F933221DAB5C0099CA91 /* DownloadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadManager.swift; sourceTree = "<group>"; };
 		5077F935221E6D0E0099CA91 /* DownloadsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsVC.swift; sourceTree = "<group>"; };
 		5077F937221F24C10099CA91 /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
-		5077F939221F40130099CA91 /* SynchronizedArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedArray.swift; sourceTree = "<group>"; };
 		5077F95022279DF40099CA91 /* PlaytimeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaytimeSlider.swift; sourceTree = "<group>"; };
 		5077F95222283FED0099CA91 /* RoundedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedImage.swift; sourceTree = "<group>"; };
 		5077F954222C58A10099CA91 /* GenericXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericXmlParser.swift; sourceTree = "<group>"; };
@@ -1199,7 +1197,6 @@
 				50FF311A2BBC4D8000C2C3B9 /* NetworkMonitor.swift */,
 				5086F87822397B2900546F5A /* StringHasher.swift */,
 				5029288826564F3600DA3A8F /* JSONConverter.swift */,
-				5077F939221F40130099CA91 /* SynchronizedArray.swift */,
 				5029288626564C6800DA3A8F /* LogData.swift */,
 				5040B2C3269CD19600911451 /* LocalNotificationManager.swift */,
 				50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */,
@@ -2517,7 +2514,6 @@
 				50C9D67E284FAA6C007F18D0 /* UserStatisticsMO+CoreDataClass.swift in Sources */,
 				50C9D6AE284FAA87007F18D0 /* PlayerData.swift in Sources */,
 				50C9D64E284FAA02007F18D0 /* SsArtistParserDelegate.swift in Sources */,
-				50C9D6C6284FAB0C007F18D0 /* SynchronizedArray.swift in Sources */,
 				50C9D6A7284FAA7F007F18D0 /* CoreDataMigrator.swift in Sources */,
 				50C9D676284FAA4D007F18D0 /* LibraryElementEnum.swift in Sources */,
 				50C9D6AF284FAA87007F18D0 /* Genre.swift in Sources */,
@@ -3016,6 +3012,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_CONCISE_MAGIC_FILE = YES;
 				SWIFT_UPCOMING_FEATURE_DEPRECATE_APPLICATION_MAIN = YES;
 				SWIFT_UPCOMING_FEATURE_DISABLE_OUTWARD_ACTOR_ISOLATION = YES;
@@ -3067,6 +3064,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_CONCISE_MAGIC_FILE = YES;
 				SWIFT_UPCOMING_FEATURE_DEPRECATE_APPLICATION_MAIN = YES;
 				SWIFT_UPCOMING_FEATURE_DISABLE_OUTWARD_ACTOR_ISOLATION = YES;

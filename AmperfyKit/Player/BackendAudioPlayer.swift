@@ -211,12 +211,14 @@ enum BackendAudioQueueType {
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if let item = object as? AVPlayerItem {
             if keyPath == "status" {
-                if item.status == .failed,
-                   let statusError = item.error {
-                    handleError(error: statusError)
-                } else {
-                    isTriggerReinsertPlayableAllowed = true
-                    isErrorOccured = false
+                Task { @MainActor in
+                    if item.status == .failed,
+                       let statusError = item.error {
+                        handleError(error: statusError)
+                    } else {
+                        isTriggerReinsertPlayableAllowed = true
+                        isErrorOccured = false
+                    }
                 }
             }
         }

@@ -22,7 +22,7 @@
 import UIKit
 import AmperfyKit
 
-extension UICellAccessory.CustomViewConfiguration {
+@MainActor extension UICellAccessory.CustomViewConfiguration {
     
     public static func createUnSelected() -> UICellAccessory.CustomViewConfiguration {
         let icon = UIImageView(image: .unSelected)

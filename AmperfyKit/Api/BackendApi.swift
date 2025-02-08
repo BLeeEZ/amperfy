@@ -141,8 +141,8 @@ public protocol LibrarySyncer {
 }
 
 
-public class CleansedURL {
-    private var urlString: String
+final public class CleansedURL: Sendable {
+    private let urlString: String
     
     init(urlString: String) {
         self.urlString = urlString

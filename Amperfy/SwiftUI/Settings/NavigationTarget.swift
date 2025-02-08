@@ -76,7 +76,7 @@ enum NavigationTarget: String, CaseIterable {
         }
     }
 
-    var icon: UIImage {
+    @MainActor var icon: UIImage {
         switch self {
         case .general: .settings
         case .displayAndInteraction: .display
