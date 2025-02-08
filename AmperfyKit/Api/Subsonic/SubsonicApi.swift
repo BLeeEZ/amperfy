@@ -58,6 +58,10 @@ extension SubsonicApi: BackendApi {
         return subsonicServerApi.isStreamingTranscodingActive
     }
 
+    public var customHeaders: [String] {
+        return subsonicServerApi.customHeaders
+    }
+
     func provideCredentials(credentials: LoginCredentials) {
         subsonicServerApi.provideCredentials(credentials: credentials)
     }
@@ -98,4 +102,7 @@ extension SubsonicApi: BackendApi {
         return subsonicServerApi.cleanse(url: url)
     }
 
+    func setCustomHeaders(headers: [String]) {
+        subsonicServerApi.setCustomHeaders(headers: headers)
+    }
 }

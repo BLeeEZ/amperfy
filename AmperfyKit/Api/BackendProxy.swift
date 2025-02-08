@@ -294,19 +294,23 @@ public class BackendProxy {
 }
     
 extension BackendProxy: BackendApi {
-  
+
     public var clientApiVersion: String {
         return activeApi.clientApiVersion
     }
-    
+
     public var serverApiVersion: String {
         return activeApi.serverApiVersion
     }
-    
+
     public var isStreamingTranscodingActive: Bool {
         return activeApi.isStreamingTranscodingActive
     }
-    
+
+    public var customHeaders: [String] {
+        return activeApi.customHeaders
+    }
+
     public func provideCredentials(credentials: LoginCredentials) {
         activeApi.provideCredentials(credentials: credentials)
     }
@@ -314,23 +318,23 @@ extension BackendProxy: BackendApi {
     public func isAuthenticationValid(credentials: LoginCredentials) -> Promise<Void> {
         return activeApi.isAuthenticationValid(credentials: credentials)
     }
-    
+
     public func generateUrl(forDownloadingPlayable playable: AbstractPlayable) -> Promise<URL> {
         return activeApi.generateUrl(forDownloadingPlayable: playable)
     }
-    
+
     public func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) -> Promise<URL> {
         return activeApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
     }
-    
+
     public func generateUrl(forArtwork artwork: Artwork) -> Promise<URL> {
         return activeApi.generateUrl(forArtwork: artwork)
     }
-    
+
     public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
         return activeApi.checkForErrorResponse(response: response)
     }
-    
+
     public func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
         return activeApi.createLibrarySyncer(storage: storage)
     }
@@ -338,13 +342,16 @@ extension BackendProxy: BackendApi {
     public func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
         return activeApi.createArtworkArtworkDownloadDelegate()
     }
-    
+
     public func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
         return activeApi.extractArtworkInfoFromURL(urlString: urlString)
     }
-    
+
     public func cleanse(url: URL) -> CleansedURL {
         return activeApi.cleanse(url: url)
     }
-    
+
+    public func setCustomHeaders(headers: [String]) {
+        activeApi.setCustomHeaders(headers: headers)
+    }
 }
