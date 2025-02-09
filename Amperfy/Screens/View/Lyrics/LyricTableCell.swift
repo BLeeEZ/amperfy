@@ -23,7 +23,7 @@ import UIKit
 import CoreData
 import AmperfyKit
 
-class LyricTableCellModel {
+@MainActor class LyricTableCellModel {
     var lyric: LyricsLine? {
         didSet {
             cell?.refresh()

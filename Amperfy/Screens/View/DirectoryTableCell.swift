@@ -23,7 +23,7 @@ import UIKit
 import CoreData
 import AmperfyKit
 
-class DirectoryTableCell: BasicTableCell {
+@MainActor class DirectoryTableCell: BasicTableCell {
     
     @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var artworkImage: LibraryEntityImage!
@@ -40,10 +40,6 @@ class DirectoryTableCell: BasicTableCell {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         appDelegate.notificationHandler.register(self, selector: #selector(self.artworkDownloadFinishedSuccessful(notification:)), name: .downloadFinishedSuccess, object: appDelegate.artworkDownloadManager)
-    }
-    
-    deinit {
-        appDelegate.notificationHandler.remove(self, name: .downloadFinishedSuccess, object: appDelegate.artworkDownloadManager)
     }
 
     func display(folder: MusicFolder) {

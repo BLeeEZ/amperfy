@@ -27,7 +27,7 @@ struct KeyboardCommand: Equatable {
     let modifierFlags: UIKeyModifierFlags
 }
 
-enum KeyboardCommands: CaseIterable {
+@MainActor enum KeyboardCommands: CaseIterable {
     case togglePausePlay
     case previous
     case next

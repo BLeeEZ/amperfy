@@ -127,9 +127,9 @@ extension BasicCollectionViewController: UISearchResultsUpdating, UISearchBarDel
     
 }
 
-class SingleSnapshotFetchedResultsCollectionViewController<ResultType>:
+@MainActor class SingleSnapshotFetchedResultsCollectionViewController<ResultType>:
     BasicCollectionViewController,
-    NSFetchedResultsControllerDelegate where ResultType : NSFetchRequestResult {
+    @preconcurrency NSFetchedResultsControllerDelegate where ResultType : NSFetchRequestResult {
     
     var diffableDataSource: BasicUICollectionViewDiffableDataSource?
     var snapshotDidChange: (() -> Void)?
@@ -149,24 +149,26 @@ class SingleSnapshotFetchedResultsCollectionViewController<ResultType>:
     
     /// This will override the NSFetchedResultsController handling of the super class -> Only use snapshots
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference) {
-        guard let dataSource = collectionView?.dataSource as? UICollectionViewDiffableDataSource<Int, NSManagedObjectID> else {
-            assertionFailure("The data source has not implemented snapshot support while it should")
-            return
-        }
-        var snapshot = snapshot as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>
-        let currentSnapshot = dataSource.snapshot() as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>
-
-        let reloadIdentifiers: [NSManagedObjectID] = snapshot.itemIdentifiers.compactMap { itemIdentifier in
-            guard let currentIndex = currentSnapshot.indexOfItem(itemIdentifier), let index = snapshot.indexOfItem(itemIdentifier), index == currentIndex else {
-                return nil
+        MainActor.assumeIsolated {
+            guard let dataSource = collectionView?.dataSource as? UICollectionViewDiffableDataSource<Int, NSManagedObjectID> else {
+                assertionFailure("The data source has not implemented snapshot support while it should")
+                return
             }
-            guard let existingObject = try? controller.managedObjectContext.existingObject(with: itemIdentifier), existingObject.isUpdated else { return nil }
-            return itemIdentifier
+            var snapshot = snapshot as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>
+            let currentSnapshot = dataSource.snapshot() as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>
+            
+            let reloadIdentifiers: [NSManagedObjectID] = snapshot.itemIdentifiers.compactMap { itemIdentifier in
+                guard let currentIndex = currentSnapshot.indexOfItem(itemIdentifier), let index = snapshot.indexOfItem(itemIdentifier), index == currentIndex else {
+                    return nil
+                }
+                guard let existingObject = try? controller.managedObjectContext.existingObject(with: itemIdentifier), existingObject.isUpdated else { return nil }
+                return itemIdentifier
+            }
+            snapshot.reconfigureItems(reloadIdentifiers)
+            
+            dataSource.apply(snapshot as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>, animatingDifferences: false)
+            self.snapshotDidChange?()
         }
-        snapshot.reconfigureItems(reloadIdentifiers)
-        
-        dataSource.apply(snapshot as NSDiffableDataSourceSnapshot<Int, NSManagedObjectID>, animatingDifferences: false)
-        self.snapshotDidChange?()
     }
     
 }

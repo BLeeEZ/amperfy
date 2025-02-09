@@ -20,7 +20,7 @@
 //
 import SwiftUI
 
-enum NavigationTarget: String, CaseIterable {
+@MainActor enum NavigationTarget: String, CaseIterable {
     case general = "general"
     case displayAndInteraction = "displayAndInteraction"
     case server = "server"

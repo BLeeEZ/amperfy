@@ -33,20 +33,28 @@ class MultiSourceTableViewController: BasicTableViewController {
     
 }
 
-extension MultiSourceTableViewController: NSFetchedResultsControllerDelegate {
+extension MultiSourceTableViewController: @preconcurrency NSFetchedResultsControllerDelegate {
     public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        resultUpdateHandler?.controllerWillChangeContent(controller)
+        MainActor.assumeIsolated {
+            resultUpdateHandler?.controllerWillChangeContent(controller)
+        }
     }
     
     public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        resultUpdateHandler?.controllerDidChangeContent(controller)
+        MainActor.assumeIsolated {
+            resultUpdateHandler?.controllerDidChangeContent(controller)
+        }
     }
     
     public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        resultUpdateHandler?.controller(controller, didChange: anObject, at: indexPath, for: type, newIndexPath: newIndexPath)
+        MainActor.assumeIsolated {
+            resultUpdateHandler?.controller(controller, didChange: anObject, at: indexPath, for: type, newIndexPath: newIndexPath)
+        }
     }
     
     public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        resultUpdateHandler?.controller(controller, didChange: sectionInfo, atSectionIndex: sectionIndex, for: type)
+        MainActor.assumeIsolated {
+            resultUpdateHandler?.controller(controller, didChange: sectionInfo, atSectionIndex: sectionIndex, for: type)
+        }
     }
 }

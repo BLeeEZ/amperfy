@@ -584,7 +584,7 @@ public struct XCallbackActionDocu: Hashable {
         }
     }
     
-    public struct AmperfyMediaIntentItemResult {
+    @MainActor public struct AmperfyMediaIntentItemResult {
         var playableContainer: PlayableContainable?
         var playableElements: [AbstractPlayable]?
         var item: INMediaItem

@@ -243,9 +243,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // whenever we change the window focus, we rebuild the menu
         NotificationCenter.default.addObserver(forName: .init("NSWindowDidBecomeMainNotification"), object: nil, queue: nil) { [weak self] notification in
-
-            self?.focusedWindowTitle = (notification.object as? AnyObject)?.value(forKey: "title") as? String
-            UIMenuSystem.main.setNeedsRebuild()
+            let focusedWindowTitle = (notification.object as? AnyObject)?.value(forKey: "title") as? String
+            Task { @MainActor in
+                self?.focusedWindowTitle = focusedWindowTitle
+                UIMenuSystem.main.setNeedsRebuild()
+            }
         }
 
         self.player.addNotifier(notifier: self)

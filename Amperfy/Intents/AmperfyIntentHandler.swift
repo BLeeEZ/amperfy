@@ -24,9 +24,9 @@ import Intents
 import AmperfyKit
 import OSLog
 
-@MainActor public class SearchAndPlayIntentHandler: NSObject, SearchAndPlayIntentHandling {
+public class SearchAndPlayIntentHandler: NSObject, SearchAndPlayIntentHandling {
     
-    let intentManager: IntentManager
+    @MainActor let intentManager: IntentManager
     
     public init(intentManager: IntentManager) {
         self.intentManager = intentManager
@@ -64,9 +64,9 @@ import OSLog
     }
 }
 
-@MainActor public class PlayIDIntentHandler: NSObject, PlayIDIntentHandling {
+public class PlayIDIntentHandler: NSObject, PlayIDIntentHandling {
     
-    let intentManager: IntentManager
+    @MainActor let intentManager: IntentManager
     
     public init(intentManager: IntentManager) {
         self.intentManager = intentManager
@@ -104,8 +104,9 @@ import OSLog
     }
 }
 
-@MainActor public class PlayRandomSongsIntentHandler: NSObject, PlayRandomSongsIntentHandling {
-    let intentManager: IntentManager
+public class PlayRandomSongsIntentHandler: NSObject, PlayRandomSongsIntentHandling {
+    
+    @MainActor let intentManager: IntentManager
     
     public init(intentManager: IntentManager) {
         self.intentManager = intentManager
@@ -127,7 +128,7 @@ import OSLog
     
 }
 
-@MainActor public class PlayMediaIntentHandler: NSObject, INPlayMediaIntentHandling {
+@MainActor public class PlayMediaIntentHandler: NSObject, @preconcurrency INPlayMediaIntentHandling {
     
     let intentManager: IntentManager
     

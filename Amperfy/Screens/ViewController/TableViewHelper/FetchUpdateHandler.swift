@@ -22,7 +22,7 @@
 import CoreData
 import UIKit
 
-class FetchUpdatePerObjectHandler: NSObject, NSFetchedResultsControllerDelegate {
+@MainActor class FetchUpdatePerObjectHandler: NSObject, NSFetchedResultsControllerDelegate {
     
     private let tableView: UITableView
     
@@ -30,16 +30,22 @@ class FetchUpdatePerObjectHandler: NSObject, NSFetchedResultsControllerDelegate 
         self.tableView = tableView
     }
     
-    public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView.beginUpdates()
+    nonisolated public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        MainActor.assumeIsolated {
+            tableView.beginUpdates()
+        }
     }
     
-    public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView.endUpdates()
+    nonisolated public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        MainActor.assumeIsolated {
+            tableView.endUpdates()
+        }
     }
     
-    public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        self.applyChangesFromFetchedResultsController(at: indexPath, for: type, newIndexPath: newIndexPath)
+    nonisolated public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        MainActor.assumeIsolated {
+            self.applyChangesFromFetchedResultsController(at: indexPath, for: type, newIndexPath: newIndexPath)
+        }
     }
 
     public func applyChangesOfMultiRowType(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, determinedSection section: Int, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -75,15 +81,17 @@ class FetchUpdatePerObjectHandler: NSObject, NSFetchedResultsControllerDelegate 
         }
     }
     
-    public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        let indexSet = IndexSet(integer: sectionIndex)
-        switch type {
-        case .insert:
-            tableView.insertSections(indexSet, with: .automatic)
-        case .delete:
-            tableView.deleteSections(indexSet, with: .automatic)
-        default:
-            break
+    nonisolated public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
+        MainActor.assumeIsolated {
+            let indexSet = IndexSet(integer: sectionIndex)
+            switch type {
+            case .insert:
+                tableView.insertSections(indexSet, with: .automatic)
+            case .delete:
+                tableView.deleteSections(indexSet, with: .automatic)
+            default:
+                break
+            }
         }
     }
     

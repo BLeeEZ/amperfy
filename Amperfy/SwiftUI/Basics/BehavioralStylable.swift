@@ -31,7 +31,7 @@ extension UIBehavioralStyle {
     #endif
 }
 
-protocol BehavioralStylable {
+@MainActor protocol BehavioralStylable {
     var behavioralStyle: UIBehavioralStyle { get }
     var preferredBehavioralStyle: UIBehavioralStyle { get set }
 }

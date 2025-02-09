@@ -27,7 +27,7 @@ class KeyCommandTableViewController: UITableViewController {
     
 }
 
-class TableViewKeyCommandsController {
+@MainActor class TableViewKeyCommandsController {
     
     let tableView: UITableView
     let overrideFirstLastIndexPath: IndexPath?

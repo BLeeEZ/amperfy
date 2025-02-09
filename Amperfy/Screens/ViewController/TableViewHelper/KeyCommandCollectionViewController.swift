@@ -25,7 +25,7 @@ class KeyCommandCollectionViewController: UICollectionViewController {
     lazy var collectionViewKeyCommandsController = CollectionViewKeyCommandsController(collectionView: collectionView)
 }
 
-class CollectionViewKeyCommandsController {
+@MainActor class CollectionViewKeyCommandsController {
     
     let collectionView: UICollectionView
     let overrideFirstLastIndexPath: IndexPath?

@@ -26,7 +26,7 @@ import AmperfyKit
 class OverlayLayer : CALayer {
 }
 
-class PlayIndicatorHandler {
+@MainActor class PlayIndicatorHandler {
     
     public static let shared = PlayIndicatorHandler()
     
@@ -37,7 +37,7 @@ class PlayIndicatorHandler {
         return UIColor.imageOverlayBackground.cgColor
     }
     
-    private init() { }
+    private init() {}
     
     func getIndicator(for viewControllerTypeName: String) -> VYPlayIndicator {
         var indicator = indicatorDict[viewControllerTypeName]

@@ -24,7 +24,7 @@ import AmperfyKit
 import CoreData
 import Collections
 
-public protocol PlaylistVCAddable : UIViewController {
+@MainActor public protocol PlaylistVCAddable : UIViewController {
     var addToPlaylistManager: AddToPlaylistManager { get set }
 }
 
@@ -80,7 +80,7 @@ extension LibraryDisplayType {
 
 public typealias SelectedCallback = (Bool) -> Void
 
-public class AddToPlaylistManager {
+@MainActor public class AddToPlaylistManager {
     public var playlist: Playlist!
     public var onDoneCB: VoidFunctionCallback?
     public var elementsToAdd = [AbstractPlayable]()

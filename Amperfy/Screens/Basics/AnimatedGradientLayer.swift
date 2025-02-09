@@ -22,7 +22,7 @@
 import UIKit
 import AmperfyKit
 
-class AnimatedGradientLayer {
+@MainActor class AnimatedGradientLayer {
     
     private let gradientLayer: CAGradientLayer
     var colors: [CGColor] = [UIColor.white.cgColor, UIColor.white.cgColor]
@@ -80,7 +80,7 @@ class AnimatedGradientLayer {
 
 }
 
-class PopupAnimatedGradientLayer {
+@MainActor class PopupAnimatedGradientLayer {
 
     let gradientLayer: AnimatedGradientLayer
     let colorPalette: [UIColor] = [

@@ -249,7 +249,7 @@ extension UICollectionView {
     }
 }
 
-extension UITableViewController {
+@MainActor extension UITableViewController {
     func dequeueCell<CellType: UITableViewCell>(for tableView: UITableView, at indexPath: IndexPath) -> CellType {
         return self.tableView.dequeueCell(for: tableView, at: indexPath)
     }
@@ -260,10 +260,8 @@ extension UITableViewController {
     }
     
     func exectueAfterAnimation(body: @escaping () -> Void) {
-        DispatchQueue.global().async {
-            DispatchQueue.main.async {
-                body()
-            }
+        Task { @MainActor in
+            body()
         }
     }
 }
@@ -275,7 +273,7 @@ extension UIViewController {
 }
 
 extension NSObject {
-    var appDelegate: AppDelegate {
+    @MainActor var appDelegate: AppDelegate {
         return (UIApplication.shared.delegate as! AppDelegate)
     }
 }

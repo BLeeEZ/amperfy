@@ -23,7 +23,7 @@ import Foundation
 
 #if targetEnvironment(macCatalyst)
 
-protocol Refreshable {
+@MainActor protocol Refreshable {
     func reload()
 }
 

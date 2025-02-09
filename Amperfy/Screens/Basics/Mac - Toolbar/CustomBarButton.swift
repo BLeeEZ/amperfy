@@ -140,9 +140,7 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
         }
     }
 
-    @objc func clicked(_ sender: UIButton) {
-
-    }
+    @objc func clicked(_ sender: UIButton) {}
 
     func reload() {
         self.updateButtonBackgroundColor()

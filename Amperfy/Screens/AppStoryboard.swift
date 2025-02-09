@@ -23,7 +23,7 @@ import Foundation
 import UIKit
 import AmperfyKit
 
-enum AppStoryboard : String {
+@MainActor enum AppStoryboard : String {
     
     case Main = "Main"
 

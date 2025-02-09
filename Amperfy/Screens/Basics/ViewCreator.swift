@@ -22,7 +22,7 @@
 import UIKit
 import AmperfyKit
 
-class ViewCreator<ViewType: UIView> {
+@MainActor class ViewCreator<ViewType: UIView> {
     
     static func createFromNib() -> ViewType? {
         return UINib(

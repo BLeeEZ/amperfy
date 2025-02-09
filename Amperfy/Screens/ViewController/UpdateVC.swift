@@ -82,12 +82,12 @@ class UpdateVC: UIViewController {
 
 extension UpdateVC: LibraryUpdaterCallbacks {
     
-    func startOperation(name: String, totalCount: Int) {
-        self.tickCount = 0
-        self.oprationPercent = 0.0
-        self.totalTickCount = totalCount > 0 ? totalCount : 1
-        
-        DispatchQueue.main.async {
+    nonisolated func startOperation(name: String, totalCount: Int) {
+        Task { @MainActor in
+            self.tickCount = 0
+            self.oprationPercent = 0.0
+            self.totalTickCount = totalCount > 0 ? totalCount : 1
+            
             if totalCount > 0 {
                 self.activitySpinner.stopAnimating()
                 self.activitySpinner.isHidden = true
@@ -96,22 +96,24 @@ extension UpdateVC: LibraryUpdaterCallbacks {
                 self.activitySpinner.isHidden = false
             }
             self.progressLabel.isHidden = totalCount <= 0
-        }
         
-        self.updateSyncInfo(infoText: name, percentParsed: 0.0)
+            self.updateSyncInfo(infoText: name, percentParsed: 0.0)
+        }
     }
     
-    func tickOperation() {
-        tickCount += 1
-        var parsePercent: Float = 0.0
-        if self.totalTickCount > 0 {
-            parsePercent = min(Float(self.tickCount) / Float(self.totalTickCount), 1.0)
+    nonisolated func tickOperation() {
+        Task { @MainActor in
+            tickCount += 1
+            var parsePercent: Float = 0.0
+            if self.totalTickCount > 0 {
+                parsePercent = min(Float(self.tickCount) / Float(self.totalTickCount), 1.0)
+            }
+            let percentDiff = Int(parsePercent*1000)-Int(self.oprationPercent*1000)
+            if percentDiff > 0 {
+                self.updateSyncInfo(percentParsed: parsePercent)
+            }
+            self.oprationPercent = parsePercent
         }
-        let percentDiff = Int(parsePercent*1000)-Int(self.oprationPercent*1000)
-        if percentDiff > 0 {
-            self.updateSyncInfo(percentParsed: parsePercent)
-        }
-        self.oprationPercent = parsePercent
     }
     
 }

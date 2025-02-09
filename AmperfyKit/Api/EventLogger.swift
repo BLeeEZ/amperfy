@@ -33,8 +33,7 @@ public enum AmperfyLogStatusCode: Int {
     case info
 }
 
-/// Must be called from main thread
-public protocol AlertDisplayable {
+@MainActor public protocol AlertDisplayable {
     func display(title: String, subtitle: String, style: LogEntryType, notificationBanner popupVC: UIViewController)
     func display(popup popupVC: UIViewController)
     func createPopupVC(topic: String, shortMessage: String, detailMessage: String, logType: LogEntryType) -> UIViewController

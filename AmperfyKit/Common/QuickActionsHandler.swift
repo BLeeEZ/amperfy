@@ -30,7 +30,7 @@ import UIKit
     
     private var savedShortCutItem: UIApplicationShortcutItem?
     
-    public init(storage: PersistentStorage, player: PlayerFacade, application: UIApplication, displaySearchTabCB: @escaping () -> Void) {
+    public init(storage: PersistentStorage, player: PlayerFacade, application: UIApplication, displaySearchTabCB: @escaping @MainActor () -> Void) {
         self.storage = storage
         self.player = player
         self.application = application

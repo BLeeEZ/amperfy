@@ -24,7 +24,7 @@ import UserNotifications
 import UIKit
 import os.log
 
-public enum NotificationContentType: NSString {
+public enum NotificationContentType: String, Sendable {
     case podcastEpisode = "PodcastEpisode"
 }
 

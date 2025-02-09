@@ -35,25 +35,30 @@ extension AppDelegate: UNUserNotificationCenterDelegate
         UNUserNotificationCenter.current().delegate = self
     }
     
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.list, .banner])
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        return [.list, .banner]
     }
 
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        userStatistics.appStartedViaNotification()
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         let userInfo = response.notification.request.content.userInfo
-        guard let contentTypeRaw = userInfo[NotificationUserInfo.type] as? NSString, let contentType = NotificationContentType(rawValue: contentTypeRaw), let id = userInfo[NotificationUserInfo.id] as? String else { completionHandler(); return }
-
-        switch contentType {
-        case .podcastEpisode:
-            let episode = storage.main.library.getPodcastEpisode(id: id)
-            if let podcast = episode?.podcast {
-                let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
-                podcastDetailVC.podcast = podcast
-                displayInLibraryTab(vc: podcastDetailVC)
+        guard let contentTypeRaw = userInfo[NotificationUserInfo.type] as? String,
+              let contentType = NotificationContentType(rawValue: contentTypeRaw),
+              let id = userInfo[NotificationUserInfo.id] as? String else {
+            return
+        }
+        
+        await MainActor.run {
+            userStatistics.appStartedViaNotification()
+            switch contentType {
+            case .podcastEpisode:
+                let episode = storage.main.library.getPodcastEpisode(id: id)
+                if let podcast = episode?.podcast {
+                    let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
+                    podcastDetailVC.podcast = podcast
+                    displayInLibraryTab(vc: podcastDetailVC)
+                }
             }
         }
-        completionHandler()
     }
     
     private func displayInLibraryTab(vc: UIViewController) {

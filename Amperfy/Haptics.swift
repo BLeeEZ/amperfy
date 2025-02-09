@@ -11,7 +11,7 @@ import UIKit
 import AudioToolbox
 import AmperfyKit
 
-enum Haptics {
+@MainActor enum Haptics {
     case error
     case success
     case warning

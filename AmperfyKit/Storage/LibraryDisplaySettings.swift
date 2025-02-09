@@ -24,7 +24,7 @@ import Foundation
 import Foundation
 import UIKit
 
-public enum LibraryDisplayType: Int, CaseIterable {
+@MainActor public enum LibraryDisplayType: Int, CaseIterable, Sendable {
     case artists = 0
     case albums = 1
     case songs = 2
@@ -74,7 +74,7 @@ public enum LibraryDisplayType: Int, CaseIterable {
         }
     }
 
-    @MainActor public var image: UIImage {
+    public var image: UIImage {
         switch self {
         case .artists:
             return UIImage.artist

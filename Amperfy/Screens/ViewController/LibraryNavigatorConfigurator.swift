@@ -22,13 +22,13 @@
 import UIKit
 import AmperfyKit
 
-class LibraryNavigatorItem: Hashable {
+final class LibraryNavigatorItem: Hashable, Sendable {
     let id = UUID()
     let title: String
-    var library: LibraryDisplayType?
-    var isSelected = false
+    let library: LibraryDisplayType?
+    @MainActor var isSelected = false
     let isInteractable: Bool
-    var tab: TabNavigatorItem?
+    let tab: TabNavigatorItem?
     
     init(title: String, library: LibraryDisplayType? = nil, isSelected: Bool = false, isInteractable: Bool = true, tab: TabNavigatorItem? = nil) {
         self.title = title
@@ -66,7 +66,7 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
         }
     }
 
-    var controller: UIViewController {
+    @MainActor var controller: UIViewController {
         switch self {
         case .search: return SearchVC.instantiateFromAppStoryboard()
         case .settings: return SettingsHostVC.instantiateFromAppStoryboard()
@@ -155,7 +155,7 @@ struct SearchNavigationItemConfiguration: UIContentConfiguration, Hashable {
 
 typealias SideBarDiffableDataSource = UICollectionViewDiffableDataSource<Int, LibraryNavigatorItem>
 
-class LibraryNavigatorConfigurator: NSObject {
+@MainActor class LibraryNavigatorConfigurator: NSObject {
     
     static let sectionHeaderElementKind = "section-header-element-kind"
     
@@ -175,7 +175,7 @@ class LibraryNavigatorConfigurator: NSObject {
     private var libraryInUse = [LibraryNavigatorItem]()
     private var libraryNotUsed = [LibraryNavigatorItem]()
     
-    init(offsetData: [LibraryNavigatorItem], librarySettings: LibraryDisplaySettings, layoutConfig: UICollectionLayoutListConfiguration, pressedOnLibraryItemCB: @escaping ((_: LibraryNavigatorItem) -> Void)) {
+    init(offsetData: [LibraryNavigatorItem], librarySettings: LibraryDisplaySettings, layoutConfig: UICollectionLayoutListConfiguration, pressedOnLibraryItemCB: @escaping (@MainActor (_: LibraryNavigatorItem) -> Void)) {
         self.offsetData = offsetData
         self.librarySettings = librarySettings
         self.layoutConfig = layoutConfig
@@ -204,7 +204,7 @@ class LibraryNavigatorConfigurator: NSObject {
         #endif
     }
 
-    @objc private func editingPressed() {
+    @MainActor @objc private func editingPressed() {
         let isInEditMode = !collectionView.isEditing
         #if !targetEnvironment(macCatalyst)
         editButton.title = isInEditMode ? "Done" : "Edit"

@@ -26,7 +26,6 @@ import AmperfyKit
 class SyncVC: UIViewController {
 
     var state: ParsedObjectType = .genre
-    let syncSemaphore = DispatchSemaphore(value: 1)
     var parsedObjectCount: Int = 0
     var parsedObjectPercent: Float = 0.0
     var libObjectsToParseCount: Int = 1
@@ -120,59 +119,58 @@ class SyncVC: UIViewController {
 
 extension SyncVC: SyncCallbacks {
     
-    func notifyParsedObject(ofType parsedObjectType: ParsedObjectType) {
-        syncSemaphore.wait()
-        guard parsedObjectType == state else {
-            syncSemaphore.signal()
-            return
+    nonisolated func notifyParsedObject(ofType parsedObjectType: ParsedObjectType) {
+        Task { @MainActor in
+            guard parsedObjectType == state else {
+                return
+            }
+            self.parsedObjectCount += 1
+            
+            var parsePercent: Float = 0.0
+            if self.libObjectsToParseCount > 0 {
+                parsePercent = min(Float(self.parsedObjectCount) / Float(self.libObjectsToParseCount), 1.0)
+            }
+            let percentDiff = Int(parsePercent*1000)-Int(self.parsedObjectPercent*1000)
+            if percentDiff > 0 {
+                self.updateSyncInfo(percentParsed: parsePercent)
+            }
+            self.parsedObjectPercent = parsePercent
         }
-        self.parsedObjectCount += 1
-        
-        var parsePercent: Float = 0.0
-        if self.libObjectsToParseCount > 0 {
-            parsePercent = min(Float(self.parsedObjectCount) / Float(self.libObjectsToParseCount), 1.0)
-        }
-        let percentDiff = Int(parsePercent*1000)-Int(self.parsedObjectPercent*1000)
-        if percentDiff > 0 {
-            self.updateSyncInfo(percentParsed: parsePercent)
-        }
-        self.parsedObjectPercent = parsePercent
-        syncSemaphore.signal()
     }
     
-    func notifySyncStarted(ofType parsedObjectType: ParsedObjectType, totalCount: Int) {
-        syncSemaphore.wait()
-        self.parsedObjectCount = 0
-        self.parsedObjectPercent = 0.0
-        self.state = parsedObjectType
-        self.libObjectsToParseCount = totalCount > 0 ? totalCount : 1
-        
-        if totalCount > 0 {
-            activitySpinner.stopAnimating()
-            activitySpinner.isHidden = true
-        } else {
-            activitySpinner.startAnimating()
-            activitySpinner.isHidden = false
+    nonisolated func notifySyncStarted(ofType parsedObjectType: ParsedObjectType, totalCount: Int) {
+        Task { @MainActor in
+            self.parsedObjectCount = 0
+            self.parsedObjectPercent = 0.0
+            self.state = parsedObjectType
+            self.libObjectsToParseCount = totalCount > 0 ? totalCount : 1
+            
+            if totalCount > 0 {
+                activitySpinner.stopAnimating()
+                activitySpinner.isHidden = true
+            } else {
+                activitySpinner.startAnimating()
+                activitySpinner.isHidden = false
+            }
+            progressLabel.isHidden = totalCount <= 0
+            
+            switch parsedObjectType {
+            case .artist:
+                self.updateSyncInfo(infoText: "Syncing artists ...", percentParsed: 0.0)
+            case .album:
+                self.updateSyncInfo(infoText: "Syncing albums ...", percentParsed: 0.0)
+            case .song:
+                self.updateSyncInfo(infoText: "Syncing songs ...", percentParsed: 0.0)
+            case .playlist:
+                self.updateSyncInfo(infoText: "Syncing playlists ...", percentParsed: 0.0)
+            case .genre:
+                self.updateSyncInfo(infoText: "Syncing genres ...", percentParsed: 0.0)
+            case .podcast:
+                self.updateSyncInfo(infoText: "Syncing podcasts ...", percentParsed: 0.0)
+            case .cache:
+                self.updateSyncInfo(infoText: "Applying cache ...", percentParsed: 0.0)
+            }
         }
-        progressLabel.isHidden = totalCount <= 0
-        
-        switch parsedObjectType {
-        case .artist:
-            self.updateSyncInfo(infoText: "Syncing artists ...", percentParsed: 0.0)
-        case .album:
-            self.updateSyncInfo(infoText: "Syncing albums ...", percentParsed: 0.0)
-        case .song:
-            self.updateSyncInfo(infoText: "Syncing songs ...", percentParsed: 0.0)
-        case .playlist:
-            self.updateSyncInfo(infoText: "Syncing playlists ...", percentParsed: 0.0)
-        case .genre:
-            self.updateSyncInfo(infoText: "Syncing genres ...", percentParsed: 0.0)
-        case .podcast:
-            self.updateSyncInfo(infoText: "Syncing podcasts ...", percentParsed: 0.0)
-        case .cache:
-            self.updateSyncInfo(infoText: "Applying cache ...", percentParsed: 0.0)
-        }
-        syncSemaphore.signal()
     }
 
 }

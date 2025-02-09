@@ -92,8 +92,10 @@ extension CarPlaySceneDelegate {
 }
 
 extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
-    func nowPlayingTemplateUpNextButtonTapped(_ nowPlayingTemplate: CPNowPlayingTemplate) {
-        self.interfaceController?.pushTemplate(playerQueueSection, animated: true, completion: nil)
+    nonisolated func nowPlayingTemplateUpNextButtonTapped(_ nowPlayingTemplate: CPNowPlayingTemplate) {
+        MainActor.assumeIsolated {
+            self.interfaceController?.pushTemplate(playerQueueSection, animated: true, completion: nil)
+        }
     }
     
     func createPlayerQueueSections() -> [CPListSection] {

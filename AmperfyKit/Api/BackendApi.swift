@@ -23,7 +23,7 @@ import Foundation
 import CoreData
 import CoreMedia
 
-public enum ParsedObjectType {
+public enum ParsedObjectType: Sendable {
     case artist
     case album
     case song

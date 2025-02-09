@@ -38,7 +38,7 @@ enum PlayableTableCellStyle {
     case artwork
 }
 
-class PlayableTableCell: BasicTableCell {
+@MainActor class PlayableTableCell: BasicTableCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
@@ -86,29 +86,32 @@ class PlayableTableCell: BasicTableCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        playContextCb = nil
+        // This must be called in Main thread
+        MainActor.assumeIsolated {
+            playContextCb = nil
 #if targetEnvironment(macCatalyst)
-        hoverGestureRecognizer = UIHoverGestureRecognizer(target: self, action: #selector(hovering(_:)))
-        self.addGestureRecognizer(hoverGestureRecognizer)
-        isHovered = false
-        doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(doubleTap))
-        doubleTapGestureRecognizer.numberOfTapsRequired = 2
-        self.addGestureRecognizer(doubleTapGestureRecognizer)
+            hoverGestureRecognizer = UIHoverGestureRecognizer(target: self, action: #selector(hovering(_:)))
+            self.addGestureRecognizer(hoverGestureRecognizer)
+            isHovered = false
+            doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(doubleTap))
+            doubleTapGestureRecognizer.numberOfTapsRequired = 2
+            self.addGestureRecognizer(doubleTapGestureRecognizer)
 #else
-        singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(singleTap))
-        singleTapGestureRecognizer.numberOfTapsRequired = 1
-        // to handle double and single tap recognizer in parallel:
-        //singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
-        self.addGestureRecognizer(singleTapGestureRecognizer)
+            singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(singleTap))
+            singleTapGestureRecognizer.numberOfTapsRequired = 1
+            // to handle double and single tap recognizer in parallel:
+            //singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
+            self.addGestureRecognizer(singleTapGestureRecognizer)
 #endif
-        
-        style = PlayableTableCellStyle.none
-        deleteButton.tintColor = .red
-        playOverArtworkButton.layer.backgroundColor = UIColor.imageOverlayBackground.cgColor
-        playOverArtworkButton.layer.cornerRadius = CornerRadius.small.asCGFloat
-        selectionStyle = .none
-        downloadProgress.isHidden = true
-        resetForReuse()
+            
+            style = PlayableTableCellStyle.none
+            deleteButton.tintColor = .red
+            playOverArtworkButton.layer.backgroundColor = UIColor.imageOverlayBackground.cgColor
+            playOverArtworkButton.layer.cornerRadius = CornerRadius.small.asCGFloat
+            selectionStyle = .none
+            downloadProgress.isHidden = true
+            resetForReuse()
+        }
     }
     
     func resetForReuse() {
@@ -124,24 +127,12 @@ class PlayableTableCell: BasicTableCell {
     }
     
 #if targetEnvironment(macCatalyst)
-    deinit {
-        unregister()
-    }
-    
     private func register() {
         guard !isNotificationRegistered else { return }
         appDelegate.notificationHandler.register(self, selector: #selector(self.playerPlay(notification:)), name: .playerPlay, object: nil)
         appDelegate.notificationHandler.register(self, selector: #selector(self.playerPause(notification:)), name: .playerPause, object: nil)
         appDelegate.notificationHandler.register(self, selector: #selector(self.playerStop(notification:)), name: .playerStop, object: nil)
         isNotificationRegistered = true
-    }
-    
-    private func unregister() {
-        guard isNotificationRegistered else { return }
-        appDelegate.notificationHandler.remove(self, name: .playerPlay, object: nil)
-        appDelegate.notificationHandler.remove(self, name: .playerPause, object: nil)
-        appDelegate.notificationHandler.remove(self, name: .playerStop, object: nil)
-        isNotificationRegistered = false
     }
 #endif
     
