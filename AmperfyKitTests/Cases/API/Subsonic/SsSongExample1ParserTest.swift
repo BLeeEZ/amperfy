@@ -24,8 +24,8 @@ import XCTest
 
 class SsSongExample1ParserTest: AbstractSsParserTest {
     
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         xmlData = getTestFileData(name: "album_example_1")
         ssParserDelegate = SsSongParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
         createTestPartner()

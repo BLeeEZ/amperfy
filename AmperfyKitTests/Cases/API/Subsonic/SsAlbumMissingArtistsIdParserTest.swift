@@ -25,8 +25,9 @@ import XCTest
 class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
     
     let albumId = "101941fb3433f9748a21d087cdccea3c"
-    override func setUp() {
-        super.setUp()
+    
+    override func setUp() async throws {
+        try await super.setUp()
         xmlData = getTestFileData(name: "album_missing_artistId")
         ssParserDelegate = SsSongParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
         createTestAlbum()

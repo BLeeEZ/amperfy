@@ -31,14 +31,31 @@ class MOCK_AVPlayerItem: AVPlayerItem {
 }
 
 class MOCK_AVPlayer: AVQueuePlayer {
-    var useMockCurrentItem = false
+    nonisolated(unsafe) private var _useMockCurrentItem: Bool = false
+    private let _useMockCurrentItemLock = NSLock()
+    nonisolated public var useMockCurrentItem: Bool {
+        get {
+            _useMockCurrentItemLock.withLock { _useMockCurrentItem }
+        }
+        set {
+            _useMockCurrentItemLock.withLock { _useMockCurrentItem = newValue }
+        }
+    }
     
+    nonisolated(unsafe) private var mockPlayerItem: AVPlayerItem?
+    nonisolated(unsafe) private var semaphore = DispatchSemaphore(value: 0)
+    
+    func useMockPlayerItem() {
+        guard let curItem = super.currentItem else { return }
+        mockPlayerItem = MOCK_AVPlayerItem(asset: curItem.asset)
+    }
+
     override var currentItem: AVPlayerItem? {
         guard let curItem = super.currentItem else { return nil }
         if !useMockCurrentItem {
             return curItem
         } else {
-            return MOCK_AVPlayerItem(asset: curItem.asset)
+            return mockPlayerItem
         }
     }
     
@@ -214,7 +231,7 @@ class MOCK_CoreDataManager: CoreDataManagable {
     var playlistThreeCached: Playlist!
     let fillCount = 5
 
-    override func setUp() {
+    override func setUp() async throws {
         cdHelper = CoreDataHelper()
         library = cdHelper.createSeededStorage()
         songDownloader = MOCK_SongDownloader()
@@ -1170,6 +1187,7 @@ class MOCK_CoreDataManager: CoreDataManagable {
         testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
         testPlayer.seek(toSecond: 3.0)
         mockAVPlayer.useMockCurrentItem = true
+        mockAVPlayer.useMockPlayerItem()
         let elapsedTime = testPlayer.elapsedTime
         XCTAssertEqual(elapsedTime, 3.0)
         mockAVPlayer.useMockCurrentItem = false
@@ -1198,6 +1216,7 @@ class MOCK_CoreDataManager: CoreDataManagable {
         XCTAssertFalse(testPlayer.isStopInsteadOfPause)
         testPlayer.seek(toSecond: 10.0)
         mockAVPlayer.useMockCurrentItem = true
+        mockAVPlayer.useMockPlayerItem()
         testPlayer.playPreviousOrReplay()
         mockAVPlayer.useMockCurrentItem = false
         XCTAssertTrue(testPlayer.isSkipAvailable)

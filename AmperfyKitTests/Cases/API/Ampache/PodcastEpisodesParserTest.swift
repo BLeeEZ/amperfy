@@ -26,8 +26,8 @@ class PodcastEpisodesParserTest: AbstractAmpacheTest {
     
     var testPodcast: Podcast?
     
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         xmlData = getTestFileData(name: "podcast_episodes")
         testPodcast = library.createPodcast()
         recreateParserDelegate()

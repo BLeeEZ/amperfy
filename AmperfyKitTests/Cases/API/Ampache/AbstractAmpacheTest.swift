@@ -30,7 +30,7 @@ import XCTest
     var xmlErrorData: Data!
     var parserDelegate: AmpacheXmlParser?
 
-    override func setUp() {
+    override func setUp() async throws {
         cdHelper = CoreDataHelper()
         let context = cdHelper.createInMemoryManagedObjectContext()
         cdHelper.clearContext(context: context)

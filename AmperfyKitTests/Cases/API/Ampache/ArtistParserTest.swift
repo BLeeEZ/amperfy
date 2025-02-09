@@ -24,8 +24,8 @@ import XCTest
 
 class ArtistParserTest: AbstractAmpacheTest {
     
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         xmlData = getTestFileData(name: "artists")
         recreateParserDelegate()
     }

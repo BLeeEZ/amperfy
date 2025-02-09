@@ -31,8 +31,8 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
         parserDelegate = PlaylistSongsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), playlist: playlist, library: library)
     }
     
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         playlist = library.createPlaylist()
         xmlData = getTestFileData(name: "playlist_songs")
         recreateParserDelegate()

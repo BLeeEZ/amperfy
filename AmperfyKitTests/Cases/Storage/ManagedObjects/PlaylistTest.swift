@@ -31,7 +31,7 @@ import XCTest
     var playlistThreeCached: Playlist!
     var playlistNoCached: Playlist!
 
-    override func setUp() {
+    override func setUp() async throws {
         cdHelper = CoreDataHelper()
         library = cdHelper.createSeededStorage()
         guard let playlist = library.getPlaylist(id: cdHelper.seeder.playlists[0].id) else { XCTFail(); return }

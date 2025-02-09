@@ -32,7 +32,7 @@ import XCTest
     var testPodcastPlaylist: Playlist!
     let fillCount = 5
 
-    override func setUp() {
+    override func setUp() async throws {
         cdHelper = CoreDataHelper()
         library = cdHelper.createSeededStorage()
         testPlayer = library.getPlayerData()

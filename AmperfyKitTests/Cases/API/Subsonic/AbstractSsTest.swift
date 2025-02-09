@@ -39,7 +39,7 @@ class MOCK_SubsonicUrlCreator: SubsonicUrlCreator {
     var subsonicUrlCreator: MOCK_SubsonicUrlCreator!
     var ssParserDelegate: SsXmlParser?
 
-    override func setUp() {
+    override func setUp() async throws {
         cdHelper = CoreDataHelper()
         context = cdHelper.createInMemoryManagedObjectContext()
         cdHelper.clearContext(context: context)

@@ -28,7 +28,7 @@ import XCTest
     var library: LibraryStorage!
     var testArtwork: Artwork!
 
-    override func setUp() {
+    override func setUp() async throws {
         cdHelper = CoreDataHelper()
         library = cdHelper.createSeededStorage()
         testArtwork = library.createArtwork()

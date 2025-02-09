@@ -24,8 +24,8 @@ import XCTest
 
 class SsGenreParserTest: AbstractSsParserTest {
 
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         xmlData = getTestFileData(name: "genres_example_1")
         ssParserDelegate = SsGenreParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, parseNotifier: nil)
     }

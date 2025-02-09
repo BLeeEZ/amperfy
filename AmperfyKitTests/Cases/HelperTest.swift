@@ -27,7 +27,7 @@ import XCTest
     var cdHelper: CoreDataHelper!
     var library: LibraryStorage!
 
-    override func setUp() {
+    override func setUp() async throws {
         cdHelper = CoreDataHelper()
         library = cdHelper.createSeededStorage()
     }

@@ -29,7 +29,7 @@ import XCTest
     var testSong: Song!
     let testId = "2345"
 
-    override func setUp() {
+    override func setUp() async throws {
         cdHelper = CoreDataHelper()
         library = cdHelper.createSeededStorage()
         testSong = library.createSong()

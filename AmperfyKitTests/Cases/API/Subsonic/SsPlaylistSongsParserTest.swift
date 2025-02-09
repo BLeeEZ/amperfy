@@ -27,8 +27,8 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     var playlist: Playlist!
     var createdSongCount = 0
     
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         xmlData = getTestFileData(name: "playlist_example_1")
         playlist = library.createPlaylist()
         recreateParserDelegate()

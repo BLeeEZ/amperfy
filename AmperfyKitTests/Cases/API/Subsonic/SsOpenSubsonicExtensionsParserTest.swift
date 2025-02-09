@@ -24,8 +24,8 @@ import XCTest
 
 class SsOpenSubsonicExtensionsParserTest: AbstractSsParserTest {
     
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         xmlData = getTestFileData(name: "OpenSubsonicExtensions_example_1")
         ssParserDelegate = SsOpenSubsonicExtensionsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
     }

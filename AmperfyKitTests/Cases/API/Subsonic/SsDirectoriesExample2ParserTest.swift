@@ -26,8 +26,8 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
     
     var directory: Directory!
     
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         xmlData = getTestFileData(name: "directory_example_2")
         directory = library.createDirectory()
         recreateParserDelegate()

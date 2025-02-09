@@ -29,7 +29,7 @@ import XCTest
     var testAlbum: Album!
     let testId = "23489"
 
-    override func setUp() {
+    override func setUp() async throws {
         cdHelper = CoreDataHelper()
         library = cdHelper.createSeededStorage()
         testAlbum = library.createAlbum()

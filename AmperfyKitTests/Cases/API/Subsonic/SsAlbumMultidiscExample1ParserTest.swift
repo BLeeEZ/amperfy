@@ -25,8 +25,9 @@ import XCTest
 class SsAlbumMultidiscExample1ParserTest: AbstractSsParserTest {
     
     let albumId = "e209ff7a279e487ea2f37a4a3e7ed563"
-    override func setUp() {
-        super.setUp()
+    
+    override func setUp() async throws {
+        try await super.setUp()
         xmlData = getTestFileData(name: "album_multidisc_example_1")
         ssParserDelegate = SsSongParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
         createTestAlbum()
