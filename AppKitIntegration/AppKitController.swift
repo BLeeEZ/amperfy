@@ -27,7 +27,7 @@ extension NSObject {
 	}
 }
 
-class AppKitController: NSObject {
+@MainActor class AppKitController: NSObject {
     // we currently support:
     // - fullSizeContentView: Bool
     // - miniaturizable: Bool
