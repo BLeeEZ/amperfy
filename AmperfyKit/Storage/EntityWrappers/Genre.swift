@@ -44,9 +44,6 @@ public class Genre: AbstractLibraryEntity {
             }
         }
     }
-    public var duration: Int {
-        return playables.reduce(0){ $0 + $1.duration }
-    }
     public var artistCount: Int {
         get { return Int(managedObject.artistCount) }
     }

@@ -328,7 +328,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         storage.main.saveContext()
     }
     
-    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @Sendable @escaping () -> Void) {
         os_log("handleEventsForBackgroundURLSession: %s", log: self.log, type: .info, identifier)
         playableDownloadManager.backgroundFetchCompletionHandler = completionHandler
     }

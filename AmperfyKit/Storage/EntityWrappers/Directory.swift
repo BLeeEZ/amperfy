@@ -84,9 +84,6 @@ extension Directory: PlayableContainable  {
             if isCached {
                 infoContent.append("Cached")
             }
-            if duration > 0 {
-                infoContent.append("\(duration.asDurationString)")
-            }
             if details.isShowDetailedInfo {
                 infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
             }
@@ -109,7 +106,4 @@ extension Directory: PlayableContainable  {
         return ArtworkCollection(defaultImage: .getGeneratedArtwork(theme: theme, artworkType: .folder), singleImageEntity: self)
     }
     public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .directory, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
-    public var duration: Int {
-        playables.reduce(0){ $0 + $1.duration }
-    }
 }

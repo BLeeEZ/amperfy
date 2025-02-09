@@ -74,7 +74,7 @@ public protocol PlayableContainable {
     var isRateable: Bool { get }
     var isDownloadAvailable: Bool { get }
     @MainActor func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection
-    func cachePlayables(downloadManager: DownloadManageable)
+    @MainActor func cachePlayables(downloadManager: DownloadManageable)
     @MainActor func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) async throws
     var isFavoritable: Bool { get }
     var isFavorite: Bool { get }
