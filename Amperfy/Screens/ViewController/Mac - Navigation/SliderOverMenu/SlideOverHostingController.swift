@@ -244,7 +244,7 @@ class SlideOverHostingController: UIViewController {
     }
 
     @objc func settingsDidChange() {
-        DispatchQueue.main.async {
+        Task { @MainActor in
             self.navigationItem.leftBarButtonItems?.forEach { ($0 as? Refreshable)?.reload() }
             self.updateButtonVisibility()
             self.slideOverViewController.settingsDidChange()

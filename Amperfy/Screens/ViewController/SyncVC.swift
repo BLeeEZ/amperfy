@@ -94,13 +94,11 @@ class SyncVC: UIViewController {
     }
     
     private func updateSyncInfo(infoText: String? = nil, percentParsed: Float = 0.0) {
-        DispatchQueue.main.async {
-            if let infoText = infoText {
-                self.progressInfo.text = infoText
-            }
-            self.progressBar.setProgress(percentParsed, animated: percentParsed != 0.0)
-            self.progressLabel.text = String(format: "%.1f", percentParsed * 100) + "%"
+        if let infoText = infoText {
+            self.progressInfo.text = infoText
         }
+        self.progressBar.setProgress(percentParsed, animated: percentParsed != 0.0)
+        self.progressLabel.text = String(format: "%.1f", percentParsed * 100) + "%"
     }
 
     @IBAction func skipPressed(_ sender: Any) {

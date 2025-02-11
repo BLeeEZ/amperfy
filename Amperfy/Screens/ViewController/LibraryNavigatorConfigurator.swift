@@ -118,7 +118,8 @@ class SearchNavigationItemContentView: UISearchBar, UIContentView, UISearchBarDe
         self.currentConfiguration = config
         self.isUserInteractionEnabled = config.selected
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        Task { @MainActor in
+            try await Task.sleep(nanoseconds: 100_000_000)
             if config.selected {
                 self.becomeFirstResponder()
             } else {

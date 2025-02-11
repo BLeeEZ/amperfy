@@ -78,7 +78,7 @@ import os.log
             (output.portType == AVAudioSession.Port.headphones ||
              output.portType == AVAudioSession.Port.bluetoothA2DP) {
                 os_log(.info, "Audio Session: headphones connected")
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.musicPlayer?.play()
                 }
                 break
@@ -90,7 +90,7 @@ import os.log
                 (output.portType == AVAudioSession.Port.headphones ||
                  output.portType == AVAudioSession.Port.bluetoothA2DP) {
                     os_log(.info, "Audio Session: headphones disconnected")
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         self.musicPlayer?.pause()
                     }
                     break

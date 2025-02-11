@@ -351,7 +351,8 @@ class SplitVC: UISplitViewController {
                    hostingTabViewControllers.count >= 2,
                    let searchTabNavVC = hostingTabViewControllers[1] as? UINavigationController {
                     tabBar.selectedIndex = 1
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
+                    Task {
+                        try await Task.sleep(nanoseconds: 500_000_000)
                         if let searchTabVC = searchTabNavVC.visibleViewController as? SearchVC {
                             searchTabVC.activateSearchBar()
                         }
@@ -360,7 +361,8 @@ class SplitVC: UISplitViewController {
             } else {
                 let searchVC = TabNavigatorItem.search.controller
                 self.setViewController(self.embeddInNavigation(vc: searchVC), for: .secondary)
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
+                Task {
+                    try await Task.sleep(nanoseconds: 500_000_000)
                     if let activeSearchVC = searchVC as? SearchVC {
                         activeSearchVC.activateSearchBar()
                     }

@@ -377,7 +377,6 @@
 		50C9D6C5284FAB0C007F18D0 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92FD21CED4AF00E5901D /* Utilities.swift */; };
 		50C9D6C7284FAB0C007F18D0 /* LogData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288626564C6800DA3A8F /* LogData.swift */; };
 		50C9D6C9284FAB0C007F18D0 /* EventNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED2B9027B7AE8500331BF7 /* EventNotificationHandler.swift */; };
-		50C9D6D0284FAB0C007F18D0 /* ConcurrentTaskGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */; };
 		50C9D6D2284FAB0C007F18D0 /* StringHasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87822397B2900546F5A /* StringHasher.swift */; };
 		50C9D6D3284FAB0C007F18D0 /* JSONConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288826564F3600DA3A8F /* JSONConverter.swift */; };
 		50C9D6D4284FAB88007F18D0 /* PlayerDownloadPreparationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048F9427590FAD0087EDFB /* PlayerDownloadPreparationHandler.swift */; };
@@ -903,7 +902,6 @@
 		50CA61232D4CE9E500EEF515 /* podcast_example_1.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = podcast_example_1.xml; sourceTree = "<group>"; };
 		50CA61252D4D191100EEF515 /* PodcastEpisodeTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastEpisodeTest.swift; sourceTree = "<group>"; };
 		50CA61272D4D72F600EEF515 /* Amperfy v44.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v44.xcdatamodel"; sourceTree = "<group>"; };
-		50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentTaskGroup.swift; sourceTree = "<group>"; };
 		50CCD0562B6C38670073793B /* PlainDetailsVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlainDetailsVC.xib; sourceTree = "<group>"; };
 		50CCD0582B6C388B0073793B /* PlainDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainDetailsVC.swift; sourceTree = "<group>"; };
 		50CDF201264BB1C000F83EF6 /* EventLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventLogger.swift; sourceTree = "<group>"; };
@@ -1199,7 +1197,6 @@
 				5029288826564F3600DA3A8F /* JSONConverter.swift */,
 				5029288626564C6800DA3A8F /* LogData.swift */,
 				5040B2C3269CD19600911451 /* LocalNotificationManager.swift */,
-				50CA8E962601E06500C90791 /* ConcurrentTaskGroup.swift */,
 				50ED2B9027B7AE8500331BF7 /* EventNotificationHandler.swift */,
 				505CA1F42B848B8300AA81CD /* QuickActionsHandler.swift */,
 				5021B1272BC723F400893C33 /* FuzzySearcher.swift */,
@@ -2556,7 +2553,6 @@
 				50C9D654284FAA02007F18D0 /* SsPlayableParserDelegate.swift in Sources */,
 				50E77DB428D1B63200BDF882 /* LibraryDisplaySettings.swift in Sources */,
 				50C9D64D284FAA02007F18D0 /* SubsonicArtworkDownloadDelegate.swift in Sources */,
-				50C9D6D0284FAB0C007F18D0 /* ConcurrentTaskGroup.swift in Sources */,
 				50BE5D9828511C3800156FC6 /* Amperfy.xcdatamodeld in Sources */,
 				50C9D65B284FAA0B007F18D0 /* PodcastParserDelegate.swift in Sources */,
 				50C9D67F284FAA6C007F18D0 /* LogEntryMO+CoreDataProperties.swift in Sources */,
